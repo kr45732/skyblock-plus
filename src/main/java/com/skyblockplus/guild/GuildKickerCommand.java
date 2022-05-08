@@ -154,30 +154,30 @@ public class GuildKickerCommand extends Command {
 				}
 			}
 
-			paginateBuilder.getPaginatorExtras()
-					.setEveryPageTitle("Guild Kick Helper")
-					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-					.setEveryPageText(
-						"**Total missing requirements:** " +
-						missingReqsCount +
-						"\n**Updated:** <t:" +
-						Instant
-							.parse(
-								higherDepth(
-									streamJsonArray(
-										higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard"), "data").getAsJsonArray()
-									)
-										.filter(g -> higherDepth(g, "id").getAsString().equals(guildId))
-										.findFirst()
-										.get(),
-									"last_updated_at"
+			paginateBuilder
+				.getPaginatorExtras()
+				.setEveryPageTitle("Guild Kick Helper")
+				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+				.setEveryPageText(
+					"**Total missing requirements:** " +
+					missingReqsCount +
+					"\n**Updated:** <t:" +
+					Instant
+						.parse(
+							higherDepth(
+								streamJsonArray(
+									higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard"), "data").getAsJsonArray()
 								)
-									.getAsString()
+									.filter(g -> higherDepth(g, "id").getAsString().equals(guildId))
+									.findFirst()
+									.get(),
+								"last_updated_at"
 							)
-							.getEpochSecond() +
-						":R>\n"
-					);
-
+								.getAsString()
+						)
+						.getEpochSecond() +
+					":R>\n"
+				);
 		} else {
 			String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
@@ -289,16 +289,16 @@ public class GuildKickerCommand extends Command {
 				}
 			}
 
-			paginateBuilder.getPaginatorExtras()
-					.setEveryPageTitle("Guild Kick Helper")
-					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-					.setEveryPageText(
-						"**Total missing requirements:** " +
-						paginateBuilder.size() +
-						(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
-						"\n"
-					)
-			;
+			paginateBuilder
+				.getPaginatorExtras()
+				.setEveryPageTitle("Guild Kick Helper")
+				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+				.setEveryPageText(
+					"**Total missing requirements:** " +
+					paginateBuilder.size() +
+					(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
+					"\n"
+				);
 		}
 		event.paginate(paginateBuilder);
 		return null;

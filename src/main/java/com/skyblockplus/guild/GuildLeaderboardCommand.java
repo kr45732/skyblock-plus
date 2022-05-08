@@ -188,11 +188,11 @@ public class GuildLeaderboardCommand extends Command {
 			) +
 			(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "");
 
-		paginateBuilder.getExtras()
-				.setEveryPageTitle(guildName)
-				.setEveryPageText(ebStr)
-				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-		;
+		paginateBuilder
+			.getExtras()
+			.setEveryPageTitle(guildName)
+			.setEveryPageText(ebStr)
+			.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId);
 		event.paginate(paginateBuilder, (guildRank / 20) + 1);
 
 		return null;

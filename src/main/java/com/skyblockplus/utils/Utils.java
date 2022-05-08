@@ -1147,9 +1147,7 @@ public class Utils {
 					if (!item.isEmpty()) {
 						InvItem itemInfo = new InvItem();
 						itemInfo.setName(item.getString("tag.display.Name", "None"));
-						itemInfo.setLore(
-							item.getList("tag.display.Lore").stream().map(line -> (String) line).collect(Collectors.toList())
-						);
+						itemInfo.setLore(item.getList("tag.display.Lore").stream().map(line -> (String) line).collect(Collectors.toList()));
 						itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
 						itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
 						itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));

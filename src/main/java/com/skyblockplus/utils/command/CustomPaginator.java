@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -457,11 +456,11 @@ public class CustomPaginator extends Menu {
 			};
 		}
 
-		public PaginatorExtras getExtras(){
+		public PaginatorExtras getExtras() {
 			return extras;
 		}
 
-		public CustomPaginator.Builder updateExtras(Function<PaginatorExtras, PaginatorExtras> extras){
+		public CustomPaginator.Builder updateExtras(Function<PaginatorExtras, PaginatorExtras> extras) {
 			extras.apply(this.extras);
 			return this;
 		}

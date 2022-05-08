@@ -18,19 +18,12 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.rendering.LoreRenderer;
 import com.skyblockplus.utils.structs.InvItem;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.Instant;
@@ -39,8 +32,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.utils.Utils.*;
+import javax.imageio.ImageIO;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 
 public class InventoryListPaginator {
 
@@ -60,31 +59,46 @@ public class InventoryListPaginator {
 		this.event = event;
 		this.renderedCache = new HashMap<>();
 		this.key = Instant.now().getEpochSecond() + "_" + player.getUuid() + "_";
-		this.player =  player;
+		this.player = player;
 		this.maxPageNumber = items.size() - 1;
 		this.lastEdit = Instant.now();
 		this.pageNumber = Math.min(Math.max(0, slot - 1), maxPageNumber);
 
 		MessageAction action;
-		EmbedBuilder eb = player.defaultPlayerEmbed().setThumbnail(null).setFooter("By CrypticPlasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null);
+		EmbedBuilder eb = player
+			.defaultPlayerEmbed()
+			.setThumbnail(null)
+			.setFooter("By CrypticPlasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null);
 		InvItem item = items.get(pageNumber);
 		if (item == null) {
 			eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
 			action = event.getChannel().sendMessageEmbeds(eb.build());
 		} else {
-			eb.setDescription("**Item:** " + (item.getCount() > 1 ? (item.getName() + "x ") : "") + item.getName() + "\n**Slot:** " + (pageNumber + 1)
-					+ "\n**Item Creation:** " + item.getCreationTimestamp()).setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId()).setImage("attachment://lore.png");
+			eb
+				.setDescription(
+					"**Item:** " +
+					(item.getCount() > 1 ? (item.getName() + "x ") : "") +
+					item.getName() +
+					"\n**Slot:** " +
+					(pageNumber + 1) +
+					"\n**Item Creation:** " +
+					item.getCreationTimestamp()
+				)
+				.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
+				.setImage("attachment://lore.png");
 			action = event.getChannel().sendMessageEmbeds(eb.build()).addFile(new File(getRenderedLore()), "lore.png");
 		}
-		this.message = action
+		this.message =
+			action
 				.setActionRow(
-						Button
-								.primary("inv_list_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
-								.withDisabled(pageNumber == 0),
-						Button
-								.primary("inv_list_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
-								.withDisabled(pageNumber == maxPageNumber)
-				).complete();
+					Button
+						.primary("inv_list_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
+						.withDisabled(pageNumber == 0),
+					Button
+						.primary("inv_list_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+						.withDisabled(pageNumber == maxPageNumber)
+				)
+				.complete();
 
 		waitForEvent();
 	}
@@ -111,7 +125,11 @@ public class InventoryListPaginator {
 	}
 
 	private boolean condition(ButtonInteractionEvent event) {
-		return (event.isFromGuild() && event.getUser().getId().equals(this.event.getUser().getId()) && event.getMessageId().equals(message.getId()));
+		return (
+			event.isFromGuild() &&
+			event.getUser().getId().equals(this.event.getUser().getId()) &&
+			event.getMessageId().equals(message.getId())
+		);
 	}
 
 	public void action(ButtonInteractionEvent event) {
@@ -131,21 +149,35 @@ public class InventoryListPaginator {
 
 			List<Button> curButtons = event.getMessage().getButtons();
 			MessageEditCallbackAction action;
-			EmbedBuilder eb = player.defaultPlayerEmbed().setThumbnail(null).setFooter("By CrypticPlasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null);
+			EmbedBuilder eb = player
+				.defaultPlayerEmbed()
+				.setThumbnail(null)
+				.setFooter("By CrypticPlasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null);
 			InvItem item = items.get(pageNumber);
 			if (item == null) {
 				eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
 				action = event.editMessageEmbeds(eb.build());
 			} else {
-				eb.setDescription("**Item:** " + (item.getCount() > 1 ? (item.getName() + "x ") : "") + item.getName() + "\n**Slot:** " + (pageNumber + 1)
-						+ "\n**Item Creation:** " + item.getCreationTimestamp()).setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId()).setImage("attachment://lore.png");
-				action = event .editMessageEmbeds(eb.build()).retainFiles().addFile(new File(getRenderedLore()), "lore.png");
+				eb
+					.setDescription(
+						"**Item:** " +
+						(item.getCount() > 1 ? (item.getName() + "x ") : "") +
+						item.getName() +
+						"\n**Slot:** " +
+						(pageNumber + 1) +
+						"\n**Item Creation:** " +
+						item.getCreationTimestamp()
+					)
+					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
+					.setImage("attachment://lore.png");
+				action = event.editMessageEmbeds(eb.build()).retainFiles().addFile(new File(getRenderedLore()), "lore.png");
 			}
 			action
-					.setActionRow(
-							pageNumber == 0 ? curButtons.get(0).asDisabled() : curButtons.get(0).asEnabled(),
-							pageNumber == (maxPageNumber) ? curButtons.get(1).asDisabled() : curButtons.get(1).asEnabled()
-					).queue();
+				.setActionRow(
+					pageNumber == 0 ? curButtons.get(0).asDisabled() : curButtons.get(0).asEnabled(),
+					pageNumber == (maxPageNumber) ? curButtons.get(1).asDisabled() : curButtons.get(1).asEnabled()
+				)
+				.queue();
 		}
 
 		waitForEvent();
@@ -153,21 +185,17 @@ public class InventoryListPaginator {
 
 	private void waitForEvent() {
 		waiter.waitForEvent(
-				ButtonInteractionEvent.class,
-				this::condition,
-				this::action,
-				30,
-				TimeUnit.SECONDS,
-				() -> {
-					message
-							.editMessageComponents(
-
-							)
-							.queue(ignore, ignore);
-					for (File file : loreRenderDir.listFiles(file -> file.getName().startsWith(key))) {
-						file.delete();
-					}
+			ButtonInteractionEvent.class,
+			this::condition,
+			this::action,
+			30,
+			TimeUnit.SECONDS,
+			() -> {
+				message.editMessageComponents().queue(ignore, ignore);
+				for (File file : loreRenderDir.listFiles(file -> file.getName().startsWith(key))) {
+					file.delete();
 				}
+			}
 		);
 	}
 }

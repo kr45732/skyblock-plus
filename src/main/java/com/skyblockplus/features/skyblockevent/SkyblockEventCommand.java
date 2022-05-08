@@ -326,11 +326,14 @@ public class SkyblockEventCommand extends Command {
 			}
 
 			if (paginateBuilder.size() > 0) {
-				paginateBuilder.updateExtras(extra ->
-					extra
-						.setEveryPageTitle("Event Leaderboard")
-						.setEveryPageText("**Last Updated:** <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>\n")
-				).build().paginate(event.getHook(), 0);
+				paginateBuilder
+					.updateExtras(extra ->
+						extra
+							.setEveryPageTitle("Event Leaderboard")
+							.setEveryPageText("**Last Updated:** <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>\n")
+					)
+					.build()
+					.paginate(event.getHook(), 0);
 				return null;
 			}
 
@@ -408,11 +411,13 @@ public class SkyblockEventCommand extends Command {
 					minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
 				}
 
-				event.paginate(paginateBuilder.updateExtras(
-					extra -> extra
-						.setEveryPageTitle("Event Leaderboard")
-						.setEveryPageText("**Last Updated " + minutesSinceUpdateString + " ago**\n")
-				));
+				event.paginate(
+					paginateBuilder.updateExtras(extra ->
+						extra
+							.setEveryPageTitle("Event Leaderboard")
+							.setEveryPageText("**Last Updated " + minutesSinceUpdateString + " ago**\n")
+					)
+				);
 				return null;
 			}
 

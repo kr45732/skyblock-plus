@@ -26,6 +26,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.skyblockplus.utils.rendering.GifWriter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -38,8 +39,6 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-
-import com.skyblockplus.utils.rendering.GifWriter;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Icon;

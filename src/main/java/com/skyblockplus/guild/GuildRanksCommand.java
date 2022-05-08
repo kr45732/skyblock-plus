@@ -370,16 +370,16 @@ public class GuildRanksCommand extends Command {
 				}
 			}
 
-			paginateBuilder.getExtras()
-					.setEveryPageTitle("Rank changes for " + guildName)
-					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-					.setEveryPageText(
-						"**Total rank changes:** " +
-						totalChange +
-						(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
-						"\n"
-					)
-			;
+			paginateBuilder
+				.getExtras()
+				.setEveryPageTitle("Rank changes for " + guildName)
+				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+				.setEveryPageText(
+					"**Total rank changes:** " +
+					totalChange +
+					(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
+					"\n"
+				);
 			event.paginate(paginateBuilder);
 		} else {
 			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
@@ -438,16 +438,16 @@ public class GuildRanksCommand extends Command {
 				}
 			}
 
-			paginateBuilder.getExtras()
-					.setEveryPageTitle("Rank changes for " + guildName)
-					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-					.setEveryPageText(
-						"**Total rank changes:** " +
-						totalChange +
-						(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
-						"\n"
-					)
-			;
+			paginateBuilder
+				.getExtras()
+				.setEveryPageTitle("Rank changes for " + guildName)
+				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+				.setEveryPageText(
+					"**Total rank changes:** " +
+					totalChange +
+					(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
+					"\n"
+				);
 			if (paginateBuilder.size() == 0) {
 				return defaultEmbed("No rank changes");
 			}

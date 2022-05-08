@@ -984,7 +984,11 @@ public class AutomaticGuild {
 	}
 
 	public void onButtonClick(ButtonInteractionEvent event) {
-		if (event.getComponentId().startsWith("paginator_") || event.getComponentId().startsWith("inv_paginator_") || event.getComponentId().startsWith("inv_list_paginator_")) {
+		if (
+			event.getComponentId().startsWith("paginator_") ||
+			event.getComponentId().startsWith("inv_paginator_") ||
+			event.getComponentId().startsWith("inv_list_paginator_")
+		) {
 			return;
 		} else if (event.getComponentId().equals("mayor_graph_button")) {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();

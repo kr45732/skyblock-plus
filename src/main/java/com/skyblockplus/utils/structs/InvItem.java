@@ -49,12 +49,12 @@ public class InvItem {
 	private int dungeonFloor = 0;
 	private NBTCompound nbtTag;
 
-	public String getName(){
+	public String getName() {
 		return getName(true);
 	}
 
-	public String getName(boolean parseMcCodes){
-		return  parseMcCodes ? parseMcCodes(name) : name;
+	public String getName(boolean parseMcCodes) {
+		return parseMcCodes ? parseMcCodes(name) : name;
 	}
 
 	public String getFormattedId() {

@@ -52,9 +52,14 @@ public class DungeonsCommand extends Command {
 					.defaultPlayerPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS)
 					.setColumns(3)
 					.setItemsPerPage(9);
-				PaginatorExtras extras = paginateBuilder.getPaginatorExtras().setEveryPageText(
-					"**Secrets:** " + formatNumber(player.getDungeonSecrets()) + "\n**Selected Class:** " + player.getSelectedDungeonClass()
-				);
+				PaginatorExtras extras = paginateBuilder
+					.getPaginatorExtras()
+					.setEveryPageText(
+						"**Secrets:** " +
+						formatNumber(player.getDungeonSecrets()) +
+						"\n**Selected Class:** " +
+						player.getSelectedDungeonClass()
+					);
 
 				SkillsStruct skillInfo = player.getCatacombs();
 				extras.addEmbedField(
