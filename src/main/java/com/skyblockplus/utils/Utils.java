@@ -1237,7 +1237,7 @@ public class Utils {
 
 						if (item.containsKey("tag.ExtraAttributes.upgrade_level")) {
 							JsonElement itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items");
-							if(itemUpgrades != null) {
+							if (itemUpgrades != null) {
 								int crimsonStar = item.getInt("tag.ExtraAttributes.upgrade_level", 0);
 								for (Map.Entry<String, JsonElement> entry : itemUpgrades.getAsJsonObject().entrySet()) {
 									if (Integer.parseInt(entry.getKey()) > crimsonStar) {

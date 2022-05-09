@@ -218,7 +218,7 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onButtonInteraction(ButtonInteractionEvent event) {
-		if(event.isAcknowledged()){
+		if (event.isAcknowledged()) {
 			return;
 		}
 

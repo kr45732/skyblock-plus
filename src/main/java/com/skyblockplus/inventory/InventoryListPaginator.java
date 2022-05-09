@@ -133,7 +133,7 @@ public class InventoryListPaginator {
 	}
 
 	public void action(ButtonInteractionEvent event) {
-		if(event.isAcknowledged()){
+		if (event.isAcknowledged()) {
 			return;
 		}
 

@@ -84,15 +84,14 @@ public class JacobHandler {
 
 							int updateCount = 0;
 							for (AutomaticGuild guild : guildMap.values()) {
-								if(guild.onFarmingContest(nextContest.getCrops(), embed)){
-									updateCount ++;
+								if (guild.onFarmingContest(nextContest.getCrops(), embed)) {
+									updateCount++;
 								}
 
-								if(updateCount != 0 && updateCount % 25 == 0){
+								if (updateCount != 0 && updateCount % 25 == 0) {
 									try {
 										TimeUnit.SECONDS.sleep(1);
-									} catch (Exception ignored) {
-									}
+									} catch (Exception ignored) {}
 								}
 							}
 							queue();

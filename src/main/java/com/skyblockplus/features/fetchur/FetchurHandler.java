@@ -43,15 +43,14 @@ public class FetchurHandler {
 
 				int updateCount = 0;
 				for (AutomaticGuild guild : guildMap.values()) {
-					if(guild.onFetchur(embed)){
-						updateCount ++;
+					if (guild.onFetchur(embed)) {
+						updateCount++;
 					}
 
-					if(updateCount != 0 && updateCount % 25 == 0){
+					if (updateCount != 0 && updateCount % 25 == 0) {
 						try {
 							TimeUnit.SECONDS.sleep(1);
-						} catch (Exception ignored) {
-						}
+						} catch (Exception ignored) {}
 					}
 				}
 			},

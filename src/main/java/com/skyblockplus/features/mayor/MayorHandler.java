@@ -148,15 +148,14 @@ public class MayorHandler {
 		MessageEmbed embed = eb.build();
 		int updateCount = 0;
 		for (AutomaticGuild guild : guildMap.values()) {
-			if(guild.onMayorElected(embed)){ // Send and ping
-				updateCount ++;
+			if (guild.onMayorElected(embed)) { // Send and ping
+				updateCount++;
 			}
 
-			if(updateCount != 0 && updateCount % 25 == 0){
+			if (updateCount != 0 && updateCount % 25 == 0) {
 				try {
 					TimeUnit.SECONDS.sleep(1);
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 			}
 		}
 	}
@@ -220,15 +219,14 @@ public class MayorHandler {
 
 			int updateCount = 0;
 			for (AutomaticGuild guild : guildMap.values()) {
-				if(guild.onMayorElection(embed, button, year)){ // Send or update message
-					updateCount ++;
+				if (guild.onMayorElection(embed, button, year)) { // Send or update message
+					updateCount++;
 				}
 
-				if(updateCount != 0 && updateCount % 25 == 0){
+				if (updateCount != 0 && updateCount % 25 == 0) {
 					try {
 						TimeUnit.SECONDS.sleep(1);
-					} catch (Exception ignored) {
-					}
+					} catch (Exception ignored) {}
 				}
 			}
 		} catch (Exception e) {

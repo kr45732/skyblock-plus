@@ -64,7 +64,7 @@ public class SlashCommandClient extends ListenerAdapter {
 
 	@Override
 	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-		if(event.isAcknowledged()){
+		if (event.isAcknowledged()) {
 			return;
 		}
 
