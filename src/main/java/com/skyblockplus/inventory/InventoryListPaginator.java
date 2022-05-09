@@ -174,9 +174,9 @@ public class InventoryListPaginator {
 					)
 					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
 					.setImage("attachment://lore.png");
-				action = event.editMessageEmbeds(eb.build()).retainFiles().addFile(new File(getRenderedLore()), "lore.png");
+				action = event.editMessageEmbeds(eb.build()).addFile(new File(getRenderedLore()), "lore.png");
 			}
-			action
+			action.retainFiles()
 				.setActionRow(
 					pageNumber == 0 ? curButtons.get(0).asDisabled() : curButtons.get(0).asEnabled(),
 					pageNumber == (maxPageNumber) ? curButtons.get(1).asDisabled() : curButtons.get(1).asEnabled()

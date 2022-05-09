@@ -23,8 +23,9 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
@@ -45,7 +46,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class MainListener extends ListenerAdapter {
 
-	public static final Map<String, AutomaticGuild> guildMap = new HashMap<>();
+	public static final Map<String, AutomaticGuild> guildMap = new ConcurrentHashMap<>();
 
 	public static String onApplyReload(String guildId) {
 		String reloadStatus = "Error reloading";

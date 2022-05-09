@@ -47,9 +47,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Dev Settings
-/DevSettings.properties
-
 # Misc
 /.history/
 /.vscode/
@@ -59,11 +56,15 @@ Temporary Items
 /.gradle/
 /build/
 
-/src/main/java/com/skyblockplus/json/test.json
 
 lombok.config
 .project
 .classpath
+
+# Dev Settings
+/DevSettings.properties
+
+# Generated folders
 /src/main/java/com/skyblockplus/json/items/
 /src/main/java/com/skyblockplus/json/cit/
 /src/main/java/com/skyblockplus/json/skycrypt_images/
@@ -71,3 +72,6 @@ lombok.config
 /src/main/java/com/skyblockplus/json/compressed_images/
 /src/main/java/com/skyblockplus/json/enchanted_images/
 /src/main/java/com/skyblockplus/json/glint_images/
+/src/main/java/com/skyblockplus/json/application_transcripts/
+/src/main/java/com/skyblockplus/json/lore_renders/
+/src/main/java/com/skyblockplus/json/test.json
