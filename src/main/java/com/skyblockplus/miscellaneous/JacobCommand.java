@@ -68,7 +68,7 @@ public class JacobCommand extends Command {
 				.collect(Collectors.toList())) {
 			extras.addEmbedField(
 				"Contest",
-				"**In:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(),
+				"**In:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(false),
 				true
 			);
 		}

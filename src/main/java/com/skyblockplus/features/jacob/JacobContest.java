@@ -68,10 +68,14 @@ public class JacobContest {
 		return Duration.between(Instant.now(), getTimeInstant());
 	}
 
-	public String getCropsFormatted() {
+	public String getCropsFormatted(){
+		return getCropsFormatted(true);
+	}
+
+	public String getCropsFormatted(boolean arrows) {
 		StringBuilder cropsFormatted = new StringBuilder();
 		for (String crop : crops) {
-			cropsFormatted.append("➜ ").append(CROP_NAME_TO_EMOJI.get(crop)).append(" ").append(crop).append("\n");
+			cropsFormatted.append(arrows ? "➜ " : "").append(CROP_NAME_TO_EMOJI.get(crop)).append(" ").append(crop).append("\n");
 		}
 		return cropsFormatted.toString();
 	}

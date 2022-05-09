@@ -89,6 +89,9 @@ public class CalcWeightCommand extends Command {
 				return eb;
 			} else if (ALL_SKILL_NAMES.contains(type)) {
 				SkillsStruct current = player.getSkill(type);
+				if(current == null){
+					return invalidEmbed("Skills API disabled");
+				}
 				SkillsStruct target = player.skillInfoFromLevel(amount, type);
 				eb.addField(
 					"Current",

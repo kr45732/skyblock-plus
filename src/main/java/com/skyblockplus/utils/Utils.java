@@ -1179,6 +1179,10 @@ public class Utils {
 							);
 						}
 
+						if (item.containsKey("tag.ExtraAttributes.dye_item")) {
+							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.dye_item"));
+						}
+
 						if (item.containsKey("tag.ExtraAttributes.talisman_enrichment")) {
 							itemInfo.addExtraValue("TALISMAN_ENRICHMENT_" + item.getString("tag.ExtraAttributes.talisman_enrichment"));
 						}
@@ -1229,6 +1233,33 @@ public class Utils {
 						}
 						if (item.containsKey("tag.ExtraAttributes.drill_part_engine")) {
 							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.drill_part_engine").toUpperCase());
+						}
+
+						if (item.containsKey("tag.ExtraAttributes.upgrade_level")) {
+							int crimsonStar = item.getInt("tag.ExtraAttributes.upgrade_level", 0);
+							JsonObject itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items").getAsJsonObject();
+							for (Map.Entry<String, JsonElement> entry : itemUpgrades.entrySet()) {
+								if(Integer.parseInt(entry.getKey()) > crimsonStar){
+									break;
+								}
+
+								for (JsonElement itemUpgrade : entry.getValue().getAsJsonArray()) {
+									String parsedUpgrade = itemUpgrade.getAsString();
+									String id;
+									int count = 1;
+									if(parsedUpgrade.contains(" §8x")){
+										String[] idNameSplit = parsedUpgrade.split(" §8x");
+										id = nameToId(parseMcCodes(idNameSplit[0]), true);
+										count = Integer.parseInt(idNameSplit[1]);
+									}else{
+										id = nameToId(parsedUpgrade, true);
+									}
+
+									if(id != null){
+										itemInfo.addExtraValues(count, id);
+									}
+								}
+							}
 						}
 
 						if (item.containsKey("tag.ExtraAttributes.petInfo")) {

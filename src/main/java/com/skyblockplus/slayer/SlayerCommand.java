@@ -132,9 +132,9 @@ public class SlayerCommand extends Command {
 				(svenFourKills + revFourKills + taraFourKills + endermanFourKills) +
 				100000L *
 				revFiveKills +
-				5000L *
+				10000L *
 				blazeOneKills +
-				20000L *
+				25000L *
 				blazeTwoKills +
 				60000L *
 				blazeThreeKills +
