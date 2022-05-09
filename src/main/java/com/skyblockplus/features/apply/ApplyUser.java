@@ -634,9 +634,9 @@ public class ApplyUser implements Serializable {
 								.getHook()
 								.editOriginal(
 									playerUsername +
-									" (" +
-									event.getUser().getAsMention() +
-									") was denied by " +
+									" (<@" +
+											applyingUserId +
+									">) was denied by " +
 									event.getUser().getAsMention()
 								)
 								.queue();
