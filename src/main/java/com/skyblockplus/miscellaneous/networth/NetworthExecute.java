@@ -366,7 +366,7 @@ public class NetworthExecute {
 			}
 
 			double totalNetworth = getTotalCalculatedNetworth();
-			int position = leaderboardDatabase.getNetworthPosition(player.getUuid());
+//			int position = leaderboardDatabase.getNetworthPosition(player.getUuid());
 			eb.setDescription(
 				"**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + formatNumber(totalNetworth)
 				//				+ ")\n**Leaderboard Position:** " +
