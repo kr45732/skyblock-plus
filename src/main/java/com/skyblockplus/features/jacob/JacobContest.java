@@ -68,7 +68,7 @@ public class JacobContest {
 		return Duration.between(Instant.now(), getTimeInstant());
 	}
 
-	public String getCropsFormatted(){
+	public String getCropsFormatted() {
 		return getCropsFormatted(true);
 	}
 

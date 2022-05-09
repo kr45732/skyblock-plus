@@ -143,7 +143,7 @@ public class ReforgeStoneCommand extends Command {
 				logCommand();
 
 				setArgs(2);
-				if(args.length >= 2) {
+				if (args.length >= 2) {
 					embed(getReforgeStone(args[1]));
 					return;
 				}

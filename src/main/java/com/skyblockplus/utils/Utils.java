@@ -1239,7 +1239,7 @@ public class Utils {
 							int crimsonStar = item.getInt("tag.ExtraAttributes.upgrade_level", 0);
 							JsonObject itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items").getAsJsonObject();
 							for (Map.Entry<String, JsonElement> entry : itemUpgrades.entrySet()) {
-								if(Integer.parseInt(entry.getKey()) > crimsonStar){
+								if (Integer.parseInt(entry.getKey()) > crimsonStar) {
 									break;
 								}
 
@@ -1247,15 +1247,15 @@ public class Utils {
 									String parsedUpgrade = itemUpgrade.getAsString();
 									String id;
 									int count = 1;
-									if(parsedUpgrade.contains(" §8x")){
+									if (parsedUpgrade.contains(" §8x")) {
 										String[] idNameSplit = parsedUpgrade.split(" §8x");
 										id = nameToId(parseMcCodes(idNameSplit[0]), true);
 										count = Integer.parseInt(idNameSplit[1]);
-									}else{
+									} else {
 										id = nameToId(parsedUpgrade, true);
 									}
 
-									if(id != null){
+									if (id != null) {
 										itemInfo.addExtraValues(count, id);
 									}
 								}
