@@ -40,8 +40,19 @@ public class FetchurHandler {
 		scheduler.scheduleAtFixedRate(
 			() -> {
 				MessageEmbed embed = FetchurCommand.getFetchurItem().build();
+
+				int updateCount = 0;
 				for (AutomaticGuild guild : guildMap.values()) {
-					guild.onFetchur(embed);
+					if(guild.onFetchur(embed)){
+						updateCount ++;
+					}
+
+					if(updateCount != 0 && updateCount % 25 == 0){
+						try {
+							TimeUnit.SECONDS.sleep(1);
+						} catch (Exception ignored) {
+						}
+					}
 				}
 			},
 			Duration.between(now, tomorrow.atStartOfDay(z)).plusMillis(1).toMillis(),

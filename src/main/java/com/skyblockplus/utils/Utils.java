@@ -1236,27 +1236,29 @@ public class Utils {
 						}
 
 						if (item.containsKey("tag.ExtraAttributes.upgrade_level")) {
-							int crimsonStar = item.getInt("tag.ExtraAttributes.upgrade_level", 0);
-							JsonObject itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items").getAsJsonObject();
-							for (Map.Entry<String, JsonElement> entry : itemUpgrades.entrySet()) {
-								if (Integer.parseInt(entry.getKey()) > crimsonStar) {
-									break;
-								}
-
-								for (JsonElement itemUpgrade : entry.getValue().getAsJsonArray()) {
-									String parsedUpgrade = itemUpgrade.getAsString();
-									String id;
-									int count = 1;
-									if (parsedUpgrade.contains(" §8x")) {
-										String[] idNameSplit = parsedUpgrade.split(" §8x");
-										id = nameToId(parseMcCodes(idNameSplit[0]), true);
-										count = Integer.parseInt(idNameSplit[1]);
-									} else {
-										id = nameToId(parsedUpgrade, true);
+							JsonElement itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items");
+							if(itemUpgrades != null) {
+								int crimsonStar = item.getInt("tag.ExtraAttributes.upgrade_level", 0);
+								for (Map.Entry<String, JsonElement> entry : itemUpgrades.getAsJsonObject().entrySet()) {
+									if (Integer.parseInt(entry.getKey()) > crimsonStar) {
+										break;
 									}
 
-									if (id != null) {
-										itemInfo.addExtraValues(count, id);
+									for (JsonElement itemUpgrade : entry.getValue().getAsJsonArray()) {
+										String parsedUpgrade = itemUpgrade.getAsString();
+										String id;
+										int count = 1;
+										if (parsedUpgrade.contains(" §8x")) {
+											String[] idNameSplit = parsedUpgrade.split(" §8x");
+											id = nameToId(parseMcCodes(idNameSplit[0]), true);
+											count = Integer.parseInt(idNameSplit[1]);
+										} else {
+											id = nameToId(parsedUpgrade, true);
+										}
+
+										if (id != null) {
+											itemInfo.addExtraValues(count, id);
+										}
 									}
 								}
 							}

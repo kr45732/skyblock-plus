@@ -81,8 +81,19 @@ public class JacobHandler {
 								)
 								.addField("Crops", nextContest.getCropsFormatted(), false)
 								.build();
+
+							int updateCount = 0;
 							for (AutomaticGuild guild : guildMap.values()) {
-								guild.onFarmingContest(nextContest.getCrops(), embed);
+								if(guild.onFarmingContest(nextContest.getCrops(), embed)){
+									updateCount ++;
+								}
+
+								if(updateCount != 0 && updateCount % 25 == 0){
+									try {
+										TimeUnit.SECONDS.sleep(1);
+									} catch (Exception ignored) {
+									}
+								}
 							}
 							queue();
 						} catch (Exception e) {

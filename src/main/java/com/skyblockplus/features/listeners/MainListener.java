@@ -218,6 +218,10 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onButtonInteraction(ButtonInteractionEvent event) {
+		if(event.isAcknowledged()){
+			return;
+		}
+
 		if (event.getUser().isBot()) {
 			return;
 		}

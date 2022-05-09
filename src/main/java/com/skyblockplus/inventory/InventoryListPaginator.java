@@ -133,7 +133,11 @@ public class InventoryListPaginator {
 	}
 
 	public void action(ButtonInteractionEvent event) {
-		if (Instant.now().minusSeconds(1).isBefore(lastEdit)) {
+		if(event.isAcknowledged()){
+			return;
+		}
+
+		if (Instant.now().minusMillis(1500).isBefore(lastEdit)) {
 			event.reply(client.getError() + " Please wait between switching pages").setEphemeral(true).queue();
 		} else {
 			lastEdit = Instant.now();

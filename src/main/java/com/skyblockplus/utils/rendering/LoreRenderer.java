@@ -40,6 +40,7 @@ public class LoreRenderer {
 					try {
 						return ImageIO.read(file);
 					} catch (IOException e) {
+						e.printStackTrace();
 						return null;
 					}
 				}
@@ -116,9 +117,7 @@ public class LoreRenderer {
 					}
 					default -> {
 						MinecraftColors color = MinecraftColors.byColorCode(colorCode);
-						if (color == null) {
-							System.out.println("Ignoring color char: " + colorCode);
-						} else {
+						if (color != null) {
 							graphics.setColor(color.awtColor);
 						}
 					}

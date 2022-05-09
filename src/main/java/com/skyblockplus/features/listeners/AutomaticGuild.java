@@ -838,7 +838,7 @@ public class AutomaticGuild {
 		this.fetchurPing = role;
 	}
 
-	public void onFetchur(MessageEmbed embed) {
+	public boolean onFetchur(MessageEmbed embed) {
 		try {
 			if (fetchurChannel != null) {
 				if (!fetchurChannel.canTalk()) {
@@ -846,7 +846,7 @@ public class AutomaticGuild {
 						defaultEmbed("Fetchur Notifications")
 							.setDescription("Missing permissions to view or send messages in " + fetchurChannel.getAsMention())
 					);
-					return;
+					return false;
 				}
 
 				if (fetchurPing == null) {
@@ -854,10 +854,12 @@ public class AutomaticGuild {
 				} else {
 					fetchurChannel.sendMessage(fetchurPing.getAsMention()).setEmbeds(embed).queue();
 				}
+				return true;
 			}
 		} catch (Exception e) {
 			log.error(guildId, e);
 		}
+		return false;
 	}
 
 	/* Mayor */
@@ -869,7 +871,7 @@ public class AutomaticGuild {
 		this.mayorPing = role;
 	}
 
-	public void onMayorElection(MessageEmbed embed, Button button, int year) {
+	public boolean onMayorElection(MessageEmbed embed, Button button, int year) {
 		try {
 			if (mayorChannel != null) {
 				if (!mayorChannel.canTalk()) {
@@ -877,7 +879,7 @@ public class AutomaticGuild {
 						defaultEmbed("Mayor Notifications")
 							.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
 					);
-					return;
+					return false;
 				}
 
 				if (
@@ -901,41 +903,46 @@ public class AutomaticGuild {
 				} else {
 					mayorChannel.sendMessageEmbeds(embed).setActionRow(button).queue(m -> lastMayorMessage = m);
 				}
+				return true;
 			}
 		} catch (Exception e) {
 			log.error(guildId, e);
 		}
+		return false;
 	}
 
-	public void onMayorElected(MessageEmbed embed) {
+	public boolean onMayorElected(MessageEmbed embed) {
 		try {
 			if (!mayorChannel.canTalk()) {
 				logAction(
 					defaultEmbed("Mayor Notifications")
 						.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
 				);
-				return;
+				return false;
 			}
 
 			if (lastMayorMessage != null) {
 				lastMayorMessage.editMessageComponents().queue(ignore, ignore);
 				lastMayorMessage = null;
 			}
+
 			if (mayorChannel != null) {
 				if (mayorPing == null) {
 					mayorChannel.sendMessageEmbeds(embed).queue();
 				} else {
 					mayorChannel.sendMessage(mayorPing.getAsMention()).setEmbeds(embed).queue();
 				}
+				return true;
 			}
 		} catch (Exception e) {
 			log.error(guildId, e);
 		}
+		return false;
 	}
 
 	/* Jacob */
-	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
-		jacobGuild.onFarmingContest(crops, embed);
+	public boolean onFarmingContest(List<String> crops, MessageEmbed embed) {
+		return jacobGuild.onFarmingContest(crops, embed);
 	}
 
 	/* Events */

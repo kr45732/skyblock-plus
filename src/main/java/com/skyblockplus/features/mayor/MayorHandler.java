@@ -146,8 +146,18 @@ public class MayorHandler {
 		);
 
 		MessageEmbed embed = eb.build();
+		int updateCount = 0;
 		for (AutomaticGuild guild : guildMap.values()) {
-			guild.onMayorElected(embed); // Send and ping
+			if(guild.onMayorElected(embed)){ // Send and ping
+				updateCount ++;
+			}
+
+			if(updateCount != 0 && updateCount % 25 == 0){
+				try {
+					TimeUnit.SECONDS.sleep(1);
+				} catch (Exception ignored) {
+				}
+			}
 		}
 	}
 
@@ -207,8 +217,19 @@ public class MayorHandler {
 
 			MessageEmbed embed = eb.build();
 			Button button = Button.primary("mayor_graph_button", "View Graph");
+
+			int updateCount = 0;
 			for (AutomaticGuild guild : guildMap.values()) {
-				guild.onMayorElection(embed, button, year); // Send or update message
+				if(guild.onMayorElection(embed, button, year)){ // Send or update message
+					updateCount ++;
+				}
+
+				if(updateCount != 0 && updateCount % 25 == 0){
+					try {
+						TimeUnit.SECONDS.sleep(1);
+					} catch (Exception ignored) {
+					}
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

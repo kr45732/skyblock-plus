@@ -74,6 +74,10 @@ public class InventoryPaginator {
 	}
 
 	public void action(ButtonInteractionEvent event) {
+		if(event.isAcknowledged()){
+			return;
+		}
+
 		if (Instant.now().minusSeconds(2).isBefore(lastEdit)) {
 			event.reply(client.getError() + " Please wait between switching pages").setEphemeral(true).queue();
 		} else {

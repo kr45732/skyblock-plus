@@ -41,7 +41,7 @@ public class JacobGuild {
 		reloadSettingsJson(jacobSettings);
 	}
 
-	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
+	public boolean onFarmingContest(List<String> crops, MessageEmbed embed) {
 		try {
 			if (enable) {
 				if (!channel.canTalk()) {
@@ -49,7 +49,7 @@ public class JacobGuild {
 						defaultEmbed("Jacob Notifications")
 							.setDescription("Missing permissions to view or send messages in " + channel.getAsMention())
 					);
-					return;
+					return false;
 				}
 
 				List<String> roleMentions = new ArrayList<>();
@@ -61,11 +61,13 @@ public class JacobGuild {
 
 				if (!roleMentions.isEmpty()) {
 					channel.sendMessage(String.join(" ", roleMentions)).setEmbeds(embed).queue();
+					return true;
 				}
 			}
 		} catch (Exception e) {
 			AutomaticGuild.getLogger().error(parent.guildId, e);
 		}
+		return false;
 	}
 
 	public void reloadSettingsJson(JsonElement jacobSettings) {
