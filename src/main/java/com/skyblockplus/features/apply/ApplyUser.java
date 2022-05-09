@@ -633,11 +633,7 @@ public class ApplyUser implements Serializable {
 							event
 								.getHook()
 								.editOriginal(
-									playerUsername +
-									" (<@" +
-											applyingUserId +
-									">) was denied by " +
-									event.getUser().getAsMention()
+									playerUsername + " (<@" + applyingUserId + ">) was denied by " + event.getUser().getAsMention()
 								)
 								.queue();
 						} catch (Exception e) {
