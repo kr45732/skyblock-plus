@@ -45,17 +45,17 @@ public class EnderChestSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "list" -> event.paginate(
-					EnderChestCommand.getPlayerEnderChestList(
-							event.player,
-							event.getOptionStr("profile"),
-							event.getOptionInt("slot", 0),
-							new PaginatorEvent(event)
-					),
-					true
+				EnderChestCommand.getPlayerEnderChestList(
+					event.player,
+					event.getOptionStr("profile"),
+					event.getOptionInt("slot", 0),
+					new PaginatorEvent(event)
+				),
+				true
 			);
 			case "emoji" -> event.paginate(
-					EnderChestCommand.getPlayerEnderChest(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
-					true
+				EnderChestCommand.getPlayerEnderChest(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
+				true
 			);
 			default -> event.embed(event.invalidCommandMessage());
 		}
@@ -64,16 +64,16 @@ public class EnderChestSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-				.slash(name, "Main ender chest command")
-				.addSubcommands(
-						new SubcommandData("list", "Get a list of the player's ender chest with lore")
-								.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-								.addOption(OptionType.STRING, "profile", "Profile name")
-								.addOption(OptionType.INTEGER, "slot", "Slot number"),
-						new SubcommandData("emoji", "Get a player's ender chest represented in emojis")
-								.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-								.addOption(OptionType.STRING, "profile", "Profile name")
-				);
+			.slash(name, "Main ender chest command")
+			.addSubcommands(
+				new SubcommandData("list", "Get a list of the player's ender chest with lore")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+					.addOption(OptionType.STRING, "profile", "Profile name")
+					.addOption(OptionType.INTEGER, "slot", "Slot number"),
+				new SubcommandData("emoji", "Get a player's ender chest represented in emojis")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+					.addOption(OptionType.STRING, "profile", "Profile name")
+			);
 	}
 
 	@Override

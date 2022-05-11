@@ -134,7 +134,10 @@ public class InventoryListPaginator {
 
 	public void action(ButtonInteractionEvent event) {
 		if (Instant.now().minusMillis(1500).isBefore(lastEdit)) {
-			event.reply(client.getError() + " Please wait between switching pages").setEphemeral(true).queue(ignored -> waitForEvent(), ignored -> waitForEvent());
+			event
+				.reply(client.getError() + " Please wait between switching pages")
+				.setEphemeral(true)
+				.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
 		} else {
 			lastEdit = Instant.now();
 			if (event.getComponentId().equals("inv_list_paginator_left_button")) {

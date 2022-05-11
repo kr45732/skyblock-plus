@@ -995,7 +995,7 @@ public class AutomaticGuild {
 			event.getComponentId().startsWith("paginator_") ||
 			event.getComponentId().startsWith("inv_paginator_") ||
 			event.getComponentId().startsWith("inv_list_paginator_") ||
-					event.getComponentId().startsWith("leaderboard_paginator_")
+			event.getComponentId().startsWith("leaderboard_paginator_")
 		) {
 			return;
 		} else if (event.getComponentId().equals("mayor_graph_button")) {

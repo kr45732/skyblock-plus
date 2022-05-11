@@ -170,17 +170,19 @@ public class LeaderboardDatabase {
 			MongoCollection<Document> lbCollection = getConnection().getCollection(mode.toCacheType());
 
 			Map<Integer, Document> out = new TreeMap<>();
-			AggregateIterable<Document> leaderboard = lbCollection.aggregate(List.of(Document.parse("{$project: {\"_id\": 0,\"username\":1,\"" + lbType + "\": 1}}"),
+			AggregateIterable<Document> leaderboard = lbCollection.aggregate(
+				List.of(
+					Document.parse("{$project: {\"_id\": 0,\"username\":1,\"" + lbType + "\": 1}}"),
 					Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
 					Document.parse("{$match: {rank : {$gt: " + rankStart + ", $lte: " + rankEnd + "}}}")
-			));
+				)
+			);
 
 			for (Document player : leaderboard) {
 				out.put(player.getInteger("rank"), player);
 			}
 			return out;
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -188,15 +190,19 @@ public class LeaderboardDatabase {
 		try {
 			MongoCollection<Document> lbCollection = getConnection().getCollection(mode.toCacheType());
 
-			Document playerPos = lbCollection.aggregate(List.of(Document.parse("{$project: {\"_id\": 0,\"uuid\":1,\"" + lbType + "\": 1}}"),
-					Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
-					Document.parse("{$match : {uuid : { $eq : \"" + uuid + "\"}}}")
-			)).first();
+			Document playerPos = lbCollection
+				.aggregate(
+					List.of(
+						Document.parse("{$project: {\"_id\": 0,\"uuid\":1,\"" + lbType + "\": 1}}"),
+						Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
+						Document.parse("{$match : {uuid : { $eq : \"" + uuid + "\"}}}")
+					)
+				)
+				.first();
 			int rank = playerPos != null ? playerPos.getInteger("rank") : 0;
 
 			return getLeaderboard(lbType, mode, rank - 200, rank + 200);
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -204,17 +210,21 @@ public class LeaderboardDatabase {
 		try {
 			MongoCollection<Document> lbCollection = getConnection().getCollection(mode.toCacheType());
 
-			Document amountPos = lbCollection.aggregate(List.of(Document.parse("{$project: {\"_id\": 0,\"" + lbType + "\": 1}}"),
-					Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
-					Document.parse("{$project: {diff: {$abs: {$subtract: [" + amount + ", \"$" + lbType + "\"]}}, rank: \"$rank\"}}"),
-					Document.parse("{$sort: {diff: 1}}"),
-					Document.parse("{$limit: 1}")
-			)).first();
+			Document amountPos = lbCollection
+				.aggregate(
+					List.of(
+						Document.parse("{$project: {\"_id\": 0,\"" + lbType + "\": 1}}"),
+						Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
+						Document.parse("{$project: {diff: {$abs: {$subtract: [" + amount + ", \"$" + lbType + "\"]}}, rank: \"$rank\"}}"),
+						Document.parse("{$sort: {diff: 1}}"),
+						Document.parse("{$limit: 1}")
+					)
+				)
+				.first();
 			int rank = amountPos != null ? amountPos.getInteger("rank") : 0;
 
 			return getLeaderboard(lbType, mode, rank - 200, rank + 200);
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -222,10 +232,15 @@ public class LeaderboardDatabase {
 		try {
 			MongoCollection<Document> lbCollection = getConnection().getCollection("all_lb");
 
-			Document playerPos = lbCollection.aggregate(List.of(Document.parse("{$project: {\"_id\": 0,\"uuid\":1,\"networth\": 1}}"),
-					Document.parse("{$setWindowFields: {sortBy: { networth: -1 }, output: {rank: {$documentNumber: {}}}}}"),
-					Document.parse("{$match : {uuid : { $eq : \"" + uuid + "\"}}}")
-			)).first();
+			Document playerPos = lbCollection
+				.aggregate(
+					List.of(
+						Document.parse("{$project: {\"_id\": 0,\"uuid\":1,\"networth\": 1}}"),
+						Document.parse("{$setWindowFields: {sortBy: { networth: -1 }, output: {rank: {$documentNumber: {}}}}}"),
+						Document.parse("{$match : {uuid : { $eq : \"" + uuid + "\"}}}")
+					)
+				)
+				.first();
 			return playerPos != null ? playerPos.getInteger("rank") : -1;
 		} catch (Exception ignored) {}
 		return -1;
