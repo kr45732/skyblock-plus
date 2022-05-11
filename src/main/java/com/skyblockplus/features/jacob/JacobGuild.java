@@ -60,7 +60,7 @@ public class JacobGuild {
 				}
 
 				if (!roleMentions.isEmpty()) {
-					channel.sendMessage(String.join(" ", roleMentions)).setEmbeds(embed).queue();
+					channel.sendMessage(String.join(" ", roleMentions)).setEmbeds(embed).queue(ignore, ignore);
 					return true;
 				}
 			}

@@ -26,6 +26,9 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import java.util.List;
+import java.util.Map;
+
+import com.skyblockplus.utils.structs.InvItem;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
 
@@ -46,16 +49,21 @@ public class EnderChestCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length == 3 || args.length == 2 || args.length == 1) {
+				int slotNumber = getIntOption("slot", -1);
+
+				if (slotNumber != -1 && (args.length == 3 || args.length == 2 || args.length == 1)) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
+					}
+
+					paginate(getPlayerEnderChestList(player, args.length == 3 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
+				} else {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
 					paginate(getPlayerEnderChest(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
-					return;
 				}
-
-				sendErrorEmbed();
 			}
 		}
 			.queue();
@@ -74,6 +82,18 @@ public class EnderChestCommand extends Command {
 				return null;
 			}
 			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+		}
+		return player.getFailEmbed();
+	}
+
+	public static EmbedBuilder getPlayerEnderChestList(String username, String profileName, int slotNum, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			Map<Integer, InvItem> echestMap = player.getEnderChestMap();
+			if (echestMap != null) {
+				new InventoryListPaginator(player, echestMap, slotNum, event);
+				return null;
+			}
 		}
 		return player.getFailEmbed();
 	}

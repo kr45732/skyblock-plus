@@ -48,53 +48,7 @@ public class ArmorCommand extends Command {
 		if (player.isValid()) {
 			Map<Integer, InvItem> inventoryMap = player.getArmorMap();
 			if (inventoryMap != null) {
-				List<String> pageTitles = new ArrayList<>();
-				List<String> pageThumbnails = new ArrayList<>();
-
-				CustomPaginator.Builder paginateBuilder = event.getPaginator();
-
-				for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
-					InvItem currentInvStruct = currentInvSlot.getValue();
-
-					if (currentInvStruct == null) {
-						pageTitles.add("Empty");
-						pageThumbnails.add(null);
-
-						String slotName =
-							switch ((currentInvSlot.getKey())) {
-								case 0 -> "Helmet";
-								case 1 -> "Chestplate";
-								case 2 -> "Leggings";
-								case 3 -> "Boots";
-								default -> "";
-							};
-
-						paginateBuilder.addItems("**Slot:** " + slotName);
-					} else {
-						pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
-						pageThumbnails.add("https://sky.shiiyu.moe/item.gif/" + currentInvStruct.getId());
-						String itemString = "";
-
-						String slotName =
-							switch ((currentInvSlot.getKey())) {
-								case 0 -> "Helmet";
-								case 1 -> "Chestplate";
-								case 2 -> "Leggings";
-								case 3 -> "Boots";
-								default -> "";
-							};
-
-						itemString += "**Slot:** " + slotName;
-						itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore();
-						if (currentInvStruct.isRecombobulated()) {
-							itemString += "\n(Recombobulated)";
-						}
-
-						itemString += "\n\n**Item Creation:** " + currentInvStruct.getCreationTimestamp();
-						paginateBuilder.addItems(itemString);
-					}
-				}
-				event.paginate(paginateBuilder.updateExtras(extra -> extra.setTitles(pageTitles).setThumbnails(pageThumbnails)));
+				new InventoryListPaginator(player, inventoryMap, 0, event);
 				return null;
 			}
 		}

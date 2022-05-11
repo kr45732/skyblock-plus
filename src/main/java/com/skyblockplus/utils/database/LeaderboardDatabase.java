@@ -26,6 +26,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -160,47 +161,72 @@ public class LeaderboardDatabase {
 		}
 	}
 
-	public Map<String, Double> getLeaderboard(String lbType, Player.Gamemode mode) {
+	/**
+	 * @param rankStart Exclusive
+	 * @param rankEnd Inclusive
+	 */
+	public Map<Integer, Document> getLeaderboard(String lbType, Player.Gamemode mode, int rankStart, int rankEnd) {
 		try {
 			MongoCollection<Document> lbCollection = getConnection().getCollection(mode.toCacheType());
-			FindIterable<Document> response = lbCollection
-				.find()
-				.projection(Projections.include("username", lbType))
-				.sort(Sorts.descending(lbType));
 
-			Map<String, Double> out = new LinkedHashMap<>();
-			for (Document document : response) {
-				try {
-					Double value = document.getDouble(lbType);
-					out.put(document.getString("username"), value == null ? 0 : value);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			Map<Integer, Document> out = new TreeMap<>();
+			AggregateIterable<Document> leaderboard = lbCollection.aggregate(List.of(Document.parse("{$project: {\"_id\": 0,\"username\":1,\"" + lbType + "\": 1}}"),
+					Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
+					Document.parse("{$match: {rank : {$gt: " + rankStart + ", $lte: " + rankEnd + "}}}")
+			));
+
+			for (Document player : leaderboard) {
+				out.put(player.getInteger("rank"), player);
 			}
 			return out;
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
+		return null;
+	}
+
+	public Map<Integer, Document> getLeaderboard(String lbType, Player.Gamemode mode, String uuid) {
+		try {
+			MongoCollection<Document> lbCollection = getConnection().getCollection(mode.toCacheType());
+
+			Document playerPos = lbCollection.aggregate(List.of(Document.parse("{$project: {\"_id\": 0,\"uuid\":1,\"" + lbType + "\": 1}}"),
+					Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
+					Document.parse("{$match : {uuid : { $eq : \"" + uuid + "\"}}}")
+			)).first();
+			int rank = playerPos != null ? playerPos.getInteger("rank") : 0;
+
+			return getLeaderboard(lbType, mode, rank - 200, rank + 200);
+		} catch (Exception ignored) {
+		}
+		return null;
+	}
+
+	public Map<Integer, Document> getLeaderboard(String lbType, Player.Gamemode mode, double amount) {
+		try {
+			MongoCollection<Document> lbCollection = getConnection().getCollection(mode.toCacheType());
+
+			Document amountPos = lbCollection.aggregate(List.of(Document.parse("{$project: {\"_id\": 0,\"" + lbType + "\": 1}}"),
+					Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
+					Document.parse("{$project: {diff: {$abs: {$subtract: [" + amount + ", \"$" + lbType + "\"]}}, rank: \"$rank\"}}"),
+					Document.parse("{$sort: {diff: 1}}"),
+					Document.parse("{$limit: 1}")
+			)).first();
+			int rank = amountPos != null ? amountPos.getInteger("rank") : 0;
+
+			return getLeaderboard(lbType, mode, rank - 200, rank + 200);
+		} catch (Exception ignored) {
+		}
 		return null;
 	}
 
 	public int getNetworthPosition(String uuid) {
 		try {
 			MongoCollection<Document> lbCollection = getConnection().getCollection("all_lb");
-			FindIterable<Document> response = lbCollection
-				.find()
-				.projection(Projections.include("uuid", "networth"))
-				.sort(Sorts.descending("networth"));
 
-			int position = 1;
-			for (Document document : response) {
-				try {
-					if (document.getString("uuid").equals(uuid)) {
-						return position;
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				position++;
-			}
+			Document playerPos = lbCollection.aggregate(List.of(Document.parse("{$project: {\"_id\": 0,\"uuid\":1,\"networth\": 1}}"),
+					Document.parse("{$setWindowFields: {sortBy: { networth: -1 }, output: {rank: {$documentNumber: {}}}}}"),
+					Document.parse("{$match : {uuid : { $eq : \"" + uuid + "\"}}}")
+			)).first();
+			return playerPos != null ? playerPos.getInteger("rank") : -1;
 		} catch (Exception ignored) {}
 		return -1;
 	}

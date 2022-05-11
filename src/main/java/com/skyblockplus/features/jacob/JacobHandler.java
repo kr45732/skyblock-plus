@@ -43,7 +43,7 @@ public class JacobHandler {
 					jda.getTextChannelById("937894945564545035").sendMessage("<@497789163555389441> Gib jacob data please :D").queue();
 				} catch (Exception ignored) {}
 			},
-			YEAR_0 + 446400000L * getSkyblockYear() + 1000 - Instant.now().toEpochMilli(),
+			YEAR_0 + 446400000L * getSkyblockYear() + 300000 - Instant.now().toEpochMilli(),
 			446400000L,
 			TimeUnit.MILLISECONDS
 		);

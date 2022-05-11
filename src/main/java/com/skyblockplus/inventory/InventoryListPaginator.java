@@ -133,12 +133,8 @@ public class InventoryListPaginator {
 	}
 
 	public void action(ButtonInteractionEvent event) {
-		if (event.isAcknowledged()) {
-			return;
-		}
-
 		if (Instant.now().minusMillis(1500).isBefore(lastEdit)) {
-			event.reply(client.getError() + " Please wait between switching pages").setEphemeral(true).queue();
+			event.reply(client.getError() + " Please wait between switching pages").setEphemeral(true).queue(ignored -> waitForEvent(), ignored -> waitForEvent());
 		} else {
 			lastEdit = Instant.now();
 			if (event.getComponentId().equals("inv_list_paginator_left_button")) {
@@ -182,10 +178,8 @@ public class InventoryListPaginator {
 					pageNumber == 0 ? curButtons.get(0).asDisabled() : curButtons.get(0).asEnabled(),
 					pageNumber == (maxPageNumber) ? curButtons.get(1).asDisabled() : curButtons.get(1).asEnabled()
 				)
-				.queue();
+				.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
 		}
-
-		waitForEvent();
 	}
 
 	private void waitForEvent() {

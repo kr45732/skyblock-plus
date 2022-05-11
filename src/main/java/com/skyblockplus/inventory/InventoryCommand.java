@@ -81,15 +81,7 @@ public class InventoryCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				int slotNumber = -1;
-				for (int i = 0; i < args.length; i++) {
-					if (args[i].startsWith("slot:")) {
-						try {
-							slotNumber = Math.max(0, Integer.parseInt(args[i].split("slot:")[1]));
-							removeArg(i);
-						} catch (Exception ignored) {}
-					}
-				}
+				int slotNumber = getIntOption("slot", -1);
 
 				if (slotNumber != -1 && (args.length == 3 || args.length == 2 || args.length == 1)) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
@@ -97,17 +89,13 @@ public class InventoryCommand extends Command {
 					}
 
 					paginate(getPlayerInventoryList(player, args.length == 3 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
-					return;
-				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
+				} else {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
 					paginate(getPlayerInventory(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
-					return;
 				}
-
-				sendErrorEmbed();
 			}
 		}
 			.queue();

@@ -64,10 +64,6 @@ public class SlashCommandClient extends ListenerAdapter {
 
 	@Override
 	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-		if (event.isAcknowledged()) {
-			return;
-		}
-
 		if (!event.isFromGuild()) {
 			event.replyEmbeds(invalidEmbed("This command cannot be used in direct messages").build()).queue();
 			return;

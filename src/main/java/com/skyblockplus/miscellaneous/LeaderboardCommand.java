@@ -18,21 +18,17 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.isValidType;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.structs.PaginatorExtras;
-import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
+
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.isValidType;
 
 @Component
 public class LeaderboardCommand extends Command {
@@ -64,56 +60,7 @@ public class LeaderboardCommand extends Command {
 			return player.getFailEmbed();
 		}
 
-		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
-		Map<String, Double> cacheList = leaderboardDatabase.getLeaderboard(lbType, gamemode);
-
-		int playerRank = -1;
-		double closestAmt = -1;
-		int idx = 1;
-		String amt = "Not on leaderboard";
-		int curRank = 1;
-		for (Map.Entry<String, Double> entry : cacheList.entrySet()) {
-			double curAmount = lbType.equals("networth") ? entry.getValue().longValue() : entry.getValue();
-			String formattedAmt = roundAndFormat(curAmount);
-			paginateBuilder.addItems("`" + (curRank) + ")` " + fixUsername(entry.getKey()) + ": " + formattedAmt);
-
-			if (entry.getKey().equals(player.getUsername())) {
-				playerRank = curRank;
-				amt = formattedAmt;
-			}
-
-			if (amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)) {
-				closestAmt = Math.abs(curAmount - amount);
-				idx = curRank;
-			}
-			curRank++;
-		}
-		if (rank != -1) {
-			page = (rank - 1) / 20 + 1;
-		} else if (amount != -1) {
-			page = (idx - 1) / 20 + 1;
-		} else if (page == -1) {
-			page = (playerRank - 1) / 20 + 1;
-		}
-
-		String ebStr =
-			"**Player:** " +
-			player.getUsernameFixed() +
-			"\n**Rank:** " +
-			(playerRank == -1 ? "Not on leaderboard" : "#" + (playerRank)) +
-			"\n**" +
-			capitalizeString(lbType.replace("_", " ")) +
-			":** " +
-			amt;
-
-		paginateBuilder.setPaginatorExtras(
-			new PaginatorExtras()
-				.setEveryPageText(ebStr)
-				.setEveryPageTitle("Global Leaderboard | " + capitalizeString(gamemode.toString()))
-				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/players")
-		);
-
-		event.paginate(paginateBuilder, page);
+		new LeaderboardPaginator(lbType, gamemode, player, page, rank, amount, event);
 		return null;
 	}
 

@@ -54,7 +54,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 				event.getOptionInt("rank", -1),
 				event.getOptionDouble("amount", -1),
 				new PaginatorEvent(event)
-			)
+			), true
 		);
 	}
 

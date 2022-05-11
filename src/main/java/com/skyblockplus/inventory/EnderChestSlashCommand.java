@@ -25,6 +25,7 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -42,15 +43,37 @@ public class EnderChestSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(EnderChestCommand.getPlayerEnderChest(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true);
+		switch (event.getSubcommandName()) {
+			case "list" -> event.paginate(
+					EnderChestCommand.getPlayerEnderChestList(
+							event.player,
+							event.getOptionStr("profile"),
+							event.getOptionInt("slot", 0),
+							new PaginatorEvent(event)
+					),
+					true
+			);
+			case "emoji" -> event.paginate(
+					EnderChestCommand.getPlayerEnderChest(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
+					true
+			);
+			default -> event.embed(event.invalidCommandMessage());
+		}
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "Get a player's enderchest represented in emojis")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
+				.slash(name, "Main ender chest command")
+				.addSubcommands(
+						new SubcommandData("list", "Get a list of the player's ender chest with lore")
+								.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+								.addOption(OptionType.STRING, "profile", "Profile name")
+								.addOption(OptionType.INTEGER, "slot", "Slot number"),
+						new SubcommandData("emoji", "Get a player's ender chest represented in emojis")
+								.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+								.addOption(OptionType.STRING, "profile", "Profile name")
+				);
 	}
 
 	@Override

@@ -366,11 +366,11 @@ public class NetworthExecute {
 			}
 
 			double totalNetworth = getTotalCalculatedNetworth();
-			//			int position = leaderboardDatabase.getNetworthPosition(player.getUuid());
+			int position = leaderboardDatabase.getNetworthPosition(player.getUuid());
 			eb.setDescription(
 				"**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + formatNumber(totalNetworth)
-				//				+ ")\n**Leaderboard Position:** " +
-				//				(position != -1 ? formatNumber(position) : "Not on leaderboard")
+								+ ")\n**Leaderboard Position:** " +
+								(position != -1 ? formatNumber(position) : "Not on leaderboard")
 			);
 			eb.addField("Purse", simplifyNumber(purseCoins), true);
 			eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);
