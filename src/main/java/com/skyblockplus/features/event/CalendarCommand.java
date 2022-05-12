@@ -20,6 +20,7 @@ package com.skyblockplus.features.event;
 
 import static com.google.common.base.Strings.padStart;
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
+import static com.skyblockplus.features.mayor.MayorHandler.currentMayorYear;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -234,6 +235,11 @@ public class CalendarCommand extends Command {
 				"**Start:** <t:" + fishingStart.getEpochSecond() + ":R>" + "\n**End:** <t:" + fishingEnd.getEpochSecond() + ":R>",
 				false
 			);
+		}
+
+		if(currentMayor.equalsIgnoreCase("cole")){
+			int curYearMayor = currentMayorYear;
+			// TODO: mining fiesta https://wiki.hypixel.net/Mining_Fiesta
 		}
 
 		int currentMonth = (int) Math.floorDiv(currentOffset, MONTH_MS);

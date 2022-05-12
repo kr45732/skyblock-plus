@@ -70,7 +70,8 @@ public class LeaderboardDatabase {
 			"taming",
 			"enchanting",
 			"networth",
-			"blaze"
+			"blaze",
+			"lily_weight", "deaths", "kills", "highest_damage", "coins"
 		),
 		COLLECTION_NAME_TO_ID.keySet().stream().toList()
 	);
@@ -228,9 +229,9 @@ public class LeaderboardDatabase {
 		return null;
 	}
 
-	public int getNetworthPosition(String uuid) {
+	public int getNetworthPosition(Player.Gamemode gamemode, String uuid) {
 		try {
-			MongoCollection<Document> lbCollection = getConnection().getCollection("all_lb");
+			MongoCollection<Document> lbCollection = getConnection().getCollection(gamemode.toCacheType());
 
 			Document playerPos = lbCollection
 				.aggregate(

@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous.networth;
 
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -41,10 +42,10 @@ public class NetworthSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(
+		event.paginate(
 			new NetworthExecute()
 				.setVerbose(event.getOptionBoolean("verbose", false))
-				.getPlayerNetworth(event.player, event.getOptionStr("profile"))
+				.getPlayerNetworth(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
 		);
 	}
 

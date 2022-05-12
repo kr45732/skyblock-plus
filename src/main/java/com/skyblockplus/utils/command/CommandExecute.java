@@ -164,7 +164,7 @@ public abstract class CommandExecute extends CommandEvent {
 			return false;
 		}
 
-		ebMessage.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build()).queue(ignore, ignore);
+		ebMessage.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot. Please specify a username or " + (getAuthor().getId().equals(userId) ? "" : "have them ") + "link using `/link`").build()).queue(ignore, ignore);
 		return true;
 	}
 

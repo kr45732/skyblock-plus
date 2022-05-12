@@ -39,6 +39,7 @@ import org.apache.groovy.util.Maps;
 public class MayorHandler {
 
 	public static String currentMayor = "";
+	public static int currentMayorYear = 0;
 
 	public static final Map<String, String> mayorNameToEmoji = Maps.of(
 		"DERPY",
@@ -70,7 +71,9 @@ public class MayorHandler {
 
 	public static void initialize() {
 		if (currentMayor.isEmpty()) {
-			currentMayor = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor.name", "");
+			JsonElement mayorJson = getJson("https://api.hypixel.net/resources/skyblock/election");
+			currentMayor = higherDepth(mayorJson, "mayor.name", "");
+			currentMayorYear = higherDepth(mayorJson, "mayor.election.year", 0);
 		}
 
 		long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1);
@@ -99,11 +102,11 @@ public class MayorHandler {
 		);
 
 		currentMayor = higherDepth(cur, "name").getAsString();
-		int year = higherDepth(cur, "election.year").getAsInt();
+		currentMayorYear = higherDepth(cur, "election.year").getAsInt();
 		double totalVotes = streamJsonArray(mayors).mapToInt(m -> higherDepth(m, "votes").getAsInt()).sum();
 
-		EmbedBuilder eb = defaultEmbed("Mayor Elected | Year " + year);
-		eb.setDescription("**Year:** " + year + "\n**Total Votes:** " + formatNumber(totalVotes));
+		EmbedBuilder eb = defaultEmbed("Mayor Elected | Year " + currentMayorYear);
+		eb.setDescription("**Year:** " + currentMayorYear + "\n**Total Votes:** " + formatNumber(totalVotes));
 		eb.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(currentMayor.toUpperCase()) + "/left");
 		StringBuilder ebStr = new StringBuilder();
 		for (JsonElement curMayor : mayors) {

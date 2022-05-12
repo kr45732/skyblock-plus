@@ -1292,6 +1292,10 @@ public class Player {
 		return "❓";
 	}
 
+	public double getLilyWeight() {
+		return new com.skyblockplus.miscellaneous.weight.lily.Weight(this, true).getTotalWeight().getRaw();
+	}
+
 	public double getWeight() {
 		return new Weight(this, true).getTotalWeight().getRaw();
 	}
@@ -1484,6 +1488,12 @@ public class Player {
 					case "purse":
 						highestAmount = Math.max(highestAmount, getPurseCoins());
 						break;
+					case "coins":
+						highestAmount = Math.max(highestAmount, Math.max(0, getBankBalance()) + getPurseCoins());
+						break;
+					case "deaths", "kills", "highest_damage":
+						highestAmount = Math.max(highestAmount, getStat(type));
+								break;
 					case "pet_score":
 						highestAmount = Math.max(highestAmount, getPetScore());
 						break;
@@ -1515,6 +1525,9 @@ public class Player {
 					case "stranded":
 						highestAmount = Math.max(highestAmount, isGamemode(Gamemode.of(type)) ? 1 : -1);
 						break;
+					case "lily_weight":
+						highestAmount = Math.max(highestAmount, getLilyWeight());
+						break;
 					default:
 						if (COLLECTION_NAME_TO_ID.containsKey(type)) {
 							highestAmount = Math.max(highestAmount, getCollection(COLLECTION_NAME_TO_ID.get(type)));
@@ -1544,6 +1557,10 @@ public class Player {
 
 	public long getCollection(String id) {
 		return higherDepth(profileJson(), "collection." + id, -1);
+	}
+
+	public double getStat(String stat){
+		return higherDepth(profileJson(), "stats."+stat, -1.0);
 	}
 
 	public int getNumMaxedCollections() {

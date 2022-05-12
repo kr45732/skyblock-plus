@@ -104,12 +104,28 @@ public class MissingCommand extends Command {
 				}
 			});
 
-			List<String> questTalismans = List.of("MELODY_HAIR", "CHEETAH_TALISMAN", "LYNX_TALISMAN", "CAT_TALISMAN");
+			missingInternalArr.removeAll(List.of("BURNING_KUUDRA_CORE", "FIERY_KUUDRA_CORE", "INFERNAL_KUUDRA_CORE")); // TODO: remove when obtainable
+
+			List<String> soulboundTalisman = List.of("ODGERS_BRONZE_TOOTH",
+					"WOLF_PAW",
+					"ODGERS_GOLD_TOOTH",
+					"FROZEN_CHICKEN",
+					"CHEETAH_TALISMAN",
+					"ODGERS_DIAMOND_TOOTH",
+					"JACOBUS_REGISTER",
+					"PIGS_FOOT",
+					"ODGERS_SILVER_TOOTH",
+					"LYNX_TALISMAN",
+					"KING_TALISMAN",
+					"CAT_TALISMAN",
+					"MELODY_HAIR",
+					"SURVIVOR_CUBE");
 			List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");
+
 			NetworthExecute calc = new NetworthExecute().initPrices();
 			missingInternalArr.sort(
 				Comparator.comparingDouble(o1 ->
-					questTalismans.contains(o1) ||
+					soulboundTalisman.contains(o1) ||
 						o1.startsWith("WEDDING_RING_") ||
 						o1.startsWith("CAMPFIRE_TALISMAN_") ||
 						(player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
@@ -127,8 +143,8 @@ public class MissingCommand extends Command {
 				totalCost += cost;
 				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
 				String name = idToName(curId);
-				if (questTalismans.contains(curId) || curId.startsWith("WEDDING_RING_") || curId.startsWith("CAMPFIRE_TALISMAN_")) {
-					costOut = " (Quest)";
+				if (soulboundTalisman.contains(curId) || curId.startsWith("WEDDING_RING_") || curId.startsWith("CAMPFIRE_TALISMAN_")) {
+					costOut = (cost != 0 ? " ➜ " + roundAndFormat(cost) : "") + " (Soulbound)";
 				} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
 					costOut = " (Unobtainable)";
 				} else {

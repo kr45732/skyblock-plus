@@ -560,7 +560,12 @@ public class ApiHandler {
 			JsonObject currentProfileMembers = higherDepth(currentProfile, "members").getAsJsonObject();
 			for (String currentProfileMemberUuid : currentProfileMembers.keySet()) {
 				JsonObject currentProfileMember = currentProfileMembers.getAsJsonObject(currentProfileMemberUuid);
-				currentProfileMember.remove("stats");
+				JsonElement stats = currentProfileMember.remove("stats");
+				JsonObject statsParsed = new JsonObject();
+				statsParsed.add("kills", higherDepth(stats, "kills"));
+				statsParsed.add("deaths", higherDepth(stats, "deaths"));
+				statsParsed.addProperty("highest_damage", Math.max(higherDepth(stats, "highest_crit_damage", 0.0), Math.max( higherDepth(stats, "highest_critical_damage", 0.0), higherDepth(stats, "highest_damage", 0.0))));
+				currentProfileMember.add("stats", statsParsed);
 				currentProfileMember.remove("objectives");
 				currentProfileMember.remove("tutorial");
 				currentProfileMember.remove("quests");
@@ -569,14 +574,13 @@ public class ApiHandler {
 				currentProfileMember.remove("experimentation");
 				currentProfileMember.remove("unlocked_coll_tiers");
 				currentProfileMember.remove("backpack_icons");
-				currentProfileMember.remove("achievement_spawned_island_types");
 				currentProfileMember.remove("slayer_quest");
 
-				currentProfileMembers.add(currentProfileMemberUuid, currentProfileMember);
+//				currentProfileMembers.add(currentProfileMemberUuid, currentProfileMember);
 			}
 
-			currentProfile.add("members", currentProfileMembers);
-			array.set(i, currentProfile);
+//			currentProfile.add("members", currentProfileMembers);
+//			array.set(i, currentProfile);
 		}
 		return array;
 	}
