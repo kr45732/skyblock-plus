@@ -237,7 +237,7 @@ public class CalendarCommand extends Command {
 			);
 		}
 
-		if(currentMayor.equalsIgnoreCase("cole")){
+		if (currentMayor.equalsIgnoreCase("cole")) {
 			int curYearMayor = currentMayorYear;
 			// TODO: mining fiesta https://wiki.hypixel.net/Mining_Fiesta
 		}

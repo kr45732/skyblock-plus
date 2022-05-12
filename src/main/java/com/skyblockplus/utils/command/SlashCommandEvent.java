@@ -99,7 +99,15 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 			return false;
 		}
 
-		embed(invalidEmbed("<@" + id + "> is not linked to the bot. Please specify a username or " + (getUser ().getId().equals(id) ? "" : "have them ") + "link using `/link`"));
+		embed(
+			invalidEmbed(
+				"<@" +
+				id +
+				"> is not linked to the bot. Please specify a username or " +
+				(getUser().getId().equals(id) ? "" : "have them ") +
+				"link using `/link`"
+			)
+		);
 		return true;
 	}
 

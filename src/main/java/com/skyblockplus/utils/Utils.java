@@ -752,7 +752,11 @@ public class Utils {
 					return;
 				}
 
-				if (m.getActionRows().size() == 1 && m.getActionRows().get(0).getButtons().get(0).getId() != null && m.getActionRows().get(0).getButtons().get(0).getId().startsWith("paginator_")) {
+				if (
+					m.getActionRows().size() == 1 &&
+					m.getActionRows().get(0).getButtons().get(0).getId() != null &&
+					m.getActionRows().get(0).getButtons().get(0).getId().startsWith("paginator_")
+				) {
 					m.editMessageComponents().queue(ignore, ignore);
 					return;
 				}

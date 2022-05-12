@@ -33,10 +33,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.InvItem;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
@@ -134,7 +133,6 @@ public class NetworthExecute {
 			.queue();
 	}
 
-
 	public void getPlayerNetworth(String username, String profileName) {
 		getPlayerNetworth(username, profileName, null);
 	}
@@ -143,7 +141,7 @@ public class NetworthExecute {
 		return getPlayerNetworth(profileName == null ? new Player(username) : new Player(username, profileName), event);
 	}
 
-	public void getPlayerNetworth(Player player){
+	public void getPlayerNetworth(Player player) {
 		getPlayerNetworth(player, null);
 	}
 
@@ -275,9 +273,9 @@ public class NetworthExecute {
 					.append("\n");
 				if (i == 4) {
 					echestStr.append("\n");
-				}else if(i == 24){
+				} else if (i == 24) {
 					int moreItems = enderChestItems.size() - 25;
-					if(moreItems > 0){
+					if (moreItems > 0) {
 						echestStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
 					}
 					break;
@@ -295,9 +293,9 @@ public class NetworthExecute {
 					.append("\n");
 				if (i == 4) {
 					personalVaultStr.append("\n");
-				}else if(i == 24){
+				} else if (i == 24) {
 					int moreItems = personalVaultItems.size() - 25;
-					if(moreItems > 0){
+					if (moreItems > 0) {
 						echestStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
 					}
 					break;
@@ -315,9 +313,9 @@ public class NetworthExecute {
 					.append("\n");
 				if (i == 4) {
 					storageStr.append("\n");
-				}else if(i == 24){
+				} else if (i == 24) {
 					int moreItems = storageItems.size() - 25;
-					if(moreItems > 0){
+					if (moreItems > 0) {
 						storageStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
 					}
 					break;
@@ -335,9 +333,9 @@ public class NetworthExecute {
 					.append("\n");
 				if (i == 4) {
 					invStr.append("\n");
-				}else if(i == 24){
+				} else if (i == 24) {
 					int moreItems = invItems.size() - 25;
-					if(moreItems > 0){
+					if (moreItems > 0) {
 						invStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
 					}
 					break;
@@ -355,9 +353,9 @@ public class NetworthExecute {
 					.append("\n");
 				if (i == 4) {
 					armorStr.append("\n");
-				}else if(i == 24){
+				} else if (i == 24) {
 					int moreItems = armorItems.size() - 25;
-					if(moreItems > 0){
+					if (moreItems > 0) {
 						armorStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
 					}
 					break;
@@ -375,9 +373,9 @@ public class NetworthExecute {
 					.append("\n");
 				if (i == 4) {
 					wardrobeStr.append("\n");
-				}else if(i == 24){
+				} else if (i == 24) {
 					int moreItems = wardrobeItems.size() - 25;
-					if(moreItems > 0){
+					if (moreItems > 0) {
 						wardrobeStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
 					}
 					break;
@@ -395,9 +393,9 @@ public class NetworthExecute {
 					.append("\n");
 				if (i == 4) {
 					petsStr.append("\n");
-				}else if(i == 24){
+				} else if (i == 24) {
 					int moreItems = petsItems.size() - 25;
-					if(moreItems > 0){
+					if (moreItems > 0) {
 						petsStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
 					}
 					break;
@@ -415,39 +413,40 @@ public class NetworthExecute {
 					.append("\n");
 				if (i == 4) {
 					talismanStr.append("\n");
-				}else if(i == 24){
+				} else if (i == 24) {
 					int moreItems = talismanItems.size() - 25;
-					if(moreItems > 0){
+					if (moreItems > 0) {
 						talismanStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
 					}
 					break;
 				}
 			}
 
-			if(event == null){
+			if (event == null) {
 				return null;
 			}
 
 			double totalNetworth = getTotalCalculatedNetworth();
 			int position = leaderboardDatabase.getNetworthPosition(player.getGamemode(), player.getUuid());
-			String ebDesc = "**Total Networth:** " +
-					simplifyNumber(totalNetworth) +
-					" (" +
-					formatNumber(totalNetworth) +
-					")\n**" + (Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode()) ? capitalizeString(player.getGamemode().toString()) + " " : "" ) + "Leaderboard Position:** " +
-					(position != -1 ? formatNumber(position) : "Not on leaderboard");
-			eb.setDescription(
-				ebDesc
-			);
+			String ebDesc =
+				"**Total Networth:** " +
+				simplifyNumber(totalNetworth) +
+				" (" +
+				formatNumber(totalNetworth) +
+				")\n**" +
+				(
+					Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
+						? capitalizeString(player.getGamemode().toString()) + " "
+						: ""
+				) +
+				"Leaderboard Position:** " +
+				(position != -1 ? formatNumber(position) : "Not on leaderboard");
+			eb.setDescription(ebDesc);
 			eb.addField("Purse", simplifyNumber(purseCoins), true);
 			eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);
 			eb.addField("Sacks", simplifyNumber(sacksTotal), true);
 			if (!echestStr.isEmpty()) {
-				eb.addField(
-					"Ender Chest | " + simplifyNumber(enderChestTotal),
-					echestStr.toString().split("\n\n")[0],
-					false
-				);
+				eb.addField("Ender Chest | " + simplifyNumber(enderChestTotal), echestStr.toString().split("\n\n")[0], false);
 			}
 			if (!storageStr.isEmpty()) {
 				eb.addField("Storage | " + simplifyNumber(storageTotal), storageStr.toString().split("\n\n")[0], false);
@@ -477,41 +476,93 @@ public class NetworthExecute {
 			extras.addEmbedPage(eb);
 
 			if (!echestStr.isEmpty()) {
-				extras.addEmbedPage(player.defaultPlayerEmbed(" | Ender Chest").setDescription(ebDesc + "\n**Ender Chest:** " + simplifyNumber(enderChestTotal) + "\n\n" +
-						echestStr.toString().replace("\n\n", "\n")
-				));
+				extras.addEmbedPage(
+					player
+						.defaultPlayerEmbed(" | Ender Chest")
+						.setDescription(
+							ebDesc +
+							"\n**Ender Chest:** " +
+							simplifyNumber(enderChestTotal) +
+							"\n\n" +
+							echestStr.toString().replace("\n\n", "\n")
+						)
+				);
 			}
 			if (!storageStr.isEmpty()) {
-			extras.addEmbedPage(player.defaultPlayerEmbed(" | Storage").setDescription(ebDesc + "\n**Storage:** " + simplifyNumber(storageTotal) + "\n\n" +
-					storageStr.toString().replace("\n\n", "\n")
-			));
+				extras.addEmbedPage(
+					player
+						.defaultPlayerEmbed(" | Storage")
+						.setDescription(
+							ebDesc + "\n**Storage:** " + simplifyNumber(storageTotal) + "\n\n" + storageStr.toString().replace("\n\n", "\n")
+						)
+				);
 			}
 			if (!invStr.isEmpty()) {
-				extras.addEmbedPage(player.defaultPlayerEmbed(" | Inventory").setDescription(ebDesc + "\n**Inventory:** " + simplifyNumber(invTotal) + "\n\n" +
-						invStr.toString().replace("\n\n", "\n")
-				));
+				extras.addEmbedPage(
+					player
+						.defaultPlayerEmbed(" | Inventory")
+						.setDescription(
+							ebDesc + "\n**Inventory:** " + simplifyNumber(invTotal) + "\n\n" + invStr.toString().replace("\n\n", "\n")
+						)
+				);
 			}
 			if (!armorStr.isEmpty()) {
-				extras.addEmbedPage(player.defaultPlayerEmbed(" | Armor").setDescription(ebDesc + "\n**Armor:** " + simplifyNumber(invArmor) + "\n\n" +
-						armorStr.toString().replace("\n\n", "\n")
-				));			}
+				extras.addEmbedPage(
+					player
+						.defaultPlayerEmbed(" | Armor")
+						.setDescription(
+							ebDesc + "\n**Armor:** " + simplifyNumber(invArmor) + "\n\n" + armorStr.toString().replace("\n\n", "\n")
+						)
+				);
+			}
 			if (!wardrobeStr.isEmpty()) {
-				extras.addEmbedPage(player.defaultPlayerEmbed(" | Wardrobe").setDescription(ebDesc + "\n**Wardrobe:** " + simplifyNumber(wardrobeTotal) + "\n\n" +
-						wardrobeStr.toString().replace("\n\n", "\n")
-				));
+				extras.addEmbedPage(
+					player
+						.defaultPlayerEmbed(" | Wardrobe")
+						.setDescription(
+							ebDesc +
+							"\n**Wardrobe:** " +
+							simplifyNumber(wardrobeTotal) +
+							"\n\n" +
+							wardrobeStr.toString().replace("\n\n", "\n")
+						)
+				);
 			}
 			if (!petsStr.isEmpty()) {
-				extras.addEmbedPage(player.defaultPlayerEmbed(" | Pets").setDescription(ebDesc + "\n**Pets:** " + simplifyNumber(petsTotal) + "\n\n" +
-						petsStr.toString().replace("\n\n", "\n")
-				));			}
+				extras.addEmbedPage(
+					player
+						.defaultPlayerEmbed(" | Pets")
+						.setDescription(
+							ebDesc + "\n**Pets:** " + simplifyNumber(petsTotal) + "\n\n" + petsStr.toString().replace("\n\n", "\n")
+						)
+				);
+			}
 			if (!talismanStr.isEmpty()) {
-				extras.addEmbedPage(player.defaultPlayerEmbed(" | Accessories").setDescription(ebDesc + "\n**Accessories:** " + simplifyNumber(talismanTotal) + "\n\n" +
-						talismanStr.toString().replace("\n\n", "\n")
-				));			}
+				extras.addEmbedPage(
+					player
+						.defaultPlayerEmbed(" | Accessories")
+						.setDescription(
+							ebDesc +
+							"\n**Accessories:** " +
+							simplifyNumber(talismanTotal) +
+							"\n\n" +
+							talismanStr.toString().replace("\n\n", "\n")
+						)
+				);
+			}
 			if (!personalVaultStr.isEmpty()) {
-				extras.addEmbedPage(player.defaultPlayerEmbed(" | Personal Vault").setDescription(ebDesc + "\n**Personal Vault:** " + simplifyNumber(personalVaultTotal) + "\n\n" +
-						personalVaultStr.toString().replace("\n\n", "\n")
-				));			}
+				extras.addEmbedPage(
+					player
+						.defaultPlayerEmbed(" | Personal Vault")
+						.setDescription(
+							ebDesc +
+							"\n**Personal Vault:** " +
+							simplifyNumber(personalVaultTotal) +
+							"\n\n" +
+							personalVaultStr.toString().replace("\n\n", "\n")
+						)
+				);
+			}
 
 			//			JsonArray missing = collectJsonArray(
 			//				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
@@ -531,7 +582,7 @@ public class NetworthExecute {
 					e.printStackTrace();
 				}
 			}
-			extras.addButton(Button.link("https://forms.gle/RBmN2AFBLafGyx5E7","Bug In Calculations?" ));
+			extras.addButton(Button.link("https://forms.gle/RBmN2AFBLafGyx5E7", "Bug In Calculations?"));
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 			return null;
 		}
@@ -1290,7 +1341,6 @@ public class NetworthExecute {
 		return getLowestPrice(itemId, onlyBazaar, true);
 	}
 
-
 	public double getLowestPrice(String itemId, boolean onlyBazaar, boolean useRecipe) {
 		double priceOverride = getPriceOverride(itemId);
 		if (priceOverride != -1) {
@@ -1373,10 +1423,15 @@ public class NetworthExecute {
 			} catch (Exception ignored) {}
 		}
 
-		if(useRecipe && higherDepth(getInternalJsonMappings(), origItemId + ".recipe") != null){
+		if (useRecipe && higherDepth(getInternalJsonMappings(), origItemId + ".recipe") != null) {
 			double cost = 0;
-			for (String item : higherDepth(getInternalJsonMappings(), origItemId + ".recipe").getAsJsonObject().entrySet().stream().map(e -> e.getValue().getAsString()).filter(e -> !e.isEmpty())
-					.collect(Collectors.toList())) {
+			for (String item : higherDepth(getInternalJsonMappings(), origItemId + ".recipe")
+				.getAsJsonObject()
+				.entrySet()
+				.stream()
+				.map(e -> e.getValue().getAsString())
+				.filter(e -> !e.isEmpty())
+				.collect(Collectors.toList())) {
 				String[] idCountSplit = item.split(":");
 				cost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
 			}
@@ -1408,7 +1463,8 @@ public class NetworthExecute {
 			.getAsJsonObject()
 			.entrySet()
 			.stream()
-			.map(e -> e.getValue().getAsString()).filter(e -> !e.isEmpty())
+			.map(e -> e.getValue().getAsString())
+			.filter(e -> !e.isEmpty())
 			.collect(Collectors.toList())) {
 			String[] idCountSplit = material.split(":");
 			if (idCountSplit[0].contains("GENERATOR")) {
@@ -1416,7 +1472,7 @@ public class NetworthExecute {
 					cost += getMinionCost(idCountSplit[0].substring(0, idCountSplit[0].lastIndexOf("_")), tier - 1, depth - 1);
 				}
 			} else {
-				cost += getLowestPrice(idCountSplit[0].replace("-", ":"),false, false) * Integer.parseInt(idCountSplit[1]);
+				cost += getLowestPrice(idCountSplit[0].replace("-", ":"), false, false) * Integer.parseInt(idCountSplit[1]);
 			}
 		}
 		return cost;

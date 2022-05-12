@@ -1493,7 +1493,7 @@ public class Player {
 						break;
 					case "deaths", "kills", "highest_damage":
 						highestAmount = Math.max(highestAmount, getStat(type));
-								break;
+						break;
 					case "pet_score":
 						highestAmount = Math.max(highestAmount, getPetScore());
 						break;
@@ -1559,8 +1559,8 @@ public class Player {
 		return higherDepth(profileJson(), "collection." + id, -1);
 	}
 
-	public double getStat(String stat){
-		return higherDepth(profileJson(), "stats."+stat, -1.0);
+	public double getStat(String stat) {
+		return higherDepth(profileJson(), "stats." + stat, -1.0);
 	}
 
 	public int getNumMaxedCollections() {

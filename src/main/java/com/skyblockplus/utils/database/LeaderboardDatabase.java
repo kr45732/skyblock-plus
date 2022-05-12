@@ -71,7 +71,11 @@ public class LeaderboardDatabase {
 			"enchanting",
 			"networth",
 			"blaze",
-			"lily_weight", "deaths", "kills", "highest_damage", "coins"
+			"lily_weight",
+			"deaths",
+			"kills",
+			"highest_damage",
+			"coins"
 		),
 		COLLECTION_NAME_TO_ID.keySet().stream().toList()
 	);

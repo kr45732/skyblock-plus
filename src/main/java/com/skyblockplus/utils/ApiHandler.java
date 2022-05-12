@@ -564,7 +564,13 @@ public class ApiHandler {
 				JsonObject statsParsed = new JsonObject();
 				statsParsed.add("kills", higherDepth(stats, "kills"));
 				statsParsed.add("deaths", higherDepth(stats, "deaths"));
-				statsParsed.addProperty("highest_damage", Math.max(higherDepth(stats, "highest_crit_damage", 0.0), Math.max( higherDepth(stats, "highest_critical_damage", 0.0), higherDepth(stats, "highest_damage", 0.0))));
+				statsParsed.addProperty(
+					"highest_damage",
+					Math.max(
+						higherDepth(stats, "highest_crit_damage", 0.0),
+						Math.max(higherDepth(stats, "highest_critical_damage", 0.0), higherDepth(stats, "highest_damage", 0.0))
+					)
+				);
 				currentProfileMember.add("stats", statsParsed);
 				currentProfileMember.remove("objectives");
 				currentProfileMember.remove("tutorial");
@@ -575,12 +581,10 @@ public class ApiHandler {
 				currentProfileMember.remove("unlocked_coll_tiers");
 				currentProfileMember.remove("backpack_icons");
 				currentProfileMember.remove("slayer_quest");
-
-//				currentProfileMembers.add(currentProfileMemberUuid, currentProfileMember);
+				//				currentProfileMembers.add(currentProfileMemberUuid, currentProfileMember);
 			}
-
-//			currentProfile.add("members", currentProfileMembers);
-//			array.set(i, currentProfile);
+			//			currentProfile.add("members", currentProfileMembers);
+			//			array.set(i, currentProfile);
 		}
 		return array;
 	}
