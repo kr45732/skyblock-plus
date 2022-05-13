@@ -400,22 +400,11 @@ public class SkyblockEventCommand extends Command {
 			}
 
 			if (paginateBuilder.size() > 0) {
-				long minutesSinceUpdate = Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes();
-
-				String minutesSinceUpdateString;
-				if (minutesSinceUpdate == 0) {
-					minutesSinceUpdateString = " less than a minute ";
-				} else if (minutesSinceUpdate == 1) {
-					minutesSinceUpdateString = " 1 minute ";
-				} else {
-					minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
-				}
-
 				event.paginate(
 					paginateBuilder.updateExtras(extra ->
 						extra
 							.setEveryPageTitle("Event Leaderboard")
-							.setEveryPageText("**Last Updated " + minutesSinceUpdateString + " ago**\n")
+							.setEveryPageText("**Last Updated <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>**\n")
 					)
 				);
 				return null;

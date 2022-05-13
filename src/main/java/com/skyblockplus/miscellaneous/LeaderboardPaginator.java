@@ -65,6 +65,7 @@ public class LeaderboardPaginator {
 		} else if (amount != -1) {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, amount));
 		} else if (page != -1) {
+			page = Math.max(1, page);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
 		} else {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.getUuid()));

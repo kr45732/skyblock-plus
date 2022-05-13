@@ -486,7 +486,6 @@ public class NetworthExecute {
 			if (!personalVaultStr.isEmpty()) {
 				eb.addField("Personal Vault | " + simplifyNumber(personalVaultTotal), personalVaultStr.toString().split("\n\n")[0], false);
 			}
-			eb.addField("Bug in the calculations?", "[Please submit a bug report here!](https://forms.gle/RBmN2AFBLafGyx5E7)", false);
 
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser());
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);

@@ -581,10 +581,7 @@ public class ApiHandler {
 				currentProfileMember.remove("unlocked_coll_tiers");
 				currentProfileMember.remove("backpack_icons");
 				currentProfileMember.remove("slayer_quest");
-				//				currentProfileMembers.add(currentProfileMemberUuid, currentProfileMember);
 			}
-			//			currentProfile.add("members", currentProfileMembers);
-			//			array.set(i, currentProfile);
 		}
 		return array;
 	}
