@@ -2274,7 +2274,9 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		try{channel.getManager().setSlowmode(5).queue();}catch (Exception ignored){}
+		try {
+			channel.getManager().setSlowmode(5).queue();
+		} catch (Exception ignored) {}
 		return defaultSettingsEmbed("**Verify text channel set to:** " + channel);
 	}
 

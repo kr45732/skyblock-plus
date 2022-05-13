@@ -1205,9 +1205,17 @@ public class Utils {
 							itemInfo.addExtraValue("THE_ART_OF_WAR");
 						}
 
-						if (item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5 || item.getInt("tag.ExtraAttributes.upgrade_level", 0) > 5) {
+						if (
+							item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5 ||
+							item.getInt("tag.ExtraAttributes.upgrade_level", 0) > 5
+						) {
 							if (higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items") == null) {
-								int masterStarCount = Math.max(item.getInt("tag.ExtraAttributes.dungeon_item_level", 0), item.getInt("tag.ExtraAttributes.upgrade_level", 0)) - 5;
+								int masterStarCount =
+									Math.max(
+										item.getInt("tag.ExtraAttributes.dungeon_item_level", 0),
+										item.getInt("tag.ExtraAttributes.upgrade_level", 0)
+									) -
+									5;
 								switch (masterStarCount) {
 									case 5:
 										itemInfo.addExtraValue("FIFTH_MASTER_STAR");
@@ -1224,12 +1232,12 @@ public class Utils {
 						}
 
 						if (item.containsKey("tag.ExtraAttributes.dungeon_item_level") || item.containsKey("dungeon_item")) {
-							JsonElement essenceUpgrades =  higherDepth(getEssenceCostsJson(), itemInfo.getId());
+							JsonElement essenceUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId());
 							if (essenceUpgrades != null) {
-								 JsonObject essenceUpgradesObj = essenceUpgrades.getAsJsonObject();
+								JsonObject essenceUpgradesObj = essenceUpgrades.getAsJsonObject();
 								int totalEssence = 0;
 								int itemLevel = Math.min(item.getInt("tag.ExtraAttributes.dungeon_item_level", 0), 5);
-								for(int j=0; j<= itemLevel; j++) {
+								for (int j = 0; j <= itemLevel; j++) {
 									if (j == 0) {
 										if (essenceUpgradesObj.has("dungeonize")) {
 											totalEssence += essenceUpgradesObj.get("dungeonize").getAsInt();
@@ -1320,10 +1328,19 @@ public class Utils {
 							}
 						}
 
-						if(itemInfo.getId().matches("(HOT|BURNING|FIERY|INFERNAL)_(CRIMSON|FERVOR|HOLLOW|TERROR|AURORA)_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)")){
+						if (
+							itemInfo
+								.getId()
+								.matches(
+									"(HOT|BURNING|FIERY|INFERNAL)_(CRIMSON|FERVOR|HOLLOW|TERROR|AURORA)_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
+								)
+						) {
 							List<String> prestigeOrder = List.of("HOT", "BURNING", "FIERY", "INFERNAL");
-							for(int j=0; j <= prestigeOrder.indexOf(itemInfo.getId().split("_")[0]); j++){
-								itemInfo.addExtraValues(higherDepth(ARMOR_PRESTIGE_COST.get(prestigeOrder.get(j)), "KUUDRA_TEETH", 0), "KUUDRA_TEETH");
+							for (int j = 0; j <= prestigeOrder.indexOf(itemInfo.getId().split("_")[0]); j++) {
+								itemInfo.addExtraValues(
+									higherDepth(ARMOR_PRESTIGE_COST.get(prestigeOrder.get(j)), "KUUDRA_TEETH", 0),
+									"KUUDRA_TEETH"
+								);
 							}
 						}
 

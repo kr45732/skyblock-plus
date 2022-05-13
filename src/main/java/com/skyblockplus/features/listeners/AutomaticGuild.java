@@ -921,8 +921,8 @@ public class AutomaticGuild {
 
 				if (!mayorChannel.canTalk()) {
 					logAction(
-							defaultEmbed("Mayor Notifications")
-									.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
+						defaultEmbed("Mayor Notifications")
+							.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
 					);
 					return false;
 				}

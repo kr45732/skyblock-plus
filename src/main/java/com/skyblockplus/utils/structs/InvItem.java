@@ -51,7 +51,7 @@ public class InvItem {
 	private int essenceCount;
 	private String essenceType;
 
-	public void setEssence(int essenceCount, String essenceType){
+	public void setEssence(int essenceCount, String essenceType) {
 		this.essenceCount = essenceCount;
 		this.essenceType = essenceType;
 	}

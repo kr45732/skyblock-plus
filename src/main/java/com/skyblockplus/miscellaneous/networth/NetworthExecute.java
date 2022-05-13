@@ -42,13 +42,22 @@ import org.apache.groovy.util.Maps;
 
 public class NetworthExecute {
 
-	private static final Map<String, Integer> essencePrices = Maps.of( "WITHER", 3500,
-			"UNDEAD", 800,
-			"DIAMOND", 4000,
-			"GOLD", 3500,
-			"ICE", 4000,
-			"SPIDER", 3000,
-			"DRAGON", 750);
+	private static final Map<String, Integer> essencePrices = Maps.of(
+		"WITHER",
+		3500,
+		"UNDEAD",
+		800,
+		"DIAMOND",
+		4000,
+		"GOLD",
+		3500,
+		"ICE",
+		4000,
+		"SPIDER",
+		3000,
+		"DRAGON",
+		750
+	);
 	//	private final Set<String> tempSet = new HashSet<>();
 	private final List<InvItem> invPets = new ArrayList<>();
 	private final List<InvItem> petsPets = new ArrayList<>();
@@ -1255,7 +1264,17 @@ public class NetworthExecute {
 			out.append(",\"count\":").append(itemCount);
 			out.append(",\"base_cost\":\"").append(simplifyNumber(itemCost)).append("\"");
 			out.append(recombobulatedExtra > 0 ? ",\"recomb\":\"" + simplifyNumber(recombobulatedExtra) + "\"" : "");
-			out.append(essenceExtras > 0 ? ",\"essence\":{\"total\":\"" + simplifyNumber(essenceExtras) + "\",\"amount\":" + item.getEssenceCount() +",\"type\":\"" + item.getEssenceType()  + "\"}" : "");
+			out.append(
+				essenceExtras > 0
+					? ",\"essence\":{\"total\":\"" +
+					simplifyNumber(essenceExtras) +
+					"\",\"amount\":" +
+					item.getEssenceCount() +
+					",\"type\":\"" +
+					item.getEssenceType() +
+					"\"}"
+					: ""
+			);
 			out.append(hbpExtras > 0 ? ",\"hbp\":\"" + simplifyNumber(hbpExtras) + "\"" : "");
 			out.append(
 				enchantsExtras > 0
