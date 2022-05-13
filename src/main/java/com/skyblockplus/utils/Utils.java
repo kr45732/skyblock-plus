@@ -21,8 +21,7 @@ package com.skyblockplus.utils;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
-import static com.skyblockplus.utils.Constants.PET_NAMES;
+import static com.skyblockplus.utils.Constants.*;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
@@ -1206,37 +1205,41 @@ public class Utils {
 							itemInfo.addExtraValue("THE_ART_OF_WAR");
 						}
 
-						if (item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5) {
-							int masterStarCount = item.getInt("tag.ExtraAttributes.dungeon_item_level", 5) - 5;
-							switch (masterStarCount) {
-								case 5:
-									itemInfo.addExtraValue("FIFTH_MASTER_STAR");
-								case 4:
-									itemInfo.addExtraValue("FOURTH_MASTER_STAR");
-								case 3:
-									itemInfo.addExtraValue("THIRD_MASTER_STAR");
-								case 2:
-									itemInfo.addExtraValue("SECOND_MASTER_STAR");
-								case 1:
-									itemInfo.addExtraValue("FIRST_MASTER_STAR");
+						if (item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5 || item.getInt("tag.ExtraAttributes.upgrade_level", 0) > 5) {
+							if (higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items") == null) {
+								int masterStarCount = Math.max(item.getInt("tag.ExtraAttributes.dungeon_item_level", 0), item.getInt("tag.ExtraAttributes.upgrade_level", 0)) - 5;
+								switch (masterStarCount) {
+									case 5:
+										itemInfo.addExtraValue("FIFTH_MASTER_STAR");
+									case 4:
+										itemInfo.addExtraValue("FOURTH_MASTER_STAR");
+									case 3:
+										itemInfo.addExtraValue("THIRD_MASTER_STAR");
+									case 2:
+										itemInfo.addExtraValue("SECOND_MASTER_STAR");
+									case 1:
+										itemInfo.addExtraValue("FIRST_MASTER_STAR");
+								}
 							}
 						}
 
-						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.farming_for_dummies_count", 0), "FARMING_FOR_DUMMIES");
-
-						itemInfo.addExtraValues(
-							Integer.parseInt(item.getString("tag.ExtraAttributes.ethermerge", "0").replace("b", " ")),
-							"ETHERWARP_CONDUIT"
-						);
-
-						if (item.containsKey("tag.ExtraAttributes.drill_part_upgrade_module")) {
-							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.drill_part_upgrade_module").toUpperCase());
-						}
-						if (item.containsKey("tag.ExtraAttributes.drill_part_fuel_tank")) {
-							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.drill_part_fuel_tank").toUpperCase());
-						}
-						if (item.containsKey("tag.ExtraAttributes.drill_part_engine")) {
-							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.drill_part_engine").toUpperCase());
+						if (item.containsKey("tag.ExtraAttributes.dungeon_item_level") || item.containsKey("dungeon_item")) {
+							JsonElement essenceUpgrades =  higherDepth(getEssenceCostsJson(), itemInfo.getId());
+							if (essenceUpgrades != null) {
+								 JsonObject essenceUpgradesObj = essenceUpgrades.getAsJsonObject();
+								int totalEssence = 0;
+								int itemLevel = Math.min(item.getInt("tag.ExtraAttributes.dungeon_item_level", 0), 5);
+								for(int j=0; j<= itemLevel; j++) {
+									if (j == 0) {
+										if (essenceUpgradesObj.has("dungeonize")) {
+											totalEssence += essenceUpgradesObj.get("dungeonize").getAsInt();
+										}
+									} else {
+										totalEssence += essenceUpgradesObj.get("" + j).getAsInt();
+									}
+								}
+								itemInfo.setEssence(totalEssence, essenceUpgradesObj.get("type").getAsString().toUpperCase());
+							}
 						}
 
 						if (item.containsKey("tag.ExtraAttributes.upgrade_level")) {
@@ -1268,6 +1271,23 @@ public class Utils {
 							}
 						}
 
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.farming_for_dummies_count", 0), "FARMING_FOR_DUMMIES");
+
+						itemInfo.addExtraValues(
+							Integer.parseInt(item.getString("tag.ExtraAttributes.ethermerge", "0").replace("b", " ")),
+							"ETHERWARP_CONDUIT"
+						);
+
+						if (item.containsKey("tag.ExtraAttributes.drill_part_upgrade_module")) {
+							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.drill_part_upgrade_module").toUpperCase());
+						}
+						if (item.containsKey("tag.ExtraAttributes.drill_part_fuel_tank")) {
+							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.drill_part_fuel_tank").toUpperCase());
+						}
+						if (item.containsKey("tag.ExtraAttributes.drill_part_engine")) {
+							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.drill_part_engine").toUpperCase());
+						}
+
 						if (item.containsKey("tag.ExtraAttributes.petInfo")) {
 							JsonElement petInfoJson = JsonParser.parseString(item.getString("tag.ExtraAttributes.petInfo"));
 							if (higherDepth(petInfoJson, "heldItem", null) != null) {
@@ -1297,6 +1317,13 @@ public class Utils {
 										itemInfo.addExtraValue(gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
 									}
 								}
+							}
+						}
+
+						if(itemInfo.getId().matches("(HOT|BURNING|FIERY|INFERNAL)_(CRIMSON|FERVOR|HOLLOW|TERROR|AURORA)_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)")){
+							List<String> prestigeOrder = List.of("HOT", "BURNING", "FIERY", "INFERNAL");
+							for(int j=0; j <= prestigeOrder.indexOf(itemInfo.getId().split("_")[0]); j++){
+								itemInfo.addExtraValues(higherDepth(ARMOR_PRESTIGE_COST.get(prestigeOrder.get(j)), "KUUDRA_TEETH", 0), "KUUDRA_TEETH");
 							}
 						}
 

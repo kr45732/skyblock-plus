@@ -117,7 +117,7 @@ public class LinkCommand extends Command {
 	/**
 	 * @return [nickname, roles]
 	 */
-	public static String[] updateLinkedUser(JsonElement verifySettings, LinkedAccount linkedAccount, Member member, boolean delay) {
+	public static String[] updateLinkedUser(JsonElement verifySettings, LinkedAccount linkedAccount, Member member, boolean doNotUseCache) {
 		String updatedNickname = "false";
 		String updatedRoles = "false";
 
@@ -249,7 +249,7 @@ public class LinkCommand extends Command {
 			if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
 				toAdd.removeIf(Objects::isNull);
 				toRemove.removeIf(Objects::isNull);
-				if (delay) {
+				if (doNotUseCache) {
 					for (Role role : toAdd) {
 						if (member.getGuild().getSelfMember().canInteract(role)) {
 							member.getGuild().addRoleToMember(member, role).queue();
@@ -270,7 +270,7 @@ public class LinkCommand extends Command {
 		guildMap
 			.get(member.getGuild().getId())
 			.logAction(
-				defaultEmbed("Member Verified")
+				defaultEmbed(linkedAccount.username() + " Verified", "https://mine.ly/" + linkedAccount.uuid())
 					.setDescription(
 						(
 							!updatedRoles.equals("false")

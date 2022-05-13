@@ -44,7 +44,7 @@ public class JacobGuild {
 	public boolean onFarmingContest(List<String> crops, MessageEmbed embed) {
 		try {
 			if (enable) {
-				if (!channel.canTalk()) {
+				if (channel != null && !channel.canTalk()) {
 					parent.logAction(
 						defaultEmbed("Jacob Notifications")
 							.setDescription("Missing permissions to view or send messages in " + channel.getAsMention())

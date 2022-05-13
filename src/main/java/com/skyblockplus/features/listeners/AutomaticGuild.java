@@ -913,20 +913,20 @@ public class AutomaticGuild {
 
 	public boolean onMayorElected(MessageEmbed embed) {
 		try {
-			if (!mayorChannel.canTalk()) {
-				logAction(
-					defaultEmbed("Mayor Notifications")
-						.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
-				);
-				return false;
-			}
-
-			if (lastMayorMessage != null) {
-				lastMayorMessage.editMessageComponents().queue(ignore, ignore);
-				lastMayorMessage = null;
-			}
-
 			if (mayorChannel != null) {
+				if (lastMayorMessage != null) {
+					lastMayorMessage.editMessageComponents().queue(ignore, ignore);
+					lastMayorMessage = null;
+				}
+
+				if (!mayorChannel.canTalk()) {
+					logAction(
+							defaultEmbed("Mayor Notifications")
+									.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
+					);
+					return false;
+				}
+
 				if (mayorPing == null) {
 					mayorChannel.sendMessageEmbeds(embed).queue();
 				} else {

@@ -48,6 +48,13 @@ public class InvItem {
 	private String rarity;
 	private int dungeonFloor = 0;
 	private NBTCompound nbtTag;
+	private int essenceCount;
+	private String essenceType;
+
+	public void setEssence(int essenceCount, String essenceType){
+		this.essenceCount = essenceCount;
+		this.essenceType = essenceType;
+	}
 
 	public String getName() {
 		return getName(true);

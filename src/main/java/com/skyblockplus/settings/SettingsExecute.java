@@ -2269,16 +2269,13 @@ public class SettingsExecute {
 		}
 		TextChannel channel = (TextChannel) eb;
 
-		try {
-			int responseCode = updateVerifySettings("messageTextChannelId", channel.getId());
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
+		int responseCode = updateVerifySettings("messageTextChannelId", channel.getId());
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
 
-			channel.getManager().setSlowmode(5).queue();
-			return defaultSettingsEmbed("**Verify text channel set to:** " + channel);
-		} catch (Exception ignored) {}
-		return defaultEmbed("Invalid Text Channel");
+		try{channel.getManager().setSlowmode(5).queue();}catch (Exception ignored){}
+		return defaultSettingsEmbed("**Verify text channel set to:** " + channel);
 	}
 
 	public EmbedBuilder setVerifyNickname(String nickname) {

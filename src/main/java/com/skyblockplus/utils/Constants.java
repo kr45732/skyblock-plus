@@ -64,6 +64,7 @@ public class Constants {
 	public static Map<String, Integer> IGNORED_ENCHANTS;
 	public static Map<String, Long> FORGE_TIMES;
 	public static Map<String, String> MAYOR_NAME_TO_SKIN;
+	public static JsonObject ARMOR_PRESTIGE_COST;
 
 	/* Fetched from other sources */
 	public static List<String> ENCHANT_NAMES;
@@ -179,6 +180,9 @@ public class Constants {
 
 			/* MAYOR_NAME_TO_SKIN */
 			MAYOR_NAME_TO_SKIN = gson.fromJson(higherDepth(CONSTANTS, "MAYOR_NAME_TO_SKIN"), mapStringString);
+
+			/* ARMOR_PRESTIGE_COST */
+			ARMOR_PRESTIGE_COST = higherDepth(CONSTANTS, "ARMOR_PRESTIGE_COST").getAsJsonObject();
 
 			/* ENCHANT_NAMES */
 			HashSet<String> enchantNames = new HashSet<>();

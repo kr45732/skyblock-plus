@@ -50,11 +50,11 @@ public class BazaarCommand extends Command {
 
 		JsonElement itemInfo = higherDepth(bazaarItems, itemId);
 		EmbedBuilder eb = defaultEmbed(idToName(itemId), "https://bazaartracker.com/product/" + itemId);
-		eb.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buy_summary.[0].pricePerUnit").getAsDouble()), true);
-		eb.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sell_summary.[0].pricePerUnit").getAsDouble()), true);
+		eb.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buy_summary.[0].pricePerUnit", 0.0)), true);
+		eb.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sell_summary.[0].pricePerUnit", 0.0)), true);
 		eb.addBlankField(true);
-		eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.buyVolume").getAsDouble()), true);
-		eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.sellVolume").getAsDouble()), true);
+		eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.buyVolume", 0L)), true);
+		eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.sellVolume", 0L)), true);
 		eb.addBlankField(true);
 		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 		return eb;
