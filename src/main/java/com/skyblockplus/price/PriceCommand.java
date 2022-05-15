@@ -107,8 +107,6 @@ public class PriceCommand extends Command {
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(5);
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 		for (JsonElement lowestBinAuction : lowestBinArr) {
-			EmbedBuilder eb = defaultEmbed("Query Auctions");
-
 			String lowestBinStr = "";
 			lowestBinStr += "**Name:** " + (tempName == null ? higherDepth(lowestBinAuction, "item_name").getAsString() : tempName);
 			lowestBinStr += "\n**Rarity:** " + higherDepth(lowestBinAuction, "tier").getAsString().toLowerCase();
@@ -117,17 +115,6 @@ public class PriceCommand extends Command {
 			lowestBinStr += "\n**Auction:** `/viewauction " + higherDepth(lowestBinAuction, "uuid").getAsString() + "`";
 			lowestBinStr +=
 				"\n**Ends:** <t:" + Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end_t").getAsLong()).getEpochSecond() + ":R>";
-
-			String itemId = higherDepth(lowestBinAuction, "item_id").getAsString();
-			if (itemId.equals("PET")) {
-				if (!higherDepth(lowestBinAuction, "item_name").getAsString().startsWith("Mystery ")) {
-					eb.setThumbnail(
-						getPetUrl(higherDepth(lowestBinAuction, "item_name").getAsString().split("] ")[1].toUpperCase().replace(" ", "_"))
-					);
-				}
-			} else {
-				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
-			}
 
 			extras.addEmbedField("Lowest Bin", lowestBinStr, false);
 		}

@@ -18,8 +18,7 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
-import static com.skyblockplus.utils.Constants.PET_NAMES;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -76,6 +75,7 @@ public class EmojiUpdater {
 			if (!new File("src/main/java/com/skyblockplus/json/glint_images").exists()) {
 				throw new FileNotFoundException("Unable to get glint images folder");
 			}
+
 			JsonArray sbItems = getSkyblockItemsJson();
 			Set<String> allSbItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
 				.getAsJsonObject()
@@ -153,14 +153,14 @@ public class EmojiUpdater {
 				out.addProperty("ENCHANTED_BOOK", enchantedBook.getPath());
 			}
 			for (String sbItem : allSbItems) {
-				String split = sbItem.split(";")[0];
-				if (PET_NAMES.contains(split)) {
+				String[] split = sbItem.split(";");
+				if (PET_NAMES.contains(split[0])) {
 					try {
 						File imgFile;
 						File[] imgFiles = skyCryptFiles.listFiles(f -> f.getName().split(".png")[0].equals(sbItem));
 						if (imgFiles.length == 0) {
 							imgFile = new File(skyCryptFiles.getPath() + "/" + sbItem + ".png");
-							ImageIO.write(ImageIO.read(new URL(getPetUrl(split))), "png", imgFile);
+							ImageIO.write(ImageIO.read(new URL(getPetUrl(split[0], NUMBER_TO_RARITY_MAP.get(split[1])))), "png", imgFile);
 							TimeUnit.MILLISECONDS.sleep(250);
 						} else {
 							imgFile = imgFiles[0];
@@ -198,7 +198,7 @@ public class EmojiUpdater {
 			}
 			System.out.println("Finished processing SkyCrypt items");
 
-			processEnchantedEmojis("https://hst.sh/raw/iledoganuf"); // Don't forget to change this!
+			processEnchantedEmojis("https://hst.sh/raw/vubusejaqu.json"); // Don't forget to change this!
 			processCompressedImages();
 			File enchantedImagesDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 			File compressedImagesDir = new File("src/main/java/com/skyblockplus/json/compressed_images");

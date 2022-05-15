@@ -361,7 +361,7 @@ public class Utils {
 			talismanJson =
 				parseJsString(
 					"{" +
-					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js")
+					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/development/src/constants/talismans.js")
 						.replace("export const ", "")
 						.replace(" = ", ": ")
 						.replace(";", ",")
@@ -465,10 +465,10 @@ public class Utils {
 			skyCryptPetJson =
 				parseJsString(
 					Pattern
-						.compile("/\\*(.*)\\*/", Pattern.DOTALL)
+						.compile("/\\*(.*?)\\*/", Pattern.DOTALL)
 						.matcher(
 							"{" +
-							getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
+							getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/development/src/constants/pets.js")
 								.split("];")[1].replace("export const ", "")
 								.replace(" = ", ": ")
 								.replace(";", ",") +
@@ -639,12 +639,18 @@ public class Utils {
 		}
 	}
 
-	public static String getPetUrl(String petName) {
+	public static String getPetUrl(String petName, String tier) {
 		if (skyCryptPetJson == null) {
 			skyCryptPetJson = getSkyCryptPetJson();
 		}
+
+		JsonElement headData = higherDepth(skyCryptPetJson, "pet_data." + petName.toUpperCase() + ".head");
 		try {
-			return ("https://sky.shiiyu.moe" + higherDepth(skyCryptPetJson, "pet_data." + petName.toUpperCase() + ".head").getAsString());
+			if (headData.isJsonObject()) {
+				return "https://sky.shiiyu.moe" + higherDepth(headData, tier.toLowerCase(), higherDepth(headData, "default").getAsString());
+			} else {
+				return "https://sky.shiiyu.moe" + headData.getAsString();
+			}
 		} catch (Exception e) {
 			return null;
 		}
@@ -1622,6 +1628,10 @@ public class Utils {
 		return list.stream();
 	}
 
+	public static Stream<JsonElement> streamJsonArray(JsonElement array) {
+		return streamJsonArray(array.getAsJsonArray());
+	}
+
 	public static JsonArray collectJsonArray(Stream<JsonElement> list) {
 		JsonArray array = new JsonArray();
 		list.forEach(array::add);
@@ -1661,7 +1671,8 @@ public class Utils {
 
 	public static String getItemThumbnail(String id) {
 		if (PET_NAMES.contains(id.split(";")[0].trim())) {
-			return getPetUrl(id.split(";")[0].trim());
+			String[] idRaritySplit = id.split(";");
+			return getPetUrl(idRaritySplit[0], NUMBER_TO_RARITY_MAP.get(idRaritySplit[1]));
 		} else if (ENCHANT_NAMES.contains(id.split(";")[0].trim())) {
 			return "https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK";
 		}

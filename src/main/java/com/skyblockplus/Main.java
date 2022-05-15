@@ -166,7 +166,7 @@ public class Main {
 					}
 				},
 				60,
-				45,
+				30,
 				TimeUnit.SECONDS
 			); // Sorry for the war crimes
 

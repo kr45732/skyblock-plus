@@ -80,6 +80,7 @@ public class EventGuild {
 					gson.fromJson(higherDepth(eventSettings, "events").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
 			}
 		} catch (Exception e) {
+			enable = false;
 			AutomaticGuild.getLogger().error(parent.guildId, e);
 		}
 	}

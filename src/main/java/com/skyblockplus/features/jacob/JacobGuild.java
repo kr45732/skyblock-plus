@@ -44,7 +44,7 @@ public class JacobGuild {
 	public boolean onFarmingContest(List<String> crops, MessageEmbed embed) {
 		try {
 			if (enable) {
-				if (channel != null && !channel.canTalk()) {
+				if (!channel.canTalk()) {
 					parent.logAction(
 						defaultEmbed("Jacob Notifications")
 							.setDescription("Missing permissions to view or send messages in " + channel.getAsMention())
@@ -79,6 +79,7 @@ public class JacobGuild {
 					gson.fromJson(higherDepth(jacobSettings, "crops").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
 			}
 		} catch (Exception e) {
+			enable = false;
 			AutomaticGuild.getLogger().error(parent.guildId, e);
 		}
 	}

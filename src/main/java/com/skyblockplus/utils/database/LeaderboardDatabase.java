@@ -18,33 +18,36 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.*;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelGuildCache;
-import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import org.apache.commons.collections4.ListUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.utils.ApiHandler.asyncSkyblockProfilesFromUuid;
+import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
+import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
+import static com.skyblockplus.utils.Utils.*;
 
 public class LeaderboardDatabase {
 
@@ -87,7 +90,7 @@ public class LeaderboardDatabase {
 		Player.Gamemode.IRONMAN,
 		Player.Gamemode.STRANDED
 	);
-	public int guildCount = -1;
+	public int userCount = -1;
 
 	public LeaderboardDatabase() {
 		dataSource = new MongoClient(new MongoClientURI(LEADERBOARD_DB_URL));
@@ -270,7 +273,7 @@ public class LeaderboardDatabase {
 				if (usernameUuidStruct.isNotValid()) {
 					executor.submit(() -> {
 						for (Player.Gamemode gamemode : leaderboardGamemodes) {
-							leaderboardDatabase.deleteFromLeaderboard(uuid, gamemode);
+							deleteFromLeaderboard(uuid, gamemode);
 						}
 					});
 				} else {
@@ -290,34 +293,27 @@ public class LeaderboardDatabase {
 				log.info("Updated " + count + " leaderboard players in " + (System.currentTimeMillis() - start) + "ms");
 			}
 
-			if (count <= 5 && guildCount != -1) {
-				count = 0;
-				String guildId = higherDepth(
-					getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/guilds.json"),
-					"[" + guildCount + "]",
-					null
-				);
-				if (guildId == null) {
-					guildCount = -1;
-					log.info("All guilds added");
+			if (count <= 5 && userCount != -1) {
+				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/users.json").getAsJsonArray();
+				if(userCount >= members.size()){
+					log.info("Finished updating all users");
+					userCount = -1;
 					return;
 				}
-				HypixelResponse guildResponse = getGuildFromId(guildId);
-				if (!guildResponse.isNotValid()) {
-					JsonArray members = guildResponse.get("members").getAsJsonArray();
-					for (JsonElement member : members) {
-						String uuid = higherDepth(member, "uuid").getAsString();
-						UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
-						if (usernameUuidStruct.isNotValid()) {
-							executor.submit(() -> {
-								for (Player.Gamemode gamemode : leaderboardGamemodes) {
-									leaderboardDatabase.deleteFromLeaderboard(uuid, gamemode);
-								}
-							});
-						} else {
-							asyncSkyblockProfilesFromUuid(
+
+				for(count =0; count < 90 && userCount < members.size() && System.currentTimeMillis() - start < 60000; userCount++, count++) {
+					String uuid = members.get(userCount).getAsString();
+					UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
+					if (usernameUuidStruct.isNotValid()) {
+						executor.submit(() -> {
+							for (Player.Gamemode gamemode : leaderboardGamemodes) {
+								deleteFromLeaderboard(uuid, gamemode);
+							}
+						});
+					} else {
+						asyncSkyblockProfilesFromUuid(
 								usernameUuidStruct.uuid(),
-								count < (members.size() / 2)
+								count < 45
 									? "c0cc68fc-a82a-462f-96ef-a060c22465fa"
 									: "4991bfe2-d7aa-446a-b310-c7a70690927c",
 								false
@@ -328,13 +324,10 @@ public class LeaderboardDatabase {
 										false
 									)
 								);
-						}
-						count++;
 					}
 				}
 
-				log.info("Finished guild count: " + guildCount);
-				guildCount++;
+				log.info("Finished up to user count: " + userCount);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

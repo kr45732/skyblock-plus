@@ -66,7 +66,7 @@ public class InvItem {
 
 	public String getFormattedId() {
 		if (id.equals("PET") && getName().contains("] ")) {
-			return getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(getPetRarity());
+			return getName().split("] ")[1].toUpperCase().replace(" ", "_").replace("_✦", "") + RARITY_TO_NUMBER_MAP.get(getPetRarity());
 		} else if (id.equals("ENCHANTED_BOOK")) {
 			return enchantsFormatted.isEmpty() ? id : enchantsFormatted.get(0).toUpperCase();
 		} else {
