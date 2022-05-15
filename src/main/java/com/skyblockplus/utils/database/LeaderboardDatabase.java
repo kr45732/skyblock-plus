@@ -77,8 +77,7 @@ public class LeaderboardDatabase {
 			"deaths",
 			"kills",
 			"highest_damage",
-			"coins",
-			"dungeon_secrets"
+			"coins"
 		),
 		COLLECTION_NAME_TO_ID.keySet().stream().toList()
 	);
