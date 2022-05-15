@@ -615,9 +615,11 @@ public class HelpCommand extends Command {
 									.addExamples("remove sven 400000", "remove alchemy 50"),
 								new HelpData("set", "Set the Discord role for a one level role.", "set <role_name> <@role>")
 									.addExamples("set ironman @ironman player", "set pet_enthusiast @pet lover"),
-									new HelpData("use_highest",
-											"Enable or disable using the highest values across all profile. Default is false", "use_highest <enable|disable>"
-									)
+								new HelpData(
+									"use_highest",
+									"Enable or disable using the highest values across all profile. Default is false",
+									"use_highest <enable|disable>"
+								)
 							),
 						new HelpData("guild", "Main command for automatic guild (application and guild roles/ranks).")
 							.addSecondData("List all setup automatic guilds.", "guild")
