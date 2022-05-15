@@ -18,6 +18,11 @@
 
 package com.skyblockplus.utils.database;
 
+import static com.skyblockplus.utils.ApiHandler.asyncSkyblockProfilesFromUuid;
+import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
+import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -32,22 +37,16 @@ import com.mongodb.client.model.Updates;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import org.apache.commons.collections4.ListUtils;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.ApiHandler.asyncSkyblockProfilesFromUuid;
-import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
-import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
-import static com.skyblockplus.utils.Utils.*;
+import org.apache.commons.collections4.ListUtils;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LeaderboardDatabase {
 
@@ -294,14 +293,19 @@ public class LeaderboardDatabase {
 			}
 
 			if (count <= 5 && userCount != -1) {
-				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/users.json").getAsJsonArray();
-				if(userCount >= members.size()){
+				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/users.json")
+					.getAsJsonArray();
+				if (userCount >= members.size()) {
 					log.info("Finished updating all users");
 					userCount = -1;
 					return;
 				}
 
-				for(count =0; count < 90 && userCount < members.size() && System.currentTimeMillis() - start < 60000; userCount++, count++) {
+				for (
+					count = 0;
+					count < 90 && userCount < members.size() && System.currentTimeMillis() - start < 60000;
+					userCount++, count++
+				) {
 					String uuid = members.get(userCount).getAsString();
 					UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
 					if (usernameUuidStruct.isNotValid()) {
@@ -312,18 +316,13 @@ public class LeaderboardDatabase {
 						});
 					} else {
 						asyncSkyblockProfilesFromUuid(
-								usernameUuidStruct.uuid(),
-								count < 45
-									? "c0cc68fc-a82a-462f-96ef-a060c22465fa"
-									: "4991bfe2-d7aa-446a-b310-c7a70690927c",
-								false
-							)
-								.whenComplete((r, e) ->
-									insertIntoLeaderboard(
-										new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true),
-										false
-									)
-								);
+							usernameUuidStruct.uuid(),
+							count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+							false
+						)
+							.whenComplete((r, e) ->
+								insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
+							);
 					}
 				}
 
