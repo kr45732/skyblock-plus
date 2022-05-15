@@ -582,10 +582,10 @@ public class HelpCommand extends Command {
 								new HelpData("sync", "Enable or disable verify automatic sync")
 									.addSubcommands(
 										new HelpData(
-											"true",
+											"enable",
 											"Enable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every 3 hours."
 										),
-										new HelpData("false", "Disable verification automatic sync")
+										new HelpData("disable", "Disable verification automatic sync")
 									),
 								new HelpData("roles_claim", "Enable or disable automatic roles sync")
 									.addSubcommands(
@@ -614,7 +614,10 @@ public class HelpCommand extends Command {
 								new HelpData("remove", "Remove a role level for a role.", "remove <role_name> <value>")
 									.addExamples("remove sven 400000", "remove alchemy 50"),
 								new HelpData("set", "Set the Discord role for a one level role.", "set <role_name> <@role>")
-									.addExamples("set ironman @ironman player", "set pet_enthusiast @pet lover")
+									.addExamples("set ironman @ironman player", "set pet_enthusiast @pet lover"),
+									new HelpData("use_highest",
+											"Enable or disable using the highest values across all profile. Default is false", "use_highest <enable|disable>"
+									)
 							),
 						new HelpData("guild", "Main command for automatic guild (application and guild roles/ranks).")
 							.addSecondData("List all setup automatic guilds.", "guild")
@@ -682,7 +685,7 @@ public class HelpCommand extends Command {
 										new HelpData(
 											"check_api",
 											"Whether an applicant must have all APIs enabled in order to apply.",
-											"settings guild <name> apply check_api <true|false>",
+											"settings guild <name> apply check_api <enable|disable>",
 											true
 										),
 										new HelpData(
@@ -751,7 +754,7 @@ public class HelpCommand extends Command {
 										new HelpData(
 											"scammer_check",
 											"Enable or disable if a player should automatically be denied if they are marked as a scammer in the SkyblockZ database. Defaults to false.",
-											"settings guild <name> apply scammer_check <true|false>",
+											"settings guild <name> apply scammer_check <enable|disable>",
 											true
 										),
 										new HelpData(
@@ -1008,7 +1011,7 @@ public class HelpCommand extends Command {
 			) +
 			help.create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none") +
 			help.create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
-			help.create("settings verify sync <true|false>", "Enable or disable automatic verify role and nickname syncing") +
+			help.create("settings verify sync <enable|disable>", "Enable or disable automatic verify role and nickname syncing") +
 			help.create("settings verify roles_claim <enable|disable>", "Enable or disable automatic role syncing")
 		);
 
@@ -1061,7 +1064,7 @@ public class HelpCommand extends Command {
 				"Remove a requirement. Run `settings guild <name>` to see the index for all current requirements"
 			) +
 			help.create(
-				"settings guild <name> apply scammer_check <true|false>",
+				"settings guild <name> apply scammer_check <enable|disable>",
 				"Whether the applicant should be automatically be denied if marked a scammer in the SkyblockZ database"
 			) +
 			help.create(
@@ -1074,7 +1077,7 @@ public class HelpCommand extends Command {
 			help.create("settings roles", "Get the current roles settings for the bot") +
 			help.create("settings roles <enable|disable>", "Enable or disable automatic roles") +
 			help.create(
-				"settings roles use_highest <true|false>",
+				"settings roles use_highest <enable|disable>",
 				"Enable or disable using the highest values or last played on profile. Default is false"
 			) +
 			help.create(

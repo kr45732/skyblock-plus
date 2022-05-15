@@ -277,9 +277,9 @@ public class SettingsExecute {
 						eb = setRoleEnable(args[3], false);
 						break;
 					case "use_highest":
-						if (args[3].equals("true")) {
+						if (args[3].equals("enable")) {
 							eb = setRolesUseHighest(true);
-						} else if (args[3].equals("false")) {
+						} else if (args[3].equals("disable")) {
 							eb = setRolesUseHighest(false);
 						}
 						break;
@@ -326,14 +326,14 @@ public class SettingsExecute {
 					case "remove_role" -> eb = setVerifyRemoveRole(args[3]);
 					case "sync" -> eb =
 						switch (args[3]) {
-							case "true" -> setVerifySyncEnable(true);
-							case "false" -> setVerifySyncEnable(false);
+							case "enable" -> setVerifySyncEnable(true);
+							case "disable" -> setVerifySyncEnable(false);
 							default -> null;
 						};
 					case "roles_claim" -> eb =
 						switch (args[3]) {
-							case "true" -> setRolesClaimEnable(true);
-							case "false" -> setRolesClaimEnable(false);
+							case "enable" -> setRolesClaimEnable(true);
+							case "disable" -> setRolesClaimEnable(false);
 							default -> null;
 						};
 				}
@@ -444,16 +444,16 @@ public class SettingsExecute {
 						case "deny_message" -> eb = setApplyDenyMessage(guildSettings.getAsJsonObject(), args[5]);
 						case "gamemode" -> eb = setApplyGamemode(guildSettings.getAsJsonObject(), args[5]);
 						case "scammer_check" -> {
-							if (args[5].equals("true")) {
+							if (args[5].equals("enable")) {
 								eb = setApplyScammerCheck(guildSettings.getAsJsonObject(), true);
-							} else if (args[5].equals("false")) {
+							} else if (args[5].equals("disable")) {
 								eb = setApplyScammerCheck(guildSettings.getAsJsonObject(), false);
 							}
 						}
 						case "check_api" -> {
-							if (args[5].equals("true")) {
+							if (args[5].equals("enable")) {
 								eb = setApplyCheckApiEnable(guildSettings.getAsJsonObject(), true);
-							} else if (args[5].equals("false")) {
+							} else if (args[5].equals("disable")) {
 								eb = setApplyCheckApiEnable(guildSettings.getAsJsonObject(), false);
 							}
 						}
