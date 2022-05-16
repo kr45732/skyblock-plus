@@ -711,10 +711,29 @@ public class Player {
 
 	/* InvItem maps */
 	public Map<Integer, InvItem> getInventoryMap() {
+		return getInventoryMap(false);
+	}
+
+	public Map<Integer, InvItem> getInventoryMap(boolean sort) {
 		try {
 			String contents = higherDepth(profileJson(), "inv_contents.data").getAsString();
 			NBTCompound parsedContents = NBTReader.readBase64(contents);
-			return getGenericInventoryMap(parsedContents);
+			Map<Integer, InvItem> invMap = getGenericInventoryMap(parsedContents);
+			if (sort) {
+				Map<Integer, InvItem> sortedMap = new TreeMap<>();
+				for (Map.Entry<Integer, InvItem> entry : invMap.entrySet()) {
+					if (entry.getKey() >= 9 && entry.getKey() <= 17) {
+						sortedMap.put(entry.getKey() + 18, entry.getValue());
+					} else if (entry.getKey() >= 27) {
+						sortedMap.put(entry.getKey() - 18, entry.getValue());
+					} else {
+						sortedMap.put(entry.getKey(), entry.getValue());
+					}
+				}
+				return sortedMap;
+			} else {
+				return invMap;
+			}
 		} catch (Exception ignored) {}
 		return null;
 	}
@@ -1677,7 +1696,7 @@ public class Player {
 	}
 
 	public boolean isInventoryApiEnabled() {
-		return getInventoryMap() != null;
+		return higherDepth(profileJson(), "inv_contents.data",null) != null;
 	}
 
 	public boolean isBankApiEnabled() {

@@ -140,7 +140,7 @@ public class NetworthExecute {
 						return;
 					}
 
-					paginate(getPlayerNetworth(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerNetworth(player, args.length == 3 ? args[2] : null, getPaginatorEvent()));
 					return;
 				}
 

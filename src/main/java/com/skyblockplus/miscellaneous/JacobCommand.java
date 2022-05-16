@@ -88,7 +88,7 @@ public class JacobCommand extends Command {
 				logCommand();
 
 				setArgs(2);
-				paginate(getJacobEmbed(args.length == 2 ? args[1] : "all", new PaginatorEvent(event)));
+				paginate(getJacobEmbed(args.length == 2 ? args[1] : "all", getPaginatorEvent()));
 			}
 		}
 			.queue();

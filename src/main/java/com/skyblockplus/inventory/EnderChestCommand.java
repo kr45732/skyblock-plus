@@ -55,13 +55,13 @@ public class EnderChestCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerEnderChestList(player, args.length == 3 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
+					paginate(getPlayerEnderChestList(player, args.length == 3 ? args[2] : null, slotNumber, getPaginatorEvent()));
 				} else {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					paginate(getPlayerEnderChest(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerEnderChest(player, args.length == 3 ? args[2] : null, getPaginatorEvent()), true);
 				}
 			}
 		}

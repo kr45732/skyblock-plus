@@ -59,6 +59,7 @@ public class LeaderboardPaginator {
 		this.gamemode = gamemode;
 		this.player = player;
 		this.event = event;
+		this.message = event.getLoadingMessage();
 
 		if (rank != -1) {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, rank - 200, rank + 200));
@@ -99,19 +100,15 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
-		message =
-			event
-				.getChannel()
-				.sendMessageEmbeds(getRender().build())
+		event.getAction().editMessageEmbeds(getRender().build())
 				.setActionRow(
 					Button
 						.primary("leaderboard_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
 						.withDisabled(pageFirstRank == 1),
 					Button.primary("leaderboard_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
 				)
-				.complete();
-
-		waitForEvent();
+				.get()
+				.queue((ignored) -> waitForEvent());
 	}
 
 	private EmbedBuilder getRender() {

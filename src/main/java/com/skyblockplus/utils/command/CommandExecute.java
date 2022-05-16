@@ -114,8 +114,14 @@ public abstract class CommandExecute extends CommandEvent {
 	}
 
 	protected void paginate(EmbedBuilder embedBuilder) {
+		paginate(embedBuilder, false);
+	}
+
+	protected void paginate(EmbedBuilder embedBuilder, boolean deleteOriginal) {
 		if (embedBuilder == null) {
-			ebMessage.delete().queue(ignore, ignore);
+			if(deleteOriginal) {
+				ebMessage.delete().queue(ignore, ignore);
+			}
 		} else {
 			ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignore, ignore);
 		}
@@ -269,5 +275,9 @@ public abstract class CommandExecute extends CommandEvent {
 	public CommandExecute setAdminCommand(boolean adminCommand) {
 		this.adminCommand = adminCommand;
 		return this;
+	}
+
+	public PaginatorEvent getPaginatorEvent(){
+		return new PaginatorEvent(this);
 	}
 }

@@ -350,7 +350,7 @@ public class AuctionsCommand extends Command {
 					return;
 				}
 
-				paginate(getPlayerAuction(player, filterType, sortType, verbose, new PaginatorEvent(event)));
+				paginate(getPlayerAuction(player, filterType, sortType, verbose, getPaginatorEvent()));
 			}
 		}
 			.queue();

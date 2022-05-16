@@ -299,7 +299,7 @@ public class PartyCommand extends Command {
 				if (args.length == 2) {
 					switch (args[1]) {
 						case "create" -> {
-							paginate(createParty(new PaginatorEvent(event)));
+							paginate(createParty(getPaginatorEvent()), true);
 							return;
 						}
 						case "list" -> {
@@ -307,26 +307,26 @@ public class PartyCommand extends Command {
 							return;
 						}
 						case "leave" -> {
-							embed(leaveParty(new PaginatorEvent(event)));
+							embed(leaveParty(getPaginatorEvent()));
 							return;
 						}
 						case "disband" -> {
-							embed(disbandParty(new PaginatorEvent(event)));
+							embed(disbandParty(getPaginatorEvent()));
 							return;
 						}
 						case "current" -> {
-							embed(getCurrentParty(new PaginatorEvent(event)));
+							embed(getCurrentParty(getPaginatorEvent()));
 							return;
 						}
 					}
 				} else if (args.length == 3) {
 					switch (args[1]) {
 						case "join" -> {
-							embed(joinParty(args[2], new PaginatorEvent(event)));
+							embed(joinParty(args[2], getPaginatorEvent()));
 							return;
 						}
 						case "kick" -> {
-							embed(kickMemberFromParty(args[2], new PaginatorEvent(event)));
+							embed(kickMemberFromParty(args[2], getPaginatorEvent()));
 							return;
 						}
 					}

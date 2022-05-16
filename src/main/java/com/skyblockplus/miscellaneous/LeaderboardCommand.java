@@ -81,7 +81,7 @@ public class LeaderboardCommand extends Command {
 						return;
 					}
 
-					paginate(getLeaderboard(args[1], player, gamemode, page, rank, amount, new PaginatorEvent(event)));
+					paginate(getLeaderboard(args[1], player, gamemode, page, rank, amount, getPaginatorEvent()));
 					return;
 				}
 

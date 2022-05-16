@@ -148,7 +148,7 @@ public class CoinsCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerBankHistory(player, args.length == 4 ? args[3] : null, new PaginatorEvent(event)));
+					paginate(getPlayerBankHistory(player, args.length == 4 ? args[3] : null, getPaginatorEvent()));
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {

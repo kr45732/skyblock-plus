@@ -75,14 +75,14 @@ public class TalismanBagCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerTalismansList(player, args.length == 3 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
+					paginate(getPlayerTalismansList(player, args.length == 3 ? args[2] : null, slotNumber, getPaginatorEvent()));
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					paginate(getPlayerTalismansEmoji(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerTalismansEmoji(player, args.length == 3 ? args[2] : null, getPaginatorEvent()), true);
 					return;
 				}
 

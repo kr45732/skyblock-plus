@@ -163,7 +163,7 @@ public class CheckGuildApiCommand extends Command {
 						return;
 					}
 
-					paginate(getGuildCheckApi(player, exclude, new PaginatorEvent(event)));
+					paginate(getGuildCheckApi(player, exclude, getPaginatorEvent()));
 					return;
 				}
 

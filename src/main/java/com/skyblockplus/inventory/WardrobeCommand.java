@@ -83,14 +83,14 @@ public class WardrobeCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerWardrobeList(player, args.length == 4 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerWardrobeList(player, args.length == 4 ? args[2] : null, getPaginatorEvent()));
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					paginate(getPlayerWardrobe(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerWardrobe(player, args.length == 3 ? args[2] : null, getPaginatorEvent()), true);
 					return;
 				}
 

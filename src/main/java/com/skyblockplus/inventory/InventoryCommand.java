@@ -44,7 +44,7 @@ public class InventoryCommand extends Command {
 	public static EmbedBuilder getPlayerInventoryList(String username, String profileName, int slotNum, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			Map<Integer, InvItem> inventoryMap = player.getInventoryMap();
+			Map<Integer, InvItem> inventoryMap = player.getInventoryMap(true);
 			if (inventoryMap != null) {
 				new InventoryListPaginator(player, inventoryMap, slotNum, event);
 				return null;
@@ -88,13 +88,13 @@ public class InventoryCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerInventoryList(player, args.length == 3 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
+					paginate(getPlayerInventoryList(player, args.length == 3 ? args[2] : null, slotNumber, getPaginatorEvent()));
 				} else {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					paginate(getPlayerInventory(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerInventory(player, args.length == 3 ? args[2] : null, getPaginatorEvent()), true);
 				}
 			}
 		}

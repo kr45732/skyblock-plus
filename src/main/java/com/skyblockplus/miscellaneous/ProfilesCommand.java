@@ -120,7 +120,7 @@ public class ProfilesCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerProfiles(player, new PaginatorEvent(event)));
+					paginate(getPlayerProfiles(player, getPaginatorEvent()));
 					return;
 				}
 

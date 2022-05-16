@@ -165,7 +165,7 @@ public class SkillsCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerSkill(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerSkill(player, args.length == 3 ? args[2] : null, getPaginatorEvent()));
 					return;
 				}
 

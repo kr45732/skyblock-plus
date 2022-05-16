@@ -126,7 +126,7 @@ public class CalcDragsCommand extends Command {
 				int position = getIntOption("position", 1);
 				double damageRatio = getDoubleOption("ratio", 1);
 
-				paginate(getCalcDrags(position, damageRatio, eyesPlaced, new PaginatorEvent(event)));
+				paginate(getCalcDrags(position, damageRatio, eyesPlaced, getPaginatorEvent()));
 			}
 		}
 			.queue();

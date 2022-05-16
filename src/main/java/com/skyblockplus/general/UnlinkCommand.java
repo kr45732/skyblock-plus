@@ -81,7 +81,7 @@ public class UnlinkCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				embed(unlinkAccount(new PaginatorEvent(event)));
+				embed(unlinkAccount(getPaginatorEvent()));
 			}
 		}
 			.queue();

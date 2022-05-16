@@ -467,7 +467,7 @@ public class GuildRanksCommand extends Command {
 					Player.Gamemode gamemode = getGamemodeOption("mode", Player.Gamemode.ALL);
 					boolean useKey = getBooleanArg("--usekey");
 
-					paginate(getRanks(args[1].split(":")[1], gamemode, useKey, new PaginatorEvent(event)));
+					paginate(getRanks(args[1].split(":")[1], gamemode, useKey, getPaginatorEvent()));
 					return;
 				}
 

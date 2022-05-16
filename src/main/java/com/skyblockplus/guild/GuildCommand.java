@@ -343,25 +343,25 @@ public class GuildCommand extends Command {
 
 					setArgs(3);
 					if (args.length >= 3 && args[2].startsWith("g:")) {
-						paginate(getGuildExpFromName(args[2].split("g:")[1], days, new PaginatorEvent(event)));
+						paginate(getGuildExpFromName(args[2].split("g:")[1], days, getPaginatorEvent()));
 					} else {
 						if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 							return;
 						}
 
-						paginate(getGuildExpFromPlayer(player, days, new PaginatorEvent(event)));
+						paginate(getGuildExpFromPlayer(player, days, getPaginatorEvent()));
 					}
 				} else if (args.length >= 2 && "members".equals(args[1])) {
 					setArgs(3);
 
 					if (args.length >= 3 && args[2].startsWith("g:")) {
-						paginate(getGuildMembersFromName(args[2].split("g:")[1], new PaginatorEvent(event)));
+						paginate(getGuildMembersFromName(args[2].split("g:")[1], getPaginatorEvent()));
 					} else {
 						if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 							return;
 						}
 
-						paginate(getGuildMembersFromPlayer(player, new PaginatorEvent(event)));
+						paginate(getGuildMembersFromPlayer(player, getPaginatorEvent()));
 					}
 				} else {
 					setArgs(2);

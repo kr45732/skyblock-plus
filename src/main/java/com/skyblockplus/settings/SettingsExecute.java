@@ -93,7 +93,7 @@ public class SettingsExecute {
 					logCommand();
 				}
 
-				paginate(getSettingsEmbed(content, args));
+				paginate(getSettingsEmbed(content, args), true);
 			}
 		}
 			.queue();

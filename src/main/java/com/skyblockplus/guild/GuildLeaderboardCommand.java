@@ -209,13 +209,13 @@ public class GuildLeaderboardCommand extends Command {
 				setArgs(3);
 				if (args.length >= 2) {
 					if (args.length >= 3 && args[2].startsWith("g:")) {
-						paginate(getLeaderboard(args[1], null, args[2].split("g:")[1], gamemode, new PaginatorEvent(event)));
+						paginate(getLeaderboard(args[1], null, args[2].split("g:")[1], gamemode, getPaginatorEvent()));
 					} else {
 						if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 							return;
 						}
 
-						paginate(getLeaderboard(args[1], player, null, gamemode, new PaginatorEvent(event)));
+						paginate(getLeaderboard(args[1], player, null, gamemode, getPaginatorEvent()));
 					}
 					return;
 				}

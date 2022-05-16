@@ -134,7 +134,7 @@ public class SacksCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerSacks(player, args.length == 3 ? args[2] : null, useNpc, new PaginatorEvent(event)));
+					paginate(getPlayerSacks(player, args.length == 3 ? args[2] : null, useNpc, getPaginatorEvent()));
 					return;
 				}
 

@@ -75,6 +75,7 @@ public class JacobGuild {
 			enable = higherDepth(jacobSettings, "enable", false);
 			if (enable) {
 				channel = jda.getGuildById(parent.guildId).getTextChannelById(higherDepth(jacobSettings, "channel").getAsString());
+				channel.getId();
 				wantedCrops =
 					gson.fromJson(higherDepth(jacobSettings, "crops").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
 			}

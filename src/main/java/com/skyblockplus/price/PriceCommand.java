@@ -144,7 +144,7 @@ public class PriceCommand extends Command {
 					}
 				}
 				if (args.length == 2) {
-					paginate(queryAuctions(args[1], auctionType, new PaginatorEvent(event)));
+					paginate(queryAuctions(args[1], auctionType, getPaginatorEvent()));
 					return;
 				}
 

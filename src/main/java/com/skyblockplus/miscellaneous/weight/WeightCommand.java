@@ -156,7 +156,7 @@ public class WeightCommand extends Command {
 					return;
 				}
 
-				paginate(getPlayerWeight(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+				paginate(getPlayerWeight(player, args.length == 3 ? args[2] : null, getPaginatorEvent()));
 			}
 		}
 			.queue();

@@ -50,7 +50,7 @@ public class StorageCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerStorage(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerStorage(player, args.length == 3 ? args[2] : null, getPaginatorEvent()), true);
 					return;
 				}
 

@@ -1111,7 +1111,7 @@ public class HelpCommand extends Command {
 				logCommand();
 				setArgs(2);
 
-				paginate(getHelp(args.length >= 2 ? args[1].toLowerCase() : null, new PaginatorEvent(event)));
+				paginate(getHelp(args.length >= 2 ? args[1].toLowerCase() : null, getPaginatorEvent()));
 			}
 		}
 			.queue();

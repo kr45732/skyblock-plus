@@ -711,7 +711,7 @@ public class SkyblockEventCommand extends Command {
 
 					switch (args[1]) {
 						case "create" -> {
-							paginate(createSkyblockEvent(new PaginatorEvent(event)));
+							paginate(createSkyblockEvent(getPaginatorEvent()));
 							return;
 						}
 						case "current" -> {
@@ -731,7 +731,7 @@ public class SkyblockEventCommand extends Command {
 							return;
 						}
 						case "leaderboard", "lb" -> {
-							paginate(getEventLeaderboard(new PaginatorEvent(event)));
+							paginate(getEventLeaderboard(getPaginatorEvent()));
 							return;
 						}
 						case "end" -> {

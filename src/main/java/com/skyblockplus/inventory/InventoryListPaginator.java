@@ -38,7 +38,6 @@ import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 
 public class InventoryListPaginator {
@@ -63,8 +62,9 @@ public class InventoryListPaginator {
 		this.maxPageNumber = items.size() - 1;
 		this.lastEdit = Instant.now();
 		this.pageNumber = Math.min(Math.max(0, slot - 1), maxPageNumber);
+		this.message = event.getLoadingMessage();
 
-		MessageAction action;
+		PaginatorEvent.PaginatorAction action;
 		EmbedBuilder eb = player
 			.defaultPlayerEmbed()
 			.setThumbnail(null)
@@ -72,7 +72,7 @@ public class InventoryListPaginator {
 		InvItem item = items.get(pageNumber);
 		if (item == null) {
 			eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
-			action = event.getChannel().sendMessageEmbeds(eb.build());
+			action = event.getAction().editMessageEmbeds(eb.build());
 		} else {
 			eb
 				.setDescription(
@@ -86,9 +86,9 @@ public class InventoryListPaginator {
 				)
 				.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
 				.setImage("attachment://lore.png");
-			action = event.getChannel().sendMessageEmbeds(eb.build()).addFile(new File(getRenderedLore()), "lore.png");
+			action = event.getAction().editMessageEmbeds(eb.build()).addFile(new File(getRenderedLore()), "lore.png");
 		}
-		this.message =
+
 			action
 				.setActionRow(
 					Button
@@ -98,9 +98,8 @@ public class InventoryListPaginator {
 						.primary("inv_list_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
 						.withDisabled(pageNumber == maxPageNumber)
 				)
-				.complete();
+				.get().queue(ignored -> waitForEvent());
 
-		waitForEvent();
 	}
 
 	public String getRenderedLore() {

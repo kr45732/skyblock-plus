@@ -50,8 +50,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 					event.getOptionStr("profile"),
 					event.getOptionInt("slot", 0),
 					new PaginatorEvent(event)
-				),
-				true
+				)
 			);
 			case "emoji" -> event.paginate(
 				EnderChestCommand.getPlayerEnderChest(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),

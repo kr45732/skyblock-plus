@@ -120,7 +120,7 @@ public class CalcDropsCommand extends Command {
 						}
 					} catch (Exception ignored) {}
 
-					paginate(getCalcDrops(floorInt, bossLuck, talisman, new PaginatorEvent(event)));
+					paginate(getCalcDrops(floorInt, bossLuck, talisman, getPaginatorEvent()));
 					return;
 				}
 

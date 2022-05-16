@@ -188,7 +188,7 @@ public class MissingCommand extends Command {
 						return;
 					}
 
-					paginate(getMissingTalismans(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getMissingTalismans(player, args.length == 3 ? args[2] : null, getPaginatorEvent()));
 					return;
 				}
 

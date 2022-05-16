@@ -76,6 +76,7 @@ public class EventGuild {
 			enable = higherDepth(eventSettings, "enable", false);
 			if (enable) {
 				channel = jda.getGuildById(parent.guildId).getTextChannelById(higherDepth(eventSettings, "channel").getAsString());
+				channel.getId();
 				wantedEvents =
 					gson.fromJson(higherDepth(eventSettings, "events").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
 			}

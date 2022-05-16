@@ -320,7 +320,7 @@ public class GuildKickerCommand extends Command {
 				args = content.split("\\s+", 3);
 
 				if (args.length == 3 && args[1].toLowerCase().startsWith("u:")) {
-					paginate(getGuildKicker(args[1].split(":")[1], args[2], useKey, new PaginatorEvent(event)));
+					paginate(getGuildKicker(args[1].split(":")[1], args[2], useKey, getPaginatorEvent()));
 					return;
 				}
 

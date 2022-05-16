@@ -115,7 +115,7 @@ public class BidsCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerBids(player, new PaginatorEvent(event)));
+					paginate(getPlayerBids(player, getPaginatorEvent()));
 					return;
 				}
 

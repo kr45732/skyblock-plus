@@ -598,7 +598,7 @@ public class RolesCommand extends Command {
 					embed(updateRoles(args.length == 3 ? args[2] : null, event.getGuild(), event.getMember()));
 					return;
 				} else if (args.length == 2 && args[1].equals("list")) {
-					paginate(listRoles(new PaginatorEvent(event)));
+					paginate(listRoles(getPaginatorEvent()));
 					return;
 				}
 

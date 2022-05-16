@@ -18,20 +18,29 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
+import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
+
+import java.io.File;
+
+import static com.skyblockplus.utils.Utils.defaultPaginator;
 
 public class PaginatorEvent {
 
 	private final SlashCommandEvent slashCommand;
 	private final CommandEvent command;
+	private Message loadingMessage;
 
-	public PaginatorEvent(Object event) {
+	public PaginatorEvent(Object event){
+		this(event, event instanceof CommandExecute e ? e.ebMessage : null);
+	}
+
+	public PaginatorEvent(Object event, Message loadingMessage) {
+		this.loadingMessage = loadingMessage;
 		if (event instanceof SlashCommandEvent e) {
 			slashCommand = e;
 			command = null;
@@ -41,6 +50,10 @@ public class PaginatorEvent {
 		} else {
 			throw new IllegalArgumentException("Invalid event class type provided: " + event.getClass());
 		}
+	}
+
+	public Message getLoadingMessage(){
+		return loadingMessage == null && isSlashCommand() ? (loadingMessage = slashCommand.getHook().retrieveOriginal().complete()) : loadingMessage;
 	}
 
 	public boolean isSlashCommand() {
@@ -56,13 +69,15 @@ public class PaginatorEvent {
 	}
 
 	public void paginate(CustomPaginator.Builder builder) {
-		paginate(builder, 0);
+		paginate(builder, 1);
 	}
 
 	public void paginate(CustomPaginator.Builder builder, int page) {
 		if (isSlashCommand()) {
 			builder.build().paginate(slashCommand.getHook(), page);
-		} else {
+		} else if(loadingMessage != null) {
+			builder.build().paginate(loadingMessage, page);
+		}else{
 			builder.build().paginate(command.getChannel(), page);
 		}
 	}
@@ -81,5 +96,45 @@ public class PaginatorEvent {
 
 	public CustomPaginator.Builder getPaginator() {
 		return defaultPaginator(getUser()).setColumns(1).setItemsPerPage(1);
+	}
+
+	public PaginatorAction getAction(){
+		return new PaginatorAction(this);
+	}
+
+	public static class PaginatorAction {
+		private final PaginatorEvent event;
+		private RestAction<Message> action;
+
+		public PaginatorAction(PaginatorEvent event) {
+			this.event = event;
+		}
+
+		public PaginatorAction editMessageEmbeds(MessageEmbed... embeds) {
+			action = event.isSlashCommand() ? event.getSlashCommand().getHook().editOriginalEmbeds(embeds) : event.getLoadingMessage().editMessageEmbeds(embeds);
+			return this;
+		}
+
+		public PaginatorAction setActionRow(ItemComponent... components) {
+			action = event.isSlashCommand() ? getSlashCommandAction().setActionRow(components) : getCommandAction().setActionRow(components);
+			return this;
+		}
+
+		public WebhookMessageUpdateAction<Message> getSlashCommandAction() {
+			return (WebhookMessageUpdateAction<Message>) action;
+		}
+
+		public MessageAction getCommandAction() {
+			return (MessageAction) action;
+		}
+
+		public RestAction<Message> get(){
+			return action;
+		}
+
+		public PaginatorAction addFile(File file, String name) {
+			action = event.isSlashCommand() ? getSlashCommandAction().addFile(file, name) : getCommandAction().addFile(file, name);
+			return this;
+		}
 	}
 }
