@@ -1696,7 +1696,7 @@ public class Player {
 	}
 
 	public boolean isInventoryApiEnabled() {
-		return higherDepth(profileJson(), "inv_contents.data",null) != null;
+		return higherDepth(profileJson(), "inv_contents.data", null) != null;
 	}
 
 	public boolean isBankApiEnabled() {

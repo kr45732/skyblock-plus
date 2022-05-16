@@ -100,15 +100,17 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
-		event.getAction().editMessageEmbeds(getRender().build())
-				.setActionRow(
-					Button
-						.primary("leaderboard_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
-						.withDisabled(pageFirstRank == 1),
-					Button.primary("leaderboard_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
-				)
-				.get()
-				.queue((ignored) -> waitForEvent());
+		event
+			.getAction()
+			.editMessageEmbeds(getRender().build())
+			.setActionRow(
+				Button
+					.primary("leaderboard_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
+					.withDisabled(pageFirstRank == 1),
+				Button.primary("leaderboard_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+			)
+			.get()
+			.queue(ignored -> waitForEvent());
 	}
 
 	private EmbedBuilder getRender() {

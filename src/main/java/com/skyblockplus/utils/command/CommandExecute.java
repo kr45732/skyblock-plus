@@ -119,7 +119,7 @@ public abstract class CommandExecute extends CommandEvent {
 
 	protected void paginate(EmbedBuilder embedBuilder, boolean deleteOriginal) {
 		if (embedBuilder == null) {
-			if(deleteOriginal) {
+			if (deleteOriginal) {
 				ebMessage.delete().queue(ignore, ignore);
 			}
 		} else {
@@ -277,7 +277,7 @@ public abstract class CommandExecute extends CommandEvent {
 		return this;
 	}
 
-	public PaginatorEvent getPaginatorEvent(){
+	public PaginatorEvent getPaginatorEvent() {
 		return new PaginatorEvent(this);
 	}
 }

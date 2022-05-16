@@ -89,17 +89,17 @@ public class InventoryListPaginator {
 			action = event.getAction().editMessageEmbeds(eb.build()).addFile(new File(getRenderedLore()), "lore.png");
 		}
 
-			action
-				.setActionRow(
-					Button
-						.primary("inv_list_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
-						.withDisabled(pageNumber == 0),
-					Button
-						.primary("inv_list_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
-						.withDisabled(pageNumber == maxPageNumber)
-				)
-				.get().queue(ignored -> waitForEvent());
-
+		action
+			.setActionRow(
+				Button
+					.primary("inv_list_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
+					.withDisabled(pageNumber == 0),
+				Button
+					.primary("inv_list_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+					.withDisabled(pageNumber == maxPageNumber)
+			)
+			.get()
+			.queue(ignored -> waitForEvent());
 	}
 
 	public String getRenderedLore() {

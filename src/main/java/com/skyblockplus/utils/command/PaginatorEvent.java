@@ -18,16 +18,15 @@
 
 package com.skyblockplus.utils.command;
 
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+
 import com.jagrosh.jdautilities.command.CommandEvent;
+import java.io.File;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
-
-import java.io.File;
-
-import static com.skyblockplus.utils.Utils.defaultPaginator;
 
 public class PaginatorEvent {
 
@@ -35,7 +34,7 @@ public class PaginatorEvent {
 	private final CommandEvent command;
 	private Message loadingMessage;
 
-	public PaginatorEvent(Object event){
+	public PaginatorEvent(Object event) {
 		this(event, event instanceof CommandExecute e ? e.ebMessage : null);
 	}
 
@@ -52,8 +51,10 @@ public class PaginatorEvent {
 		}
 	}
 
-	public Message getLoadingMessage(){
-		return loadingMessage == null && isSlashCommand() ? (loadingMessage = slashCommand.getHook().retrieveOriginal().complete()) : loadingMessage;
+	public Message getLoadingMessage() {
+		return loadingMessage == null && isSlashCommand()
+			? (loadingMessage = slashCommand.getHook().retrieveOriginal().complete())
+			: loadingMessage;
 	}
 
 	public boolean isSlashCommand() {
@@ -75,9 +76,9 @@ public class PaginatorEvent {
 	public void paginate(CustomPaginator.Builder builder, int page) {
 		if (isSlashCommand()) {
 			builder.build().paginate(slashCommand.getHook(), page);
-		} else if(loadingMessage != null) {
+		} else if (loadingMessage != null) {
 			builder.build().paginate(loadingMessage, page);
-		}else{
+		} else {
 			builder.build().paginate(command.getChannel(), page);
 		}
 	}
@@ -98,11 +99,12 @@ public class PaginatorEvent {
 		return defaultPaginator(getUser()).setColumns(1).setItemsPerPage(1);
 	}
 
-	public PaginatorAction getAction(){
+	public PaginatorAction getAction() {
 		return new PaginatorAction(this);
 	}
 
 	public static class PaginatorAction {
+
 		private final PaginatorEvent event;
 		private RestAction<Message> action;
 
@@ -111,12 +113,16 @@ public class PaginatorEvent {
 		}
 
 		public PaginatorAction editMessageEmbeds(MessageEmbed... embeds) {
-			action = event.isSlashCommand() ? event.getSlashCommand().getHook().editOriginalEmbeds(embeds) : event.getLoadingMessage().editMessageEmbeds(embeds);
+			action =
+				event.isSlashCommand()
+					? event.getSlashCommand().getHook().editOriginalEmbeds(embeds)
+					: event.getLoadingMessage().editMessageEmbeds(embeds);
 			return this;
 		}
 
 		public PaginatorAction setActionRow(ItemComponent... components) {
-			action = event.isSlashCommand() ? getSlashCommandAction().setActionRow(components) : getCommandAction().setActionRow(components);
+			action =
+				event.isSlashCommand() ? getSlashCommandAction().setActionRow(components) : getCommandAction().setActionRow(components);
 			return this;
 		}
 
@@ -128,7 +134,7 @@ public class PaginatorEvent {
 			return (MessageAction) action;
 		}
 
-		public RestAction<Message> get(){
+		public RestAction<Message> get() {
 			return action;
 		}
 
