@@ -328,11 +328,11 @@ public class SettingsExecute {
 							default -> null;
 						};
 					case "dm_on_sync" -> eb =
-							switch (args[3]) {
-								case "enable" -> setVerifyDmOnSync(true);
-								case "disable" -> setVerifyDmOnSync(false);
-								default -> null;
-							};
+						switch (args[3]) {
+							case "enable" -> setVerifyDmOnSync(true);
+							case "disable" -> setVerifyDmOnSync(false);
+							default -> null;
+						};
 					case "roles_claim" -> eb =
 						switch (args[3]) {
 							case "enable" -> setRolesClaimEnable(true);
@@ -543,7 +543,7 @@ public class SettingsExecute {
 			}
 		}
 
-		if(!removedCrop){
+		if (!removedCrop) {
 			return invalidEmbed("Provided crop is not added");
 		}
 
@@ -599,7 +599,7 @@ public class SettingsExecute {
 		}
 
 		try {
-			if(role == null) {
+			if (role == null) {
 				role = guild.createRole().setName(crop).complete();
 			}
 		} catch (PermissionException e) {
@@ -2453,7 +2453,7 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Automatic sync " + (enable ? "enabled" : "disabled"));
 	}
 
-	public EmbedBuilder setVerifyDmOnSync(boolean enable){
+	public EmbedBuilder setVerifyDmOnSync(boolean enable) {
 		int responseCode = updateVerifySettings("dmOnSync", "" + enable);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);

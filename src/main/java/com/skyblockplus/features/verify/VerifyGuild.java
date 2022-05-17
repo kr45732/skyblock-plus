@@ -103,35 +103,37 @@ public class VerifyGuild {
 
 		String[] result = updateLinkedUser(verifySettings, linkedUser, event.getMember(), true);
 
-		if(higherDepth(verifySettings, "dmOnSync", true)) {
+		if (higherDepth(verifySettings, "dmOnSync", true)) {
 			event
-					.getUser()
-					.openPrivateChannel()
-					.queue(privateChannel ->
-							privateChannel
-									.sendMessageEmbeds(
-											defaultEmbed("Member synced")
-													.setDescription(
-															"You have automatically been synced in `" +
-																	event.getGuild().getName() +
-																	"`" +
-																	(
-																			!result[1].equals("false")
-																					? result[1].equals("true") ? "\n• Successfully synced your roles" : "\n• Error syncing your roles"
-																					: ""
-																	) +
-																	(
-																			!result[0].equals("false")
-																					? result[0].equals("true")
-																					? "\n• Successfully synced your nickname"
-																					: "\n• Error syncing your nickname"
-																					: ""
-																	)
-													)
-													.build()
+				.getUser()
+				.openPrivateChannel()
+				.queue(privateChannel ->
+					privateChannel
+						.sendMessageEmbeds(
+							defaultEmbed("Member synced")
+								.setDescription(
+									"You have automatically been synced in `" +
+									event.getGuild().getName() +
+									"`" +
+									(
+										!result[1].equals("false")
+											? result[1].equals("true")
+												? "\n• Successfully synced your roles"
+												: "\n• Error syncing your roles"
+											: ""
+									) +
+									(
+										!result[0].equals("false")
+											? result[0].equals("true")
+												? "\n• Successfully synced your nickname"
+												: "\n• Error syncing your nickname"
+											: ""
 									)
-									.queue(ignore, ignore)
-					);
+								)
+								.build()
+						)
+						.queue(ignore, ignore)
+				);
 		}
 	}
 
