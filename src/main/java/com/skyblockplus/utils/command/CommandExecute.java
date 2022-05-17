@@ -101,9 +101,15 @@ public abstract class CommandExecute extends CommandEvent {
 		}
 	}
 
-	protected void paginate(Object ebOrMb) {
+	protected void paginate(Object ebOrMb){
+		paginate(ebOrMb, false);
+	}
+
+	protected void paginate(Object ebOrMb, boolean deleteOriginal) {
 		if (ebOrMb == null) {
-			ebMessage.delete().queue(ignore, ignore);
+			if(deleteOriginal) {
+				ebMessage.delete().queue(ignore, ignore);
+			}
 		} else if (ebOrMb instanceof EmbedBuilder eb) {
 			ebMessage.editMessageEmbeds(eb.build()).queue(ignore, ignore);
 		} else if (ebOrMb instanceof MessageBuilder mb) {
