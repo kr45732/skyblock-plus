@@ -42,7 +42,7 @@ public class SetupCommand extends Command {
 			.setEmbeds(
 				defaultEmbed("Setup")
 					.setDescription(
-						"Choose one of the buttons below to setup the corresponding feature. Note that setting a feature can/will override previous settings."
+						"Choose one of the buttons below to setup the corresponding feature. Note that setting up a feature can/will override previous settings."
 					)
 					.build()
 			)

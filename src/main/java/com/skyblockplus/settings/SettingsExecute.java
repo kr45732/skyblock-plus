@@ -18,6 +18,7 @@
 
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.features.jacob.JacobContest.CROP_NAME_TO_EMOJI;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
@@ -78,10 +79,6 @@ public class SettingsExecute {
 			database.newServerSettings(guild.getId(), new ServerSettingsModel(guild.getName(), guild.getId()));
 		}
 		this.serverSettings = database.getServerSettings(guild.getId()).getAsJsonObject();
-	}
-
-	public static boolean isOneLevelRole(String roleName) {
-		return roleName.equals("pet_enthusiast");
 	}
 
 	public void execute(Command command, CommandEvent event) {
@@ -221,11 +218,11 @@ public class SettingsExecute {
 				} else if (args[2].equals("disable")) {
 					eb = setJacobEnable(false);
 				}
-			} else if (content.split("\\s+", 4).length == 4) {
+			} else {
 				args = content.split("\\s+", 4);
 				eb =
 					switch (args[2]) {
-						case "add" -> addJacobCrop(args[3]);
+						case "add" -> addJacobCrop(args[3], args.length == 5 ? args[4] : null);
 						case "remove" -> removeJacobCrop(args[3]);
 						case "channel" -> setJacobChannel(args[3]);
 						default -> null;
@@ -330,6 +327,12 @@ public class SettingsExecute {
 							case "disable" -> setVerifySyncEnable(false);
 							default -> null;
 						};
+					case "dm_on_sync" -> eb =
+							switch (args[3]) {
+								case "enable" -> setVerifyDmOnSync(true);
+								case "disable" -> setVerifyDmOnSync(false);
+								default -> null;
+							};
 					case "roles_claim" -> eb =
 						switch (args[3]) {
 							case "enable" -> setRolesClaimEnable(true);
@@ -517,12 +520,13 @@ public class SettingsExecute {
 		TextChannel channel = ((TextChannel) eb);
 		JsonObject jacobSettings = getJacobSetings();
 		jacobSettings.addProperty("channel", channel.getId());
+
 		int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Set jacob notification channel to: " + channel.getAsMention());
+		return defaultSettingsEmbed("Set jacob notification channel to " + channel.getAsMention());
 	}
 
 	public EmbedBuilder removeJacobCrop(String crop) {
@@ -531,16 +535,18 @@ public class SettingsExecute {
 		JsonObject jacobSettings = getJacobSetings();
 		JsonArray jacobRoles = higherDepth(jacobSettings, "crops").getAsJsonArray();
 
+		boolean removedCrop = false;
 		for (int i = jacobRoles.size() - 1; i >= 0; i--) {
 			if (higherDepth(jacobRoles.get(i), "value").getAsString().equals(crop)) {
-				try {
-					guild.getRoleById(higherDepth(jacobRoles.get(i), "roleId").getAsString()).delete().queue();
-				} catch (Exception ignored) {}
 				jacobRoles.remove(i);
+				removedCrop = true;
 			}
 		}
 
-		jacobSettings.add("crops", jacobRoles);
+		if(!removedCrop){
+			return invalidEmbed("Provided crop is not added");
+		}
+
 		if (jacobRoles.size() == 0) {
 			jacobSettings.addProperty("enable", "false");
 		}
@@ -555,62 +561,60 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Removed jacob crop: " + crop);
 	}
 
-	public EmbedBuilder addJacobCrop(String crop) {
+	public EmbedBuilder addJacobCrop(String crop, String roleMention) {
 		crop = capitalizeString(crop.replace("_", " "));
-		List<String> validCrops = Arrays.asList(
-			"Wheat",
-			"Carrot",
-			"Potato",
-			"Pumpkin",
-			"Melon",
-			"Mushroom",
-			"Cactus",
-			"Sugar Cane",
-			"Nether Wart",
-			"Cocoa Beans"
-		);
+		Role role = null;
+		if (roleMention != null) {
+			Object eb = checkRole(roleMention);
+			if (eb instanceof EmbedBuilder e) {
+				return e;
+			}
+			role = ((Role) eb);
+		}
+
 		if (crop.equalsIgnoreCase("all")) {
-			for (String validCrop : validCrops) {
-				EmbedBuilder eb = addJacobCrop(validCrop);
+			for (String validCrop : CROP_NAME_TO_EMOJI.keySet()) {
+				EmbedBuilder eb = addJacobCrop(validCrop, role != null ? role.getId() : null);
 				if (
 					!eb.build().getTitle().equalsIgnoreCase("Settings") &&
-					!eb.build().getDescription().equals("You have already added this crop")
+					!eb.build().getDescription().startsWith("You have already added the crop: ")
 				) {
 					return eb;
 				}
 			}
-			return defaultSettingsEmbed("Added all Jacob crops");
+			return defaultSettingsEmbed("Added all jacob crops");
 		}
-		if (!validCrops.contains(crop)) {
-			return invalidEmbed("Invalid crop name\n\nValid crop names are: " + String.join(", ", validCrops));
+
+		if (!CROP_NAME_TO_EMOJI.containsKey(crop)) {
+			return invalidEmbed("Invalid crop\n\nValid crops are: " + String.join(", ", CROP_NAME_TO_EMOJI.keySet()));
 		}
 
 		JsonObject jacobSettings = getJacobSetings();
 		JsonArray crops = higherDepth(jacobSettings, "crops").getAsJsonArray();
 
-		for (int i = crops.size() - 1; i >= 0; i--) {
-			if (higherDepth(crops.get(i), "value").getAsString().equals(crop)) {
-				return invalidEmbed("You have already added this crop");
+		for (JsonElement cropJson : crops) {
+			if (higherDepth(cropJson, "value").getAsString().equals(crop)) {
+				return invalidEmbed("You have already added the crop: " + crop);
 			}
 		}
 
-		Role role;
 		try {
-			role = guild.createRole().setName(crop).complete();
+			if(role == null) {
+				role = guild.createRole().setName(crop).complete();
+			}
 		} catch (PermissionException e) {
 			return invalidEmbed("Missing permission `" + e.getPermission().getName() + "` to create a role for " + crop);
 		}
 
 		crops.add(gson.toJsonTree(new RoleObject(crop, role.getId())));
-		jacobSettings.add("crops", crops);
-		int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);
 
+		int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
 		guildMap.get(guild.getId()).jacobGuild.reloadSettingsJson(jacobSettings);
 
-		return defaultSettingsEmbed("Added Jacob crop: " + crop + " - " + role.getAsMention());
+		return defaultSettingsEmbed("Added jacob crop: " + crop + " - " + role.getAsMention());
 	}
 
 	public EmbedBuilder setJacobEnable(boolean enable) {
@@ -620,7 +624,7 @@ public class SettingsExecute {
 				guild.getTextChannelById(higherDepth(jacobSettings, "channel").getAsString()).getId();
 				higherDepth(jacobSettings, "crops").getAsJsonArray().get(0);
 			} catch (Exception e) {
-				return invalidEmbed("A channel and at least one crop must be set before enabling");
+				return invalidEmbed("The channel and at least one crop must be set before enabling");
 			}
 		}
 
@@ -657,13 +661,15 @@ public class SettingsExecute {
 		TextChannel channel = ((TextChannel) eb);
 		JsonObject eventSettings = getEventSettings();
 		eventSettings.addProperty("channel", channel.getId());
+
 		int responseCode = database.setEventSettings(guild.getId(), eventSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
+
 		guildMap.get(guild.getId()).eventGuild.reloadSettingsJson(eventSettings);
 
-		return defaultSettingsEmbed("Set event notification channel to: " + channel.getAsMention());
+		return defaultSettingsEmbed("Set event notification channel to " + channel.getAsMention());
 	}
 
 	public EmbedBuilder removeEvent(String event) {
@@ -678,7 +684,6 @@ public class SettingsExecute {
 			}
 		}
 
-		eventSettings.add("events", events);
 		if (events.size() == 0) {
 			eventSettings.addProperty("enable", "false");
 		}
@@ -719,7 +724,7 @@ public class SettingsExecute {
 		);
 		if (event.equals("all")) {
 			for (String validCrop : validEvents) {
-				EmbedBuilder eb = addEvent(validCrop, role != null ? role.getId() : "");
+				EmbedBuilder eb = addEvent(validCrop, role != null ? role.getId() : null);
 				if (
 					!eb.build().getTitle().equalsIgnoreCase("Settings") &&
 					!eb.build().getDescription().equals("You have already added this event")
@@ -789,7 +794,7 @@ public class SettingsExecute {
 		return higherDepth(serverSettings, "eventNotif").getAsJsonObject();
 	}
 
-	/* Apply Settings */
+	/* Guild Settings */
 	public EmbedBuilder removePlayerBlacklist(String username) {
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
 		if (uuidStruct.isNotValid()) {
@@ -2202,6 +2207,10 @@ public class SettingsExecute {
 		return defaultSettingsEmbed(roleName + " set to " + role.getAsMention());
 	}
 
+	public static boolean isOneLevelRole(String roleName) {
+		return roleName.equals("pet_enthusiast");
+	}
+
 	/* Verify Settings */
 	public String getCurrentVerifySettings(JsonElement verifySettings) {
 		String ebFieldString = "";
@@ -2212,6 +2221,7 @@ public class SettingsExecute {
 		ebFieldString += "\n• **Verified Remove Role:** " + displaySettings(verifySettings, "verifiedRemoveRole");
 		ebFieldString += "\n• **Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
 		ebFieldString += "\n• **Automatic Sync:** " + displaySettings(verifySettings, "enableAutomaticSync");
+		ebFieldString += "\n• **DM On Automatic Sync:** " + displaySettings(verifySettings, "dmOnSync");
 		ebFieldString += "\n• **Automatic Roles Claim:** " + displaySettings(verifySettings, "enableRolesClaim");
 		return ebFieldString;
 	}
@@ -2441,6 +2451,15 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Automatic sync " + (enable ? "enabled" : "disabled"));
+	}
+
+	public EmbedBuilder setVerifyDmOnSync(boolean enable){
+		int responseCode = updateVerifySettings("dmOnSync", "" + enable);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("DM on sync " + (enable ? "enabled" : "disabled"));
 	}
 
 	public EmbedBuilder setRolesClaimEnable(boolean enable) {

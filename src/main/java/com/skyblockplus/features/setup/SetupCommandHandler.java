@@ -18,6 +18,7 @@
 
 package com.skyblockplus.features.setup;
 
+import static com.skyblockplus.features.jacob.JacobContest.CROP_NAME_TO_EMOJI;
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
 import static com.skyblockplus.utils.Utils.*;
@@ -511,20 +512,7 @@ public class SetupCommandHandler {
 						List<String> crops = new ArrayList<>();
 
 						if (event.getMessage().getContentRaw().equalsIgnoreCase("all")) {
-							crops.addAll(
-								Arrays.asList(
-									"Wheat",
-									"Carrot",
-									"Potato",
-									"Pumpkin",
-									"Melon",
-									"Mushroom",
-									"Cactus",
-									"Sugar Cane",
-									"Nether Wart",
-									"Cocoa Beans"
-								)
-							);
+							crops.addAll(CROP_NAME_TO_EMOJI.keySet());
 						} else {
 							for (String crop : event.getMessage().getContentRaw().split(",")) {
 								crops.add(capitalizeString(crop.trim()));
@@ -532,7 +520,7 @@ public class SetupCommandHandler {
 						}
 
 						for (String crop : crops) {
-							eb = settings.addJacobCrop(crop);
+							eb = settings.addJacobCrop(crop, null);
 							if (!eb.build().getTitle().equals("Settings")) {
 								break;
 							}
