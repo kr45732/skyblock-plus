@@ -52,7 +52,7 @@ public class ApplyLog {
 			);
 
 		String text = message.getContentRaw();
-		for (Member mentionedMember : message.getMentionedMembers()) {
+		for (Member mentionedMember : message.getMentions().getMembers()) {
 			text =
 				text
 					.replace(
@@ -64,14 +64,14 @@ public class ApplyLog {
 						"<discord-mention>" + mentionedMember.getEffectiveName() + "</discord-mention>"
 					);
 		}
-		for (TextChannel mentionedChannel : message.getMentionedChannels()) {
+		for (TextChannel mentionedChannel : message.getMentions().getChannels(TextChannel.class)) {
 			text =
 				text.replace(
 					mentionedChannel.getAsMention(),
 					"<discord-mention type=\"channel\">" + mentionedChannel.getName() + "</discord-mention>"
 				);
 		}
-		for (Role mentionedRole : message.getMentionedRoles()) {
+		for (Role mentionedRole : message.getMentions().getRoles()) {
 			text =
 				text.replace(
 					mentionedRole.getAsMention(),
@@ -82,7 +82,7 @@ public class ApplyLog {
 					"</discord-mention>"
 				);
 		}
-		for (Emote emote : message.getEmotes()) {
+		for (Emote emote : message.getMentions().getEmotes()) {
 			text = text.replace(emote.getAsMention(), "<img src=\"" + emote.getImageUrl() + "\" width=\"16\" height=\"16\"/>");
 		}
 		builder.text(parseMarkdown(text));
