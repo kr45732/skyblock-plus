@@ -104,7 +104,7 @@ public class FixApplicationCommand extends Command {
 				return invalidEmbed("Unable to find initial message in application");
 			}
 
-			User applicant = firstMessage.getMentionedUsers().get(0);
+			User applicant = firstMessage.getMentions().getUsers().get(0);
 			String guildName = firstMessage.getContentRaw().split(" this is your application for ")[1].replace(" ", "_").toLowerCase();
 			JsonObject settings = database.getGuildSettings(guild.getId(), guildName).getAsJsonObject();
 			settings.remove("applyUsersCache");
