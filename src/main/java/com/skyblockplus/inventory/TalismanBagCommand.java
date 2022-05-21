@@ -101,7 +101,7 @@ public class TalismanBagCommand extends Command {
 					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
 				}
 
-				new InventoryPaginator(talismanBag, "Talisman Bag", player, event);
+				new InventoryEmojiPaginator(talismanBag, "Talisman Bag", player, event);
 				return null;
 			}
 			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");

@@ -27,6 +27,8 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
+
+import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
@@ -91,48 +93,48 @@ public class EssenceCommand extends Command {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
 			StringBuilder amountsStr = new StringBuilder();
-			for (Map.Entry<String, JsonElement> entry : player.profileJson().getAsJsonObject().entrySet()) {
-				if (entry.getKey().startsWith("essence_")) {
-					String essenceType = entry.getKey().split("essence_")[1];
-					amountsStr
-						.append(ESSENCE_EMOJI_MAP.get(essenceType))
+			for (String essence : List.of("ice", "gold", "dragon", "spider", "undead", "wither", "diamond")) {
+				amountsStr
+						.append(ESSENCE_EMOJI_MAP.get(essence))
 						.append("** ")
-						.append(capitalizeString(essenceType))
+						.append(capitalizeString(essence))
 						.append(" Essence:** ")
-						.append(formatNumber(entry.getValue().getAsInt()))
+						.append(formatNumber(higherDepth(player.profileJson(), "essence_" + essence, 0)))
 						.append("\n");
-				}
 			}
+
 			eb.addField("Amounts", amountsStr.toString(), false);
 
-			JsonElement essenceTiers = getConstant("ESSENCE_SHOP_TIERS");
-			StringBuilder witherShopUpgrades = new StringBuilder();
-			StringBuilder undeadShopUpgrades = new StringBuilder();
-			for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject().entrySet()) {
-				JsonElement curPerk = higherDepth(essenceTiers, perk.getKey());
-				JsonArray tiers = higherDepth(curPerk, "tiers").getAsJsonArray();
-				String out =
-					"\n" +
-					ESSENCE_EMOJI_MAP.get(perk.getKey()) +
-					"** " +
-					capitalizeString(perk.getKey().replace("catacombs_", "").replace("_", " ")) +
-					":** " +
-					perk.getValue().getAsInt() +
-					"/" +
-					higherDepth(curPerk, "tiers").getAsJsonArray().size() +
-					(
-						perk.getValue().getAsInt() == tiers.size()
-							? ""
-							: (" (" + formatNumber(tiers.get(perk.getValue().getAsInt()).getAsInt()) + " for next)")
-					);
-				if (higherDepth(curPerk, "type").getAsString().equals("undead")) {
-					undeadShopUpgrades.append(out);
-				} else {
-					witherShopUpgrades.append(out);
+			if(higherDepth(player.profileJson(), "perks") != null) {
+				JsonElement essenceTiers = getConstant("ESSENCE_SHOP_TIERS");
+				StringBuilder witherShopUpgrades = new StringBuilder();
+				StringBuilder undeadShopUpgrades = new StringBuilder();
+				for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject().entrySet()) {
+					JsonElement curPerk = higherDepth(essenceTiers, perk.getKey());
+					JsonArray tiers = higherDepth(curPerk, "tiers").getAsJsonArray();
+					String out =
+							"\n" +
+									ESSENCE_EMOJI_MAP.get(perk.getKey()) +
+									"** " +
+									capitalizeString(perk.getKey().replace("catacombs_", "").replace("_", " ")) +
+									":** " +
+									perk.getValue().getAsInt() +
+									"/" +
+									higherDepth(curPerk, "tiers").getAsJsonArray().size() +
+									(
+											perk.getValue().getAsInt() == tiers.size()
+													? ""
+													: (" (" + formatNumber(tiers.get(perk.getValue().getAsInt()).getAsInt()) + " for next)")
+									);
+					if (higherDepth(curPerk, "type").getAsString().equals("undead")) {
+						undeadShopUpgrades.append(out);
+					} else {
+						witherShopUpgrades.append(out);
+					}
 				}
+				eb.addField("Undead Essence Upgrades", undeadShopUpgrades.toString(), false);
+				eb.addField("Wither Essence Upgrades", witherShopUpgrades.toString(), false);
 			}
-			eb.addField("Undead Essence Upgrades", undeadShopUpgrades.toString(), false);
-			eb.addField("Wither Essence Upgrades", witherShopUpgrades.toString(), false);
 
 			return eb;
 		}
@@ -148,33 +150,16 @@ public class EssenceCommand extends Command {
 				setArgs(3);
 
 				if (args.length == 3 && args[1].equals("upgrade")) {
-					String itemId = nameToId(args[2]);
-
-					if (higherDepth(getEssenceCostsJson(), itemId) == null) {
-						String closestMatch = getClosestMatchFromIds(itemId, ESSENCE_ITEM_NAMES);
-						itemId = closestMatch != null ? closestMatch : itemId;
-					}
-
-					JsonElement itemJson = higherDepth(getEssenceCostsJson(), itemId);
-					if (itemJson != null) {
-						new EssenceHandler(itemId, itemJson, ebMessage, event.getAuthor());
-					} else {
-						embed(invalidEmbed("Invalid item name"));
-					}
-					return;
+					new EssenceHandler(nameToId(args[2]), getPaginatorEvent());
 				} else if (args.length == 3 && (args[1].equals("info") || args[1].equals("information"))) {
 					embed(getEssenceInformation(args[2]));
-					return;
-				} else if ((args.length == 4 || args.length == 3 || args.length == 2) && args[1].equals("player")) {
-					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
+				} else {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					embed(getPlayerEssence(player, args.length == 4 ? args[3] : null));
-					return;
+					embed(getPlayerEssence(player, args.length == 3 ? args[2] : null));
 				}
-
-				sendErrorEmbed();
 			}
 		}
 			.queue();

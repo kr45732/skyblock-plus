@@ -145,7 +145,7 @@ public class HelpCommand extends Command {
 				new HelpData(
 					"calcdrops",
 					"Calculate the drop rate and cost of all chests for a floor",
-					"calcdrops floor [luck:1|2|3|4|5] [accessory:none|talisman|ring|artifact]"
+					"calcdrops <floor> [luck:1|2|3|4|5] [accessory:none|talisman|ring|artifact]"
 				)
 					.addAliases("drops")
 					.setCategory("dungeons"),
@@ -354,8 +354,7 @@ public class HelpCommand extends Command {
 					.addExamples("weight calculate CrypticPlasma type:catacombs amount:43")
 					.setCategory("miscellaneous"),
 				new HelpData("hypixel", "Get Hypixel information about a player.", "hypixel [player]")
-					.addSecondData("Get fastest Hypixel lobby parkour for a player.", "hypixel parkour [player]")
-					.addExamples("hypixel CrypticPlasma", "hypixel parkour CrypticPlasma")
+					.addExamples("hypixel CrypticPlasma")
 					.setCategory("miscellaneous"),
 				new HelpData("missing", "Get a player's missing talismans.", "missing [player] [profile]")
 					.addExamples("missing CrypticPlasma", "missing CrypticPlasma Zucchini")
@@ -408,8 +407,7 @@ public class HelpCommand extends Command {
 				)
 					.addAliases("drags")
 					.setCategory("miscellaneous"),
-				new HelpData("reforgestone", "Get the reforge stone stats for each rarity.", "reforgestone <stone>")
-					.addAliases("reforge")
+				new HelpData("reforge", "Get the reforge stone stats for each rarity.", "reforge <stone>")
 					.setCategory("miscellaneous"),
 				// Party
 				new HelpData("party", "Main party command.")
@@ -832,13 +830,13 @@ public class HelpCommand extends Command {
 			help.create("dungeons [player] [profile]", "Get the dungeons data of a player") +
 			help.create("essence upgrade <item>", "Interactive message to find the essence amount to upgrade an item") +
 			help.create("essence information <item>", "Get the amount of essence to upgrade an item for each level") +
-			help.create("essence player [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
+			help.create("essence [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
 			help.create(
 				"calcruns [player] [profile] <level:level> <floor:floor>",
 				"Calculate the number of runs needed to reach a certain catacombs level"
 			) +
 			help.create(
-				"calcdrops floor [luck:boss_luck] [accessory:accessory]",
+				"calcdrops <floor> [luck:boss_luck] [accessory:accessory]",
 				"Calculate the drop rate and cost of all chests for a floor"
 			)
 		);
@@ -905,7 +903,6 @@ public class HelpCommand extends Command {
 				"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount"
 			) +
 			help.create("hypixel [player]", "Get Hypixel information about a player") +
-			help.create("hypixel parkour [player]", "Get fastest Hypixel lobby parkour for a player") +
 			help.create("profiles [player]", "Get information about all of a player's profiles") +
 			help.create("missing [player] [profile]", "Get a player's missing talismans") +
 			help.create("fetchur", "Get the item that fetchur wants today") +

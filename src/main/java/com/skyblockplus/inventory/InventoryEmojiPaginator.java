@@ -34,7 +34,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-public class InventoryPaginator {
+public class InventoryEmojiPaginator {
 
 	private final List<String[]> inventoryPages;
 	private final Message pagePart1;
@@ -44,7 +44,7 @@ public class InventoryPaginator {
 	private int pageNumber = 0;
 	private Instant lastEdit;
 
-	public InventoryPaginator(List<String[]> inventoryPages, String type, Player player, PaginatorEvent event) {
+	public InventoryEmojiPaginator(List<String[]> inventoryPages, String type, Player player, PaginatorEvent event) {
 		this.inventoryPages = inventoryPages;
 		this.user = event.getUser();
 		this.maxPageNumber = inventoryPages.size() - 1;
@@ -94,8 +94,8 @@ public class InventoryPaginator {
 			pagePart1.editMessage(inventoryPages.get(pageNumber)[0]).queue(ignore, ignore);
 
 			List<Button> curButtons = event.getMessage().getButtons();
-			Button leftButton = pageNumber == 0 ? curButtons.get(0).asDisabled() : curButtons.get(0).asEnabled();
-			Button rightButton = pageNumber == (maxPageNumber) ? curButtons.get(1).asDisabled() : curButtons.get(1).asEnabled();
+			Button leftButton =curButtons.get(0).withDisabled(pageNumber == 0);
+			Button rightButton = curButtons.get(1).withDisabled(pageNumber == maxPageNumber);
 			Button linkButton = curButtons
 				.get(2)
 				.withLabel(curButtons.get(2).getLabel().split("•")[0] + "• Page " + (pageNumber + 1) + "/" + (maxPageNumber + 1));

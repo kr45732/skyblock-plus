@@ -21,8 +21,8 @@ package com.skyblockplus.dungeons;
 import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Utils;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -45,19 +45,7 @@ public class EssenceSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		switch (event.getSubcommandName()) {
-			case "upgrade" -> {
-				String itemId = nameToId(event.getOptionStr("item"));
-				if (higherDepth(getEssenceCostsJson(), itemId) == null) {
-					String closestMatch = getClosestMatchFromIds(itemId, ESSENCE_ITEM_NAMES);
-					itemId = closestMatch != null ? closestMatch : itemId;
-				}
-				JsonElement itemJson = higherDepth(getEssenceCostsJson(), itemId);
-				if (itemJson != null) {
-					new EssenceHandler(itemId, itemJson, event.getHook().retrieveOriginal().complete(), event.getUser());
-				} else {
-					event.embed(invalidEmbed("Invalid item name"));
-				}
-			}
+			case "upgrade" -> new EssenceHandler(nameToId(event.getOptionStr("item")), new PaginatorEvent(event));
 			case "information" -> event.embed(EssenceCommand.getEssenceInformation(event.getOptionStr("item")));
 			case "player" -> {
 				if (event.invalidPlayerOption()) {

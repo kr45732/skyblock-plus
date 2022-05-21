@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.Utils.defaultPaginator;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import java.io.File;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -123,6 +124,12 @@ public class PaginatorEvent {
 		public PaginatorAction setActionRow(ItemComponent... components) {
 			action =
 				event.isSlashCommand() ? getSlashCommandAction().setActionRow(components) : getCommandAction().setActionRow(components);
+			return this;
+		}
+
+		public PaginatorAction setActionRows(ActionRow... rows) {
+			action =
+					event.isSlashCommand() ? getSlashCommandAction().setActionRows(rows) : getCommandAction().setActionRows(rows);
 			return this;
 		}
 

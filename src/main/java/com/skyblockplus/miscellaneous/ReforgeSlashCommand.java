@@ -31,17 +31,17 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ReforgeStoneSlashCommand extends SlashCommand {
+public class ReforgeSlashCommand extends SlashCommand {
 
-	public ReforgeStoneSlashCommand() {
-		this.name = "reforgestone";
+	public ReforgeSlashCommand() {
+		this.name = "reforge";
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(ReforgeStoneCommand.getReforgeStone(event.getOptionStr("item")));
+		event.embed(ReforgeCommand.getReforgeStone(event.getOptionStr("item")));
 	}
 
 	@Override

@@ -35,7 +35,7 @@ import org.apache.groovy.util.Maps;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ReforgeStoneCommand extends Command {
+public class ReforgeCommand extends Command {
 
 	public static final Map<String, String> statToEmoji = Maps.of(
 		"HEALTH",
@@ -72,9 +72,8 @@ public class ReforgeStoneCommand extends Command {
 		getEmoji("IRON_SWORD")
 	);
 
-	public ReforgeStoneCommand() {
-		this.name = "reforgestone";
-		this.aliases = new String[] { "reforge" };
+	public ReforgeCommand() {
+		this.name = "reforge";
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
 	}

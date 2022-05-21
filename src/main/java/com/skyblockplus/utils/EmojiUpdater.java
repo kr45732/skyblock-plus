@@ -198,7 +198,7 @@ public class EmojiUpdater {
 			}
 			System.out.println("Finished processing SkyCrypt items");
 
-			processEnchantedEmojis("https://hst.sh/raw/vubusejaqu.json"); // Don't forget to change this!
+			processEnchantedEmojis(); // Don't forget to change this!
 			processCompressedImages();
 			File enchantedImagesDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 			File compressedImagesDir = new File("src/main/java/com/skyblockplus/json/compressed_images");
@@ -421,6 +421,11 @@ public class EmojiUpdater {
 
 	public static void runEmojis(String parsedItemsUrl) {
 		idToEmoji = new JsonObject();
+		runEmojis(parsedItemsUrl, false);
+		runEmojis(parsedItemsUrl, true);
+	}
+
+	public static void runEmojis(String parsedItemsUrl, boolean enchanted) {
 		String last = "";
 		try {
 			JsonObject allParsedItems = getJson(parsedItemsUrl).getAsJsonObject();
@@ -429,12 +434,12 @@ public class EmojiUpdater {
 				.getAsJsonObject()
 				.keySet();
 			JsonObject regItems = new JsonObject();
-			JsonObject enchItems = new JsonObject();
 			for (Map.Entry<String, JsonElement> entry : allParsedItems.get("regular").getAsJsonObject().entrySet()) {
 				if (!added.contains(entry.getKey())) {
 					regItems.add(entry.getKey(), entry.getValue());
 				}
 			}
+			JsonObject enchItems = new JsonObject();
 			for (Map.Entry<String, JsonElement> entry : allParsedItems.get("enchanted").getAsJsonObject().entrySet()) {
 				if (!added.contains(entry.getKey())) {
 					enchItems.add(entry.getKey(), entry.getValue());
@@ -451,12 +456,12 @@ public class EmojiUpdater {
 						return false;
 					}
 				})
-				.filter(g -> g.getEmotes().size() < g.getMaxEmotes()) // *2 if enchanted
+				.filter(g -> g.getEmotes().size() < g.getMaxEmotes() * (enchanted ? 2 : 1))
 				.sorted(Comparator.comparingInt(g -> Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1])))
 				.collect(Collectors.toList());
 
 			int guildCount = 0;
-			for (Map.Entry<String, JsonElement> entry : regItems.entrySet()) { // Regular or enchanted
+			for (Map.Entry<String, JsonElement> entry : (enchanted ? enchItems : regItems).entrySet()) {
 				try {
 					last = entry.toString();
 					String name = idToName(entry.getKey())
@@ -487,10 +492,10 @@ public class EmojiUpdater {
 						};
 
 					Guild curGuild = guildList.get(guildCount);
-					if (curGuild.getEmotes().size() >= curGuild.getMaxEmotes()) { // *2 if enchanted
+					if (curGuild.getEmotes().size() >= curGuild.getMaxEmotes() * (enchanted ? 2 : 1)) {
 						guildCount++;
 						curGuild = guildList.get(guildCount);
-						TimeUnit.SECONDS.sleep(5);
+						TimeUnit.SECONDS.sleep(3);
 						System.out.println("Switched to " + curGuild.getName());
 					}
 
@@ -556,14 +561,14 @@ public class EmojiUpdater {
 		}
 	}
 
-	public static void processEnchantedEmojis(String url) throws IOException {
+	public static void processEnchantedEmojis(String... url) throws IOException {
 		List<File> glintFiles = Arrays
 			.stream(new File("src/main/java/com/skyblockplus/json/glint_images").listFiles())
 			.sorted(Comparator.comparing(File::getName))
 			.toList();
-		List<String> enchantList = streamJsonArray(getJson(url).getAsJsonArray())
+		List<String> enchantList = url.length == 1 ? streamJsonArray(getJson(url[0]).getAsJsonArray())
 			.map(JsonElement::getAsString)
-			.collect(Collectors.toList());
+			.collect(Collectors.toList()) : getEnchantedItems();
 		File outputFileDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 		if (!outputFileDir.exists()) {
 			outputFileDir.mkdir();

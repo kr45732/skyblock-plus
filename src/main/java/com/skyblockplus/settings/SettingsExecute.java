@@ -47,6 +47,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -1654,39 +1656,39 @@ public class SettingsExecute {
 
 	/* Roles Settings */
 	public EmbedBuilder getRoleSettings(String roleName) {
-		Map<String, Integer> rolePageMap = new HashMap<>();
-		rolePageMap.put("sven", 2);
-		rolePageMap.put("rev", 3);
-		rolePageMap.put("tara", 4);
-		rolePageMap.put("blaze", 5);
-		rolePageMap.put("enderman", 6);
-		rolePageMap.put("alchemy", 7);
-		rolePageMap.put("combat", 8);
-		rolePageMap.put("fishing", 9);
-		rolePageMap.put("farming", 10);
-		rolePageMap.put("foraging", 11);
-		rolePageMap.put("carpentry", 12);
-		rolePageMap.put("mining", 13);
-		rolePageMap.put("taming", 14);
-		rolePageMap.put("enchanting", 15);
-		rolePageMap.put("catacombs", 16);
-		rolePageMap.put("weight", 17);
-		rolePageMap.put("guild_member", 18);
-		rolePageMap.put("guild_ranks", 19);
-		rolePageMap.put("coins", 20);
-		rolePageMap.put("fairy_souls", 21);
-		rolePageMap.put("slot_collector", 22);
-		rolePageMap.put("pet_enthusiast", 23);
-		rolePageMap.put("total_slayer", 24);
-		rolePageMap.put("slayer_nine", 25);
-		rolePageMap.put("skill_average", 26);
-		rolePageMap.put("pet_score", 27);
-		rolePageMap.put("dungeon_secrets", 28);
-		rolePageMap.put("accessory_count", 29);
-		rolePageMap.put("networth", 30);
-		rolePageMap.put("gamemode", 31);
-		rolePageMap.put("maxed_collections", 32);
-		rolePageMap.put("player_items", 33);
+		List<String> allRoles = List.of("sven",
+				"rev",
+				"tara",
+				"blaze",
+				"enderman",
+				"alchemy",
+				"combat",
+				"fishing",
+				"farming",
+				"foraging",
+				"carpentry",
+				"mining",
+				"taming",
+				"enchanting",
+				"catacombs",
+				"healer","mage","berserk", "archer","tank",
+				"weight",
+				"guild_member",
+				"guild_ranks",
+				"coins",
+				"fairy_souls",
+				"slot_collector",
+				"pet_enthusiast",
+				"total_slayer",
+				"slayer_nine",
+				"skill_average",
+				"pet_score",
+				"dungeon_secrets",
+				"accessory_count",
+				"networth",
+				"gamemode",
+				"maxed_collections");
+		Map<String, Integer> rolePageMap = IntStream.range(0, allRoles.size()).boxed().collect(Collectors.toMap(allRoles::get, i -> i + 2, (a, b) -> b));
 
 		if (rolePageMap.containsKey(roleName)) {
 			return getRolesSettings(database.getRolesSettings(guild.getId()), rolePageMap.get(roleName));
@@ -1759,7 +1761,7 @@ public class SettingsExecute {
 					"enchanting",
 					"skill_average",
 					"pet_score",
-					"catacombs" -> ebFieldString
+					"catacombs","healer","mage","berserk", "archer","tank" -> ebFieldString
 					.append("**A player's ")
 					.append(roleName)
 					.append(" level**\nExample: `/settings roles add ")
@@ -2100,8 +2102,8 @@ public class SettingsExecute {
 				totalRoleCount += higherDepth(i.getValue(), "levels").getAsJsonArray().size();
 			} catch (Exception ignored) {}
 		}
-		if (totalRoleCount >= 120) {
-			return invalidEmbed("You have reached the max amount of total levels (120/120)");
+		if (totalRoleCount >= 150) {
+			return invalidEmbed("You have reached the max amount of total levels (150/150)");
 		}
 
 		JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();

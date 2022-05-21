@@ -38,6 +38,7 @@ import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
 import org.apache.groovy.util.Maps;
 
 public class Player {
@@ -1346,12 +1347,12 @@ public class Player {
 		return defaultEmbed(fixUsername(getUsername()) + getSymbol(" ") + extra, skyblockStatsLink()).setThumbnail(getThumbnailUrl());
 	}
 
-	public CustomPaginator.Builder defaultPlayerPaginator() {
+	public CustomPaginator.Builder defaultPlayerPaginator(User... users) {
 		return defaultPlayerPaginator(PaginatorExtras.PaginatorType.DEFAULT);
 	}
 
-	public CustomPaginator.Builder defaultPlayerPaginator(PaginatorExtras.PaginatorType type) {
-		return defaultPaginator()
+	public CustomPaginator.Builder defaultPlayerPaginator(PaginatorExtras.PaginatorType type, User... users) {
+		return defaultPaginator(users)
 			.setColumns(1)
 			.setItemsPerPage(1)
 			.setPaginatorExtras(
@@ -1464,6 +1465,9 @@ public class Player {
 						break;
 					case "catacombs_xp":
 						highestAmount = Math.max(highestAmount, getCatacombs().totalExp());
+						break;
+					case "healer","mage","berserk", "archer","tank":
+						highestAmount = Math.max(highestAmount, getDungeonClass(type).getProgressLevel());
 						break;
 					case "weight":
 						highestAmount = Math.max(highestAmount, getWeight());
@@ -1599,7 +1603,7 @@ public class Player {
 		}
 		int numMaxedColl = 0;
 		for (Map.Entry<String, JsonElement> collection : collections.entrySet()) {
-			long maxAmount = COLLECTION_ID_TO_MAX_AMOUNT.getOrDefault(collection.getKey(), -1L);
+			long maxAmount = higherDepth(getCollectionsJson(), collection.getKey() + ".tiers.[-1]", -1L);
 			if (maxAmount != -1 && collection.getValue().getAsLong() >= maxAmount) {
 				numMaxedColl++;
 			}

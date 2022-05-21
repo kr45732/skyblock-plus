@@ -20,7 +20,6 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -76,7 +75,6 @@ public class Constants {
 	public static List<String> BITS_ITEM_NAMES;
 	public static List<String> PET_ITEM_NAMES;
 	public static Set<String> ALL_TALISMANS;
-	public static Map<String, Long> COLLECTION_ID_TO_MAX_AMOUNT;
 	public static Map<String, String> NUMBER_TO_RARITY_MAP;
 
 	public static void initialize() {
@@ -229,25 +227,6 @@ public class Constants {
 						.getAsJsonArray()) {
 						ALL_TALISMANS.add(duplicate.getAsString());
 					}
-				}
-			}
-
-			/* COLLECTION_ID_TO_MAX_AMOUNT */
-			COLLECTION_ID_TO_MAX_AMOUNT = new HashMap<>();
-			for (Map.Entry<String, JsonElement> collectionCategories : higherDepth(
-				getJson("https://api.hypixel.net/resources/skyblock/collections"),
-				"collections"
-			)
-				.getAsJsonObject()
-				.entrySet()) {
-				for (Map.Entry<String, JsonElement> collection : higherDepth(collectionCategories.getValue(), "items")
-					.getAsJsonObject()
-					.entrySet()) {
-					JsonArray collectionTiers = higherDepth(collection.getValue(), "tiers").getAsJsonArray();
-					COLLECTION_ID_TO_MAX_AMOUNT.put(
-						collection.getKey(),
-						higherDepth(collectionTiers.get(collectionTiers.size() - 1), "amountRequired").getAsLong()
-					);
 				}
 			}
 

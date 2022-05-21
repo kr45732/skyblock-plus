@@ -137,7 +137,7 @@ public class MissingCommand extends Command {
 			);
 
 			JsonObject mappings = getInternalJsonMappings();
-			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator().setItemsPerPage(25);
+			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
 			double totalCost = 0;
 			for (String curId : missingInternalArr) {
 				String costOut;

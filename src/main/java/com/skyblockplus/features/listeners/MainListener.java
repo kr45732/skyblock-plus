@@ -21,6 +21,7 @@ package com.skyblockplus.features.listeners;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.skyblockplus.inventory.InventoryListPaginator;
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.Comparator;
 import java.util.Map;
@@ -34,6 +35,7 @@ import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -230,6 +232,20 @@ public class MainListener extends ListenerAdapter {
 
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onButtonClick(event);
+		}
+	}
+
+
+	@Override
+	public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+		if (event.getUser().isBot() || event.getGuild() == null ) {
+			return;
+		}
+
+		for (InventoryListPaginator paginator : InventoryListPaginator.paginators) {
+			if(paginator.onModalInteraction(event)){
+				return;
+			}
 		}
 	}
 

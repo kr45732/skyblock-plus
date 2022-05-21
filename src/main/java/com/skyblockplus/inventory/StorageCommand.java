@@ -69,7 +69,7 @@ public class StorageCommand extends Command {
 					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
 				}
 
-				new InventoryPaginator(storagePages, "Storage", player, event);
+				new InventoryEmojiPaginator(storagePages, "Storage", player, event);
 				return null;
 			}
 			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");

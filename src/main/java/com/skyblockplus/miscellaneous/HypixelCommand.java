@@ -39,35 +39,8 @@ public class HypixelCommand extends Command {
 	public HypixelCommand() {
 		this.name = "hypixel";
 		this.cooldown = globalCooldown;
+		this.aliases = new String[]{"hy"};
 		this.botPermissions = defaultPerms();
-	}
-
-	public static EmbedBuilder getParkourStats(String username) {
-		HypixelPlayer player = new HypixelPlayer(username);
-		if (player.isNotValid()) {
-			return invalidEmbed(player.getFailCause());
-		}
-
-		try {
-			EmbedBuilder eb = player.getDefaultEmbed();
-			StringBuilder parkourCompletionString = new StringBuilder();
-			for (String parkourLocation : getJsonKeys(player.get("parkourCompletions"))) {
-				int fastestTime = -1;
-				for (JsonElement parkourTime : player.get("parkourCompletions." + parkourLocation).getAsJsonArray()) {
-					fastestTime = Math.max(higherDepth(parkourTime, "timeTook", -1), fastestTime);
-				}
-
-				if (fastestTime != -1) {
-					parkourCompletionString.append("• ").append(parkourLocation).append(": ").append(fastestTime / 1000).append("s\n");
-				}
-			}
-
-			if (parkourCompletionString.length() > 0) {
-				eb.setDescription("**Fastest Parkour Times:**\n" + parkourCompletionString);
-				return eb;
-			}
-		} catch (Exception ignored) {}
-		return invalidEmbed("Player has no completed parkours");
 	}
 
 	public static EmbedBuilder getHypixelStats(String username) {
@@ -156,7 +129,7 @@ public class HypixelCommand extends Command {
 
 		if (player.get("scorpius_bribe_96") != null) {
 			skyblockItems +=
-				"• Scorpius Bribe (Year 96): " +
+				"• Scorpius Bribe (96): " +
 				"<t:" +
 				Instant.ofEpochMilli(player.get("scorpius_bribe_96").getAsLong()).getEpochSecond() +
 				":d>" +
@@ -165,7 +138,7 @@ public class HypixelCommand extends Command {
 
 		if (player.get("scorpius_bribe_120") != null) {
 			skyblockItems +=
-				"• Scorpius Bribe (Year 120): " +
+				"• Scorpius Bribe (120): " +
 				"<t:" +
 				Instant.ofEpochMilli(player.get("scorpius_bribe_120").getAsLong()).getEpochSecond() +
 				":d>" +
@@ -174,11 +147,29 @@ public class HypixelCommand extends Command {
 
 		if (player.get("scorpius_bribe_144") != null) {
 			skyblockItems +=
-				"• Scorpius Bribe (Year 144): " +
+				"• Scorpius Bribe (144): " +
 				"<t:" +
 				Instant.ofEpochMilli(player.get("scorpius_bribe_144").getAsLong()).getEpochSecond() +
 				":d>" +
 				"\n";
+		}
+
+		if (player.get("scorpius_bribe_168") != null) {
+			skyblockItems +=
+					"• Scorpius Bribe (168): " +
+							"<t:" +
+							Instant.ofEpochMilli(player.get("scorpius_bribe_168").getAsLong()).getEpochSecond() +
+							":d>" +
+							"\n";
+		}
+
+		if (player.get("scorpius_bribe_192") != null) {
+			skyblockItems +=
+					"• Scorpius Bribe (192): " +
+							"<t:" +
+							Instant.ofEpochMilli(player.get("scorpius_bribe_192").getAsLong()).getEpochSecond() +
+							":d>" +
+							"\n";
 		}
 
 		if (player.get("claimed_potato_talisman") != null) {
@@ -226,23 +217,11 @@ public class HypixelCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if ((args.length == 3 || args.length == 2) && args[1].equals("parkour")) {
-					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
-						return;
-					}
-
-					embed(getParkourStats(player));
-					return;
-				} else if (args.length == 2 || args.length == 1) {
-					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-						return;
-					}
-
-					embed(getHypixelStats(player));
+				if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 					return;
 				}
 
-				sendErrorEmbed();
+				embed(getHypixelStats(player));
 			}
 		}
 			.queue();

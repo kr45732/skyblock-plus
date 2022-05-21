@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -27,10 +28,10 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HypixelSlashCommand extends SlashCommand {
+public class CollectionsSlashCommand extends SlashCommand {
 
-	public HypixelSlashCommand() {
-		this.name = "hypixel";
+	public CollectionsSlashCommand() {
+		this.name = "collections";
 	}
 
 	@Override
@@ -41,14 +42,15 @@ public class HypixelSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(HypixelCommand.getHypixelStats(event.player));
+		event.paginate(CollectionsCommand.getCollections(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "Get Hypixel information about a player")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
+			.slash(name, "Get a player's collection amounts and levels")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 
 	@Override

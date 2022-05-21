@@ -81,6 +81,21 @@ public class AutomatedRoles {
 	private RoleModel catacombs = new RoleModel();
 
 	@Embedded
+	private RoleModel healer = new RoleModel();
+
+	@Embedded
+	private RoleModel mage = new RoleModel();
+
+	@Embedded
+	private RoleModel berserk = new RoleModel();
+
+	@Embedded
+	private RoleModel archer = new RoleModel();
+
+	@Embedded
+	private RoleModel tank = new RoleModel();
+
+	@Embedded
 	private RoleModel weight = new RoleModel();
 
 	@Embedded

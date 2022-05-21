@@ -140,7 +140,7 @@ public class SkillsCommand extends Command {
 					.append(getEmoji(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()))
 					.append(" ")
 					.append(idToName(entry.getKey()))
-					.append(" - ")
+					.append(": ")
 					.append(entry.getValue());
 			}
 			eb.addField("Participated Contests | " + higherDepth(jacobStats, "contests").getAsJsonObject().size(), ebStr.toString(), false);

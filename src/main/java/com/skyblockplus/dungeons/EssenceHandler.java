@@ -18,19 +18,20 @@
 
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.command.PaginatorEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
 
 public class EssenceHandler {
 
@@ -38,19 +39,22 @@ public class EssenceHandler {
 	private final String itemName;
 	private final JsonElement itemJson;
 	private final Message reactMessage;
-	private final User user;
+	private final PaginatorEvent event;
 	private final ArrayList<String> validReactions;
 	private final Map<String, Integer> essenceEmojiMap = new HashMap<>();
 	private final Map<Integer, String> emojiEssenceMap;
 	private int startingLevel;
 
-	public EssenceHandler(String itemId, JsonElement itemJson, Message _reactMessage, User user) {
-		TextChannel channel = _reactMessage.getTextChannel();
-		_reactMessage.delete().queue();
+	public EssenceHandler(String itemId, PaginatorEvent event) {
+		if (higherDepth(getEssenceCostsJson(), itemId) == null) {
+			itemId = getClosestMatchFromIds(itemId, ESSENCE_ITEM_NAMES);
+		}
+
 		this.itemId = itemId;
 		this.itemName = idToName(itemId);
-		this.itemJson = itemJson;
-		this.user = user;
+		this.itemJson = higherDepth(getEssenceCostsJson(), itemId);
+		this.event = event;
+		this.reactMessage = event.getLoadingMessage();
 
 		essenceEmojiMap.put("⏫", -1);
 		essenceEmojiMap.put("0⃣", 0);
@@ -72,7 +76,7 @@ public class EssenceHandler {
 		}
 		eb.addField("Levels", initialMessageInfo + "0⃣ - 0 stars\n1⃣ - 1 star\n2⃣ - 2 stars\n3⃣ - 3 stars\n4⃣ - 4 stars", false);
 		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
-		this.reactMessage = channel.sendMessageEmbeds(eb.build()).complete();
+		event.getAction().editMessageEmbeds(eb.build()).get().queue();
 
 		validReactions.add("0⃣");
 		validReactions.add("1⃣");
@@ -97,7 +101,7 @@ public class EssenceHandler {
 		return (
 			event.isFromGuild() &&
 			event.getMessageId().equals(reactMessage.getId()) &&
-			event.getUser().getId().equals(user.getId()) &&
+			event.getUser().getId().equals(this.event.getUser().getId()) &&
 			validReactions.contains(event.getReactionEmote().getName())
 		);
 	}

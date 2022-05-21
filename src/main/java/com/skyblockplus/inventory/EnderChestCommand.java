@@ -77,7 +77,7 @@ public class EnderChestCommand extends Command {
 					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
 				}
 
-				new InventoryPaginator(enderChestPages, "Ender Chest", player, event);
+				new InventoryEmojiPaginator(enderChestPages, "Ender Chest", player, event);
 				return null;
 			}
 			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");

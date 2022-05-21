@@ -46,7 +46,7 @@ public class GuildRanksCommand extends Command {
 
 	public GuildRanksCommand() {
 		this.name = "guild-ranks";
-		this.cooldown = globalCooldown + 1;
+		this.cooldown = globalCooldown + 2;
 		this.aliases = new String[] { "g-rank", "g-ranks" };
 		this.botPermissions = defaultPerms();
 	}

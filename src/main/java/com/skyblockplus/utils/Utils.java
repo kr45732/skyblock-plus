@@ -99,7 +99,7 @@ public class Utils {
 
 	/* Constants */
 	public static final Color botColor = new Color(223, 5, 5);
-	public static final int globalCooldown = 4;
+	public static final int globalCooldown = 3;
 	public static final String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
 	public static final String BOT_INVITE_LINK =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395540032593&scope=bot%20applications.commands";
@@ -234,7 +234,7 @@ public class Utils {
 	}
 
 	public static String getEmoji(String id) {
-		return higherDepth(getEmojiMap(), id, "");
+		return getEmojiOr(id, "");
 	}
 
 	public static String getEmojiOr(String id, String defaultValue) {
@@ -451,6 +451,7 @@ public class Utils {
 					}
 					JsonObject idAndTier = new JsonObject();
 					idAndTier.add("name", higherDepth(item.getValue(), "name"));
+					idAndTier.addProperty("type", collectionType.getKey().toLowerCase());
 					idAndTier.add("tiers", tierAmounts);
 					collectionsJson.add(item.getKey(), idAndTier);
 				}
@@ -842,7 +843,8 @@ public class Utils {
 		try {
 			for (String key : paths) {
 				if (key.length() >= 3 && key.startsWith("[") && key.endsWith("]")) {
-					element = element.getAsJsonArray().get(Integer.parseInt(key.substring(1, key.length() - 1)));
+					int idx = Integer.parseInt(key.substring(1, key.length() - 1));
+					element = element.getAsJsonArray().get(idx == -1 ? element.getAsJsonArray().size() - 1 : idx);
 				} else {
 					element = element.getAsJsonObject().get(key);
 				}

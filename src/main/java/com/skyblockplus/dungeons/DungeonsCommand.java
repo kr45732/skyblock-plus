@@ -49,7 +49,7 @@ public class DungeonsCommand extends Command {
 		if (player.isValid()) {
 			try {
 				CustomPaginator.Builder paginateBuilder = player
-					.defaultPlayerPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS)
+					.defaultPlayerPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS, event.getUser())
 					.setColumns(3)
 					.setItemsPerPage(9);
 				PaginatorExtras extras = paginateBuilder

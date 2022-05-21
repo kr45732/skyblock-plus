@@ -186,6 +186,16 @@ public class ServerSettingsService {
 					return new ResponseEntity<>(currentRoleSettings.getGuild_member(), HttpStatus.OK);
 				case "fairy_souls":
 					return new ResponseEntity<>(currentRoleSettings.getFairy_souls(), HttpStatus.OK);
+				case "healer":
+					return new ResponseEntity<>(currentRoleSettings.getHealer(), HttpStatus.OK);
+				case "mage":
+					return new ResponseEntity<>(currentRoleSettings.getMage(), HttpStatus.OK);
+				case "berserk":
+					return new ResponseEntity<>(currentRoleSettings.getBerserk(), HttpStatus.OK);
+				case "archer":
+					return new ResponseEntity<>(currentRoleSettings.getArcher(), HttpStatus.OK);
+				case "tank":
+					return new ResponseEntity<>(currentRoleSettings.getTank(), HttpStatus.OK);
 				case "slot_collector":
 					return new ResponseEntity<>(currentRoleSettings.getSlot_collector(), HttpStatus.OK);
 				case "maxed_collections":
@@ -256,6 +266,11 @@ public class ServerSettingsService {
 				case "catacombs" -> currentRoleSettings.setCatacombs(newRoleSettings);
 				case "guild_member" -> currentRoleSettings.setGuild_member(newRoleSettings);
 				case "fairy_souls" -> currentRoleSettings.setFairy_souls(newRoleSettings);
+				case "healer" -> currentRoleSettings.setHealer(newRoleSettings);
+				case "mage" -> currentRoleSettings.setMage(newRoleSettings);
+				case "berserk" -> currentRoleSettings.setBerserk(newRoleSettings);
+				case "archer" -> currentRoleSettings.setArcher(newRoleSettings);
+				case "tank" -> currentRoleSettings.setTank(newRoleSettings);
 				case "slot_collector" -> currentRoleSettings.setSlot_collector(newRoleSettings);
 				case "maxed_collections" -> currentRoleSettings.setMaxed_collections(newRoleSettings);
 				case "pet_enthusiast" -> currentRoleSettings.setPet_enthusiast(newRoleSettings);

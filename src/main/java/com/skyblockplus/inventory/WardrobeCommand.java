@@ -46,7 +46,7 @@ public class WardrobeCommand extends Command {
 		if (player.isValid()) {
 			Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
 			if (armorStructMap != null) {
-				CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator().setItemsPerPage(4);
+				CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(4);
 
 				for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
 					paginateBuilder.addItems(
@@ -109,7 +109,7 @@ public class WardrobeCommand extends Command {
 					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
 				}
 
-				new InventoryPaginator(wardrobe, "Wardrobe", player, event);
+				new InventoryEmojiPaginator(wardrobe, "Wardrobe", player, event);
 				return null;
 			}
 			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");

@@ -49,7 +49,7 @@ public class SacksCommand extends Command {
 				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 			}
 
-			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator().setItemsPerPage(20);
+			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(20);
 
 			JsonElement bazaarPrices = higherDepth(getBazaarJson(), "products");
 

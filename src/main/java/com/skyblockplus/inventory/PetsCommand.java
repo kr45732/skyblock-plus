@@ -44,7 +44,7 @@ public class PetsCommand extends Command {
 	public static EmbedBuilder getPlayerPets(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator().setItemsPerPage(25);
+			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
 
 			JsonArray playerPets = player.getPets();
 			for (JsonElement pet : playerPets) {
