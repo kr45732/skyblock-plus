@@ -18,6 +18,8 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -26,12 +28,9 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-
-import static com.skyblockplus.utils.Utils.*;
 
 @Component
 public class CollectionsCommand extends Command {
@@ -54,17 +53,32 @@ public class CollectionsCommand extends Command {
 			String collectionType = null;
 			for (Map.Entry<String, JsonElement> entry : getCollectionsJson().entrySet()) {
 				String curCollectionType = higherDepth(entry.getValue(), "type").getAsString();
-				if(collectionType == null){
+				if (collectionType == null) {
 					collectionType = curCollectionType;
 				}
-				if(!curCollectionType.equals(collectionType)){
-					extras.addEmbedPage(eb.setDescription("**Total Maxed Collections:** " + maxedCount + "/" + getCollectionsJson().size() + "\n**Maxed " + capitalizeString(collectionType) + " Collections:** " + maxCountType + "/" + totalCountType + "\n" + eb.getDescriptionBuilder()));
+				if (!curCollectionType.equals(collectionType)) {
+					extras.addEmbedPage(
+						eb.setDescription(
+							"**Total Maxed Collections:** " +
+							maxedCount +
+							"/" +
+							getCollectionsJson().size() +
+							"\n**Maxed " +
+							capitalizeString(collectionType) +
+							" Collections:** " +
+							maxCountType +
+							"/" +
+							totalCountType +
+							"\n" +
+							eb.getDescriptionBuilder()
+						)
+					);
 					eb = player.defaultPlayerEmbed();
 					collectionType = curCollectionType;
 					maxCountType = totalCountType = 0;
 				}
 
-				JsonArray tiers =  higherDepth(entry.getValue(), "tiers").getAsJsonArray();
+				JsonArray tiers = higherDepth(entry.getValue(), "tiers").getAsJsonArray();
 				long amt = player.getCollection(entry.getKey());
 				int level = 0;
 				for (int i = 0; i < tiers.size(); i++) {
@@ -74,12 +88,24 @@ public class CollectionsCommand extends Command {
 						break;
 					}
 				}
-				if(level == tiers.size()){
-					maxCountType ++;
+				if (level == tiers.size()) {
+					maxCountType++;
 				}
 
-				eb.appendDescription("\n" + getEmoji(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()) + " " + idToName(entry.getKey()) + ": " + level + "/" + tiers.size() + " (" + simplifyNumber(amt) + ")");
-				totalCountType ++;
+				eb.appendDescription(
+					"\n" +
+					getEmoji(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()) +
+					" " +
+					idToName(entry.getKey()) +
+					": " +
+					level +
+					"/" +
+					tiers.size() +
+					" (" +
+					simplifyNumber(amt) +
+					")"
+				);
+				totalCountType++;
 			}
 
 			event.paginate(defaultPaginator(event.getUser()).setPaginatorExtras(extras));

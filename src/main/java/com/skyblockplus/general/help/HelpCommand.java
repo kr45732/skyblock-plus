@@ -407,8 +407,7 @@ public class HelpCommand extends Command {
 				)
 					.addAliases("drags")
 					.setCategory("miscellaneous"),
-				new HelpData("reforge", "Get the reforge stone stats for each rarity.", "reforge <stone>")
-					.setCategory("miscellaneous"),
+				new HelpData("reforge", "Get the reforge stone stats for each rarity.", "reforge <stone>").setCategory("miscellaneous"),
 				// Party
 				new HelpData("party", "Main party command.")
 					.addSubcommands(

@@ -240,8 +240,8 @@ public class CustomPaginator extends Menu {
 		actionRows.set(
 			0,
 			ActionRow.of(
-					actionRows.get(0).getButtons().get(0).withDisabled(newPageNum == 1),
-				actionRows.get(0).getButtons().get(1).withDisabled( newPageNum == pages)
+				actionRows.get(0).getButtons().get(0).withDisabled(newPageNum == 1),
+				actionRows.get(0).getButtons().get(1).withDisabled(newPageNum == pages)
 			)
 		);
 

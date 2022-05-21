@@ -39,7 +39,7 @@ public class HypixelCommand extends Command {
 	public HypixelCommand() {
 		this.name = "hypixel";
 		this.cooldown = globalCooldown;
-		this.aliases = new String[]{"hy"};
+		this.aliases = new String[] { "hy" };
 		this.botPermissions = defaultPerms();
 	}
 
@@ -156,20 +156,20 @@ public class HypixelCommand extends Command {
 
 		if (player.get("scorpius_bribe_168") != null) {
 			skyblockItems +=
-					"• Scorpius Bribe (168): " +
-							"<t:" +
-							Instant.ofEpochMilli(player.get("scorpius_bribe_168").getAsLong()).getEpochSecond() +
-							":d>" +
-							"\n";
+				"• Scorpius Bribe (168): " +
+				"<t:" +
+				Instant.ofEpochMilli(player.get("scorpius_bribe_168").getAsLong()).getEpochSecond() +
+				":d>" +
+				"\n";
 		}
 
 		if (player.get("scorpius_bribe_192") != null) {
 			skyblockItems +=
-					"• Scorpius Bribe (192): " +
-							"<t:" +
-							Instant.ofEpochMilli(player.get("scorpius_bribe_192").getAsLong()).getEpochSecond() +
-							":d>" +
-							"\n";
+				"• Scorpius Bribe (192): " +
+				"<t:" +
+				Instant.ofEpochMilli(player.get("scorpius_bribe_192").getAsLong()).getEpochSecond() +
+				":d>" +
+				"\n";
 		}
 
 		if (player.get("claimed_potato_talisman") != null) {

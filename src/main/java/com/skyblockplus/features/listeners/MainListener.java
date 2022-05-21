@@ -235,15 +235,14 @@ public class MainListener extends ListenerAdapter {
 		}
 	}
 
-
 	@Override
 	public void onModalInteraction(@NotNull ModalInteractionEvent event) {
-		if (event.getUser().isBot() || event.getGuild() == null ) {
+		if (event.getUser().isBot() || event.getGuild() == null) {
 			return;
 		}
 
 		for (InventoryListPaginator paginator : InventoryListPaginator.paginators) {
-			if(paginator.onModalInteraction(event)){
+			if (paginator.onModalInteraction(event)) {
 				return;
 			}
 		}

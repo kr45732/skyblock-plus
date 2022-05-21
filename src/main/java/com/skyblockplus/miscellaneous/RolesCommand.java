@@ -213,7 +213,11 @@ public class RolesCommand extends Command {
 						"taming",
 						"enchanting",
 						"catacombs",
-							"healer","mage","berserk", "archer","tank",
+						"healer",
+						"mage",
+						"berserk",
+						"archer",
+						"tank",
 						"fairy_souls",
 						"skill_average",
 						"pet_score",
@@ -280,8 +284,10 @@ public class RolesCommand extends Command {
 								useHighest ? player.getHighestAmount(currentRoleName) : player.getNumLvlNineSlayers();
 							case "maxed_collections" -> roleAmount =
 								useHighest ? player.getHighestAmount(currentRoleName) : player.getNumMaxedCollections();
-							case "healer","mage","berserk", "archer","tank" -> roleAmount =
-								useHighest ? player.getHighestAmount(currentRoleName) : player.getDungeonClass(currentRoleName).getProgressLevel();
+							case "healer", "mage", "berserk", "archer", "tank" -> roleAmount =
+								useHighest
+									? player.getHighestAmount(currentRoleName)
+									: player.getDungeonClass(currentRoleName).getProgressLevel();
 						}
 
 						if (roleAmount == -1) {

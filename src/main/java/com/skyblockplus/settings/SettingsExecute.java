@@ -48,7 +48,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -1656,39 +1655,48 @@ public class SettingsExecute {
 
 	/* Roles Settings */
 	public EmbedBuilder getRoleSettings(String roleName) {
-		List<String> allRoles = List.of("sven",
-				"rev",
-				"tara",
-				"blaze",
-				"enderman",
-				"alchemy",
-				"combat",
-				"fishing",
-				"farming",
-				"foraging",
-				"carpentry",
-				"mining",
-				"taming",
-				"enchanting",
-				"catacombs",
-				"healer","mage","berserk", "archer","tank",
-				"weight",
-				"guild_member",
-				"guild_ranks",
-				"coins",
-				"fairy_souls",
-				"slot_collector",
-				"pet_enthusiast",
-				"total_slayer",
-				"slayer_nine",
-				"skill_average",
-				"pet_score",
-				"dungeon_secrets",
-				"accessory_count",
-				"networth",
-				"gamemode",
-				"maxed_collections");
-		Map<String, Integer> rolePageMap = IntStream.range(0, allRoles.size()).boxed().collect(Collectors.toMap(allRoles::get, i -> i + 2, (a, b) -> b));
+		List<String> allRoles = List.of(
+			"sven",
+			"rev",
+			"tara",
+			"blaze",
+			"enderman",
+			"alchemy",
+			"combat",
+			"fishing",
+			"farming",
+			"foraging",
+			"carpentry",
+			"mining",
+			"taming",
+			"enchanting",
+			"catacombs",
+			"healer",
+			"mage",
+			"berserk",
+			"archer",
+			"tank",
+			"weight",
+			"guild_member",
+			"guild_ranks",
+			"coins",
+			"fairy_souls",
+			"slot_collector",
+			"pet_enthusiast",
+			"total_slayer",
+			"slayer_nine",
+			"skill_average",
+			"pet_score",
+			"dungeon_secrets",
+			"accessory_count",
+			"networth",
+			"gamemode",
+			"maxed_collections"
+		);
+		Map<String, Integer> rolePageMap = IntStream
+			.range(0, allRoles.size())
+			.boxed()
+			.collect(Collectors.toMap(allRoles::get, i -> i + 2, (a, b) -> b));
 
 		if (rolePageMap.containsKey(roleName)) {
 			return getRolesSettings(database.getRolesSettings(guild.getId()), rolePageMap.get(roleName));
@@ -1761,7 +1769,12 @@ public class SettingsExecute {
 					"enchanting",
 					"skill_average",
 					"pet_score",
-					"catacombs","healer","mage","berserk", "archer","tank" -> ebFieldString
+					"catacombs",
+					"healer",
+					"mage",
+					"berserk",
+					"archer",
+					"tank" -> ebFieldString
 					.append("**A player's ")
 					.append(roleName)
 					.append(" level**\nExample: `/settings roles add ")

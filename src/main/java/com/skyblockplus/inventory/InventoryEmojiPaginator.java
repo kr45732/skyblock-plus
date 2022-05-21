@@ -94,7 +94,7 @@ public class InventoryEmojiPaginator {
 			pagePart1.editMessage(inventoryPages.get(pageNumber)[0]).queue(ignore, ignore);
 
 			List<Button> curButtons = event.getMessage().getButtons();
-			Button leftButton =curButtons.get(0).withDisabled(pageNumber == 0);
+			Button leftButton = curButtons.get(0).withDisabled(pageNumber == 0);
 			Button rightButton = curButtons.get(1).withDisabled(pageNumber == maxPageNumber);
 			Button linkButton = curButtons
 				.get(2)

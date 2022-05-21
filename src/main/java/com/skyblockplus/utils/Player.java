@@ -1466,7 +1466,7 @@ public class Player {
 					case "catacombs_xp":
 						highestAmount = Math.max(highestAmount, getCatacombs().totalExp());
 						break;
-					case "healer","mage","berserk", "archer","tank":
+					case "healer", "mage", "berserk", "archer", "tank":
 						highestAmount = Math.max(highestAmount, getDungeonClass(type).getProgressLevel());
 						break;
 					case "weight":

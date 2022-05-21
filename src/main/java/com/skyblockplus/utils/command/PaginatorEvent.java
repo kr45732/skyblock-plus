@@ -128,8 +128,7 @@ public class PaginatorEvent {
 		}
 
 		public PaginatorAction setActionRows(ActionRow... rows) {
-			action =
-					event.isSlashCommand() ? getSlashCommandAction().setActionRows(rows) : getCommandAction().setActionRows(rows);
+			action = event.isSlashCommand() ? getSlashCommandAction().setActionRows(rows) : getCommandAction().setActionRows(rows);
 			return this;
 		}
 

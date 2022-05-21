@@ -48,7 +48,7 @@ public class HypixelSlashCommand extends SlashCommand {
 	public CommandData getCommandData() {
 		return Commands
 			.slash(name, "Get Hypixel information about a player")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
 	}
 
 	@Override

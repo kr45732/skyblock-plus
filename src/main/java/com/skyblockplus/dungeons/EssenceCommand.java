@@ -27,7 +27,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -95,17 +94,17 @@ public class EssenceCommand extends Command {
 			StringBuilder amountsStr = new StringBuilder();
 			for (String essence : List.of("ice", "gold", "dragon", "spider", "undead", "wither", "diamond")) {
 				amountsStr
-						.append(ESSENCE_EMOJI_MAP.get(essence))
-						.append("** ")
-						.append(capitalizeString(essence))
-						.append(" Essence:** ")
-						.append(formatNumber(higherDepth(player.profileJson(), "essence_" + essence, 0)))
-						.append("\n");
+					.append(ESSENCE_EMOJI_MAP.get(essence))
+					.append("** ")
+					.append(capitalizeString(essence))
+					.append(" Essence:** ")
+					.append(formatNumber(higherDepth(player.profileJson(), "essence_" + essence, 0)))
+					.append("\n");
 			}
 
 			eb.addField("Amounts", amountsStr.toString(), false);
 
-			if(higherDepth(player.profileJson(), "perks") != null) {
+			if (higherDepth(player.profileJson(), "perks") != null) {
 				JsonElement essenceTiers = getConstant("ESSENCE_SHOP_TIERS");
 				StringBuilder witherShopUpgrades = new StringBuilder();
 				StringBuilder undeadShopUpgrades = new StringBuilder();
@@ -113,19 +112,19 @@ public class EssenceCommand extends Command {
 					JsonElement curPerk = higherDepth(essenceTiers, perk.getKey());
 					JsonArray tiers = higherDepth(curPerk, "tiers").getAsJsonArray();
 					String out =
-							"\n" +
-									ESSENCE_EMOJI_MAP.get(perk.getKey()) +
-									"** " +
-									capitalizeString(perk.getKey().replace("catacombs_", "").replace("_", " ")) +
-									":** " +
-									perk.getValue().getAsInt() +
-									"/" +
-									higherDepth(curPerk, "tiers").getAsJsonArray().size() +
-									(
-											perk.getValue().getAsInt() == tiers.size()
-													? ""
-													: (" (" + formatNumber(tiers.get(perk.getValue().getAsInt()).getAsInt()) + " for next)")
-									);
+						"\n" +
+						ESSENCE_EMOJI_MAP.get(perk.getKey()) +
+						"** " +
+						capitalizeString(perk.getKey().replace("catacombs_", "").replace("_", " ")) +
+						":** " +
+						perk.getValue().getAsInt() +
+						"/" +
+						higherDepth(curPerk, "tiers").getAsJsonArray().size() +
+						(
+							perk.getValue().getAsInt() == tiers.size()
+								? ""
+								: (" (" + formatNumber(tiers.get(perk.getValue().getAsInt()).getAsInt()) + " for next)")
+						);
 					if (higherDepth(curPerk, "type").getAsString().equals("undead")) {
 						undeadShopUpgrades.append(out);
 					} else {
