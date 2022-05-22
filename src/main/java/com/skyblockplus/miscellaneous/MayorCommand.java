@@ -45,11 +45,9 @@ public class MayorCommand extends Command {
 
 	public static MessageBuilder getMayor() {
 		Message message = jda.getTextChannelById("932484216179011604").getHistory().retrievePast(1).complete().get(0);
-		EmbedBuilder eb = new EmbedBuilder();
-		eb.copyFrom(message.getEmbeds().get(0));
 		List<Button> buttons = message.getButtons();
 		buttons.add(Button.primary("mayor_special_button", "Special Mayors"));
-		return new MessageBuilder().setEmbeds(eb.setTimestamp(Instant.now()).build()).setActionRows(ActionRow.of(buttons));
+		return new MessageBuilder().setEmbeds(message.getEmbeds()).setActionRows(ActionRow.of(buttons));
 	}
 
 	public static EmbedBuilder getSpecialMayors() {

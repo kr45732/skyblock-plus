@@ -115,7 +115,8 @@ public class AutomaticGuild {
 	/* Mayor */
 	public TextChannel mayorChannel = null;
 	public Role mayorPing = null;
-	public Message lastMayorMessage = null;
+	public Message lastMayorElectionOpenMessage = null;
+	public Message lastMayorElectedMessage = null;
 	/* Party */
 	public final List<Party> partyList = new ArrayList<>();
 	/* Jacob */
@@ -181,7 +182,7 @@ public class AutomaticGuild {
 		} catch (Exception ignored) {}
 		try {
 			mayorChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "mayorChannel", null));
-			lastMayorMessage =
+			lastMayorElectionOpenMessage =
 				mayorChannel
 					.getIterableHistory()
 					.takeAsync(15)
@@ -191,10 +192,24 @@ public class AutomaticGuild {
 						m.getAuthor().getId().equals(selfUserId) &&
 						!m.getEmbeds().isEmpty() &&
 						m.getEmbeds().get(0).getTitle() != null &&
-						m.getEmbeds().get(0).getTitle().startsWith("Mayor Election Open | ")
+						m.getEmbeds().get(0).getTitle().startsWith("Mayor Election Open | Year ")
 					)
 					.findFirst()
 					.orElse(null);
+			lastMayorElectedMessage =
+					mayorChannel
+							.getIterableHistory()
+							.takeAsync(15)
+							.get()
+							.stream()
+							.filter(m ->
+									m.getAuthor().getId().equals(selfUserId) &&
+											!m.getEmbeds().isEmpty() &&
+											m.getEmbeds().get(0).getTitle() != null &&
+											m.getEmbeds().get(0).getTitle().startsWith("Mayor Elected | Year ")
+							)
+							.findFirst()
+							.orElse(null);
 		} catch (Exception ignored) {}
 		try {
 			mayorPing = event.getGuild().getRoleById(higherDepth(serverSettings, "mayorRole", null));
@@ -871,9 +886,11 @@ public class AutomaticGuild {
 		this.mayorPing = role;
 	}
 
-	public boolean onMayorElection(List<MessageEmbed> embeds, Button button, int year) {
+	public boolean onMayorElection(MessageEmbed embed, Button button, int year) {
 		try {
 			if (mayorChannel != null) {
+				lastMayorElectedMessage = null;
+
 				if (!mayorChannel.canTalk()) {
 					logAction(
 						defaultEmbed("Mayor Notifications")
@@ -883,25 +900,59 @@ public class AutomaticGuild {
 				}
 
 				if (
-					lastMayorMessage != null && Integer.parseInt(lastMayorMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
+					lastMayorElectionOpenMessage != null && Integer.parseInt(lastMayorElectionOpenMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
 				) {
-					lastMayorMessage = null;
+					lastMayorElectionOpenMessage = null;
 				}
 
-				if (lastMayorMessage != null) {
+				if (lastMayorElectionOpenMessage != null) {
 					mayorChannel
-						.editMessageEmbedsById(lastMayorMessage.getId(), embeds)
+						.editMessageEmbedsById(lastMayorElectionOpenMessage.getId(), embed)
 						.setActionRow(button)
 						.queue(
 							ignore,
 							e -> {
 								if (e instanceof ErrorResponseException ex && ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
-									lastMayorMessage = null;
+									lastMayorElectionOpenMessage = null;
 								}
 							}
 						);
 				} else {
-					mayorChannel.sendMessageEmbeds(embeds).setActionRow(button).queue(m -> lastMayorMessage = m);
+					mayorChannel.sendMessageEmbeds(embed).setActionRow(button).queue(m -> lastMayorElectionOpenMessage = m);
+				}
+				return true;
+			}
+		} catch (Exception e) {
+			log.error(guildId, e);
+		}
+		return false;
+	}
+
+	public boolean onMayorJerryRotation(List<MessageEmbed> embeds) {
+		try {
+			if (mayorChannel != null) {
+				if (!mayorChannel.canTalk()) {
+					logAction(
+							defaultEmbed("Mayor Notifications")
+									.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
+					);
+					return false;
+				}
+
+
+				if (lastMayorElectedMessage != null) {
+					mayorChannel
+							.editMessageEmbedsById(lastMayorElectedMessage.getId(), embeds)
+							.queue(
+									ignore,
+									e -> {
+										if (e instanceof ErrorResponseException ex && ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
+											lastMayorElectedMessage = null;
+										}
+									}
+							);
+				}else{
+					mayorChannel.sendMessageEmbeds(embeds).queue(m -> lastMayorElectedMessage = m);
 				}
 				return true;
 			}
@@ -914,9 +965,9 @@ public class AutomaticGuild {
 	public boolean onMayorElected(MessageEmbed embed) {
 		try {
 			if (mayorChannel != null) {
-				if (lastMayorMessage != null) {
-					lastMayorMessage.editMessageComponents().queue(ignore, ignore);
-					lastMayorMessage = null;
+				if (lastMayorElectionOpenMessage != null) {
+					lastMayorElectionOpenMessage.editMessageComponents().queue(ignore, ignore);
+					lastMayorElectionOpenMessage = null;
 				}
 
 				if (!mayorChannel.canTalk()) {
@@ -928,9 +979,9 @@ public class AutomaticGuild {
 				}
 
 				if (mayorPing == null) {
-					mayorChannel.sendMessageEmbeds(embed).queue();
+					mayorChannel.sendMessageEmbeds(embed).queue(m -> lastMayorElectedMessage = m);
 				} else {
-					mayorChannel.sendMessage(mayorPing.getAsMention()).setEmbeds(embed).queue();
+					mayorChannel.sendMessage(mayorPing.getAsMention()).setEmbeds(embed).queue(m -> lastMayorElectedMessage = m);
 				}
 				return true;
 			}

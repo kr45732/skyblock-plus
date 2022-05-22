@@ -28,7 +28,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -94,13 +93,17 @@ public class MayorHandler {
 		} else { // Election is open
 			updateCurrentElection();
 		}
+
+		if (currentMayor.equals("Jerry")) {
+			scheduler.schedule(MayorHandler::updateMayorJerryRotations,5, TimeUnit.MINUTES);
+		}
 	}
 
-	public static void mayorElected() {
+	public static MessageEmbed getMayorElectedEmbed(){
 		JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor");
 		JsonArray mayors = collectJsonArray(
-			streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray())
-				.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
+				streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray())
+						.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
 		);
 
 		currentMayor = higherDepth(cur, "name").getAsString();
@@ -119,38 +122,42 @@ public class MayorHandler {
 				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
 					perksStr
-						.append("\n➜ ")
-						.append(higherDepth(perk, "name").getAsString())
-						.append(": ")
-						.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+							.append("\n➜ ")
+							.append(higherDepth(perk, "name").getAsString())
+							.append(": ")
+							.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
 				}
 
 				eb.addField(
-					mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
-					"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
-					false
+						mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
+						"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
+						false
 				);
 			} else {
 				ebStr
-					.append("\n")
-					.append(mayorNameToEmoji.get(name.toUpperCase()))
-					.append(" **")
-					.append(name)
-					.append(":** ")
-					.append(roundProgress(votes / totalVotes))
-					.append(" (")
-					.append(formatNumber(votes))
-					.append(")");
+						.append("\n")
+						.append(mayorNameToEmoji.get(name.toUpperCase()))
+						.append(" **")
+						.append(name)
+						.append(":** ")
+						.append(roundProgress(votes / totalVotes))
+						.append(" (")
+						.append(formatNumber(votes))
+						.append(")");
 			}
 		}
 		eb.addField("Loosing Mayors", ebStr.toString(), false);
 		eb.addField(
-			"Next Election",
-			"Opens <t:" + Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 217200000).getEpochSecond() + ":R>",
-			false
+				"Next Election",
+				"Opens <t:" + Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 217200000).getEpochSecond() + ":R>",
+				false
 		);
 
-		MessageEmbed embed = eb.build();
+		return eb.build();
+	}
+
+	public static void mayorElected() {
+		MessageEmbed embed = getMayorElectedEmbed();
 		int updateCount = 0;
 		for (AutomaticGuild guild : guildMap.values()) {
 			if (guild.onMayorElected(embed)) { // Send and ping
@@ -163,6 +170,42 @@ public class MayorHandler {
 				} catch (Exception ignored) {}
 			}
 		}
+	}
+
+	public static void updateMayorJerryRotations() {
+		try {
+			if (!currentMayor.equals("Jerry")) {
+				return;
+			}
+
+			JsonElement jerryJson = higherDepth(getJson("https://api.skytils.gg/api/mayor/jerry"), "mayor");
+			String jerryMayorName = higherDepth(jerryJson, "name").getAsString();
+			EmbedBuilder eb = defaultEmbed(jerryMayorName)
+					.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(jerryMayorName.toUpperCase()) + "/left");
+			for (JsonElement perk : higherDepth(jerryJson, "perks").getAsJsonArray()) {
+				eb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
+			}
+
+			List<MessageEmbed> embeds = List.of(getMayorElectedEmbed(), eb.build());
+
+			int updateCount = 0;
+			for (AutomaticGuild guild : guildMap.values()) {
+				if (guild.onMayorJerryRotation(embeds)) {
+					updateCount++;
+				}
+
+				if (updateCount != 0 && updateCount % 25 == 0) {
+					try {
+						TimeUnit.SECONDS.sleep(1);
+					} catch (Exception ignored) {
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		scheduler.schedule(MayorHandler::updateMayorJerryRotations, 5, TimeUnit.MINUTES);
 	}
 
 	public static void updateCurrentElection() {
@@ -219,23 +262,12 @@ public class MayorHandler {
 			}
 			votesEmbed = defaultEmbed("Mayor Election Graph | Year " + year).setDescription(votesStr).build();
 
-			List<MessageEmbed> embeds = new ArrayList<>();
-			embeds.add(eb.build());
-			if (currentMayor.equals("Jerry")) {
-				JsonElement jerryJson = higherDepth(getJson("https://api.skytils.gg/api/mayor/jerry"), "mayor");
-				String jerryMayorName = higherDepth(jerryJson, "name").getAsString();
-				EmbedBuilder jerryEb = defaultEmbed(jerryMayorName)
-					.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(jerryMayorName.toUpperCase()) + "/left");
-				for (JsonElement perk : higherDepth(jerryJson, "perks").getAsJsonArray()) {
-					jerryEb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
-				}
-				embeds.add(jerryEb.build());
-			}
+			MessageEmbed embed = eb.build();
 			Button button = Button.primary("mayor_graph_button", "View Graph");
 
 			int updateCount = 0;
 			for (AutomaticGuild guild : guildMap.values()) {
-				if (guild.onMayorElection(embeds, button, year)) { // Send or update message
+				if (guild.onMayorElection(embed, button, year)) { // Send or update message
 					updateCount++;
 				}
 
