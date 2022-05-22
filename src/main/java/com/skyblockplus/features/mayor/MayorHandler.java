@@ -221,11 +221,11 @@ public class MayorHandler {
 
 			List<MessageEmbed> embeds = new ArrayList<>();
 			embeds.add(eb.build());
-			if(currentMayor.equals("Jerry")){
+			if (currentMayor.equals("Jerry")) {
 				JsonElement jerryJson = higherDepth(getJson("https://api.skytils.gg/api/mayor/jerry"), "mayor");
-				String jerryMayorName = higherDepth(jerryJson , "name").getAsString();
+				String jerryMayorName = higherDepth(jerryJson, "name").getAsString();
 				EmbedBuilder jerryEb = defaultEmbed(jerryMayorName)
-						.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(jerryMayorName.toUpperCase()) + "/left");;
+					.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(jerryMayorName.toUpperCase()) + "/left");
 				for (JsonElement perk : higherDepth(jerryJson, "perks").getAsJsonArray()) {
 					jerryEb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
 				}
