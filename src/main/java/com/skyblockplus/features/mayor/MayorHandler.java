@@ -28,7 +28,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -217,12 +219,23 @@ public class MayorHandler {
 			}
 			votesEmbed = defaultEmbed("Mayor Election Graph | Year " + year).setDescription(votesStr).build();
 
-			MessageEmbed embed = eb.build();
+			List<MessageEmbed> embeds = new ArrayList<>();
+			embeds.add(eb.build());
+			if(currentMayor.equals("Jerry")){
+				JsonElement jerryJson = higherDepth(getJson("https://api.skytils.gg/api/mayor/jerry"), "mayor");
+				String jerryMayorName = higherDepth(jerryJson , "name").getAsString();
+				EmbedBuilder jerryEb = defaultEmbed(jerryMayorName)
+						.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(jerryMayorName.toUpperCase()) + "/left");;
+				for (JsonElement perk : higherDepth(jerryJson, "perks").getAsJsonArray()) {
+					jerryEb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
+				}
+				embeds.add(jerryEb.build());
+			}
 			Button button = Button.primary("mayor_graph_button", "View Graph");
 
 			int updateCount = 0;
 			for (AutomaticGuild guild : guildMap.values()) {
-				if (guild.onMayorElection(embed, button, year)) { // Send or update message
+				if (guild.onMayorElection(embeds, button, year)) { // Send or update message
 					updateCount++;
 				}
 

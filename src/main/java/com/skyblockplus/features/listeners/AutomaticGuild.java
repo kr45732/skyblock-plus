@@ -871,7 +871,7 @@ public class AutomaticGuild {
 		this.mayorPing = role;
 	}
 
-	public boolean onMayorElection(MessageEmbed embed, Button button, int year) {
+	public boolean onMayorElection(List<MessageEmbed> embeds, Button button, int year) {
 		try {
 			if (mayorChannel != null) {
 				if (!mayorChannel.canTalk()) {
@@ -890,7 +890,7 @@ public class AutomaticGuild {
 
 				if (lastMayorMessage != null) {
 					mayorChannel
-						.editMessageEmbedsById(lastMayorMessage.getId(), embed)
+						.editMessageEmbedsById(lastMayorMessage.getId(), embeds)
 						.setActionRow(button)
 						.queue(
 							ignore,
@@ -901,7 +901,7 @@ public class AutomaticGuild {
 							}
 						);
 				} else {
-					mayorChannel.sendMessageEmbeds(embed).setActionRow(button).queue(m -> lastMayorMessage = m);
+					mayorChannel.sendMessageEmbeds(embeds).setActionRow(button).queue(m -> lastMayorMessage = m);
 				}
 				return true;
 			}
