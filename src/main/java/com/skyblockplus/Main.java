@@ -155,14 +155,14 @@ public class Main {
 
 		File transcriptDir = new File("src/main/java/com/skyblockplus/json/application_transcripts/");
 		File[] transcriptDirFiles = transcriptDir.listFiles();
-		if(transcriptDirFiles != null) {
+		if (transcriptDirFiles != null) {
 			Arrays.stream(transcriptDirFiles).map(File::delete).collect(Collectors.toList());
 		}
 		log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
 
 		File loreRendersDir = new File("src/main/java/com/skyblockplus/json/lore_renders/");
 		File[] loreRendersDirFiles = transcriptDir.listFiles();
-		if(loreRendersDirFiles != null) {
+		if (loreRendersDirFiles != null) {
 			Arrays.stream(loreRendersDirFiles).map(File::delete).collect(Collectors.toList());
 		}
 		log.info((loreRendersDir.mkdirs() ? "Successfully created" : "Failed to create") + " lore render directory");

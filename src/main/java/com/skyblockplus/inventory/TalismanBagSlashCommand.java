@@ -56,7 +56,9 @@ public class TalismanBagSlashCommand extends SlashCommand {
 				TalismanBagCommand.getPlayerTalismansEmoji(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
 				true
 			);
-			case "tuning"-> event.paginate(TalismanBagCommand.getPlayerTuning(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+			case "tuning" -> event.paginate(
+				TalismanBagCommand.getPlayerTuning(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
+			);
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -73,9 +75,9 @@ public class TalismanBagSlashCommand extends SlashCommand {
 				new SubcommandData("emoji", "Get a player's talisman bag represented in emojis")
 					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 					.addOption(OptionType.STRING, "profile", "Profile name"),
-					new SubcommandData("tuning", "Get a player's power stone stats and tuning stats")
-							.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-							.addOption(OptionType.STRING, "profile", "Profile name")
+				new SubcommandData("tuning", "Get a player's power stone stats and tuning stats")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+					.addOption(OptionType.STRING, "profile", "Profile name")
 			);
 	}
 
