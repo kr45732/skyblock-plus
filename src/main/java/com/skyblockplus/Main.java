@@ -44,6 +44,7 @@ import com.skyblockplus.utils.database.Database;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import java.io.File;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -151,12 +152,20 @@ public class Main {
 		MayorHandler.initialize();
 		JacobHandler.initialize();
 		EventHandler.initialize();
+
 		File transcriptDir = new File("src/main/java/com/skyblockplus/json/application_transcripts/");
-		transcriptDir.delete();
+		File[] transcriptDirFiles = transcriptDir.listFiles();
+		if(transcriptDirFiles != null) {
+			Arrays.stream(transcriptDirFiles).map(File::delete).collect(Collectors.toList());
+		}
 		log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
-		File loreRenders = new File("src/main/java/com/skyblockplus/json/lore_renders/");
-		loreRenders.delete();
-		log.info((loreRenders.mkdirs() ? "Successfully created" : "Failed to create") + " lore render directory");
+
+		File loreRendersDir = new File("src/main/java/com/skyblockplus/json/lore_renders/");
+		File[] loreRendersDirFiles = transcriptDir.listFiles();
+		if(loreRendersDirFiles != null) {
+			Arrays.stream(loreRendersDirFiles).map(File::delete).collect(Collectors.toList());
+		}
+		log.info((loreRendersDir.mkdirs() ? "Successfully created" : "Failed to create") + " lore render directory");
 
 		if (isMainBot()) {
 			scheduler.scheduleWithFixedDelay(

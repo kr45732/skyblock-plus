@@ -64,6 +64,7 @@ public class Constants {
 	public static Map<String, Long> FORGE_TIMES;
 	public static Map<String, String> MAYOR_NAME_TO_SKIN;
 	public static JsonObject ARMOR_PRESTIGE_COST;
+	public static JsonObject POWER_TO_BASE_STATS;
 
 	/* Fetched from other sources */
 	public static List<String> ENCHANT_NAMES;
@@ -181,6 +182,9 @@ public class Constants {
 
 			/* ARMOR_PRESTIGE_COST */
 			ARMOR_PRESTIGE_COST = higherDepth(CONSTANTS, "ARMOR_PRESTIGE_COST").getAsJsonObject();
+
+			/* POWER_TO_BASE_STATS */
+			POWER_TO_BASE_STATS = higherDepth(CONSTANTS, "POWER_TO_BASE_STATS").getAsJsonObject();
 
 			/* ENCHANT_NAMES */
 			HashSet<String> enchantNames = new HashSet<>();

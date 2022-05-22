@@ -2302,7 +2302,7 @@ public class SettingsExecute {
 		try {
 			channel.getManager().setSlowmode(5).queue();
 		} catch (Exception ignored) {}
-		return defaultSettingsEmbed("**Verify text channel set to:** " + channel);
+		return defaultSettingsEmbed("**Verify text channel set to:** " + channel.getAsMention());
 	}
 
 	public EmbedBuilder setVerifyNickname(String nickname) {
