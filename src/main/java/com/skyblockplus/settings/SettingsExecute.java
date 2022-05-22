@@ -220,7 +220,6 @@ public class SettingsExecute {
 					eb = setJacobEnable(false);
 				}
 			} else {
-				args = content.split("\\s+", 4);
 				eb =
 					switch (args[2]) {
 						case "add" -> addJacobCrop(args[3], args.length == 5 ? args[4] : null);
