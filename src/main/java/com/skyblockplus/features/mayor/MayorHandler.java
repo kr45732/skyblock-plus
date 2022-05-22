@@ -95,7 +95,7 @@ public class MayorHandler {
 		}
 
 		if (currentMayor.equals("Jerry")) {
-//			scheduler.schedule(MayorHandler::updateMayorJerryRotations, 5, TimeUnit.MINUTES);
+			//			scheduler.schedule(MayorHandler::updateMayorJerryRotations, 5, TimeUnit.MINUTES);
 		}
 	}
 
