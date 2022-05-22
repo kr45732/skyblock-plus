@@ -95,7 +95,7 @@ public class MayorHandler {
 		}
 
 		if (currentMayor.equals("Jerry")) {
-			scheduler.schedule(MayorHandler::updateMayorJerryRotations, 5, TimeUnit.MINUTES);
+//			scheduler.schedule(MayorHandler::updateMayorJerryRotations, 5, TimeUnit.MINUTES);
 		}
 	}
 
@@ -158,6 +158,7 @@ public class MayorHandler {
 
 	public static void mayorElected() {
 		MessageEmbed embed = getMayorElectedEmbed();
+
 		int updateCount = 0;
 		for (AutomaticGuild guild : guildMap.values()) {
 			if (guild.onMayorElected(embed)) { // Send and ping
