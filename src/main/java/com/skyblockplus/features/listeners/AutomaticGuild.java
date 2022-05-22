@@ -197,19 +197,19 @@ public class AutomaticGuild {
 					.findFirst()
 					.orElse(null);
 			lastMayorElectedMessage =
-					mayorChannel
-							.getIterableHistory()
-							.takeAsync(15)
-							.get()
-							.stream()
-							.filter(m ->
-									m.getAuthor().getId().equals(selfUserId) &&
-											!m.getEmbeds().isEmpty() &&
-											m.getEmbeds().get(0).getTitle() != null &&
-											m.getEmbeds().get(0).getTitle().startsWith("Mayor Elected | Year ")
-							)
-							.findFirst()
-							.orElse(null);
+				mayorChannel
+					.getIterableHistory()
+					.takeAsync(15)
+					.get()
+					.stream()
+					.filter(m ->
+						m.getAuthor().getId().equals(selfUserId) &&
+						!m.getEmbeds().isEmpty() &&
+						m.getEmbeds().get(0).getTitle() != null &&
+						m.getEmbeds().get(0).getTitle().startsWith("Mayor Elected | Year ")
+					)
+					.findFirst()
+					.orElse(null);
 		} catch (Exception ignored) {}
 		try {
 			mayorPing = event.getGuild().getRoleById(higherDepth(serverSettings, "mayorRole", null));
@@ -900,7 +900,8 @@ public class AutomaticGuild {
 				}
 
 				if (
-					lastMayorElectionOpenMessage != null && Integer.parseInt(lastMayorElectionOpenMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
+					lastMayorElectionOpenMessage != null &&
+					Integer.parseInt(lastMayorElectionOpenMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
 				) {
 					lastMayorElectionOpenMessage = null;
 				}
@@ -933,25 +934,24 @@ public class AutomaticGuild {
 			if (mayorChannel != null) {
 				if (!mayorChannel.canTalk()) {
 					logAction(
-							defaultEmbed("Mayor Notifications")
-									.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
+						defaultEmbed("Mayor Notifications")
+							.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
 					);
 					return false;
 				}
 
-
 				if (lastMayorElectedMessage != null) {
 					mayorChannel
-							.editMessageEmbedsById(lastMayorElectedMessage.getId(), embeds)
-							.queue(
-									ignore,
-									e -> {
-										if (e instanceof ErrorResponseException ex && ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
-											lastMayorElectedMessage = null;
-										}
-									}
-							);
-				}else{
+						.editMessageEmbedsById(lastMayorElectedMessage.getId(), embeds)
+						.queue(
+							ignore,
+							e -> {
+								if (e instanceof ErrorResponseException ex && ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
+									lastMayorElectedMessage = null;
+								}
+							}
+						);
+				} else {
 					mayorChannel.sendMessageEmbeds(embeds).queue(m -> lastMayorElectedMessage = m);
 				}
 				return true;
