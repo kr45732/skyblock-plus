@@ -154,9 +154,9 @@ public class Main {
 		EventHandler.initialize();
 
 		File transcriptDir = new File("src/main/java/com/skyblockplus/json/application_transcripts/");
-		if(!transcriptDir.exists()) {
+		if (!transcriptDir.exists()) {
 			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
-		}else{
+		} else {
 			File[] transcriptDirFiles = transcriptDir.listFiles();
 			if (transcriptDirFiles != null) {
 				Arrays.stream(transcriptDirFiles).map(File::delete).collect(Collectors.toList());
@@ -164,9 +164,9 @@ public class Main {
 		}
 
 		File loreRendersDir = new File("src/main/java/com/skyblockplus/json/lore_renders/");
-		if(!loreRendersDir.exists()) {
+		if (!loreRendersDir.exists()) {
 			log.info((loreRendersDir.mkdirs() ? "Successfully created" : "Failed to create") + " lore render directory");
-		}else{
+		} else {
 			File[] loreRendersDirFiles = loreRendersDir.listFiles();
 			if (loreRendersDirFiles != null) {
 				Arrays.stream(loreRendersDirFiles).map(File::delete).collect(Collectors.toList());
