@@ -202,7 +202,7 @@ public abstract class CommandExecute extends CommandEvent {
 		args = newArgs;
 	}
 
-	protected boolean getBooleanArg(String match) {
+	protected boolean getBooleanOption(String match) {
 		boolean arg = false;
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals(match)) {

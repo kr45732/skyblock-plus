@@ -344,7 +344,7 @@ public class AuctionsCommand extends Command {
 						}
 					}
 				}
-				boolean verbose = getBooleanArg("--verbose");
+				boolean verbose = getBooleanOption("--verbose");
 
 				if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 					return;

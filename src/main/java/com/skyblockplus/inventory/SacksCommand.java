@@ -128,7 +128,7 @@ public class SacksCommand extends Command {
 				logCommand();
 
 				if (args.length == 3 || args.length == 2 || args.length == 1) {
-					boolean useNpc = getBooleanArg("--npc");
+					boolean useNpc = getBooleanOption("--npc");
 
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;

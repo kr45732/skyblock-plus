@@ -133,7 +133,7 @@ public class NetworthExecute {
 			@Override
 			protected void execute() {
 				logCommand();
-				verbose = getBooleanArg("--verbose");
+				verbose = getBooleanOption("--verbose");
 
 				if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {

@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -41,6 +42,7 @@ public class MayorHandler {
 
 	public static String currentMayor = "";
 	public static int currentMayorYear = 0;
+	public static ScheduledFuture<?> jerryFuture;
 
 	public static final Map<String, String> mayorNameToEmoji = Maps.of(
 		"DERPY",
@@ -94,8 +96,8 @@ public class MayorHandler {
 			updateCurrentElection();
 		}
 
-		if (currentMayor.equals("Jerry")) {
-			//			scheduler.schedule(MayorHandler::updateMayorJerryRotations, 5, TimeUnit.MINUTES);
+		if (currentMayor.equals("Jerry") && jerryFuture == null) {
+			jerryFuture = scheduler.schedule(MayorHandler::updateMayorJerryRotations, 5, TimeUnit.MINUTES);
 		}
 	}
 
@@ -176,6 +178,7 @@ public class MayorHandler {
 	public static void updateMayorJerryRotations() {
 		try {
 			if (!currentMayor.equals("Jerry")) {
+				jerryFuture = null;
 				return;
 			}
 
@@ -205,7 +208,7 @@ public class MayorHandler {
 			e.printStackTrace();
 		}
 
-		scheduler.schedule(MayorHandler::updateMayorJerryRotations, 5, TimeUnit.MINUTES);
+		jerryFuture = scheduler.schedule(MayorHandler::updateMayorJerryRotations, 5, TimeUnit.MINUTES);
 	}
 
 	public static void updateCurrentElection() {
