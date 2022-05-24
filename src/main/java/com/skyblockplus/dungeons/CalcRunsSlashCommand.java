@@ -43,7 +43,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(
+		event.paginate(
 			CalcRunsCommand.getCalcRuns(
 				event.player,
 				event.getOptionStr("profile"),
