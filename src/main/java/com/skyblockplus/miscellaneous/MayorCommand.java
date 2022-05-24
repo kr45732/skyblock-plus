@@ -19,13 +19,16 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.features.event.CalendarCommand.*;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.mayorNameToEmoji;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
@@ -44,10 +47,15 @@ public class MayorCommand extends Command {
 	}
 
 	public static MessageBuilder getMayor() {
-		Message message = jda.getTextChannelById("932484216179011604").getHistory().retrievePast(1).complete().get(0);
-		List<Button> buttons = message.getButtons();
+		AutomaticGuild automaticGuild = guildMap.get("796790757947867156");
+
+		List<Button> buttons = automaticGuild.lastMayorElectedMessage.getButtons();
+		if(automaticGuild.lastMayorElectionOpenMessage != null){
+			buttons.add(Button.primary("mayor_current_election_button", "Current Election"));
+		}
 		buttons.add(Button.primary("mayor_special_button", "Special Mayors"));
-		return new MessageBuilder().setEmbeds(message.getEmbeds()).setActionRows(ActionRow.of(buttons));
+
+		return new MessageBuilder().setEmbeds(automaticGuild.lastMayorElectedMessage.getEmbeds()).setActionRows(ActionRow.of(buttons));
 	}
 
 	public static EmbedBuilder getSpecialMayors() {

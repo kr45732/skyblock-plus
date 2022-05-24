@@ -19,6 +19,7 @@
 package com.skyblockplus.features.listeners;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.features.mayor.MayorHandler.jerryEmbed;
 import static com.skyblockplus.features.mayor.MayorHandler.votesEmbed;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.ApiHandler.*;
@@ -38,6 +39,7 @@ import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.event.EventGuild;
 import com.skyblockplus.features.jacob.JacobGuild;
+import com.skyblockplus.features.mayor.MayorHandler;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
@@ -909,7 +911,7 @@ public class AutomaticGuild {
 						.editMessageEmbedsById(lastMayorElectionOpenMessage.getId(), embed)
 						.setActionRow(button)
 						.queue(
-							ignore,
+							m -> lastMayorElectionOpenMessage = m,
 							e -> {
 								if (e instanceof ErrorResponseException ex && ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
 									lastMayorElectionOpenMessage = null;
@@ -927,40 +929,8 @@ public class AutomaticGuild {
 		return false;
 	}
 
-	public boolean onMayorJerryRotation(List<MessageEmbed> embeds) {
-		try {
-			if (mayorChannel != null) {
-				if (!mayorChannel.canTalk()) {
-					logAction(
-						defaultEmbed("Mayor Notifications")
-							.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
-					);
-					return false;
-				}
 
-				if (lastMayorElectedMessage != null) {
-					mayorChannel
-						.editMessageEmbedsById(lastMayorElectedMessage.getId(), embeds)
-						.queue(
-							ignore,
-							e -> {
-								if (e instanceof ErrorResponseException ex && ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
-									lastMayorElectedMessage = null;
-								}
-							}
-						);
-				} else {
-					mayorChannel.sendMessageEmbeds(embeds).queue(m -> lastMayorElectedMessage = m);
-				}
-				return true;
-			}
-		} catch (Exception e) {
-			log.error(guildId, e);
-		}
-		return false;
-	}
-
-	public boolean onMayorElected(MessageEmbed embed) {
+	public boolean onMayorElected(MessageEmbed embed, Button... button) {
 		try {
 			if (mayorChannel != null) {
 				if (lastMayorElectionOpenMessage != null) {
@@ -977,9 +947,9 @@ public class AutomaticGuild {
 				}
 
 				if (mayorPing == null) {
-					mayorChannel.sendMessageEmbeds(embed).queue(m -> lastMayorElectedMessage = m);
+					mayorChannel.sendMessageEmbeds(embed).setActionRow(button).queue(m -> lastMayorElectedMessage = m);
 				} else {
-					mayorChannel.sendMessage(mayorPing.getAsMention()).setEmbeds(embed).queue(m -> lastMayorElectedMessage = m);
+					mayorChannel.sendMessage(mayorPing.getAsMention()).setEmbeds(embed).setActionRow(button).queue(m -> lastMayorElectedMessage = m);
 				}
 				return true;
 			}
@@ -1052,6 +1022,12 @@ public class AutomaticGuild {
 			return;
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorCommand.getSpecialMayors().build()).setEphemeral(true).queue();
+			return;
+		} else if(event.getComponentId().equals("mayor_current_election_button")) {
+			event.reply(guildMap.get("796790757947867156").lastMayorElectionOpenMessage).setEphemeral(true).queue();
+			return;
+		} else if (event.getComponentId().equals("mayor_jerry_button")){
+			event.replyEmbeds(jerryEmbed).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().startsWith("bingo_")) {
 			StringBuilder card = new StringBuilder();

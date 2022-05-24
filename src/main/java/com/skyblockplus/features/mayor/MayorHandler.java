@@ -29,7 +29,6 @@ import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +42,8 @@ public class MayorHandler {
 	public static String currentMayor = "";
 	public static int currentMayorYear = 0;
 	public static ScheduledFuture<?> jerryFuture;
-
+	public static MessageEmbed jerryEmbed;
+	public static MessageEmbed votesEmbed = defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build();
 	public static final Map<String, String> mayorNameToEmoji = Maps.of(
 		"DERPY",
 		"<:derpy:940083649129349150>",
@@ -70,7 +70,7 @@ public class MayorHandler {
 		"MARINA",
 		"<:marina:940083649783664660>"
 	);
-	public static MessageEmbed votesEmbed = defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build();
+
 
 	public static void initialize() {
 		if (currentMayor.isEmpty()) {
@@ -101,11 +101,11 @@ public class MayorHandler {
 		}
 	}
 
-	public static MessageEmbed getMayorElectedEmbed() {
+	public static void mayorElected() {
 		JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor");
 		JsonArray mayors = collectJsonArray(
-			streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray())
-				.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
+				streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray())
+						.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
 		);
 
 		currentMayor = higherDepth(cur, "name").getAsString();
@@ -124,46 +124,46 @@ public class MayorHandler {
 				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
 					perksStr
-						.append("\n➜ ")
-						.append(higherDepth(perk, "name").getAsString())
-						.append(": ")
-						.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+							.append("\n➜ ")
+							.append(higherDepth(perk, "name").getAsString())
+							.append(": ")
+							.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
 				}
 
 				eb.addField(
-					mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
-					"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
-					false
+						mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
+						"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
+						false
 				);
 			} else {
 				ebStr
-					.append("\n")
-					.append(mayorNameToEmoji.get(name.toUpperCase()))
-					.append(" **")
-					.append(name)
-					.append(":** ")
-					.append(roundProgress(votes / totalVotes))
-					.append(" (")
-					.append(formatNumber(votes))
-					.append(")");
+						.append("\n")
+						.append(mayorNameToEmoji.get(name.toUpperCase()))
+						.append(" **")
+						.append(name)
+						.append(":** ")
+						.append(roundProgress(votes / totalVotes))
+						.append(" (")
+						.append(formatNumber(votes))
+						.append(")");
 			}
 		}
 		eb.addField("Loosing Mayors", ebStr.toString(), false);
 		eb.addField(
-			"Next Election",
-			"Opens <t:" + Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 217200000).getEpochSecond() + ":R>",
-			false
+				"Next Election",
+				"Opens <t:" + Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 217200000).getEpochSecond() + ":R>",
+				false
 		);
 
-		return eb.build();
-	}
-
-	public static void mayorElected() {
-		MessageEmbed embed = getMayorElectedEmbed();
+		MessageEmbed embed = eb.build();
+		Button[] buttons = new Button[0];
+		if(currentMayor.equals("Jerry")){
+			buttons = new Button[]{Button.primary("mayor_jerry_button", "Current Jerry Mayor")};
+		}
 
 		int updateCount = 0;
 		for (AutomaticGuild guild : guildMap.values()) {
-			if (guild.onMayorElected(embed)) { // Send and ping
+			if (guild.onMayorElected(embed, buttons)) { // Send and ping
 				updateCount++;
 			}
 
@@ -190,20 +190,7 @@ public class MayorHandler {
 				eb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
 			}
 
-			List<MessageEmbed> embeds = List.of(getMayorElectedEmbed(), eb.build());
-
-			int updateCount = 0;
-			for (AutomaticGuild guild : guildMap.values()) {
-				if (guild.onMayorJerryRotation(embeds)) {
-					updateCount++;
-				}
-
-				if (updateCount != 0 && updateCount % 25 == 0) {
-					try {
-						TimeUnit.SECONDS.sleep(1);
-					} catch (Exception ignored) {}
-				}
-			}
+			jerryEmbed = eb.build();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
