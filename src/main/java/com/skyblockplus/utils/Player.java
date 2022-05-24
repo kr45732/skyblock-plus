@@ -803,7 +803,7 @@ public class Player {
 		return null;
 	}
 
-	public List<InvItem> getPetsMapNames() {
+	public List<InvItem> getPetsMap() {
 		JsonArray petsArr;
 		try {
 			petsArr = getPets();

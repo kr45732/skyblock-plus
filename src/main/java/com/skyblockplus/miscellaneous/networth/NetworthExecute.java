@@ -224,7 +224,7 @@ public class NetworthExecute {
 				}
 			}
 
-			List<InvItem> petsMap = player.getPetsMapNames();
+			List<InvItem> petsMap = player.getPetsMap();
 			if (petsMap != null) {
 				for (InvItem item : petsMap) {
 					petsTotal += calculateItemPrice(item, "pets");
@@ -1167,7 +1167,7 @@ public class NetworthExecute {
 				}
 				return 0;
 			} else {
-				itemCost = getLowestPrice(item.getId().toUpperCase());
+				itemCost = item.getDarkAuctionPrice() != -1 ? item.getDarkAuctionPrice() : getLowestPrice(item.getId().toUpperCase());
 			}
 		} catch (Exception ignored) {}
 

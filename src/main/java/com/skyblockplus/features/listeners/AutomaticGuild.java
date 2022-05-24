@@ -889,8 +889,6 @@ public class AutomaticGuild {
 	public boolean onMayorElection(MessageEmbed embed, Button button, int year) {
 		try {
 			if (mayorChannel != null) {
-				lastMayorElectedMessage = null;
-
 				if (!mayorChannel.canTalk()) {
 					logAction(
 						defaultEmbed("Mayor Notifications")

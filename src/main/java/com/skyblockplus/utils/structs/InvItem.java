@@ -47,9 +47,10 @@ public class InvItem {
 	private List<InvItem> backpackItems = new ArrayList<>();
 	private String rarity;
 	private int dungeonFloor = 0;
-	private NBTCompound nbtTag;
 	private int essenceCount;
 	private String essenceType;
+	private long darkAuctionPrice;
+	private NBTCompound nbtTag;
 
 	public void setEssence(int essenceCount, String essenceType) {
 		this.essenceCount = essenceCount;
