@@ -67,7 +67,7 @@ public class SkyblockEventHandler {
 			MessageReceivedEvent.class,
 			this::condition,
 			this::action,
-			3,
+			2,
 			TimeUnit.MINUTES,
 			() -> sendEmbedMessage(defaultEmbed("Skyblock Event").setDescription("Event creation timed out"), false)
 		);
@@ -482,7 +482,7 @@ public class SkyblockEventHandler {
 				MessageReceivedEvent.class,
 				this::condition,
 				this::action,
-				3,
+				2,
 				TimeUnit.MINUTES,
 				() -> sendEmbedMessage(defaultEmbed("Skyblock Event").setDescription("Event creation timed out"), false)
 			);

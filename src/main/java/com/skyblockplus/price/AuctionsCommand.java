@@ -32,7 +32,7 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.InvItem;
-import com.skyblockplus.utils.structs.PaginatorExtras;
+import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Duration;
 import java.time.Instant;

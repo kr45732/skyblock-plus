@@ -111,8 +111,8 @@ public class InventoryEmojiPaginator {
 			ButtonInteractionEvent.class,
 			this::condition,
 			this::action,
-			30,
-			TimeUnit.SECONDS,
+			1,
+			TimeUnit.MINUTES,
 			() ->
 				pagePart2
 					.editMessageComponents(

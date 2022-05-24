@@ -198,8 +198,8 @@ public class LeaderboardPaginator {
 			ButtonInteractionEvent.class,
 			this::condition,
 			this::action,
-			30,
-			TimeUnit.SECONDS,
+			1,
+			TimeUnit.MINUTES,
 			() -> message.editMessageComponents().queue(ignore, ignore)
 		);
 	}

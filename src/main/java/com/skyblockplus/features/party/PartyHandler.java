@@ -202,7 +202,7 @@ public class PartyHandler {
 			SelectMenuInteractionEvent.class,
 			this::condition,
 			this::action,
-			3,
+			2,
 			TimeUnit.MINUTES,
 			() -> message.editMessageEmbeds(invalidEmbed("Party creation timeout").build()).setActionRows().queue()
 		);

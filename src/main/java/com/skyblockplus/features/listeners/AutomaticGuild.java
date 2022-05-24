@@ -1015,6 +1015,7 @@ public class AutomaticGuild {
 	public void onButtonClick(ButtonInteractionEvent event) {
 		if (
 			event.getComponentId().startsWith("paginator_") ||
+					event.getComponentId().startsWith("reactive_") ||
 			event.getComponentId().startsWith("inv_paginator_") ||
 			event.getComponentId().startsWith("inv_list_paginator_") ||
 			event.getComponentId().startsWith("leaderboard_paginator_")
@@ -1096,29 +1097,6 @@ public class AutomaticGuild {
 						}
 					});
 			}
-			return;
-		} else if (event.getComponentId().startsWith("calc_runs_ring_")) {
-			event
-				.deferReply(true)
-				.queue(ignored -> {
-					// [uuid, profileName, targetLevel, floor]
-					String[] split = event.getComponentId().split("calc_runs_ring_")[1].split("_");
-					Object ebOrMb = CalcRunsCommand.getCalcRuns(
-						split[0],
-						split[1],
-						Integer.parseInt(split[2]),
-						Integer.parseInt(split[3]),
-						true
-					);
-					event
-						.getHook()
-						.editOriginal(
-							(
-								ebOrMb instanceof EmbedBuilder eb ? new MessageBuilder().setEmbeds(eb.build()) : ((MessageBuilder) ebOrMb)
-							).build()
-						)
-						.queue();
-				});
 			return;
 		} else if (event.getComponentId().startsWith("event_message_")) {
 			event

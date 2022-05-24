@@ -215,8 +215,8 @@ public class InventoryListPaginator {
 			ButtonInteractionEvent.class,
 			this::condition,
 			this::action,
-			30,
-			TimeUnit.SECONDS,
+			1,
+			TimeUnit.MINUTES,
 			() -> {
 				if (lastEdit.plusSeconds(27).isAfter(Instant.now())) {
 					waitForEvent();

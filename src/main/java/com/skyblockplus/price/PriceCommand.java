@@ -29,7 +29,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.structs.PaginatorExtras;
+import com.skyblockplus.utils.command.PaginatorExtras;
 import java.time.Instant;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;

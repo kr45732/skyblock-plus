@@ -29,7 +29,7 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.InvItem;
-import com.skyblockplus.utils.structs.PaginatorExtras;
+import com.skyblockplus.utils.command.PaginatorExtras;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

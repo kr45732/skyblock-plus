@@ -30,6 +30,7 @@ import com.google.gson.JsonParser;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.miscellaneous.weight.senither.Weight;
 import com.skyblockplus.utils.command.CustomPaginator;
+import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.*;
 import java.time.Instant;
 import java.util.*;

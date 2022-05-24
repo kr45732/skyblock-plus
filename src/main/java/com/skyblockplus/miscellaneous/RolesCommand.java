@@ -33,7 +33,7 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import com.skyblockplus.utils.structs.PaginatorExtras;
+import com.skyblockplus.utils.command.PaginatorExtras;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -18,6 +18,7 @@
 
 package com.skyblockplus.dungeons;
 
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -47,8 +48,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 				event.player,
 				event.getOptionStr("profile"),
 				event.getOptionInt("level", 1),
-				event.getOptionInt("floor", 0),
-				false
+				event.getOptionInt("floor", 0), new PaginatorEvent(event)
 			)
 		);
 	}

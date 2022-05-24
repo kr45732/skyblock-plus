@@ -28,13 +28,13 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -120,7 +120,8 @@ public class MissingCommand extends Command {
 				"KING_TALISMAN",
 				"CAT_TALISMAN",
 				"MELODY_HAIR",
-				"SURVIVOR_CUBE"
+				"SURVIVOR_CUBE",
+				"NETHERRACK_LOOKING_SUNSHADE"
 			);
 			List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");
 
@@ -139,6 +140,7 @@ public class MissingCommand extends Command {
 			JsonObject mappings = getInternalJsonMappings();
 			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
 			double totalCost = 0;
+			List<String> out = new ArrayList<>();
 			for (String curId : missingInternalArr) {
 				String costOut;
 				double cost = calc.getLowestPrice(curId);
@@ -152,7 +154,7 @@ public class MissingCommand extends Command {
 				} else {
 					costOut = " ➜ " + roundAndFormat(cost);
 				}
-				paginateBuilder.addItems(
+				out.add(
 					getEmoji(curId) +
 					" " +
 					(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
@@ -160,7 +162,52 @@ public class MissingCommand extends Command {
 					costOut
 				);
 			}
-			paginateBuilder
+
+			for (int i = 0; i < missingInternalArr.size(); i++) {
+				String highestValue = higherDepth(talismanUpgrades, missingInternalArr.get(i) + ".[-1]", null);
+				if(highestValue != null){
+					missingInternalArr.set(i, highestValue);
+				}
+			}
+			missingInternalArr.sort(
+					Comparator.comparingDouble(o1 ->
+							soulboundTalisman.contains(o1) ||
+									o1.startsWith("WEDDING_RING_") ||
+									o1.startsWith("CAMPFIRE_TALISMAN_") ||
+									(player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
+									? Double.MAX_VALUE
+									: calc.getLowestPrice(o1)
+					)
+			);
+
+			long totalCostHighest = 0;
+			List<String> outHighest = new ArrayList<>();
+			for (String curId : missingInternalArr) {
+				double cost = calc.getLowestPrice(curId);
+				totalCostHighest += cost;
+				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
+				String name = idToName(curId);
+
+				String costOut;
+				if (soulboundTalisman.contains(curId) || curId.startsWith("WEDDING_RING_") || curId.startsWith("CAMPFIRE_TALISMAN_")) {
+					costOut = (cost != 0 ? " ➜ " + roundAndFormat(cost) : "") + " (Soulbound)";
+				} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
+					costOut = " (Unobtainable)";
+				} else {
+					costOut = " ➜ " + roundAndFormat(cost);
+				}
+				outHighest.add(
+						getEmoji(curId) +
+								" " +
+								(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
+								(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
+								costOut
+				);
+			}
+
+			long finalTotalCostHighest = totalCostHighest;
+			double finalTotalCost = totalCost;
+			paginateBuilder.addItems(out)
 				.getPaginatorExtras()
 				.setEveryPageText(
 					"**Total Missing:** " +
@@ -168,7 +215,41 @@ public class MissingCommand extends Command {
 					"\n**Total Cost:** " +
 					simplifyNumber(totalCost) +
 					"\n**Note:** Talismans with a * have higher tiers\n"
-				);
+				).addReactiveButtons(
+							new PaginatorExtras.ReactiveButton(
+									Button.primary("reactive_missing_command_show_highest", "Show Highest Tier"),
+									 paginator -> {
+										 paginator.setStrings(outHighest);
+										 paginator.getExtras().setEveryPageText(
+												 "**Total Missing:** " +
+														 missingInternalArr.size() +
+														 "\n**Total Cost:** " +
+														 simplifyNumber(finalTotalCostHighest) +
+														 "\n**Note:** Showing highest tiers\n")
+												 .toggleReactiveButton("reactive_missing_command_show_highest", false)
+												 .toggleReactiveButton("reactive_missing_command_show_next", true);
+									 }
+									,
+									true
+							),
+							new PaginatorExtras.ReactiveButton(
+									Button.primary("reactive_missing_command_show_next", "Show Next Tier"),
+									paginator -> {
+										paginator.setStrings(out);
+										paginator.getExtras()
+												.setEveryPageText(
+														"**Total Missing:** " +
+																missingInternalArr.size() +
+																"\n**Total Cost:** " +
+																simplifyNumber(finalTotalCost) +
+																"\n**Note:** Talismans with a * have higher tiers\n")
+												.toggleReactiveButton("reactive_missing_command_show_highest", true)
+												.toggleReactiveButton("reactive_missing_command_show_next", false);
+									}
+									,
+									false
+							)
+					);
 
 			event.paginate(paginateBuilder);
 			return null;

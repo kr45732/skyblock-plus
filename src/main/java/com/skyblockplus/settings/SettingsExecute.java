@@ -40,7 +40,7 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import com.skyblockplus.utils.structs.PaginatorExtras;
+import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.vdurmont.emoji.EmojiParser;
 import java.util.*;

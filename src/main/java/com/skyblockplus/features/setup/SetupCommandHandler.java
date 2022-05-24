@@ -570,7 +570,7 @@ public class SetupCommandHandler {
 			MessageReceivedEvent.class,
 			this::checkReply,
 			this::handleReply,
-			1,
+			2,
 			TimeUnit.MINUTES,
 			() -> {
 				cancel();

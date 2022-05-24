@@ -29,7 +29,7 @@ import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.structs.PaginatorExtras;
+import com.skyblockplus.utils.command.PaginatorExtras;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
