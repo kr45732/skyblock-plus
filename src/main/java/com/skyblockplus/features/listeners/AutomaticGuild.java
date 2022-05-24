@@ -929,7 +929,6 @@ public class AutomaticGuild {
 		return false;
 	}
 
-
 	public boolean onMayorElected(MessageEmbed embed, Button... button) {
 		try {
 			if (mayorChannel != null) {
@@ -949,7 +948,11 @@ public class AutomaticGuild {
 				if (mayorPing == null) {
 					mayorChannel.sendMessageEmbeds(embed).setActionRow(button).queue(m -> lastMayorElectedMessage = m);
 				} else {
-					mayorChannel.sendMessage(mayorPing.getAsMention()).setEmbeds(embed).setActionRow(button).queue(m -> lastMayorElectedMessage = m);
+					mayorChannel
+						.sendMessage(mayorPing.getAsMention())
+						.setEmbeds(embed)
+						.setActionRow(button)
+						.queue(m -> lastMayorElectedMessage = m);
 				}
 				return true;
 			}
@@ -1023,10 +1026,10 @@ public class AutomaticGuild {
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 			return;
-		} else if(event.getComponentId().equals("mayor_current_election_button")) {
+		} else if (event.getComponentId().equals("mayor_current_election_button")) {
 			event.reply(guildMap.get("796790757947867156").lastMayorElectionOpenMessage).setEphemeral(true).queue();
 			return;
-		} else if (event.getComponentId().equals("mayor_jerry_button")){
+		} else if (event.getComponentId().equals("mayor_jerry_button")) {
 			event.replyEmbeds(jerryEmbed).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().startsWith("bingo_")) {

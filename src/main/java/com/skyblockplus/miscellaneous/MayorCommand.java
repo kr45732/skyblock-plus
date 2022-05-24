@@ -50,7 +50,7 @@ public class MayorCommand extends Command {
 		AutomaticGuild automaticGuild = guildMap.get("796790757947867156");
 
 		List<Button> buttons = automaticGuild.lastMayorElectedMessage.getButtons();
-		if(automaticGuild.lastMayorElectionOpenMessage != null){
+		if (automaticGuild.lastMayorElectionOpenMessage != null) {
 			buttons.add(Button.primary("mayor_current_election_button", "Current Election"));
 		}
 		buttons.add(Button.primary("mayor_special_button", "Special Mayors"));
