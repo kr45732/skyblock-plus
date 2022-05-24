@@ -1167,7 +1167,11 @@ public class Utils {
 						itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
 						itemInfo.setDungeonFloor(Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "-1")));
 						itemInfo.setNbtTag(item);
-						itemInfo.setDarkAuctionPrice((itemInfo.getId().equals("MIDAS_SWORD") || itemInfo.getId().equals("MIDAS_STAFF")) ? item.getLong("winning_bid", -1L) : -1);
+						itemInfo.setDarkAuctionPrice(
+							(itemInfo.getId().equals("MIDAS_SWORD") || itemInfo.getId().equals("MIDAS_STAFF"))
+								? item.getLong("winning_bid", -1L)
+								: -1
+						);
 
 						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
 							NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");
