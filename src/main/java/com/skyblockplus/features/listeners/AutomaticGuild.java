@@ -1015,7 +1015,7 @@ public class AutomaticGuild {
 	public void onButtonClick(ButtonInteractionEvent event) {
 		if (
 			event.getComponentId().startsWith("paginator_") ||
-					event.getComponentId().startsWith("reactive_") ||
+			event.getComponentId().startsWith("reactive_") ||
 			event.getComponentId().startsWith("inv_paginator_") ||
 			event.getComponentId().startsWith("inv_list_paginator_") ||
 			event.getComponentId().startsWith("leaderboard_paginator_")

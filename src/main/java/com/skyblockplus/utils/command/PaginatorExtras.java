@@ -18,18 +18,17 @@
 
 package com.skyblockplus.utils.command;
 
-import lombok.Data;
-import lombok.Getter;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed.Field;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import lombok.Data;
+import lombok.Getter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed.Field;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 @Getter
 public class PaginatorExtras {
@@ -137,13 +136,13 @@ public class PaginatorExtras {
 		return this;
 	}
 
-	public List<Button> getButtons(){
+	public List<Button> getButtons() {
 		return reactiveButtons.stream().filter(ReactiveButton::isVisible).map(ReactiveButton::getButton).collect(Collectors.toList());
 	}
 
-	public PaginatorExtras toggleReactiveButton(String id, boolean visible){
+	public PaginatorExtras toggleReactiveButton(String id, boolean visible) {
 		for (ReactiveButton reactiveButton : reactiveButtons) {
-			if(reactiveButton.getId().equals(id)) {
+			if (reactiveButton.getId().equals(id)) {
 				reactiveButton.setVisible(visible);
 			}
 		}
@@ -168,6 +167,7 @@ public class PaginatorExtras {
 
 	@Data
 	public static class ReactiveButton {
+
 		private final Consumer<CustomPaginator> action;
 		private final Button button;
 		private final boolean reactive;
@@ -187,7 +187,7 @@ public class PaginatorExtras {
 			this.visible = visible;
 		}
 
-		public String getId(){
+		public String getId() {
 			return button.getId();
 		}
 

@@ -48,7 +48,8 @@ public class CalcRunsSlashCommand extends SlashCommand {
 				event.player,
 				event.getOptionStr("profile"),
 				event.getOptionInt("level", 1),
-				event.getOptionInt("floor", 0), new PaginatorEvent(event)
+				event.getOptionInt("floor", 0),
+				new PaginatorEvent(event)
 			)
 		);
 	}

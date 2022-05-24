@@ -18,6 +18,8 @@
 
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.miscellaneous.weight.senither.Weight;
@@ -30,8 +32,6 @@ import com.skyblockplus.utils.structs.WeightStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
-
-import static com.skyblockplus.utils.Utils.*;
 
 @Component
 public class CalcRunsCommand extends Command {
@@ -53,32 +53,47 @@ public class CalcRunsCommand extends Command {
 
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-
 			EmbedBuilder regEmbed = getCalcRunsEmbed(player, targetLevel, floor, false);
-			EmbedBuilder ringEmbed = getCalcRunsEmbed(player, targetLevel, floor, true).setDescription("**Note:** Calculating with catacombs expert ring");
+			EmbedBuilder ringEmbed = getCalcRunsEmbed(player, targetLevel, floor, true)
+				.setDescription("**Note:** Calculating with catacombs expert ring");
 
-			event.paginate(defaultPaginator(event.getUser()).showPageNumbers(false).setPaginatorExtras(new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES).addEmbedPage(regEmbed)
-					.addReactiveButtons(
-							new PaginatorExtras.ReactiveButton(Button.primary("reactive_calc_runs_ring", "Calculate With Catacombs Expert Ring"),
-									paginator -> paginator.getExtras().setEmbedPages(ringEmbed)
+			event.paginate(
+				defaultPaginator(event.getUser())
+					.showPageNumbers(false)
+					.setPaginatorExtras(
+						new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES)
+							.addEmbedPage(regEmbed)
+							.addReactiveButtons(
+								new PaginatorExtras.ReactiveButton(
+									Button.primary("reactive_calc_runs_ring", "Calculate With Catacombs Expert Ring"),
+									paginator ->
+										paginator
+											.getExtras()
+											.setEmbedPages(ringEmbed)
 											.toggleReactiveButton("reactive_calc_runs_ring", false)
 											.toggleReactiveButton("reactive_calc_runs_reg", true),
 									true
-							),
-							new PaginatorExtras.ReactiveButton(Button.primary("reactive_calc_runs_reg", "Calculate Without Catacombs Expert Ring"),
-									paginator -> paginator.getExtras().setEmbedPages(regEmbed)
+								),
+								new PaginatorExtras.ReactiveButton(
+									Button.primary("reactive_calc_runs_reg", "Calculate Without Catacombs Expert Ring"),
+									paginator ->
+										paginator
+											.getExtras()
+											.setEmbedPages(regEmbed)
 											.toggleReactiveButton("reactive_calc_runs_ring", true)
-										.toggleReactiveButton("reactive_calc_runs_reg", false),
+											.toggleReactiveButton("reactive_calc_runs_reg", false),
 									false
+								)
 							)
-					)));
+					)
+			);
 			return null;
 		}
 
 		return player.getFailEmbed();
 	}
 
-	public static EmbedBuilder getCalcRunsEmbed(Player player, int targetLevel, int floor, boolean useRing){
+	public static EmbedBuilder getCalcRunsEmbed(Player player, int targetLevel, int floor, boolean useRing) {
 		SkillsStruct current = player.getCatacombs();
 		SkillsStruct target = player.skillInfoFromLevel(targetLevel, "catacombs");
 		if (current.totalExp() >= target.totalExp()) {
@@ -86,37 +101,37 @@ public class CalcRunsCommand extends Command {
 		}
 
 		int completions = higherDepth(
-				player.profileJson(),
-				floor > 7
-						? "dungeons.dungeon_types.master_catacombs.tier_completions." + (floor - 7)
-						: "dungeons.dungeon_types.catacombs.tier_completions." + floor,
-				0
+			player.profileJson(),
+			floor > 7
+				? "dungeons.dungeon_types.master_catacombs.tier_completions." + (floor - 7)
+				: "dungeons.dungeon_types.catacombs.tier_completions." + floor,
+			0
 		);
 		int runs = 0;
 
 		int completionsCap =
-				switch (floor) {
-					case 0, 1, 2, 3, 4, 5 -> 150;
-					case 6 -> 100;
-					default -> 50;
-				};
+			switch (floor) {
+				case 0, 1, 2, 3, 4, 5 -> 150;
+				case 6 -> 100;
+				default -> 50;
+			};
 		int baseXp =
-				switch (floor) {
-					case 0 -> 50;
-					case 1 -> 80;
-					case 2 -> 160;
-					case 3 -> 400;
-					case 4 -> 1420;
-					case 5 -> 2000;
-					case 6 -> 4000;
-					case 7 -> 20000;
-					case 8 -> 10000;
-					case 9 -> 15000;
-					case 10 -> 36500;
-					case 11 -> 48500;
-					case 12 -> 70000;
-					default -> 100000;
-				};
+			switch (floor) {
+				case 0 -> 50;
+				case 1 -> 80;
+				case 2 -> 160;
+				case 3 -> 400;
+				case 4 -> 1420;
+				case 5 -> 2000;
+				case 6 -> 4000;
+				case 7 -> 20000;
+				case 8 -> 10000;
+				case 9 -> 15000;
+				case 10 -> 36500;
+				case 11 -> 48500;
+				case 12 -> 70000;
+				default -> 100000;
+			};
 
 		double xpNeeded = target.totalExp() - current.totalExp();
 		for (int i = completions + 1; i <= completionsCap; i++) { // First 0 to completionsCap give different xp per run than after completionsCap
@@ -138,40 +153,39 @@ public class CalcRunsCommand extends Command {
 		WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight("catacombs");
 		WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight("catacombs", target);
 
-		return
-				player
-						.defaultPlayerEmbed()
-						.addField(
-								"Current",
-								"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
-								false
-						)
-						.addField(
-								"Target",
-								"Level: " +
-										target.currentLevel() +
-										"\nXP: " +
-										formatNumber(target.totalExp()) +
-										" (+" +
-										formatNumber(target.totalExp() - current.totalExp()) +
-										")\n" +
-										(floor > 7 ? "M" + (floor - 7) : "F" + floor) +
-										" Runs Needed: " +
-										formatNumber(runs),
-								false
-						)
-						.addField(
-								"Weight Change",
-								"Total: " +
-										weight.getTotalWeight().getFormatted(false) +
-										" ➜ " +
-										predictedWeight.getTotalWeight().getFormatted(false) +
-										"\nCatacombs: " +
-										pre.getFormatted(false) +
-										" ➜ " +
-										post.getFormatted(false),
-								false
-						);
+		return player
+			.defaultPlayerEmbed()
+			.addField(
+				"Current",
+				"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+				false
+			)
+			.addField(
+				"Target",
+				"Level: " +
+				target.currentLevel() +
+				"\nXP: " +
+				formatNumber(target.totalExp()) +
+				" (+" +
+				formatNumber(target.totalExp() - current.totalExp()) +
+				")\n" +
+				(floor > 7 ? "M" + (floor - 7) : "F" + floor) +
+				" Runs Needed: " +
+				formatNumber(runs),
+				false
+			)
+			.addField(
+				"Weight Change",
+				"Total: " +
+				weight.getTotalWeight().getFormatted(false) +
+				" ➜ " +
+				predictedWeight.getTotalWeight().getFormatted(false) +
+				"\nCatacombs: " +
+				pre.getFormatted(false) +
+				" ➜ " +
+				post.getFormatted(false),
+				false
+			);
 	}
 
 	@Override

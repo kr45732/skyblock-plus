@@ -35,7 +35,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;

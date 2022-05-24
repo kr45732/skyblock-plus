@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Utils.defaultEmbed;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
-
 import java.awt.*;
 import java.time.Instant;
 import java.util.*;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -63,11 +61,14 @@ public class CustomPaginator extends Menu {
 	private final int columns;
 	private final int itemsPerPage;
 	private final boolean showPageNumbers;
+
 	@Setter
 	private List<String> strings;
+
 	private int pages;
 	private final Consumer<Message> finalAction;
 	private final boolean wrapPageEnds;
+
 	@Getter
 	private final PaginatorExtras extras;
 
@@ -231,7 +232,14 @@ public class CustomPaginator extends Menu {
 					pageNum++;
 				}
 			}
-			default -> extras.getReactiveButtons().stream().filter(b -> b.isReacting() && event.getComponentId().equals(b.getId())).map(PaginatorExtras.ReactiveButton::getAction).findFirst().orElse(ignored -> {}).accept(this);
+			default -> extras
+				.getReactiveButtons()
+				.stream()
+				.filter(b -> b.isReacting() && event.getComponentId().equals(b.getId()))
+				.map(PaginatorExtras.ReactiveButton::getAction)
+				.findFirst()
+				.orElse(ignored -> {})
+				.accept(this);
 		}
 		calculatePages();
 		pageNum = Math.min(pageNum, pages);
@@ -239,13 +247,13 @@ public class CustomPaginator extends Menu {
 		List<ActionRow> actionRows = new ArrayList<>();
 		if (pages > 1) {
 			actionRows.add(
-					ActionRow.of(
-							Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).withDisabled(pageNum == 1),
-							Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>")).withDisabled(pageNum == pages)
-					)
+				ActionRow.of(
+					Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).withDisabled(pageNum == 1),
+					Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>")).withDisabled(pageNum == pages)
+				)
 			);
 		}
-		if(!extras.getButtons().isEmpty()){
+		if (!extras.getButtons().isEmpty()) {
 			actionRows.add(ActionRow.of(extras.getButtons()));
 		}
 
@@ -322,18 +330,19 @@ public class CustomPaginator extends Menu {
 
 		embedBuilder
 			.setColor(color)
-			.setFooter("By CrypticPlasma" + ( showPageNumbers? " • Page " + pageNum + "/" + pages  : "" ) + " • dsc.gg/sb+", null)
+			.setFooter("By CrypticPlasma" + (showPageNumbers ? " • Page " + pageNum + "/" + pages : "") + " • dsc.gg/sb+", null)
 			.setTimestamp(Instant.now());
 
 		return embedBuilder.build();
 	}
 
-	private void calculatePages(){
-		this.pages = switch (extras.getType()) {
-			case DEFAULT ->  (int) Math.ceil((double) strings.size() / itemsPerPage);
-			case EMBED_FIELDS -> (int) Math.ceil((double) extras.getEmbedFields().size() / itemsPerPage);
-			case EMBED_PAGES -> extras.getEmbedPages().size();
-		};
+	private void calculatePages() {
+		this.pages =
+			switch (extras.getType()) {
+				case DEFAULT -> (int) Math.ceil((double) strings.size() / itemsPerPage);
+				case EMBED_FIELDS -> (int) Math.ceil((double) extras.getEmbedFields().size() / itemsPerPage);
+				case EMBED_PAGES -> extras.getEmbedPages().size();
+			};
 	}
 
 	public static class Builder extends Menu.Builder<CustomPaginator.Builder, CustomPaginator> {
@@ -405,7 +414,7 @@ public class CustomPaginator extends Menu {
 				finalAction,
 				columns,
 				itemsPerPage,
-					showPageNumbers,
+				showPageNumbers,
 				strings,
 				wrapPageEnds,
 				extras

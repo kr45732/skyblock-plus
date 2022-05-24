@@ -90,7 +90,7 @@ public class EssenceHandler {
 			MessageReactionAddEvent.class,
 			this::condition,
 			this::actionOne,
-				1,
+			1,
 			TimeUnit.MINUTES,
 			() -> reactMessage.clearReactions().queue()
 		);
@@ -130,7 +130,7 @@ public class EssenceHandler {
 			MessageReactionAddEvent.class,
 			this::condition,
 			this::actionTwo,
-				1,
+			1,
 			TimeUnit.MINUTES,
 			() -> reactMessage.clearReactions().queue()
 		);
