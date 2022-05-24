@@ -42,7 +42,7 @@ public class MayorHandler {
 	public static String currentMayor = "";
 	public static int currentMayorYear = 0;
 	public static ScheduledFuture<?> jerryFuture;
-	public static MessageEmbed jerryEmbed;
+	public static MessageEmbed jerryEmbed = invalidEmbed("Jerry is not the current mayor").build();
 	public static MessageEmbed votesEmbed = defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build();
 	public static final Map<String, String> mayorNameToEmoji = Maps.of(
 		"DERPY",
@@ -178,6 +178,7 @@ public class MayorHandler {
 		try {
 			if (!currentMayor.equals("Jerry")) {
 				jerryFuture = null;
+				jerryEmbed = invalidEmbed("Jerry is not the current mayor").build();
 				return;
 			}
 

@@ -1027,7 +1027,8 @@ public class AutomaticGuild {
 			event.replyEmbeds(MayorCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {
-			event.reply(guildMap.get("796790757947867156").lastMayorElectionOpenMessage).setEphemeral(true).queue();
+			Message msg = guildMap.get("796790757947867156").lastMayorElectionOpenMessage;
+			event.reply(msg != null ? msg : new MessageBuilder().setEmbeds(invalidEmbed("Election is not open").build()).build()).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().equals("mayor_jerry_button")) {
 			event.replyEmbeds(jerryEmbed).setEphemeral(true).queue();
