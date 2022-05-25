@@ -324,7 +324,10 @@ public class EventHandler {
 		}
 
 		index++;
-		if (currentMayor.equalsIgnoreCase("marina") || (currentMayor.equalsIgnoreCase("Jerry") && currentJerryMayor.equalsIgnoreCase("marina"))) {
+		if (
+			currentMayor.equalsIgnoreCase("marina") ||
+			(currentMayor.equalsIgnoreCase("Jerry") && currentJerryMayor.equalsIgnoreCase("marina"))
+		) {
 			Instant fishingFestival = Instant.ofEpochMilli(
 				YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + Math.floorDiv((nowEpoch - YEAR_0) % YEAR_MS, MONTH_MS) * MONTH_MS
 			);

@@ -39,7 +39,7 @@ import org.apache.groovy.util.Maps;
 
 public class MayorHandler {
 
-	public static String currentMayor =  "";
+	public static String currentMayor = "";
 	public static String currentJerryMayor = "";
 	public static int currentMayorYear = 0;
 	public static ScheduledFuture<?> jerryFuture;
