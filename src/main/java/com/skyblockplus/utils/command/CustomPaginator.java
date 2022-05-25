@@ -64,8 +64,10 @@ public class CustomPaginator extends Menu {
 	private int pages;
 	private final Consumer<Message> finalAction;
 	private final boolean wrapPageEnds;
+
 	@Setter
 	private List<String> strings;
+
 	@Getter
 	private final PaginatorExtras extras;
 
@@ -162,10 +164,7 @@ public class CustomPaginator extends Menu {
 			}
 			action.queue();
 		} else {
-			action.queue(
-				m -> pagination(m, pageNum),
-				throwableConsumer
-			);
+			action.queue(m -> pagination(m, pageNum), throwableConsumer);
 		}
 	}
 
@@ -185,11 +184,15 @@ public class CustomPaginator extends Menu {
 			return false;
 		}
 
-		if(!isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null)){
+		if (!isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null)) {
 			return false;
 		}
 
-		return event.getComponentId().equals(LEFT) || event.getComponentId().equals(RIGHT) || extras.getReactiveButtons().stream().anyMatch(b -> b.isReacting() && event.getComponentId().equals(b.getId()));
+		return (
+			event.getComponentId().equals(LEFT) ||
+			event.getComponentId().equals(RIGHT) ||
+			extras.getReactiveButtons().stream().anyMatch(b -> b.isReacting() && event.getComponentId().equals(b.getId()))
+		);
 	}
 
 	private void handleButtonClick(ButtonInteractionEvent event, int pageNum) {
@@ -465,6 +468,5 @@ public class CustomPaginator extends Menu {
 				case EMBED_PAGES -> extras.getEmbedPages().size();
 			};
 		}
-
 	}
 }
