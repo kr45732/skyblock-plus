@@ -936,7 +936,7 @@ public class AutomaticGuild {
 					lastMayorElectionOpenMessage.editMessageComponents().queue(ignore, ignore);
 					lastMayorElectionOpenMessage = null;
 				}
-				if(lastMayorElectedMessage != null){
+				if (lastMayorElectedMessage != null) {
 					lastMayorElectedMessage.editMessageComponents().queue(ignore, ignore);
 					lastMayorElectedMessage = null;
 				}
