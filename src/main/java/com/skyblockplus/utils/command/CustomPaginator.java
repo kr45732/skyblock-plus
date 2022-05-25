@@ -61,14 +61,11 @@ public class CustomPaginator extends Menu {
 	private final int columns;
 	private final int itemsPerPage;
 	private final boolean showPageNumbers;
-
-	@Setter
-	private List<String> strings;
-
 	private int pages;
 	private final Consumer<Message> finalAction;
 	private final boolean wrapPageEnds;
-
+	@Setter
+	private List<String> strings;
 	@Getter
 	private final PaginatorExtras extras;
 
@@ -110,11 +107,8 @@ public class CustomPaginator extends Menu {
 	}
 
 	public void paginate(MessageChannel channel, int pageNum) {
-		if (pageNum < 1) {
-			pageNum = 1;
-		} else if (pageNum > pages) {
-			pageNum = pages;
-		}
+		pageNum = Math.min(Math.max(pageNum, 1), pages);
+
 		Message msg = new MessageBuilder()
 			.setEmbeds(getEmbedRender(pageNum))
 			//			.setContent(
@@ -127,21 +121,14 @@ public class CustomPaginator extends Menu {
 	}
 
 	public void paginate(InteractionHook channel, int pageNum) {
-		if (pageNum < 1) {
-			pageNum = 1;
-		} else if (pageNum > pages) {
-			pageNum = pages;
-		}
+		pageNum = Math.min(Math.max(pageNum, 1), pages);
+
 		Message msg = new MessageBuilder().setEmbeds(getEmbedRender(pageNum)).build();
 		initialize(channel.editOriginal(msg), pageNum);
 	}
 
 	public void paginate(Message message, int pageNum) {
-		if (pageNum < 1) {
-			pageNum = 1;
-		} else if (pageNum > pages) {
-			pageNum = pages;
-		}
+		pageNum = Math.min(Math.max(pageNum, 1), pages);
 
 		Message msg = new MessageBuilder().setEmbeds(getEmbedRender(pageNum)).build();
 		initialize(message.editMessage(msg), pageNum);
@@ -176,9 +163,7 @@ public class CustomPaginator extends Menu {
 			action.queue();
 		} else {
 			action.queue(
-				m -> {
-					pagination(m, pageNum);
-				},
+				m -> pagination(m, pageNum),
 				throwableConsumer
 			);
 		}
@@ -200,14 +185,11 @@ public class CustomPaginator extends Menu {
 			return false;
 		}
 
-		if (event.getButton().getId() == null) {
+		if(!isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null)){
 			return false;
 		}
 
-		return switch (event.getButton().getId()) {
-			case LEFT, RIGHT -> isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
-			default -> extras.getReactiveButtons().stream().anyMatch(b -> b.isReacting() && event.getComponentId().equals(b.getId()));
-		};
+		return event.getComponentId().equals(LEFT) || event.getComponentId().equals(RIGHT) || extras.getReactiveButtons().stream().anyMatch(b -> b.isReacting() && event.getComponentId().equals(b.getId()));
 	}
 
 	private void handleButtonClick(ButtonInteractionEvent event, int pageNum) {
@@ -348,21 +330,13 @@ public class CustomPaginator extends Menu {
 	public static class Builder extends Menu.Builder<CustomPaginator.Builder, CustomPaginator> {
 
 		private final List<String> strings = new LinkedList<>();
-		private PaginatorExtras extras;
+		private PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.DEFAULT);
 		private Color color = null;
 		private Consumer<Message> finalAction = m -> m.delete().queue(null, throwableConsumer);
 		private int columns = 1;
 		private int itemsPerPage = 12;
 		private boolean wrapPageEnds = false;
 		private boolean showPageNumbers = true;
-
-		public Builder() {
-			this(PaginatorExtras.PaginatorType.DEFAULT);
-		}
-
-		public Builder(PaginatorExtras.PaginatorType paginatorType) {
-			this.extras = new PaginatorExtras(paginatorType);
-		}
 
 		@Override
 		public CustomPaginator build() {
@@ -470,14 +444,6 @@ public class CustomPaginator extends Menu {
 			return this;
 		}
 
-		public int size() {
-			return switch (extras.getType()) {
-				case DEFAULT -> strings.size();
-				case EMBED_FIELDS -> extras.getEmbedFields().size();
-				case EMBED_PAGES -> extras.getEmbedPages().size();
-			};
-		}
-
 		public Builder showPageNumbers(boolean showPageNumbers) {
 			this.showPageNumbers = showPageNumbers;
 			return this;
@@ -491,5 +457,14 @@ public class CustomPaginator extends Menu {
 			extras.apply(this.extras);
 			return this;
 		}
+
+		public int size() {
+			return switch (extras.getType()) {
+				case DEFAULT -> strings.size();
+				case EMBED_FIELDS -> extras.getEmbedFields().size();
+				case EMBED_PAGES -> extras.getEmbedPages().size();
+			};
+		}
+
 	}
 }
