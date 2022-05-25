@@ -20,6 +20,7 @@ package com.skyblockplus.features.event;
 
 import static com.skyblockplus.features.event.CalendarCommand.*;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.features.mayor.MayorHandler.currentJerryMayor;
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -323,7 +324,7 @@ public class EventHandler {
 		}
 
 		index++;
-		if (currentMayor.equalsIgnoreCase("marina")) {
+		if (currentMayor.equalsIgnoreCase("marina") || (currentMayor.equalsIgnoreCase("Jerry") && currentJerryMayor.equalsIgnoreCase("marina"))) {
 			Instant fishingFestival = Instant.ofEpochMilli(
 				YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + Math.floorDiv((nowEpoch - YEAR_0) % YEAR_MS, MONTH_MS) * MONTH_MS
 			);

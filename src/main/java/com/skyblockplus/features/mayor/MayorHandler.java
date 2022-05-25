@@ -39,7 +39,8 @@ import org.apache.groovy.util.Maps;
 
 public class MayorHandler {
 
-	public static String currentMayor = "";
+	public static String currentMayor =  "";
+	public static String currentJerryMayor = "";
 	public static int currentMayorYear = 0;
 	public static ScheduledFuture<?> jerryFuture;
 	public static MessageEmbed jerryEmbed = invalidEmbed("Jerry is not the current mayor").build();
@@ -183,9 +184,9 @@ public class MayorHandler {
 			}
 
 			JsonElement jerryJson = higherDepth(getJson("https://api.skytils.gg/api/mayor/jerry"), "mayor");
-			String jerryMayorName = higherDepth(jerryJson, "name").getAsString();
-			EmbedBuilder eb = defaultEmbed(jerryMayorName)
-				.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(jerryMayorName.toUpperCase()) + "/left");
+			currentJerryMayor = higherDepth(jerryJson, "name").getAsString();
+			EmbedBuilder eb = defaultEmbed(currentJerryMayor)
+				.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(currentJerryMayor.toUpperCase()) + "/left");
 			for (JsonElement perk : higherDepth(jerryJson, "perks").getAsJsonArray()) {
 				eb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
 			}
