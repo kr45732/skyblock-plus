@@ -516,39 +516,53 @@ public class ApplyUser implements Serializable {
 							waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 						} catch (Exception ignored) {}
 
-						MessageAction action =
-								applicationChannel
-										.sendMessage("<@" + applyingUserId + ">")
-										.setEmbeds(defaultEmbed("Application Accepted").setDescription(higherDepth(currentSettings, "applyAcceptMessage").getAsString()).build());
+						MessageAction action = applicationChannel
+							.sendMessage("<@" + applyingUserId + ">")
+							.setEmbeds(
+								defaultEmbed("Application Accepted")
+									.setDescription(higherDepth(currentSettings, "applyAcceptMessage").getAsString())
+									.build()
+							);
 						if (waitInviteChannel == null) {
 							action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
 							try {
 								event
-										.getGuild()
-										.addRoleToMember(
-												UserSnowflake.fromId(applyingUserId),
-												jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
-										)
-										.queue();
+									.getGuild()
+									.addRoleToMember(
+										UserSnowflake.fromId(applyingUserId),
+										jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
+									)
+									.queue();
 							} catch (Exception ignored) {}
 						} else {
-							action = action.setActionRow(Button.danger("apply_user_cancel_" + waitInviteChannel.getId()
-									+ "_" +  waitInviteChannel
-									.sendMessageEmbeds(defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build())
-									.setActionRow(
-											Button.success(
-													"apply_user_wait_" +
-															higherDepth(currentSettings, "guildName").getAsString() +
-															"_" +
-															applicationChannelId +
-															"_" +
-															applyingUserId +
-															"_" +
-															higherDepth(currentSettings, "guildMemberRole", "null"),
-													"Invited"
+							action =
+								action.setActionRow(
+									Button.danger(
+										"apply_user_cancel_" +
+										waitInviteChannel.getId() +
+										"_" +
+										waitInviteChannel
+											.sendMessageEmbeds(
+												defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build()
 											)
+											.setActionRow(
+												Button.success(
+													"apply_user_wait_" +
+													higherDepth(currentSettings, "guildName").getAsString() +
+													"_" +
+													applicationChannelId +
+													"_" +
+													applyingUserId +
+													"_" +
+													higherDepth(currentSettings, "guildMemberRole", "null"),
+													"Invited"
+												)
+											)
+											.complete()
+											.getId(),
+										"Cancel Application"
 									)
-									.complete().getId(), "Cancel Application"));
+								);
 						}
 
 						state = 3;
@@ -580,39 +594,54 @@ public class ApplyUser implements Serializable {
 									jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 							} catch (Exception ignored) {}
 
-							action = applicationChannel.sendMessage("<@" + applyingUserId + ">").setEmbeds(defaultEmbed("Application Waitlisted").setDescription(higherDepth(currentSettings, "applyWaitlistMessage").getAsString()).build());
+							action =
+								applicationChannel
+									.sendMessage("<@" + applyingUserId + ">")
+									.setEmbeds(
+										defaultEmbed("Application Waitlisted")
+											.setDescription(higherDepth(currentSettings, "applyWaitlistMessage").getAsString())
+											.build()
+									);
 							if (waitInviteChannel == null) {
 								action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
 								try {
 									event
-											.getGuild()
-											.addRoleToMember(
-													UserSnowflake.fromId(applyingUserId),
-													jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
-											)
-											.queue();
+										.getGuild()
+										.addRoleToMember(
+											UserSnowflake.fromId(applyingUserId),
+											jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
+										)
+										.queue();
 								} catch (Exception ignored) {}
-							}else{
-								action = action.setActionRow(Button.danger("apply_user_cancel_" + waitInviteChannel.getId()
-										+ "_" +  waitInviteChannel
-										.sendMessageEmbeds(
-												defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build()
-										)
-										.setActionRow(
-												Button.success(
-														"apply_user_wait_" +
-																higherDepth(currentSettings, "guildName").getAsString() +
-																"_" +
-																applicationChannelId +
-																"_" +
-																applyingUserId +
-																"_" +
-																higherDepth(currentSettings, "guildMemberRole", "null"),
-														"Invited"
+							} else {
+								action =
+									action.setActionRow(
+										Button.danger(
+											"apply_user_cancel_" +
+											waitInviteChannel.getId() +
+											"_" +
+											waitInviteChannel
+												.sendMessageEmbeds(
+													defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build()
 												)
+												.setActionRow(
+													Button.success(
+														"apply_user_wait_" +
+														higherDepth(currentSettings, "guildName").getAsString() +
+														"_" +
+														applicationChannelId +
+														"_" +
+														applyingUserId +
+														"_" +
+														higherDepth(currentSettings, "guildMemberRole", "null"),
+														"Invited"
+													)
+												)
+												.complete()
+												.getId(),
+											"Cancel Application"
 										)
-										.complete().getId(), "Cancel Application"));
-
+									);
 							}
 
 							state = 3;
@@ -636,25 +665,31 @@ public class ApplyUser implements Serializable {
 						}
 
 						state = 3;
-						this.reactMessageId = applicationChannel
+						this.reactMessageId =
+							applicationChannel
 								.sendMessage("<@" + applyingUserId + ">")
-								.setEmbeds(defaultEmbed("Application Not Accepted").setDescription(higherDepth(currentSettings, "applyDenyMessage").getAsString()).build())
+								.setEmbeds(
+									defaultEmbed("Application Not Accepted")
+										.setDescription(higherDepth(currentSettings, "applyDenyMessage").getAsString())
+										.build()
+								)
 								.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
-								.complete().getId();
+								.complete()
+								.getId();
 						return true;
 				}
 				break;
 			case 3:
-				if(event.getComponentId().startsWith("apply_user_cancel_")){
+				if (event.getComponentId().startsWith("apply_user_cancel_")) {
 					parent.applyUserList.remove(this);
 					event.getMessage().editMessageComponents().queue();
 					event.getHook().editOriginalEmbeds(defaultEmbed("Canceling application & closing channel").build()).queue();
 					event
-							.getGuild()
-							.getTextChannelById(event.getChannel().getId())
-							.delete()
-							.reason("Application canceled")
-							.queueAfter(10, TimeUnit.SECONDS);
+						.getGuild()
+						.getTextChannelById(event.getChannel().getId())
+						.delete()
+						.reason("Application canceled")
+						.queueAfter(10, TimeUnit.SECONDS);
 
 					String[] channelMessageSplit = event.getComponentId().split("apply_user_cancel_")[1].split("_");
 					event.getGuild().getTextChannelById(channelMessageSplit[0]).deleteMessageById(channelMessageSplit[1]).queue();
