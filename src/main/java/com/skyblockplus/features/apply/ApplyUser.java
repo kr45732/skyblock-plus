@@ -500,7 +500,7 @@ public class ApplyUser implements Serializable {
 						reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
 						try {
 							applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
-						}catch(Exception ignored){}
+						} catch (Exception ignored) {}
 
 						event
 							.getHook()
@@ -579,7 +579,7 @@ public class ApplyUser implements Serializable {
 							reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
 							try {
 								applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
-							}catch(Exception ignored){}
+							} catch (Exception ignored) {}
 
 							event
 								.getHook()
@@ -657,7 +657,7 @@ public class ApplyUser implements Serializable {
 						reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
 						try {
 							applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
-						}catch(Exception ignored){}
+						} catch (Exception ignored) {}
 
 						try {
 							event
