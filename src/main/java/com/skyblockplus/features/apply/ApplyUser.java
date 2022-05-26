@@ -498,7 +498,9 @@ public class ApplyUser implements Serializable {
 					case "apply_user_accept":
 						event.getMessage().editMessageComponents().queue();
 						reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
-						applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
+						try {
+							applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
+						}catch(Exception ignored){}
 
 						event
 							.getHook()
@@ -575,7 +577,9 @@ public class ApplyUser implements Serializable {
 						) {
 							event.getMessage().editMessageComponents().queue();
 							reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
-							applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
+							try {
+								applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
+							}catch(Exception ignored){}
 
 							event
 								.getHook()
@@ -651,7 +655,9 @@ public class ApplyUser implements Serializable {
 					case "apply_user_deny":
 						event.getMessage().editMessageComponents().queue();
 						reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
-						applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
+						try {
+							applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
+						}catch(Exception ignored){}
 
 						try {
 							event
