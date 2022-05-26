@@ -398,7 +398,6 @@ public class ApplyUser implements Serializable {
 							.editOriginalEmbeds(finishApplyEmbed.build())
 							.setActionRow(Button.danger("apply_user_cancel", "Cancel Application"))
 							.queue(m -> applySubmitedMessageId = m.getId());
-						state = 2;
 						TextChannel staffChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyStaffChannel").getAsString());
 						staffChannelId = staffChannel.getId();
 						EmbedBuilder applyPlayerStats = defaultPlayerEmbed();
@@ -431,6 +430,7 @@ public class ApplyUser implements Serializable {
 							? staffChannel.sendMessageEmbeds(applyPlayerStats.build()).setActionRow(row).complete()
 							: staffChannel.sendMessage(staffPingMentions).setEmbeds(applyPlayerStats.build()).setActionRow(row).complete();
 						reactMessageId = reactMessage.getId();
+						state = 2;
 						return true;
 					}
 					case "apply_user_retry" -> {

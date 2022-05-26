@@ -25,8 +25,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
+
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -85,10 +88,17 @@ public class ApplyGuild {
 	}
 
 	public void onTextChannelDelete(ChannelDeleteEvent event) {
-		applyUserList.removeIf(applyUser ->
-			(applyUser.applicationChannelId != null && applyUser.applicationChannelId.equals(event.getChannel().getId())) ||
-			(applyUser.staffChannelId != null && applyUser.staffChannelId.equals(event.getChannel().getId()))
-		);
+		for (Iterator<ApplyUser> iterator = applyUserList.iterator(); iterator.hasNext();) {
+			ApplyUser applyUser = iterator.next();
+			if((applyUser.applicationChannelId != null && applyUser.applicationChannelId.equals(event.getChannel().getId()))){
+				if(applyUser.state == 2) {
+					event.getGuild().getTextChannelById(applyUser.staffChannelId).deleteMessageById(applyUser.reactMessageId).queue();
+				}
+				iterator.remove();
+			}else if(applyUser.staffChannelId != null && applyUser.staffChannelId.equals(event.getChannel().getId())) {
+				iterator.remove();
+			}
+		}
 	}
 
 	public String onButtonClick_NewApplyUser(ButtonInteractionEvent event) {
