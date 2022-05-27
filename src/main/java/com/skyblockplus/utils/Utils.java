@@ -368,7 +368,7 @@ public class Utils {
 						.replace("export const ", "")
 						.replace(" = ", ": ")
 						.replace(";", ",")
-						.split("//")[0] +
+						.split("// Getting Unique Accessories Count")[0] +
 					"}"
 				)
 					.getAsJsonObject();

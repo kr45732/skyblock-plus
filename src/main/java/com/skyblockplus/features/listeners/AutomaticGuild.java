@@ -833,9 +833,7 @@ public class AutomaticGuild {
 					endSkyblockEvent(guildId);
 				}
 			}
-		} catch (Exception e) {
-			log.error("updateSkyblockEvent - " + guildId, e);
-		}
+		} catch (Exception ignored) {}
 	}
 
 	public void setEventMemberListLastUpdated(Instant eventMemberListLastUpdated) {
