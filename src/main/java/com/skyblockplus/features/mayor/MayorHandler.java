@@ -156,14 +156,14 @@ public class MayorHandler {
 		);
 
 		MessageEmbed embed = eb.build();
-		Button[] buttons = new Button[0];
+		Button button = null;
 		if (currentMayor.equals("Jerry")) {
-			buttons = new Button[] { Button.primary("mayor_jerry_button", "Current Jerry Mayor") };
+			button = Button.primary("mayor_jerry_button", "Current Jerry Mayor");
 		}
 
 		int updateCount = 0;
 		for (AutomaticGuild guild : guildMap.values()) {
-			if (guild.onMayorElected(embed, buttons)) { // Send and ping
+			if (guild.onMayorElected(embed, button)) { // Send and ping
 				updateCount++;
 			}
 

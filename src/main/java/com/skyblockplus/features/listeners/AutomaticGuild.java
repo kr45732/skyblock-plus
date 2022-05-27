@@ -82,6 +82,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
@@ -927,7 +928,7 @@ public class AutomaticGuild {
 		return false;
 	}
 
-	public boolean onMayorElected(MessageEmbed embed, Button... button) {
+	public boolean onMayorElected(MessageEmbed embed, Button button) {
 		try {
 			if (mayorChannel != null) {
 				if (lastMayorElectionOpenMessage != null) {
@@ -947,15 +948,15 @@ public class AutomaticGuild {
 					return false;
 				}
 
-				if (mayorPing == null) {
-					mayorChannel.sendMessageEmbeds(embed).setActionRow(button).queue(m -> lastMayorElectedMessage = m);
-				} else {
-					mayorChannel
-						.sendMessage(mayorPing.getAsMention())
-						.setEmbeds(embed)
-						.setActionRow(button)
-						.queue(m -> lastMayorElectedMessage = m);
+				MessageAction action = mayorChannel.sendMessageEmbeds(embed);
+				if (button != null) {
+					action = action.setActionRow(button);
 				}
+				if (mayorPing != null) {
+					action = action.content(mayorPing.getAsMention());
+				}
+				action.queue(m -> lastMayorElectedMessage = m);
+
 				return true;
 			}
 		} catch (Exception e) {
