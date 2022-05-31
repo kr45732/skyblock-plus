@@ -74,7 +74,7 @@ public class MissingCommand extends Command {
 				);
 			} catch (Exception ignored) {}
 
-			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
+			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "accessory_upgrades").getAsJsonObject();
 			Set<String> missingInternal = new HashSet<>(ALL_TALISMANS);
 
 			for (String playerItem : playerItems) {

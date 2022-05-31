@@ -222,12 +222,12 @@ public class Constants {
 
 			/* ALL_TALISMANS */
 			ALL_TALISMANS = new HashSet<>();
-			for (Map.Entry<String, JsonElement> talismanUpgrade : higherDepth(getTalismanJson(), "talismans")
+			for (Map.Entry<String, JsonElement> talismanUpgrade : higherDepth(getTalismanJson(), "accessories")
 				.getAsJsonObject()
 				.entrySet()) {
 				ALL_TALISMANS.add(talismanUpgrade.getKey());
-				if (higherDepth(getTalismanJson(), "talisman_duplicates." + talismanUpgrade.getKey()) != null) {
-					for (JsonElement duplicate : higherDepth(getTalismanJson(), "talisman_duplicates." + talismanUpgrade.getKey())
+				if (higherDepth(getTalismanJson(), "accessory_duplicates." + talismanUpgrade.getKey()) != null) {
+					for (JsonElement duplicate : higherDepth(getTalismanJson(), "accessory_duplicates." + talismanUpgrade.getKey())
 						.getAsJsonArray()) {
 						ALL_TALISMANS.add(duplicate.getAsString());
 					}

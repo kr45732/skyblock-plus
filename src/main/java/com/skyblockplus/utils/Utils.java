@@ -364,7 +364,7 @@ public class Utils {
 			talismanJson =
 				parseJsString(
 					"{" +
-					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/development/src/constants/talismans.js")
+					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/development/src/constants/accessories.js")
 						.replace("export const ", "")
 						.replace(" = ", ": ")
 						.replace(";", ",")
