@@ -196,18 +196,17 @@ public class CustomPaginator extends Menu {
 	}
 
 	@Override
-	protected boolean isValidUser(User user, Guild guild)
-	{
-		if(user.isBot()) {
+	protected boolean isValidUser(User user, Guild guild) {
+		if (user.isBot()) {
 			return false;
 		}
-		if(users.isEmpty() && roles.isEmpty()) {
+		if (users.isEmpty() && roles.isEmpty()) {
 			return true;
 		}
-		if(users.contains(user)) {
+		if (users.contains(user)) {
 			return true;
 		}
-		if(guild == null || !guild.isMember(user)) {
+		if (guild == null || !guild.isMember(user)) {
 			return false;
 		}
 
