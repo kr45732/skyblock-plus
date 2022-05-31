@@ -195,6 +195,25 @@ public class CustomPaginator extends Menu {
 		);
 	}
 
+	@Override
+	protected boolean isValidUser(User user, Guild guild)
+	{
+		if(user.isBot()) {
+			return false;
+		}
+		if(users.isEmpty() && roles.isEmpty()) {
+			return true;
+		}
+		if(users.contains(user)) {
+			return true;
+		}
+		if(guild == null || !guild.isMember(user)) {
+			return false;
+		}
+
+		return guild.getMember(user).getRoles().stream().anyMatch(roles::contains);
+	}
+
 	private void handleButtonClick(ButtonInteractionEvent event, int pageNum) {
 		if (event.getButton().getId() == null) {
 			return;
