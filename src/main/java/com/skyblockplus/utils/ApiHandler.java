@@ -283,7 +283,7 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean useCache) {
-		if(useCache) {
+		if (useCache) {
 			JsonElement cachedResponse = cacheDatabase.getCachedJson(uuid);
 			if (cachedResponse != null) {
 				return new HypixelResponse(cachedResponse);
