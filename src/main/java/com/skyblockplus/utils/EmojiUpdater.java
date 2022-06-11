@@ -198,7 +198,7 @@ public class EmojiUpdater {
 			}
 			System.out.println("Finished processing SkyCrypt items");
 
-			processEnchantedEmojis(); // Don't forget to change this!
+			processEnchantedEmojis();
 			processCompressedImages();
 			File enchantedImagesDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 			File compressedImagesDir = new File("src/main/java/com/skyblockplus/json/compressed_images");
@@ -456,7 +456,7 @@ public class EmojiUpdater {
 						return false;
 					}
 				})
-				.filter(g -> g.getEmotes().size() < g.getMaxEmotes() * (enchanted ? 2 : 1))
+				.filter(g -> g.getEmotes().stream().filter(e -> enchanted == e.isAnimated()).count() < g.getMaxEmotes())
 				.sorted(Comparator.comparingInt(g -> Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1])))
 				.collect(Collectors.toList());
 
@@ -482,7 +482,8 @@ public class EmojiUpdater {
 						.replace("travel_scroll_to_the_void_sepulture", "travel_scroll_void_sepulture")
 						.replace("starred_shadow_assassin_chestplate", "star_shadow_assassin_chestplate")
 						.replace("travel_scroll_to_the_crystal_hollows", "travel_scroll_crystal_hollows")
-						.replace("travel_scroll_to_the_dwarven_forge", "travel_scroll_dwarven_forge");
+						.replace("travel_scroll_to_the_dwarven_forge", "travel_scroll_dwarven_forge")
+						.replace("dusty_travel_scroll_to_the_kuudra_skull", "travel_scroll_kuudra_skull");
 					name =
 						switch (name = name.startsWith("_") ? name.substring(1) : name) {
 							case "x" -> "xx";
@@ -492,7 +493,7 @@ public class EmojiUpdater {
 						};
 
 					Guild curGuild = guildList.get(guildCount);
-					if (curGuild.getEmotes().size() >= curGuild.getMaxEmotes() * (enchanted ? 2 : 1)) {
+					if (curGuild.getEmotes().stream().filter(e -> enchanted == e.isAnimated()).count() >= curGuild.getMaxEmotes()) {
 						guildCount++;
 						curGuild = guildList.get(guildCount);
 						TimeUnit.SECONDS.sleep(3);

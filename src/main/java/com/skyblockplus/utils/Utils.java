@@ -50,6 +50,9 @@ import java.awt.*;
 import java.io.*;
 import java.math.RoundingMode;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Duration;
@@ -92,8 +95,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.Dsl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -107,7 +108,7 @@ public class Utils {
 	public static final String BOT_INVITE_LINK =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395540032593&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
-	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
+	public static final HttpClient asyncHttpClient = HttpClient.newHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
 	public static final ExecutorService executor = new ExceptionExecutor();
@@ -542,6 +543,16 @@ public class Utils {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	public static CompletableFuture<HttpResponse<InputStream>> asyncGet(String url){
+		return asyncHttpClient.sendAsync(
+				HttpRequest.newBuilder(URI.create(url)).build(), HttpResponse.BodyHandlers.ofInputStream()
+		);
+	}
+
+	public static CompletableFuture<JsonElement> asyncGetJson(String url){
+		return asyncGet(url).thenApplyAsync(r -> JsonParser.parseReader(new InputStreamReader(r.body())));
 	}
 
 	public static String getSkyCryptData(String dataUrl) {
@@ -1529,15 +1540,6 @@ public class Utils {
 			log.info("Cached jacob data in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		} else {
 			log.error("Failed to cache jacob data in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
-		}
-	}
-
-	public static void closeAsyncHttpClient() {
-		try {
-			asyncHttpClient.close();
-			log.info("Successfully Closed Async Http Client");
-		} catch (Exception e) {
-			log.error("", e);
 		}
 	}
 

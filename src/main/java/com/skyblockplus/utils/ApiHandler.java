@@ -18,8 +18,6 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Utils.*;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonArray;
@@ -32,6 +30,14 @@ import com.skyblockplus.utils.database.CacheDatabase;
 import com.skyblockplus.utils.database.LeaderboardDatabase;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import net.dv8tion.jda.api.entities.Activity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.time.Duration;
@@ -42,14 +48,10 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
-import net.dv8tion.jda.api.entities.Activity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.message.BasicHeader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class ApiHandler {
 
@@ -64,6 +66,7 @@ public class ApiHandler {
 	public static boolean useAlternativeAhApi = false;
 	public static boolean useAlternativeApi = false;
 	public static ScheduledFuture<?> updateCacheTask;
+	public static Instant asyncSkyblockProfilesCount = Instant.now();
 
 	public static void initialize() {
 		try {
@@ -256,17 +259,13 @@ public class ApiHandler {
 			future.complete(cachedResponse);
 		} else {
 			future =
-				asyncHttpClient
-					.prepareGet(
-						(useAlternativeApi ? "https://playerdb.co/api/player/minecraft/" : "https://api.ashcon.app/mojang/v2/user/") + uuid
+					asyncGetJson((useAlternativeApi ? "https://playerdb.co/api/player/minecraft/" : "https://api.ashcon.app/mojang/v2/user/") + uuid
 					)
-					.execute()
-					.toCompletableFuture()
-					.thenApply(uuidToUsernameResponse -> {
+					.thenApply(uuidToUsernameJson -> {
 						try {
 							String username = Utils
 								.higherDepth(
-									JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
+									uuidToUsernameJson,
 									(useAlternativeApi ? "data.player." : "") + "username"
 								)
 								.getAsString();
@@ -324,25 +323,27 @@ public class ApiHandler {
 			future.complete(cachedResponse);
 		} else {
 			future =
-				asyncHttpClient
-					.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
-					.execute()
-					.toCompletableFuture()
+				asyncGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
 					.thenApply(profilesResponse -> {
 						try {
+							if( Runtime.getRuntime().totalMemory() > 1000000000 && asyncSkyblockProfilesCount.plusSeconds(4).isBefore(Instant.now())){
+								asyncSkyblockProfilesCount = Instant.now();
+								System.gc();
+							}
+
 							try {
 								keyCooldownMap
 									.get(hypixelApiKey)
 									.remainingLimit()
-									.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
+									.set(Integer.parseInt(profilesResponse.headers().firstValue("RateLimit-Remaining").get()));
 								keyCooldownMap
 									.get(hypixelApiKey)
 									.timeTillReset()
-									.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
+									.set(Integer.parseInt(profilesResponse.headers().firstValue("RateLimit-Reset").get()));
 							} catch (Exception ignored) {}
 
 							JsonArray profileArray = processSkyblockProfilesArray(
-								higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles").getAsJsonArray()
+								higherDepth(JsonParser.parseReader(new InputStreamReader(profilesResponse.body())), "profiles").getAsJsonArray()
 							);
 
 							if (cache) {

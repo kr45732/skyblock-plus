@@ -92,7 +92,7 @@ public class EssenceCommand extends Command {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
 			StringBuilder amountsStr = new StringBuilder();
-			for (String essence : List.of("ice", "gold", "dragon", "spider", "undead", "wither", "diamond")) {
+			for (String essence : List.of("ice", "gold", "dragon", "spider", "undead", "wither", "diamond", "crimson")) {
 				amountsStr
 					.append(ESSENCE_EMOJI_MAP.get(essence))
 					.append("** ")

@@ -454,7 +454,7 @@ public class Player {
 			return 60;
 		}
 
-		int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName, 0);
+		int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." +skillName, 0);
 
 		if (skillName.equals("farming")) {
 			maxLevel = weightType == WeightType.SENITHER ? 60 : maxLevel + getFarmingCapUpgrade();
@@ -477,7 +477,7 @@ public class Player {
 
 	public SkillsStruct getSkill(String skillName, WeightType weightType) {
 		try {
-			return skillInfoFromExp(higherDepth(profileJson(), "experience_skill_" + skillName).getAsLong(), skillName, weightType);
+			return skillInfoFromExp(higherDepth(profileJson(), "experience_skill_" + (skillName.equals("social") ? "social2" : skillName)).getAsLong(), skillName, weightType);
 		} catch (Exception e) {
 			return null;
 		}
@@ -513,6 +513,7 @@ public class Player {
 			switch (skill) {
 				case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
 				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+				case "social" -> higherDepth(getLevelingJson(), "social").getAsJsonArray();
 				case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
 				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
 			};
@@ -557,6 +558,7 @@ public class Player {
 			switch (skill) {
 				case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
 				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+				case "social" -> higherDepth(getLevelingJson(), "social").getAsJsonArray();
 				case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
 				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
 			};
@@ -774,6 +776,15 @@ public class Player {
 	public Map<Integer, InvItem> getTalismanBagMap() {
 		try {
 			String contents = higherDepth(profileJson(), "talisman_bag.data").getAsString();
+			NBTCompound parsedContents = NBTReader.readBase64(contents);
+			return getGenericInventoryMap(parsedContents);
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public Map<Integer, InvItem> getEquipmentMap() {
+		try {
+			String contents = higherDepth(profileJson(), "equippment_contents.data").getAsString();
 			NBTCompound parsedContents = NBTReader.readBase64(contents);
 			return getGenericInventoryMap(parsedContents);
 		} catch (Exception ignored) {}
@@ -1720,6 +1731,6 @@ public class Player {
 	}
 
 	public boolean isSkillsApiEnabled() {
-		return getSkillAverage("", -1) != -1;
+		return getSkill("combat") != null;
 	}
 }

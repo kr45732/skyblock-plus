@@ -62,6 +62,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.web.firewall.HttpStatusRequestRejectedHandler;
+import org.springframework.security.web.firewall.RequestRejectedHandler;
 
 @SpringBootApplication
 public class Main {
@@ -176,7 +179,7 @@ public class Main {
 		if (isMainBot()) {
 			scheduler.scheduleWithFixedDelay(
 				() -> {
-					if (Runtime.getRuntime().totalMemory() > 1500000000) {
+					if (Runtime.getRuntime().totalMemory() > 1350000000) {
 						System.gc();
 					}
 				},
@@ -221,9 +224,11 @@ public class Main {
 		log.info("Closing Http Client");
 		closeHttpClient();
 
-		log.info("Closing Async Http Client");
-		closeAsyncHttpClient();
-
 		log.info("Finished");
+	}
+
+	@Bean
+	public RequestRejectedHandler requestRejectedHandler() {
+		return new HttpStatusRequestRejectedHandler();
 	}
 }

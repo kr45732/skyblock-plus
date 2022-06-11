@@ -60,7 +60,7 @@ public class DungeonsWeight {
 					new WeightStruct(1.2733079672009226 * ((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n)))
 				);
 			} else {
-				return weightStruct.add(new WeightStruct(4100 + extra));
+				return weightStruct.add(new WeightStruct((4100 + extra) * 2));
 			}
 		} else {
 			return new WeightStruct();

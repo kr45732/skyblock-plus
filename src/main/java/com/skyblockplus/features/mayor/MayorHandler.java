@@ -73,31 +73,35 @@ public class MayorHandler {
 	);
 
 	public static void initialize() {
-		if (currentMayor.isEmpty()) {
-			JsonElement mayorJson = getJson("https://api.hypixel.net/resources/skyblock/election");
-			currentMayor = higherDepth(mayorJson, "mayor.name", "");
-			currentMayorYear = higherDepth(mayorJson, "mayor.election.year", 0);
-		}
+		try {
+			if (currentMayor.isEmpty()) {
+				JsonElement mayorJson = getJson("https://api.hypixel.net/resources/skyblock/election");
+				currentMayor = higherDepth(mayorJson, "mayor.name", "");
+				currentMayorYear = higherDepth(mayorJson, "mayor.election.year", 0);
+			}
 
-		long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1);
-		long newYearToElectionOpen = 217200000;
-		long newYearToElectionClose = 105600000;
+			long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1);
+			long newYearToElectionOpen = 217200000;
+			long newYearToElectionClose = 105600000;
 
-		long currentTime = Instant.now().toEpochMilli();
-		long closeTime = newYearStartEpoch + newYearToElectionClose;
-		long openTime = newYearStartEpoch + newYearToElectionOpen;
+			long currentTime = Instant.now().toEpochMilli();
+			long closeTime = newYearStartEpoch + newYearToElectionClose;
+			long openTime = newYearStartEpoch + newYearToElectionOpen;
 
-		if (currentTime > closeTime && currentTime < closeTime + 420000) { // Ended at most 7 min ago
-			scheduler.schedule(MayorHandler::mayorElected, 5, TimeUnit.MINUTES);
-			scheduler.schedule(MayorHandler::initialize, 15, TimeUnit.MINUTES);
-		} else if (currentTime > closeTime && currentTime < openTime) { // Election booth is closed so wait for next open
-			scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
-		} else { // Election is open
-			updateCurrentElection();
-		}
+			if (currentTime > closeTime && currentTime < closeTime + 420000) { // Ended at most 7 min ago
+				scheduler.schedule(MayorHandler::mayorElected, 5, TimeUnit.MINUTES);
+				scheduler.schedule(MayorHandler::initialize, 15, TimeUnit.MINUTES);
+			} else if (currentTime > closeTime && currentTime < openTime) { // Election booth is closed so wait for next open
+				scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
+			} else { // Election is open
+				updateCurrentElection();
+			}
 
-		if (currentMayor.equals("Jerry") && jerryFuture == null) {
-			jerryFuture = scheduler.schedule(MayorHandler::updateMayorJerryRotations, 30, TimeUnit.SECONDS);
+			if (currentMayor.equals("Jerry") && jerryFuture == null) {
+				jerryFuture = scheduler.schedule(MayorHandler::updateMayorJerryRotations, 30, TimeUnit.SECONDS);
+			}
+		}catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 

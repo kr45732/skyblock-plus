@@ -2763,7 +2763,6 @@
   "ENCHANTED_MYCELIUM_CUBE": "<:enchanted_mycelium_cube:969809196067475476>",
   "EVERBURNING_FLAME": "<:everburning_flame:969809197329952839>",
   "THUNDER_HELMET": "<:thunder_helmet:969809198739251220>",
-  "KUUDRA_MANDIBLE": "<:kuudra_mandible:969809200710582303>",
   "BEZOS": "<:bezos:969809202052739112>",
   "THUNDER_IN_A_BOTTLE": "<:thunder_in_a_bottle:969809203306823750>",
   "RED_THORNLEAF_TEA": "<:red_thornleaf_tea:969809204439306240>",
@@ -2850,7 +2849,6 @@
   "INFERNO_GENERATOR_1": "<:inferno_minion_i:969809363105620008>",
   "INFERNO_APEX": "<:inferno_apex:969809364296826921>",
   "ARROW_BUNDLE_MAGMA": "<:bundle_of_magma_arrows:969809365441843290>",
-  "MANA_DISINTEGRATOR": "<:mana_disintegrator:969809366695940166>",
   "BURSTSTOPPER_ARTIFACT": "<:burststopper_artifact:969809368122007622>",
   "BURSTSTOPPER_TALISMAN": "<:burststopper_talisman:969809370143682641>",
   "UPGRADE_STONE_GLACIAL": "<:wisp_upgrade_stone:969809372643467275>",
@@ -4267,5 +4265,10 @@
   "CROWN_OF_GREED": "<a:crown_of_greed:981618965304455209>",
   "MUSIC_PANTS": "<a:stereo_pants:981618966982197248>",
   "BINGO_ARTIFACT": "<:bingo_artifact:981620520623697920>",
-  "DITTO_SKIN": "<:ditto_skin:981620522196549632>"
+  "DITTO_SKIN": "<:ditto_skin:981620522196549632>",
+  "KUUDRA_MANDIBLE": "<:kuudra_mandible:984249692516913242>",
+  "MANA_DISINTEGRATOR": "<:mana_disintegrator:984249694546972762>",
+  "FROST_WISP;2": "<:rare_frost_wisp:984249696346325073>",
+  "GLACIAL_WISP;3": "<:epic_glacial_wisp:984249698594476122>",
+  "SUBZERO_WISP;4": "<:legendary_subzero_wisp:984249703417909298>"
 }

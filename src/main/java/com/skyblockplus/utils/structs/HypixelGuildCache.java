@@ -128,6 +128,7 @@ public class HypixelGuildCache {
 			switch (skill) {
 				case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
 				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+				case "social" -> higherDepth(getLevelingJson(), "social").getAsJsonArray();
 				case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
 				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
 			};

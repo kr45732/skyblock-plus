@@ -212,6 +212,16 @@ public class NetworthExecute {
 					}
 				}
 			}
+			Map<Integer, InvItem> equipmentMap = player.getEquipmentMap();
+			if (equipmentMap != null) {
+				for (InvItem item : equipmentMap.values()) {
+					double itemPrice = calculateItemPrice(item);
+					invArmor += itemPrice;
+					if (item != null) {
+						armorItems.add(addItemStr(item, itemPrice));
+					}
+				}
+			}
 
 			Map<Integer, InvItem> wardrobeMap = player.getWardrobeMap();
 			if (wardrobeMap != null) {
@@ -472,7 +482,7 @@ public class NetworthExecute {
 				eb.addField("Inventory | " + simplifyNumber(invTotal), invStr.toString().split("\n\n")[0], false);
 			}
 			if (!armorStr.isEmpty()) {
-				eb.addField("Armor | " + simplifyNumber(invArmor), armorStr.toString().split("\n\n")[0], false);
+				eb.addField("Armor & Equipment | " + simplifyNumber(invArmor), armorStr.toString().split("\n\n")[0], false);
 			}
 			if (!wardrobeStr.isEmpty()) {
 				eb.addField("Wardrobe | " + simplifyNumber(wardrobeTotal), wardrobeStr.toString().split("\n\n")[0], false);
@@ -525,7 +535,7 @@ public class NetworthExecute {
 			if (!armorStr.isEmpty()) {
 				extras.addEmbedPage(
 					player
-						.defaultPlayerEmbed(" | Armor")
+						.defaultPlayerEmbed(" | Armor & Equipment")
 						.setDescription(
 							ebDesc + "\n**Armor:** " + simplifyNumber(invArmor) + "\n\n" + armorStr.toString().replace("\n\n", "\n")
 						)

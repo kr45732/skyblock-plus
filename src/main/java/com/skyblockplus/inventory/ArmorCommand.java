@@ -26,8 +26,10 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.InvItem;
+
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,9 +46,50 @@ public class ArmorCommand extends Command {
 		if (player.isValid()) {
 			Map<Integer, InvItem> inventoryMap = player.getArmorMap();
 			if (inventoryMap != null) {
+				Map<Integer, InvItem> equipmentMap = player.getEquipmentMap();
+				if(equipmentMap != null){
+					for (Map.Entry<Integer, InvItem> entry : equipmentMap.entrySet()) {
+						inventoryMap.put(entry.getKey() + 4, entry.getValue());
+					}
+				}
 				new InventoryListPaginator(player, inventoryMap, 0, event);
 				return null;
 			}
+		}
+		return player.getFailEmbed();
+	}
+
+	public static EmbedBuilder getPlayerArmor(String username, String profileName, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			Map<Integer, InvItem> playerArmor = player.getArmorMap();
+			Map<Integer, InvItem> playerEquipment = player.getEquipmentMap();
+			if (playerArmor != null || playerEquipment != null) {
+				StringBuilder out = new StringBuilder();
+				for(int i=0; i<8 ; i++){
+					if(i%2 == 0){
+						try{
+							out.append(getEmojiOr(playerEquipment.get(i / 2).getId(), "❓"));
+						}catch (Exception e){
+							out.append(getEmoji("EMPTY"));
+						}
+					}else{
+						try {
+							out.append(getEmojiOr(playerArmor.get((i - 1) / 2).getId(), "❓")).append("\n");
+						} catch (Exception e){
+							out.append(getEmoji("EMPTY")).append("\n");
+						}
+					}
+				}
+
+				event
+						.getChannel()
+						.sendMessage(out)
+						.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Armor & Equipment"))
+						.queue();
+				return null;
+			}
+			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 		}
 		return player.getFailEmbed();
 	}
@@ -58,16 +101,19 @@ public class ArmorCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length == 3 || args.length == 2 || args.length == 1) {
+				if (args.length >= 2 && args[1].equals("list")) {
+					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
+						return;
+					}
+
+					paginate(getPlayerEquippedArmor(player, args.length == 4 ? args[3] : null, getPaginatorEvent()));
+				} else {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					paginate(getPlayerEquippedArmor(player, args.length == 3 ? args[2] : null, getPaginatorEvent()));
-					return;
+					paginate(getPlayerArmor(player, args.length == 3 ? args[2] : null, getPaginatorEvent()), true);
 				}
-
-				sendErrorEmbed();
 			}
 		}
 			.queue();
