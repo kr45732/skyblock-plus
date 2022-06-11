@@ -220,6 +220,31 @@ public class Player {
 		leaderboardDatabase.insertIntoLeaderboard(this);
 	}
 
+	public Player(String username, Gamemode gamemode) {
+		if (usernameToUuid(username)) {
+			return;
+		}
+
+		try {
+			HypixelResponse response = skyblockProfilesFromUuid(uuid);
+			if (response.isNotValid()) {
+				failCause = response.failCause();
+				return;
+			}
+
+			this.profilesArray = response.response().getAsJsonArray();
+			if (getLatestProfile(profilesArray)) {
+				return;
+			}
+		} catch (Exception e) {
+			failCause = e.getMessage();
+			return;
+		}
+
+		this.valid = true;
+		leaderboardDatabase.insertIntoLeaderboardSync(this, gamemode);
+	}
+
 	public Player(String username, String profileName) {
 		if (usernameToUuid(username)) {
 			return;
@@ -1504,6 +1529,7 @@ public class Player {
 					case "mining":
 					case "taming":
 					case "enchanting":
+					case "social":
 						highestAmount = Math.max(highestAmount, getSkill(type) != null ? getSkill(type).getProgressLevel() : -1);
 						break;
 					case "alchemy_xp":
@@ -1515,6 +1541,7 @@ public class Player {
 					case "mining_xp":
 					case "taming_xp":
 					case "enchanting_xp":
+					case "social_xp":
 						highestAmount =
 							Math.max(
 								highestAmount,
@@ -1559,6 +1586,12 @@ public class Player {
 						break;
 					case "maxed_collections":
 						highestAmount = Math.max(highestAmount, getNumMaxedCollections());
+						break;
+					case "mage_rep":
+						highestAmount = Math.max(highestAmount, getMageRep());
+						break;
+					case "barbarian_rep":
+						highestAmount = Math.max(highestAmount, getBarbarianRep());
 						break;
 					case "ironman":
 					case "stranded":
@@ -1642,6 +1675,14 @@ public class Player {
 		return networth;
 	}
 
+	public int getMageRep(){
+		return higherDepth(profileJson(), "nether_island_player_data.mages_reputation", 0);
+	}
+
+	public int getBarbarianRep(){
+		return higherDepth(profileJson(), "nether_island_player_data.barbarians_reputation", 0);
+	}
+
 	@Override
 	public String toString() {
 		return (
@@ -1661,7 +1702,7 @@ public class Player {
 		);
 	}
 
-	public enum WeightType {
+    public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,

@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.Activity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -65,7 +64,6 @@ public class ApiHandler {
 	public static boolean useAlternativeAhApi = false;
 	public static boolean useAlternativeApi = false;
 	public static ScheduledFuture<?> updateCacheTask;
-	public static Instant asyncSkyblockProfilesCount = Instant.now();
 
 	public static void initialize() {
 		try {
@@ -323,11 +321,10 @@ public class ApiHandler {
 				asyncGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
 					.thenApply(profilesResponse -> {
 						try {
+							System.out.println(Runtime.getRuntime().totalMemory());
 							if (
-								Runtime.getRuntime().totalMemory() > 1000000000 &&
-								asyncSkyblockProfilesCount.plusSeconds(4).isBefore(Instant.now())
+								Runtime.getRuntime().totalMemory() > 1000000000
 							) {
-								asyncSkyblockProfilesCount = Instant.now();
 								System.gc();
 							}
 

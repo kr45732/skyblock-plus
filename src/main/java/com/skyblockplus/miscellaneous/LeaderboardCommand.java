@@ -55,7 +55,7 @@ public class LeaderboardCommand extends Command {
 			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help leaderboard` to see valid types");
 		}
 
-		Player player = new Player(username);
+		Player player = new Player(username, gamemode);
 		if (!player.isValid()) {
 			return player.getFailEmbed();
 		}

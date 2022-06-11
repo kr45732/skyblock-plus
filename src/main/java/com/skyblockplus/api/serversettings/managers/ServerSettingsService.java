@@ -18,8 +18,6 @@
 
 package com.skyblockplus.api.serversettings.managers;
 
-import static com.skyblockplus.utils.Utils.DEFAULT_PREFIX;
-
 import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
@@ -30,6 +28,7 @@ import com.skyblockplus.api.serversettings.eventnotif.EventNotifSettings;
 import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -153,82 +152,9 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			AutomatedRoles currentRoleSettings = currentServerSettings.getAutomatedRoles();
-			switch (roleName) {
-				case "sven":
-					return new ResponseEntity<>(currentRoleSettings.getSven(), HttpStatus.OK);
-				case "rev":
-					return new ResponseEntity<>(currentRoleSettings.getRev(), HttpStatus.OK);
-				case "tara":
-					return new ResponseEntity<>(currentRoleSettings.getTara(), HttpStatus.OK);
-				case "coins":
-					return new ResponseEntity<>(currentRoleSettings.getCoins(), HttpStatus.OK);
-				case "alchemy":
-					return new ResponseEntity<>(currentRoleSettings.getAlchemy(), HttpStatus.OK);
-				case "combat":
-					return new ResponseEntity<>(currentRoleSettings.getCombat(), HttpStatus.OK);
-				case "fishing":
-					return new ResponseEntity<>(currentRoleSettings.getFishing(), HttpStatus.OK);
-				case "foraging":
-					return new ResponseEntity<>(currentRoleSettings.getForaging(), HttpStatus.OK);
-				case "carpentry":
-					return new ResponseEntity<>(currentRoleSettings.getCarpentry(), HttpStatus.OK);
-				case "farming":
-					return new ResponseEntity<>(currentRoleSettings.getFarming(), HttpStatus.OK);
-				case "mining":
-					return new ResponseEntity<>(currentRoleSettings.getMining(), HttpStatus.OK);
-				case "taming":
-					return new ResponseEntity<>(currentRoleSettings.getTaming(), HttpStatus.OK);
-				case "enchanting":
-					return new ResponseEntity<>(currentRoleSettings.getEnchanting(), HttpStatus.OK);
-				case "catacombs":
-					return new ResponseEntity<>(currentRoleSettings.getCatacombs(), HttpStatus.OK);
-				case "guild_member":
-					return new ResponseEntity<>(currentRoleSettings.getGuild_member(), HttpStatus.OK);
-				case "fairy_souls":
-					return new ResponseEntity<>(currentRoleSettings.getFairy_souls(), HttpStatus.OK);
-				case "healer":
-					return new ResponseEntity<>(currentRoleSettings.getHealer(), HttpStatus.OK);
-				case "mage":
-					return new ResponseEntity<>(currentRoleSettings.getMage(), HttpStatus.OK);
-				case "berserk":
-					return new ResponseEntity<>(currentRoleSettings.getBerserk(), HttpStatus.OK);
-				case "archer":
-					return new ResponseEntity<>(currentRoleSettings.getArcher(), HttpStatus.OK);
-				case "tank":
-					return new ResponseEntity<>(currentRoleSettings.getTank(), HttpStatus.OK);
-				case "slot_collector":
-					return new ResponseEntity<>(currentRoleSettings.getSlot_collector(), HttpStatus.OK);
-				case "maxed_collections":
-					return new ResponseEntity<>(currentRoleSettings.getMaxed_collections(), HttpStatus.OK);
-				case "pet_enthusiast":
-					return new ResponseEntity<>(currentRoleSettings.getPet_enthusiast(), HttpStatus.OK);
-				case "blaze":
-					return new ResponseEntity<>(currentRoleSettings.getBlaze(), HttpStatus.OK);
-				case "slayer_nine":
-					return new ResponseEntity<>(currentRoleSettings.getSlayer_nine(), HttpStatus.OK);
-				case "gamemode":
-					return new ResponseEntity<>(currentRoleSettings.getGamemode(), HttpStatus.OK);
-				case "skill_average":
-					return new ResponseEntity<>(currentRoleSettings.getSkill_average(), HttpStatus.OK);
-				case "pet_score":
-					return new ResponseEntity<>(currentRoleSettings.getPet_score(), HttpStatus.OK);
-				case "dungeon_secrets":
-					return new ResponseEntity<>(currentRoleSettings.getDungeon_secrets(), HttpStatus.OK);
-				case "accessory_count":
-					return new ResponseEntity<>(currentRoleSettings.getAccessory_count(), HttpStatus.OK);
-				case "player_items":
-					return new ResponseEntity<>(currentRoleSettings.getPlayer_items(), HttpStatus.OK);
-				case "networth":
-					return new ResponseEntity<>(currentRoleSettings.getNetworth(), HttpStatus.OK);
-				case "guild_ranks":
-					return new ResponseEntity<>(currentRoleSettings.getGuild_ranks(), HttpStatus.OK);
-				case "enderman":
-					return new ResponseEntity<>(currentRoleSettings.getEnderman(), HttpStatus.OK);
-				case "weight":
-					return new ResponseEntity<>(currentRoleSettings.getWeight(), HttpStatus.OK);
-				case "total_slayer":
-					return new ResponseEntity<>(currentRoleSettings.getTotal_slayer(), HttpStatus.OK);
-			}
+			try {
+				return new ResponseEntity<>(new PropertyDescriptor(roleName, AutomatedRoles.class).getReadMethod().invoke(currentRoleSettings), HttpStatus.OK);
+			} catch (Exception ignored) {}
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
@@ -249,45 +175,9 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			AutomatedRoles currentRoleSettings = currentServerSettings.getAutomatedRoles();
-			switch (roleName) {
-				case "sven" -> currentRoleSettings.setSven(newRoleSettings);
-				case "rev" -> currentRoleSettings.setRev(newRoleSettings);
-				case "tara" -> currentRoleSettings.setTara(newRoleSettings);
-				case "coins" -> currentRoleSettings.setCoins(newRoleSettings);
-				case "alchemy" -> currentRoleSettings.setAlchemy(newRoleSettings);
-				case "combat" -> currentRoleSettings.setCombat(newRoleSettings);
-				case "fishing" -> currentRoleSettings.setFishing(newRoleSettings);
-				case "foraging" -> currentRoleSettings.setForaging(newRoleSettings);
-				case "carpentry" -> currentRoleSettings.setCarpentry(newRoleSettings);
-				case "farming" -> currentRoleSettings.setFarming(newRoleSettings);
-				case "mining" -> currentRoleSettings.setMining(newRoleSettings);
-				case "taming" -> currentRoleSettings.setTaming(newRoleSettings);
-				case "enchanting" -> currentRoleSettings.setEnchanting(newRoleSettings);
-				case "catacombs" -> currentRoleSettings.setCatacombs(newRoleSettings);
-				case "guild_member" -> currentRoleSettings.setGuild_member(newRoleSettings);
-				case "fairy_souls" -> currentRoleSettings.setFairy_souls(newRoleSettings);
-				case "healer" -> currentRoleSettings.setHealer(newRoleSettings);
-				case "mage" -> currentRoleSettings.setMage(newRoleSettings);
-				case "berserk" -> currentRoleSettings.setBerserk(newRoleSettings);
-				case "archer" -> currentRoleSettings.setArcher(newRoleSettings);
-				case "tank" -> currentRoleSettings.setTank(newRoleSettings);
-				case "slot_collector" -> currentRoleSettings.setSlot_collector(newRoleSettings);
-				case "maxed_collections" -> currentRoleSettings.setMaxed_collections(newRoleSettings);
-				case "pet_enthusiast" -> currentRoleSettings.setPet_enthusiast(newRoleSettings);
-				case "blaze" -> currentRoleSettings.setBlaze(newRoleSettings);
-				case "slayer_nine" -> currentRoleSettings.setSlayer_nine(newRoleSettings);
-				case "gamemode" -> currentRoleSettings.setGamemode(newRoleSettings);
-				case "skill_average" -> currentRoleSettings.setSkill_average(newRoleSettings);
-				case "pet_score" -> currentRoleSettings.setPet_score(newRoleSettings);
-				case "dungeon_secrets" -> currentRoleSettings.setDungeon_secrets(newRoleSettings);
-				case "accessory_count" -> currentRoleSettings.setAccessory_count(newRoleSettings);
-				case "player_items" -> currentRoleSettings.setPlayer_items(newRoleSettings);
-				case "networth" -> currentRoleSettings.setNetworth(newRoleSettings);
-				case "guild_ranks" -> currentRoleSettings.setGuild_ranks(newRoleSettings);
-				case "enderman" -> currentRoleSettings.setEnderman(newRoleSettings);
-				case "weight" -> currentRoleSettings.setWeight(newRoleSettings);
-				case "total_slayer" -> currentRoleSettings.setTotal_slayer(newRoleSettings);
-			}
+			try {
+				new PropertyDescriptor(roleName, AutomatedRoles.class).getWriteMethod().invoke(currentRoleSettings, newRoleSettings);
+			} catch (Exception ignored) {}
 			currentServerSettings.setAutomatedRoles(currentRoleSettings);
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -542,20 +432,6 @@ public class ServerSettingsService {
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	public ResponseEntity<String> getPrefix(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			String dbPrefix = currentServerSettings.getPrefix();
-			return new ResponseEntity<>(
-				(dbPrefix != null && dbPrefix.length() > 0 && dbPrefix.length() <= 5) ? dbPrefix : DEFAULT_PREFIX,
-				HttpStatus.OK
-			);
-		}
-
-		return new ResponseEntity<>(DEFAULT_PREFIX, HttpStatus.BAD_REQUEST);
 	}
 
 	public ResponseEntity<HttpStatus> setPrefix(String serverId, String prefix) {

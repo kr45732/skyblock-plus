@@ -145,4 +145,10 @@ public class AutomatedRoles {
 
 	@Embedded
 	private RoleModel player_items = new RoleModel();
+
+	@Embedded
+	private RoleModel mage_rep = new RoleModel();
+
+	@Embedded
+	private RoleModel barbarian_rep = new RoleModel();
 }

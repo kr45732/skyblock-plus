@@ -62,7 +62,7 @@ public class RolesCommand extends Command {
 	public static Object updateRoles(Player player, Guild guild, Member member) {
 		try {
 			JsonElement rolesJson = database.getRolesSettings(guild.getId());
-			if (rolesJson == null | rolesJson.isJsonNull()) {
+			if (rolesJson == null || rolesJson.isJsonNull()) {
 				return invalidEmbed("Unable to fetch roles settings");
 			}
 
@@ -229,6 +229,8 @@ public class RolesCommand extends Command {
 						"accessory_count",
 						"networth",
 						"maxed_collections",
+							"mage_rep",
+							"barbarian_rep",
 						"slayer_nine" -> {
 						double roleAmount = -1;
 						switch (currentRoleName) {
@@ -288,6 +290,8 @@ public class RolesCommand extends Command {
 								useHighest
 									? player.getHighestAmount(currentRoleName)
 									: player.getDungeonClass(currentRoleName).getProgressLevel();
+							case "mage_rep" -> roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getMageRep();
+							case "barbarian_rep" -> roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getBarbarianRep();
 						}
 
 						if (roleAmount == -1) {
