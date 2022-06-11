@@ -321,7 +321,6 @@ public class ApiHandler {
 				asyncGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
 					.thenApply(profilesResponse -> {
 						try {
-							System.out.println(Runtime.getRuntime().totalMemory());
 							if (Runtime.getRuntime().totalMemory() > 1000000000) {
 								System.gc();
 							}
