@@ -100,7 +100,7 @@ public class MayorHandler {
 			if (currentMayor.equals("Jerry") && jerryFuture == null) {
 				jerryFuture = scheduler.schedule(MayorHandler::updateMayorJerryRotations, 30, TimeUnit.SECONDS);
 			}
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

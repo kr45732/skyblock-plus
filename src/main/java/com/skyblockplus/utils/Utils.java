@@ -545,13 +545,11 @@ public class Utils {
 		}
 	}
 
-	public static CompletableFuture<HttpResponse<InputStream>> asyncGet(String url){
-		return asyncHttpClient.sendAsync(
-				HttpRequest.newBuilder(URI.create(url)).build(), HttpResponse.BodyHandlers.ofInputStream()
-		);
+	public static CompletableFuture<HttpResponse<InputStream>> asyncGet(String url) {
+		return asyncHttpClient.sendAsync(HttpRequest.newBuilder(URI.create(url)).build(), HttpResponse.BodyHandlers.ofInputStream());
 	}
 
-	public static CompletableFuture<JsonElement> asyncGetJson(String url){
+	public static CompletableFuture<JsonElement> asyncGetJson(String url) {
 		return asyncGet(url).thenApplyAsync(r -> JsonParser.parseReader(new InputStreamReader(r.body())));
 	}
 

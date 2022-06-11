@@ -26,7 +26,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.InvItem;
-
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -47,7 +46,7 @@ public class ArmorCommand extends Command {
 			Map<Integer, InvItem> inventoryMap = player.getArmorMap();
 			if (inventoryMap != null) {
 				Map<Integer, InvItem> equipmentMap = player.getEquipmentMap();
-				if(equipmentMap != null){
+				if (equipmentMap != null) {
 					for (Map.Entry<Integer, InvItem> entry : equipmentMap.entrySet()) {
 						inventoryMap.put(entry.getKey() + 4, entry.getValue());
 					}
@@ -66,27 +65,27 @@ public class ArmorCommand extends Command {
 			Map<Integer, InvItem> playerEquipment = player.getEquipmentMap();
 			if (playerArmor != null || playerEquipment != null) {
 				StringBuilder out = new StringBuilder();
-				for(int i=0; i<8 ; i++){
-					if(i%2 == 0){
-						try{
+				for (int i = 0; i < 8; i++) {
+					if (i % 2 == 0) {
+						try {
 							out.append(getEmojiOr(playerEquipment.get(i / 2).getId(), "❓"));
-						}catch (Exception e){
+						} catch (Exception e) {
 							out.append(getEmoji("EMPTY"));
 						}
-					}else{
+					} else {
 						try {
 							out.append(getEmojiOr(playerArmor.get((i - 1) / 2).getId(), "❓")).append("\n");
-						} catch (Exception e){
+						} catch (Exception e) {
 							out.append(getEmoji("EMPTY")).append("\n");
 						}
 					}
 				}
 
 				event
-						.getChannel()
-						.sendMessage(out)
-						.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Armor & Equipment"))
-						.queue();
+					.getChannel()
+					.sendMessage(out)
+					.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Armor & Equipment"))
+					.queue();
 				return null;
 			}
 			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");

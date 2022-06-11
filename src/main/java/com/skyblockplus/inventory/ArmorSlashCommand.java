@@ -45,15 +45,11 @@ public class ArmorSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "list" -> event.paginate(
-					ArmorCommand.getPlayerEquippedArmor(
-							event.player,
-							event.getOptionStr("profile"),
-							new PaginatorEvent(event)
-					)
+				ArmorCommand.getPlayerEquippedArmor(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
 			);
 			case "emoji" -> event.paginate(
-					ArmorCommand.getPlayerArmor(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
-					true
+				ArmorCommand.getPlayerArmor(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
+				true
 			);
 			default -> event.embed(event.invalidCommandMessage());
 		}
@@ -63,15 +59,15 @@ public class ArmorSlashCommand extends SlashCommand {
 	public CommandData getCommandData() {
 		return Commands
 			.slash(name, "Main armor command")
-				.addSubcommands(
-						new SubcommandData("list", "Get a list of the player's equipped armor and equipment with lore")
-								.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-								.addOption(OptionType.STRING, "profile", "Profile name")
-								.addOption(OptionType.INTEGER, "slot", "Slot number"),
-						new SubcommandData("emoji", "Get a player's equipped armor and equipment represented in emojis")
-								.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-								.addOption(OptionType.STRING, "profile", "Profile name")
-				);
+			.addSubcommands(
+				new SubcommandData("list", "Get a list of the player's equipped armor and equipment with lore")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+					.addOption(OptionType.STRING, "profile", "Profile name")
+					.addOption(OptionType.INTEGER, "slot", "Slot number"),
+				new SubcommandData("emoji", "Get a player's equipped armor and equipment represented in emojis")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+					.addOption(OptionType.STRING, "profile", "Profile name")
+			);
 	}
 
 	@Override

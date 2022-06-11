@@ -878,7 +878,7 @@ public class HelpCommand extends Command {
 			help.create("inventory [player] [profile]", "Get a player's inventory represented in emojis") +
 			help.create("inventory [player] [profile] <slot:number>", "Get a player's inventory with lore") +
 			help.create("armor list [player] [profile]", "Get a player's equipped armor & equipment with lore") +
-					help.create("armor [player] [profile]", "Get a player's equipped armor & equipment represented in emojis") +
+			help.create("armor [player] [profile]", "Get a player's equipped armor & equipment represented in emojis") +
 			help.create("enderchest [player] <profile]", "Get a player's ender chest represented in emojis") +
 			help.create("storage [player] <profile]", "Get a player's storage represented in emojis") +
 			help.create("talisman [player] [profile]", "Get a player's talisman bag represented in emojis") +

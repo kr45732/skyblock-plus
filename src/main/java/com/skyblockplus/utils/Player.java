@@ -454,7 +454,7 @@ public class Player {
 			return 60;
 		}
 
-		int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." +skillName, 0);
+		int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName, 0);
 
 		if (skillName.equals("farming")) {
 			maxLevel = weightType == WeightType.SENITHER ? 60 : maxLevel + getFarmingCapUpgrade();
@@ -477,7 +477,11 @@ public class Player {
 
 	public SkillsStruct getSkill(String skillName, WeightType weightType) {
 		try {
-			return skillInfoFromExp(higherDepth(profileJson(), "experience_skill_" + (skillName.equals("social") ? "social2" : skillName)).getAsLong(), skillName, weightType);
+			return skillInfoFromExp(
+				higherDepth(profileJson(), "experience_skill_" + (skillName.equals("social") ? "social2" : skillName)).getAsLong(),
+				skillName,
+				weightType
+			);
 		} catch (Exception e) {
 			return null;
 		}
