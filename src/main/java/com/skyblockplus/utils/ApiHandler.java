@@ -322,9 +322,7 @@ public class ApiHandler {
 					.thenApply(profilesResponse -> {
 						try {
 							System.out.println(Runtime.getRuntime().totalMemory());
-							if (
-								Runtime.getRuntime().totalMemory() > 1000000000
-							) {
+							if (Runtime.getRuntime().totalMemory() > 1000000000) {
 								System.gc();
 							}
 

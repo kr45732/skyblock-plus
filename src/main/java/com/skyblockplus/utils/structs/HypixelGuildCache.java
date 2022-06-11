@@ -113,7 +113,7 @@ public class HypixelGuildCache {
 								"carpentry",
 								"mining",
 								"taming",
-									"social",
+								"social",
 								"enchanting" -> "_xp";
 							default -> "";
 						},

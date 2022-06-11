@@ -121,12 +121,11 @@ public class LeaderboardDatabase {
 		});
 	}
 
-
 	/**
 	 * Sync insert into requestedGamemode and async insert for other gamemodes (makes copy of player)
 	 */
 	public void insertIntoLeaderboardSync(Player player, Player.Gamemode requestedGamemode) {
-		Player finalPlayer =  player.copy();
+		Player finalPlayer = player.copy();
 
 		if (player.isValid()) {
 			insertIntoLeaderboard(finalPlayer, requestedGamemode);
@@ -169,7 +168,7 @@ public class LeaderboardDatabase {
 									"carpentry",
 									"mining",
 									"taming",
-										"social",
+									"social",
 									"enchanting" -> "_xp";
 								default -> "";
 							},

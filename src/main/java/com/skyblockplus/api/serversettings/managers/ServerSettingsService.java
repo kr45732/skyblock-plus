@@ -153,7 +153,10 @@ public class ServerSettingsService {
 		if (currentServerSettings != null) {
 			AutomatedRoles currentRoleSettings = currentServerSettings.getAutomatedRoles();
 			try {
-				return new ResponseEntity<>(new PropertyDescriptor(roleName, AutomatedRoles.class).getReadMethod().invoke(currentRoleSettings), HttpStatus.OK);
+				return new ResponseEntity<>(
+					new PropertyDescriptor(roleName, AutomatedRoles.class).getReadMethod().invoke(currentRoleSettings),
+					HttpStatus.OK
+				);
 			} catch (Exception ignored) {}
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

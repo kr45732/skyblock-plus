@@ -1691,8 +1691,8 @@ public class SettingsExecute {
 			"networth",
 			"gamemode",
 			"maxed_collections",
-				"mage_rep",
-				"barbarian_rep"
+			"mage_rep",
+			"barbarian_rep"
 		);
 		Map<String, Integer> rolePageMap = IntStream
 			.range(0, allRoles.size())
@@ -1824,10 +1824,10 @@ public class SettingsExecute {
 					"**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n"
 				);
 				case "mage_rep" -> ebFieldString.append(
-						"**A player's mage reputation**\nExample: `/settings roles add mage_rep 1000 @1k mage rep`\n"
+					"**A player's mage reputation**\nExample: `/settings roles add mage_rep 1000 @1k mage rep`\n"
 				);
 				case "barbarian_rep" -> ebFieldString.append(
-						"**A player's barbarian reputation**\nExample: `/settings roles add barbarian_rep 1000 @1k barbarian rep`\n"
+					"**A player's barbarian reputation**\nExample: `/settings roles add barbarian_rep 1000 @1k barbarian rep`\n"
 				);
 			}
 

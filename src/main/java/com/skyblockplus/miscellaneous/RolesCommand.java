@@ -229,8 +229,8 @@ public class RolesCommand extends Command {
 						"accessory_count",
 						"networth",
 						"maxed_collections",
-							"mage_rep",
-							"barbarian_rep",
+						"mage_rep",
+						"barbarian_rep",
 						"slayer_nine" -> {
 						double roleAmount = -1;
 						switch (currentRoleName) {
@@ -291,7 +291,8 @@ public class RolesCommand extends Command {
 									? player.getHighestAmount(currentRoleName)
 									: player.getDungeonClass(currentRoleName).getProgressLevel();
 							case "mage_rep" -> roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getMageRep();
-							case "barbarian_rep" -> roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getBarbarianRep();
+							case "barbarian_rep" -> roleAmount =
+								useHighest ? player.getHighestAmount(currentRoleName) : player.getBarbarianRep();
 						}
 
 						if (roleAmount == -1) {

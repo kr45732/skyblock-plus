@@ -1675,11 +1675,11 @@ public class Player {
 		return networth;
 	}
 
-	public int getMageRep(){
+	public int getMageRep() {
 		return higherDepth(profileJson(), "nether_island_player_data.mages_reputation", 0);
 	}
 
-	public int getBarbarianRep(){
+	public int getBarbarianRep() {
 		return higherDepth(profileJson(), "nether_island_player_data.barbarians_reputation", 0);
 	}
 
@@ -1702,7 +1702,7 @@ public class Player {
 		);
 	}
 
-    public enum WeightType {
+	public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,
