@@ -220,13 +220,16 @@ public class Player {
 		leaderboardDatabase.insertIntoLeaderboard(this);
 	}
 
+	/**
+	 * <b>Meant to only be used for leaderboard command</b>
+	 */
 	public Player(String username, Gamemode gamemode) {
 		if (usernameToUuid(username)) {
 			return;
 		}
 
 		try {
-			HypixelResponse response = skyblockProfilesFromUuid(uuid);
+			HypixelResponse response = skyblockProfilesFromUuid(uuid, HYPIXEL_API_KEY, false);
 			if (response.isNotValid()) {
 				failCause = response.failCause();
 				return;

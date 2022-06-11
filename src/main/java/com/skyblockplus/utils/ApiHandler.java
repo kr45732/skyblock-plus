@@ -279,9 +279,15 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
-		JsonElement cachedResponse = cacheDatabase.getCachedJson(uuid);
-		if (cachedResponse != null) {
-			return new HypixelResponse(cachedResponse);
+		return skyblockProfilesFromUuid(uuid, hypixelApiKey, true);
+	}
+
+	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean useCache) {
+		if(useCache) {
+			JsonElement cachedResponse = cacheDatabase.getCachedJson(uuid);
+			if (cachedResponse != null) {
+				return new HypixelResponse(cachedResponse);
+			}
 		}
 
 		try {
