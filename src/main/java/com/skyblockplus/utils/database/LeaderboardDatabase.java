@@ -90,7 +90,7 @@ public class LeaderboardDatabase {
 		Player.Gamemode.IRONMAN,
 		Player.Gamemode.STRANDED
 	);
-	public int userCount = -1;
+	public int userCount = 0;
 
 	public LeaderboardDatabase() {
 		dataSource = new MongoClient(new MongoClientURI(LEADERBOARD_DB_URL));
@@ -114,8 +114,6 @@ public class LeaderboardDatabase {
 			for (Player.Gamemode gamemode : leaderboardGamemodes) {
 				if (player.isValid()) {
 					insertIntoLeaderboard(finalPlayer, gamemode);
-				} else {
-					deleteFromLeaderboard(finalPlayer.getUuid(), gamemode);
 				}
 			}
 		});
@@ -129,8 +127,6 @@ public class LeaderboardDatabase {
 
 		if (player.isValid()) {
 			insertIntoLeaderboard(finalPlayer, requestedGamemode);
-		} else {
-			deleteFromLeaderboard(finalPlayer.getUuid(), requestedGamemode);
 		}
 
 		executor.submit(() -> {
@@ -138,8 +134,6 @@ public class LeaderboardDatabase {
 				if (gamemode != requestedGamemode) {
 					if (player.isValid()) {
 						insertIntoLeaderboard(finalPlayer, gamemode);
-					} else {
-						deleteFromLeaderboard(finalPlayer.getUuid(), gamemode);
 					}
 				}
 			}
@@ -296,16 +290,10 @@ public class LeaderboardDatabase {
 
 				String uuid = document.getString("uuid");
 				UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
-				if (usernameUuidStruct.isNotValid()) {
-					executor.submit(() -> {
-						for (Player.Gamemode gamemode : leaderboardGamemodes) {
-							deleteFromLeaderboard(uuid, gamemode);
-						}
-					});
-				} else {
+				if (!usernameUuidStruct.isNotValid()) {
 					asyncSkyblockProfilesFromUuid(
 						usernameUuidStruct.uuid(),
-						count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+						count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
 						false
 					)
 						.whenComplete((r, e) ->
@@ -335,13 +323,7 @@ public class LeaderboardDatabase {
 				) {
 					String uuid = members.get(userCount).getAsString();
 					UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
-					if (usernameUuidStruct.isNotValid()) {
-						executor.submit(() -> {
-							for (Player.Gamemode gamemode : leaderboardGamemodes) {
-								deleteFromLeaderboard(uuid, gamemode);
-							}
-						});
-					} else {
+					if (!usernameUuidStruct.isNotValid()) {
 						asyncSkyblockProfilesFromUuid(
 							usernameUuidStruct.uuid(),
 							count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
