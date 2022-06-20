@@ -259,5 +259,35 @@
         }
       ]
     }
+  },
+  "62ae64938ea8c90da91fe139": {
+    "name": "142billion",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "staff_ranks": [
+        "jakedoodoo",
+        "water",
+        "guild master"
+      ],
+      "ignore_staff": true,
+      "default_role": [
+        "member"
+      ],
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 8000,
+                "type": "weight"
+              }
+            ]
+          ],
+          "names": [
+            "admin"
+          ]
+        }
+      ]
+    }
   }
 }
