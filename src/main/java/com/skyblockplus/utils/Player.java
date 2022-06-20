@@ -1630,7 +1630,7 @@ public class Player {
 		return higherDepth(profileJson(), "collection." + id, -1);
 	}
 
-	public long getCombinedCollection(String id){
+	public long getCombinedCollection(String id) {
 		long amount = 0;
 		for (Map.Entry<String, JsonElement> member : higherDepth(getOuterProfileJson(), "members").getAsJsonObject().entrySet()) {
 			amount += higherDepth(member.getValue(), "collection." + id, 0L);
@@ -1649,10 +1649,7 @@ public class Player {
 				for (Map.Entry<String, JsonElement> collection : higherDepth(member.getValue(), "collection")
 					.getAsJsonObject()
 					.entrySet()) {
-					collections.compute(
-						collection.getKey(),
-							(k, v) -> (v == null ? 0 : v) + collection.getValue().getAsLong()
-					);
+					collections.compute(collection.getKey(), (k, v) -> (v == null ? 0 : v) + collection.getValue().getAsLong());
 				}
 			} catch (Exception ignored) {}
 		}
