@@ -77,9 +77,9 @@ public class LeaderboardPaginator {
 		int idx = 1;
 		for (Map.Entry<Integer, Document> entry : leaderboardCache.entrySet()) {
 			int curRank = entry.getValue().getInteger("rank");
-			double curAmount = entry.getValue().getDouble(lbType);
+			double curAmount = entry.getValue().get(lbType, 0.0);
 
-			if (entry.getValue().getString("username").equals(player.getUsername())) {
+			if (entry.getValue().get("username", "").equals(player.getUsername())) {
 				playerRank = curRank;
 				playerAmount = roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount);
 			}
@@ -119,12 +119,12 @@ public class LeaderboardPaginator {
 		for (int i = pageFirstRank; i < pageFirstRank + 20; i++) {
 			Document curPlayer = leaderboardCache.getOrDefault(i, null);
 			if (curPlayer != null) {
-				double curAmount = curPlayer.getDouble(lbType);
+				double curAmount = curPlayer.get(lbType, 0.0);
 				String out =
 					"`" +
 					i +
 					")` " +
-					fixUsername(curPlayer.getString("username")) +
+					fixUsername(curPlayer.get("username", "?")) +
 					": " +
 					(roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount));
 

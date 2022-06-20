@@ -1489,10 +1489,6 @@ public class Player {
 	}
 
 	public double getHighestAmount(String type, Gamemode gamemode) {
-		return getHighestAmount(type, gamemode, false);
-	}
-
-	public double getHighestAmount(String type, Gamemode gamemode, boolean alwaysPositive) {
 		double highestAmount = -1.0;
 		int beforeProfileIndex = this.profileIndex;
 		this.profileIndex = 0;
@@ -1609,7 +1605,7 @@ public class Player {
 							break;
 						} else {
 							this.profileIndex = beforeProfileIndex;
-							return alwaysPositive ? 0 : -1;
+							return -1;
 						}
 				}
 			}
@@ -1618,7 +1614,7 @@ public class Player {
 		}
 
 		this.profileIndex = beforeProfileIndex;
-		return alwaysPositive ? Math.max(0, highestAmount) : highestAmount;
+		return highestAmount;
 	}
 
 	public int getNumLvlNineSlayers() {
