@@ -92,9 +92,9 @@ public class GuildRanksCommand extends Command {
 		} catch (Exception e) {
 			return invalidEmbed(
 				guildName +
-				"'s settings are not setup. Please join the [Skyblock Plus Discord](" +
+				"'s is not setup. Please join the [Skyblock Plus Discord](" +
 				DISCORD_SERVER_INVITE_LINK +
-				") to setup this for your guild."
+				") and mention CrypticPlasma to setup this for your guild."
 			);
 		}
 
@@ -200,8 +200,9 @@ public class GuildRanksCommand extends Command {
 				}
 			}
 		} else {
-			JsonArray guildLbJson = higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId), "data")
-				.getAsJsonArray();
+			JsonArray guildLbJson;
+			try{guildLbJson = higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId), "data")
+				.getAsJsonArray();}catch(Exception e){return invalidEmbed(guildName + " is not on the senither leaderboard. You must run this command with usekey set to true.");}
 			for (JsonElement lbM : guildLbJson) {
 				String lbUuid = higherDepth(lbM, "uuid").getAsString().replace("-", "");
 				String curRank = ranksMap.get(lbUuid);
