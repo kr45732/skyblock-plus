@@ -79,7 +79,7 @@ public class CollectionsCommand extends Command {
 				}
 
 				JsonArray tiers = higherDepth(entry.getValue(), "tiers").getAsJsonArray();
-				long amt = player.getCollection(entry.getKey());
+				long amt = player.getCombinedCollection(entry.getKey());
 				int level = 0;
 				for (int i = 0; i < tiers.size(); i++) {
 					if (amt >= tiers.get(i).getAsLong()) {

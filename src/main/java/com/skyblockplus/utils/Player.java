@@ -1630,29 +1630,36 @@ public class Player {
 		return higherDepth(profileJson(), "collection." + id, -1);
 	}
 
+	public long getCombinedCollection(String id){
+		long amount = 0;
+		for (Map.Entry<String, JsonElement> member : higherDepth(getOuterProfileJson(), "members").getAsJsonObject().entrySet()) {
+			amount += higherDepth(member.getValue(), "collection." + id, 0L);
+		}
+		return amount;
+	}
+
 	public double getStat(String stat) {
 		return higherDepth(profileJson(), "stats." + stat, -1.0);
 	}
 
 	public int getNumMaxedCollections() {
-		JsonObject collections = new JsonObject();
+		Map<String, Long> collections = new HashMap<>();
 		for (Map.Entry<String, JsonElement> member : higherDepth(getOuterProfileJson(), "members").getAsJsonObject().entrySet()) {
 			try {
 				for (Map.Entry<String, JsonElement> collection : higherDepth(member.getValue(), "collection")
 					.getAsJsonObject()
 					.entrySet()) {
-					collections.addProperty(
+					collections.compute(
 						collection.getKey(),
-						(collections.has(collection.getKey()) ? collections.get(collection.getKey()).getAsLong() : 0) +
-						collection.getValue().getAsLong()
+							(k, v) -> (v == null ? 0 : v) + collection.getValue().getAsLong()
 					);
 				}
 			} catch (Exception ignored) {}
 		}
 		int numMaxedColl = 0;
-		for (Map.Entry<String, JsonElement> collection : collections.entrySet()) {
+		for (Map.Entry<String, Long> collection : collections.entrySet()) {
 			long maxAmount = higherDepth(getCollectionsJson(), collection.getKey() + ".tiers.[-1]", -1L);
-			if (maxAmount != -1 && collection.getValue().getAsLong() >= maxAmount) {
+			if (maxAmount != -1 && collection.getValue() >= maxAmount) {
 				numMaxedColl++;
 			}
 		}
