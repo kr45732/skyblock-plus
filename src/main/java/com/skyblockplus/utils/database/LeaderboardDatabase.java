@@ -200,7 +200,7 @@ public class LeaderboardDatabase {
 			AggregateIterable<Document> leaderboard = lbCollection.aggregate(
 				List.of(
 					Document.parse("{$project: {\"_id\": 0,\"username\":1,\"" + lbType + "\": 1}}"),
-						Document.parse("{$match: {" + lbType + ": {$gte: 0}}}"),
+					Document.parse("{$match: {" + lbType + ": {$gte: 0}}}"),
 					Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
 					Document.parse("{$match: {rank : {$gt: " + rankStart + ", $lte: " + rankEnd + "}}}")
 				)
@@ -222,7 +222,7 @@ public class LeaderboardDatabase {
 				.aggregate(
 					List.of(
 						Document.parse("{$project: {\"_id\": 0,\"uuid\":1,\"" + lbType + "\": 1}}"),
-							Document.parse("{$match: {" + lbType + ": {$gte: 0}}}"),
+						Document.parse("{$match: {" + lbType + ": {$gte: 0}}}"),
 						Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
 						Document.parse("{$match : {uuid : { $eq : \"" + uuid + "\"}}}")
 					)
