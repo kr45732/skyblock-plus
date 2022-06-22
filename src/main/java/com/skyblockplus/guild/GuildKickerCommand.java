@@ -208,11 +208,12 @@ public class GuildKickerCommand extends Command {
 					} catch (Exception ignored) {}
 
 					futuresList.add(
-							asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey).thenApply(guildMemberProfileJsonResponse -> {
+						asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey)
+							.thenApply(guildMemberProfileJsonResponse -> {
 								Player guildMemberPlayer = new Player(
-										guildMemberUuid,
-										usernameToUuid(guildMemberUuid).username(),
-										guildMemberProfileJsonResponse
+									guildMemberUuid,
+									usernameToUuid(guildMemberUuid).username(),
+									guildMemberProfileJsonResponse
 								);
 
 								if (guildMemberPlayer.isValid()) {

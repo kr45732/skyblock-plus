@@ -79,7 +79,6 @@ public class CheckGuildApiCommand extends Command {
 		JsonArray guildMembers = guildResponse.get("members").getAsJsonArray();
 		List<CompletableFuture<String>> futuresList = new ArrayList<>();
 
-
 		for (JsonElement guildMember : guildMembers) {
 			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 
@@ -91,11 +90,12 @@ public class CheckGuildApiCommand extends Command {
 			} catch (Exception ignored) {}
 
 			futuresList.add(
-					asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey).thenApply(guildMemberProfileJsonResponse -> {
+				asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey)
+					.thenApply(guildMemberProfileJsonResponse -> {
 						Player player = new Player(
-								guildMemberUuid,
-								usernameToUuid(guildMemberUuid).username(),
-								guildMemberProfileJsonResponse
+							guildMemberUuid,
+							usernameToUuid(guildMemberUuid).username(),
+							guildMemberProfileJsonResponse
 						);
 
 						if (player.isValid()) {
@@ -109,11 +109,11 @@ public class CheckGuildApiCommand extends Command {
 								return client.getSuccess() + " **" + player.getUsernameFixed() + ":** all APIs enabled";
 							} else {
 								String out =
-										(invEnabled ? "" : "Inventory API, ") +
-												(bankEnabled ? "" : "Bank API, ") +
-												(collectionsEnabled ? "" : "Collections API, ") +
-												(vaultEnabled ? "" : "Vault API, ") +
-												(skillsEnabled ? "" : "Skills API, ");
+									(invEnabled ? "" : "Inventory API, ") +
+									(bankEnabled ? "" : "Bank API, ") +
+									(collectionsEnabled ? "" : "Collections API, ") +
+									(vaultEnabled ? "" : "Vault API, ") +
+									(skillsEnabled ? "" : "Skills API, ");
 
 								return client.getError() + " **" + player.getUsernameFixed() + ":** " + out.substring(0, out.length() - 2);
 							}

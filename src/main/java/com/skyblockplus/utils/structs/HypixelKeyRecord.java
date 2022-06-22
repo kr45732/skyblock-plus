@@ -18,14 +18,14 @@
 
 package com.skyblockplus.utils.structs;
 
-import lombok.ToString;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
+import lombok.ToString;
 
 @ToString
 public final class HypixelKeyRecord {
+
 	private final AtomicInteger remainingLimit;
 	private final AtomicInteger timeTillReset;
 	private final Instant time;
@@ -52,7 +52,7 @@ public final class HypixelKeyRecord {
 		return timeTillReset;
 	}
 
-	public long getTimeTillReset(){
+	public long getTimeTillReset() {
 		return Math.max(0, Duration.between(Instant.now(), time.plusSeconds(timeTillReset.get())).getSeconds());
 	}
 }
