@@ -18,19 +18,41 @@
 
 package com.skyblockplus.utils.structs;
 
+import lombok.ToString;
+
+import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public record HypixelKeyRecord(AtomicInteger remainingLimit, AtomicInteger timeTillReset) {
+@ToString
+public final class HypixelKeyRecord {
+	private final AtomicInteger remainingLimit;
+	private final AtomicInteger timeTillReset;
+	private final Instant time;
+
+	public HypixelKeyRecord(AtomicInteger remainingLimit, AtomicInteger timeTillReset) {
+		this.remainingLimit = remainingLimit;
+		this.timeTillReset = timeTillReset;
+		this.time = Instant.now();
+	}
+
 	public HypixelKeyRecord() {
 		this(new AtomicInteger(120), new AtomicInteger(0));
 	}
 
 	public boolean isRateLimited() {
-		return remainingLimit.get() < 5 && timeTillReset.get() > 0;
+		return remainingLimit.get() < 5 && timeTillReset.get() > 0 && time.plusSeconds(timeTillReset.get()).isAfter(Instant.now());
 	}
 
-	@Override
-	public String toString() {
-		return "HypixelKeyRecord{" + "remainingLimit=" + remainingLimit + ", timeTillReset=" + timeTillReset + '}';
+	public AtomicInteger remainingLimit() {
+		return remainingLimit;
+	}
+
+	public AtomicInteger timeTillReset() {
+		return timeTillReset;
+	}
+
+	public long getTimeTillReset(){
+		return Math.max(0, Duration.between(Instant.now(), time.plusSeconds(timeTillReset.get())).getSeconds());
 	}
 }

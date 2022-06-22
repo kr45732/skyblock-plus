@@ -77,24 +77,26 @@ public class CheckGuildApiCommand extends Command {
 		}
 
 		JsonArray guildMembers = guildResponse.get("members").getAsJsonArray();
-		List<CompletableFuture<CompletableFuture<String>>> futuresList = new ArrayList<>();
+		List<CompletableFuture<String>> futuresList = new ArrayList<>();
+
 
 		for (JsonElement guildMember : guildMembers) {
 			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 
-			CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
-			futuresList.add(
-				guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-					try {
-						if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
-							System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset().get() + " seconds");
-							TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset().get());
-						}
-					} catch (Exception ignored) {}
+			try {
+				if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
+					System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset() + " seconds");
+					TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset());
+				}
+			} catch (Exception ignored) {}
 
-					CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey);
-					return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-						Player player = new Player(guildMemberUuid, guildMemberUsernameResponse, guildMemberProfileJsonResponse);
+			futuresList.add(
+					asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey).thenApply(guildMemberProfileJsonResponse -> {
+						Player player = new Player(
+								guildMemberUuid,
+								usernameToUuid(guildMemberUuid).username(),
+								guildMemberProfileJsonResponse
+						);
 
 						if (player.isValid()) {
 							boolean invEnabled = excludeArr.contains("inventory") || player.isInventoryApiEnabled();
@@ -107,25 +109,24 @@ public class CheckGuildApiCommand extends Command {
 								return client.getSuccess() + " **" + player.getUsernameFixed() + ":** all APIs enabled";
 							} else {
 								String out =
-									(invEnabled ? "" : "Inventory API, ") +
-									(bankEnabled ? "" : "Bank API, ") +
-									(collectionsEnabled ? "" : "Collections API, ") +
-									(vaultEnabled ? "" : "Vault API, ") +
-									(skillsEnabled ? "" : "Skills API, ");
+										(invEnabled ? "" : "Inventory API, ") +
+												(bankEnabled ? "" : "Bank API, ") +
+												(collectionsEnabled ? "" : "Collections API, ") +
+												(vaultEnabled ? "" : "Vault API, ") +
+												(skillsEnabled ? "" : "Skills API, ");
 
 								return client.getError() + " **" + player.getUsernameFixed() + ":** " + out.substring(0, out.length() - 2);
 							}
 						}
 						return client.getError() + " **" + player.getUsernameFixed() + ":** unable to get data";
-					});
-				})
+					})
 			);
 		}
 
 		List<String> out = new ArrayList<>();
-		for (CompletableFuture<CompletableFuture<String>> future : futuresList) {
+		for (CompletableFuture<String> future : futuresList) {
 			try {
-				out.add(future.get().get());
+				out.add(future.get());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

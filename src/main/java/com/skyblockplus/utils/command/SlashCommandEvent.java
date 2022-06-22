@@ -43,11 +43,17 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	}
 
 	public void logCommand() {
-		StringBuilder options = new StringBuilder();
-		for (OptionMapping option : getOptions()) {
-			options.append(" ").append(option.getAsString());
+		StringBuilder builder = new StringBuilder("/" + getName());
+		if (getSubcommandGroup() != null) {
+			builder.append(" ").append(getSubcommandGroup());
 		}
-		Utils.logCommand(getGuild(), getUser(), ("/" + getCommandPath().replace("/", " ") + options));
+		if (getSubcommandName() != null) {
+			builder.append(" ").append(getSubcommandName());
+		}
+		for (OptionMapping o : getOptions()) {
+			builder.append(" ").append(o.getName()).append(": ").append(o.getAsString());
+		}
+		Utils.logCommand(getGuild(), getUser(), builder.toString());
 	}
 
 	public String getOptionStr(String name) {

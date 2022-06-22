@@ -131,46 +131,37 @@ public class GuildRanksCommand extends Command {
 				lastUpdated = guildCache.getLastUpdated();
 			} else {
 				HypixelGuildCache newGuildCache = new HypixelGuildCache();
-				List<CompletableFuture<CompletableFuture<String>>> futuresList = new ArrayList<>();
+				List<CompletableFuture<String>> futuresList = new ArrayList<>();
 
 				for (JsonElement guildMember : guildMembers) {
 					String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 
-					CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
+					try {
+						if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
+							System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset() + " seconds");
+							TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset());
+						}
+					} catch (Exception ignored) {}
+
 					futuresList.add(
-						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-							try {
-								if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
-									System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset().get() + " seconds");
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset().get());
-								}
-							} catch (Exception ignored) {}
-
-							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
-								guildMemberUuid,
-								hypixelKey
-							);
-
-							return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
+							asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey).thenApply(guildMemberProfileJsonResponse -> {
 								Player guildMemberPlayer = new Player(
-									guildMemberUuid,
-									guildMemberUsernameResponse,
-									guildMemberProfileJsonResponse
+										guildMemberUuid,
+										usernameToUuid(guildMemberUuid).username(),
+										guildMemberProfileJsonResponse
 								);
 
 								if (guildMemberPlayer.isValid()) {
 									newGuildCache.addPlayer(guildMemberPlayer);
 								}
-
 								return null;
-							});
-						})
+							})
 					);
 				}
 
-				for (CompletableFuture<CompletableFuture<String>> future : futuresList) {
+				for (CompletableFuture<String> future : futuresList) {
 					try {
-						future.get().get();
+						future.get();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

@@ -498,9 +498,9 @@ public class Utils {
 		boolean isMain = hypixelApiKey.equals(HYPIXEL_API_KEY);
 		try {
 			if (
-				jsonUrl.contains(hypixelApiKey) && (isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).get() < 5
+				jsonUrl.contains(hypixelApiKey) && (isMain ? remainingLimit.get() < 5 : keyCooldownMap.get(hypixelApiKey).isRateLimited())
 			) {
-				int timeTillResetInt = (isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).get();
+				long timeTillResetInt = isMain ? timeTillReset.get() : keyCooldownMap.get(hypixelApiKey).getTimeTillReset();
 				log.info("Sleeping for " + timeTillResetInt + " seconds (" + isMain + ")");
 				TimeUnit.SECONDS.sleep(timeTillResetInt);
 			}

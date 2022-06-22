@@ -305,10 +305,6 @@ public class LeaderboardDatabase {
 				count++;
 			}
 
-			if (count > 0) {
-				log.info("Updated " + count + " leaderboard players in " + (System.currentTimeMillis() - start) + "ms");
-			}
-
 			if (count <= 5 && userCount != -1) {
 				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/users.json")
 					.getAsJsonArray();
