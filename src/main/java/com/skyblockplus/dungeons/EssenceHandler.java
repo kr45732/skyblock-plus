@@ -18,19 +18,18 @@
 
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
 public class EssenceHandler {
 
@@ -53,8 +52,8 @@ public class EssenceHandler {
 		this.reactMessage = event.getLoadingMessage();
 
 		int max = 0;
-		for(int i=1; i <= 10; i++){
-			if(higherDepth(itemJson, "" + i) != null){
+		for (int i = 1; i <= 10; i++) {
+			if (higherDepth(itemJson, "" + i) != null) {
 				max = i;
 			}
 		}
@@ -63,13 +62,23 @@ public class EssenceHandler {
 		if (higherDepth(itemJson, "dungeonize") != null) {
 			menuBuilder.addOption("Dungeonize", "-1");
 		}
-		for(int i=0; i <= max - 1; i++){
-			if(i == 0 || higherDepth(itemJson, "" + i) != null){
+		for (int i = 0; i <= max - 1; i++) {
+			if (i == 0 || higherDepth(itemJson, "" + i) != null) {
 				menuBuilder.addOption("" + i, "" + i);
 			}
 		}
 
-		event.getAction().editMessageEmbeds(defaultEmbed("Essence upgrade for " + itemName).setDescription("Choose the current item level").setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId).build()).setActionRow(menuBuilder.build()).get().queue();
+		event
+			.getAction()
+			.editMessageEmbeds(
+				defaultEmbed("Essence upgrade for " + itemName)
+					.setDescription("Choose the current item level")
+					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+					.build()
+			)
+			.setActionRow(menuBuilder.build())
+			.get()
+			.queue();
 
 		waiter.waitForEvent(
 			SelectMenuInteractionEvent.class,
@@ -94,16 +103,24 @@ public class EssenceHandler {
 
 		SelectMenu.Builder menuBuilder = SelectMenu.create("essence_upgrade_command");
 
-		for(int i=startingLevel + 1; i <= 10; i++){
-			if(i == 0 || higherDepth(itemJson, "" + i) != null){
+		for (int i = startingLevel + 1; i <= 10; i++) {
+			if (i == 0 || higherDepth(itemJson, "" + i) != null) {
 				menuBuilder.addOption("" + i, "" + i);
 			}
 		}
 
-		event.editMessageEmbeds(defaultEmbed("Essence upgrade for " + itemName).setDescription("Choose the ending item level").setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId).build()).setActionRow(menuBuilder.build()).queue();
+		event
+			.editMessageEmbeds(
+				defaultEmbed("Essence upgrade for " + itemName)
+					.setDescription("Choose the ending item level")
+					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+					.build()
+			)
+			.setActionRow(menuBuilder.build())
+			.queue();
 
 		waiter.waitForEvent(
-				SelectMenuInteractionEvent.class,
+			SelectMenuInteractionEvent.class,
 			this::condition,
 			this::actionTwo,
 			1,
@@ -124,7 +141,7 @@ public class EssenceHandler {
 				totalEssence += higherDepth(itemJson, "" + i, 0);
 			}
 
-			if(higherDepth(itemJson, "items." + i) != null){
+			if (higherDepth(itemJson, "items." + i) != null) {
 				for (JsonElement upgrade : higherDepth(itemJson, "items." + i).getAsJsonArray()) {
 					String strUpgrade = upgrade.getAsString();
 					String name = parseMcCodes(strUpgrade);
@@ -140,16 +157,35 @@ public class EssenceHandler {
 			}
 		}
 
-		event.editMessageEmbeds(defaultEmbed("Essence upgrade for " + itemName).setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
-				.addField(
+		event
+			.editMessageEmbeds(
+				defaultEmbed("Essence upgrade for " + itemName)
+					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+					.addField(
 						"From " +
-								(startingLevel == -1 ? "not dungeonized" : startingLevel + (startingLevel == 1 ? " star" : " stars")) +
-								" to " +
-								endingLevel +
-								(endingLevel == 1 ? " star" : " stars"),
-						(!otherItems.isEmpty() ? "• " : "") + totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence" +
-								(!otherItems.isEmpty() ? otherItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey()).collect(Collectors.joining("\n• ", "\n• ", "")) : ""),
+						(startingLevel == -1 ? "not dungeonized" : startingLevel + (startingLevel == 1 ? " star" : " stars")) +
+						" to " +
+						endingLevel +
+						(endingLevel == 1 ? " star" : " stars"),
+						(!otherItems.isEmpty() ? "• " : "") +
+						totalEssence +
+						" " +
+						higherDepth(itemJson, "type").getAsString().toLowerCase() +
+						" essence" +
+						(
+							!otherItems.isEmpty()
+								? otherItems
+									.entrySet()
+									.stream()
+									.map(e -> e.getValue() + " " + e.getKey())
+									.collect(Collectors.joining("\n• ", "\n• ", ""))
+								: ""
+						),
 						false
-				).build()).setActionRows().queue();
+					)
+					.build()
+			)
+			.setActionRows()
+			.queue();
 	}
 }

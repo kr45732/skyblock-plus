@@ -30,7 +30,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
 
@@ -72,8 +71,13 @@ public class EssenceCommand extends Command {
 						higherDepth(itemJson, level).getAsString() +
 						" " +
 						ESSENCE_EMOJI_MAP.get(essenceType) +
-								(higherDepth(itemJson, "items.1") != null ?
-						streamJsonArray(higherDepth(itemJson, "items.1")).map(i ->parseMcCodes(i.getAsString())).collect(Collectors.joining(", ", ", ", "")) : "")
+						(
+							higherDepth(itemJson, "items.1") != null
+								? streamJsonArray(higherDepth(itemJson, "items.1"))
+									.map(i -> parseMcCodes(i.getAsString()))
+									.collect(Collectors.joining(", ", ", ", ""))
+								: ""
+						)
 					);
 					default -> eb.appendDescription(
 						"\n➜ **" +
@@ -81,9 +85,14 @@ public class EssenceCommand extends Command {
 						" Stars:** " +
 						higherDepth(itemJson, level).getAsString() +
 						" " +
-						ESSENCE_EMOJI_MAP.get(essenceType)+
-								(higherDepth(itemJson, "items." + level) != null ?
-										streamJsonArray(higherDepth(itemJson, "items." + level)).map(i ->parseMcCodes(i.getAsString())).collect(Collectors.joining(", ", ", ", "")) : "")
+						ESSENCE_EMOJI_MAP.get(essenceType) +
+						(
+							higherDepth(itemJson, "items." + level) != null
+								? streamJsonArray(higherDepth(itemJson, "items." + level))
+									.map(i -> parseMcCodes(i.getAsString()))
+									.collect(Collectors.joining(", ", ", ", ""))
+								: ""
+						)
 					);
 				}
 			}
