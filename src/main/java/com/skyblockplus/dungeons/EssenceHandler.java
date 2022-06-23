@@ -18,19 +18,19 @@
 
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import java.util.ArrayList;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
 
 public class EssenceHandler {
 
@@ -39,9 +39,6 @@ public class EssenceHandler {
 	private final JsonElement itemJson;
 	private final Message reactMessage;
 	private final PaginatorEvent event;
-	private final ArrayList<String> validReactions;
-	private final Map<String, Integer> essenceEmojiMap = new HashMap<>();
-	private final Map<Integer, String> emojiEssenceMap;
 	private int startingLevel;
 
 	public EssenceHandler(String itemId, PaginatorEvent event) {
@@ -55,109 +52,104 @@ public class EssenceHandler {
 		this.event = event;
 		this.reactMessage = event.getLoadingMessage();
 
-		essenceEmojiMap.put("⏫", -1);
-		essenceEmojiMap.put("0⃣", 0);
-		essenceEmojiMap.put("1⃣", 1);
-		essenceEmojiMap.put("2⃣", 2);
-		essenceEmojiMap.put("3⃣", 3);
-		essenceEmojiMap.put("4⃣", 4);
-		essenceEmojiMap.put("5⃣", 5);
-		emojiEssenceMap = essenceEmojiMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+		int max = 0;
+		for(int i=1; i <= 10; i++){
+			if(higherDepth(itemJson, "" + i) != null){
+				max = i;
+			}
+		}
 
-		EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName);
-		eb.setDescription("Choose the current item level");
-
-		validReactions = new ArrayList<>();
-		String initialMessageInfo = "";
+		SelectMenu.Builder menuBuilder = SelectMenu.create("essence_upgrade_command");
 		if (higherDepth(itemJson, "dungeonize") != null) {
-			validReactions.add("⏫");
-			initialMessageInfo += "⏫ - Not dungeonized\n";
+			menuBuilder.addOption("Dungeonize", "-1");
 		}
-		eb.addField("Levels", initialMessageInfo + "0⃣ - 0 stars\n1⃣ - 1 star\n2⃣ - 2 stars\n3⃣ - 3 stars\n4⃣ - 4 stars", false);
-		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
-		event.getAction().editMessageEmbeds(eb.build()).get().queue();
+		for(int i=0; i <= max - 1; i++){
+			if(i == 0 || higherDepth(itemJson, "" + i) != null){
+				menuBuilder.addOption("" + i, "" + i);
+			}
+		}
 
-		validReactions.add("0⃣");
-		validReactions.add("1⃣");
-		validReactions.add("2⃣");
-		validReactions.add("3⃣");
-		validReactions.add("4⃣");
-		for (String i : validReactions) {
-			reactMessage.addReaction(i).queue();
-		}
+		event.getAction().editMessageEmbeds(defaultEmbed("Essence upgrade for " + itemName).setDescription("Choose the current item level").setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId).build()).setActionRow(menuBuilder.build()).get().queue();
 
 		waiter.waitForEvent(
-			MessageReactionAddEvent.class,
+			SelectMenuInteractionEvent.class,
 			this::condition,
 			this::actionOne,
 			1,
 			TimeUnit.MINUTES,
-			() -> reactMessage.clearReactions().queue()
+			() -> reactMessage.editMessageComponents().queue()
 		);
 	}
 
-	private boolean condition(MessageReactionAddEvent event) {
+	private boolean condition(SelectMenuInteractionEvent event) {
 		return (
 			event.isFromGuild() &&
 			event.getMessageId().equals(reactMessage.getId()) &&
-			event.getUser().getId().equals(this.event.getUser().getId()) &&
-			validReactions.contains(event.getReactionEmote().getName())
+			event.getUser().getId().equals(this.event.getUser().getId())
 		);
 	}
 
-	private void actionOne(MessageReactionAddEvent event) {
-		validReactions.clear();
-		startingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
-		reactMessage.clearReactions().complete();
-		EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName).setDescription("Choose the ending item level");
+	private void actionOne(SelectMenuInteractionEvent event) {
+		startingLevel = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
 
-		StringBuilder levelsString = new StringBuilder();
-		for (int i = (startingLevel + 1); i <= 5; i++) {
-			reactMessage.addReaction(emojiEssenceMap.get(i)).queue();
-			validReactions.add(emojiEssenceMap.get(i));
-			if (startingLevel == -1 && i == 0) {
-				levelsString.append(emojiEssenceMap.get(i)).append(" - Dungeonized\n");
-			} else {
-				levelsString.append(emojiEssenceMap.get(i)).append(" - ").append(i).append(i == 1 ? " star\n" : " stars\n");
+		SelectMenu.Builder menuBuilder = SelectMenu.create("essence_upgrade_command");
+
+		for(int i=startingLevel + 1; i <= 10; i++){
+			if(i == 0 || higherDepth(itemJson, "" + i) != null){
+				menuBuilder.addOption("" + i, "" + i);
 			}
 		}
-		eb.addField("Levels", levelsString.toString(), false);
-		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 
-		reactMessage.editMessageEmbeds(eb.build()).queue();
+		event.editMessageEmbeds(defaultEmbed("Essence upgrade for " + itemName).setDescription("Choose the ending item level").setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId).build()).setActionRow(menuBuilder.build()).queue();
 
 		waiter.waitForEvent(
-			MessageReactionAddEvent.class,
+				SelectMenuInteractionEvent.class,
 			this::condition,
 			this::actionTwo,
 			1,
 			TimeUnit.MINUTES,
-			() -> reactMessage.clearReactions().queue()
+			() -> reactMessage.editMessageComponents().queue()
 		);
 	}
 
-	private void actionTwo(MessageReactionAddEvent event) {
-		int endingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
-		reactMessage.clearReactions().complete();
+	private void actionTwo(SelectMenuInteractionEvent event) {
+		int endingLevel = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
+
 		int totalEssence = 0;
+		Map<String, Integer> otherItems = new HashMap<>();
 		for (int i = (startingLevel + 1); i <= endingLevel; i++) {
 			if (i == 0) {
 				totalEssence += higherDepth(itemJson, "dungeonize", 0);
 			} else {
 				totalEssence += higherDepth(itemJson, "" + i, 0);
 			}
+
+			if(higherDepth(itemJson, "items." + i) != null){
+				for (JsonElement upgrade : higherDepth(itemJson, "items." + i).getAsJsonArray()) {
+					String strUpgrade = upgrade.getAsString();
+					String name = parseMcCodes(strUpgrade);
+					int count = 1;
+					if (strUpgrade.contains(" §8x")) {
+						String[] nameCountSplit = strUpgrade.split(" §8x");
+						name = parseMcCodes(nameCountSplit[0]);
+						count = Integer.parseInt(nameCountSplit[1]);
+					}
+					int finalCount = count;
+					otherItems.compute(name, (k, v) -> (v != null ? v : 0) + finalCount);
+				}
+			}
 		}
-		EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName);
-		eb.addField(
-			"From " +
-			(startingLevel == -1 ? "not dungeonized" : startingLevel + (startingLevel == 1 ? " star" : " stars")) +
-			" to " +
-			endingLevel +
-			(endingLevel == 1 ? " star" : " stars"),
-			totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence",
-			false
-		);
-		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
-		reactMessage.editMessageEmbeds(eb.build()).queue();
+
+		event.editMessageEmbeds(defaultEmbed("Essence upgrade for " + itemName).setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+				.addField(
+						"From " +
+								(startingLevel == -1 ? "not dungeonized" : startingLevel + (startingLevel == 1 ? " star" : " stars")) +
+								" to " +
+								endingLevel +
+								(endingLevel == 1 ? " star" : " stars"),
+						(!otherItems.isEmpty() ? "• " : "") + totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence" +
+								(!otherItems.isEmpty() ? otherItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey()).collect(Collectors.joining("\n• ", "\n• ", "")) : ""),
+						false
+				).build()).setActionRows().queue();
 	}
 }
