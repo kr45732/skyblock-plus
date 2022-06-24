@@ -1108,6 +1108,31 @@ public class Utils {
 		}
 	}
 
+	public static String toPrettyTime(long millis) {
+		long seconds = millis / 1000 % 60;
+		long minutes = (millis / 1000 / 60) % 60;
+		long hours = (millis / 1000 / 60 / 60) % 24;
+		long days = (millis / 1000 / 60 / 60 / 24);
+
+		String endsIn = "";
+		if (millis < 0) {
+			endsIn += "Ended!";
+		} else if (minutes == 0 && hours == 0 && days == 0) {
+			endsIn += seconds + "s";
+		} else if (hours == 0 && days == 0) {
+			endsIn += minutes + "m" + seconds + "s";
+		} else if (days == 0) {
+			if (hours <= 6) {
+				endsIn += hours + "h" + minutes + "m" + seconds + "s";
+			} else {
+				endsIn += hours + "h";
+			}
+		} else {
+			endsIn += days + "d" + hours + "h";
+		}
+		return endsIn;
+	}
+
 	/**
 	 * @param toMatch name to match
 	 * @param matchFrom list of ID (will convert to their names)

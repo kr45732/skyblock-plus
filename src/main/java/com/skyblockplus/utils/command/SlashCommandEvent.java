@@ -51,7 +51,7 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 			builder.append(" ").append(getSubcommandName());
 		}
 		for (OptionMapping o : getOptions()) {
-			builder.append(" ").append(o.getName()).append(": ").append(o.getAsString());
+			builder.append(" ").append(o.getName()).append(":").append(o.getAsString());
 		}
 		Utils.logCommand(getGuild(), getUser(), builder.toString());
 	}
