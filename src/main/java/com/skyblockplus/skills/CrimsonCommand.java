@@ -18,6 +18,8 @@
 
 package com.skyblockplus.skills;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -25,14 +27,11 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
+import java.util.List;
+import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.apache.groovy.util.Maps;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Map;
-
-import static com.skyblockplus.utils.Utils.*;
 
 @Component
 public class CrimsonCommand extends Command {
@@ -50,7 +49,7 @@ public class CrimsonCommand extends Command {
 
 			JsonElement crimsonJson = higherDepth(player.profileJson(), "nether_island_player_data");
 
-			int rep = higherDepth(crimsonJson,  higherDepth(crimsonJson, "selected_faction", "None") + "_reputation", 0);
+			int rep = higherDepth(crimsonJson, higherDepth(crimsonJson, "selected_faction", "None") + "_reputation", 0);
 			String title;
 			if (rep <= -1000) {
 				title = "Hostile";
@@ -67,36 +66,66 @@ public class CrimsonCommand extends Command {
 			} else {
 				title = "Hero";
 			}
-			EmbedBuilder eb = player.defaultPlayerEmbed().setDescription("**Faction:** " + capitalizeString(higherDepth(crimsonJson, "selected_faction", "none"))
-					+ "\n**Reputation:** " + formatNumber(rep)
-					+ "\n**Title:** " + title
-			);
+			EmbedBuilder eb = player
+				.defaultPlayerEmbed()
+				.setDescription(
+					"**Faction:** " +
+					capitalizeString(higherDepth(crimsonJson, "selected_faction", "none")) +
+					"\n**Reputation:** " +
+					formatNumber(rep) +
+					"\n**Title:** " +
+					title
+				);
 			extras.addEmbedPage(eb);
 
-
-			List<String> allFish = List.of("gusher", "blobfish", "golden_fish", "volcanic_stonefish", "sulphur_skitter", "lava_horse", "moldfin", "mana_ray", "slugfish", "skeleton_fish", "obfuscated_fish_1", "soul_fish", "vanille", "steaming_hot_flounder", "flyfish", "karate_fish", "obfuscated_fish_2", "obfuscated_fish_3");
+			List<String> allFish = List.of(
+				"gusher",
+				"blobfish",
+				"golden_fish",
+				"volcanic_stonefish",
+				"sulphur_skitter",
+				"lava_horse",
+				"moldfin",
+				"mana_ray",
+				"slugfish",
+				"skeleton_fish",
+				"obfuscated_fish_1",
+				"soul_fish",
+				"vanille",
+				"steaming_hot_flounder",
+				"flyfish",
+				"karate_fish",
+				"obfuscated_fish_2",
+				"obfuscated_fish_3"
+			);
 			JsonElement fishJson = higherDepth(player.profileJson(), "trophy_fish");
-			eb = player.defaultPlayerEmbed().setDescription("**Total Caught:** " + higherDepth(fishJson, "total_caught", 0)
-					+ "\n**Status:** " + switch (higherDepth(fishJson, "rewards.[-1]", 0)) {
-				case 1 -> "Novice Fisher";
-				case 2 -> "Adept Fisher";
-				case 3 -> "Expert Fisher";
-				case 4 -> "Master Fisher";
-				default -> "None";
-			});
+			eb =
+				player
+					.defaultPlayerEmbed()
+					.setDescription(
+						"**Total Caught:** " +
+						higherDepth(fishJson, "total_caught", 0) +
+						"\n**Status:** " +
+						switch (higherDepth(fishJson, "rewards.[-1]", 0)) {
+							case 1 -> "Novice Fisher";
+							case 2 -> "Adept Fisher";
+							case 3 -> "Expert Fisher";
+							case 4 -> "Master Fisher";
+							default -> "None";
+						}
+					);
 			for (String fish : allFish) {
-				eb.addField(getEmoji(fish.toUpperCase() + "_BRONZE") + " " + capitalizeString(fish.replace("_", " ")),
-
-
-
-								 "Diamond: " + higherDepth(fishJson, fish + "_diamond", 0)
-								+ "\n Gold: " + higherDepth(fishJson, fish + "_gold", 0)
-								+ "\n Silver: " + higherDepth(fishJson, fish + "_silver", 0)
-						+"\nBronze: " + higherDepth(fishJson, fish + "_bronze", 0)
-
-						,
-
-						true
+				eb.addField(
+					getEmoji(fish.toUpperCase() + "_BRONZE") + " " + capitalizeString(fish.replace("_", " ")),
+					"Diamond: " +
+					higherDepth(fishJson, fish + "_diamond", 0) +
+					"\n Gold: " +
+					higherDepth(fishJson, fish + "_gold", 0) +
+					"\n Silver: " +
+					higherDepth(fishJson, fish + "_silver", 0) +
+					"\nBronze: " +
+					higherDepth(fishJson, fish + "_bronze", 0),
+					true
 				);
 			}
 			extras.addEmbedPage(eb);
@@ -106,29 +135,62 @@ public class CrimsonCommand extends Command {
 			int burning = higherDepth(crimsonJson, "kuudra_completed_tiers.burning", 0);
 			int fiery = higherDepth(crimsonJson, "kuudra_completed_tiers.fiery", 0);
 			int infernal = higherDepth(crimsonJson, "kuudra_completed_tiers.infernal", 0);
-			eb = player.defaultPlayerEmbed().setDescription("**Total Kuudra Completions:** " + (basic + hot + burning + fiery + infernal)
-					+ "\n\n" + getEmoji("KUUDRA;0") + " Basic: " + basic
-					+ "\n" + getEmoji("KUUDRA_HOT_TIER_KEY") + " Hot: " + hot
-					+ "\n" + getEmoji("KUUDRA_BURNING_TIER_KEY") + " Burning: " + burning
-					+ "\n" + getEmoji("KUUDRA_FIERY_TIER_KEY") + " Fiery: " + fiery
-					+ "\n" + getEmoji("KUUDRA_INFERNAL_TIER_KEY") + " Infernal: " + infernal
-			);
+			eb =
+				player
+					.defaultPlayerEmbed()
+					.setDescription(
+						"**Total Kuudra Completions:** " +
+						(basic + hot + burning + fiery + infernal) +
+						"\n\n" +
+						getEmoji("KUUDRA;0") +
+						" Basic: " +
+						basic +
+						"\n" +
+						getEmoji("KUUDRA_HOT_TIER_KEY") +
+						" Hot: " +
+						hot +
+						"\n" +
+						getEmoji("KUUDRA_BURNING_TIER_KEY") +
+						" Burning: " +
+						burning +
+						"\n" +
+						getEmoji("KUUDRA_FIERY_TIER_KEY") +
+						" Fiery: " +
+						fiery +
+						"\n" +
+						getEmoji("KUUDRA_INFERNAL_TIER_KEY") +
+						" Infernal: " +
+						infernal
+					);
 			extras.addEmbedPage(eb);
 
 			eb = player.defaultPlayerEmbed();
 			Map<String, String> dojoQuests = Maps.of(
-					"snake", "Swiftness",
-					"archer", "Mastery",
-					"mob_kb", "Force",
-					"fireball", "Tenacity",
-					"wall_jump", "Stamina",
-					"sword_swap", "Discipline"
+				"snake",
+				"Swiftness",
+				"archer",
+				"Mastery",
+				"mob_kb",
+				"Force",
+				"fireball",
+				"Tenacity",
+				"wall_jump",
+				"Stamina",
+				"sword_swap",
+				"Discipline"
 			);
 			int totalPoints = 0;
 			for (Map.Entry<String, String> dojoQuest : dojoQuests.entrySet()) {
 				int points = higherDepth(crimsonJson, "dojo.dojo_points_" + dojoQuest.getKey(), 0);
 				totalPoints += points;
-				eb.addField(dojoQuest.getValue(), "Points: " + formatNumber(points) + "\nTime: " + toPrettyTime(higherDepth(crimsonJson, "dojo.dojo_time_" + dojoQuest.getKey(), 0)) , true);
+				eb.addField(
+					dojoQuest.getValue(),
+					"Points: " +
+					formatNumber(points) +
+					"\nTime: " +
+					toPrettyTime(higherDepth(crimsonJson, "dojo.dojo_time_" + dojoQuest.getKey(), 0)),
+					true
+				);
 			}
 			String belt;
 			if (totalPoints >= 7000) {
