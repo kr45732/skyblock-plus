@@ -38,5 +38,4 @@ public record DiscordInfoStruct(String discordTag, String username, String uuid,
 	public boolean isNotValid() {
 		return discordTag == null || username == null || uuid == null;
 	}
-
 }

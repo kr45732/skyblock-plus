@@ -284,7 +284,12 @@ public class SkyblockEventCommand extends Command {
 		return guildMemberPlayersList;
 	}
 
-	public static EmbedBuilder getEventLeaderboard(Guild guild, User user, PaginatorEvent paginatorEvent, ButtonInteractionEvent buttonEvent) {
+	public static EmbedBuilder getEventLeaderboard(
+		Guild guild,
+		User user,
+		PaginatorEvent paginatorEvent,
+		ButtonInteractionEvent buttonEvent
+	) {
 		String guildId = guild.getId();
 		if (!database.getSkyblockEventActive(guildId)) {
 			return defaultEmbed("No event running");
@@ -313,23 +318,27 @@ public class SkyblockEventCommand extends Command {
 			}
 
 			if (paginateBuilder.size() > 0) {
-				if(paginatorEvent != null) {
+				if (paginatorEvent != null) {
 					paginatorEvent.paginate(
-							paginateBuilder.updateExtras(extra ->
-									extra
-											.setEveryPageTitle("Event Leaderboard")
-											.setEveryPageText("**Last Updated <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>**\n")
-							)
+						paginateBuilder.updateExtras(extra ->
+							extra
+								.setEveryPageTitle("Event Leaderboard")
+								.setEveryPageText(
+									"**Last Updated <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>**\n"
+								)
+						)
 					);
-				}else{
+				} else {
 					paginateBuilder
-							.updateExtras(extra ->
-									extra
-											.setEveryPageTitle("Event Leaderboard")
-											.setEveryPageText("**Last Updated:** <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>\n")
-							)
-							.build()
-							.paginate(buttonEvent.getHook(), 0);
+						.updateExtras(extra ->
+							extra
+								.setEveryPageTitle("Event Leaderboard")
+								.setEveryPageText(
+									"**Last Updated:** <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>\n"
+								)
+						)
+						.build()
+						.paginate(buttonEvent.getHook(), 0);
 				}
 				return null;
 			}
@@ -337,7 +346,7 @@ public class SkyblockEventCommand extends Command {
 			return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
 		}
 
-		if(currentGuild.eventCurrentlyUpdating){
+		if (currentGuild.eventCurrentlyUpdating) {
 			return invalidEmbed("The leaderboard is currently updating, please try again in a couple of seconds");
 		}
 
@@ -365,9 +374,9 @@ public class SkyblockEventCommand extends Command {
 		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
 
 		if (paginateBuilder.size() > 0) {
-			if(paginatorEvent != null) {
+			if (paginatorEvent != null) {
 				paginatorEvent.paginate(paginateBuilder);
-			}else{
+			} else {
 				paginateBuilder.build().paginate(buttonEvent.getHook(), 0);
 			}
 			return null;

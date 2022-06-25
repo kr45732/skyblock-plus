@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;

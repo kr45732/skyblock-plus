@@ -844,7 +844,7 @@ public class AutomaticGuild {
 		this.skyblockEventHandler = skyblockEventHandler;
 	}
 
-	public void setEventCurrentlyUpdating(boolean eventCurrentlyUpdating){
+	public void setEventCurrentlyUpdating(boolean eventCurrentlyUpdating) {
 		this.eventCurrentlyUpdating = eventCurrentlyUpdating;
 	}
 

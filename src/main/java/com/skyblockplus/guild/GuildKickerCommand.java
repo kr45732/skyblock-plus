@@ -193,7 +193,7 @@ public class GuildKickerCommand extends Command {
 				guildMemberPlayersList = guildCache.getCache();
 				lastUpdated = guildCache.getLastUpdated();
 			} else {
-				if(hypixelGuildQueue.contains(guildId)){
+				if (hypixelGuildQueue.contains(guildId)) {
 					return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
 				}
 
