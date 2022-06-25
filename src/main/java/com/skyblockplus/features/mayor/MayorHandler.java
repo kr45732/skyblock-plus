@@ -152,7 +152,7 @@ public class MayorHandler {
 					.append(")");
 			}
 		}
-		eb.addField("Loosing Mayors", ebStr.toString(), false);
+		eb.addField("Losing Mayors", ebStr.toString(), false);
 		eb.addField(
 			"Next Election",
 			"Opens <t:" + Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 217200000).getEpochSecond() + ":R>",
