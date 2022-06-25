@@ -58,20 +58,29 @@ public class LinkCommand extends Command {
 	public static Object linkAccount(String username, Member member, Guild guild) {
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
 		if (playerInfo.isNotValid()) {
-			return playerInfo.failCause().endsWith(" is not linked on Hypixel") ? new MessageBuilder().setEmbeds(invalidEmbed(playerInfo.failCause()).build()).setActionRows(ActionRow.of(Button.link("https://streamable.com/sdq8tp", "Help Linking"))) : invalidEmbed(playerInfo.failCause());
+			return playerInfo.failCause().endsWith(" is not linked on Hypixel")
+				? new MessageBuilder()
+					.setEmbeds(invalidEmbed(playerInfo.failCause()).build())
+					.setActionRows(ActionRow.of(Button.link("https://streamable.com/sdq8tp", "Help Linking")))
+				: invalidEmbed(playerInfo.failCause());
 		}
 
 		if (!member.getUser().getAsTag().equals(playerInfo.discordTag())) {
-			return new MessageBuilder().setEmbeds( defaultEmbed("Discord tag mismatch")
-				.setDescription(
-					"**Player Username:** `" +
-					playerInfo.username() +
-					"`\n**API Discord Tag:** `" +
-					playerInfo.discordTag() +
-					"`\n**Your Discord Tag:** `" +
-					member.getUser().getAsTag() +
-					"`"
-				).build()).setActionRows(ActionRow.of(Button.link("https://streamable.com/sdq8tp", "Help Linking")));
+			return new MessageBuilder()
+				.setEmbeds(
+					defaultEmbed("Discord tag mismatch")
+						.setDescription(
+							"**Player Username:** `" +
+							playerInfo.username() +
+							"`\n**API Discord Tag:** `" +
+							playerInfo.discordTag() +
+							"`\n**Your Discord Tag:** `" +
+							member.getUser().getAsTag() +
+							"`"
+						)
+						.build()
+				)
+				.setActionRows(ActionRow.of(Button.link("https://streamable.com/sdq8tp", "Help Linking")));
 		}
 
 		LinkedAccount toAdd = new LinkedAccount(Instant.now().toEpochMilli(), member.getId(), playerInfo.uuid(), playerInfo.username());

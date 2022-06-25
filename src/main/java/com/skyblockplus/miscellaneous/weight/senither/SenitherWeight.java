@@ -18,10 +18,10 @@
 
 package com.skyblockplus.miscellaneous.weight.senither;
 
+import static com.skyblockplus.utils.Constants.*;
+
 import com.skyblockplus.miscellaneous.weight.weight.Weight;
 import com.skyblockplus.utils.Player;
-
-import static com.skyblockplus.utils.Constants.*;
 
 public class SenitherWeight extends Weight {
 

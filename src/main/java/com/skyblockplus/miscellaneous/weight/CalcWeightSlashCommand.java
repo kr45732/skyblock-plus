@@ -49,7 +49,7 @@ public class CalcWeightSlashCommand extends SlashCommand {
 				event.getOptionStr("profile"),
 				event.getOptionStr("type"),
 				event.getOptionInt("amount", 0),
-					Player.WeightType.of(event.getOptionStr("system", "senither"))
+				Player.WeightType.of(event.getOptionStr("system", "senither"))
 			)
 		);
 	}
@@ -74,8 +74,10 @@ public class CalcWeightSlashCommand extends SlashCommand {
 					.addChoice("Enchanting", "enchanting")
 					.addChoice("Foraging", "foraging")
 					.addChoice("Catacombs", "catacombs"),
-				new OptionData(OptionType.INTEGER, "amount", "Target xp (slayers) or level", true).setRequiredRange(0, 500000000)
-			,(new OptionData(OptionType.STRING, "system", "Weight system that should be used")).addChoice("Senither", "senither").addChoice( "Lily", "lily"))
+				new OptionData(OptionType.INTEGER, "amount", "Target xp (slayers) or level", true).setRequiredRange(0, 500000000),
+				(new OptionData(OptionType.STRING, "system", "Weight system that should be used")).addChoice("Senither", "senither")
+					.addChoice("Lily", "lily")
+			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

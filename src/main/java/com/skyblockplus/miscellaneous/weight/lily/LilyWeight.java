@@ -31,7 +31,7 @@ public class LilyWeight extends Weight {
 	}
 
 	public LilyWeight(Player player, boolean calculateWeight) {
-		super(calculateWeight, new LilySlayerWeight(player), new LilySkillsWeight(player),new LilyDungeonsWeight(player));
+		super(calculateWeight, new LilySlayerWeight(player), new LilySkillsWeight(player), new LilyDungeonsWeight(player));
 	}
 
 	@Override

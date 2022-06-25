@@ -53,7 +53,9 @@ public class WeightCommand extends Command {
 			EmbedBuilder eb = player.defaultPlayerEmbed(" | Senither Weight");
 			StringBuilder slayerStr = new StringBuilder();
 			for (String slayerName : SLAYER_NAMES) {
-				if(slayerName.equals("blaze")){continue;}
+				if (slayerName.equals("blaze")) {
+					continue;
+				}
 				slayerStr
 					.append(SLAYER_EMOJI_MAP.get(slayerName))
 					.append(" ")

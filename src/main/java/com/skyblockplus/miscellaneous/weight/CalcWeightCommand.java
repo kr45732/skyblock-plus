@@ -71,7 +71,7 @@ public class CalcWeightCommand extends Command {
 				Weight weight = Weight.of(weightType, player).calculateWeight(type);
 				Weight predictedWeight = Weight.of(weightType, player).calculateWeight(type);
 				WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight();
-				WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight( target);
+				WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight(target);
 				eb.addField(
 					capitalizeString(weightType.name()) + " Weight Change",
 					"Total: " +
@@ -110,7 +110,7 @@ public class CalcWeightCommand extends Command {
 					false
 				);
 				Weight weight = Weight.of(weightType, player).calculateWeight(type);
-				Weight predictedWeight = Weight.of(weightType,player).calculateWeight(type);
+				Weight predictedWeight = Weight.of(weightType, player).calculateWeight(type);
 				WeightStruct pre = weight.getSkillsWeight().getSkillsWeight(type);
 				WeightStruct post = predictedWeight.getSkillsWeight().getSkillsWeight(type, target);
 				eb.addField(
@@ -119,7 +119,7 @@ public class CalcWeightCommand extends Command {
 					false
 				);
 				eb.addField(
-						capitalizeString(weightType.name()) + " Weight Change",
+					capitalizeString(weightType.name()) + " Weight Change",
 					"Total: " +
 					weight.getTotalWeight().getFormatted(false) +
 					" ➜ " +
@@ -147,8 +147,8 @@ public class CalcWeightCommand extends Command {
 					")",
 					false
 				);
-				Weight weight = Weight.of( weightType,player).calculateWeight(type);
-				Weight predictedWeight = Weight.of(weightType,player).calculateWeight(type);
+				Weight weight = Weight.of(weightType, player).calculateWeight(type);
+				Weight predictedWeight = Weight.of(weightType, player).calculateWeight(type);
 				WeightStruct pre = weight.getSlayerWeight().getSlayerWeight(type);
 				WeightStruct post = predictedWeight.getSlayerWeight().getSlayerWeight(type, amount);
 				eb.addField(
@@ -157,7 +157,7 @@ public class CalcWeightCommand extends Command {
 					false
 				);
 				eb.addField(
-						capitalizeString(weightType.name()) + " Weight Change",
+					capitalizeString(weightType.name()) + " Weight Change",
 					"Total: " +
 					weight.getTotalWeight().getFormatted(false) +
 					" ➜ " +

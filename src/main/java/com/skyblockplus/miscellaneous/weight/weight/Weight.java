@@ -39,7 +39,7 @@ public abstract class Weight {
 		}
 	}
 
-	public static Weight of(Player.WeightType weightType, Player player){
+	public static Weight of(Player.WeightType weightType, Player player) {
 		return weightType == Player.WeightType.LILY ? new LilyWeight(player) : new SenitherWeight(player);
 	}
 

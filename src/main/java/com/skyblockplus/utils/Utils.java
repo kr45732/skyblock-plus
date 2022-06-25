@@ -637,9 +637,7 @@ public class Utils {
 			}
 
 			if (response.get("socialMedia.links.DISCORD") == null) {
-				return new DiscordInfoStruct(
-						usernameUuidStruct.username() + " is not linked on Hypixel"
-				);
+				return new DiscordInfoStruct(usernameUuidStruct.username() + " is not linked on Hypixel");
 			}
 
 			String discordTag = response.get("socialMedia.links.DISCORD").getAsString();

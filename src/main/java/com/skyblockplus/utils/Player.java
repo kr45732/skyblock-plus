@@ -1709,8 +1709,7 @@ public class Player {
 	public enum WeightType {
 		NONE,
 		SENITHER,
-		LILY,
-		;
+		LILY;
 
 		public static WeightType of(String name) {
 			return valueOf(name.toUpperCase());

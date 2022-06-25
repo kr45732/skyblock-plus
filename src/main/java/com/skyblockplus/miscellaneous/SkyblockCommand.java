@@ -51,10 +51,7 @@ public class SkyblockCommand extends Command {
 			CustomPaginator.Builder paginator = event.getPaginator();
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 			SenitherWeight weight = new SenitherWeight(player, true);
-			LilyWeight lilyWeight = new LilyWeight(
-				player,
-				true
-			);
+			LilyWeight lilyWeight = new LilyWeight(player, true);
 
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 			eb.addField(getEmoji("SAPLING") + " Skill Average", roundAndFormat(player.getSkillAverage()), true);

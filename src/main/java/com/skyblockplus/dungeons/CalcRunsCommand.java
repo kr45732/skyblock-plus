@@ -151,7 +151,7 @@ public class CalcRunsCommand extends Command {
 		SenitherWeight weight = new SenitherWeight(player).calculateWeight("catacombs");
 		SenitherWeight predictedWeight = new SenitherWeight(player).calculateWeight("catacombs");
 		WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight();
-		WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight( target);
+		WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight(target);
 
 		return player
 			.defaultPlayerEmbed()
