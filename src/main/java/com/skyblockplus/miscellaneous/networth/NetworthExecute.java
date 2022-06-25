@@ -29,15 +29,13 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.command.PaginatorExtras;
+import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.apache.groovy.util.Maps;
 
 public class NetworthExecute {
@@ -499,10 +497,11 @@ public class NetworthExecute {
 
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser());
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
-			extras.addEmbedPage(eb);
+			Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
+			pages.put(SelectOption.of("Overview", "overview").withEmoji(getEmojiObj("SKYBLOCK_MENU")), eb);
 
 			if (!echestStr.isEmpty()) {
-				extras.addEmbedPage(
+				pages.put(SelectOption.of("Ender Chest", "ender_chest").withEmoji(getEmojiObj("ENDER_CHEST")),
 					player
 						.defaultPlayerEmbed(" | Ender Chest")
 						.setDescription(
@@ -515,7 +514,7 @@ public class NetworthExecute {
 				);
 			}
 			if (!storageStr.isEmpty()) {
-				extras.addEmbedPage(
+				pages.put(SelectOption.of("Storage", "storage").withEmoji(getEmojiObj("SMALL_BACKPACK")),
 					player
 						.defaultPlayerEmbed(" | Storage")
 						.setDescription(
@@ -524,7 +523,7 @@ public class NetworthExecute {
 				);
 			}
 			if (!invStr.isEmpty()) {
-				extras.addEmbedPage(
+				pages.put(SelectOption.of("Inventory", "inventory").withEmoji(getEmojiObj("CHEST")),
 					player
 						.defaultPlayerEmbed(" | Inventory")
 						.setDescription(
@@ -533,7 +532,7 @@ public class NetworthExecute {
 				);
 			}
 			if (!armorStr.isEmpty()) {
-				extras.addEmbedPage(
+				pages.put(SelectOption.of("Armor & Equipment", "armor_equipment").withEmoji(getEmojiObj("GOLD_CHESTPLATE")),
 					player
 						.defaultPlayerEmbed(" | Armor & Equipment")
 						.setDescription(
@@ -542,7 +541,7 @@ public class NetworthExecute {
 				);
 			}
 			if (!wardrobeStr.isEmpty()) {
-				extras.addEmbedPage(
+				pages.put(SelectOption.of("Wardrobe", "wardrobe").withEmoji(getEmojiObj("ARMOR_STAND")),
 					player
 						.defaultPlayerEmbed(" | Wardrobe")
 						.setDescription(
@@ -555,7 +554,7 @@ public class NetworthExecute {
 				);
 			}
 			if (!petsStr.isEmpty()) {
-				extras.addEmbedPage(
+				pages.put(SelectOption.of("Pets", "pets").withEmoji(getEmojiObj("ENDER_DRAGON;4")),
 					player
 						.defaultPlayerEmbed(" | Pets")
 						.setDescription(
@@ -564,7 +563,7 @@ public class NetworthExecute {
 				);
 			}
 			if (!talismanStr.isEmpty()) {
-				extras.addEmbedPage(
+				pages.put(SelectOption.of("Accessories", "accessories").withEmoji(getEmojiObj("MASTER_SKULL_TIER_7")),
 					player
 						.defaultPlayerEmbed(" | Accessories")
 						.setDescription(
@@ -577,7 +576,7 @@ public class NetworthExecute {
 				);
 			}
 			if (!personalVaultStr.isEmpty()) {
-				extras.addEmbedPage(
+				pages.put(SelectOption.of("Personal Vault", "personal_vault").withEmoji(getEmojiObj("IRON_CHEST")),
 					player
 						.defaultPlayerEmbed(" | Personal Vault")
 						.setDescription(
@@ -609,7 +608,8 @@ public class NetworthExecute {
 				}
 			}
 			extras.addButton(Button.link("https://forms.gle/RBmN2AFBLafGyx5E7", "Bug In Calculations?"));
-			event.paginate(paginateBuilder.setPaginatorExtras(extras));
+			new SelectMenuPaginator(pages, "overview", extras, event);
+//			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 			return null;
 		}
 		return player.getFailEmbed();

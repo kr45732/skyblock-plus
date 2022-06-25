@@ -77,10 +77,7 @@ import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -244,6 +241,10 @@ public class Utils {
 
 	public static String getEmojiOr(String id, String defaultValue) {
 		return higherDepth(getEmojiMap(), id, defaultValue);
+	}
+
+	public static Emoji getEmojiObj(String id) {
+		return Emoji.fromMarkdown(getEmojiOr(id, null));
 	}
 
 	public static JsonObject getAverageAuctionJson() {
