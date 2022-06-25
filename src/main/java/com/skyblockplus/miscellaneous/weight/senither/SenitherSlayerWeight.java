@@ -20,43 +20,14 @@ package com.skyblockplus.miscellaneous.weight.senither;
 
 import static com.skyblockplus.utils.Constants.SLAYER_WEIGHTS;
 
+import com.skyblockplus.miscellaneous.weight.weight.SlayerWeight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
 
-public class SlayerWeight {
+public class SenitherSlayerWeight extends SlayerWeight {
 
-	private final Player player;
-	private final WeightStruct weightStruct;
-
-	public SlayerWeight(Player player) {
-		this.player = player;
-		this.weightStruct = new WeightStruct();
-	}
-
-	public static double of(double slayerXp, double divider, double modifier) {
-		slayerXp = slayerXp / 3;
-
-		if (slayerXp <= 1000000) {
-			return 3 * (slayerXp == 0 ? 0 : slayerXp / divider);
-		} else {
-			double base = 1000000 / divider;
-			double remaining = slayerXp - 1000000;
-			double overflow = 0;
-
-			while (remaining > 0) {
-				double left = Math.min(remaining, 1000000);
-
-				overflow += Math.pow(left / (divider * (1.5 + modifier)), 0.942);
-				modifier += modifier;
-				remaining -= left;
-			}
-
-			return 3 * (base + overflow);
-		}
-	}
-
-	public WeightStruct getWeightStruct() {
-		return weightStruct;
+	public SenitherSlayerWeight(Player player) {
+		super(player);
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName) {
@@ -64,7 +35,7 @@ public class SlayerWeight {
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName, int currentSlayerXp) {
-		if (slayerName.equals("blaze")) { // TODO: senither blaze weight
+		if (slayerName.equals("blaze")) {
 			return new WeightStruct();
 		}
 

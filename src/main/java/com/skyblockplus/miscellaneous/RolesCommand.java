@@ -32,7 +32,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
-import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -509,26 +508,7 @@ public class RolesCommand extends Command {
 			return defaultEmbed("You must be linked to run this command. Use `/link <player>` to link");
 		}
 
-		DiscordInfoStruct discordInfo = getPlayerDiscordInfo(linkedInfo.uuid());
-
-		if (discordInfo.isNotValid()) {
-			return discordInfo.getFailEmbed();
-		}
-
-		if (!member.getUser().getAsTag().equals(discordInfo.discordTag())) {
-			return defaultEmbed("Discord tag mismatch")
-				.setDescription(
-					"**Player Username:** `" +
-					discordInfo.username() +
-					"`\n**API Discord Tag:** `" +
-					discordInfo.discordTag() +
-					"`\n**Your Discord Tag:** `" +
-					member.getUser().getAsTag() +
-					"`"
-				);
-		}
-
-		String username = discordInfo.username();
+		String username = linkedInfo.username();
 		Player player = profile == null ? new Player(username) : new Player(username, profile);
 		if (!player.isValid()) {
 			return player.getFailEmbed();

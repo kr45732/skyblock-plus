@@ -22,29 +22,27 @@ import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonElement;
+import com.skyblockplus.miscellaneous.weight.weight.DungeonsWeight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
 import java.util.Map;
 
-public class DungeonsWeight {
+public class LilyDungeonsWeight extends DungeonsWeight {
 
-	private final Player player;
-	private final WeightStruct weightStruct;
-
-	public DungeonsWeight(Player player) {
-		this.player = player;
-		this.weightStruct = new WeightStruct();
+	public LilyDungeonsWeight(Player player) {
+		super(player);
 	}
 
-	public WeightStruct getWeightStruct() {
-		return weightStruct;
-	}
-
+	@Override
 	public WeightStruct getDungeonWeight() {
-		SkillsStruct cataSkill = player.getCatacombs();
-		double level = cataSkill.getProgressLevel();
-		long cataXP = cataSkill.totalExp();
+		return getDungeonWeight(player.getCatacombs());
+	}
+
+	@Override
+	public WeightStruct getDungeonWeight(SkillsStruct catacombs) {
+		double level = catacombs.getProgressLevel();
+		long cataXP = catacombs.totalExp();
 
 		double extra = 0;
 		double n = 0;
@@ -57,7 +55,7 @@ public class DungeonsWeight {
 		if (level != 0) {
 			if (cataXP < 569809640) {
 				return weightStruct.add(
-					new WeightStruct(1.2733079672009226 * ((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n)))
+						new WeightStruct(1.2733079672009226 * ((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n)))
 				);
 			} else {
 				return weightStruct.add(new WeightStruct((4100 + extra) * 2));

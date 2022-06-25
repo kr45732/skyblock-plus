@@ -638,7 +638,7 @@ public class Utils {
 
 			if (response.get("socialMedia.links.DISCORD") == null) {
 				return new DiscordInfoStruct(
-					"Player is not linked on Hypixel. For help on how to link view [__**this video**__](https://streamable.com/sdq8tp)."
+						usernameUuidStruct.username() + " is not linked on Hypixel"
 				);
 			}
 

@@ -1978,7 +1978,7 @@ public class SettingsExecute {
 				return defaultSettingsEmbed("**Enabled:** " + (enabled.size() > 0 ? String.join(", ", enabled) : " no roles"));
 			} else {
 				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
-					if (!role.getKey().equals("enable")) {
+					if (!role.getKey().equals("enable") && !role.getKey().equals("useHighest")) {
 						JsonObject curRole = role.getValue().getAsJsonObject();
 						curRole.addProperty("enable", "false");
 						roleSettings.add(role.getKey(), curRole);

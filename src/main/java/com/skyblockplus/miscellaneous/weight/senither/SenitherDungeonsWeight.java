@@ -21,27 +21,16 @@ package com.skyblockplus.miscellaneous.weight.senither;
 import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_WEIGHTS;
 import static com.skyblockplus.utils.Constants.DUNGEON_WEIGHTS;
 
+import com.skyblockplus.miscellaneous.weight.weight.DungeonsWeight;
 import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
 
-public class DungeonsWeight {
+public class SenitherDungeonsWeight extends DungeonsWeight {
 
-	private final Player player;
-	private final WeightStruct weightStruct;
-
-	public DungeonsWeight(Player player) {
-		this.player = player;
-		this.weightStruct = new WeightStruct();
-	}
-
-	public static double of(double averageDungeonClass, double maxClassPoints, double catacombs, double maxDungeonPoints) {
-		return (5 * Math.pow(averageDungeonClass, 4.5) * maxClassPoints) + (Math.pow(catacombs, 4.5) * maxDungeonPoints);
-	}
-
-	public WeightStruct getWeightStruct() {
-		return weightStruct;
+	public SenitherDungeonsWeight(Player player) {
+		super(player);
 	}
 
 	public WeightStruct getClassWeight(String className) {
@@ -59,14 +48,16 @@ public class DungeonsWeight {
 		return weightStruct.add(new WeightStruct(Math.floor(base), Math.pow(remaining / splitter, 0.968)));
 	}
 
-	public WeightStruct getDungeonWeight(String dungeonName) {
-		return getDungeonWeight(dungeonName, player.getCatacombs());
+	@Override
+	public WeightStruct getDungeonWeight() {
+		return getDungeonWeight(player.getCatacombs());
 	}
 
-	public WeightStruct getDungeonWeight(String dungeonName, SkillsStruct catacombs) {
+	@Override
+	public WeightStruct getDungeonWeight(SkillsStruct catacombs) {
 		double catacombsSkillXp = catacombs.totalExp();
 		double level = catacombs.getProgressLevel();
-		double base = Math.pow(level, 4.5) * DUNGEON_WEIGHTS.get(dungeonName);
+		double base = Math.pow(level, 4.5) * DUNGEON_WEIGHTS.get("catacombs");
 
 		if (catacombsSkillXp <= Constants.CATACOMBS_LEVEL_50_XP) {
 			return weightStruct.add(new WeightStruct(base));

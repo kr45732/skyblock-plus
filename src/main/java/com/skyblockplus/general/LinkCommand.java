@@ -37,10 +37,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -53,14 +55,14 @@ public class LinkCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder linkAccount(String username, Member member, Guild guild) {
+	public static Object linkAccount(String username, Member member, Guild guild) {
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
 		if (playerInfo.isNotValid()) {
-			return invalidEmbed(playerInfo.failCause());
+			return playerInfo.failCause().endsWith(" is not linked on Hypixel") ? new MessageBuilder().setEmbeds(invalidEmbed(playerInfo.failCause()).build()).setActionRows(ActionRow.of(Button.link("https://streamable.com/sdq8tp", "Help Linking"))) : invalidEmbed(playerInfo.failCause());
 		}
 
 		if (!member.getUser().getAsTag().equals(playerInfo.discordTag())) {
-			return defaultEmbed("Discord tag mismatch")
+			return new MessageBuilder().setEmbeds( defaultEmbed("Discord tag mismatch")
 				.setDescription(
 					"**Player Username:** `" +
 					playerInfo.username() +
@@ -68,8 +70,8 @@ public class LinkCommand extends Command {
 					playerInfo.discordTag() +
 					"`\n**Your Discord Tag:** `" +
 					member.getUser().getAsTag() +
-					"`\nFor help on how to link view [__**this video**__](https://streamable.com/sdq8tp)."
-				);
+					"`"
+				).build()).setActionRows(ActionRow.of(Button.link("https://streamable.com/sdq8tp", "Help Linking")));
 		}
 
 		LinkedAccount toAdd = new LinkedAccount(Instant.now().toEpochMilli(), member.getId(), playerInfo.uuid(), playerInfo.username());

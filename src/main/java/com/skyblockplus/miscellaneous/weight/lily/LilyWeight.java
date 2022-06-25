@@ -21,50 +21,35 @@ package com.skyblockplus.miscellaneous.weight.lily;
 import static com.skyblockplus.utils.Constants.SKILL_NAMES;
 import static com.skyblockplus.utils.Constants.SLAYER_NAMES;
 
+import com.skyblockplus.miscellaneous.weight.weight.Weight;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.WeightStruct;
 
-public class Weight {
+public class LilyWeight extends Weight {
 
-	private final SlayerWeight slayerWeight;
-	private final SkillsWeight skillsWeight;
-	private final DungeonsWeight dungeonsWeight;
-
-	public Weight(Player player) {
+	public LilyWeight(Player player) {
 		this(player, false);
 	}
 
-	public Weight(Player player, boolean calculateWeight) {
-		this.slayerWeight = new SlayerWeight(player);
-		this.skillsWeight = new SkillsWeight(player);
-		this.dungeonsWeight = new DungeonsWeight(player);
-
-		if (calculateWeight) {
-			calculateWeight();
-		}
+	public LilyWeight(Player player, boolean calculateWeight) {
+		super(calculateWeight, new LilySlayerWeight(player), new LilySkillsWeight(player),new LilyDungeonsWeight(player));
 	}
 
-	public SkillsWeight getSkillsWeight() {
-		return skillsWeight;
+	@Override
+	public LilySkillsWeight getSkillsWeight() {
+		return (LilySkillsWeight) skillsWeight;
 	}
 
-	public SlayerWeight getSlayerWeight() {
-		return slayerWeight;
+	@Override
+	public LilySlayerWeight getSlayerWeight() {
+		return (LilySlayerWeight) slayerWeight;
 	}
 
-	public DungeonsWeight getDungeonsWeight() {
-		return dungeonsWeight;
+	@Override
+	public LilyDungeonsWeight getDungeonsWeight() {
+		return (LilyDungeonsWeight) dungeonsWeight;
 	}
 
-	public WeightStruct getTotalWeight() {
-		WeightStruct w = new WeightStruct();
-		w.add(slayerWeight.getWeightStruct());
-		w.add(skillsWeight.getWeightStruct());
-		w.add(dungeonsWeight.getWeightStruct());
-
-		return w;
-	}
-
+	@Override
 	public String getStage() {
 		double weight = getTotalWeight().getRaw();
 		if (weight >= 43900) {
@@ -90,15 +75,30 @@ public class Weight {
 		}
 	}
 
-	private void calculateWeight() {
+	@Override
+	public LilyWeight calculateWeight(String exclude) {
+		exclude = exclude.toLowerCase();
+
+		slayerWeight.getWeightStruct().reset();
+		skillsWeight.getWeightStruct().reset();
+		dungeonsWeight.getWeightStruct().reset();
+
 		for (String slayerName : SLAYER_NAMES) {
-			slayerWeight.getSlayerWeight(slayerName);
+			if (!exclude.equals(slayerName)) {
+				slayerWeight.getSlayerWeight(slayerName);
+			}
 		}
 		for (String skillName : SKILL_NAMES) {
-			skillsWeight.getSkillsWeight(skillName);
+			if (!exclude.equals(skillName)) {
+				skillsWeight.getSkillsWeight(skillName);
+			}
 		}
-		dungeonsWeight.getDungeonWeight();
-		dungeonsWeight.getDungeonCompletionWeight("normal");
-		dungeonsWeight.getDungeonCompletionWeight("master");
+		if (!exclude.equals("catacombs")) {
+			dungeonsWeight.getDungeonWeight();
+		}
+		getDungeonsWeight().getDungeonCompletionWeight("normal");
+		getDungeonsWeight().getDungeonCompletionWeight("master");
+
+		return this;
 	}
 }

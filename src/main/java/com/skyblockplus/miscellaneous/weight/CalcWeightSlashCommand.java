@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous.weight;
 
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -47,7 +48,8 @@ public class CalcWeightSlashCommand extends SlashCommand {
 				event.player,
 				event.getOptionStr("profile"),
 				event.getOptionStr("type"),
-				event.getOptionInt("amount", 0)
+				event.getOptionInt("amount", 0),
+					Player.WeightType.of(event.getOptionStr("system", "senither"))
 			)
 		);
 	}
@@ -73,7 +75,7 @@ public class CalcWeightSlashCommand extends SlashCommand {
 					.addChoice("Foraging", "foraging")
 					.addChoice("Catacombs", "catacombs"),
 				new OptionData(OptionType.INTEGER, "amount", "Target xp (slayers) or level", true).setRequiredRange(0, 500000000)
-			)
+			,(new OptionData(OptionType.STRING, "system", "Weight system that should be used")).addChoice("Senither", "senither").addChoice( "Lily", "lily"))
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

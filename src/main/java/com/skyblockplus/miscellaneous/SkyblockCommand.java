@@ -24,7 +24,8 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.miscellaneous.weight.senither.Weight;
+import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
+import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -49,8 +50,8 @@ public class SkyblockCommand extends Command {
 		if (player.isValid()) {
 			CustomPaginator.Builder paginator = event.getPaginator();
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
-			Weight weight = new Weight(player, true);
-			com.skyblockplus.miscellaneous.weight.lily.Weight lilyWeight = new com.skyblockplus.miscellaneous.weight.lily.Weight(
+			SenitherWeight weight = new SenitherWeight(player, true);
+			LilyWeight lilyWeight = new LilyWeight(
 				player,
 				true
 			);

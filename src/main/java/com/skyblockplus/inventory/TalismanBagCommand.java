@@ -84,7 +84,9 @@ public class TalismanBagCommand extends Command {
 		"LEGENDARY",
 		16,
 		"MYTHIC",
-		22
+		22,
+			"VERY_SPECIAL",
+			5
 	);
 
 	public TalismanBagCommand() {

@@ -18,52 +18,37 @@
 
 package com.skyblockplus.miscellaneous.weight.senither;
 
+import com.skyblockplus.miscellaneous.weight.weight.Weight;
+import com.skyblockplus.utils.Player;
+
 import static com.skyblockplus.utils.Constants.*;
 
-import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.WeightStruct;
+public class SenitherWeight extends Weight {
 
-public class Weight {
-
-	private final SlayerWeight slayerWeight;
-	private final SkillsWeight skillsWeight;
-	private final DungeonsWeight dungeonsWeight;
-
-	public Weight(Player player) {
+	public SenitherWeight(Player player) {
 		this(player, false);
 	}
 
-	public Weight(Player player, boolean calculateWeight) {
-		this.slayerWeight = new SlayerWeight(player);
-		this.skillsWeight = new SkillsWeight(player);
-		this.dungeonsWeight = new DungeonsWeight(player);
-
-		if (calculateWeight) {
-			calculateWeight("");
-		}
+	public SenitherWeight(Player player, boolean calculateWeight) {
+		super(calculateWeight, new SenitherSlayerWeight(player), new SenitherSkillsWeight(player), new SenitherDungeonsWeight(player));
 	}
 
-	public SkillsWeight getSkillsWeight() {
-		return skillsWeight;
+	@Override
+	public SenitherSkillsWeight getSkillsWeight() {
+		return (SenitherSkillsWeight) skillsWeight;
 	}
 
-	public SlayerWeight getSlayerWeight() {
-		return slayerWeight;
+	@Override
+	public SenitherSlayerWeight getSlayerWeight() {
+		return (SenitherSlayerWeight) slayerWeight;
 	}
 
-	public DungeonsWeight getDungeonsWeight() {
-		return dungeonsWeight;
+	@Override
+	public SenitherDungeonsWeight getDungeonsWeight() {
+		return (SenitherDungeonsWeight) dungeonsWeight;
 	}
 
-	public WeightStruct getTotalWeight() {
-		WeightStruct w = new WeightStruct();
-		w.add(slayerWeight.getWeightStruct());
-		w.add(skillsWeight.getWeightStruct());
-		w.add(dungeonsWeight.getWeightStruct());
-
-		return w;
-	}
-
+	@Override
 	public String getStage() {
 		double weight = getTotalWeight().getRaw();
 		if (weight >= 30000) {
@@ -81,12 +66,14 @@ public class Weight {
 		}
 	}
 
-	public Weight calculateWeight(String exclude) {
+	@Override
+	public SenitherWeight calculateWeight(String exclude) {
+		exclude = exclude.toLowerCase();
+
 		slayerWeight.getWeightStruct().reset();
 		skillsWeight.getWeightStruct().reset();
 		dungeonsWeight.getWeightStruct().reset();
 
-		exclude = exclude.toLowerCase();
 		for (String slayerName : SLAYER_NAMES) {
 			if (!exclude.equals(slayerName)) {
 				slayerWeight.getSlayerWeight(slayerName);
@@ -100,13 +87,14 @@ public class Weight {
 		}
 
 		if (!exclude.equals("catacombs")) {
-			dungeonsWeight.getDungeonWeight("catacombs");
+			dungeonsWeight.getDungeonWeight();
 		}
 		for (String dungeonClassName : DUNGEON_CLASS_NAMES) {
 			if (!exclude.equals(dungeonClassName)) {
-				dungeonsWeight.getClassWeight(dungeonClassName);
+				getDungeonsWeight().getClassWeight(dungeonClassName);
 			}
 		}
+
 		return this;
 	}
 }

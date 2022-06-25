@@ -22,7 +22,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.miscellaneous.weight.senither.Weight;
+import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
@@ -148,10 +148,10 @@ public class CalcRunsCommand extends Command {
 			runs = Math.max(0, completionsCap - completions) + (int) Math.ceil(xpNeeded / xpPerRun);
 		}
 
-		Weight weight = new Weight(player).calculateWeight("catacombs");
-		Weight predictedWeight = new Weight(player).calculateWeight("catacombs");
-		WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight("catacombs");
-		WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight("catacombs", target);
+		SenitherWeight weight = new SenitherWeight(player).calculateWeight("catacombs");
+		SenitherWeight predictedWeight = new SenitherWeight(player).calculateWeight("catacombs");
+		WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight();
+		WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight( target);
 
 		return player
 			.defaultPlayerEmbed()

@@ -20,33 +20,24 @@ package com.skyblockplus.miscellaneous.weight.senither;
 
 import static com.skyblockplus.utils.Constants.SKILL_WEIGHTS;
 
+import com.skyblockplus.miscellaneous.weight.weight.SkillsWeight;
 import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
 
-public class SkillsWeight {
+public class SenitherSkillsWeight extends SkillsWeight {
 
-	private final Player player;
-	private final WeightStruct weightStruct;
-
-	public SkillsWeight(Player player) {
-		this.player = player;
-		this.weightStruct = new WeightStruct();
+	public SenitherSkillsWeight(Player player) {
+		super(player);
 	}
 
-	public static double of(double skillAverage, double exponent) {
-		return (8 * (Math.pow(skillAverage * 10, 0.5 + exponent + (skillAverage / 100)) / 1250));
-	}
-
-	public WeightStruct getWeightStruct() {
-		return weightStruct;
-	}
-
+	@Override
 	public WeightStruct getSkillsWeight(String skillName) {
 		return getSkillsWeight(skillName, player.getSkill(skillName, Player.WeightType.SENITHER));
 	}
 
+	@Override
 	public WeightStruct getSkillsWeight(String skillName, SkillsStruct skillsStruct) {
 		Double[] curWeights = SKILL_WEIGHTS.get(skillName);
 		double exponent = curWeights[0];

@@ -246,6 +246,20 @@ public abstract class CommandExecute extends CommandEvent {
 		return defaultValue;
 	}
 
+	protected Player.WeightType getWeightTypeOption(String match, Player.WeightType defaultValue) {
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].startsWith(match + ":")) {
+				try {
+					Player.WeightType arg = Player.WeightType.of(args[i].split(match + ":")[1]);
+					removeArg(i);
+					return arg;
+				} catch (Exception ignored) {}
+			}
+		}
+
+		return defaultValue;
+	}
+
 	protected int getIntOption(String match) {
 		return getIntOption(match, -1);
 	}

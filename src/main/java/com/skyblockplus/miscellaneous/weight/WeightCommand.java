@@ -23,7 +23,8 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.miscellaneous.weight.senither.Weight;
+import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
+import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -48,10 +49,11 @@ public class WeightCommand extends Command {
 			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(3);
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 
-			Weight weight = new Weight(player);
+			SenitherWeight weight = new SenitherWeight(player);
 			EmbedBuilder eb = player.defaultPlayerEmbed(" | Senither Weight");
 			StringBuilder slayerStr = new StringBuilder();
 			for (String slayerName : SLAYER_NAMES) {
+				if(slayerName.equals("blaze")){continue;}
 				slayerStr
 					.append(SLAYER_EMOJI_MAP.get(slayerName))
 					.append(" ")
@@ -77,7 +79,7 @@ public class WeightCommand extends Command {
 				.append(" ")
 				.append(capitalizeString("catacombs"))
 				.append(": ")
-				.append(weight.getDungeonsWeight().getDungeonWeight("catacombs").getFormatted())
+				.append(weight.getDungeonsWeight().getDungeonWeight().getFormatted())
 				.append("\n");
 			for (String dungeonClassName : DUNGEON_CLASS_NAMES) {
 				dungeonsStr
@@ -95,7 +97,7 @@ public class WeightCommand extends Command {
 			eb.setDescription("**Total Weight:** " + weight.getTotalWeight().getFormatted() + "\n**Stage:** " + weight.getStage());
 			extras.addEmbedPage(eb);
 
-			com.skyblockplus.miscellaneous.weight.lily.Weight lilyWeight = new com.skyblockplus.miscellaneous.weight.lily.Weight(player);
+			LilyWeight lilyWeight = new LilyWeight(player);
 			EmbedBuilder lilyEb = player.defaultPlayerEmbed(" | Lily Weight");
 			StringBuilder lilySlayerStr = new StringBuilder();
 			for (String slayerName : SLAYER_NAMES) {

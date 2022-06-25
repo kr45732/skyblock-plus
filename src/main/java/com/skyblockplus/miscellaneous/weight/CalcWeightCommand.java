@@ -24,7 +24,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.miscellaneous.weight.senither.Weight;
+import com.skyblockplus.miscellaneous.weight.weight.Weight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.SkillsStruct;
@@ -41,7 +41,7 @@ public class CalcWeightCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder calculateWeight(String username, String profileName, String type, int amount) {
+	public static EmbedBuilder calculateWeight(String username, String profileName, String type, int amount, Player.WeightType weightType) {
 		if ((SLAYER_NAMES.contains(type) && amount > 500000000) || (!SLAYER_NAMES.contains(type) && amount > 100)) {
 			return invalidEmbed("Invalid amount");
 		}
@@ -68,12 +68,12 @@ public class CalcWeightCommand extends Command {
 					")",
 					false
 				);
-				Weight weight = new Weight(player).calculateWeight(type);
-				Weight predictedWeight = new Weight(player).calculateWeight(type);
-				WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight(type);
-				WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight(type, target);
+				Weight weight = Weight.of(weightType, player).calculateWeight(type);
+				Weight predictedWeight = Weight.of(weightType, player).calculateWeight(type);
+				WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight();
+				WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight( target);
 				eb.addField(
-					"Weight Change",
+					capitalizeString(weightType.name()) + " Weight Change",
 					"Total: " +
 					weight.getTotalWeight().getFormatted(false) +
 					" ➜ " +
@@ -109,8 +109,8 @@ public class CalcWeightCommand extends Command {
 					")",
 					false
 				);
-				Weight weight = new Weight(player).calculateWeight(type);
-				Weight predictedWeight = new Weight(player).calculateWeight(type);
+				Weight weight = Weight.of(weightType, player).calculateWeight(type);
+				Weight predictedWeight = Weight.of(weightType,player).calculateWeight(type);
 				WeightStruct pre = weight.getSkillsWeight().getSkillsWeight(type);
 				WeightStruct post = predictedWeight.getSkillsWeight().getSkillsWeight(type, target);
 				eb.addField(
@@ -119,7 +119,7 @@ public class CalcWeightCommand extends Command {
 					false
 				);
 				eb.addField(
-					"Weight Change",
+						capitalizeString(weightType.name()) + " Weight Change",
 					"Total: " +
 					weight.getTotalWeight().getFormatted(false) +
 					" ➜ " +
@@ -147,17 +147,17 @@ public class CalcWeightCommand extends Command {
 					")",
 					false
 				);
-				Weight weight = new Weight(player).calculateWeight(type);
-				Weight predictedWeight = new Weight(player).calculateWeight(type);
+				Weight weight = Weight.of( weightType,player).calculateWeight(type);
+				Weight predictedWeight = Weight.of(weightType,player).calculateWeight(type);
 				WeightStruct pre = weight.getSlayerWeight().getSlayerWeight(type);
 				WeightStruct post = predictedWeight.getSlayerWeight().getSlayerWeight(type, amount);
 				eb.addField(
-					"Slayer Change",
+					"Total Slayer XP Change",
 					roundAndFormat(player.getTotalSlayer()) + " ➜ " + roundAndFormat(player.getTotalSlayer(type, amount)),
 					false
 				);
 				eb.addField(
-					"Weight Change",
+						capitalizeString(weightType.name()) + " Weight Change",
 					"Total: " +
 					weight.getTotalWeight().getFormatted(false) +
 					" ➜ " +
@@ -187,6 +187,7 @@ public class CalcWeightCommand extends Command {
 
 				String type = getStringOption("type");
 				int amount = getIntOption("amount");
+				Player.WeightType weightType = getWeightTypeOption("system", Player.WeightType.SENITHER);
 
 				if (type == null) {
 					embed(invalidEmbed("Type is not provided or invalid"));
@@ -201,7 +202,7 @@ public class CalcWeightCommand extends Command {
 					return;
 				}
 
-				embed(calculateWeight(player, args.length == 3 ? args[2] : null, type, amount));
+				embed(calculateWeight(player, args.length == 3 ? args[2] : null, type, amount, weightType));
 			}
 		}
 			.queue();

@@ -21,29 +21,24 @@ package com.skyblockplus.miscellaneous.weight.lily;
 import static com.skyblockplus.utils.Constants.SLAYER_DEPRECATION_SCALING;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
+import com.skyblockplus.miscellaneous.weight.weight.SlayerWeight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
 
-public class SlayerWeight {
+public class LilySlayerWeight extends SlayerWeight {
 
-	private final Player player;
-	private final WeightStruct weightStruct;
-
-	public SlayerWeight(Player player) {
-		this.player = player;
-		this.weightStruct = new WeightStruct();
-	}
-
-	public WeightStruct getWeightStruct() {
-		return weightStruct;
+	public LilySlayerWeight(Player player) {
+		super(player);
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName) {
-		double slayerXp = player.getSlayer(slayerName);
+		return getSlayerWeight(slayerName, player.getSlayer(slayerName));
+	}
 
+	public WeightStruct getSlayerWeight(String slayerName, int currentSlayerXp) {
 		double score;
-		double d = slayerXp / 100000;
-		if (slayerXp >= 6416) {
+		double d = currentSlayerXp / 100000.0;
+		if (currentSlayerXp >= 6416) {
 			double D = (d - Math.pow(3, (-5.0 / 2))) * (d + Math.pow(3, -5.0 / 2));
 			double u = Math.cbrt(3 * (d + Math.sqrt(D)));
 			double v = Math.cbrt(3 * (d - Math.sqrt(D)));
@@ -54,25 +49,25 @@ public class SlayerWeight {
 
 		double scaleFactor = higherDepth(SLAYER_DEPRECATION_SCALING, slayerName).getAsDouble();
 		int intScore = (int) score;
-		double distance = slayerXp - actualInt(intScore);
+		double distance = currentSlayerXp - actualInt(intScore);
 		double effectiveDistance = distance * Math.pow(scaleFactor, intScore);
 		double effectiveScore = effectiveInt(intScore, scaleFactor) + effectiveDistance;
 		double weight;
 		switch (slayerName) {
 			case "rev":
-				weight = (effectiveScore / 8390.64) + (slayerXp / 1000000);
+				weight = (effectiveScore / 8390.64) + (currentSlayerXp / 1000000.0);
 				break;
 			case "tara":
-				weight = (effectiveScore / 7019.57) + ((slayerXp * 1.6) / 1000000);
+				weight = (effectiveScore / 7019.57) + ((currentSlayerXp * 1.6) / 1000000);
 				break;
 			case "sven":
-				weight = (effectiveScore / 2982.06) + ((slayerXp * 3.6) / 1000000);
+				weight = (effectiveScore / 2982.06) + ((currentSlayerXp * 3.6) / 1000000);
 				break;
 			case "enderman":
-				weight = (effectiveScore / 1118.81) + ((slayerXp * 10) / 1000000);
+				weight = (effectiveScore / 1118.81) + ((currentSlayerXp * 10.0) / 1000000);
 				break;
 			case "blaze":
-				weight = (effectiveScore / 751.281) + ((slayerXp * 15) / 1000000);
+				weight = (effectiveScore / 751.281) + ((currentSlayerXp * 15.0) / 1000000);
 				break;
 			default:
 				return null;

@@ -28,7 +28,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
-import com.skyblockplus.miscellaneous.weight.senither.Weight;
+import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
+import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.*;
@@ -1357,15 +1358,15 @@ public class Player {
 	}
 
 	public double getLilyWeight() {
-		return new com.skyblockplus.miscellaneous.weight.lily.Weight(this, true).getTotalWeight().getRaw();
+		return new LilyWeight(this, true).getTotalWeight().getRaw();
 	}
 
 	public double getWeight() {
-		return new Weight(this, true).getTotalWeight().getRaw();
+		return new SenitherWeight(this, true).getTotalWeight().getRaw();
 	}
 
 	public double getWeight(String... weightTypes) {
-		Weight weight = new Weight(this);
+		SenitherWeight weight = new SenitherWeight(this);
 		for (String weightType : weightTypes) {
 			if (SLAYER_NAMES.contains(weightType)) {
 				weight.getSlayerWeight().getSlayerWeight(weightType);
@@ -1374,7 +1375,7 @@ public class Player {
 			} else if (DUNGEON_CLASS_NAMES.contains(weightType)) {
 				weight.getDungeonsWeight().getClassWeight(weightType);
 			} else if (weightType.equals("catacombs")) {
-				weight.getDungeonsWeight().getDungeonWeight("catacombs");
+				weight.getDungeonsWeight().getDungeonWeight();
 			} else {
 				throw new IllegalArgumentException("Invalid weight type: " + weightType);
 			}
@@ -1709,6 +1710,11 @@ public class Player {
 		NONE,
 		SENITHER,
 		LILY,
+		;
+
+		public static WeightType of(String name) {
+			return valueOf(name.toUpperCase());
+		}
 	}
 
 	public enum Gamemode {
