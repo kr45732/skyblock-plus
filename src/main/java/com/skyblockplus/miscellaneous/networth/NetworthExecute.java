@@ -501,7 +501,8 @@ public class NetworthExecute {
 			pages.put(SelectOption.of("Overview", "overview").withEmoji(getEmojiObj("SKYBLOCK_MENU")), eb);
 
 			if (!echestStr.isEmpty()) {
-				pages.put(SelectOption.of("Ender Chest", "ender_chest").withEmoji(getEmojiObj("ENDER_CHEST")),
+				pages.put(
+					SelectOption.of("Ender Chest", "ender_chest").withEmoji(getEmojiObj("ENDER_CHEST")),
 					player
 						.defaultPlayerEmbed(" | Ender Chest")
 						.setDescription(
@@ -514,7 +515,8 @@ public class NetworthExecute {
 				);
 			}
 			if (!storageStr.isEmpty()) {
-				pages.put(SelectOption.of("Storage", "storage").withEmoji(getEmojiObj("SMALL_BACKPACK")),
+				pages.put(
+					SelectOption.of("Storage", "storage").withEmoji(getEmojiObj("SMALL_BACKPACK")),
 					player
 						.defaultPlayerEmbed(" | Storage")
 						.setDescription(
@@ -523,7 +525,8 @@ public class NetworthExecute {
 				);
 			}
 			if (!invStr.isEmpty()) {
-				pages.put(SelectOption.of("Inventory", "inventory").withEmoji(getEmojiObj("CHEST")),
+				pages.put(
+					SelectOption.of("Inventory", "inventory").withEmoji(getEmojiObj("CHEST")),
 					player
 						.defaultPlayerEmbed(" | Inventory")
 						.setDescription(
@@ -532,7 +535,8 @@ public class NetworthExecute {
 				);
 			}
 			if (!armorStr.isEmpty()) {
-				pages.put(SelectOption.of("Armor & Equipment", "armor_equipment").withEmoji(getEmojiObj("GOLD_CHESTPLATE")),
+				pages.put(
+					SelectOption.of("Armor & Equipment", "armor_equipment").withEmoji(getEmojiObj("GOLD_CHESTPLATE")),
 					player
 						.defaultPlayerEmbed(" | Armor & Equipment")
 						.setDescription(
@@ -541,7 +545,8 @@ public class NetworthExecute {
 				);
 			}
 			if (!wardrobeStr.isEmpty()) {
-				pages.put(SelectOption.of("Wardrobe", "wardrobe").withEmoji(getEmojiObj("ARMOR_STAND")),
+				pages.put(
+					SelectOption.of("Wardrobe", "wardrobe").withEmoji(getEmojiObj("ARMOR_STAND")),
 					player
 						.defaultPlayerEmbed(" | Wardrobe")
 						.setDescription(
@@ -554,7 +559,8 @@ public class NetworthExecute {
 				);
 			}
 			if (!petsStr.isEmpty()) {
-				pages.put(SelectOption.of("Pets", "pets").withEmoji(getEmojiObj("ENDER_DRAGON;4")),
+				pages.put(
+					SelectOption.of("Pets", "pets").withEmoji(getEmojiObj("ENDER_DRAGON;4")),
 					player
 						.defaultPlayerEmbed(" | Pets")
 						.setDescription(
@@ -563,7 +569,8 @@ public class NetworthExecute {
 				);
 			}
 			if (!talismanStr.isEmpty()) {
-				pages.put(SelectOption.of("Accessories", "accessories").withEmoji(getEmojiObj("MASTER_SKULL_TIER_7")),
+				pages.put(
+					SelectOption.of("Accessories", "accessories").withEmoji(getEmojiObj("MASTER_SKULL_TIER_7")),
 					player
 						.defaultPlayerEmbed(" | Accessories")
 						.setDescription(
@@ -576,7 +583,8 @@ public class NetworthExecute {
 				);
 			}
 			if (!personalVaultStr.isEmpty()) {
-				pages.put(SelectOption.of("Personal Vault", "personal_vault").withEmoji(getEmojiObj("IRON_CHEST")),
+				pages.put(
+					SelectOption.of("Personal Vault", "personal_vault").withEmoji(getEmojiObj("IRON_CHEST")),
 					player
 						.defaultPlayerEmbed(" | Personal Vault")
 						.setDescription(
@@ -609,7 +617,7 @@ public class NetworthExecute {
 			}
 			extras.addButton(Button.link("https://forms.gle/RBmN2AFBLafGyx5E7", "Bug In Calculations?"));
 			new SelectMenuPaginator(pages, "overview", extras, event);
-//			event.paginate(paginateBuilder.setPaginatorExtras(extras));
+			//			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 			return null;
 		}
 		return player.getFailEmbed();

@@ -18,7 +18,13 @@
 
 package com.skyblockplus.utils.command;
 
+import static com.skyblockplus.utils.Utils.ignore;
+import static com.skyblockplus.utils.Utils.waiter;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
@@ -28,74 +34,72 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.ignore;
-import static com.skyblockplus.utils.Utils.waiter;
-
 public class SelectMenuPaginator {
-    public Message message;
-    public String page;
-    public Map<String, EmbedBuilder> pages;
-    public PaginatorEvent event;
-    public SelectMenu.Builder selectMenu;
-    public PaginatorExtras extras;
 
-    public SelectMenuPaginator(Map<SelectOption, EmbedBuilder> pages, String page, PaginatorExtras extras, PaginatorEvent event) {
-        this.pages = pages.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getValue(), Map.Entry::getValue));
-        this.page = page;
-        this.extras = extras;
-        this.event = event;
-        this.selectMenu = SelectMenu.create("select_menu_paginator").addOptions(pages.keySet());
+	public Message message;
+	public String page;
+	public Map<String, EmbedBuilder> pages;
+	public PaginatorEvent event;
+	public SelectMenu.Builder selectMenu;
+	public PaginatorExtras extras;
 
-        event.getAction().editMessageEmbeds(this.pages.get(page).build()).setActionRows(ActionRow.of(extras.getButtons()), ActionRow.of(selectMenu.build())).get().queue(
-                m -> {
-                    message = m;
-                    waitForEvent();
-                }
-        );
-    }
+	public SelectMenuPaginator(Map<SelectOption, EmbedBuilder> pages, String page, PaginatorExtras extras, PaginatorEvent event) {
+		this.pages = pages.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getValue(), Map.Entry::getValue));
+		this.page = page;
+		this.extras = extras;
+		this.event = event;
+		this.selectMenu = SelectMenu.create("select_menu_paginator").addOptions(pages.keySet());
 
-    public boolean condition(SelectMenuInteractionEvent event) {
-        return event.isFromGuild() &&
-                event.getUser().getId().equals(this.event.getUser().getId()) &&
-                event.getMessageId().equals(message.getId());
-    }
+		event
+			.getAction()
+			.editMessageEmbeds(this.pages.get(page).build())
+			.setActionRows(ActionRow.of(extras.getButtons()), ActionRow.of(selectMenu.build()))
+			.get()
+			.queue(m -> {
+				message = m;
+				waitForEvent();
+			});
+	}
 
-    public void action(SelectMenuInteractionEvent event) {
-        page = event.getSelectedOptions().get(0).getValue();
-        event.editMessageEmbeds(this.pages.get(page).build()).queue(
-                m -> {
-                    message = event.getMessage();
-                    waitForEvent();
-                }
-        );
-    }
+	public boolean condition(SelectMenuInteractionEvent event) {
+		return (
+			event.isFromGuild() &&
+			event.getUser().getId().equals(this.event.getUser().getId()) &&
+			event.getMessageId().equals(message.getId())
+		);
+	}
 
-    public void waitForEvent() {
-        waiter.waitForEvent(
-                SelectMenuInteractionEvent.class,
-                this::condition,
-                this::action,
-                1,
-                TimeUnit.MINUTES,
-                () -> {
-                    if (!message.getActionRows().isEmpty()) {
-                        List<Button> buttons = message
-                                .getButtons()
-                                .stream()
-                                .filter(b -> b.getStyle() == ButtonStyle.LINK)
-                                .collect(Collectors.toList());
-                        if (buttons.isEmpty()) {
-                            message.editMessageComponents().queue(ignore, ignore);
-                        } else {
-                            message.editMessageComponents(ActionRow.of(buttons)).queue(ignore, ignore);
-                        }
-                    }
-                }
-        );
-    }
+	public void action(SelectMenuInteractionEvent event) {
+		page = event.getSelectedOptions().get(0).getValue();
+		event
+			.editMessageEmbeds(this.pages.get(page).build())
+			.queue(m -> {
+				message = event.getMessage();
+				waitForEvent();
+			});
+	}
+
+	public void waitForEvent() {
+		waiter.waitForEvent(
+			SelectMenuInteractionEvent.class,
+			this::condition,
+			this::action,
+			1,
+			TimeUnit.MINUTES,
+			() -> {
+				if (!message.getActionRows().isEmpty()) {
+					List<Button> buttons = message
+						.getButtons()
+						.stream()
+						.filter(b -> b.getStyle() == ButtonStyle.LINK)
+						.collect(Collectors.toList());
+					if (buttons.isEmpty()) {
+						message.editMessageComponents().queue(ignore, ignore);
+					} else {
+						message.editMessageComponents(ActionRow.of(buttons)).queue(ignore, ignore);
+					}
+				}
+			}
+		);
+	}
 }
