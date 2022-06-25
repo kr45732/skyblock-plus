@@ -68,7 +68,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				break;
 			case "leaderboard":
 			case "lb":
-				event.paginate(SkyblockEventCommand.getEventLeaderboard(new PaginatorEvent(event)));
+				event.paginate(SkyblockEventCommand.getEventLeaderboard(event.getGuild(), event.getUser(), new PaginatorEvent(event), null));
 				break;
 			case "end":
 				if (database.getSkyblockEventActive(event.getGuild().getId())) {

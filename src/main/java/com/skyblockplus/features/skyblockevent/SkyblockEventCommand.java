@@ -46,6 +46,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,6 +155,7 @@ public class SkyblockEventCommand extends Command {
 		}
 		String hypixelKey = key;
 
+		guildMap.get(guildId).setEventCurrentlyUpdating(true);
 		for (JsonElement guildMember : membersArr) {
 			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 			String guildMemberProfile = higherDepth(guildMember, "profileName").getAsString();
@@ -278,22 +280,19 @@ public class SkyblockEventCommand extends Command {
 		if (guildId.equals("602137436490956820")) {
 			executor.submit(() -> postJson("https://soopymc.my.to/api/soopyv2/lbdatathing", gson.toJsonTree(guildMemberPlayersList)));
 		}
+		guildMap.get(guildId).setEventCurrentlyUpdating(false);
 		return guildMemberPlayersList;
 	}
 
-	public static EmbedBuilder getEventLeaderboard(ButtonInteractionEvent event) {
-		String guildId = event.getGuild().getId();
+	public static EmbedBuilder getEventLeaderboard(Guild guild, User user, PaginatorEvent paginatorEvent, ButtonInteractionEvent buttonEvent) {
+		String guildId = guild.getId();
 		if (!database.getSkyblockEventActive(guildId)) {
 			return defaultEmbed("No event running");
 		}
 
-		if (!guildMap.containsKey(guildId)) {
-			return defaultEmbed("No guild found");
-		}
-
 		AutomaticGuild currentGuild = guildMap.get(guildId);
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(25);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(user).setColumns(1).setItemsPerPage(25);
 
 		if (
 			(currentGuild.eventMemberList != null) &&
@@ -314,91 +313,32 @@ public class SkyblockEventCommand extends Command {
 			}
 
 			if (paginateBuilder.size() > 0) {
-				paginateBuilder
-					.updateExtras(extra ->
-						extra
-							.setEveryPageTitle("Event Leaderboard")
-							.setEveryPageText("**Last Updated:** <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>\n")
-					)
-					.build()
-					.paginate(event.getHook(), 0);
+				if(paginatorEvent != null) {
+					paginatorEvent.paginate(
+							paginateBuilder.updateExtras(extra ->
+									extra
+											.setEveryPageTitle("Event Leaderboard")
+											.setEveryPageText("**Last Updated <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>**\n")
+							)
+					);
+				}else{
+					paginateBuilder
+							.updateExtras(extra ->
+									extra
+											.setEveryPageTitle("Event Leaderboard")
+											.setEveryPageText("**Last Updated:** <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>\n")
+							)
+							.build()
+							.paginate(buttonEvent.getHook(), 0);
+				}
 				return null;
 			}
 
 			return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
 		}
 
-		JsonElement runningSettings = database.getSkyblockEventSettings(guildId);
-		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings, guildId);
-		if (guildMemberPlayersList == null) {
-			return invalidEmbed("A Hypixel API key must be set for events with over 45 members");
-		}
-
-		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
-			EventMember eventMember = guildMemberPlayersList.get(i);
-			paginateBuilder.addItems(
-				"`" +
-				(i + 1) +
-				")` " +
-				fixUsername(eventMember.getUsername()) +
-				" | +" +
-				formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
-			);
-		}
-
-		paginateBuilder.getPaginatorExtras().setEveryPageTitle("Event Leaderboard");
-
-		guildMap.get(guildId).setEventMemberList(guildMemberPlayersList);
-		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
-
-		if (paginateBuilder.size() > 0) {
-			paginateBuilder.build().paginate(event.getHook(), 0);
-			return null;
-		}
-
-		return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
-	}
-
-	public static EmbedBuilder getEventLeaderboard(PaginatorEvent event) {
-		String guildId = event.getGuild().getId();
-		if (!database.getSkyblockEventActive(guildId)) {
-			return defaultEmbed("No event running");
-		}
-
-		AutomaticGuild currentGuild = guildMap.get(guildId);
-
-		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(25);
-
-		if (
-			(currentGuild.eventMemberList != null) &&
-			(currentGuild.eventMemberListLastUpdated != null) &&
-			(Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes() < 15)
-		) {
-			List<EventMember> eventMemberList = currentGuild.eventMemberList;
-			for (int i = 0; i < eventMemberList.size(); i++) {
-				EventMember eventMember = eventMemberList.get(i);
-				paginateBuilder.addItems(
-					"`" +
-					(i + 1) +
-					")` " +
-					fixUsername(eventMember.getUsername()) +
-					" | +" +
-					formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
-				);
-			}
-
-			if (paginateBuilder.size() > 0) {
-				event.paginate(
-					paginateBuilder.updateExtras(extra ->
-						extra
-							.setEveryPageTitle("Event Leaderboard")
-							.setEveryPageText("**Last Updated <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>**\n")
-					)
-				);
-				return null;
-			}
-
-			return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
+		if(currentGuild.eventCurrentlyUpdating){
+			return invalidEmbed("The leaderboard is currently updating, please try again in a couple of seconds");
 		}
 
 		JsonElement runningSettings = database.getSkyblockEventSettings(guildId);
@@ -425,7 +365,11 @@ public class SkyblockEventCommand extends Command {
 		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
 
 		if (paginateBuilder.size() > 0) {
-			event.paginate(paginateBuilder);
+			if(paginatorEvent != null) {
+				paginatorEvent.paginate(paginateBuilder);
+			}else{
+				paginateBuilder.build().paginate(buttonEvent.getHook(), 0);
+			}
 			return null;
 		}
 
@@ -719,7 +663,7 @@ public class SkyblockEventCommand extends Command {
 							return;
 						}
 						case "leaderboard", "lb" -> {
-							paginate(getEventLeaderboard(getPaginatorEvent()));
+							paginate(getEventLeaderboard(event.getGuild(), event.getAuthor(), getPaginatorEvent(), null));
 							return;
 						}
 						case "end" -> {

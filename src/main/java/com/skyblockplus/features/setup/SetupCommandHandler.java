@@ -28,7 +28,6 @@ import com.google.gson.JsonObject;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.settings.SettingsExecute;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;

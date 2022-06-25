@@ -21,7 +21,6 @@ package com.skyblockplus.utils;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -1393,7 +1392,7 @@ public class Player {
 	}
 
 	public CustomPaginator.Builder defaultPlayerPaginator(User... users) {
-		return defaultPlayerPaginator(PaginatorExtras.PaginatorType.DEFAULT);
+		return defaultPlayerPaginator(PaginatorExtras.PaginatorType.DEFAULT, users);
 	}
 
 	public CustomPaginator.Builder defaultPlayerPaginator(PaginatorExtras.PaginatorType type, User... users) {

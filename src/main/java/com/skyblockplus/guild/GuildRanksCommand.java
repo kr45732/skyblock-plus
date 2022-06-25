@@ -130,6 +130,12 @@ public class GuildRanksCommand extends Command {
 				guildMemberPlayersList = guildCache.getCache(gamemode);
 				lastUpdated = guildCache.getLastUpdated();
 			} else {
+				if(hypixelGuildQueue.contains(guildId)){
+					return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
+				}
+
+				hypixelGuildQueue.add(guildId);
+
 				HypixelGuildCache newGuildCache = new HypixelGuildCache();
 				List<CompletableFuture<String>> futuresList = new ArrayList<>();
 
@@ -170,6 +176,8 @@ public class GuildRanksCommand extends Command {
 
 				guildMemberPlayersList = newGuildCache.getCache(gamemode);
 				hypixelGuildsCacheMap.put(guildId, newGuildCache.setLastUpdated());
+
+				hypixelGuildQueue.remove(guildId);
 			}
 
 			for (String lbM : guildMemberPlayersList) {

@@ -87,6 +87,12 @@ public class GuildStatisticsCommand extends Command {
 			guildMemberPlayersList = guildCache.getCache();
 			lastUpdated = guildCache.getLastUpdated();
 		} else {
+			if(hypixelGuildQueue.contains(guildId)){
+				return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
+			}
+
+			hypixelGuildQueue.add(guildId);
+
 			HypixelGuildCache newGuildCache = new HypixelGuildCache();
 			JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
 			List<CompletableFuture<String>> futuresList = new ArrayList<>();
@@ -128,6 +134,8 @@ public class GuildStatisticsCommand extends Command {
 
 			guildMemberPlayersList = newGuildCache.getCache();
 			hypixelGuildsCacheMap.put(guildId, newGuildCache.setLastUpdated());
+
+			hypixelGuildQueue.remove(guildId);
 		}
 
 		List<String> slayerLb = guildMemberPlayersList

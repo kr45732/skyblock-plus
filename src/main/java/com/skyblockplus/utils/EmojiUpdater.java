@@ -169,7 +169,7 @@ public class EmojiUpdater {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-				} else if (ENCHANT_NAMES.contains(split)) {
+				} else if (ENCHANT_NAMES.contains(split[0])) {
 					out.addProperty(sbItem, enchantedBook.getPath());
 				}
 			}
@@ -535,11 +535,6 @@ public class EmojiUpdater {
 
 		for (File file : new File("src/main/java/com/skyblockplus/json/enchanted_images").listFiles()) {
 			if (file.length() > 250000) {
-				String command =
-					"gifsicle -i " +
-					file.getPath() +
-					" -O3 --colors 256 -o src/main/java/com/skyblockplus/json/compressed_images" +
-					file.getName();
 				try {
 					ProcessBuilder builder = new ProcessBuilder(
 						"gifsicle",

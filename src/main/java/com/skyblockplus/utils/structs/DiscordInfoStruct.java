@@ -39,7 +39,4 @@ public record DiscordInfoStruct(String discordTag, String username, String uuid,
 		return discordTag == null || username == null || uuid == null;
 	}
 
-	public EmbedBuilder getFailEmbed() {
-		return invalidEmbed(failCause);
-	}
 }

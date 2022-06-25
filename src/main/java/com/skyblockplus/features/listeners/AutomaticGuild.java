@@ -34,12 +34,10 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
-import com.skyblockplus.dungeons.CalcRunsCommand;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.event.EventGuild;
 import com.skyblockplus.features.jacob.JacobGuild;
-import com.skyblockplus.features.mayor.MayorHandler;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
@@ -110,8 +108,9 @@ public class AutomaticGuild {
 	public SkyblockEventHandler skyblockEventHandler = null;
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
+	public boolean eventCurrentlyUpdating = false;
 	/* Event */
-	public EventGuild eventGuild;
+	public final EventGuild eventGuild;
 	/* Fetchur */
 	public TextChannel fetchurChannel = null;
 	public Role fetchurPing = null;
@@ -382,7 +381,7 @@ public class AutomaticGuild {
 
 	/* Verify Methods */
 	public void verifyConstructor(GenericGuildEvent event, JsonElement currentSettings) {
-		verifyGuild = new VerifyGuild(guildId);
+		verifyGuild = new VerifyGuild();
 		if (currentSettings == null) {
 			return;
 		}
@@ -406,7 +405,7 @@ public class AutomaticGuild {
 					if (reactMessage != null) {
 						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
 
-						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings, guildId);
+						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
 						return;
 					}
 				} catch (Exception ignored) {}
@@ -420,7 +419,7 @@ public class AutomaticGuild {
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
 				database.setVerifySettings(event.getGuild().getId(), newSettings);
 
-				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings, guildId);
+				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings);
 			}
 		} catch (Exception e) {
 			log.error("Verify constructor error - " + event.getGuild().getId(), e);
@@ -448,12 +447,12 @@ public class AutomaticGuild {
 					if (reactMessage != null) {
 						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
 
-						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings, guildId);
+						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
 						return "Reloaded";
 					}
 				} catch (Exception ignored) {}
 
-				verifyGuild = new VerifyGuild(guildId); // Prevent the old settings from deleting the new message
+				verifyGuild = new VerifyGuild(); // Prevent the old settings from deleting the new message
 
 				Message reactMessage = reactChannel
 					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
@@ -464,10 +463,10 @@ public class AutomaticGuild {
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
 				database.setVerifySettings(guild.getId(), newSettings);
 
-				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings, guildId);
+				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings);
 				return "Reloaded";
 			} else {
-				verifyGuild = new VerifyGuild(guildId);
+				verifyGuild = new VerifyGuild();
 				return "Not enabled";
 			}
 		} catch (Exception e) {
@@ -845,6 +844,10 @@ public class AutomaticGuild {
 		this.skyblockEventHandler = skyblockEventHandler;
 	}
 
+	public void setEventCurrentlyUpdating(boolean eventCurrentlyUpdating){
+		this.eventCurrentlyUpdating = eventCurrentlyUpdating;
+	}
+
 	/* Fetchur */
 	public void setFetchurChannel(TextChannel channel) {
 		this.fetchurChannel = channel;
@@ -1108,7 +1111,7 @@ public class AutomaticGuild {
 					if (event.getComponentId().equals("event_message_join")) {
 						event.getHook().editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(null, event.getMember()).build()).queue();
 					} else {
-						EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
+						EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event.getGuild(), event.getUser(), null, event);
 						if (eb != null) {
 							event.getHook().editOriginalEmbeds(eb.build()).queue();
 						}

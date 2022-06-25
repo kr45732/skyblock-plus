@@ -21,12 +21,10 @@ package com.skyblockplus.api.miscellaneous;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.general.help.HelpCommand;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

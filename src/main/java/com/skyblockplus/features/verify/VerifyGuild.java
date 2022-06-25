@@ -33,23 +33,20 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class VerifyGuild {
 
-	public final String guildId;
 	public TextChannel messageChannel;
 	public Message originalMessage;
 	public JsonElement verifySettings;
 	public final boolean enable;
 
-	public VerifyGuild(TextChannel messageChannel, Message originalMessage, JsonElement verifySettings, String guildId) {
+	public VerifyGuild(TextChannel messageChannel, Message originalMessage, JsonElement verifySettings) {
 		this.messageChannel = messageChannel;
 		this.originalMessage = originalMessage;
 		this.verifySettings = verifySettings;
-		this.guildId = guildId;
 		this.enable = true;
 	}
 
-	public VerifyGuild(String guildId) {
+	public VerifyGuild() {
 		this.enable = false;
-		this.guildId = guildId;
 	}
 
 	public boolean onGuildMessageReceived(MessageReceivedEvent event) {

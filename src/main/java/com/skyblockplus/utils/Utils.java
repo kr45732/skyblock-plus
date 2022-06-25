@@ -117,6 +117,7 @@ public class Utils {
 	public static final AtomicInteger remainingLimit = new AtomicInteger(240);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final ConcurrentHashMap<String, HypixelKeyRecord> keyCooldownMap = new ConcurrentHashMap<>();
+	public static final List<String> hypixelGuildQueue = Collections.synchronizedList(new ArrayList<>());
 	public static final Cache<String, HypixelGuildCache> hypixelGuildsCacheMap = Caffeine
 		.newBuilder()
 		.expireAfterWrite(15, TimeUnit.MINUTES)

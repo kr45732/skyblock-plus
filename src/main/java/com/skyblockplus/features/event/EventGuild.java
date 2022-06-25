@@ -25,9 +25,8 @@ import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import java.util.*;
-import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 public class EventGuild {

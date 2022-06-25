@@ -126,9 +126,9 @@ public class LoreRenderer {
 				for (char ch : text.toCharArray()) {
 					Glyph glpyh = getGlyph(ch);
 					if (bold) {
-						glpyh.renderOnto(graphics, x + scale, y, scale, false);
+						glpyh.renderOnto(graphics, x + scale, y, scale);
 					}
-					glpyh.renderOnto(graphics, x, y, scale, false);
+					glpyh.renderOnto(graphics, x, y, scale);
 					x += glpyh.getWidth() * scale;
 					if (bold) {
 						x += scale;
@@ -227,7 +227,7 @@ public class LoreRenderer {
 	}
 
 	private interface Glyph {
-		void renderOnto(Graphics2D graphics, int xPos, int yPos, int scale, boolean bold);
+		void renderOnto(Graphics2D graphics, int xPos, int yPos, int scale);
 
 		int getWidth();
 	}
@@ -235,7 +235,7 @@ public class LoreRenderer {
 	private static class SpaceGlyph implements Glyph {
 
 		@Override
-		public void renderOnto(Graphics2D graphics, int xPos, int yPos, int scale, boolean bold) {}
+		public void renderOnto(Graphics2D graphics, int xPos, int yPos, int scale) {}
 
 		@Override
 		public int getWidth() {
@@ -246,7 +246,7 @@ public class LoreRenderer {
 	private static class MissingGlyph implements Glyph {
 
 		@Override
-		public void renderOnto(Graphics2D graphics, int xPos, int yPos, int scale, boolean bold) {
+		public void renderOnto(Graphics2D graphics, int xPos, int yPos, int scale) {
 			graphics.drawRect(xPos, yPos, GLYPH_SIZE * scale, GLYPH_SIZE * scale);
 		}
 
@@ -269,7 +269,7 @@ public class LoreRenderer {
 		}
 
 		@Override
-		public void renderOnto(Graphics2D graphics, int xPos, int yPos, int scale, boolean bold) {
+		public void renderOnto(Graphics2D graphics, int xPos, int yPos, int scale) {
 			int actualScale = scale / this.scale;
 			for (int x = 0; x < GLYPH_SIZE * this.scale; x++) {
 				for (int y = 0; y < GLYPH_SIZE * this.scale; y++) {
