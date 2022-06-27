@@ -18,6 +18,8 @@
 
 package com.skyblockplus.guild;
 
+import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedGuildTypesSubList;
+
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -29,8 +31,6 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
-
-import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedGuildTypesSubList;
 
 @Component
 public class GuildLeaderboardSlashCommand extends SlashCommand {

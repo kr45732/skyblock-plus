@@ -46,11 +46,7 @@ public class HypixelGuildCache {
 	}
 
 	public static int typeToIndex(String type) {
-		return IntStream
-			.range(0, guildTypes.size())
-			.filter(i -> guildTypes.get(i).equals(type))
-			.findFirst()
-			.orElse(-1);
+		return IntStream.range(0, guildTypes.size()).filter(i -> guildTypes.get(i).equals(type)).findFirst().orElse(-1);
 	}
 
 	public static String getStringFromCache(String cache, String type) {

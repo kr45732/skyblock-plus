@@ -49,7 +49,8 @@ import org.slf4j.LoggerFactory;
 
 public class LeaderboardDatabase {
 
-	public static final List<String> types = new ArrayList<>(List.of(
+	public static final List<String> types = new ArrayList<>(
+		List.of(
 			"username",
 			"uuid",
 			"slayer",
@@ -74,7 +75,8 @@ public class LeaderboardDatabase {
 			"blaze",
 			"lily_weight",
 			"coins"
-	));
+		)
+	);
 	public static final List<String> typesSubList = new ArrayList<>();
 	public static final List<String> formattedTypesSubList = new ArrayList<>();
 
@@ -91,7 +93,9 @@ public class LeaderboardDatabase {
 		formattedTypesSubList.addAll(typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList()));
 
 		guildTypesSubList.addAll(guildTypes.subList(2, guildTypes.size()));
-		formattedGuildTypesSubList.addAll(guildTypesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList()));
+		formattedGuildTypesSubList.addAll(
+			guildTypesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList())
+		);
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
