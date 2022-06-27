@@ -21,6 +21,7 @@ package com.skyblockplus.utils.command;
 import static com.skyblockplus.utils.Utils.ignore;
 import static com.skyblockplus.utils.Utils.waiter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -36,24 +37,25 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 
 public class SelectMenuPaginator {
 
-	public Message message;
-	public String page;
-	public Map<String, EmbedBuilder> pages;
-	public PaginatorEvent event;
-	public SelectMenu.Builder selectMenu;
-	public PaginatorExtras extras;
+	private final Map<String, EmbedBuilder> pages;
+	private final PaginatorEvent event;
+	private Message message;
+	private String page;
 
 	public SelectMenuPaginator(Map<SelectOption, EmbedBuilder> pages, String page, PaginatorExtras extras, PaginatorEvent event) {
 		this.pages = pages.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getValue(), Map.Entry::getValue));
 		this.page = page;
-		this.extras = extras;
 		this.event = event;
-		this.selectMenu = SelectMenu.create("select_menu_paginator").addOptions(pages.keySet());
 
+		List<ActionRow> actionRows = new ArrayList<>();
+		if(!extras.getButtons().isEmpty()){
+			actionRows.add(ActionRow.of(extras.getButtons()));
+		}
+		actionRows.add(ActionRow.of(SelectMenu.create("select_menu_paginator").addOptions(pages.keySet()).build()));
 		event
 			.getAction()
 			.editMessageEmbeds(this.pages.get(page).build())
-			.setActionRows(ActionRow.of(extras.getButtons()), ActionRow.of(selectMenu.build()))
+			.setActionRows(actionRows)
 			.get()
 			.queue(m -> {
 				message = m;

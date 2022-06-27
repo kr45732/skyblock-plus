@@ -27,9 +27,14 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
+
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.skyblockplus.utils.command.SelectMenuPaginator;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.apache.groovy.util.Maps;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +50,7 @@ public class CrimsonCommand extends Command {
 	public static EmbedBuilder getCrimson(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 
 			JsonElement crimsonJson = higherDepth(player.profileJson(), "nether_island_player_data");
 
@@ -76,7 +81,7 @@ public class CrimsonCommand extends Command {
 					"\n**Title:** " +
 					title
 				);
-			extras.addEmbedPage(eb);
+			pages.put(SelectOption.of("Stats", "stats"), eb);
 
 			List<String> allFish = List.of(
 				"gusher",
@@ -128,7 +133,7 @@ public class CrimsonCommand extends Command {
 					true
 				);
 			}
-			extras.addEmbedPage(eb);
+			pages.put(SelectOption.of("Trophy Fishing", "trophy_fishing"), eb);
 
 			int basic = higherDepth(crimsonJson, "kuudra_completed_tiers.none", 0);
 			int hot = higherDepth(crimsonJson, "kuudra_completed_tiers.hot", 0);
@@ -162,7 +167,7 @@ public class CrimsonCommand extends Command {
 						" Infernal: " +
 						infernal
 					);
-			extras.addEmbedPage(eb);
+			pages.put(SelectOption.of("Kuudra", "kuudra"), eb);
 
 			eb = player.defaultPlayerEmbed();
 			Map<String, String> dojoQuests = Maps.of(
@@ -207,9 +212,9 @@ public class CrimsonCommand extends Command {
 				belt = "None";
 			}
 			eb.setDescription("**Total Points:** " + formatNumber(totalPoints) + "\n**Belt:** " + belt);
-			extras.addEmbedPage(eb);
+			pages.put(SelectOption.of("Dojo", "dojo"), eb);
 
-			event.paginate(event.getPaginator().setPaginatorExtras(extras));
+			new SelectMenuPaginator(pages, "stats", new PaginatorExtras(), event);
 			return null;
 		}
 		return player.getFailEmbed();
