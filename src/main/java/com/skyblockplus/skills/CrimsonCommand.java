@@ -27,12 +27,10 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
-
+import com.skyblockplus.utils.command.SelectMenuPaginator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.skyblockplus.utils.command.SelectMenuPaginator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.apache.groovy.util.Maps;

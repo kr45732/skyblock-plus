@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.defaultPaginator;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import java.io.File;
 import java.util.Collection;
-
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;

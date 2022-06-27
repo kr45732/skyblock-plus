@@ -48,7 +48,7 @@ public class SelectMenuPaginator {
 		this.event = event;
 
 		List<ActionRow> actionRows = new ArrayList<>();
-		if(!extras.getButtons().isEmpty()){
+		if (!extras.getButtons().isEmpty()) {
 			actionRows.add(ActionRow.of(extras.getButtons()));
 		}
 		actionRows.add(ActionRow.of(SelectMenu.create("select_menu_paginator").addOptions(pages.keySet()).build()));
