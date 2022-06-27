@@ -221,7 +221,7 @@ public class Player {
 	}
 
 	/**
-	 * <b>Meant to only be used for leaderboard command</b>
+	 * Meant to only be used for leaderboard command
 	 */
 	public Player(String username, Gamemode gamemode) {
 		if (usernameToUuid(username)) {

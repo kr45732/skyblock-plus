@@ -19,18 +19,27 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
+
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import org.bson.Document;
 
 public class LeaderboardPaginator {
@@ -39,8 +48,8 @@ public class LeaderboardPaginator {
 	private final Message message;
 	private final String lbType;
 	private final Player.Gamemode gamemode;
-	private final Player player;
 	private final PaginatorEvent event;
+	private String player;
 	private int pageFirstRank;
 	private int playerRank = -1;
 	private String playerAmount = "Not on leaderboard";
@@ -57,7 +66,7 @@ public class LeaderboardPaginator {
 	) {
 		this.lbType = lbType;
 		this.gamemode = gamemode;
-		this.player = player;
+		this.player = player.getUsername();
 		this.event = event;
 		this.message = event.getLoadingMessage();
 
@@ -103,12 +112,8 @@ public class LeaderboardPaginator {
 		event
 			.getAction()
 			.editMessageEmbeds(getRender().build())
-			.setActionRow(
-				Button
-					.primary("leaderboard_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
-					.withDisabled(pageFirstRank == 1),
-				Button.primary("leaderboard_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
-			)
+			.setActionRows(
+				getActionRow())
 			.get()
 			.queue(ignored -> waitForEvent());
 	}
@@ -143,9 +148,9 @@ public class LeaderboardPaginator {
 			.setDescription(
 				isPlayer
 					? "**Player:** " +
-					player.getUsernameFixed() +
+						fixUsername(player) +
 					"\n**Rank:** " +
-					(playerRank == -1 ? "Not on leaderboard" : "#" + (playerRank)) +
+					(playerRank == -1 ? "Not on leaderboard" : "#" + playerRank) +
 					"\n**" +
 					capitalizeString(lbType.replace("_", " ")) +
 					":** " +
@@ -180,24 +185,137 @@ public class LeaderboardPaginator {
 			if (!leaderboardCache.containsKey(pageFirstRank)) {
 				leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, pageFirstRank - 19, pageFirstRank + 199));
 			}
+		} else if(event.getComponentId().equals("leaderboard_paginator_search_button")){
+			event.replyModal(Modal.create("leaderboard_paginator_search_modal_" + event.getMessageId(), "Search")
+							.addActionRows(
+									ActionRow.of(TextInput.create("rank", "Rank", TextInputStyle.SHORT)
+											.setRequired(false)
+											.build()),
+									ActionRow.of(TextInput.create("amount", "Amount", TextInputStyle.SHORT)
+											.setRequired(false)
+											.build()),
+									ActionRow.of(TextInput.create("page", "Page", TextInputStyle.SHORT)
+											.setRequired(false)
+											.build()),
+									ActionRow.of(TextInput.create("player", "Player", TextInputStyle.SHORT)
+											.setRequired(false)
+											.build())
+							)
+					.build()).queue(ignored -> waitForEventModal(), ignored -> waitForEventModal());
+			return;
 		}
 
 		event
 			.editMessageEmbeds(getRender().build())
-			.setActionRow(
-				Button
-					.primary("leaderboard_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
-					.withDisabled(pageFirstRank == 1),
-				Button.primary("leaderboard_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+			.setActionRows(
+				getActionRow()
 			)
 			.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
 	}
 
 	private void waitForEvent() {
 		waiter.waitForEvent(
-			ButtonInteractionEvent.class,
-			this::condition,
-			this::action,
+				ButtonInteractionEvent.class,
+				this::condition,
+				this::action,
+				1,
+				TimeUnit.MINUTES,
+				() -> message.editMessageComponents().queue(ignore, ignore)
+		);
+	}
+
+	private boolean conditionModal(ModalInteractionEvent event) {
+		return (
+				event.isFromGuild() &&
+						event.getUser().getId().equals(this.event.getUser().getId()) &&
+						event.getModalId().equals("leaderboard_paginator_search_modal_" + message.getId())
+		);
+	}
+
+	public void actionModal(ModalInteractionEvent event) {
+		int rank = -1;
+		double amount = -1;
+		int page = -1;
+		UsernameUuidStruct player = null;
+
+		try {
+			rank = Integer.parseInt(event.getValue("rank").getAsString());
+		}catch (Exception ignored){}
+		try {
+			amount = Double.parseDouble(event.getValue("amount").getAsString());
+		}catch (Exception ignored){}
+		try {
+			page = Integer.parseInt(event.getValue("page").getAsString());
+		}catch (Exception ignored){}
+		try{
+			player = usernameToUuid(event.getValue("player").getAsString());
+			player = player.isNotValid() ? null : player;
+		}catch (Exception ignored){}
+
+		if (rank != -1) {
+			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, rank - 200, rank + 200));
+			isPlayer = false;
+		} else if (amount != -1) {
+			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, amount));
+			isPlayer = false;
+		} else if (page != -1) {
+			page = Math.max(1, page);
+			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
+			isPlayer = false;
+		} else if(player != null) {
+			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.uuid()));
+			this.player = player.username();
+			isPlayer = true;
+		}
+
+		double closestAmt = -1;
+		int idx = 1;
+		for (Map.Entry<Integer, Document> entry : leaderboardCache.entrySet()) {
+			int curRank = entry.getValue().getInteger("rank");
+			double curAmount = entry.getValue().get(lbType, 0.0);
+
+			if (player != null && entry.getValue().get("username", "").equals(player.username())) {
+				playerRank = curRank;
+				playerAmount = roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount);
+			}
+
+			if (amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)) {
+				closestAmt = Math.abs(curAmount - amount);
+				idx = curRank;
+			}
+		}
+
+		if (rank != -1) {
+			pageFirstRank = ((rank - 1) / 20) * 20 + 1;
+		} else if (amount != -1) {
+			pageFirstRank = ((idx - 1) / 20) * 20 + 1;
+		} else if (page != -1) {
+			pageFirstRank = (page - 1) * 20 + 1;
+		} else if (player != null){
+			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
+		}
+
+		event
+				.editMessageEmbeds(getRender().build())
+				.setActionRows(
+						getActionRow())
+				.queue(ignored -> waitForEvent());
+	}
+
+	private ActionRow getActionRow(){
+		return ActionRow.of(Button
+						.primary("leaderboard_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
+						.withDisabled(pageFirstRank == 1),
+				Button.primary("leaderboard_paginator_search_button", "Search").withEmoji(Emoji.fromUnicode("\uD83D\uDD0E")),
+				Button.primary("leaderboard_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+		);
+	}
+
+	private void waitForEventModal() {
+		waiter.waitForEvent(
+			ModalInteractionEvent.class,
+			this::conditionModal,
+			this::actionModal,
 			1,
 			TimeUnit.MINUTES,
 			() -> message.editMessageComponents().queue(ignore, ignore)
