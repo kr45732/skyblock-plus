@@ -21,6 +21,7 @@ package com.skyblockplus.utils.database;
 import static com.skyblockplus.utils.ApiHandler.asyncSkyblockProfilesFromUuid;
 import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
 import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
+import static com.skyblockplus.utils.Player.STATS_LIST;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -35,14 +36,12 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.apache.commons.collections4.ListUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -50,8 +49,7 @@ import org.slf4j.LoggerFactory;
 
 public class LeaderboardDatabase {
 
-	public static final List<String> types = ListUtils.union(
-		List.of(
+	public static final List<String> types = new ArrayList<>(List.of(
 			"username",
 			"uuid",
 			"slayer",
@@ -75,13 +73,27 @@ public class LeaderboardDatabase {
 			"networth",
 			"blaze",
 			"lily_weight",
-			"deaths",
-			"kills",
-			"highest_damage",
 			"coins"
-		),
-		COLLECTION_NAME_TO_ID.keySet().stream().toList()
-	);
+	));
+	public static final List<String> typesSubList = new ArrayList<>();
+	public static final List<String> formattedTypesSubList = new ArrayList<>();
+
+	public static final List<String> guildTypes = new ArrayList<>();
+	public static final List<String> guildTypesSubList = new ArrayList<>();
+	public static final List<String> formattedGuildTypesSubList = new ArrayList<>();
+
+	static {
+		types.addAll(COLLECTION_NAME_TO_ID.keySet());
+		guildTypes.addAll(types);
+		types.addAll(STATS_LIST);
+
+		typesSubList.addAll(types.subList(2, types.size()));
+		formattedTypesSubList.addAll(typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList()));
+
+		guildTypesSubList.addAll(guildTypes.subList(2, guildTypes.size()));
+		formattedGuildTypesSubList.addAll(guildTypesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList()));
+	}
+
 	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
 
 	private final MongoClient dataSource;
@@ -146,7 +158,7 @@ public class LeaderboardDatabase {
 			updates.add(Updates.set("last_updated", Instant.now().toEpochMilli()));
 			updates.add(Updates.set("username", player.getUsername()));
 			updates.add(Updates.set("uuid", player.getUuid()));
-			for (String type : getTypes()) {
+			for (String type : typesSubList) {
 				updates.add(
 					Updates.set(
 						type,
@@ -340,21 +352,7 @@ public class LeaderboardDatabase {
 		}
 	}
 
-	public static List<String> getTypes() {
-		return getTypes(false);
-	}
-
-	/**
-	 * @return Only stats (no uuid or username)
-	 */
-	public static List<String> getTypes(boolean formatted) {
-		List<String> typesSubList = types.subList(2, types.size());
-		return formatted
-			? typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList())
-			: typesSubList;
-	}
-
-	public static String getType(String lbType) {
+	public static String getType(String lbType, boolean allLb) {
 		lbType =
 			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
 				case "nw" -> "networth";
@@ -365,14 +363,10 @@ public class LeaderboardDatabase {
 				default -> lbType;
 			};
 
-		if (!isValidType(lbType)) {
-			lbType = getClosestMatch(lbType, getTypes());
+		if (!(allLb ? typesSubList : guildTypesSubList).contains(lbType)) {
+			lbType = getClosestMatch(lbType, allLb ? typesSubList : guildTypesSubList);
 		}
 
 		return lbType;
-	}
-
-	public static boolean isValidType(String type) {
-		return HypixelGuildCache.typeToIndex(type.toLowerCase()) >= 2;
 	}
 }

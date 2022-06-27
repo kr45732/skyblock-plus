@@ -19,6 +19,8 @@
 package com.skyblockplus.utils.structs;
 
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.guildTypes;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.guildTypesSubList;
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
@@ -45,8 +47,8 @@ public class HypixelGuildCache {
 
 	public static int typeToIndex(String type) {
 		return IntStream
-			.range(0, LeaderboardDatabase.types.size())
-			.filter(i -> LeaderboardDatabase.types.get(i).equals(type))
+			.range(0, guildTypes.size())
+			.filter(i -> guildTypes.get(i).equals(type))
 			.findFirst()
 			.orElse(-1);
 	}
@@ -96,8 +98,7 @@ public class HypixelGuildCache {
 			"=:=" +
 			player.getUuid() +
 			"=:=" +
-			LeaderboardDatabase
-				.getTypes()
+			guildTypesSubList
 				.stream()
 				.map(type ->
 					"" +

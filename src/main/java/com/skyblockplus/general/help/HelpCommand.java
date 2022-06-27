@@ -20,7 +20,6 @@ package com.skyblockplus.general.help;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.getTypes;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -175,7 +174,7 @@ public class HelpCommand extends Command {
 					.setCategory("guild"),
 				new HelpData(
 					"guild-leaderboard",
-					"Get a leaderboard for a player's guild. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded. A Hypixel API key must be set in settings set hypixel_key <key>.",
+					"Get a leaderboard for a player's guild. All types can be seen through autocomplete. The mode can be all, ironman, or stranded. A Hypixel API key must be set in settings set hypixel_key <key>.",
 					"guild-leaderboard <type> [player] [mode:all|ironman|stranded]"
 				)
 					.addSecondData("Get a leaderboard for a guild.", "guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded]")
@@ -378,9 +377,7 @@ public class HelpCommand extends Command {
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
 				new HelpData(
 					"leaderboard",
-					"Get a global leaderboard. The type can be " +
-					String.join(", ", getTypes()) +
-					". The mode can be all, ironman, or stranded.",
+					"Get a global leaderboard. All types can be seen through autocomplete. The mode can be all, ironman, or stranded.",
 					"leaderboard <type> [player] [mode:all|ironman|stranded] [page:page] [rank:rank] [amount:amount]"
 				)
 					.addAliases("lb")

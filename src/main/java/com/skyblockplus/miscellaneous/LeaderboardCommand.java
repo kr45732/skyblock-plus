@@ -19,8 +19,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.isValidType;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -49,9 +48,9 @@ public class LeaderboardCommand extends Command {
 		double amount,
 		PaginatorEvent event
 	) {
-		lbType = getType(lbType);
+		lbType = getType(lbType, true);
 
-		if (!isValidType(lbType)) {
+		if (!typesSubList.contains(lbType)) {
 			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help leaderboard` to see valid types");
 		}
 

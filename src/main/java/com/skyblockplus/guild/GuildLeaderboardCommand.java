@@ -20,7 +20,7 @@ package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.*;
 import static com.skyblockplus.utils.structs.HypixelGuildCache.*;
 
 import com.google.gson.JsonArray;
@@ -68,9 +68,9 @@ public class GuildLeaderboardCommand extends Command {
 			return eb;
 		}
 
-		lbType = getType(lbType);
+		lbType = getType(lbType, false);
 
-		if (!LeaderboardDatabase.isValidType(lbType)) { // Type is invalid, username, or uuid
+		if (!guildTypesSubList.contains(lbType)) { // Type is invalid, username, or uuid
 			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help guild-leaderboard` to see valid types");
 		}
 

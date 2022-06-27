@@ -562,18 +562,6 @@ public class ApiHandler {
 			JsonObject currentProfileMembers = higherDepth(currentProfile, "members").getAsJsonObject();
 			for (String currentProfileMemberUuid : currentProfileMembers.keySet()) {
 				JsonObject currentProfileMember = currentProfileMembers.getAsJsonObject(currentProfileMemberUuid);
-				JsonElement stats = currentProfileMember.remove("stats");
-				JsonObject statsParsed = new JsonObject();
-				statsParsed.add("kills", higherDepth(stats, "kills"));
-				statsParsed.add("deaths", higherDepth(stats, "deaths"));
-				statsParsed.addProperty(
-					"highest_damage",
-					Math.max(
-						higherDepth(stats, "highest_crit_damage", 0.0),
-						Math.max(higherDepth(stats, "highest_critical_damage", 0.0), higherDepth(stats, "highest_damage", 0.0))
-					)
-				);
-				currentProfileMember.add("stats", statsParsed);
 				currentProfileMember.remove("objectives");
 				currentProfileMember.remove("tutorial");
 				currentProfileMember.remove("quests");
