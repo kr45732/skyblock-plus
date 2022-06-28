@@ -134,8 +134,7 @@ public class LeaderboardPaginator {
 		}
 
 		return defaultEmbed(
-			"Global Leaderboard | " + capitalizeString(gamemode.toString()),
-			"https://hypixel-leaderboard.senither.com/players"
+			"Global Leaderboard | " + capitalizeString(gamemode.toString())
 		)
 			.setDescription(
 				isPlayer
@@ -147,7 +146,7 @@ public class LeaderboardPaginator {
 					capitalizeString(lbType.replace("_", " ")) +
 					":** " +
 					playerAmount
-					: ""
+					: ("**Type:** " + capitalizeString(lbType.replace("_", " ")))
 			)
 			.addField("", columnOne.toString(), true)
 			.addField("", columnTwo.toString(), true)

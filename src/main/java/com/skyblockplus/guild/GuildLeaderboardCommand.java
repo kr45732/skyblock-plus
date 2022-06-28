@@ -70,10 +70,6 @@ public class GuildLeaderboardCommand extends Command {
 
 		lbType = getType(lbType, false);
 
-		if (!guildTypesSubList.contains(lbType)) { // Type is invalid, username, or uuid
-			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help guild-leaderboard` to see valid types");
-		}
-
 		UsernameUuidStruct usernameUuidStruct = null;
 		HypixelResponse guildResponse;
 		if (username != null) {

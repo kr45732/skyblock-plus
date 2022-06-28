@@ -50,10 +50,6 @@ public class LeaderboardCommand extends Command {
 	) {
 		lbType = getType(lbType, true);
 
-		if (!typesSubList.contains(lbType)) {
-			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help leaderboard` to see valid types");
-		}
-
 		Player player = new Player(username, gamemode);
 		if (!player.isValid()) {
 			return player.getFailEmbed();
