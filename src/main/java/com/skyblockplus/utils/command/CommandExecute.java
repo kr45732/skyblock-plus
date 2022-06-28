@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils.command;
 
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -62,12 +63,12 @@ public abstract class CommandExecute extends CommandEvent {
 			if (sendLoadingEmbed) {
 				this.ebMessage =
 					getChannel()
-						//						.sendMessage(
-						//							"**⚠️ Skyblock Plus will stop responding to message commands <t:1662004740:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using `" +
-						//							getGuildPrefix(getGuild().getId()) +
-						//							"invite`"
-						//						)
-						.sendMessageEmbeds(loadingEmbed().build())
+					.sendMessage(
+						"**⚠️ Skyblock Plus will stop responding to message commands <t:1662004740:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using `" +
+						getGuildPrefix(getGuild().getId()) +
+						"invite`"
+					)
+						.setEmbeds(loadingEmbed().build())
 						.complete();
 			}
 			this.args = getMessage().getContentRaw().split("\\s+");

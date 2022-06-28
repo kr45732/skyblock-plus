@@ -97,7 +97,7 @@ public class HelpCommand extends Command {
 				// Slayer
 				new HelpData("slayer", "Get the slayer data of a player.", "slayer [player] [profile]")
 					.addAliases("slayers")
-					.addExamples("slayer CrypticPlasma", "slayer CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("slayer"),
 				new HelpData(
 					"calcslayer",
@@ -109,18 +109,21 @@ public class HelpCommand extends Command {
 				// Skills
 				new HelpData("skills", "Get the skills data of a player.", "skills [player] [profile]")
 					.addAliases("skill")
-					.addExamples("skills CrypticPlasma", "skills CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("skills"),
 				new HelpData("hotm", "Get a player's heart of the mountain statistics.", "hotm [player] [profile]")
-					.addExamples("hotm CrypticPlasma", "hotm CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("skills"),
 				new HelpData("forge", "Get a player's forge items and ending times", "forge [player] [profile]")
-					.addExamples("forge CrypticPlasma", "forge CrypticPlasma Zucchini")
+						.addPlayerExamples()
 					.setCategory("skills"),
+					new HelpData("crimson", "Get a player's crimson isle stats", "crimson [player] [profile]")
+							.addPlayerExamples()
+							.setCategory("skills"),
 				// Dungeons
 				new HelpData("dungeons", "Get the dungeons data of a player.", "dungeons [player] [profile]")
 					.addAliases("cata", "catacombs")
-					.addExamples("dungeons CrypticPlasma", "dungeons CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("dungeons"),
 				new HelpData("essence", "Main essence command.")
 					.setCategory("dungeons")
@@ -131,7 +134,7 @@ public class HelpCommand extends Command {
 							.addExamples("information Hyperion")
 							.addAliases("info"),
 						new HelpData("player", "Get a player's essence amounts and their essence shop upgrades.", "[player] [profile]")
-							.addExamples("player CrypticPlasma", "player CrypticPlasma Zucchini")
+							.addPlayerExamples()
 					),
 				new HelpData(
 					"calcruns",
@@ -268,14 +271,14 @@ public class HelpCommand extends Command {
 					)
 					.setCategory("inventory"),
 				new HelpData("armor", "Get a player's equipped armor with lore.", "armor [player] [profile]")
-					.addExamples("armor CrypticPlasma", "armor CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("inventory"),
 				new HelpData("enderchest", "Get a player's ender chest represented in emojis.", "enderchest [player] [profile]")
 					.addAliases("ec", "echest")
-					.addExamples("enderchest CrypticPlasma", "enderchest CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("inventory"),
 				new HelpData("storage", "Get a player's storage represented in emojis.", "storage [player] [profile]")
-					.addExamples("storage CrypticPlasma", "storage CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("inventory"),
 				new HelpData("talisman", "Get a player's talisman bag represented in emojis.", "talisman [player] [profile]")
 					.addSecondData("Get a player's talisman bag with lore.", "talisman [player] [profile] <slot:number>")
@@ -292,7 +295,7 @@ public class HelpCommand extends Command {
 					"Get a player's sacks' content bag represented in a list. Sorted by descending price.",
 					"sacks [player] [profile]"
 				)
-					.addExamples("sacks CrypticPlasma", "sacks CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("inventory"),
 				new HelpData("wardrobe", "Get a player's wardrobe armors represented in emojis.", "wardrobe [player] [profile]")
 					.addSecondData("Get a player's wardrobe armors represented in a list.", "wardrobe list [player] [profile]")
@@ -303,7 +306,7 @@ public class HelpCommand extends Command {
 						"wardrobe list CrypticPlasma Zucchini"
 					),
 				new HelpData("pets", "Get a player's pets.", "pets [player] [profile]")
-					.addExamples("pets CrypticPlasma", "pets CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("inventory"),
 				// Misc
 				new HelpData("roles", "Main roles command.")
@@ -342,7 +345,7 @@ public class HelpCommand extends Command {
 					"weight [player] [profile]"
 				)
 					.addAliases("we")
-					.addExamples("weight CrypticPlasma", "weight CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("miscellaneous"),
 				new HelpData(
 					"calcweight",
@@ -355,19 +358,20 @@ public class HelpCommand extends Command {
 					.addExamples("hypixel CrypticPlasma")
 					.setCategory("miscellaneous"),
 				new HelpData("missing", "Get a player's missing talismans.", "missing [player] [profile]")
-					.addExamples("missing CrypticPlasma", "missing CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("miscellaneous"),
 				new HelpData("check-api", "Get a player's enabled and/or disabled Skyblock APIs", "check-api [player] [profile]")
+						.addPlayerExamples()
 					.addAliases("api")
 					.setCategory("miscellaneous"),
 				new HelpData("profiles", "Get information about all of a player's profiles.", "missing [player] [profile]")
-					.addExamples("profiles CrypticPlasma", "profiles CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("miscellaneous"),
 				new HelpData("cakes", "Get a player's active and inactive cake buffs.", "cakes [player] [profile]")
-					.addExamples("cakes CrypticPlasma", "caks CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("miscellaneous"),
 				new HelpData("harp", "Get a player's harp statistics.", "harp [player] [profile]")
-					.addExamples("harp CrypticPlasma", "harp CrypticPlasma Zucchini")
+					.addPlayerExamples()
 					.setCategory("miscellaneous"),
 				new HelpData("uuid", "Convert username to UUID or UUID to username.", "uuid [username|uuid]")
 					.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88")
@@ -383,6 +387,7 @@ public class HelpCommand extends Command {
 					.addAliases("lb")
 					.setCategory("miscellaneous"),
 				new HelpData("skyblock", "Get an overview of a player's Skyblock statistics", "skyblock [player] [profile]")
+						.addPlayerExamples()
 					.addAliases("sb")
 					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
@@ -580,6 +585,14 @@ public class HelpCommand extends Command {
 										),
 										new HelpData("disable", "Disable verification automatic sync")
 									),
+									new HelpData("dm_on_sync", "Enable or disable verify DM on join automatic sync")
+											.addSubcommands(
+													new HelpData(
+															"enable",
+															"Enable verification automatic DM on join sync. This will toggle if a user should be DMd when their roles are synced on joining the server."
+													),
+													new HelpData("disable", "Disable verification automatic DM on join sync")
+											),
 								new HelpData("roles_claim", "Enable or disable automatic roles sync")
 									.addSubcommands(
 										new HelpData(

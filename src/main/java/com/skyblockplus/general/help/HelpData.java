@@ -185,6 +185,12 @@ public class HelpData {
 		return this;
 	}
 
+	public HelpData addPlayerExamples() {
+		this.examples.add(name + " CrypticPlasma");
+		this.examples.add(name + " CrypticPlasma Zucchini");
+		return this;
+	}
+
 	public HelpData addSubcommands(HelpData... subcommands) {
 		for (HelpData subcommand : subcommands) {
 			this.subcommands.add(subcommand.setSuperCommand(this));
