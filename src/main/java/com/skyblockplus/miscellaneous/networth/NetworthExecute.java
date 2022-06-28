@@ -540,7 +540,11 @@ public class NetworthExecute {
 					player
 						.defaultPlayerEmbed(" | Armor & Equipment")
 						.setDescription(
-							ebDesc + "\n**Armor & Equipment:** " + simplifyNumber(invArmor) + "\n\n" + armorStr.toString().replace("\n\n", "\n")
+							ebDesc +
+							"\n**Armor & Equipment:** " +
+							simplifyNumber(invArmor) +
+							"\n\n" +
+							armorStr.toString().replace("\n\n", "\n")
 						)
 				);
 			}

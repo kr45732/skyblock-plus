@@ -819,7 +819,7 @@ public class HelpCommand extends Command {
 			help.create("skills [player] [profile]", "Get the skills data of a player") +
 			help.create("hotm [player] [profile]", "Get a player's heart of the mountain statistics") +
 			help.create("forge [player] [profile]", "Get a player's forge items & ending times") +
-					help.create("crimson [player] [profile]", "Get the crimson isle stats of a player")
+			help.create("crimson [player] [profile]", "Get the crimson isle stats of a player")
 		);
 
 		paginateBuilder.addItems(
@@ -920,7 +920,7 @@ public class HelpCommand extends Command {
 				"Calculate loot quality and loot from dragons in the end"
 			) +
 			help.create("reforgestone <stone>", "Get the reforge stone stats for each rarity") +
-					help.create("collections [player] [profile]", "Get a player's collection counts")
+			help.create("collections [player] [profile]", "Get a player's collection counts")
 		);
 
 		paginateBuilder.addItems(
@@ -1009,7 +1009,7 @@ public class HelpCommand extends Command {
 			help.create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none") +
 			help.create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
 			help.create("settings verify sync <enable|disable>", "Enable or disable automatic verify role and nickname syncing") +
-					help.create("settings verify dm_on_sync <enable|disable>", "Enable or disable DMing the user on syncing") +
+			help.create("settings verify dm_on_sync <enable|disable>", "Enable or disable DMing the user on syncing") +
 			help.create("settings verify roles_claim <enable|disable>", "Enable or disable automatic role syncing")
 		);
 
