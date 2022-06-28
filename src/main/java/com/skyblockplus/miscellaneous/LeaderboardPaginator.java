@@ -69,8 +69,10 @@ public class LeaderboardPaginator {
 		this.message = event.getLoadingMessage();
 
 		if (rank != -1) {
+			rank = Math.max(1, rank);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, rank - 200, rank + 200));
 		} else if (amount != -1) {
+			amount = Math.max(0, amount);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, amount));
 		} else if (page != -1) {
 			page = Math.max(1, page);
@@ -237,9 +239,11 @@ public class LeaderboardPaginator {
 		} catch (Exception ignored) {}
 
 		if (rank != -1) {
+			rank = Math.max(1, rank);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, rank - 200, rank + 200));
 			isPlayer = false;
 		} else if (amount != -1) {
+			amount = Math.max(0, amount);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, amount));
 			isPlayer = false;
 		} else if (page != -1) {
