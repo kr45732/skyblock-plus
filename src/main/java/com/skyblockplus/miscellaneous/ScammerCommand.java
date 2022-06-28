@@ -55,7 +55,7 @@ public class ScammerCommand extends Command {
 			);
 		}
 
-		eb.setDescription(client.getError() + " This account **IS** marked as a scammer");
+		eb.setDescription(client.getError() + " This player **IS** marked as a scammer");
 		eb.addField("Reason", higherDepth(scammerJson, "result.reason", "No reason provided"), false);
 		if (higherDepth(scammerJson, "is_alt", false)) {
 			eb.setDescription("This account **IS** marked as an alt");

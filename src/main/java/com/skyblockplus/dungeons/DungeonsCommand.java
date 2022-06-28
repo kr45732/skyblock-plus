@@ -119,7 +119,7 @@ public class DungeonsCommand extends Command {
 				event.paginate(paginateBuilder);
 				return null;
 			} catch (Exception e) {
-				return invalidEmbed("Player has not played dungeons");
+				return invalidEmbed(player.getUsernameFixed() + " has not played dungeons");
 			}
 		}
 

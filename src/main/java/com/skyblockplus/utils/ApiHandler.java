@@ -298,7 +298,8 @@ public class ApiHandler {
 
 			try {
 				if (higherDepth(profilesJson, "profiles").isJsonNull()) {
-					return new HypixelResponse("Player has no SkyBlock profiles");
+					String username = uuidToUsernameCache.getIfPresent(uuid);
+					return new HypixelResponse((username != null ? username : "Player") + " has no SkyBlock profiles");
 				}
 
 				JsonArray profileArray = processSkyblockProfilesArray(higherDepth(profilesJson, "profiles").getAsJsonArray());
@@ -366,7 +367,8 @@ public class ApiHandler {
 
 			try {
 				if (higherDepth(playerJson, "player").isJsonNull()) {
-					return new HypixelResponse("Player has not played on Hypixel");
+					String username = uuidToUsernameCache.getIfPresent(uuid);
+					return new HypixelResponse((username != null ? username : "Player") + " has not played on Hypixel");
 				}
 
 				JsonObject playerObject = higherDepth(playerJson, "player").getAsJsonObject();
