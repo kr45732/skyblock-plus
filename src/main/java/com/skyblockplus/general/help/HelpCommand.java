@@ -115,11 +115,11 @@ public class HelpCommand extends Command {
 					.addPlayerExamples()
 					.setCategory("skills"),
 				new HelpData("forge", "Get a player's forge items and ending times", "forge [player] [profile]")
-						.addPlayerExamples()
+					.addPlayerExamples()
 					.setCategory("skills"),
-					new HelpData("crimson", "Get a player's crimson isle stats", "crimson [player] [profile]")
-							.addPlayerExamples()
-							.setCategory("skills"),
+				new HelpData("crimson", "Get a player's crimson isle stats", "crimson [player] [profile]")
+					.addPlayerExamples()
+					.setCategory("skills"),
 				// Dungeons
 				new HelpData("dungeons", "Get the dungeons data of a player.", "dungeons [player] [profile]")
 					.addAliases("cata", "catacombs")
@@ -305,9 +305,7 @@ public class HelpCommand extends Command {
 						"wardrobe list CrypticPlasma",
 						"wardrobe list CrypticPlasma Zucchini"
 					),
-				new HelpData("pets", "Get a player's pets.", "pets [player] [profile]")
-					.addPlayerExamples()
-					.setCategory("inventory"),
+				new HelpData("pets", "Get a player's pets.", "pets [player] [profile]").addPlayerExamples().setCategory("inventory"),
 				// Misc
 				new HelpData("roles", "Main roles command.")
 					.addAliases("role")
@@ -361,7 +359,7 @@ public class HelpCommand extends Command {
 					.addPlayerExamples()
 					.setCategory("miscellaneous"),
 				new HelpData("check-api", "Get a player's enabled and/or disabled Skyblock APIs", "check-api [player] [profile]")
-						.addPlayerExamples()
+					.addPlayerExamples()
 					.addAliases("api")
 					.setCategory("miscellaneous"),
 				new HelpData("profiles", "Get information about all of a player's profiles.", "missing [player] [profile]")
@@ -387,7 +385,7 @@ public class HelpCommand extends Command {
 					.addAliases("lb")
 					.setCategory("miscellaneous"),
 				new HelpData("skyblock", "Get an overview of a player's Skyblock statistics", "skyblock [player] [profile]")
-						.addPlayerExamples()
+					.addPlayerExamples()
 					.addAliases("sb")
 					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
@@ -585,14 +583,14 @@ public class HelpCommand extends Command {
 										),
 										new HelpData("disable", "Disable verification automatic sync")
 									),
-									new HelpData("dm_on_sync", "Enable or disable verify DM on join automatic sync")
-											.addSubcommands(
-													new HelpData(
-															"enable",
-															"Enable verification automatic DM on join sync. This will toggle if a user should be DMd when their roles are synced on joining the server."
-													),
-													new HelpData("disable", "Disable verification automatic DM on join sync")
-											),
+								new HelpData("dm_on_sync", "Enable or disable verify DM on join automatic sync")
+									.addSubcommands(
+										new HelpData(
+											"enable",
+											"Enable verification automatic DM on join sync. This will toggle if a user should be DMd when their roles are synced on joining the server."
+										),
+										new HelpData("disable", "Disable verification automatic DM on join sync")
+									),
 								new HelpData("roles_claim", "Enable or disable automatic roles sync")
 									.addSubcommands(
 										new HelpData(

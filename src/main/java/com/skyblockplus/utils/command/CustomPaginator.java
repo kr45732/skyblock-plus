@@ -111,9 +111,7 @@ public class CustomPaginator extends Menu {
 	public void paginate(MessageChannel channel, int pageNum) {
 		pageNum = Math.min(Math.max(pageNum, 1), pages);
 
-		Message msg = new MessageBuilder()
-			.setEmbeds(getEmbedRender(pageNum))
-			.build();
+		Message msg = new MessageBuilder().setEmbeds(getEmbedRender(pageNum)).build();
 		initialize(channel.sendMessage(msg), pageNum);
 	}
 
