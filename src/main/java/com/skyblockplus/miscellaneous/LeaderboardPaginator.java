@@ -48,7 +48,7 @@ public class LeaderboardPaginator {
 	private final Player.Gamemode gamemode;
 	private final PaginatorEvent event;
 	private String player;
-	private int pageFirstRank;
+	private int pageFirstRank = 1;
 	private int playerRank = -1;
 	private String playerAmount = "Not on leaderboard";
 	private boolean isPlayer = false;
@@ -64,7 +64,7 @@ public class LeaderboardPaginator {
 	) {
 		this.lbType = lbType;
 		this.gamemode = gamemode;
-		this.player = player.getUsername();
+		this.player = player != null ? player.getUsername() : null;
 		this.event = event;
 		this.message = event.getLoadingMessage();
 
@@ -77,9 +77,11 @@ public class LeaderboardPaginator {
 		} else if (page != -1) {
 			page = Math.max(1, page);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
-		} else {
+		} else if(player != null) {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.getUuid()));
 			isPlayer = true;
+		}else{
+			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, 0, 201));
 		}
 
 		double closestAmt = -1;
@@ -88,7 +90,7 @@ public class LeaderboardPaginator {
 			int curRank = entry.getValue().getInteger("rank");
 			double curAmount = entry.getValue().get(lbType, 0.0);
 
-			if (entry.getValue().get("username", "").equals(player.getUsername())) {
+			if (player != null && entry.getValue().get("username", "").equals(player.getUsername())) {
 				playerRank = curRank;
 				playerAmount = roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount);
 			}
@@ -105,7 +107,7 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((idx - 1) / 20) * 20 + 1;
 		} else if (page != -1) {
 			pageFirstRank = (page - 1) * 20 + 1;
-		} else {
+		} else if (player != null){
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 

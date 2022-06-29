@@ -23,11 +23,15 @@ import static com.skyblockplus.utils.database.LeaderboardDatabase.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class LeaderboardCommand extends Command {
@@ -50,9 +54,12 @@ public class LeaderboardCommand extends Command {
 	) {
 		lbType = getType(lbType, true);
 
-		Player player = new Player(username, gamemode);
-		if (!player.isValid()) {
-			return player.getFailEmbed();
+		Player player = null;
+		if(username != null) {
+			player = new Player(username, gamemode);
+			if (!player.isValid()) {
+				return player.getFailEmbed();
+			}
 		}
 
 		new LeaderboardPaginator(lbType, gamemode, player, page, rank, amount, event);
@@ -70,17 +77,17 @@ public class LeaderboardCommand extends Command {
 				int page = getIntOption("page", -1);
 				int rank = getIntOption("rank", -1);
 				double amount = getDoubleOption("amount", -1);
-
-				if (args.length == 3 || args.length == 2) {
-					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
-						return;
+				player = getStringOption("u");
+				if(player == null){
+					LinkedAccount linkedUserUsername = database.getByDiscord(getAuthor().getId());
+					if (linkedUserUsername != null) {
+						player = linkedUserUsername.uuid();
 					}
-
-					paginate(getLeaderboard(args[1], player, gamemode, page, rank, amount, getPaginatorEvent()));
-					return;
 				}
 
-				sendErrorEmbed();
+				setArgs(2);
+
+				paginate(getLeaderboard(args[1], player, gamemode, page, rank, amount, getPaginatorEvent()));
 			}
 		}
 			.queue();

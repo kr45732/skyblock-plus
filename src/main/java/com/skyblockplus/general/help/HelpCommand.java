@@ -380,7 +380,7 @@ public class HelpCommand extends Command {
 				new HelpData(
 					"leaderboard",
 					"Get a global leaderboard. All types can be seen through autocomplete. The mode can be all, ironman, or stranded.",
-					"leaderboard <type> [player] [mode:all|ironman|stranded] [page:page] [rank:rank] [amount:amount]"
+					"leaderboard <type> [u:player] [mode:all|ironman|stranded] [page:page] [rank:rank] [amount:amount]"
 				)
 					.addAliases("lb")
 					.setCategory("miscellaneous"),
@@ -922,7 +922,7 @@ public class HelpCommand extends Command {
 			help.create("jacob [crop]", "Get the upcoming contests and their crops") +
 			help.create("mayor", "Get information about the current mayor or the running election") +
 			help.create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
-			help.create("leaderboard <type> [player] [page:page] [rank:rank] [amount:amount]", "Get a global leaderboard") +
+			help.create("leaderboard <type> [u:player] [page:page] [rank:rank] [amount:amount]", "Get a global leaderboard") +
 			help.create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
 			help.create("recipe <item>", "Get the crafting recipe of an item") +
 			help.create("check-api [player]", "Check which Skyblock APIs a player has enabled or disabled") +
