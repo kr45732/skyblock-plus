@@ -95,16 +95,14 @@ public class InventoryListPaginator {
 		}
 
 		action
-			.setActionRows(
-				ActionRow.of(
+			.setActionRow(
 					Button
 						.primary("inv_list_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))
 						.withDisabled(pageNumber == 0),
+								Button.primary("inv_list_paginator_search_button", "Search").withEmoji(Emoji.fromFormatted("\uD83D\uDD0E")),
 					Button
 						.primary("inv_list_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 						.withDisabled(pageNumber == maxPageNumber)
-				),
-				ActionRow.of(Button.primary("inv_list_paginator_search_button", "Search For Item"))
 			)
 			.get()
 			.queue(ignored -> {
@@ -147,7 +145,7 @@ public class InventoryListPaginator {
 			event
 				.replyModal(
 					Modal
-						.create("inv_list_search_modal_" + message.getId(), "Search For Item")
+						.create("inv_list_search_modal_" + message.getId(), "Search")
 						.addActionRow(TextInput.create("item", "Item Name", TextInputStyle.SHORT).build())
 						.build()
 				)
@@ -277,16 +275,14 @@ public class InventoryListPaginator {
 		}
 		action
 			.retainFiles()
-			.setActionRows(
-				ActionRow.of(
+			.setActionRow(
 					Button
 						.primary("inv_list_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))
 						.withDisabled(pageNumber == 0),
+					Button.primary("inv_list_paginator_search_button", "Search").withEmoji(Emoji.fromFormatted("\uD83D\uDD0E")),
 					Button
 						.primary("inv_list_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 						.withDisabled(pageNumber == maxPageNumber)
-				),
-				ActionRow.of(Button.primary("inv_list_paginator_search_button", "Search For Item"))
 			)
 			.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
 

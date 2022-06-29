@@ -162,7 +162,7 @@ public class Main {
 		} else {
 			File[] transcriptDirFiles = transcriptDir.listFiles();
 			if (transcriptDirFiles != null) {
-				Arrays.stream(transcriptDirFiles).map(File::delete).collect(Collectors.toList());
+				Arrays.stream(transcriptDirFiles).forEach(File::delete);
 			}
 		}
 
@@ -172,7 +172,7 @@ public class Main {
 		} else {
 			File[] loreRendersDirFiles = loreRendersDir.listFiles();
 			if (loreRendersDirFiles != null) {
-				Arrays.stream(loreRendersDirFiles).map(File::delete).collect(Collectors.toList());
+				Arrays.stream(loreRendersDirFiles).forEach(File::delete);
 			}
 		}
 
