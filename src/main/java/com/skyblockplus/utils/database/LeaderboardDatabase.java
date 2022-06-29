@@ -106,7 +106,7 @@ public class LeaderboardDatabase {
 		Player.Gamemode.IRONMAN,
 		Player.Gamemode.STRANDED
 	);
-	public int userCount = 0;
+	public int userCount = -1;
 
 	public LeaderboardDatabase() {
 		dataSource = new MongoClient(new MongoClientURI(LEADERBOARD_DB_URL));

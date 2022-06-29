@@ -70,6 +70,7 @@ public class NetworthExecute {
 	private final List<String> armorItems = new ArrayList<>();
 	private final List<String> storageItems = new ArrayList<>();
 	private final List<String> personalVaultItems = new ArrayList<>();
+	private final List<String> sacksItems = new ArrayList<>();
 	private StringBuilder calcItemsJsonStr = new StringBuilder("[");
 	private JsonElement lowestBinJson;
 	private JsonElement averageAuctionJson;
@@ -276,7 +277,13 @@ public class NetworthExecute {
 			if (sacksMap != null) {
 				for (Map.Entry<String, Integer> sackEntry : sacksMap.entrySet()) {
 					if (sackEntry.getValue() > 0) {
-						sacksTotal += getLowestPrice(sackEntry.getKey(), true) * sackEntry.getValue();
+						double itemPrice = getLowestPrice(sackEntry.getKey(), true) * sackEntry.getValue();
+						sacksTotal += itemPrice;
+						String emoji = higherDepth(getEmojiMap(), sackEntry.getKey(), null);
+						sacksItems.add(
+								(emoji == null ? "" : emoji + " ") +
+										(sackEntry.getValue() != 1 ? sackEntry.getValue() + "x " : "") +
+										 idToName(sackEntry.getKey()) + "=:=" + itemPrice);
 					}
 				}
 			}
@@ -300,6 +307,24 @@ public class NetworthExecute {
 					echestStr.append("\n");
 				} else if (i == 24) {
 					int moreItems = enderChestItems.size() - 25;
+					if (moreItems > 0) {
+						echestStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
+					}
+					break;
+				}
+			}
+
+			sacksItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("=:=")[1])));
+			StringBuilder sacksStr = new StringBuilder();
+			for (int i = 0; i < sacksItems.size(); i++) {
+				String item = sacksItems.get(i);
+				echestStr
+						.append(item.split("=:=")[0])
+						.append(" ➜ ")
+						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+						.append("\n");
+				if (i == 24) {
+					int moreItems = sacksItems.size() - 25;
 					if (moreItems > 0) {
 						echestStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
 					}
@@ -495,7 +520,6 @@ public class NetworthExecute {
 				eb.addField("Personal Vault | " + simplifyNumber(personalVaultTotal), personalVaultStr.toString().split("\n\n")[0], false);
 			}
 
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser());
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 			Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 			pages.put(SelectOption.of("Overview", "overview").withEmoji(getEmojiObj("SKYBLOCK_MENU")), eb);
@@ -598,6 +622,20 @@ public class NetworthExecute {
 							"\n\n" +
 							personalVaultStr.toString().replace("\n\n", "\n")
 						)
+				);
+			}
+			if(!sacksStr.isEmpty()){
+				pages.put(
+						SelectOption.of("Sacks", "sacks").withEmoji(getEmojiObj("RUNE_SACK")),
+						player
+								.defaultPlayerEmbed(" | Sacks")
+								.setDescription(
+										ebDesc +
+												"\n**Sacks:** " +
+												simplifyNumber(sacksTotal) +
+												"\n\n" +
+												echestStr
+								)
 				);
 			}
 

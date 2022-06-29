@@ -85,8 +85,12 @@ public class LeaderboardCommand extends Command {
 				}
 
 				setArgs(2);
+				if(args.length >= 2) {
+					paginate(getLeaderboard(args[1], player, gamemode, page, rank, amount, getPaginatorEvent()));
+					return;
+				}
 
-				paginate(getLeaderboard(args[1], player, gamemode, page, rank, amount, getPaginatorEvent()));
+				sendErrorEmbed();
 			}
 		}
 			.queue();
