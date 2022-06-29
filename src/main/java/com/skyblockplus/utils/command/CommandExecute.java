@@ -26,7 +26,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
-import java.util.List;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
@@ -65,7 +64,7 @@ public abstract class CommandExecute extends CommandEvent {
 				this.ebMessage =
 					getChannel()
 						.sendMessage(
-							"**⚠️ Skyblock Plus will stop responding to message commands <t:1662004740:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using `" +
+							"**⚠️ Skyblock Plus will stop responding to message commands <t:1662004740:R>!** Please use slash commands instead. If you do not see slash commands, then make sure the everyone role has the `Use Application Commands` permissions enabled or re-invite the bot using `" +
 							getGuildPrefix(getGuild().getId()) +
 							"invite`"
 						)
