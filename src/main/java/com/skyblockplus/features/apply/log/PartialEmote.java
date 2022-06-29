@@ -18,7 +18,6 @@
 
 package com.skyblockplus.features.apply.log;
 
-
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 
 public record PartialEmote(long id, String name, boolean animated) {

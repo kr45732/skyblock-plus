@@ -18,6 +18,9 @@
 
 package com.skyblockplus.api.security;
 
+import static com.skyblockplus.utils.Utils.API_PASSWORD;
+import static com.skyblockplus.utils.Utils.API_USERNAME;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,9 +33,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.skyblockplus.utils.Utils.API_PASSWORD;
-import static com.skyblockplus.utils.Utils.API_USERNAME;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -44,9 +44,12 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		return http.userDetailsService(
-					new 	InMemoryUserDetailsManager(User.builder().username(API_USERNAME).password(passwordEncoder().encode(API_PASSWORD)).roles("ADMIN").build())
+		return http
+			.userDetailsService(
+				new InMemoryUserDetailsManager(
+					User.builder().username(API_USERNAME).password(passwordEncoder().encode(API_PASSWORD)).roles("ADMIN").build()
 				)
+			)
 			.authorizeRequests()
 			.antMatchers("/api/public/**")
 			.permitAll()
@@ -56,7 +59,8 @@ public class SecurityConfiguration {
 			.httpBasic()
 			.and()
 			.csrf()
-			.disable().build();
+			.disable()
+			.build();
 	}
 
 	@Bean
