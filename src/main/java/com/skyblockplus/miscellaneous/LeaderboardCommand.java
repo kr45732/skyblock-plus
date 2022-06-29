@@ -27,11 +27,10 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import org.springframework.stereotype.Component;
-
 import java.util.Arrays;
 import java.util.List;
+import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
 @Component
 public class LeaderboardCommand extends Command {
@@ -55,7 +54,7 @@ public class LeaderboardCommand extends Command {
 		lbType = getType(lbType, true);
 
 		Player player = null;
-		if(username != null) {
+		if (username != null) {
 			player = new Player(username, gamemode);
 			if (!player.isValid()) {
 				return player.getFailEmbed();
@@ -78,7 +77,7 @@ public class LeaderboardCommand extends Command {
 				int rank = getIntOption("rank", -1);
 				double amount = getDoubleOption("amount", -1);
 				player = getStringOption("u");
-				if(player == null){
+				if (player == null) {
 					LinkedAccount linkedUserUsername = database.getByDiscord(getAuthor().getId());
 					if (linkedUserUsername != null) {
 						player = linkedUserUsername.uuid();

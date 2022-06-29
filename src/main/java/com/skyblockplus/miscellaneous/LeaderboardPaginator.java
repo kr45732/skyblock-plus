@@ -77,10 +77,10 @@ public class LeaderboardPaginator {
 		} else if (page != -1) {
 			page = Math.max(1, page);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
-		} else if(player != null) {
+		} else if (player != null) {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.getUuid()));
 			isPlayer = true;
-		}else{
+		} else {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, 0, 201));
 		}
 
@@ -107,7 +107,7 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((idx - 1) / 20) * 20 + 1;
 		} else if (page != -1) {
 			pageFirstRank = (page - 1) * 20 + 1;
-		} else if (player != null){
+		} else if (player != null) {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
