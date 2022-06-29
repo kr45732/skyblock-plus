@@ -410,10 +410,12 @@ public class AutomaticGuild {
 					}
 				} catch (Exception ignored) {}
 
-				Message reactMessage = reactChannel
-					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-					.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
-					.complete();
+				MessageAction action = reactChannel
+					.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				if(higherDepth(currentSettings, "enableVerifyVideo", true)) {
+					action = action.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"));
+				}
+				Message reactMessage = action.complete();
 
 				JsonObject newSettings = currentSettings.getAsJsonObject();
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
@@ -454,10 +456,12 @@ public class AutomaticGuild {
 
 				verifyGuild = new VerifyGuild(); // Prevent the old settings from deleting the new message
 
-				Message reactMessage = reactChannel
-					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-					.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
-					.complete();
+				MessageAction action = reactChannel
+						.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				if(higherDepth(currentSettings, "enableVerifyVideo", true)) {
+					action = action.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"));
+				}
+				Message reactMessage = action.complete();
 
 				JsonObject newSettings = currentSettings.getAsJsonObject();
 				newSettings.addProperty("previousMessageId", reactMessage.getId());

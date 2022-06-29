@@ -41,6 +41,8 @@ public class AutomatedVerify {
 	@Column(length = 2048)
 	private String messageText = "";
 
+	private String enableVerifyVideo = "true";
+
 	private String messageTextChannelId = "";
 
 	@ElementCollection(fetch = FetchType.EAGER)
