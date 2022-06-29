@@ -25,9 +25,9 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -55,10 +55,10 @@ public class InventoryEmojiPaginator {
 				.sendMessage(inventoryPages.get(0)[1])
 				.setActionRow(
 					Button
-						.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
+						.primary("inv_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))
 						.withDisabled(pageNumber == 0),
 					Button
-						.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+						.primary("inv_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 						.withDisabled(pageNumber == (maxPageNumber)),
 					Button.link(player.skyblockStatsLink(), player.getUsername() + "'s " + type + " • Page 1/" + (maxPageNumber + 1))
 				)

@@ -34,6 +34,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -134,8 +135,8 @@ public class CustomPaginator extends Menu {
 		if (pages > 1) {
 			actionRows.add(
 				ActionRow.of(
-					Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).withDisabled(pageNum == 1),
-					Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>")).withDisabled(pageNum == pages)
+					Button.primary(LEFT, Emoji.fromFormatted("<:left_button_arrow:885628386435821578>")).withDisabled(pageNum == 1),
+					Button.primary(RIGHT, Emoji.fromFormatted("<:right_button_arrow:885628386578423908>")).withDisabled(pageNum == pages)
 				)
 			);
 		}
@@ -244,8 +245,8 @@ public class CustomPaginator extends Menu {
 		if (pages > 1) {
 			actionRows.add(
 				ActionRow.of(
-					Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).withDisabled(pageNum == 1),
-					Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>")).withDisabled(pageNum == pages)
+					Button.primary(LEFT, Emoji.fromFormatted("<:left_button_arrow:885628386435821578>")).withDisabled(pageNum == 1),
+					Button.primary(RIGHT, Emoji.fromFormatted("<:right_button_arrow:885628386578423908>")).withDisabled(pageNum == pages)
 				)
 			);
 		}

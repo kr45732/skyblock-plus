@@ -27,6 +27,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.utils.MiscUtil;
 
 public class ApplyLog {
@@ -82,8 +84,8 @@ public class ApplyLog {
 					"</discord-mention>"
 				);
 		}
-		for (Emote emote : message.getMentions().getEmotes()) {
-			text = text.replace(emote.getAsMention(), "<img src=\"" + emote.getImageUrl() + "\" width=\"16\" height=\"16\"/>");
+		for (CustomEmoji emote : message.getMentions().getCustomEmojis()) {
+			text = text.replace(emote.getFormatted(), "<img src=\"" + emote.getImageUrl() + "\" width=\"16\" height=\"16\"/>");
 		}
 		builder.text(parseMarkdown(text));
 
@@ -120,7 +122,7 @@ public class ApplyLog {
 	}
 
 	public static List<PartialEmote> getEmotes(String content) {
-		return processMentions(content, Message.MentionType.EMOTE, new ArrayList<>(), ApplyLog::matchEmote);
+		return processMentions(content, Message.MentionType.EMOJI, new ArrayList<>(), ApplyLog::matchEmote);
 	}
 
 	public static PartialEmote matchEmote(Matcher m) {

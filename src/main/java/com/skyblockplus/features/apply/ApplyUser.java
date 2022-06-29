@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -145,7 +146,6 @@ public class ApplyUser implements Serializable {
 				for (String profileName : profileNames) {
 					String profileEmoji = profileNameToEmoji(profileName);
 					this.profileEmojiToName.put(profileEmoji, profileName);
-					profileEmoji = profileEmoji.contains(":") ? "<:" + profileEmoji + ">" : profileEmoji;
 					welcomeEb.appendDescription(
 						"\n" +
 						profileEmoji +
@@ -176,10 +176,10 @@ public class ApplyUser implements Serializable {
 				this.reactMessageId = reactMessage.getId();
 
 				for (String profileEmoji : profileEmojiToName.keySet()) {
-					reactMessage.addReaction(profileEmoji).complete();
+					reactMessage.addReaction(Emoji.fromFormatted(profileEmoji)).complete();
 				}
 
-				reactMessage.addReaction(client.getError().replaceAll("[<>]", "")).queue();
+				reactMessage.addReaction(Emoji.fromFormatted(client.getError())).queue();
 			}
 		} catch (Exception e) {
 			AutomaticGuild.getLogger().error(guildId, e);
@@ -215,7 +215,7 @@ public class ApplyUser implements Serializable {
 
 		if (state == 0) {
 			reactMessage.clearReactions().queue();
-			if (event.getReactionEmote().getAsReactionCode().equals(client.getError())) {
+			if (event.getEmoji().getFormatted().equals(client.getError())) {
 				event.getChannel().sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
 				event
 					.getGuild()
@@ -224,8 +224,8 @@ public class ApplyUser implements Serializable {
 					.reason("Application canceled")
 					.queueAfter(10, TimeUnit.SECONDS);
 				return true;
-			} else if (profileEmojiToName.containsKey(event.getReactionEmote().getAsReactionCode())) {
-				caseOne(profileEmojiToName.get(event.getReactionEmote().getAsReactionCode()), currentSettings, applicationChannel);
+			} else if (profileEmojiToName.containsKey(event.getEmoji().getFormatted())) {
+				caseOne(profileEmojiToName.get(event.getEmoji().getFormatted()), currentSettings, applicationChannel);
 			}
 		}
 
@@ -441,9 +441,7 @@ public class ApplyUser implements Serializable {
 							" to cancel the application."
 						);
 						for (Map.Entry<String, String> profileEntry : profileEmojiToName.entrySet()) {
-							String profileEmoji = profileEntry.getKey().contains(":")
-								? "<:" + profileEntry.getKey() + ">"
-								: profileEntry.getKey();
+							String profileEmoji = profileEntry.getKey();
 							if (profileEntry.getKey().equals("↩️")) {
 								String lastPlayedProfile = profileEmojiToName.get("↩️");
 								retryEmbed.appendDescription(
@@ -471,9 +469,9 @@ public class ApplyUser implements Serializable {
 						Message reactMessage = event.getHook().editOriginalEmbeds(retryEmbed.build()).complete();
 						this.reactMessageId = reactMessage.getId();
 						for (String profileEmoji : profileEmojiToName.keySet()) {
-							reactMessage.addReaction(profileEmoji).complete();
+							reactMessage.addReaction(Emoji.fromFormatted(profileEmoji)).complete();
 						}
-						reactMessage.addReaction(client.getError().replaceAll("[<>]", "")).queue();
+						reactMessage.addReaction(Emoji.fromFormatted(client.getError())).queue();
 						state = 0;
 						return true;
 					}

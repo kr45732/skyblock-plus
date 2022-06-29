@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.command.SlashCommand;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -85,6 +84,6 @@ public class UpdateSlashCommands extends Command {
 	}
 
 	private List<CommandData> generateSlashCommands() {
-		return slashCommandClient.getCommands().stream().map(SlashCommand::getCommandData).collect(Collectors.toList());
+		return slashCommandClient.getCommands().stream().map(c -> c.getCommandData().setGuildOnly(true)).collect(Collectors.toList());
 	}
 }

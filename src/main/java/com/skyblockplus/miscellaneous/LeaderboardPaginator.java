@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -289,10 +289,10 @@ public class LeaderboardPaginator {
 	private ActionRow getActionRow() {
 		return ActionRow.of(
 			Button
-				.primary("leaderboard_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
+				.primary("leaderboard_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))
 				.withDisabled(pageFirstRank == 1),
-			Button.primary("leaderboard_paginator_search_button", "Search").withEmoji(Emoji.fromUnicode("\uD83D\uDD0E")),
-			Button.primary("leaderboard_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+			Button.primary("leaderboard_paginator_search_button", "Search").withEmoji(Emoji.fromFormatted("\uD83D\uDD0E")),
+			Button.primary("leaderboard_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 		);
 	}
 

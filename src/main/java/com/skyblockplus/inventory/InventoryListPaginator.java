@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -98,10 +98,10 @@ public class InventoryListPaginator {
 			.setActionRows(
 				ActionRow.of(
 					Button
-						.primary("inv_list_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
+						.primary("inv_list_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))
 						.withDisabled(pageNumber == 0),
 					Button
-						.primary("inv_list_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+						.primary("inv_list_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 						.withDisabled(pageNumber == maxPageNumber)
 				),
 				ActionRow.of(Button.primary("inv_list_paginator_search_button", "Search For Item"))
@@ -280,10 +280,10 @@ public class InventoryListPaginator {
 			.setActionRows(
 				ActionRow.of(
 					Button
-						.primary("inv_list_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>"))
+						.primary("inv_list_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))
 						.withDisabled(pageNumber == 0),
 					Button
-						.primary("inv_list_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+						.primary("inv_list_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 						.withDisabled(pageNumber == maxPageNumber)
 				),
 				ActionRow.of(Button.primary("inv_list_paginator_search_button", "Search For Item"))

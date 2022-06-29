@@ -25,7 +25,7 @@ import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -46,8 +46,8 @@ public class GetServerEmojisCommand extends Command {
 				logCommand();
 
 				JsonObject toAdd = new JsonObject();
-				for (Emote emote : event.getGuild().getEmotes()) {
-					toAdd.addProperty(emote.getName().toUpperCase(), emote.getAsMention());
+				for (Emoji emote : event.getGuild().getEmojis()) {
+					toAdd.addProperty(emote.getName().toUpperCase(), emote.getFormatted());
 				}
 				event.reply(makeHastePost(toAdd.toString()));
 			}

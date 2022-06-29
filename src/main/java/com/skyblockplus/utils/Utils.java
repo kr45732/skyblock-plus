@@ -78,6 +78,7 @@ import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -244,7 +245,7 @@ public class Utils {
 	}
 
 	public static Emoji getEmojiObj(String id) {
-		return Emoji.fromMarkdown(getEmojiOr(id, null));
+		return Emoji.fromFormatted(getEmojiOr(id, null));
 	}
 
 	public static JsonObject getAverageAuctionJson() {
@@ -995,19 +996,19 @@ public class Utils {
 			case "grapes" -> "\uD83C\uDF47";
 			case "kiwi" -> "\uD83E\uDD5D";
 			case "lemon" -> "\uD83C\uDF4B";
-			case "lime" -> "lime:828632854174498837";
+			case "lime" -> "<:lime:828632854174498837>";
 			case "mango" -> "\uD83E\uDD6D";
-			case "orange" -> "orange:828634110360289331";
-			case "papaya" -> "papaya:828633125370200085";
+			case "orange" -> "<:orange:828634110360289331>";
+			case "papaya" -> "<:papaya:828633125370200085>";
 			case "peach" -> "\uD83C\uDF51";
 			case "pear" -> "\uD83C\uDF50";
 			case "pineapple" -> "\uD83C\uDF4D";
-			case "pomegranate" -> "pomegranate:828632397032456232";
-			case "raspberry" -> "raspberry:828632035127853064";
+			case "pomegranate" -> "<:pomegranate:828632397032456232>";
+			case "raspberry" -> "<:raspberry:828632035127853064>";
 			case "strawberry" -> "\uD83C\uDF53";
 			case "tomato" -> "\uD83C\uDF45";
 			case "watermelon" -> "\uD83C\uDF49";
-			case "zucchini" -> "zucchini:828636746358194206";
+			case "zucchini" -> "<:zucchini:828636746358194206>";
 			default -> null;
 		};
 	}

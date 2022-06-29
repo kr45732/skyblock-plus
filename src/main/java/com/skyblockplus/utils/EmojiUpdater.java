@@ -38,9 +38,9 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Icon;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 
@@ -457,7 +457,7 @@ public class EmojiUpdater {
 						return false;
 					}
 				})
-				.filter(g -> g.getEmotes().stream().filter(e -> enchanted == e.isAnimated()).count() < g.getMaxEmotes())
+				.filter(g -> g.getEmojis().stream().filter(e -> enchanted == e.isAnimated()).count() < g.getMaxEmojis())
 				.sorted(Comparator.comparingInt(g -> Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1])))
 				.collect(Collectors.toList());
 
@@ -496,7 +496,7 @@ public class EmojiUpdater {
 						};
 
 					Guild curGuild = guildList.get(guildCount);
-					if (curGuild.getEmotes().stream().filter(e -> enchanted == e.isAnimated()).count() >= curGuild.getMaxEmotes()) {
+					if (curGuild.getEmojis().stream().filter(e -> enchanted == e.isAnimated()).count() >= curGuild.getMaxEmojis()) {
 						guildCount++;
 						curGuild = guildList.get(guildCount);
 						TimeUnit.SECONDS.sleep(3);
@@ -504,17 +504,17 @@ public class EmojiUpdater {
 					}
 
 					String urlOrPath = entry.getValue().getAsString();
-					Emote emoji;
+					Emoji emoji;
 					if (urlOrPath.startsWith("src/main/java/com/skyblockplus/json")) {
-						emoji = curGuild.createEmote(name, Icon.from(new File(urlOrPath))).complete();
+						emoji = curGuild.createEmoji(name, Icon.from(new File(urlOrPath))).complete();
 					} else {
 						URLConnection urlConn = new URL(urlOrPath).openConnection();
 						urlConn.addRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
-						emoji = curGuild.createEmote(name, Icon.from(urlConn.getInputStream())).complete();
+						emoji = curGuild.createEmoji(name, Icon.from(urlConn.getInputStream())).complete();
 					}
 
 					System.out.println("Created emoji - " + last);
-					idToEmoji.addProperty(entry.getKey(), emoji.getAsMention());
+					idToEmoji.addProperty(entry.getKey(), emoji.getFormatted());
 					TimeUnit.MILLISECONDS.sleep(100);
 				} catch (Exception e) {
 					System.out.println("Failed emoji - " + last);
