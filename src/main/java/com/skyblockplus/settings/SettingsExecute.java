@@ -328,11 +328,11 @@ public class SettingsExecute {
 							default -> null;
 						};
 					case "video" -> eb =
-							switch (args[3]) {
-								case "enable" -> setVerifyVideoEnable(true);
-								case "disable" -> setVerifyVideoEnable(false);
-								default -> null;
-							};
+						switch (args[3]) {
+							case "enable" -> setVerifyVideoEnable(true);
+							case "disable" -> setVerifyVideoEnable(false);
+							default -> null;
+						};
 					case "dm_on_sync" -> eb =
 						switch (args[3]) {
 							case "enable" -> setVerifyDmOnSync(true);

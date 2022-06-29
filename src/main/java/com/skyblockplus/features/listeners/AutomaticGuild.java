@@ -410,9 +410,8 @@ public class AutomaticGuild {
 					}
 				} catch (Exception ignored) {}
 
-				MessageAction action = reactChannel
-					.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
-				if(higherDepth(currentSettings, "enableVerifyVideo", true)) {
+				MessageAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
 					action = action.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"));
 				}
 				Message reactMessage = action.complete();
@@ -456,9 +455,8 @@ public class AutomaticGuild {
 
 				verifyGuild = new VerifyGuild(); // Prevent the old settings from deleting the new message
 
-				MessageAction action = reactChannel
-						.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
-				if(higherDepth(currentSettings, "enableVerifyVideo", true)) {
+				MessageAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
 					action = action.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"));
 				}
 				Message reactMessage = action.complete();
