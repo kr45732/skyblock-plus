@@ -281,9 +281,12 @@ public class NetworthExecute {
 						sacksTotal += itemPrice;
 						String emoji = higherDepth(getEmojiMap(), sackEntry.getKey(), null);
 						sacksItems.add(
-								(emoji == null ? "" : emoji + " ") +
-										(sackEntry.getValue() != 1 ? sackEntry.getValue() + "x " : "") +
-										 idToName(sackEntry.getKey()) + "=:=" + itemPrice);
+							(emoji == null ? "" : emoji + " ") +
+							(sackEntry.getValue() != 1 ? sackEntry.getValue() + "x " : "") +
+							idToName(sackEntry.getKey()) +
+							"=:=" +
+							itemPrice
+						);
 					}
 				}
 			}
@@ -319,10 +322,10 @@ public class NetworthExecute {
 			for (int i = 0; i < sacksItems.size(); i++) {
 				String item = sacksItems.get(i);
 				echestStr
-						.append(item.split("=:=")[0])
-						.append(" ➜ ")
-						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
-						.append("\n");
+					.append(item.split("=:=")[0])
+					.append(" ➜ ")
+					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+					.append("\n");
 				if (i == 24) {
 					int moreItems = sacksItems.size() - 25;
 					if (moreItems > 0) {
@@ -624,18 +627,12 @@ public class NetworthExecute {
 						)
 				);
 			}
-			if(!sacksStr.isEmpty()){
+			if (!sacksStr.isEmpty()) {
 				pages.put(
-						SelectOption.of("Sacks", "sacks").withEmoji(getEmojiObj("RUNE_SACK")),
-						player
-								.defaultPlayerEmbed(" | Sacks")
-								.setDescription(
-										ebDesc +
-												"\n**Sacks:** " +
-												simplifyNumber(sacksTotal) +
-												"\n\n" +
-												echestStr
-								)
+					SelectOption.of("Sacks", "sacks").withEmoji(getEmojiObj("RUNE_SACK")),
+					player
+						.defaultPlayerEmbed(" | Sacks")
+						.setDescription(ebDesc + "\n**Sacks:** " + simplifyNumber(sacksTotal) + "\n\n" + echestStr)
 				);
 			}
 
