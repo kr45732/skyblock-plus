@@ -437,6 +437,9 @@ public class Utils {
 				getJsonObject(
 					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/essencecosts.json"
 				);
+			for (Map.Entry<String, JsonElement> entry : getConstant("ADDITIONAL_ESSENCE_UPGRADE_DATA").getAsJsonObject().entrySet()) {
+				essenceCostsJson.add(entry.getKey(), entry.getValue());
+			}
 		}
 		return essenceCostsJson;
 	}
