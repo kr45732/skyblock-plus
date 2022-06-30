@@ -83,13 +83,13 @@ public class CrimsonCommand extends Command {
 
 			List<String> allFish = List.of(
 				"gusher",
-				"blobfish",
+				"obfuscated_fish_3",
 				"golden_fish",
-				"volcanic_stonefish",
+				"mana_ray",
 				"sulphur_skitter",
 				"lava_horse",
 				"moldfin",
-				"mana_ray",
+				"volcanic_stonefish",
 				"slugfish",
 				"skeleton_fish",
 				"obfuscated_fish_1",
@@ -99,7 +99,7 @@ public class CrimsonCommand extends Command {
 				"flyfish",
 				"karate_fish",
 				"obfuscated_fish_2",
-				"obfuscated_fish_3"
+				"blobfish"
 			);
 			JsonElement fishJson = higherDepth(player.profileJson(), "trophy_fish");
 			eb =

@@ -64,7 +64,7 @@ public abstract class CommandExecute extends CommandEvent {
 				this.ebMessage =
 					getChannel()
 						.sendMessage(
-							"**⚠️ Skyblock Plus will stop responding to message commands <t:1662004740:R>!** Please use slash commands instead. If you do not see slash commands, then make sure the everyone role has the `Use Application Commands` permissions enabled or re-invite the bot using `" +
+							"**⚠️ Skyblock Plus will stop responding to message commands <t:1662004740:R>!** Please use slash commands instead. If you do not see slash commands, make sure `Use Application Commands` is enabled for @ everyone or re-invite the bot using `" +
 							getGuildPrefix(getGuild().getId()) +
 							"invite`"
 						)
