@@ -154,10 +154,8 @@ public class EssenceHandler {
 				}
 			}
 		}
-		if(totalEssence > 0) {
-			items.put(
-					higherDepth(itemJson, "type").getAsString().toLowerCase() +
-					" essence", totalEssence);
+		if (totalEssence > 0) {
+			items.put(higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence", totalEssence);
 		}
 
 		event
@@ -170,12 +168,11 @@ public class EssenceHandler {
 						" to " +
 						endingLevel +
 						(endingLevel == 1 ? " star" : " stars"),
-							items
-									.entrySet()
-									.stream()
-									.map(e -> e.getValue() + " " + e.getKey())
-									.collect( Collectors.joining( items.size() == 1 ? "": "\n• ", items.size() == 1 ? "":"\n• ", ""))
-						,
+						items
+							.entrySet()
+							.stream()
+							.map(e -> e.getValue() + " " + e.getKey())
+							.collect(Collectors.joining(items.size() == 1 ? "" : "\n• ", items.size() == 1 ? "" : "\n• ", "")),
 						false
 					)
 					.build()

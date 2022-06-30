@@ -981,7 +981,9 @@ public class AutomaticGuild {
 	}
 
 	public void onGuildMessageReceived(MessageReceivedEvent event) {
-		if (isMainBot() && event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")) {
+		if (
+			isMainBot() && event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")
+		) {
 			if (
 				event.getMessage().getEmbeds().size() > 0 &&
 				event.getMessage().getEmbeds().get(0).getDescription() != null &&
