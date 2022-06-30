@@ -53,7 +53,7 @@ public class EssenceHandler {
 
 		int max = 0;
 		for (int i = 1; i <= 10; i++) {
-			if (higherDepth(itemJson, "" + i) != null) {
+			if (higherDepth(itemJson, "" + i) != null || higherDepth(itemJson, "items." + i) != null) {
 				max = i;
 			}
 		}
@@ -63,9 +63,7 @@ public class EssenceHandler {
 			menuBuilder.addOption("Dungeonize", "-1");
 		}
 		for (int i = 0; i <= max - 1; i++) {
-			if (i == 0 || higherDepth(itemJson, "" + i) != null) {
-				menuBuilder.addOption("" + i, "" + i);
-			}
+			menuBuilder.addOption("" + i, "" + i);
 		}
 
 		event
@@ -104,7 +102,7 @@ public class EssenceHandler {
 		SelectMenu.Builder menuBuilder = SelectMenu.create("essence_upgrade_command");
 
 		for (int i = startingLevel + 1; i <= 10; i++) {
-			if (i == 0 || higherDepth(itemJson, "" + i) != null) {
+			if (i == 0 || higherDepth(itemJson, "" + i) != null || higherDepth(itemJson, "items." + i) != null) {
 				menuBuilder.addOption("" + i, "" + i);
 			}
 		}
@@ -133,7 +131,7 @@ public class EssenceHandler {
 		int endingLevel = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
 
 		int totalEssence = 0;
-		Map<String, Integer> otherItems = new HashMap<>();
+		Map<String, Integer> items = new HashMap<>();
 		for (int i = (startingLevel + 1); i <= endingLevel; i++) {
 			if (i == 0) {
 				totalEssence += higherDepth(itemJson, "dungeonize", 0);
@@ -152,9 +150,14 @@ public class EssenceHandler {
 						count = Integer.parseInt(nameCountSplit[1]);
 					}
 					int finalCount = count;
-					otherItems.compute(name, (k, v) -> (v != null ? v : 0) + finalCount);
+					items.compute(name, (k, v) -> (v != null ? v : 0) + finalCount);
 				}
 			}
+		}
+		if(totalEssence > 0) {
+			items.put(
+					higherDepth(itemJson, "type").getAsString().toLowerCase() +
+					" essence", totalEssence);
 		}
 
 		event
@@ -167,20 +170,12 @@ public class EssenceHandler {
 						" to " +
 						endingLevel +
 						(endingLevel == 1 ? " star" : " stars"),
-						(!otherItems.isEmpty() ? "• " : "") +
-						totalEssence +
-						" " +
-						higherDepth(itemJson, "type").getAsString().toLowerCase() +
-						" essence" +
-						(
-							!otherItems.isEmpty()
-								? otherItems
+							items
 									.entrySet()
 									.stream()
 									.map(e -> e.getValue() + " " + e.getKey())
-									.collect(Collectors.joining("\n• ", "\n• ", ""))
-								: ""
-						),
+									.collect( Collectors.joining( items.size() == 1 ? "": "\n• ", items.size() == 1 ? "":"\n• ", ""))
+						,
 						false
 					)
 					.build()
