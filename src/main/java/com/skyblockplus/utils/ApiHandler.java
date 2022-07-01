@@ -105,7 +105,7 @@ public class ApiHandler {
 	public static void updateBotStatistics() {
 		try {
 			int serverCount = jda.getGuilds().size();
-			jda.setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + serverCount + " servers"));
+			jda.setActivity(Activity.watching("/help in " + serverCount + " servers"));
 
 			if (!isMainBot()) {
 				return;

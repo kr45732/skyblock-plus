@@ -1118,23 +1118,21 @@ public class Utils {
 		long hours = (millis / 1000 / 60 / 60) % 24;
 		long days = (millis / 1000 / 60 / 60 / 24);
 
-		String endsIn = "";
-		if (millis < 0) {
-			endsIn += "Ended!";
-		} else if (minutes == 0 && hours == 0 && days == 0) {
-			endsIn += seconds + "s";
+		String formattedTime = "";
+		if (minutes == 0 && hours == 0 && days == 0) {
+			formattedTime += seconds + "s";
 		} else if (hours == 0 && days == 0) {
-			endsIn += minutes + "m" + seconds + "s";
+			formattedTime += minutes + "m" + (seconds > 0 ? seconds + "s" : "");
 		} else if (days == 0) {
 			if (hours <= 6) {
-				endsIn += hours + "h" + minutes + "m" + seconds + "s";
+				formattedTime += hours + "h" + minutes + "m" + seconds + "s";
 			} else {
-				endsIn += hours + "h";
+				formattedTime += hours + "h";
 			}
 		} else {
-			endsIn += days + "d" + hours + "h";
+			formattedTime += days + "d" + hours + "h";
 		}
-		return endsIn;
+		return formattedTime;
 	}
 
 	/**
