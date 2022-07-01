@@ -632,7 +632,7 @@ public class NetworthExecute {
 					SelectOption.of("Sacks", "sacks").withEmoji(getEmojiObj("RUNE_SACK")),
 					player
 						.defaultPlayerEmbed(" | Sacks")
-						.setDescription(ebDesc + "\n**Sacks:** " + simplifyNumber(sacksTotal) + "\n\n" + echestStr)
+						.setDescription(ebDesc + "\n**Sacks:** " + simplifyNumber(sacksTotal) + "\n\n" + sacksStr)
 				);
 			}
 
