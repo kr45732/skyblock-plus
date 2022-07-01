@@ -321,7 +321,7 @@ public class NetworthExecute {
 			StringBuilder sacksStr = new StringBuilder();
 			for (int i = 0; i < sacksItems.size(); i++) {
 				String item = sacksItems.get(i);
-				echestStr
+				sacksStr
 					.append(item.split("=:=")[0])
 					.append(" ➜ ")
 					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
@@ -329,7 +329,7 @@ public class NetworthExecute {
 				if (i == 24) {
 					int moreItems = sacksItems.size() - 25;
 					if (moreItems > 0) {
-						echestStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
+						sacksStr.append("... ").append(moreItems).append(" more item").append(moreItems > 1 ? "s" : "");
 					}
 					break;
 				}
