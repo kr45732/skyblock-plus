@@ -1204,7 +1204,7 @@ public class Utils {
 						itemInfo.setNbtTag(item);
 						itemInfo.setDarkAuctionPrice(
 							(itemInfo.getId().equals("MIDAS_SWORD") || itemInfo.getId().equals("MIDAS_STAFF"))
-								? item.getLong("winning_bid", -1L)
+								? item.getLong("tag.ExtraAttributes.winning_bid", -1L)
 								: -1
 						);
 
