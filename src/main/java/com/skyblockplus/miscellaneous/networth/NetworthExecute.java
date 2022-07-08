@@ -1439,7 +1439,7 @@ public class NetworthExecute {
 		String origItemId = itemId;
 
 		try {
-			return Math.max(higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble(), 0);
+			double bazaarPrice = Math.max(higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble(), getNpcSellPrice(itemId));
 		} catch (Exception ignored) {}
 
 		if (!onlyBazaar) {
@@ -1528,7 +1528,7 @@ public class NetworthExecute {
 		}
 
 		//		tempSet.add(itemId + " - " + iName);
-		return 0;
+		return Math.max(getNpcSellPrice(itemId), 0);
 	}
 
 	public double getMinionCost(String id, int tier) {

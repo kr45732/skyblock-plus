@@ -88,10 +88,10 @@ public class MayorHandler {
 			long closeTime = newYearStartEpoch + newYearToElectionClose;
 			long openTime = newYearStartEpoch + newYearToElectionOpen;
 
-			if (currentTime > closeTime && currentTime < closeTime + 420000) { // Ended at most 7 min ago
+			if (closeTime < currentTime && currentTime < closeTime + 420000) { // Ended at most 7 min ago
 				scheduler.schedule(MayorHandler::mayorElected, 5, TimeUnit.MINUTES);
 				scheduler.schedule(MayorHandler::initialize, 15, TimeUnit.MINUTES);
-			} else if (currentTime > closeTime && currentTime < openTime) { // Election booth is closed so wait for next open
+			} else if (closeTime < currentTime && currentTime < openTime) { // Election booth is closed so wait for next open
 				scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
 			} else { // Election is open
 				updateCurrentElection();

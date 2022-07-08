@@ -1711,4 +1711,8 @@ public class Utils {
 		}
 		return "https://sky.shiiyu.moe/item.gif/" + id;
 	}
+
+	public static String getAvatarlUrl(String uuid) {
+		return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
+	}
 }

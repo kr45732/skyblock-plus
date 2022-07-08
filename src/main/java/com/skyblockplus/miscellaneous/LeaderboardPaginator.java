@@ -137,6 +137,10 @@ public class LeaderboardPaginator {
 			}
 		}
 
+		if (columnOne.isEmpty() && columnTwo.isEmpty()) {
+			columnOne.append("This page is empty");
+		}
+
 		return defaultEmbed("Global Leaderboard | " + capitalizeString(gamemode.toString()))
 			.setDescription(
 				isPlayer

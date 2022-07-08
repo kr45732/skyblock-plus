@@ -166,13 +166,13 @@ public class AuctionsCommand extends Command {
 			}
 			if (extras.getEmbedFields().size() == 0) {
 				return new MessageBuilder()
-					.setEmbeds(invalidEmbed("No auctions found for " + usernameUuidStruct.username()).build())
+					.setEmbeds(invalidEmbed("No auctions found for " + usernameUuidStruct.usernameFixed()).build())
 					.setActionRows(ActionRow.of(button));
 			}
 
 			extras
-				.setEveryPageTitle(usernameUuidStruct.username())
-				.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.username(), null))
+				.setEveryPageTitle(usernameUuidStruct.usernameFixed())
+				.setEveryPageTitleUrl(usernameUuidStruct.getAuctionUrl())
 				.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
 				.setEveryPageText(
 					(
@@ -200,7 +200,7 @@ public class AuctionsCommand extends Command {
 			NetworthExecute calc = new NetworthExecute().initPrices().setVerbose(true);
 
 			for (JsonElement currentAuction : auctionsArray) {
-				EmbedBuilder eb = defaultEmbed(usernameUuidStruct.username(), skyblockStatsLink(usernameUuidStruct.username(), null));
+				EmbedBuilder eb = defaultEmbed(usernameUuidStruct.usernameFixed(), usernameUuidStruct.getAuctionUrl());
 				if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
 					String auctionName;
 
@@ -277,7 +277,7 @@ public class AuctionsCommand extends Command {
 			}
 
 			if (extras.getEmbedPages().size() == 0) {
-				return invalidEmbed("No auctions found for " + usernameUuidStruct.username());
+				return invalidEmbed("No auctions found for " + usernameUuidStruct.usernameFixed());
 			}
 
 			for (int i = 0; i < extras.getEmbedPages().size(); i++) {
@@ -288,7 +288,7 @@ public class AuctionsCommand extends Command {
 						extras
 							.getEmbedPages()
 							.get(i)
-							.setTitle(usernameUuidStruct.username(), skyblockStatsLink(usernameUuidStruct.username(), null))
+							.setTitle(usernameUuidStruct.usernameFixed(), usernameUuidStruct.getAuctionUrl())
 							.setThumbnail(usernameUuidStruct.getAvatarlUrl())
 							.setDescription(
 								(
