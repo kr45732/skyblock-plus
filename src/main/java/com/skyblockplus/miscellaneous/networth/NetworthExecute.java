@@ -1439,7 +1439,10 @@ public class NetworthExecute {
 		String origItemId = itemId;
 
 		try {
-			double bazaarPrice = Math.max(higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble(), getNpcSellPrice(itemId));
+			double bazaarPrice = Math.max(
+				higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble(),
+				getNpcSellPrice(itemId)
+			);
 		} catch (Exception ignored) {}
 
 		if (!onlyBazaar) {

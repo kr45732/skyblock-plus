@@ -18,9 +18,9 @@
 
 package com.skyblockplus.utils.structs;
 
-import com.skyblockplus.utils.Utils;
-
 import static com.skyblockplus.utils.Utils.fixUsername;
+
+import com.skyblockplus.utils.Utils;
 
 public record UsernameUuidStruct(String username, String uuid, String failCause) {
 	public UsernameUuidStruct(String username, String uuid) {
