@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -102,7 +103,7 @@ public class AuctionFlipper {
 		if (underBinJson != null) {
 			JsonElement avgAuctionJson = getAverageAuctionJson();
 
-			for (JsonElement auction : underBinJson.getAsJsonArray()) {
+			for (JsonElement auction : collectJsonArray(streamJsonArray(underBinJson.getAsJsonArray()).sorted(Comparator.comparingLong(c -> -higherDepth(c, "profit", 0L))).limit(15))) {
 				String itemId = higherDepth(auction, "id").getAsString();
 				if (isVanillaItem(itemId) || itemId.equals("BEDROCK")) {
 					continue;
