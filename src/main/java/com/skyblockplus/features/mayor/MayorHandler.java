@@ -88,6 +88,7 @@ public class MayorHandler {
 			long closeTime = newYearStartEpoch + newYearToElectionClose;
 			long openTime = newYearStartEpoch + newYearToElectionOpen;
 
+			System.out.println("Close: " + closeTime + " | Cur: " + currentTime + " | NewYrSart: " + newYearStartEpoch);
 			if (closeTime < currentTime && currentTime < closeTime + 420000) { // Ended at most 7 min ago
 				scheduler.schedule(MayorHandler::mayorElected, 5, TimeUnit.MINUTES);
 				scheduler.schedule(MayorHandler::initialize, 15, TimeUnit.MINUTES);
@@ -106,76 +107,82 @@ public class MayorHandler {
 	}
 
 	public static void mayorElected() {
-		JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor");
-		JsonArray mayors = collectJsonArray(
-			streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray())
-				.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
-		);
+		try {
+			System.out.println("mayor elected called");
+			JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor");
+			JsonArray mayors = collectJsonArray(
+					streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray())
+							.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
+			);
 
-		currentMayor = higherDepth(cur, "name").getAsString();
-		currentMayorYear = higherDepth(cur, "election.year").getAsInt();
-		double totalVotes = streamJsonArray(mayors).mapToInt(m -> higherDepth(m, "votes").getAsInt()).sum();
+			currentMayor = higherDepth(cur, "name").getAsString();
+			currentMayorYear = higherDepth(cur, "election.year").getAsInt();
+			double totalVotes = streamJsonArray(mayors).mapToInt(m -> higherDepth(m, "votes").getAsInt()).sum();
 
-		EmbedBuilder eb = defaultEmbed("Mayor Elected | Year " + currentMayorYear);
-		eb.setDescription("**Year:** " + currentMayorYear + "\n**Total Votes:** " + formatNumber(totalVotes));
-		eb.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(currentMayor.toUpperCase()) + "/left");
-		StringBuilder ebStr = new StringBuilder();
-		for (JsonElement curMayor : mayors) {
-			String name = higherDepth(curMayor, "name").getAsString();
-			int votes = higherDepth(curMayor, "votes").getAsInt();
+			EmbedBuilder eb = defaultEmbed("Mayor Elected | Year " + currentMayorYear);
+			eb.setDescription("**Year:** " + currentMayorYear + "\n**Total Votes:** " + formatNumber(totalVotes));
+			eb.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(currentMayor.toUpperCase()) + "/left");
+			StringBuilder ebStr = new StringBuilder();
+			for (JsonElement curMayor : mayors) {
+				String name = higherDepth(curMayor, "name").getAsString();
+				int votes = higherDepth(curMayor, "votes").getAsInt();
 
-			if (higherDepth(curMayor, "name").getAsString().equals(currentMayor)) {
-				StringBuilder perksStr = new StringBuilder();
-				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
-					perksStr
-						.append("\n➜ ")
-						.append(higherDepth(perk, "name").getAsString())
-						.append(": ")
-						.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+				if (higherDepth(curMayor, "name").getAsString().equals(currentMayor)) {
+					StringBuilder perksStr = new StringBuilder();
+					for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
+						perksStr
+								.append("\n➜ ")
+								.append(higherDepth(perk, "name").getAsString())
+								.append(": ")
+								.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+					}
+
+					eb.addField(
+							mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
+							"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
+							false
+					);
+				} else {
+					ebStr
+							.append("\n")
+							.append(mayorNameToEmoji.get(name.toUpperCase()))
+							.append(" **")
+							.append(name)
+							.append(":** ")
+							.append(roundProgress(votes / totalVotes))
+							.append(" (")
+							.append(formatNumber(votes))
+							.append(")");
+				}
+			}
+			eb.addField("Losing Mayors", ebStr.toString(), false);
+			eb.addField(
+					"Next Election",
+					"Opens <t:" + Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 217200000).getEpochSecond() + ":R>",
+					false
+			);
+
+			MessageEmbed embed = eb.build();
+			Button button = null;
+			if (currentMayor.equals("Jerry")) {
+				button = Button.primary("mayor_jerry_button", "Current Jerry Mayor");
+			}
+
+			int updateCount = 0;
+			for (AutomaticGuild guild : guildMap.values()) {
+				if (guild.onMayorElected(embed, button)) { // Send and ping
+					updateCount++;
 				}
 
-				eb.addField(
-					mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
-					"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
-					false
-				);
-			} else {
-				ebStr
-					.append("\n")
-					.append(mayorNameToEmoji.get(name.toUpperCase()))
-					.append(" **")
-					.append(name)
-					.append(":** ")
-					.append(roundProgress(votes / totalVotes))
-					.append(" (")
-					.append(formatNumber(votes))
-					.append(")");
+				if (updateCount != 0 && updateCount % 25 == 0) {
+					try {
+						TimeUnit.SECONDS.sleep(1);
+					} catch (Exception ignored) {
+					}
+				}
 			}
-		}
-		eb.addField("Losing Mayors", ebStr.toString(), false);
-		eb.addField(
-			"Next Election",
-			"Opens <t:" + Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 217200000).getEpochSecond() + ":R>",
-			false
-		);
-
-		MessageEmbed embed = eb.build();
-		Button button = null;
-		if (currentMayor.equals("Jerry")) {
-			button = Button.primary("mayor_jerry_button", "Current Jerry Mayor");
-		}
-
-		int updateCount = 0;
-		for (AutomaticGuild guild : guildMap.values()) {
-			if (guild.onMayorElected(embed, button)) { // Send and ping
-				updateCount++;
-			}
-
-			if (updateCount != 0 && updateCount % 25 == 0) {
-				try {
-					TimeUnit.SECONDS.sleep(1);
-				} catch (Exception ignored) {}
-			}
+		}catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 
