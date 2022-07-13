@@ -307,7 +307,9 @@ public class ApiHandler {
 				}
 
 				JsonArray profileArray = processSkyblockProfilesArray(higherDepth(profilesJson, "profiles").getAsJsonArray());
-				if(shouldCache){cacheDatabase.cacheJson(uuid, profileArray);}
+				if (shouldCache) {
+					cacheDatabase.cacheJson(uuid, profileArray);
+				}
 				return new HypixelResponse(profileArray);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(profilesJson, "cause").getAsString());

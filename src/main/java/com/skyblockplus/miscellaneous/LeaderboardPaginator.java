@@ -111,7 +111,12 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
-		event.getAction().editMessageEmbeds(getRender().build()).setActionRows(getActionRow()).get().queue(ignored -> waitForEvent(), ignore);
+		event
+			.getAction()
+			.editMessageEmbeds(getRender().build())
+			.setActionRows(getActionRow())
+			.get()
+			.queue(ignored -> waitForEvent(), ignore);
 	}
 
 	private EmbedBuilder getRender() {

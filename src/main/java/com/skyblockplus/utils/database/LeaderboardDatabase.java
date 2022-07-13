@@ -318,10 +318,14 @@ public class LeaderboardDatabase {
 						HypixelResponse userResponse = skyblockProfilesFromUuid(
 							usernameUuidStruct.uuid(),
 							count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
-							false, false
+							false,
+							false
 						);
-						if (!userResponse.isNotValid()){
-							insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), userResponse.response(), true), false);
+						if (!userResponse.isNotValid()) {
+							insertIntoLeaderboard(
+								new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), userResponse.response(), true),
+								false
+							);
 						}
 					}
 				}
@@ -345,12 +349,16 @@ public class LeaderboardDatabase {
 					UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
 					if (!usernameUuidStruct.isNotValid()) {
 						HypixelResponse userResponse = skyblockProfilesFromUuid(
-								usernameUuidStruct.uuid(),
-								count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
-								false, false
+							usernameUuidStruct.uuid(),
+							count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+							false,
+							false
 						);
-						if (!userResponse.isNotValid()){
-							insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), userResponse.response(), true), false);
+						if (!userResponse.isNotValid()) {
+							insertIntoLeaderboard(
+								new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), userResponse.response(), true),
+								false
+							);
 						}
 					}
 					count++;
@@ -379,7 +387,7 @@ public class LeaderboardDatabase {
 		return lbType;
 	}
 
-	public void close () {
+	public void close() {
 		updateTask.cancel(true);
 		dataSource.close();
 	}
