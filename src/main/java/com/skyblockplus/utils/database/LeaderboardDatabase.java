@@ -294,34 +294,9 @@ public class LeaderboardDatabase {
 
 	public void updateLeaderboard() {
 		try {
-			long start = System.currentTimeMillis();
-			FindIterable<Document> response = getConnection()
-				.getCollection("all_lb")
-				.find(Filters.lt("last_updated", Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli()))
-				.projection(Projections.include("uuid"))
-				.limit(180);
 			int count = 0;
-			for (Document document : response) {
-				if (count == 90 || System.currentTimeMillis() - start >= 60000) {
-					break;
-				}
-
-				String uuid = document.getString("uuid");
-				UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
-				if (!usernameUuidStruct.isNotValid()) {
-					asyncSkyblockProfilesFromUuid(
-						usernameUuidStruct.uuid(),
-						count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
-						false
-					)
-						.whenComplete((r, e) ->
-							insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
-						);
-				}
-				count++;
-			}
-
-			if (count <= 5 && userCount != -1) {
+			long start = System.currentTimeMillis();
+			if (userCount != -1) {
 				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/users.json")
 					.getAsJsonArray();
 				if (userCount >= members.size()) {
@@ -340,7 +315,7 @@ public class LeaderboardDatabase {
 					if (!usernameUuidStruct.isNotValid()) {
 						asyncSkyblockProfilesFromUuid(
 							usernameUuidStruct.uuid(),
-							count < 45 ? "a15379df-a8c6-4c8f-912e-dfc371df2316" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+							count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
 							false
 						)
 							.whenComplete((r, e) ->
@@ -350,6 +325,34 @@ public class LeaderboardDatabase {
 				}
 
 				log.info("Finished up to user count: " + userCount);
+			}
+
+			if (count < 90 && System.currentTimeMillis() - start < 60000) {
+				FindIterable<Document> response = getConnection()
+					.getCollection("all_lb")
+					.find(Filters.lt("last_updated", Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli()))
+					.projection(Projections.include("uuid"))
+					.limit(180);
+				
+				for (Document document : response) {
+					if (count == 90 || System.currentTimeMillis() - start >= 60000) {
+						break;
+					}
+
+					String uuid = document.getString("uuid");
+					UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
+					if (!usernameUuidStruct.isNotValid()) {
+						asyncSkyblockProfilesFromUuid(
+							usernameUuidStruct.uuid(),
+							count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+							false
+						)
+							.whenComplete((r, e) ->
+								insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
+							);
+					}
+					count++;
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
