@@ -26,7 +26,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.mongodb.WriteConcern;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
