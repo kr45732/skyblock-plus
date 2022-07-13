@@ -18,8 +18,7 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.ApiHandler.asyncSkyblockProfilesFromUuid;
-import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Player.STATS_LIST;
 import static com.skyblockplus.utils.Utils.*;
@@ -37,10 +36,12 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.bson.Document;
@@ -101,19 +102,20 @@ public class LeaderboardDatabase {
 
 	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
 
-	private final MongoClient dataSource;
+	public final MongoClient dataSource;
 	private final List<Player.Gamemode> leaderboardGamemodes = Arrays.asList(
 		Player.Gamemode.ALL,
 		Player.Gamemode.IRONMAN,
 		Player.Gamemode.STRANDED
 	);
 	public int userCount = -1;
+	public ScheduledFuture<?> updateTask;
 
 	public LeaderboardDatabase() {
 		dataSource = new MongoClient(new MongoClientURI(LEADERBOARD_DB_URL));
 
 		if (isMainBot()) {
-			scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
+			updateTask = scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
 	}
 
@@ -191,7 +193,6 @@ public class LeaderboardDatabase {
 
 			getConnection()
 				.getCollection(gamemode.toCacheType())
-				.withWriteConcern(WriteConcern.UNACKNOWLEDGED)
 				.updateOne(Filters.eq("uuid", player.getUuid()), Updates.combine(updates), new UpdateOptions().upsert(true));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -315,14 +316,14 @@ public class LeaderboardDatabase {
 					String uuid = members.get(userCount).getAsString();
 					UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
 					if (!usernameUuidStruct.isNotValid()) {
-						asyncSkyblockProfilesFromUuid(
+						HypixelResponse userResponse = skyblockProfilesFromUuid(
 							usernameUuidStruct.uuid(),
 							count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
-							false
-						)
-							.whenComplete((r, e) ->
-								insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
-							);
+							false, false
+						);
+						if (!userResponse.isNotValid()){
+							insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), userResponse.response(), true), false);
+						}
 					}
 				}
 
@@ -344,14 +345,14 @@ public class LeaderboardDatabase {
 					String uuid = document.getString("uuid");
 					UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
 					if (!usernameUuidStruct.isNotValid()) {
-						asyncSkyblockProfilesFromUuid(
-							usernameUuidStruct.uuid(),
-							count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
-							false
-						)
-							.whenComplete((r, e) ->
-								insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
-							);
+						HypixelResponse userResponse = skyblockProfilesFromUuid(
+								usernameUuidStruct.uuid(),
+								count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+								false, false
+						);
+						if (!userResponse.isNotValid()){
+							insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), userResponse.response(), true), false);
+						}
 					}
 					count++;
 				}
@@ -377,5 +378,10 @@ public class LeaderboardDatabase {
 		}
 
 		return lbType;
+	}
+
+	public void close () {
+		updateTask.cancel(true);
+		dataSource.close();
 	}
 }

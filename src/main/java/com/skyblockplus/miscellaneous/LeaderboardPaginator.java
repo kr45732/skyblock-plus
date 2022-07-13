@@ -111,7 +111,7 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
-		event.getAction().editMessageEmbeds(getRender().build()).setActionRows(getActionRow()).get().queue(ignored -> waitForEvent());
+		event.getAction().editMessageEmbeds(getRender().build()).setActionRows(getActionRow()).get().queue(ignored -> waitForEvent(), ignore);
 	}
 
 	private EmbedBuilder getRender() {
@@ -195,14 +195,14 @@ public class LeaderboardPaginator {
 						)
 						.build()
 				)
-				.queue(ignored -> waitForEventModal(), ignored -> waitForEventModal());
+				.queue(ignored -> waitForEventModal(), ignored -> waitForEventModal(), ignore);
 			return;
 		}
 
 		event
 			.editMessageEmbeds(getRender().build())
 			.setActionRows(getActionRow())
-			.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
+			.queue(ignored -> waitForEvent(), ignored -> waitForEvent(), ignore);
 	}
 
 	private void waitForEvent() {
@@ -289,7 +289,7 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
-		event.editMessageEmbeds(getRender().build()).setActionRows(getActionRow()).queue(ignored -> waitForEvent());
+		event.editMessageEmbeds(getRender().build()).setActionRows(getActionRow()).queue(ignored -> waitForEvent(), ignore);
 	}
 
 	private ActionRow getActionRow() {

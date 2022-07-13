@@ -283,6 +283,10 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean useCache) {
+		return skyblockProfilesFromUuid(uuid, hypixelApiKey, useCache, true);
+	}
+
+	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean useCache, boolean shouldCache) {
 		if (useCache) {
 			JsonElement cachedResponse = cacheDatabase.getCachedJson(uuid);
 			if (cachedResponse != null) {
@@ -303,7 +307,7 @@ public class ApiHandler {
 				}
 
 				JsonArray profileArray = processSkyblockProfilesArray(higherDepth(profilesJson, "profiles").getAsJsonArray());
-				cacheDatabase.cacheJson(uuid, profileArray);
+				if(shouldCache){cacheDatabase.cacheJson(uuid, profileArray);}
 				return new HypixelResponse(profileArray);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(profilesJson, "cause").getAsString());

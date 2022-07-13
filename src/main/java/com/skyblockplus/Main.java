@@ -20,6 +20,7 @@ package com.skyblockplus;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -205,6 +206,9 @@ public class Main {
 		log.info("Stopping");
 
 		log.info("Canceling cache update future: " + updateCacheTask.cancel(true));
+
+		log.info("Closing leaderboard database");
+		leaderboardDatabase.close();
 
 		log.info("Caching Apply Users");
 		cacheApplyGuildUsers();
