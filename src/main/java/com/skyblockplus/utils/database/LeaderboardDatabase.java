@@ -333,7 +333,7 @@ public class LeaderboardDatabase {
 					.find(Filters.lt("last_updated", Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli()))
 					.projection(Projections.include("uuid"))
 					.limit(180);
-				
+
 				for (Document document : response) {
 					if (count == 90 || System.currentTimeMillis() - start >= 60000) {
 						break;
