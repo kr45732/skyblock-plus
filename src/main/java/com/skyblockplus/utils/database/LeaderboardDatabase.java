@@ -27,6 +27,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -190,6 +191,7 @@ public class LeaderboardDatabase {
 
 			getConnection()
 				.getCollection(gamemode.toCacheType())
+				.withWriteConcern(WriteConcern.UNACKNOWLEDGED)
 				.updateOne(Filters.eq("uuid", player.getUuid()), Updates.combine(updates), new UpdateOptions().upsert(true));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -307,7 +309,7 @@ public class LeaderboardDatabase {
 
 				for (
 					count = 0;
-					count < 90 && userCount < members.size() && System.currentTimeMillis() - start < 60000;
+					count <= 90 && userCount < members.size() && System.currentTimeMillis() - start < 60000;
 					userCount++, count++
 				) {
 					String uuid = members.get(userCount).getAsString();
