@@ -480,7 +480,7 @@ public class NetworthExecute {
 			}
 
 			double totalNetworth = getTotalCalculatedNetworth();
-			int position = leaderboardDatabase.getNetworthPosition(player.getGamemode(), player.getUuid());
+//			int position = leaderboardDatabase.getNetworthPosition(player.getGamemode(), player.getUuid());
 			String ebDesc =
 				"**Total Networth:** " +
 				simplifyNumber(totalNetworth) +
@@ -491,9 +491,10 @@ public class NetworthExecute {
 					Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
 						? capitalizeString(player.getGamemode().toString()) + " "
 						: ""
-				) +
-				"Leaderboard Position:** " +
-				(position != -1 ? formatNumber(position) : "Not on leaderboard");
+				);
+//						+
+//				"Leaderboard Position:** " +
+//				(position != -1 ? formatNumber(position) : "Not on leaderboard");
 			eb.setDescription(ebDesc);
 			eb.addField("Purse", simplifyNumber(purseCoins), true);
 			eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);

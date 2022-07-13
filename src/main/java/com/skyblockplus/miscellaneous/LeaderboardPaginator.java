@@ -195,14 +195,14 @@ public class LeaderboardPaginator {
 						)
 						.build()
 				)
-				.queue(ignored -> waitForEventModal(), ignored -> waitForEventModal(), ignore);
+				.queue(ignored -> waitForEventModal(), ignored -> waitForEventModal());
 			return;
 		}
 
 		event
 			.editMessageEmbeds(getRender().build())
 			.setActionRows(getActionRow())
-			.queue(ignored -> waitForEvent(), ignored -> waitForEvent(), ignore);
+			.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
 	}
 
 	private void waitForEvent() {
