@@ -88,7 +88,6 @@ public class MayorHandler {
 			long closeTime = newYearStartEpoch + newYearToElectionClose;
 			long openTime = newYearStartEpoch + newYearToElectionOpen;
 
-			System.out.println("Close: " + closeTime + " | Cur: " + currentTime + " | NewYrSart: " + newYearStartEpoch);
 			if (closeTime < currentTime && currentTime < closeTime + 420000) { // Ended at most 7 min ago
 				scheduler.schedule(MayorHandler::mayorElected, 5, TimeUnit.MINUTES);
 				scheduler.schedule(MayorHandler::initialize, 15, TimeUnit.MINUTES);
@@ -96,6 +95,7 @@ public class MayorHandler {
 				scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
 			} else { // Election is open
 				updateCurrentElection();
+				scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
 			}
 
 			if (currentMayor.equals("Jerry") && jerryFuture == null) {
@@ -281,7 +281,5 @@ public class MayorHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
 	}
 }
