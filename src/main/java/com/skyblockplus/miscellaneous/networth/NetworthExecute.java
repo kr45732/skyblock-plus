@@ -486,15 +486,13 @@ public class NetworthExecute {
 				simplifyNumber(totalNetworth) +
 				" (" +
 				formatNumber(totalNetworth) +
-				")\n**" +
-				(
-					Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
-						? capitalizeString(player.getGamemode().toString()) + " "
-						: ""
-				);
-			//						+
-			//				"Leaderboard Position:** " +
-			//				(position != -1 ? formatNumber(position) : "Not on leaderboard");
+				")";
+//			\n**" +
+//				(
+//					Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
+//						? capitalizeString(player.getGamemode().toString()) + " "
+//						: ""
+//				)+"Leaderboard Position:** " + (position != -1 ? formatNumber(position) : "Not on leaderboard");
 			eb.setDescription(ebDesc);
 			eb.addField("Purse", simplifyNumber(purseCoins), true);
 			eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);

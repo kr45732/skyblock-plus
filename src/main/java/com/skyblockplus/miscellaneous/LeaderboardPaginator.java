@@ -152,7 +152,7 @@ public class LeaderboardPaginator {
 					? "**Player:** " +
 					fixUsername(player) +
 					"\n**Rank:** " +
-					(playerRank == -1 ? "Not on leaderboard" : "#" + playerRank) +
+					(playerRank == -1 ? "Not on leaderboard" : "#" + formatNumber(playerRank)) +
 					"\n**" +
 					capitalizeString(lbType.replace("_", " ")) +
 					":** " +
