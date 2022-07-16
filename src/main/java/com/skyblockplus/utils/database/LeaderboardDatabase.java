@@ -137,27 +137,6 @@ public class LeaderboardDatabase {
 		});
 	}
 
-	/**
-	 * Sync insert into requestedGamemode and async insert for other gamemodes (makes copy of player)
-	 */
-	public void insertIntoLeaderboardSync(Player player, Player.Gamemode requestedGamemode) {
-		Player finalPlayer = player.copy();
-
-		if (player.isValid()) {
-			insertIntoLeaderboard(finalPlayer, requestedGamemode);
-		}
-
-		executor.submit(() -> {
-			for (Player.Gamemode gamemode : leaderboardGamemodes) {
-				if (gamemode != requestedGamemode) {
-					if (player.isValid()) {
-						insertIntoLeaderboard(finalPlayer, gamemode);
-					}
-				}
-			}
-		});
-	}
-
 	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
 		try {
 			List<Bson> updates = new ArrayList<>();
@@ -196,6 +175,27 @@ public class LeaderboardDatabase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Sync insert into requestedGamemode and async insert for other gamemodes (makes copy of player)
+	 */
+	public void insertIntoLeaderboardSync(Player player, Player.Gamemode requestedGamemode) {
+		Player finalPlayer = player.copy();
+
+		if (player.isValid()) {
+			insertIntoLeaderboard(finalPlayer, requestedGamemode);
+		}
+
+		executor.submit(() -> {
+			for (Player.Gamemode gamemode : leaderboardGamemodes) {
+				if (gamemode != requestedGamemode) {
+					if (player.isValid()) {
+						insertIntoLeaderboard(finalPlayer, gamemode);
+					}
+				}
+			}
+		});
 	}
 
 	public void deleteFromLeaderboard(String uuid, Player.Gamemode gamemode) {

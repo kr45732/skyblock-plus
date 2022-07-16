@@ -104,11 +104,6 @@ public class HelpData {
 		return getCategory(this);
 	}
 
-	public HelpData setCategory(String category) {
-		this.category = category;
-		return this;
-	}
-
 	private String getCategory(HelpData data) {
 		if (data.category != null) {
 			return data.category;
@@ -116,6 +111,11 @@ public class HelpData {
 			return getCategory(data.superCommand);
 		}
 		return null;
+	}
+
+	public HelpData setCategory(String category) {
+		this.category = category;
+		return this;
 	}
 
 	public String getUsage() {
