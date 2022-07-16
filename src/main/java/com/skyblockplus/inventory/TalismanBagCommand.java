@@ -176,7 +176,7 @@ public class TalismanBagCommand extends Command {
 			Map<Integer, InvItem> accessoryBagMap = player.getTalismanBagMap();
 			List<InvItem> accessoryBag = accessoryBagMap == null
 				? new ArrayList<>()
-				: accessoryBagMap.values().stream().filter(Objects::nonNull).collect(Collectors.toList());
+				: accessoryBagMap.values().stream().filter(Objects::nonNull).toList();
 			StringBuilder accessoryStr = new StringBuilder();
 			int magicPower = 0;
 			for (Map.Entry<String, Integer> entry : rarityToMagicPower.entrySet()) {

@@ -58,7 +58,7 @@ public class ApiHandler {
 	public static final LeaderboardDatabase leaderboardDatabase = new LeaderboardDatabase();
 	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);
 	private static final Pattern minecraftUuidRegex = Pattern.compile(
-		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+		"[\\da-f]{32}|[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}"
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	public static boolean useAlternativeAhApi = false;

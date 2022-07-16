@@ -2483,8 +2483,6 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setVerifyVideoEnable(boolean enable) {
-		JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
-
 		int responseCode = updateVerifySettings("enableVerifyVideo", "" + enable);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);

@@ -1777,12 +1777,11 @@ public class Player {
 		try {
 			List<String[]> out = new ArrayList<>();
 			for (JsonElement page : higherDepth(profileJson(), "backpack_contents")
-				.getAsJsonObject()
-				.entrySet()
-				.stream()
-				.sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey())))
-				.map(Map.Entry::getValue)
-				.collect(Collectors.toList())) {
+					.getAsJsonObject()
+					.entrySet()
+					.stream()
+					.sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey())))
+					.map(Map.Entry::getValue).toList()) {
 				NBTCompound decodedInventoryContents = NBTReader.readBase64(higherDepth(page, "data").getAsString());
 
 				NBTList invFrames = decodedInventoryContents.getList("i");

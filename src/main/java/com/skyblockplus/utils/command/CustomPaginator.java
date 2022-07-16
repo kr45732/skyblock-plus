@@ -296,7 +296,7 @@ public class CustomPaginator extends Menu {
 				embedBuilder.setDescription(extras.getEveryPageText());
 			} catch (Exception ignored) {}
 
-			int start = (pageNum - 1) * itemsPerPage;
+			int start = Math.max(0, (pageNum - 1) * itemsPerPage);
 			int end = Math.min(strings.size(), pageNum * itemsPerPage);
 			if (extras.getType() == PaginatorExtras.PaginatorType.EMBED_FIELDS) {
 				end = Math.min(extras.getEmbedFields().size(), pageNum * itemsPerPage);

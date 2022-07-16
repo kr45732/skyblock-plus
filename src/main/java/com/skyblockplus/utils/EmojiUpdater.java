@@ -236,7 +236,7 @@ public class EmojiUpdater {
 			}
 			neuDir.mkdir();
 
-			Git.cloneRepository().setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git").setDirectory(neuDir).call();
+			Git.cloneRepository().setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git").setDirectory(neuDir).call().close();
 
 			List<String> enchantedItems = Arrays
 				.stream(
@@ -448,18 +448,17 @@ public class EmojiUpdater {
 			}
 
 			List<Guild> guildList = jda
-				.getGuilds()
-				.stream()
-				.filter(g -> {
-					try {
-						return Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1]) > 0;
-					} catch (Exception e) {
-						return false;
-					}
-				})
-				.filter(g -> g.getEmojis().stream().filter(e -> enchanted == e.isAnimated()).count() < g.getMaxEmojis())
-				.sorted(Comparator.comparingInt(g -> Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1])))
-				.collect(Collectors.toList());
+                    .getGuilds()
+                    .stream()
+                    .filter(g -> {
+                        try {
+                            return Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1]) > 0;
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    })
+                    .filter(g -> g.getEmojis().stream().filter(e -> enchanted == e.isAnimated()).count() < g.getMaxEmojis())
+                    .sorted(Comparator.comparingInt(g -> Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1]))).toList();
 
 			int guildCount = 0;
 			for (Map.Entry<String, JsonElement> entry : (enchanted ? enchItems : regItems).entrySet()) {
@@ -566,7 +565,7 @@ public class EmojiUpdater {
 			.sorted(Comparator.comparing(File::getName))
 			.toList();
 		List<String> enchantList = url.length == 1
-			? streamJsonArray(getJson(url[0]).getAsJsonArray()).map(JsonElement::getAsString).collect(Collectors.toList())
+			? streamJsonArray(getJson(url[0]).getAsJsonArray()).map(JsonElement::getAsString).toList()
 			: getEnchantedItems();
 		File outputFileDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 		if (!outputFileDir.exists()) {

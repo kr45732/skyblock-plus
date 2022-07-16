@@ -19,7 +19,6 @@
 package com.skyblockplus.miscellaneous.networth;
 
 import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
-import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -1509,12 +1508,11 @@ public class NetworthExecute {
 		if (useRecipe && higherDepth(getInternalJsonMappings(), origItemId + ".recipe") != null) {
 			double cost = 0;
 			for (String item : higherDepth(getInternalJsonMappings(), origItemId + ".recipe")
-				.getAsJsonObject()
-				.entrySet()
-				.stream()
-				.map(e -> e.getValue().getAsString())
-				.filter(e -> !e.isEmpty())
-				.collect(Collectors.toList())) {
+                    .getAsJsonObject()
+                    .entrySet()
+                    .stream()
+                    .map(e -> e.getValue().getAsString())
+                    .filter(e -> !e.isEmpty()).toList()) {
 				String[] idCountSplit = item.split(":");
 				cost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
 			}
@@ -1543,12 +1541,11 @@ public class NetworthExecute {
 
 		double cost = 0;
 		for (String material : higherDepth(getInternalJsonMappings(), id + "_" + tier + ".recipe")
-			.getAsJsonObject()
-			.entrySet()
-			.stream()
-			.map(e -> e.getValue().getAsString())
-			.filter(e -> !e.isEmpty())
-			.collect(Collectors.toList())) {
+                .getAsJsonObject()
+                .entrySet()
+                .stream()
+                .map(e -> e.getValue().getAsString())
+                .filter(e -> !e.isEmpty()).toList()) {
 			String[] idCountSplit = material.split(":");
 			if (idCountSplit[0].contains("GENERATOR")) {
 				if (depth - 1 != 0) {

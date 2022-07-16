@@ -390,8 +390,7 @@ public class GuildRanksCommand extends Command {
 			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
 			int totalChange = 0;
 			List<String> defaultRank = streamJsonArray(higherDepth(lbSettings, "default_role").getAsJsonArray())
-				.map(JsonElement::getAsString)
-				.collect(Collectors.toList());
+					.map(JsonElement::getAsString).toList();
 			for (GuildRanksStruct gMember : gMembers) {
 				int highestRankMet = -1;
 				JsonArray gRanks = higherDepth(lbSettings, "ranks").getAsJsonArray();
@@ -429,8 +428,7 @@ public class GuildRanksCommand extends Command {
 
 				if (highestRankMet != -1) {
 					List<String> rankNamesList = streamJsonArray(higherDepth(gRanks.get(highestRankMet), "names").getAsJsonArray())
-						.map(JsonElement::getAsString)
-						.collect(Collectors.toList());
+							.map(JsonElement::getAsString).toList();
 					if (!rankNamesList.contains(gMember.guildRank().toLowerCase())) {
 						paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.name()) + " " + rankNamesList.get(0)));
 						totalChange++;

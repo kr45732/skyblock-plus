@@ -276,11 +276,10 @@ public class GuildCommand extends Command {
 			.setEveryPageFirstFieldTitle("Members:");
 
 		for (String member : guildMembers
-			.entrySet()
-			.stream()
-			.sorted(Comparator.comparingInt(m -> -m.getValue()))
-			.map(Map.Entry::getKey)
-			.collect(Collectors.toList())) {
+				.entrySet()
+				.stream()
+				.sorted(Comparator.comparingInt(m -> -m.getValue()))
+				.map(Map.Entry::getKey).toList()) {
 			if (member != null) {
 				paginateBuilder.addItems("• [" + fixUsername(member) + "](" + skyblockStatsLink(member, null) + ")  ");
 			}

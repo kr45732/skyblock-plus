@@ -24,7 +24,7 @@ import static com.skyblockplus.utils.database.LeaderboardDatabase.guildTypesSubL
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.database.LeaderboardDatabase;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

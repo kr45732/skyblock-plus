@@ -218,16 +218,14 @@ public class AutomaticGuild {
 		} catch (Exception ignored) {}
 		try {
 			botManagerRoles.addAll(
-				streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray())
-					.map(JsonElement::getAsString)
-					.collect(Collectors.toList())
+					streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray())
+							.map(JsonElement::getAsString).toList()
 			);
 		} catch (Exception ignored) {}
 		try {
 			channelBlacklist.addAll(
-				streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray())
-					.map(JsonElement::getAsString)
-					.collect(Collectors.toList())
+					streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray())
+							.map(JsonElement::getAsString).toList()
 			);
 		} catch (Exception ignored) {}
 		try {
@@ -557,9 +555,8 @@ public class AutomaticGuild {
 				int numUpdated = 0;
 
 				List<Member> notUpdatedMembers = inGuildUsers
-					.stream()
-					.filter(m -> !updatedMembers.contains(m.getId()))
-					.collect(Collectors.toList());
+						.stream()
+						.filter(m -> !updatedMembers.contains(m.getId())).toList();
 				if (notUpdatedMembers.size() < 120) {
 					updatedMembers.clear();
 					inGuildUsers.sort(Comparator.comparing(m -> !notUpdatedMembers.contains(m)));
@@ -1277,6 +1274,8 @@ public class AutomaticGuild {
 
 			FileUtils.deleteDirectory(neuDir);
 			FileUtils.deleteDirectory(skyblockPlusDir);
+			neuRepo.close();
+			skyblockPlusDataRepo.close();
 		} catch (Exception e) {
 			log.error("Exception while automatically updating item mappings", e);
 		}
@@ -1286,7 +1285,7 @@ public class AutomaticGuild {
 		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
 		JsonObject outputObj = new JsonObject();
 
-		for (File child : Arrays.stream(dir.listFiles()).sorted(Comparator.comparing(File::getName)).collect(Collectors.toList())) {
+		for (File child : Arrays.stream(dir.listFiles()).sorted(Comparator.comparing(File::getName)).toList()) {
 			try {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
 				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
@@ -1368,7 +1367,7 @@ public class AutomaticGuild {
 
 	public boolean isAdmin(Member member) {
 		if (!member.hasPermission(Permission.ADMINISTRATOR)) {
-			List<String> playerRoles = member.getRoles().stream().map(ISnowflake::getId).collect(Collectors.toList());
+			List<String> playerRoles = member.getRoles().stream().map(ISnowflake::getId).toList();
 			return botManagerRoles.stream().anyMatch(playerRoles::contains);
 		}
 		return true;

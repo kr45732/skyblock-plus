@@ -91,11 +91,11 @@ public class LeaderboardDatabase {
 		types.addAll(STATS_LIST);
 
 		typesSubList.addAll(types.subList(2, types.size()));
-		formattedTypesSubList.addAll(typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList()));
+		formattedTypesSubList.addAll(typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).toList());
 
 		guildTypesSubList.addAll(guildTypes.subList(2, guildTypes.size()));
 		formattedGuildTypesSubList.addAll(
-			guildTypesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList())
+                guildTypesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).toList()
 		);
 	}
 

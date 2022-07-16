@@ -57,13 +57,12 @@ public class LoreRenderer {
 		MinecraftColors defaultColor = MinecraftColors.DARK_PURPLE;
 
 		List<List<String>> formattedLines = loreLines
-			.stream()
-			.map(line -> {
-				List<String> parts = Arrays.stream(line.split("§")).collect(Collectors.toCollection(ArrayList::new));
-				parts.set(0, "r" + parts.get(0));
-				return parts;
-			})
-			.collect(Collectors.toList());
+                .stream()
+                .map(line -> {
+                    List<String> parts = Arrays.stream(line.split("§")).collect(Collectors.toCollection(ArrayList::new));
+                    parts.set(0, "r" + parts.get(0));
+                    return parts;
+                }).toList();
 
 		int width = formattedLines
 			.stream()

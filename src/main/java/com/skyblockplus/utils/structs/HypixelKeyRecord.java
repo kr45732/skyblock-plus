@@ -36,10 +36,6 @@ public final class HypixelKeyRecord {
 		this.time = Instant.now();
 	}
 
-	public HypixelKeyRecord() {
-		this(new AtomicInteger(120), new AtomicInteger(0));
-	}
-
 	public boolean isRateLimited() {
 		return remainingLimit.get() < 5 && timeTillReset.get() > 0 && time.plusSeconds(timeTillReset.get()).isAfter(Instant.now());
 	}

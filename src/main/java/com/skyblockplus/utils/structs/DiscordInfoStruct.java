@@ -18,10 +18,6 @@
 
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-
 public record DiscordInfoStruct(String discordTag, String username, String uuid, String failCause) {
 	public DiscordInfoStruct(String discordTag, String username, String uuid) {
 		this(discordTag, username, uuid, null);

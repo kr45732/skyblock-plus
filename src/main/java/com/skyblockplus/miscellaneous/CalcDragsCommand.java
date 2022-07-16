@@ -80,12 +80,11 @@ public class CalcDragsCommand extends Command {
 			);
 			eb.setThumbnail("https://wiki.hypixel.net/images/6/60/Minecraft_entities_ender_dragon.gif");
 			for (Map.Entry<String, JsonElement> entry : dragon
-				.getValue()
-				.getAsJsonObject()
-				.entrySet()
-				.stream()
-				.sorted(Comparator.comparingInt(e -> -higherDepth(e.getValue(), "quality", 0)))
-				.collect(Collectors.toList())) {
+                    .getValue()
+                    .getAsJsonObject()
+                    .entrySet()
+                    .stream()
+                    .sorted(Comparator.comparingInt(e -> -higherDepth(e.getValue(), "quality", 0))).toList()) {
 				eb.addField(
 					getEmoji(nameToId(entry.getKey())) +
 					" " +

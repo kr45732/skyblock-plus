@@ -122,7 +122,7 @@ public class Utils {
 		.build();
 	public static final Gson gson = new Gson();
 	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
-	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
+	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[\\dA-FK-OR]");
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	public static final Consumer<Object> ignore = ignored -> {};
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
