@@ -19,6 +19,7 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -102,19 +103,14 @@ public class AuctionsCommand extends Command {
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 
 			for (JsonElement currentAuction : auctionsArray) {
-				if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
+				if (!higherDepth(currentAuction, "claimed", false)) {
 					InvItem item = nbtToItem(higherDepth(currentAuction, "item_bytes.data").getAsString());
-					String auctionName = getEmoji(item.getId()) + " ";
-					String auction;
-					boolean bin = higherDepth(currentAuction, "bin", false);
 
-					Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
-					Duration duration = Duration.between(Instant.now(), endingAt);
-
+					String aucTitle = getEmoji(item.getId().equals("PET") ? item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity()) : item.getId()) + " ";
 					if (item.getId().equals("ENCHANTED_BOOK")) {
-						auctionName += parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
+						aucTitle += parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
 					} else {
-						auctionName +=
+						aucTitle +=
 							(
 								item.getId().equals("PET")
 									? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " "
@@ -123,32 +119,35 @@ public class AuctionsCommand extends Command {
 							higherDepth(currentAuction, "item_name").getAsString();
 					}
 
+					String desc;
+					Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
+					Duration duration = Duration.between(Instant.now(), endingAt);
 					long highestBid = higherDepth(currentAuction, "highest_bid_amount", 0);
 					long startingBid = higherDepth(currentAuction, "starting_bid", 0);
 					if (duration.toMillis() > 0) {
-						if (bin) {
-							auction = "BIN: " + simplifyNumber(startingBid) + " coins";
+						if (higherDepth(currentAuction, "bin", false)) {
+							desc = "BIN: " + simplifyNumber(startingBid) + " coins";
 							totalPendingValue += startingBid;
 						} else {
-							auction = "Current bid: " + simplifyNumber(highestBid);
+							desc = "Current bid: " + simplifyNumber(highestBid);
 							totalPendingValue += highestBid;
 						}
-						auction += " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
+						desc += " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
 					} else {
 						if (highestBid >= startingBid) {
-							auction = "Auction sold for " + simplifyNumber(highestBid) + " coins";
+							desc = "Auction sold for " + simplifyNumber(highestBid) + " coins";
 							totalSoldValue += highestBid;
 							auctionTax +=
 								(highestBid > 1000000)
 									? ((0.99 * highestBid < 1000000) ? (highestBid - 1000000) : (long) (0.01 * highestBid))
 									: 0;
 						} else {
-							auction = "Auction did not sell";
+							desc = "Auction did not sell";
 							failedToSell += startingBid;
 						}
 					}
 
-					extras.addEmbedField(auctionName, auction, false);
+					extras.addEmbedField(aucTitle, desc, false);
 				}
 			}
 
