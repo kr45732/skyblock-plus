@@ -303,7 +303,7 @@ public class LeaderboardDatabase {
 				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/users.json")
 					.getAsJsonArray();
 				if (userCount >= members.size()) {
-					log.info("Finished updating all users");
+					log.info("Finished updating all users: " + userCount);
 					userCount = -1;
 				} else {
 					for (count = 0; count <= 90 && userCount < members.size() && System.currentTimeMillis() - start < 60000; userCount++) {
@@ -376,7 +376,6 @@ public class LeaderboardDatabase {
 	}
 
 	public void close() {
-		updateTask.cancel(true);
 		dataSource.close();
 	}
 }

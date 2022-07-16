@@ -207,8 +207,7 @@ public class Main {
 
 		log.info("Canceling cache update future: " + updateCacheTask.cancel(true));
 
-		log.info("Closing leaderboard database");
-		leaderboardDatabase.close();
+		log.info("Canceling leaderboard update task: " + leaderboardDatabase.updateTask.cancel(true));
 
 		log.info("Caching Apply Users");
 		cacheApplyGuildUsers();
@@ -227,6 +226,9 @@ public class Main {
 
 		log.info("Closing Http Client");
 		closeHttpClient();
+
+		log.info("Closing leaderboard database");
+		leaderboardDatabase.close();
 
 		log.info("Finished");
 	}
