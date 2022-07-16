@@ -49,10 +49,7 @@ public class CoinsPerBitCommand extends Command {
 			values.put(entry.getKey(), calc.getLowestPrice(entry.getKey()) / entry.getValue().getAsLong());
 		}
 		EmbedBuilder eb = defaultEmbed("Coins Per Bit");
-		for (Map.Entry<String, Double> entry : values
-                .entrySet()
-                .stream()
-                .sorted(Comparator.comparingDouble(v -> -v.getValue())).toList()) {
+		for (Map.Entry<String, Double> entry : values.entrySet().stream().sorted(Comparator.comparingDouble(v -> -v.getValue())).toList()) {
 			eb.appendDescription(getEmoji(entry.getKey()) + " " + idToName(entry.getKey()) + " ➜ " + formatNumber(entry.getValue()) + "\n");
 		}
 		return eb;

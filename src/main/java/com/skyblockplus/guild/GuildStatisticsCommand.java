@@ -139,17 +139,21 @@ public class GuildStatisticsCommand extends Command {
 		}
 
 		List<String> slayerLb = guildMemberPlayersList
-                .stream()
-                .sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "slayer"))).toList();
+			.stream()
+			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "slayer")))
+			.toList();
 		List<String> skillsLb = guildMemberPlayersList
-                .stream()
-                .sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "skills"))).toList();
+			.stream()
+			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "skills")))
+			.toList();
 		List<String> cataLb = guildMemberPlayersList
-                .stream()
-                .sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "catacombs"))).toList();
+			.stream()
+			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "catacombs")))
+			.toList();
 		List<String> weightLb = guildMemberPlayersList
-                .stream()
-                .sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "weight"))).toList();
+			.stream()
+			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "weight")))
+			.toList();
 
 		double averageSlayer = slayerLb.stream().mapToDouble(m -> getDoubleFromCache(m, "slayer")).sum() / slayerLb.size();
 		double averageSkills = skillsLb.stream().mapToDouble(m -> getDoubleFromCache(m, "skills")).sum() / skillsLb.size();

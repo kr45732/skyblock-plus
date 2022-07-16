@@ -131,9 +131,10 @@ public class SkillsCommand extends Command {
 				.collect(Collectors.groupingBy(c -> c, Collectors.counting()));
 			StringBuilder ebStr = new StringBuilder();
 			for (Map.Entry<String, Long> entry : contests
-                    .entrySet()
-                    .stream()
-                    .sorted(Comparator.comparingLong(e -> -e.getValue())).toList()) {
+				.entrySet()
+				.stream()
+				.sorted(Comparator.comparingLong(e -> -e.getValue()))
+				.toList()) {
 				ebStr
 					.append("\n")
 					.append(getEmoji(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()))

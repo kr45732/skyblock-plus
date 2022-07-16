@@ -218,14 +218,12 @@ public class AutomaticGuild {
 		} catch (Exception ignored) {}
 		try {
 			botManagerRoles.addAll(
-					streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray())
-							.map(JsonElement::getAsString).toList()
+				streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray()).map(JsonElement::getAsString).toList()
 			);
 		} catch (Exception ignored) {}
 		try {
 			channelBlacklist.addAll(
-					streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray())
-							.map(JsonElement::getAsString).toList()
+				streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray()).map(JsonElement::getAsString).toList()
 			);
 		} catch (Exception ignored) {}
 		try {
@@ -554,9 +552,7 @@ public class AutomaticGuild {
 				key = checkHypixelKey(key, false) == null ? key : null;
 				int numUpdated = 0;
 
-				List<Member> notUpdatedMembers = inGuildUsers
-						.stream()
-						.filter(m -> !updatedMembers.contains(m.getId())).toList();
+				List<Member> notUpdatedMembers = inGuildUsers.stream().filter(m -> !updatedMembers.contains(m.getId())).toList();
 				if (notUpdatedMembers.size() < 120) {
 					updatedMembers.clear();
 					inGuildUsers.sort(Comparator.comparing(m -> !notUpdatedMembers.contains(m)));

@@ -94,9 +94,7 @@ public class LeaderboardDatabase {
 		formattedTypesSubList.addAll(typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).toList());
 
 		guildTypesSubList.addAll(guildTypes.subList(2, guildTypes.size()));
-		formattedGuildTypesSubList.addAll(
-                guildTypesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).toList()
-		);
+		formattedGuildTypesSubList.addAll(guildTypesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).toList());
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);

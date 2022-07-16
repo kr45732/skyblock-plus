@@ -61,10 +61,7 @@ public class JacobCommand extends Command {
 		String finalCrop = crop;
 		for (JacobContest contest : crop.equals("All")
 			? data.getContests()
-			: data
-                .getContests()
-                .stream()
-                .filter(c -> c.getCrops().stream().anyMatch(thisCrop -> thisCrop.equals(finalCrop))).toList()) {
+			: data.getContests().stream().filter(c -> c.getCrops().stream().anyMatch(thisCrop -> thisCrop.equals(finalCrop))).toList()) {
 			extras.addEmbedField(
 				"Contest",
 				"**In:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(false),
