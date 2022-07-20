@@ -339,6 +339,7 @@ public class LeaderboardDatabase {
 
 				UsernameUuidStruct usernameUuidStruct = uuidToUsername(document.getString("uuid"));
 				if (!usernameUuidStruct.isNotValid()) {
+					count++;
 					asyncSkyblockProfilesFromUuid(
 						usernameUuidStruct.uuid(),
 						count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
@@ -348,8 +349,9 @@ public class LeaderboardDatabase {
 							insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
 						);
 				}
-				count++;
 			}
+
+			System.out.println("Updated " + count + " users in " + (System.currentTimeMillis() - start) + "ms");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
