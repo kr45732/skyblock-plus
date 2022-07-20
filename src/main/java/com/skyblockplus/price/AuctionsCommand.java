@@ -106,7 +106,13 @@ public class AuctionsCommand extends Command {
 				if (!higherDepth(currentAuction, "claimed", false)) {
 					InvItem item = nbtToItem(higherDepth(currentAuction, "item_bytes.data").getAsString());
 
-					String aucTitle = getEmoji(item.getId().equals("PET") ? item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity()) : item.getId()) + " ";
+					String aucTitle =
+						getEmoji(
+							item.getId().equals("PET")
+								? item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity())
+								: item.getId()
+						) +
+						" ";
 					if (item.getId().equals("ENCHANTED_BOOK")) {
 						aucTitle += parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
 					} else {

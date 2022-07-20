@@ -69,13 +69,16 @@ public class DevSettingsCommand extends Command {
 								return;
 							}
 						}
-					} else if(args[1].equals("verify")) {
-						if (args[2].equals("disable")){
-							embed(new SettingsExecute(jda.getGuildById(args[3]),  event.getEvent()).setVerifyEnable(false));
+					} else if (args[1].equals("verify")) {
+						if (args[2].equals("disable")) {
+							embed(new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setVerifyEnable(false));
 						}
-					} else if(args[1].equals("apply")) {
-						if (args[2].equals("disable")){
-							embed(new SettingsExecute(jda.getGuildById(args[3]),  event.getEvent()).setApplyEnable(database.getGuildSettings(args[3], args[4]).getAsJsonObject(), false));
+					} else if (args[1].equals("apply")) {
+						if (args[2].equals("disable")) {
+							embed(
+								new SettingsExecute(jda.getGuildById(args[3]), event.getEvent())
+									.setApplyEnable(database.getGuildSettings(args[3], args[4]).getAsJsonObject(), false)
+							);
 						}
 					}
 				}
@@ -85,6 +88,7 @@ public class DevSettingsCommand extends Command {
 		}
 			.queue();
 	}
+
 	private EmbedBuilder deleteSkyblockEvent(String serverId) {
 		return defaultEmbed("API returned response code " + database.setSkyblockEventSettings(serverId, new EventSettings()));
 	}
