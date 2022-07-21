@@ -18,19 +18,18 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-import org.springframework.stereotype.Component;
-
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
 //@Component
 public class BestiaryCommand extends Command {
@@ -47,9 +46,7 @@ public class BestiaryCommand extends Command {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
 			for (Map.Entry<String, JsonElement> mob : higherDepth(player.profileJson(), "bestiary").getAsJsonObject().entrySet()) {
-				if(mob.getKey().startsWith("kills_family_")) {
-
-				}
+				if (mob.getKey().startsWith("kills_family_")) {}
 			}
 
 			return eb;
