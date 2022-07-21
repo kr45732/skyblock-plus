@@ -94,13 +94,9 @@ public class ServerSettingsService {
 	}
 
 	public ResponseEntity<HttpStatus> setServerSettings(String serverId, ServerSettingsModel newServerSettings) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			settingsRepository.save(newServerSettings);
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		settingsRepository.deleteByServerId(serverId);
+		settingsRepository.save(newServerSettings);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	// Verify

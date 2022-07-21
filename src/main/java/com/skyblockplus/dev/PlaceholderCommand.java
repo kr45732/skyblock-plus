@@ -44,18 +44,25 @@ public class PlaceholderCommand extends Command {
 				logCommand();
 
 				eb = defaultEmbed("Debug");
-				if (args.length == 2 && args[1].equals("gc")) {
-					System.gc();
-					eb.addField("GC RUN", "GC RUN", false);
-				}
 				eb.addField("Total", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);
 				eb.addField("Free", "" + (Runtime.getRuntime().freeMemory() / 1000000.0) + " MB", false);
 				eb.addField(
-					"Used",
-					"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
-					false
+						"Used",
+						"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
+						false
 				);
 				eb.addField("Max", "" + (Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false);
+				if (args.length == 2 && args[1].equals("gc")) {
+					System.gc();
+					eb.addField("Total GC", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);
+					eb.addField("Free GC", "" + (Runtime.getRuntime().freeMemory() / 1000000.0) + " MB", false);
+					eb.addField(
+							"Used GC",
+							"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
+							false
+					);
+					eb.addField("Max GC", "" + (Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false);
+				}
 
 				embed(eb);
 			}
