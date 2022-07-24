@@ -121,43 +121,6 @@ public class HypixelGuildCache {
 	}
 
 	public static SkillsStruct skillInfoFromExp(long skillExp, String skill) {
-		JsonArray skillsTable =
-			switch (skill) {
-				case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
-				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
-				case "social" -> higherDepth(getLevelingJson(), "social").getAsJsonArray();
-				case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
-				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
-			};
-
-		int maxLevel = skill.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + skill, 0);
-
-		long xpTotal = 0L;
-		int level = 1;
-		for (int i = 0; i < maxLevel; i++) {
-			xpTotal += skillsTable.get(i).getAsLong();
-
-			if (xpTotal > skillExp) {
-				xpTotal -= skillsTable.get(i).getAsLong();
-				break;
-			} else {
-				level = (i + 1);
-			}
-		}
-
-		long xpCurrent = (long) Math.floor(skillExp - xpTotal);
-		long xpForNext = 0;
-		if (level < maxLevel) {
-			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
-		}
-
-		if (skillExp == 0) {
-			level = 0;
-			xpForNext = 0;
-		}
-
-		double progress = xpForNext > 0 ? Math.max(0, Math.min(((double) xpCurrent) / xpForNext, 1)) : 0;
-
-		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
+		return levelingInfoFromExp(skillExp, skill, skill.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + skill, 0));
 	}
 }

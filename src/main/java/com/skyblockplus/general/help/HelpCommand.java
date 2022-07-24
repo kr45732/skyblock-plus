@@ -368,6 +368,9 @@ public class HelpCommand extends Command {
 				new HelpData("cakes", "Get a player's active and inactive cake buffs.", "cakes [player] [profile]")
 					.addPlayerExamples()
 					.setCategory("miscellaneous"),
+					new HelpData("bestiary", "Get bestiary stats.", "bestiary [player] [profile]")
+							.addPlayerExamples()
+							.setCategory("miscellaneous"),
 				new HelpData("harp", "Get a player's harp statistics.", "harp [player] [profile]")
 					.addPlayerExamples()
 					.setCategory("miscellaneous"),
@@ -915,6 +918,7 @@ public class HelpCommand extends Command {
 			help.create("missing [player] [profile]", "Get a player's missing talismans") +
 			help.create("fetchur", "Get the item that fetchur wants today") +
 			help.create("cakes [player] [profile]", "Get a player's inactive and active cake buffs") +
+					help.create("bestiary [player] [profile]", "Get a player's bestiary stats") +
 			help.create("harp [player] [profile]", "Get a player's harp statistics") +
 			help.create("uuid [username|uuid]", "Convert username to UUID or UUID to username") +
 			help.create("calendar", "Get the current Skyblock datetime and running or upcoming events") +

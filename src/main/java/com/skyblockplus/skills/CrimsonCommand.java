@@ -107,7 +107,7 @@ public class CrimsonCommand extends Command {
 					.defaultPlayerEmbed()
 					.setDescription(
 						"**Total Caught:** " +
-						higherDepth(fishJson, "total_caught", 0) +
+						formatNumber(higherDepth(fishJson, "total_caught", 0)) +
 						"\n**Status:** " +
 						switch (higherDepth(fishJson, "rewards.[-1]", 0)) {
 							case 1 -> "Novice Fisher";
@@ -207,9 +207,9 @@ public class CrimsonCommand extends Command {
 			} else if (totalPoints >= 1000) {
 				belt = "Yellow";
 			} else {
-				belt = "None";
+				belt = "White";
 			}
-			eb.setDescription("**Total Points:** " + formatNumber(totalPoints) + "\n**Belt:** " + belt);
+			eb.setDescription("⭐ **Total Points:** " + formatNumber(totalPoints) + "\n" + getEmoji("DOJO_" + belt.toUpperCase() + "_BELT") + " **Belt:** " + belt);
 			pages.put(SelectOption.of("Dojo", "dojo"), eb);
 
 			new SelectMenuPaginator(pages, "stats", new PaginatorExtras(), event);

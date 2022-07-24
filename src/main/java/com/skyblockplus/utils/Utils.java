@@ -1715,4 +1715,46 @@ public class Utils {
 	public static String getAvatarlUrl(String uuid) {
 		return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
 	}
+
+	public static SkillsStruct levelingInfoFromExp(long skillExp, String skill, int maxLevel) {
+		JsonArray skillsTable =
+				switch (skill) {
+					case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" ->
+							higherDepth(getLevelingJson(), skill).getAsJsonArray();
+					case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+					default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+				};
+
+		long xpTotal = 0L;
+		int level = 1;
+		for (int i = 0; i < skillsTable.size(); i++) {
+			if (i == maxLevel) {
+				break;
+			}
+
+			xpTotal += skillsTable.get(i).getAsLong();
+
+			if (xpTotal > skillExp) {
+				xpTotal -= skillsTable.get(i).getAsLong();
+				break;
+			} else {
+				level = (i + 1);
+			}
+		}
+
+		long xpCurrent = (long) Math.floor(skillExp - xpTotal);
+		long xpForNext = 0;
+		if (level < maxLevel && level < skillsTable.size()) {
+			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
+		}
+
+		if (skillExp == 0) {
+			level = 0;
+			xpForNext = 0;
+		}
+
+		double progress = xpForNext > 0 ? Math.max(0, Math.min(((double) xpCurrent) / xpForNext, 1)) : 0;
+
+		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
+	}
 }

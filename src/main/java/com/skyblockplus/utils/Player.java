@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.miscellaneous.BestiaryCommand.*;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
@@ -34,12 +35,12 @@ import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.*;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.apache.groovy.util.Maps;
 
 public class Player {
@@ -1282,44 +1283,7 @@ public class Player {
 	}
 
 	public SkillsStruct skillInfoFromExp(long skillExp, String skill, WeightType weightType) {
-		JsonArray skillsTable =
-			switch (skill) {
-				case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
-				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
-				case "social" -> higherDepth(getLevelingJson(), "social").getAsJsonArray();
-				case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
-				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
-			};
-
-		int maxLevel = getSkillMaxLevel(skill, weightType);
-
-		long xpTotal = 0L;
-		int level = 1;
-		for (int i = 0; i < maxLevel; i++) {
-			xpTotal += skillsTable.get(i).getAsLong();
-
-			if (xpTotal > skillExp) {
-				xpTotal -= skillsTable.get(i).getAsLong();
-				break;
-			} else {
-				level = (i + 1);
-			}
-		}
-
-		long xpCurrent = (long) Math.floor(skillExp - xpTotal);
-		long xpForNext = 0;
-		if (level < maxLevel) {
-			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
-		}
-
-		if (skillExp == 0) {
-			level = 0;
-			xpForNext = 0;
-		}
-
-		double progress = xpForNext > 0 ? Math.max(0, Math.min(((double) xpCurrent) / xpForNext, 1)) : 0;
-
-		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
+		return levelingInfoFromExp(skillExp, skill, getSkillMaxLevel(skill, weightType));
 	}
 
 	public SkillsStruct skillInfoFromLevel(int targetLevel, String skill) {
@@ -1328,13 +1292,12 @@ public class Player {
 
 	public SkillsStruct skillInfoFromLevel(int targetLevel, String skill, WeightType weightType) {
 		JsonArray skillsTable =
-			switch (skill) {
-				case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
-				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
-				case "social" -> higherDepth(getLevelingJson(), "social").getAsJsonArray();
-				case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
-				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
-			};
+				switch (skill) {
+					case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" ->
+							higherDepth(getLevelingJson(), skill).getAsJsonArray();
+					case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+					default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+				};
 
 		int maxLevel = getSkillMaxLevel(skill, weightType);
 
@@ -2444,6 +2407,23 @@ public class Player {
 			'\'' +
 			'}'
 		);
+	}
+
+	public double getBestiaryLevel() {
+		int total = 0;
+		for (Map.Entry<String, List<String>> location : locations.entrySet()) {
+			for (String mob : location.getValue()) {
+				int kills = higherDepth(profileJson(), "bestiary.kills_" + mob, 0);
+				String type = "MOB";
+				if (location.getKey().equals("Private Island")){
+					type = "ISLAND";
+				}else if(bosses.contains(mob)){
+					type = "BOSS";
+				}
+				total += levelingInfoFromExp(kills, "bestiary." + type,higherDepth(getLevelingJson(), "bestiary.caps." + type).getAsInt()).currentLevel();
+			}
+		}
+		return total / 10.0;
 	}
 
 	public enum WeightType {
