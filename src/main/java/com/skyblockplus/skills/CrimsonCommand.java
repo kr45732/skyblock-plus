@@ -209,7 +209,14 @@ public class CrimsonCommand extends Command {
 			} else {
 				belt = "White";
 			}
-			eb.setDescription("⭐ **Total Points:** " + formatNumber(totalPoints) + "\n" + getEmoji("DOJO_" + belt.toUpperCase() + "_BELT") + " **Belt:** " + belt);
+			eb.setDescription(
+				"⭐ **Total Points:** " +
+				formatNumber(totalPoints) +
+				"\n" +
+				getEmoji("DOJO_" + belt.toUpperCase() + "_BELT") +
+				" **Belt:** " +
+				belt
+			);
 			pages.put(SelectOption.of("Dojo", "dojo"), eb);
 
 			new SelectMenuPaginator(pages, "stats", new PaginatorExtras(), event);

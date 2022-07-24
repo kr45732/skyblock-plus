@@ -1718,12 +1718,15 @@ public class Utils {
 
 	public static SkillsStruct levelingInfoFromExp(long skillExp, String skill, int maxLevel) {
 		JsonArray skillsTable =
-				switch (skill) {
-					case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" ->
-							higherDepth(getLevelingJson(), skill).getAsJsonArray();
-					case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
-					default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
-				};
+			switch (skill) {
+				case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(
+					getLevelingJson(),
+					skill
+				)
+					.getAsJsonArray();
+				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+			};
 
 		long xpTotal = 0L;
 		int level = 1;

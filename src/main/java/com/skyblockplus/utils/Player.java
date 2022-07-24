@@ -1292,12 +1292,15 @@ public class Player {
 
 	public SkillsStruct skillInfoFromLevel(int targetLevel, String skill, WeightType weightType) {
 		JsonArray skillsTable =
-				switch (skill) {
-					case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" ->
-							higherDepth(getLevelingJson(), skill).getAsJsonArray();
-					case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
-					default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
-				};
+			switch (skill) {
+				case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(
+					getLevelingJson(),
+					skill
+				)
+					.getAsJsonArray();
+				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+			};
 
 		int maxLevel = getSkillMaxLevel(skill, weightType);
 
@@ -2415,12 +2418,14 @@ public class Player {
 			for (String mob : location.getValue()) {
 				int kills = higherDepth(profileJson(), "bestiary.kills_" + mob, 0);
 				String type = "MOB";
-				if (location.getKey().equals("Private Island")){
+				if (location.getKey().equals("Private Island")) {
 					type = "ISLAND";
-				}else if(bosses.contains(mob)){
+				} else if (bosses.contains(mob)) {
 					type = "BOSS";
 				}
-				total += levelingInfoFromExp(kills, "bestiary." + type,higherDepth(getLevelingJson(), "bestiary.caps." + type).getAsInt()).currentLevel();
+				total +=
+					levelingInfoFromExp(kills, "bestiary." + type, higherDepth(getLevelingJson(), "bestiary.caps." + type).getAsInt())
+						.currentLevel();
 			}
 		}
 		return total / 10.0;

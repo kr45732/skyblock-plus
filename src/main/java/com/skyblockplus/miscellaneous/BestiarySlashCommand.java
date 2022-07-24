@@ -48,9 +48,9 @@ public class BestiarySlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-				.slash(name, "Get a player's bestiary stats")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "profile", "Profile name");
+			.slash(name, "Get a player's bestiary stats")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 
 	@Override

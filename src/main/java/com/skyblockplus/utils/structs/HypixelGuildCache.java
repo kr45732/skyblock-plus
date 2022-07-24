@@ -121,6 +121,10 @@ public class HypixelGuildCache {
 	}
 
 	public static SkillsStruct skillInfoFromExp(long skillExp, String skill) {
-		return levelingInfoFromExp(skillExp, skill, skill.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + skill, 0));
+		return levelingInfoFromExp(
+			skillExp,
+			skill,
+			skill.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + skill, 0)
+		);
 	}
 }
