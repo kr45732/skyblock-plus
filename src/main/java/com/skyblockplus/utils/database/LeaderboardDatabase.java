@@ -308,15 +308,15 @@ public class LeaderboardDatabase {
 						if (!usernameUuidStruct.isNotValid()) {
 							count++;
 							HypixelResponse profileResponse = skyblockProfilesFromUuid(
-									usernameUuidStruct.uuid(),
-									count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
-									true,
-									false
+								usernameUuidStruct.uuid(),
+								count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+								true,
+								false
 							);
 							if (!profileResponse.isNotValid()) {
 								insertIntoLeaderboard(
-										new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), true),
-										false
+									new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), true),
+									false
 								);
 							}
 						}
@@ -354,8 +354,7 @@ public class LeaderboardDatabase {
 					}
 				}
 			}
-
-//			System.out.println("Updated " + count + " users in " + (System.currentTimeMillis() - start) + "ms");
+			//			System.out.println("Updated " + count + " users in " + (System.currentTimeMillis() - start) + "ms");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
