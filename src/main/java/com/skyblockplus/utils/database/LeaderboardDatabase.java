@@ -18,8 +18,7 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.ApiHandler.asyncSkyblockProfilesFromUuid;
-import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Player.STATS_LIST;
 import static com.skyblockplus.utils.Utils.*;
@@ -36,13 +35,14 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -340,14 +340,14 @@ public class LeaderboardDatabase {
 				UsernameUuidStruct usernameUuidStruct = uuidToUsername(document.getString("uuid"));
 				if (!usernameUuidStruct.isNotValid()) {
 					count++;
-					asyncSkyblockProfilesFromUuid(
-						usernameUuidStruct.uuid(),
-						count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
-						false
-					)
-						.whenComplete((r, e) ->
-							insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
-						);
+					HypixelResponse profileResponse = skyblockProfilesFromUuid(
+							usernameUuidStruct.uuid(),
+							count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c", true,
+							false
+					);
+					if (!profileResponse.isNotValid()) {
+						insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), true), false);
+					}
 				}
 			}
 

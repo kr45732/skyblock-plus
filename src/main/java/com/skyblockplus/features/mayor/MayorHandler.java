@@ -108,7 +108,6 @@ public class MayorHandler {
 
 	public static void mayorElected() {
 		try {
-			System.out.println("mayor elected called");
 			JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor");
 			JsonArray mayors = collectJsonArray(
 				streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray())
@@ -176,7 +175,7 @@ public class MayorHandler {
 
 				if (updateCount != 0 && updateCount % 25 == 0) {
 					try {
-						TimeUnit.SECONDS.sleep(1);
+						TimeUnit.SECONDS.sleep(2);
 					} catch (Exception ignored) {}
 				}
 			}
@@ -274,7 +273,7 @@ public class MayorHandler {
 
 				if (updateCount != 0 && updateCount % 25 == 0) {
 					try {
-						TimeUnit.SECONDS.sleep(1);
+						TimeUnit.SECONDS.sleep(2);
 					} catch (Exception ignored) {}
 				}
 			}
