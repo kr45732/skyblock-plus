@@ -18,22 +18,20 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.command.PaginatorExtras;
-import java.time.Instant;
-import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.util.List;
+
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
 
 @Component
 public class PriceCommand extends Command {
@@ -44,9 +42,8 @@ public class PriceCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder queryAuctions(String query, AuctionType auctionType, PaginatorEvent event) {
+	public static EmbedBuilder queryAuctions(String query, AuctionType auctionType) {
 		JsonArray lowestBinArr = null;
-		String tempName = null;
 		for (String enchantId : ENCHANT_NAMES) {
 			if (query.replace(" ", "_").toUpperCase().contains(enchantId)) {
 				int enchantLevel;
@@ -60,7 +57,6 @@ public class PriceCommand extends Command {
 				if (lowestBinArr == null) {
 					return invalidEmbed("Error fetching auctions data");
 				}
-				tempName = idToName(enchantId + ";" + enchantLevel);
 				break;
 			}
 		}
@@ -88,13 +84,20 @@ public class PriceCommand extends Command {
 			}
 		}
 
+		String matchedQuery = null;
 		if (lowestBinArr == null) {
-			String finalQuery = query;
-			List<String> queryItems = getQueryItems();
-			if (queryItems != null && queryItems.stream().noneMatch(q -> q.equalsIgnoreCase(finalQuery))) {
-				query = getClosestMatch(query, getQueryItems());
+			String idStrict = nameToId(query, true);
+			if (idStrict != null) {
+				lowestBinArr = queryLowestBin(idStrict, false, auctionType);
+			} else {
+				String finalQuery = query;
+				List<String> queryItems = getQueryItems();
+				if (queryItems != null && queryItems.stream().noneMatch(q -> q.equalsIgnoreCase(finalQuery))) {
+					matchedQuery = getClosestMatch(query, queryItems);
+				}
+				lowestBinArr = queryLowestBin(matchedQuery != null ? matchedQuery : query, true, auctionType);
 			}
-			lowestBinArr = queryLowestBin(query, auctionType);
+
 			if (lowestBinArr == null) {
 				return invalidEmbed("Error fetching auctions data");
 			}
@@ -103,24 +106,21 @@ public class PriceCommand extends Command {
 		if (lowestBinArr.size() == 0) {
 			return invalidEmbed("No " + auctionType.getName() + " matching '" + query + "' found");
 		}
+		EmbedBuilder eb = defaultEmbed("Auction Searcher");
+		if(matchedQuery != null){
+			eb.setDescription("Searched for '" + matchedQuery + "' since no " + auctionType.getName() + " matching '" + query + "' were found");
+		}
+		for (JsonElement auction : lowestBinArr) {
+			String ahStr = "**Price:** " + roundAndFormat(higherDepth(auction, "starting_bid").getAsDouble())
+					+ "\n**Rarity:** " + higherDepth(auction, "tier").getAsString().toLowerCase()
+					//	ahStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString()).username();
+					+ "\n**" + (higherDepth(auction, "bin", false) ? "Bin" : "Auction") + ":** `/viewauction " + higherDepth(auction, "uuid").getAsString() + "`"
+					+ "\n**Ends:** <t:" + Instant.ofEpochMilli(higherDepth(auction, "end_t").getAsLong()).getEpochSecond() + ":R>";
 
-		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(5);
-		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
-		for (JsonElement lowestBinAuction : lowestBinArr) {
-			String lowestBinStr = "";
-			lowestBinStr += "**Name:** " + (tempName == null ? higherDepth(lowestBinAuction, "item_name").getAsString() : tempName);
-			lowestBinStr += "\n**Rarity:** " + higherDepth(lowestBinAuction, "tier").getAsString().toLowerCase();
-			lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAuction, "starting_bid").getAsDouble());
-			//			lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAuction, "auctioneer").getAsString()).username();
-			lowestBinStr += "\n**Auction:** `/viewauction " + higherDepth(lowestBinAuction, "uuid").getAsString() + "`";
-			lowestBinStr +=
-				"\n**Ends:** <t:" + Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end_t").getAsLong()).getEpochSecond() + ":R>";
-
-			extras.addEmbedField("Lowest Bin", lowestBinStr, false);
+			eb.addField(getEmoji(higherDepth(auction, "item_id").getAsString()) + " " + higherDepth(auction, "item_name").getAsString(), ahStr, false);
 		}
 
-		event.paginate(paginateBuilder.setPaginatorExtras(extras));
-		return null;
+		return eb;
 	}
 
 	@Override
@@ -129,7 +129,6 @@ public class PriceCommand extends Command {
 			@Override
 			protected void execute() {
 				logCommand();
-				setArgs(2);
 
 				AuctionType auctionType = AuctionType.BIN;
 				for (int i = 0; i < args.length; i++) {
@@ -143,8 +142,10 @@ public class PriceCommand extends Command {
 						}
 					}
 				}
+
+				setArgs(2);
 				if (args.length == 2) {
-					paginate(queryAuctions(args[1], auctionType, getPaginatorEvent()));
+					embed(queryAuctions(args[1], auctionType));
 					return;
 				}
 

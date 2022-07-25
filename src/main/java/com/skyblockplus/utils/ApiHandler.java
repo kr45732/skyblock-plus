@@ -467,17 +467,21 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonArray queryLowestBin(String query, PriceCommand.AuctionType auctionType) {
+	public static JsonArray queryLowestBin(String query, boolean isName, PriceCommand.AuctionType auctionType) {
 		try {
 			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
 				.addParameter("end", "" + Instant.now().toEpochMilli())
-				.addParameter("item_name", "%" + query + "%")
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "10")
+				.addParameter("limit", "5")
 				.addParameter("key", AUCTION_API_KEY);
+			if(isName) {
+				uriBuilder.addParameter("item_name", "%" + query + "%");
+			}else{
+				uriBuilder.addParameter("item_id", query);
+			}
 			if (auctionType == PriceCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");
 			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
@@ -502,7 +506,7 @@ public class ApiHandler {
 				.addParameter("item_name", "%" + petName + "%")
 				.addParameter("item_id", "PET")
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "10")
+				.addParameter("limit", "5")
 				.addParameter("key", AUCTION_API_KEY);
 			if (!rarity.equals("ANY")) {
 				uriBuilder.addParameter("tier", rarity);
@@ -531,7 +535,7 @@ public class ApiHandler {
 				.addParameter("item_id", "ENCHANTED_BOOK")
 				.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "10")
+				.addParameter("limit", "5")
 				.addParameter("key", AUCTION_API_KEY);
 			if (auctionType == PriceCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");

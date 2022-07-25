@@ -18,9 +18,6 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.getQueryItems;
-
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -29,6 +26,8 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
+
+import static com.skyblockplus.utils.Utils.getQueryItems;
 
 @Component
 public class PriceSlashCommand extends SlashCommand {
@@ -41,11 +40,10 @@ public class PriceSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.paginate(
+		event.embed(
 			PriceCommand.queryAuctions(
 				event.getOptionStr("item"),
-				PriceCommand.AuctionType.valueOf(event.getOptionStr("auction_type", "bin").toUpperCase()),
-				new PaginatorEvent(event)
+				PriceCommand.AuctionType.valueOf(event.getOptionStr("auction_type", "bin").toUpperCase())
 			)
 		);
 	}
