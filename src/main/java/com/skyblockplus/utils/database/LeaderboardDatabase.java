@@ -42,7 +42,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -341,12 +340,16 @@ public class LeaderboardDatabase {
 				if (!usernameUuidStruct.isNotValid()) {
 					count++;
 					HypixelResponse profileResponse = skyblockProfilesFromUuid(
-							usernameUuidStruct.uuid(),
-							count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c", true,
-							false
+						usernameUuidStruct.uuid(),
+						count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+						true,
+						false
 					);
 					if (!profileResponse.isNotValid()) {
-						insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), true), false);
+						insertIntoLeaderboard(
+							new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), true),
+							false
+						);
 					}
 				}
 			}
