@@ -477,9 +477,9 @@ public class ApiHandler {
 				.addParameter("sort", "ASC")
 				.addParameter("limit", "5")
 				.addParameter("key", AUCTION_API_KEY);
-			if(isName) {
+			if (isName) {
 				uriBuilder.addParameter("item_name", "%" + query + "%");
-			}else{
+			} else {
 				uriBuilder.addParameter("item_id", query);
 			}
 			if (auctionType == PriceCommand.AuctionType.BIN) {

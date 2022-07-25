@@ -18,20 +18,19 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-import org.springframework.stereotype.Component;
-
 import java.time.Instant;
 import java.util.List;
-
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PriceCommand extends Command {
@@ -107,17 +106,32 @@ public class PriceCommand extends Command {
 			return invalidEmbed("No " + auctionType.getName() + " matching '" + query + "' found");
 		}
 		EmbedBuilder eb = defaultEmbed("Auction Searcher");
-		if(matchedQuery != null){
-			eb.setDescription("Searched for '" + matchedQuery + "' since no " + auctionType.getName() + " matching '" + query + "' were found");
+		if (matchedQuery != null) {
+			eb.setDescription(
+				"Searched for '" + matchedQuery + "' since no " + auctionType.getName() + " matching '" + query + "' were found"
+			);
 		}
 		for (JsonElement auction : lowestBinArr) {
-			String ahStr = "**Price:** " + roundAndFormat(higherDepth(auction, "starting_bid").getAsDouble())
-					+ "\n**Rarity:** " + higherDepth(auction, "tier").getAsString().toLowerCase()
-					//	ahStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString()).username();
-					+ "\n**" + (higherDepth(auction, "bin", false) ? "Bin" : "Auction") + ":** `/viewauction " + higherDepth(auction, "uuid").getAsString() + "`"
-					+ "\n**Ends:** <t:" + Instant.ofEpochMilli(higherDepth(auction, "end_t").getAsLong()).getEpochSecond() + ":R>";
+			String ahStr =
+				"**Price:** " +
+				roundAndFormat(higherDepth(auction, "starting_bid").getAsDouble()) +
+				"\n**Rarity:** " +
+				higherDepth(auction, "tier").getAsString().toLowerCase() +
+				//	ahStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString()).username();
+				"\n**" +
+				(higherDepth(auction, "bin", false) ? "Bin" : "Auction") +
+				":** `/viewauction " +
+				higherDepth(auction, "uuid").getAsString() +
+				"`" +
+				"\n**Ends:** <t:" +
+				Instant.ofEpochMilli(higherDepth(auction, "end_t").getAsLong()).getEpochSecond() +
+				":R>";
 
-			eb.addField(getEmoji(higherDepth(auction, "item_id").getAsString()) + " " + higherDepth(auction, "item_name").getAsString(), ahStr, false);
+			eb.addField(
+				getEmoji(higherDepth(auction, "item_id").getAsString()) + " " + higherDepth(auction, "item_name").getAsString(),
+				ahStr,
+				false
+			);
 		}
 
 		return eb;
