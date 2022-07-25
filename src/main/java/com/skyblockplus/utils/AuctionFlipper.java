@@ -150,10 +150,10 @@ public class AuctionFlipper {
 			Map<String, Long> toEdit = auctionUuidToMessage.getAllPresent(
 				streamJsonArray(higherDepth(endedAuctionsJson, "auctions").getAsJsonArray())
 					.map(a -> higherDepth(a, "auction_id").getAsString())
-					.collect(Collectors.toList())
+					.collect(Collectors.toSet())
 			);
-			for (Map.Entry<String, Long> entry : toEdit.entrySet()) {
-				flipperWebhook.edit(entry.getValue(), defaultEmbed("Auction Sold").build());
+			for (long messageId : toEdit.values()) {
+				flipperWebhook.edit(messageId, defaultEmbed("Auction Sold").build());
 			}
 			auctionUuidToMessage.invalidateAll(toEdit.keySet());
 		}

@@ -303,21 +303,22 @@ public class LeaderboardDatabase {
 					log.info("Finished updating all users: " + userCount);
 					userCount = -1;
 				} else {
-					for (count = 0; count <= 90 && userCount < members.size() && System.currentTimeMillis() - start < 60000; userCount++) {
+					for (count = 0; count <= 90 && userCount < members.size() && System.currentTimeMillis() - start < 57000; userCount++) {
 						UsernameUuidStruct usernameUuidStruct = uuidToUsername(members.get(userCount).getAsString());
 						if (!usernameUuidStruct.isNotValid()) {
 							count++;
-							asyncSkyblockProfilesFromUuid(
-								usernameUuidStruct.uuid(),
-								count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
-								false
-							)
-								.whenComplete((r, e) ->
-									insertIntoLeaderboard(
-										new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true),
+							HypixelResponse profileResponse = skyblockProfilesFromUuid(
+									usernameUuidStruct.uuid(),
+									count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+									true,
+									false
+							);
+							if (!profileResponse.isNotValid()) {
+								insertIntoLeaderboard(
+										new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), true),
 										false
-									)
 								);
+							}
 						}
 					}
 					System.out.println("Finished up to user count: " + userCount);
@@ -332,7 +333,7 @@ public class LeaderboardDatabase {
 				.limit(180);
 
 			for (Document document : response) {
-				if (count == 90 || System.currentTimeMillis() - start >= 60000) {
+				if (count == 90 || System.currentTimeMillis() - start >= 57000) {
 					break;
 				}
 
@@ -354,7 +355,7 @@ public class LeaderboardDatabase {
 				}
 			}
 
-			System.out.println("Updated " + count + " users in " + (System.currentTimeMillis() - start) + "ms");
+//			System.out.println("Updated " + count + " users in " + (System.currentTimeMillis() - start) + "ms");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
