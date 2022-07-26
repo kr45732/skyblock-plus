@@ -2303,6 +2303,9 @@ public class Player {
 					case "lily_weight":
 						highestAmount = Math.max(highestAmount, getLilyWeight());
 						break;
+					case "lily_slayer_weight":
+						highestAmount = Math.max(highestAmount, new LilyWeight(this, true).getSlayerWeight().getWeightStruct().getRaw());
+						break;
 					default:
 						if (COLLECTION_NAME_TO_ID.containsKey(type)) {
 							highestAmount = Math.max(highestAmount, getCollection(COLLECTION_NAME_TO_ID.get(type)));

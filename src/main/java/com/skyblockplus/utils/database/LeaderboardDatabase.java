@@ -87,6 +87,7 @@ public class LeaderboardDatabase {
 	static {
 		types.addAll(COLLECTION_NAME_TO_ID.keySet());
 		guildTypes.addAll(types);
+		guildTypes.add("lily_slayer_weight");
 		types.addAll(STATS_LIST);
 
 		typesSubList.addAll(types.subList(2, types.size()));
