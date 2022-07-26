@@ -42,6 +42,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -404,18 +406,34 @@ public class SkyblockEventCommand extends Command {
 		}
 	}
 
-	public static EmbedBuilder joinSkyblockEvent(String profile, Member member) {
-		if (database.getSkyblockEventActive(member.getGuild().getId())) {
-			LinkedAccount linkedAccount = database.getByDiscord(member.getId());
-			if (linkedAccount != null) {
-				String uuid = linkedAccount.uuid();
-				String username = linkedAccount.username();
-
-				if (database.eventHasMemberByUuid(member.getGuild().getId(), uuid)) {
-					return invalidEmbed("You are already in the event! If you want to leave or change profile use `/event leave`");
+	public static EmbedBuilder joinSkyblockEvent(String username, String profile, Member member, String guildId) {
+		if (database.getSkyblockEventActive(guildId)) {
+			String uuid;
+			if (member != null) {
+				LinkedAccount linkedAccount = database.getByDiscord(member.getId());
+				if(linkedAccount == null) {
+					return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
 				}
 
-				JsonElement eventSettings = database.getSkyblockEventSettings(member.getGuild().getId());
+				uuid = linkedAccount.uuid();
+				username = linkedAccount.username();
+			} else {
+				UsernameUuidStruct uuidStruct = usernameToUuid(username);
+				if (uuidStruct.isNotValid()) {
+					return invalidEmbed(uuidStruct.failCause());
+				}
+
+				uuid = usernameToUuid(username).uuid();
+				username = uuidStruct.username();
+			}
+
+			if (database.eventHasMemberByUuid(guildId, uuid)) {
+				return invalidEmbed(member != null ? "You are already in the event! If you want to leave or change profile use `/event leave`" : "Player is already in the event");
+			}
+
+			JsonElement eventSettings = database.getSkyblockEventSettings(guildId);
+
+			if (member != null) {
 				if (!higherDepth(eventSettings, "eventGuildId", "").isEmpty()) {
 					HypixelResponse guildJson = getGuildFromPlayer(uuid);
 					if (guildJson.isNotValid()) {
@@ -423,110 +441,108 @@ public class SkyblockEventCommand extends Command {
 					}
 
 					if (!guildJson.get("_id").getAsString().equals(higherDepth(eventSettings, "eventGuildId").getAsString())) {
-						return invalidEmbed("You must be in the guild to join the event");
+						return invalidEmbed( "You must be in the guild to join the event");
 					}
 				}
+
 				String requiredRole = higherDepth(eventSettings, "whitelistRole", "");
 				if (!requiredRole.isEmpty() && member.getRoles().stream().noneMatch(r -> r.getId().equals(requiredRole))) {
 					return invalidEmbed("You must have the <@&" + requiredRole + "> role to join this event");
 				}
+			}
 
-				Player player = profile != null ? new Player(username, profile) : new Player(username);
+			Player player = profile != null ? new Player(username, profile) : new Player(username);
+			if (player.isValid()) {
+				try {
+					double startingAmount = 0;
+					String startingAmountFormatted = "";
 
-				if (player.isValid()) {
+					String eventType = higherDepth(eventSettings, "eventType").getAsString();
+
+					if ((eventType.startsWith("skills") || eventType.startsWith("weight")) && !player.isSkillsApiEnabled()) {
+						return invalidEmbed(member != null ? "Please enable your skills API before joining" : "Player's skills API is disabled");
+					}
+
+					switch (eventType) {
+						case "slayer" -> {
+							startingAmount = player.getTotalSlayer();
+							startingAmountFormatted = formatNumber(startingAmount) + " total slayer xp";
+						}
+						case "skills" -> {
+							startingAmount = player.getTotalSkillsXp();
+							startingAmountFormatted = formatNumber(startingAmount) + " total skills xp";
+						}
+						case "catacombs" -> {
+							startingAmount = player.getCatacombs().totalExp();
+							startingAmountFormatted = formatNumber(startingAmount) + " total catacombs xp";
+						}
+						case "weight" -> {
+							startingAmount = player.getWeight();
+							startingAmountFormatted = formatNumber(startingAmount) + " weight";
+						}
+						default -> {
+							if (eventType.startsWith("collection.")) {
+								startingAmount =
+									higherDepth(player.profileJson(), eventType.split("-")[0]) != null
+										? higherDepth(player.profileJson(), eventType.split("-")[0]).getAsDouble()
+										: 0;
+								startingAmountFormatted = formatNumber(startingAmount) + " " + eventType.split("-")[1] + " collection";
+							} else if (eventType.startsWith("skills.")) {
+								String skillType = eventType.split("skills.")[1];
+								startingAmount = skillType.equals("all") ? player.getTotalSkillsXp() : player.getSkillXp(skillType);
+								startingAmountFormatted =
+									formatNumber(startingAmount) +
+									" " +
+									(skillType.equals("all") ? "total skills" : skillType) +
+									"  xp";
+							} else if (eventType.startsWith("weight.")) {
+								String weightTypes = eventType.split("weight.")[1];
+								startingAmount = player.getWeight(weightTypes.split("-"));
+								startingAmountFormatted = formatNumber(startingAmount) + " " + getEventTypeFormatted(eventType);
+							}
+						}
+					}
+
 					try {
-						double startingAmount = 0;
-						String startingAmountFormatted = "";
-
-						String eventType = higherDepth(eventSettings, "eventType").getAsString();
-
-						if ((eventType.startsWith("skills") || eventType.startsWith("weight")) && !player.isSkillsApiEnabled()) {
-							return invalidEmbed("Please enable your skills API before joining");
-						}
-
-						switch (eventType) {
-							case "slayer" -> {
-								startingAmount = player.getTotalSlayer();
-								startingAmountFormatted = formatNumber(startingAmount) + " total slayer xp";
-							}
-							case "skills" -> {
-								startingAmount = player.getTotalSkillsXp();
-								startingAmountFormatted = formatNumber(startingAmount) + " total skills xp";
-							}
-							case "catacombs" -> {
-								startingAmount = player.getCatacombs().totalExp();
-								startingAmountFormatted = formatNumber(startingAmount) + " total catacombs xp";
-							}
-							case "weight" -> {
-								startingAmount = player.getWeight();
-								startingAmountFormatted = formatNumber(startingAmount) + " weight";
-							}
-							default -> {
-								if (eventType.startsWith("collection.")) {
-									startingAmount =
-										higherDepth(player.profileJson(), eventType.split("-")[0]) != null
-											? higherDepth(player.profileJson(), eventType.split("-")[0]).getAsDouble()
-											: 0;
-									startingAmountFormatted = formatNumber(startingAmount) + " " + eventType.split("-")[1] + " collection";
-								} else if (eventType.startsWith("skills.")) {
-									String skillType = eventType.split("skills.")[1];
-									startingAmount = skillType.equals("all") ? player.getTotalSkillsXp() : player.getSkillXp(skillType);
-									startingAmountFormatted =
-										formatNumber(startingAmount) +
-										" " +
-										(skillType.equals("all") ? "total skills" : skillType) +
-										"  xp";
-								} else if (eventType.startsWith("weight.")) {
-									String weightTypes = eventType.split("weight.")[1];
-									startingAmount = player.getWeight(weightTypes.split("-"));
-									startingAmountFormatted = formatNumber(startingAmount) + " " + getEventTypeFormatted(eventType);
-								}
-							}
-						}
-
-						try {
-							int minAmt = Integer.parseInt(higherDepth(eventSettings, "minAmount").getAsString());
-							if (minAmt != -1 && startingAmount < minAmt) {
-								return invalidEmbed(
-									"You must have at least " + formatNumber(minAmt) + " " + getEventTypeFormatted(eventType)
-								);
-							}
-						} catch (Exception ignored) {}
-
-						try {
-							int maxAmt = Integer.parseInt(higherDepth(eventSettings, "maxAmount").getAsString());
-							if (maxAmt != -1 && startingAmount > maxAmt) {
-								return invalidEmbed(
-									"You must have no more than " + formatNumber(maxAmt) + " " + getEventTypeFormatted(eventType)
-								);
-							}
-						} catch (Exception ignored) {}
-
-						int code = database.addMemberToSkyblockEvent(
-							member.getGuild().getId(),
-							new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
-						);
-
-						if (code == 200) {
-							return defaultEmbed("Joined event")
-								.setDescription(
-									"**Username:** " +
-									username +
-									"\n**Profile:** " +
-									player.getProfileName() +
-									"\n**Starting amount:** " +
-									startingAmountFormatted
-								);
-						} else {
-							return invalidEmbed("API returned code " + code);
+						int minAmt = Integer.parseInt(higherDepth(eventSettings, "minAmount").getAsString());
+						if (minAmt != -1 && startingAmount < minAmt) {
+							return invalidEmbed(
+								(member != null ? "You" : "Player" )+ " must have at least " + formatNumber(minAmt) + " " + getEventTypeFormatted(eventType) + " to join"
+							);
 						}
 					} catch (Exception ignored) {}
-				}
 
-				return player.getFailEmbed();
-			} else {
-				return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
+					try {
+						int maxAmt = Integer.parseInt(higherDepth(eventSettings, "maxAmount").getAsString());
+						if (maxAmt != -1 && startingAmount > maxAmt) {
+							return invalidEmbed(
+									(member != null ? "You" : "Player" ) + " must have no more than " + formatNumber(maxAmt) + " " + getEventTypeFormatted(eventType) + " to join"
+							);
+						}
+					} catch (Exception ignored) {}
+
+					int code = database.addMemberToSkyblockEvent(
+						guildId,
+						new EventMember(player.getUsername(), player.getUuid(), "" + startingAmount, player.getProfileName())
+					);
+
+					if (code == 200) {
+						return defaultEmbed(member != null ? "Joined event" : "Added player to event")
+							.setDescription(
+								"**Username:** " +
+								player.getUsername() +
+								"\n**Profile:** " +
+								player.getProfileName() +
+								"\n**Starting amount:** " +
+								startingAmountFormatted
+							);
+					} else {
+						return invalidEmbed("API returned code " + code);
+					}
+				} catch (Exception ignored) {}
 			}
+
+			return player.getFailEmbed();
 		} else {
 			return invalidEmbed("No event running");
 		}
@@ -637,9 +653,9 @@ public class SkyblockEventCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length == 2 || args.length == 3) {
+				if (args.length >= 2) {
 					if (
-						(args[1].equals("create") || args[1].equals("cancel") || args[1].equals("end")) &&
+						(args[1].equals("create") || args[1].equals("cancel") || args[1].equals("end") || args[1].equals("add")) &&
 						!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
 					) {
 						ebMessage.delete().complete();
@@ -664,7 +680,15 @@ public class SkyblockEventCommand extends Command {
 							return;
 						}
 						case "join" -> {
-							embed(joinSkyblockEvent(args.length == 3 ? args[2] : null, event.getMember()));
+							embed(joinSkyblockEvent(null, args.length == 3 ? args[2] : null, event.getMember(), event.getGuild().getId()));
+							return;
+						}
+						case "add" -> {
+							if (args.length < 3) {
+								embed(invalidEmbed("You must provide a player to add to the event"));
+							} else {
+								embed(joinSkyblockEvent(args[2], args.length == 4 ? args[3] : null, null, event.getGuild().getId()));
+							}
 							return;
 						}
 						case "leave" -> {
