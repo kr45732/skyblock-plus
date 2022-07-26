@@ -46,7 +46,7 @@ public class ViewAuctionCommand extends Command {
 
 	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
 		HypixelResponse auctionResponse = getAuctionFromUuid(auctionUuid);
-		if (auctionResponse.isNotValid()) {
+		if (!auctionResponse.isValid()) {
 			return invalidEmbed(auctionResponse.failCause());
 		}
 

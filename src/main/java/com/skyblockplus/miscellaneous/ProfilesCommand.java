@@ -49,12 +49,12 @@ public class ProfilesCommand extends Command {
 
 	public static EmbedBuilder getPlayerProfiles(String username, PaginatorEvent event) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
+		if (!usernameUuid.isValid()) {
 			return invalidEmbed(usernameUuid.failCause());
 		}
 
 		HypixelResponse profilesJson = skyblockProfilesFromUuid(usernameUuid.uuid());
-		if (profilesJson.isNotValid()) {
+		if (!profilesJson.isValid()) {
 			return invalidEmbed(profilesJson.failCause());
 		}
 

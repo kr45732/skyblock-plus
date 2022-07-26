@@ -40,7 +40,6 @@ import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.apache.groovy.util.Maps;
 
 public class Player {
@@ -944,7 +943,7 @@ public class Player {
 
 		try {
 			HypixelResponse response = skyblockProfilesFromUuid(uuid);
-			if (response.isNotValid()) {
+			if (!response.isValid()) {
 				failCause = response.failCause();
 				return;
 			}
@@ -972,7 +971,7 @@ public class Player {
 
 		try {
 			HypixelResponse response = skyblockProfilesFromUuid(uuid, HYPIXEL_API_KEY, false);
-			if (response.isNotValid()) {
+			if (!response.isValid()) {
 				failCause = response.failCause();
 				return;
 			}
@@ -997,7 +996,7 @@ public class Player {
 
 		try {
 			HypixelResponse response = skyblockProfilesFromUuid(uuid);
-			if (response.isNotValid()) {
+			if (!response.isValid()) {
 				failCause = response.failCause();
 				return;
 			}
@@ -1080,7 +1079,7 @@ public class Player {
 	/* Constructor helper methods */
 	public boolean usernameToUuid(String username) {
 		UsernameUuidStruct response = ApiHandler.usernameToUuid(username);
-		if (response.isNotValid()) {
+		if (!response.isValid()) {
 			failCause = response.failCause();
 			return true;
 		}

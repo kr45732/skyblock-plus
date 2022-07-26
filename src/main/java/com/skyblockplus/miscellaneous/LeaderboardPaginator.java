@@ -246,7 +246,7 @@ public class LeaderboardPaginator {
 		} catch (Exception ignored) {}
 		try {
 			player = usernameToUuid(event.getValue("player").getAsString());
-			player = player.isNotValid() ? null : player;
+			player = !player.isValid() ? null : player;
 		} catch (Exception ignored) {}
 
 		if (rank != -1) {

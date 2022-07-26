@@ -51,7 +51,7 @@ public class CoinsCommand extends Command {
 			double playerPurseCoins = player.getPurseCoins();
 			double auctionCoins = 0;
 			HypixelResponse playerAuctions = getAuctionFromPlayer(player.getUuid());
-			if (!playerAuctions.isNotValid()) {
+			if (playerAuctions.isValid()) {
 				for (JsonElement currentAuction : playerAuctions.response().getAsJsonArray()) {
 					if (higherDepth(currentAuction, "claimed").getAsBoolean()) {
 						continue;

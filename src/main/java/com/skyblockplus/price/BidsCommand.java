@@ -46,7 +46,7 @@ public class BidsCommand extends Command {
 
 	public static EmbedBuilder getPlayerBids(String username, PaginatorEvent event) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-		if (usernameUuidStruct.isNotValid()) {
+		if (!usernameUuidStruct.isValid()) {
 			return invalidEmbed(usernameUuidStruct.failCause());
 		}
 

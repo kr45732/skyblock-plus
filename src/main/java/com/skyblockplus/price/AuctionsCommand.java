@@ -64,12 +64,12 @@ public class AuctionsCommand extends Command {
 		PaginatorEvent event
 	) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-		if (usernameUuidStruct.isNotValid()) {
+		if (!usernameUuidStruct.isValid()) {
 			return invalidEmbed(usernameUuidStruct.failCause());
 		}
 
 		HypixelResponse auctionsResponse = getAuctionFromPlayer(usernameUuidStruct.uuid());
-		if (auctionsResponse.isNotValid()) {
+		if (!auctionsResponse.isValid()) {
 			return invalidEmbed(auctionsResponse.failCause());
 		}
 

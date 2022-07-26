@@ -306,7 +306,7 @@ public class LeaderboardDatabase {
 				} else {
 					for (count = 0; count <= 90 && userCount < members.size() && System.currentTimeMillis() - start < 57000; userCount++) {
 						UsernameUuidStruct usernameUuidStruct = uuidToUsername(members.get(userCount).getAsString());
-						if (!usernameUuidStruct.isNotValid()) {
+						if (usernameUuidStruct.isValid()) {
 							count++;
 							HypixelResponse profileResponse = skyblockProfilesFromUuid(
 								usernameUuidStruct.uuid(),
@@ -314,7 +314,7 @@ public class LeaderboardDatabase {
 								true,
 								false
 							);
-							if (!profileResponse.isNotValid()) {
+							if (profileResponse.isValid()) {
 								insertIntoLeaderboard(
 									new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), true),
 									false
@@ -339,7 +339,7 @@ public class LeaderboardDatabase {
 				}
 
 				UsernameUuidStruct usernameUuidStruct = uuidToUsername(document.getString("uuid"));
-				if (!usernameUuidStruct.isNotValid()) {
+				if (usernameUuidStruct.isValid()) {
 					count++;
 					HypixelResponse profileResponse = skyblockProfilesFromUuid(
 						usernameUuidStruct.uuid(),
@@ -347,7 +347,7 @@ public class LeaderboardDatabase {
 						true,
 						false
 					);
-					if (!profileResponse.isNotValid()) {
+					if (profileResponse.isValid()) {
 						insertIntoLeaderboard(
 							new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), true),
 							false

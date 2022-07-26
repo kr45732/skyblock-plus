@@ -35,8 +35,8 @@ public record HypixelResponse(JsonElement response, String failCause) {
 		this("Unknown fail cause");
 	}
 
-	public boolean isNotValid() {
-		return response == null;
+	public boolean isValid() {
+		return response != null;
 	}
 
 	public JsonElement get(String path) {

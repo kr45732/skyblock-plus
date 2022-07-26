@@ -45,7 +45,7 @@ public class HypixelCommand extends Command {
 
 	public static EmbedBuilder getHypixelStats(String username) {
 		HypixelPlayer player = new HypixelPlayer(username);
-		if (player.isNotValid()) {
+		if (!player.isValid()) {
 			return invalidEmbed(player.getFailCause());
 		}
 
@@ -84,7 +84,7 @@ public class HypixelCommand extends Command {
 		} catch (Exception ignored) {}
 
 		HypixelResponse guildResponse = getGuildFromPlayer(player.getUuid());
-		if (!guildResponse.isNotValid()) {
+		if (guildResponse.isValid()) {
 			eb.addField("Guild", guildResponse.get("name").getAsString(), true);
 
 			for (JsonElement member : guildResponse.get("members").getAsJsonArray()) {

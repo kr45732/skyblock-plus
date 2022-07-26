@@ -96,7 +96,7 @@ public class RolesCommand extends Command {
 					case "guild_member" -> {
 						if (guildJson == null) {
 							HypixelResponse response = getGuildFromPlayer(player.getUuid());
-							if (!response.isNotValid()) {
+							if (response.isValid()) {
 								guildJson = response.response();
 							}
 						}
@@ -138,7 +138,7 @@ public class RolesCommand extends Command {
 					case "guild_ranks" -> {
 						if (guildJson == null) {
 							HypixelResponse response = getGuildFromPlayer(player.getUuid());
-							if (!response.isNotValid()) {
+							if (response.isValid()) {
 								guildJson = response.response();
 							}
 						}

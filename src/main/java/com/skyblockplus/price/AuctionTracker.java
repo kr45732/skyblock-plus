@@ -40,7 +40,7 @@ public class AuctionTracker {
 		UsernameUuidStruct curTrack = commandAuthorToTrackingUser.getOrDefault(userId, null);
 
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if (uuidStruct.isNotValid()) {
+		if (!uuidStruct.isValid()) {
 			return invalidEmbed(uuidStruct.failCause());
 		}
 

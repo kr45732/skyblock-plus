@@ -37,7 +37,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
 
@@ -68,12 +68,12 @@ public class GuildRanksCommand extends Command {
 		}
 
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
+		if (!usernameUuid.isValid()) {
 			return invalidEmbed(usernameUuid.failCause());
 		}
 
 		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.uuid());
-		if (guildResponse.isNotValid()) {
+		if (!guildResponse.isValid()) {
 			return invalidEmbed(guildResponse.failCause());
 		}
 

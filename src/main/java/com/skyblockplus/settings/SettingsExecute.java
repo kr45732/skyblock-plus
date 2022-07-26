@@ -803,7 +803,7 @@ public class SettingsExecute {
 	/* Guild Settings */
 	public EmbedBuilder removePlayerBlacklist(String username) {
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if (uuidStruct.isNotValid()) {
+		if (!uuidStruct.isValid()) {
 			return invalidEmbed(uuidStruct.failCause());
 		}
 
@@ -868,7 +868,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder addPlayerBlacklist(String username, String reason) {
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if (uuidStruct.isNotValid()) {
+		if (!uuidStruct.isValid()) {
 			return invalidEmbed(uuidStruct.failCause());
 		}
 
@@ -1050,7 +1050,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder createNewGuild(String guildName) {
 		HypixelResponse guildResponse = getGuildFromName(guildName);
-		if (guildResponse.isNotValid()) {
+		if (!guildResponse.isValid()) {
 			return invalidEmbed(guildResponse.failCause());
 		}
 
@@ -1132,7 +1132,7 @@ public class SettingsExecute {
 		}
 
 		HypixelResponse guildJson = getGuildFromId(higherDepth(guildSettings, "guildId").getAsString());
-		if (guildJson.isNotValid()) {
+		if (!guildJson.isValid()) {
 			return invalidEmbed(guildJson.failCause());
 		}
 
@@ -1172,7 +1172,7 @@ public class SettingsExecute {
 		Role role = ((Role) eb);
 
 		HypixelResponse guildJson = getGuildFromId(higherDepth(guildSettings, "guildId").getAsString());
-		if (guildJson.isNotValid()) {
+		if (!guildJson.isValid()) {
 			return invalidEmbed(guildJson.failCause());
 		}
 
@@ -1875,7 +1875,7 @@ public class SettingsExecute {
 					for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
 						String guildId = higherDepth(roleLevel, "value").getAsString();
 						HypixelResponse guildJson = getGuildFromId(guildId);
-						if (!guildJson.isNotValid()) {
+						if (guildJson.isValid()) {
 							ebFieldString
 								.append("\n• ")
 								.append(guildJson.get("name").getAsString())
@@ -2033,7 +2033,7 @@ public class SettingsExecute {
 		String guildName = "";
 		if (roleName.equals("guild_member")) {
 			HypixelResponse guildJson = getGuildFromName(roleValue);
-			if (guildJson.isNotValid()) {
+			if (!guildJson.isValid()) {
 				return invalidEmbed(guildJson.failCause());
 			}
 			roleValue = guildJson.get("_id").getAsString();
@@ -2175,7 +2175,7 @@ public class SettingsExecute {
 			String currentValue = higherDepth(level, "value").getAsString();
 			if (roleName.equals("guild_member")) {
 				HypixelResponse guildJson = getGuildFromId(higherDepth(level, "value").getAsString());
-				if (guildJson.isNotValid()) {
+				if (!guildJson.isValid()) {
 					return invalidEmbed(guildJson.failCause());
 				}
 				currentValue = guildJson.get("name").getAsString();

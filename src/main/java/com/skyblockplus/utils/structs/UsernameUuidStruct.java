@@ -35,8 +35,8 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 		this("Unknown fail cause");
 	}
 
-	public boolean isNotValid() {
-		return username == null || uuid == null;
+	public boolean isValid() {
+		return username != null && uuid != null;
 	}
 
 	public String getAvatarlUrl() {

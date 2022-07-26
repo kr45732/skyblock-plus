@@ -57,7 +57,7 @@ public class LinkCommand extends Command {
 
 	public static Object linkAccount(String username, Member member, Guild guild) {
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
-		if (playerInfo.isNotValid()) {
+		if (!playerInfo.isValid()) {
 			return playerInfo.failCause().endsWith(" is not linked on Hypixel")
 				? new MessageBuilder()
 					.setEmbeds(invalidEmbed(playerInfo.failCause()).build())
@@ -149,7 +149,7 @@ public class LinkCommand extends Command {
 					if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK"))) {
 						if (playerGuild == null) {
 							playerGuild = getGuildFromPlayer(linkedAccount.uuid());
-							if (!playerGuild.isNotValid()) {
+							if (playerGuild.isValid()) {
 								String gId = playerGuild.get("_id").getAsString();
 								if (
 									database
@@ -162,7 +162,7 @@ public class LinkCommand extends Command {
 							}
 						}
 
-						if (!playerGuild.isNotValid()) {
+						if (playerGuild.isValid()) {
 							nicknameTemplate =
 								nicknameTemplate.replace(
 									matcher.group(0),
@@ -195,7 +195,7 @@ public class LinkCommand extends Command {
 							if (player == null) {
 								HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
 								player =
-									response.isNotValid()
+									!response.isValid()
 										? new Player()
 										: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
 							}
@@ -243,7 +243,7 @@ public class LinkCommand extends Command {
 						if (player == null) {
 							HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
 							player =
-								response.isNotValid()
+								!response.isValid()
 									? new Player()
 									: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
 						}

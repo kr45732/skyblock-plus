@@ -418,7 +418,7 @@ public class SkyblockEventCommand extends Command {
 				username = linkedAccount.username();
 			} else {
 				UsernameUuidStruct uuidStruct = usernameToUuid(username);
-				if (uuidStruct.isNotValid()) {
+				if (!uuidStruct.isValid()) {
 					return invalidEmbed(uuidStruct.failCause());
 				}
 
@@ -439,7 +439,7 @@ public class SkyblockEventCommand extends Command {
 			if (member != null) {
 				if (!higherDepth(eventSettings, "eventGuildId", "").isEmpty()) {
 					HypixelResponse guildJson = getGuildFromPlayer(uuid);
-					if (guildJson.isNotValid()) {
+					if (!guildJson.isValid()) {
 						return invalidEmbed(guildJson.failCause());
 					}
 
@@ -567,7 +567,7 @@ public class SkyblockEventCommand extends Command {
 
 			if (!higherDepth(currentSettings, "eventGuildId", "").isEmpty()) {
 				HypixelResponse guildJson = getGuildFromId(higherDepth(currentSettings, "eventGuildId").getAsString());
-				if (guildJson.isNotValid()) {
+				if (!guildJson.isValid()) {
 					return invalidEmbed(guildJson.failCause());
 				}
 				eb.addField("Guild", guildJson.get("name").getAsString(), false);

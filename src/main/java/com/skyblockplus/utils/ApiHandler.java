@@ -406,7 +406,7 @@ public class ApiHandler {
 
 	public static HypixelResponse getAuctionFromUuid(String auctionUuid) {
 		HypixelResponse response = getAuctionGeneric("&uuid=" + auctionUuid);
-		return response.isNotValid() ? response : (response.get("[0]") != null ? response : new HypixelResponse("Invalid auction UUID"));
+		return !response.isValid() ? response : (response.get("[0]") != null ? response : new HypixelResponse("Invalid auction UUID"));
 	}
 
 	public static HypixelResponse getGuildGeneric(String query) {

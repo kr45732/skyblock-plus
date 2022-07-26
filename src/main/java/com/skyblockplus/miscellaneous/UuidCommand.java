@@ -40,7 +40,7 @@ public class UuidCommand extends Command {
 
 	public static EmbedBuilder getUuidPlayer(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
+		if (!usernameUuid.isValid()) {
 			return invalidEmbed(usernameUuid.failCause());
 		}
 

@@ -24,10 +24,11 @@ import java.util.concurrent.*;
 
 public class ExceptionExecutor extends ThreadPoolExecutor {
 
-	public ExceptionExecutor() {
-		super(10, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
+	public ExceptionExecutor(int corePoolSize, int maximumPoolSize) {
+		super(corePoolSize, maximumPoolSize, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 	}
 
+	@Override
 	protected void afterExecute(Runnable r, Throwable t) {
 		super.afterExecute(r, t);
 		if (t == null && r instanceof Future<?>) {

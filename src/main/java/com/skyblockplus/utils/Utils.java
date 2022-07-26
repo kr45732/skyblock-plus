@@ -44,6 +44,7 @@ import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandClient;
 import com.skyblockplus.utils.database.Database;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
+import com.skyblockplus.utils.exceptionhandler.ExceptionScheduler;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import com.skyblockplus.utils.structs.*;
 import java.awt.*;
@@ -106,11 +107,11 @@ public class Utils {
 	public static final String BOT_INVITE_LINK =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395540032593&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
-	public static final HttpClient asyncHttpClient = HttpClient.newHttpClient();
+	public static final HttpClient asyncHttpClient = HttpClient.newBuilder().executor(new ExceptionExecutor(0, 20)).build();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
-	public static final ExecutorService executor = new ExceptionExecutor();
-	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(7);
+	public static final ExecutorService executor = new ExceptionExecutor(10, Integer.MAX_VALUE);
+	public static final ScheduledExecutorService scheduler = new ExceptionScheduler(7);
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
 	public static final AtomicInteger remainingLimit = new AtomicInteger(240);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
@@ -634,11 +635,11 @@ public class Utils {
 	public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
 		try {
 			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-			if (usernameUuidStruct.isNotValid()) {
+			if (!usernameUuidStruct.isValid()) {
 				return new DiscordInfoStruct(usernameUuidStruct.failCause());
 			}
 			HypixelResponse response = playerFromUuid(usernameUuidStruct.uuid());
-			if (response.isNotValid()) {
+			if (!response.isValid()) {
 				return new DiscordInfoStruct(response.failCause());
 			}
 

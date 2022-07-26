@@ -73,14 +73,14 @@ public class GuildLeaderboardCommand extends Command {
 		HypixelResponse guildResponse;
 		if (username != null) {
 			usernameUuidStruct = usernameToUuid(username);
-			if (usernameUuidStruct.isNotValid()) {
+			if (!usernameUuidStruct.isValid()) {
 				return invalidEmbed(usernameUuidStruct.failCause());
 			}
 			guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
 		} else {
 			guildResponse = getGuildFromName(guildName);
 		}
-		if (guildResponse.isNotValid()) {
+		if (!guildResponse.isValid()) {
 			return invalidEmbed(guildResponse.failCause());
 		}
 

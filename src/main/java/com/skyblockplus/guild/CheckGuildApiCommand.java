@@ -67,12 +67,12 @@ public class CheckGuildApiCommand extends Command {
 		}
 
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
+		if (!usernameUuid.isValid()) {
 			return invalidEmbed(usernameUuid.failCause());
 		}
 
 		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.uuid());
-		if (guildResponse.isNotValid()) {
+		if (!guildResponse.isValid()) {
 			return invalidEmbed(guildResponse.failCause());
 		}
 

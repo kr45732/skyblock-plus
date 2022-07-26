@@ -45,7 +45,7 @@ public class BingoCommand extends Command {
 
 	public static Object getPlayerBingo(String username) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-		if (usernameUuidStruct.isNotValid()) {
+		if (!usernameUuidStruct.isValid()) {
 			return invalidEmbed(usernameUuidStruct.failCause());
 		}
 

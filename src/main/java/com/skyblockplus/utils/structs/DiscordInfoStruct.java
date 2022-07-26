@@ -31,7 +31,7 @@ public record DiscordInfoStruct(String discordTag, String username, String uuid,
 		this("Player is not linked on Hypixel");
 	}
 
-	public boolean isNotValid() {
-		return discordTag == null || username == null || uuid == null;
+	public boolean isValid() {
+		return discordTag != null && username != null && uuid != null;
 	}
 }

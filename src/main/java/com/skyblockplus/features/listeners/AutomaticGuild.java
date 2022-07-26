@@ -631,7 +631,7 @@ public class AutomaticGuild {
 										if (player == null) {
 											HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
 											player =
-												response.isNotValid()
+												!response.isValid()
 													? new Player()
 													: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
 										}
@@ -682,7 +682,7 @@ public class AutomaticGuild {
 				Set<String> inGuild = new HashSet<>();
 				for (AutomatedGuild currentSetting : filteredGuildSettings) {
 					HypixelResponse response = getGuildFromId(currentSetting.getGuildId());
-					if (response.isNotValid()) {
+					if (!response.isValid()) {
 						continue;
 					}
 

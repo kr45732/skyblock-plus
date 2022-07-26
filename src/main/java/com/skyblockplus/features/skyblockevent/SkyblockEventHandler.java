@@ -99,7 +99,7 @@ public class SkyblockEventHandler {
 						.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
 				} else {
 					HypixelResponse response = getGuildFromName(replyMessage);
-					if (response.isNotValid()) {
+					if (!response.isValid()) {
 						eb.setDescription(response.failCause() + ". Please try again.");
 						attemptsLeft--;
 					} else {

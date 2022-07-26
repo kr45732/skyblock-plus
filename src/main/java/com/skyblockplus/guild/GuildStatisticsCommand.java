@@ -38,7 +38,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
 
@@ -63,7 +63,7 @@ public class GuildStatisticsCommand extends Command {
 		HypixelResponse guildResponse;
 		if (username != null) {
 			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-			if (usernameUuidStruct.isNotValid()) {
+			if (!usernameUuidStruct.isValid()) {
 				return invalidEmbed(usernameUuidStruct.failCause());
 			}
 
@@ -71,7 +71,7 @@ public class GuildStatisticsCommand extends Command {
 		} else {
 			guildResponse = getGuildFromName(guildName);
 		}
-		if (guildResponse.isNotValid()) {
+		if (!guildResponse.isValid()) {
 			return invalidEmbed(guildResponse.failCause());
 		}
 
@@ -166,7 +166,7 @@ public class GuildStatisticsCommand extends Command {
 			roundAndFormat(averageSlayer) +
 			"\n**Average Skills Level:** " +
 			roundAndFormat(averageSkills) +
-			"\n**Average Catacombs Level:** " +
+			"\n**Average Catacombs XP:** " +
 			roundAndFormat(averageCata) +
 			"\n**Average Weight:** " +
 			roundAndFormat(averageWeight) +

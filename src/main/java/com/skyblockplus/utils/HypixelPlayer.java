@@ -44,7 +44,7 @@ public class HypixelPlayer {
 
 		try {
 			HypixelResponse response = playerFromUuid(uuid);
-			if (response.isNotValid()) {
+			if (!response.isValid()) {
 				failCause = response.failCause();
 				return;
 			}
@@ -58,8 +58,8 @@ public class HypixelPlayer {
 	}
 
 	/* Getters */
-	public boolean isNotValid() {
-		return !validPlayer;
+	public boolean isValid() {
+		return validPlayer;
 	}
 
 	public String getFailCause() {
@@ -123,7 +123,7 @@ public class HypixelPlayer {
 	/* Helper methods */
 	private boolean usernameToUuid(String username) {
 		UsernameUuidStruct response = ApiHandler.usernameToUuid(username);
-		if (response.isNotValid()) {
+		if (!response.isValid()) {
 			failCause = response.failCause();
 			return true;
 		}

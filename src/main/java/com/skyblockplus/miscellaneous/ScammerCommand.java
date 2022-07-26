@@ -41,7 +41,7 @@ public class ScammerCommand extends Command {
 
 	public static EmbedBuilder getScammer(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
+		if (!usernameUuid.isValid()) {
 			return invalidEmbed(usernameUuid.failCause());
 		}
 

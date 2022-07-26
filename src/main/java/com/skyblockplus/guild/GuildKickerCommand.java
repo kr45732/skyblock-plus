@@ -84,11 +84,11 @@ public class GuildKickerCommand extends Command {
 		}
 
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-		if (usernameUuidStruct.isNotValid()) {
+		if (!usernameUuidStruct.isValid()) {
 			return invalidEmbed(usernameUuidStruct.failCause());
 		}
 		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
-		if (guildResponse.isNotValid()) {
+		if (!guildResponse.isValid()) {
 			return invalidEmbed(guildResponse.failCause());
 		}
 		JsonElement guildJson = guildResponse.response();
