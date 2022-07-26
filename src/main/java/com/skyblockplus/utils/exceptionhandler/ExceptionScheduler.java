@@ -18,36 +18,36 @@
 
 package com.skyblockplus.utils.exceptionhandler;
 
-import java.util.concurrent.*;
-
 import static com.skyblockplus.utils.Utils.globalExceptionHandler;
+
+import java.util.concurrent.*;
 
 public class ExceptionScheduler extends ScheduledThreadPoolExecutor {
 
-    public ExceptionScheduler(int corePoolSize) {
-        super(corePoolSize);
-    }
+	public ExceptionScheduler(int corePoolSize) {
+		super(corePoolSize);
+	}
 
-    @Override
-    protected void afterExecute(Runnable r, Throwable t) {
-        super.afterExecute(r, t);
-        if (t == null && r instanceof Future<?>) {
-            try {
-                Future<?> future = (Future<?>) r;
-                if (future.isDone()) {
-                    future.get();
-                }
-            } catch (CancellationException ce) {
-                t = ce;
-            } catch (ExecutionException ee) {
-                t = ee.getCause();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
-        }
+	@Override
+	protected void afterExecute(Runnable r, Throwable t) {
+		super.afterExecute(r, t);
+		if (t == null && r instanceof Future<?>) {
+			try {
+				Future<?> future = (Future<?>) r;
+				if (future.isDone()) {
+					future.get();
+				}
+			} catch (CancellationException ce) {
+				t = ce;
+			} catch (ExecutionException ee) {
+				t = ee.getCause();
+			} catch (InterruptedException ie) {
+				Thread.currentThread().interrupt();
+			}
+		}
 
-        if (t != null) {
-            globalExceptionHandler.uncaughtException(null, t);
-        }
-    }
+		if (t != null) {
+			globalExceptionHandler.uncaughtException(null, t);
+		}
+	}
 }
