@@ -1106,7 +1106,12 @@ public class AutomaticGuild {
 				.deferReply(true)
 				.queue(ignored -> {
 					if (event.getComponentId().equals("event_message_join")) {
-						event.getHook().editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(null, null, event.getMember(), event.getGuild().getId()).build()).queue();
+						event
+							.getHook()
+							.editOriginalEmbeds(
+								SkyblockEventCommand.joinSkyblockEvent(null, null, event.getMember(), event.getGuild().getId()).build()
+							)
+							.queue();
 					} else {
 						EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event.getGuild(), event.getUser(), null, event);
 						if (eb != null) {

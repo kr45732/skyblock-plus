@@ -35,6 +35,7 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -42,8 +43,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
-import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -411,7 +410,7 @@ public class SkyblockEventCommand extends Command {
 			String uuid;
 			if (member != null) {
 				LinkedAccount linkedAccount = database.getByDiscord(member.getId());
-				if(linkedAccount == null) {
+				if (linkedAccount == null) {
 					return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
 				}
 
@@ -428,7 +427,11 @@ public class SkyblockEventCommand extends Command {
 			}
 
 			if (database.eventHasMemberByUuid(guildId, uuid)) {
-				return invalidEmbed(member != null ? "You are already in the event! If you want to leave or change profile use `/event leave`" : "Player is already in the event");
+				return invalidEmbed(
+					member != null
+						? "You are already in the event! If you want to leave or change profile use `/event leave`"
+						: "Player is already in the event"
+				);
 			}
 
 			JsonElement eventSettings = database.getSkyblockEventSettings(guildId);
@@ -441,7 +444,7 @@ public class SkyblockEventCommand extends Command {
 					}
 
 					if (!guildJson.get("_id").getAsString().equals(higherDepth(eventSettings, "eventGuildId").getAsString())) {
-						return invalidEmbed( "You must be in the guild to join the event");
+						return invalidEmbed("You must be in the guild to join the event");
 					}
 				}
 
@@ -460,7 +463,9 @@ public class SkyblockEventCommand extends Command {
 					String eventType = higherDepth(eventSettings, "eventType").getAsString();
 
 					if ((eventType.startsWith("skills") || eventType.startsWith("weight")) && !player.isSkillsApiEnabled()) {
-						return invalidEmbed(member != null ? "Please enable your skills API before joining" : "Player's skills API is disabled");
+						return invalidEmbed(
+							member != null ? "Please enable your skills API before joining" : "Player's skills API is disabled"
+						);
 					}
 
 					switch (eventType) {
@@ -491,10 +496,7 @@ public class SkyblockEventCommand extends Command {
 								String skillType = eventType.split("skills.")[1];
 								startingAmount = skillType.equals("all") ? player.getTotalSkillsXp() : player.getSkillXp(skillType);
 								startingAmountFormatted =
-									formatNumber(startingAmount) +
-									" " +
-									(skillType.equals("all") ? "total skills" : skillType) +
-									"  xp";
+									formatNumber(startingAmount) + " " + (skillType.equals("all") ? "total skills" : skillType) + "  xp";
 							} else if (eventType.startsWith("weight.")) {
 								String weightTypes = eventType.split("weight.")[1];
 								startingAmount = player.getWeight(weightTypes.split("-"));
@@ -507,7 +509,12 @@ public class SkyblockEventCommand extends Command {
 						int minAmt = Integer.parseInt(higherDepth(eventSettings, "minAmount").getAsString());
 						if (minAmt != -1 && startingAmount < minAmt) {
 							return invalidEmbed(
-								(member != null ? "You" : "Player" )+ " must have at least " + formatNumber(minAmt) + " " + getEventTypeFormatted(eventType) + " to join"
+								(member != null ? "You" : "Player") +
+								" must have at least " +
+								formatNumber(minAmt) +
+								" " +
+								getEventTypeFormatted(eventType) +
+								" to join"
 							);
 						}
 					} catch (Exception ignored) {}
@@ -516,7 +523,12 @@ public class SkyblockEventCommand extends Command {
 						int maxAmt = Integer.parseInt(higherDepth(eventSettings, "maxAmount").getAsString());
 						if (maxAmt != -1 && startingAmount > maxAmt) {
 							return invalidEmbed(
-									(member != null ? "You" : "Player" ) + " must have no more than " + formatNumber(maxAmt) + " " + getEventTypeFormatted(eventType) + " to join"
+								(member != null ? "You" : "Player") +
+								" must have no more than " +
+								formatNumber(maxAmt) +
+								" " +
+								getEventTypeFormatted(eventType) +
+								" to join"
 							);
 						}
 					} catch (Exception ignored) {}

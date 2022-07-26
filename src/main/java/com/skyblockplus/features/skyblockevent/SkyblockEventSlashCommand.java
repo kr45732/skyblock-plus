@@ -43,7 +43,12 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		String subcommandName = event.getSubcommandName();
 		if (
-			(subcommandName.equals("create") || subcommandName.equals("cancel") || subcommandName.equals("end") || subcommandName.equals("add")) &&
+			(
+				subcommandName.equals("create") ||
+				subcommandName.equals("cancel") ||
+				subcommandName.equals("end") ||
+				subcommandName.equals("add")
+			) &&
 			!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
 		) {
 			event.string(client.getError() + " You must have the administrator permission in this guild to use that!");
@@ -61,10 +66,19 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				event.embed(SkyblockEventCommand.cancelSkyblockEvent(event.getGuild()));
 				break;
 			case "join":
-				event.embed(SkyblockEventCommand.joinSkyblockEvent(null, event.getOptionStr("profile"), event.getMember(), event.getGuild().getId()));
+				event.embed(
+					SkyblockEventCommand.joinSkyblockEvent(null, event.getOptionStr("profile"), event.getMember(), event.getGuild().getId())
+				);
 				break;
 			case "add":
-				event.embed(SkyblockEventCommand.joinSkyblockEvent(event.getOptionStr("player"), event.getOptionStr("profile"), null, event.getGuild().getId()));
+				event.embed(
+					SkyblockEventCommand.joinSkyblockEvent(
+						event.getOptionStr("player"),
+						event.getOptionStr("profile"),
+						null,
+						event.getGuild().getId()
+					)
+				);
 				break;
 			case "leave":
 				event.embed(SkyblockEventCommand.leaveSkyblockEvent(event.getGuild().getId(), event.getUser().getId()));
@@ -98,8 +112,8 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				new SubcommandData("current", "Get information about the current event"),
 				new SubcommandData("join", "Join the current event").addOption(OptionType.STRING, "profile", "Profile name"),
 				new SubcommandData("add", "Force add a player to the current event")
-						.addOption(OptionType.STRING, "player", "Player username or mention", true, true)
-						.addOption(OptionType.STRING, "profile", "Profile name"),
+					.addOption(OptionType.STRING, "player", "Player username or mention", true, true)
+					.addOption(OptionType.STRING, "profile", "Profile name"),
 				new SubcommandData("leave", "Leave the current event"),
 				new SubcommandData("cancel", "Cancel the event"),
 				new SubcommandData("leaderboard", "Get the leaderboard for current event")
