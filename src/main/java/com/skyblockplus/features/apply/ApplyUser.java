@@ -119,7 +119,7 @@ public class ApplyUser implements Serializable {
 			} catch (PermissionException e) {
 				failCause = client.getError() + " Missing permission: " + e.getPermission().getName();
 				return;
-			}catch (ErrorResponseException e){
+			} catch (ErrorResponseException e) {
 				failCause = client.getError() + " Error when creating channel: " + e.getMeaning();
 				return;
 			}
