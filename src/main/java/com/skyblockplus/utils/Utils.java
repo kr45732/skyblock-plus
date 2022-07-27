@@ -107,7 +107,7 @@ public class Utils {
 	public static final String BOT_INVITE_LINK =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395540032593&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
-	public static final HttpClient asyncHttpClient = HttpClient.newBuilder().executor(new ExceptionExecutor(0, 20)).build();
+	public static final HttpClient asyncHttpClient = HttpClient.newBuilder().executor(new ExceptionExecutor(0, Integer.MAX_VALUE)).build();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
 	public static final ExecutorService executor = new ExceptionExecutor(10, Integer.MAX_VALUE);

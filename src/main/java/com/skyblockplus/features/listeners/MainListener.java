@@ -169,17 +169,6 @@ public class MainListener extends ListenerAdapter {
 		}
 
 		if (guildMap.containsKey(event.getGuild().getId())) {
-			if (
-				!event.getAuthor().isBot() &&
-				event.getMessage().getContentRaw().equals("<@!" + selfUserId + ">") ||
-				event.getMessage().getContentRaw().equals("<@" + selfUserId + ">")
-			) {
-				event
-					.getMessage()
-					.reply("My prefix here is `/` or `" + getGuildPrefix(event.getGuild().getId()) + "`. Type `/help` for help!")
-					.queue();
-			}
-
 			guildMap.get(event.getGuild().getId()).onGuildMessageReceived(event);
 		}
 		AuctionFlipper.onGuildMessageReceived(event);

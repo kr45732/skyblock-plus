@@ -194,7 +194,9 @@ public class GuildRanksCommand extends Command {
 						continue;
 					}
 
-					gMembers.add(new GuildRanksStruct(gMemUsername, skills, slayer, catacombs, weight, curRank));
+					gMembers.add(new GuildRanksStruct(gMemUsername, skills, slayer, catacombs, weight,
+							streamJsonArray(guildMembers).filter(e -> higherDepth(e, "uuid", "").equals(gMemUuid)).map(e -> higherDepth(e, "expHistory").getAsJsonObject().entrySet().stream().mapToDouble(g -> g.getValue().getAsDouble()).sum()).findFirst().orElse(0.0),
+							curRank));
 					uniqueGuildName.add(gMemUsername);
 				}
 			}
@@ -222,6 +224,7 @@ public class GuildRanksCommand extends Command {
 							higherDepth(lbM, "total_slayer").getAsDouble(),
 							higherDepth(lbM, "catacomb").getAsDouble(),
 							higherDepth(lbM, "weight").getAsDouble(),
+							streamJsonArray(guildMembers).filter(e -> higherDepth(e, "uuid", "").equals(lbUuid)).map(e -> higherDepth(e, "expHistory").getAsJsonObject().entrySet().stream().mapToDouble(g -> g.getValue().getAsDouble()).sum()).findFirst().orElse(0.0),
 							curRank
 						)
 					);
@@ -407,6 +410,7 @@ public class GuildRanksCommand extends Command {
 									case "skills" -> gMember.skills();
 									case "catacombs" -> gMember.catacombs();
 									case "weight" -> gMember.weight();
+									case "gexp" -> gMember.gexp();
 									default -> 0;
 								};
 

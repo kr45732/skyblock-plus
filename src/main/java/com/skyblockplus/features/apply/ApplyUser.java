@@ -44,6 +44,7 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
@@ -117,6 +118,9 @@ public class ApplyUser implements Serializable {
 				applicationChannel = applicationChannelAction.complete();
 			} catch (PermissionException e) {
 				failCause = client.getError() + " Missing permission: " + e.getPermission().getName();
+				return;
+			}catch (ErrorResponseException e){
+				failCause = client.getError() + " Error when creating channel: " + e.getMeaning();
 				return;
 			}
 			this.applicationChannelId = applicationChannel.getId();
