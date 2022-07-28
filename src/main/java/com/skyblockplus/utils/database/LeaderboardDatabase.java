@@ -18,16 +18,18 @@
 
 package com.skyblockplus.utils.database;
 
+import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
+import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
+import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
+import static com.skyblockplus.utils.Player.STATS_LIST;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import net.dv8tion.jda.api.utils.data.DataObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,12 +40,9 @@ import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
-import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
-import static com.skyblockplus.utils.Player.STATS_LIST;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.utils.data.DataObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LeaderboardDatabase {
 
@@ -211,8 +210,8 @@ public class LeaderboardDatabase {
 
 	public void deleteFromLeaderboard(String uuid, Player.Gamemode gamemode) {
 		try (
-				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gamemode.toCacheType() + " WHERE uuid = ?")
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gamemode.toCacheType() + " WHERE uuid = ?")
 		) {
 			statement.setString(1, uuid);
 		} catch (SQLException e) {
@@ -247,10 +246,7 @@ public class LeaderboardDatabase {
 				while (response.next()) {
 					out.put(
 						response.getInt("rank"),
-						DataObject
-							.empty()
-							.put("username", response.getString("username"))
-							.put(lbType, response.getDouble(lbType))
+						DataObject.empty().put("username", response.getString("username")).put(lbType, response.getDouble(lbType))
 					);
 				}
 			}
@@ -309,10 +305,7 @@ public class LeaderboardDatabase {
 				while (response.next()) {
 					out.put(
 						response.getInt("rank"),
-						DataObject
-							.empty()
-							.put("username", response.getString("username"))
-							.put(lbType, response.getDouble(lbType))
+						DataObject.empty().put("username", response.getString("username")).put(lbType, response.getDouble(lbType))
 					);
 				}
 			}
@@ -340,10 +333,7 @@ public class LeaderboardDatabase {
 				while (response.next()) {
 					out.put(
 						response.getInt("rank"),
-						DataObject
-							.empty()
-							.put("username", response.getString("username"))
-							.put(lbType, response.getDouble(lbType))
+						DataObject.empty().put("username", response.getString("username")).put(lbType, response.getDouble(lbType))
 					);
 				}
 			}
@@ -356,12 +346,12 @@ public class LeaderboardDatabase {
 
 	public int getNetworthPosition(Player.Gamemode gamemode, String uuid) {
 		try (
-				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-						"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS rank FROM " +
-								gamemode.toCacheType() +
-								") s WHERE uuid=?"
-				)
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS rank FROM " +
+				gamemode.toCacheType() +
+				") s WHERE uuid=?"
+			)
 		) {
 			statement.setString(1, uuid);
 			try (ResultSet response = statement.executeQuery()) {
@@ -369,7 +359,6 @@ public class LeaderboardDatabase {
 					return response.getInt("rank");
 				}
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -413,16 +402,14 @@ public class LeaderboardDatabase {
 
 			List<String> out = new ArrayList<>();
 			try (
-					Connection connection = getConnection();
-					PreparedStatement statement = connection.prepareStatement(
-							"SELECT uuid FROM all_lb WHERE last_updated < " + Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli() + " LIMIT 180"
-					)
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+					"SELECT uuid FROM all_lb WHERE last_updated < " + Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli() + " LIMIT 180"
+				)
 			) {
 				try (ResultSet response = statement.executeQuery()) {
 					while (response.next()) {
-						out.add(
-								response.getString("uuid")
-						);
+						out.add(response.getString("uuid"));
 					}
 				}
 			} catch (Exception e) {
