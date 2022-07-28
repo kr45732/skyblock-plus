@@ -54,8 +54,6 @@ public class CacheDatabase {
 	public CacheDatabase() {
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(PLANET_SCALE_URL);
-		config.setUsername(PLANET_SCALE_USERNAME);
-		config.setPassword(PLANET_SCALE_PASSWORD);
 		dataSource = new HikariDataSource(config);
 	}
 

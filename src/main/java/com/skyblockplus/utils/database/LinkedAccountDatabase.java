@@ -16,25 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.api.linkedaccounts;
+package com.skyblockplus.utils.database;
 
 import static com.skyblockplus.utils.Utils.*;
 
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LinkedAccountService {
+public class LinkedAccountDatabase {
 
 	private final HikariDataSource dataSource;
 
-	public LinkedAccountService() {
+	public LinkedAccountDatabase() {
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(LINKED_USER_URL);
-		config.setUsername(LINKED_USER_USERNAME);
-		config.setPassword(LINKED_USER_PASSWORD);
 		dataSource = new HikariDataSource(config);
 	}
 
