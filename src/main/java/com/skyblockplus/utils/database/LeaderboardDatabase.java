@@ -249,7 +249,6 @@ public class LeaderboardDatabase {
 						response.getInt("rank"),
 						DataObject
 							.empty()
-							.put("rank", response.getInt("rank"))
 							.put("username", response.getString("username"))
 							.put(lbType, response.getDouble(lbType))
 					);
@@ -312,7 +311,6 @@ public class LeaderboardDatabase {
 						response.getInt("rank"),
 						DataObject
 							.empty()
-							.put("rank", response.getInt("rank"))
 							.put("username", response.getString("username"))
 							.put(lbType, response.getDouble(lbType))
 					);
@@ -344,7 +342,6 @@ public class LeaderboardDatabase {
 						response.getInt("rank"),
 						DataObject
 							.empty()
-							.put("rank", response.getInt("rank"))
 							.put("username", response.getString("username"))
 							.put(lbType, response.getDouble(lbType))
 					);

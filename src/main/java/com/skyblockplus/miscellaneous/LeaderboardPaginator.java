@@ -87,7 +87,7 @@ public class LeaderboardPaginator {
 		double closestAmt = -1;
 		int idx = 1;
 		for (Map.Entry<Integer, DataObject> entry : leaderboardCache.entrySet()) {
-			int curRank = entry.getValue().getInt("rank");
+			int curRank = entry.getKey();
 			double curAmount = entry.getValue().getDouble(lbType, 0.0);
 
 			if (player != null && entry.getValue().getString("username", "").equals(player.getUsername())) {
@@ -270,7 +270,7 @@ public class LeaderboardPaginator {
 		double closestAmt = -1;
 		int idx = 1;
 		for (Map.Entry<Integer, DataObject> entry : leaderboardCache.entrySet()) {
-			int curRank = entry.getValue().getInt("rank");
+			int curRank = entry.getKey();
 			double curAmount = entry.getValue().getDouble(lbType, 0.0);
 
 			if (player != null && entry.getValue().getString("username", "").equals(player.username())) {
