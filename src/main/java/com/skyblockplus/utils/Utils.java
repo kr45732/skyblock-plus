@@ -143,14 +143,10 @@ public class Utils {
 	public static String DEFAULT_PREFIX = "";
 	public static String AUCTION_API_KEY = "";
 	public static String PLANET_SCALE_URL = "";
-	public static String PLANET_SCALE_USERNAME = "";
-	public static String PLANET_SCALE_PASSWORD = "";
 	public static String SBZ_SCAMMER_DB_KEY = "";
 	public static String LINKED_USER_URL = "";
-	public static String LINKED_USER_USERNAME = "";
-	public static String LINKED_USER_PASSWORD = "";
-	public static String HEROKU_API_KEY = "";
 	public static String LEADERBOARD_DB_URL = "";
+	public static String HEROKU_API_KEY = "";
 	/* JSON */
 	private static JsonObject essenceCostsJson;
 	private static JsonObject levelingJson;
@@ -1075,12 +1071,8 @@ public class Utils {
 			DEFAULT_PREFIX = (String) appProps.get("DEFAULT_PREFIX");
 			AUCTION_API_KEY = (String) appProps.get("AUCTION_API_KEY");
 			PLANET_SCALE_URL = (String) appProps.get("PLANET_SCALE_URL");
-			PLANET_SCALE_USERNAME = (String) appProps.get("PLANET_SCALE_USERNAME");
-			PLANET_SCALE_PASSWORD = (String) appProps.get("PLANET_SCALE_PASSWORD");
 			SBZ_SCAMMER_DB_KEY = (String) appProps.get("SBZ_SCAMMER_DB_KEY");
 			LINKED_USER_URL = (String) appProps.get("LINKED_USER_URL");
-			LINKED_USER_USERNAME = (String) appProps.get("LINKED_USER_USERNAME");
-			LINKED_USER_PASSWORD = (String) appProps.get("LINKED_USER_PASSWORD");
 			HEROKU_API_KEY = (String) appProps.get("HEROKU_API_KEY");
 			LEADERBOARD_DB_URL = (String) appProps.get("LEADERBOARD_DB_URL");
 		} catch (IOException e) {
@@ -1102,12 +1094,8 @@ public class Utils {
 			DEFAULT_PREFIX = System.getenv("DEFAULT_PREFIX");
 			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
 			PLANET_SCALE_URL = System.getenv("PLANET_SCALE_URL");
-			PLANET_SCALE_USERNAME = System.getenv("PLANET_SCALE_USERNAME");
-			PLANET_SCALE_PASSWORD = System.getenv("PLANET_SCALE_PASSWORD");
 			SBZ_SCAMMER_DB_KEY = System.getenv("SBZ_SCAMMER_DB_KEY");
 			LINKED_USER_URL = System.getenv("LINKED_USER_URL");
-			LINKED_USER_USERNAME = System.getenv("LINKED_USER_USERNAME");
-			LINKED_USER_PASSWORD = System.getenv("LINKED_USER_PASSWORD");
 			HEROKU_API_KEY = System.getenv("HEROKU_API_KEY");
 			LEADERBOARD_DB_URL = System.getenv("LEADERBOARD_DB_URL");
 		}

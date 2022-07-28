@@ -18,32 +18,29 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
+import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
 import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Player.STATS_LIST;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.client.AggregateIterable;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
-import com.mongodb.client.model.UpdateOptions;
-import com.mongodb.client.model.Updates;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import org.bson.Document;
-import org.bson.conversions.Bson;
+import java.util.stream.Collectors;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +96,7 @@ public class LeaderboardDatabase {
 
 	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
 
-	public final MongoClient dataSource;
+	private final HikariDataSource dataSource;
 	private final List<Player.Gamemode> leaderboardGamemodes = Arrays.asList(
 		Player.Gamemode.ALL,
 		Player.Gamemode.IRONMAN,
@@ -109,15 +106,17 @@ public class LeaderboardDatabase {
 	public ScheduledFuture<?> updateTask;
 
 	public LeaderboardDatabase() {
-		dataSource = new MongoClient(new MongoClientURI(LEADERBOARD_DB_URL));
+		HikariConfig config = new HikariConfig();
+		config.setJdbcUrl(LEADERBOARD_DB_URL);
+		dataSource = new HikariDataSource(config);
 
 		if (isMainBot()) {
 			updateTask = scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
 	}
 
-	public MongoDatabase getConnection() {
-		return dataSource.getDatabase("skyblock-plus");
+	public Connection getConnection() throws SQLException {
+		return dataSource.getConnection();
 	}
 
 	public void insertIntoLeaderboard(Player player) {
@@ -137,14 +136,30 @@ public class LeaderboardDatabase {
 
 	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
 		try {
-			List<Bson> updates = new ArrayList<>();
-			updates.add(Updates.set("last_updated", Instant.now().toEpochMilli()));
-			updates.add(Updates.set("username", player.getUsername()));
-			updates.add(Updates.set("uuid", player.getUuid()));
-			for (String type : typesSubList) {
-				updates.add(
-					Updates.set(
-						type,
+			String paramStr = "?,".repeat(types.size() + 1); // Add 1 for last_updated
+			paramStr = paramStr.substring(0, paramStr.length() - 1);
+
+			try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+					"INSERT INTO " +
+					gamemode.toCacheType() +
+					" VALUES (" +
+					paramStr +
+					") ON CONFLICT (uuid) DO UPDATE SET " +
+					typesSubList
+						.stream()
+						.map(t -> t + "=EXCLUDED." + t)
+						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
+				)
+			) {
+				statement.setString(1, player.getUuid());
+				statement.setString(2, player.getUsername());
+				statement.setLong(3, Instant.now().toEpochMilli());
+				for (int i = 0; i < typesSubList.size(); i++) {
+					String type = typesSubList.get(i);
+					statement.setDouble(
+						i + 4,
 						player.getHighestAmount(
 							type +
 							switch (type) {
@@ -163,13 +178,10 @@ public class LeaderboardDatabase {
 							},
 							gamemode
 						)
-					)
-				);
+					);
+				}
+				statement.executeUpdate();
 			}
-
-			getConnection()
-				.getCollection(gamemode.toCacheType())
-				.updateOne(Filters.eq("uuid", player.getUuid()), Updates.combine(updates), new UpdateOptions().upsert(true));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -197,9 +209,12 @@ public class LeaderboardDatabase {
 	}
 
 	public void deleteFromLeaderboard(String uuid, Player.Gamemode gamemode) {
-		try {
-			getConnection().getCollection(gamemode.toCacheType()).deleteOne(Filters.eq("uuid", uuid));
-		} catch (Exception e) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gamemode.toCacheType() + " WHERE uuid = ?")
+		) {
+			statement.setString(1, uuid);
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -208,87 +223,145 @@ public class LeaderboardDatabase {
 	 * @param rankStart Exclusive
 	 * @param rankEnd Inclusive
 	 */
-	public Map<Integer, Document> getLeaderboard(String lbType, Player.Gamemode mode, int rankStart, int rankEnd) {
-		try {
-			MongoCollection<Document> lbCollection = getConnection().getCollection(mode.toCacheType());
-
-			Map<Integer, Document> out = new TreeMap<>();
-			AggregateIterable<Document> leaderboard = lbCollection.aggregate(
-				List.of(
-					Document.parse("{$project: {\"_id\": 0,\"username\":1,\"" + lbType + "\": 1}}"),
-					Document.parse("{$match: {" + lbType + ": {$gte: 0}}}"),
-					Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
-					Document.parse("{$match: {rank : {$gt: " + rankStart + ", $lte: " + rankEnd + "}}}")
-				)
-			);
-
-			for (Document player : leaderboard) {
-				out.put(player.getInteger("rank"), player);
+	public Map<Integer, DataObject> getLeaderboard(String lbType, Player.Gamemode mode, int rankStart, int rankEnd) {
+		rankStart = Math.max(0, rankStart);
+		rankEnd = Math.max(rankStart, rankEnd);
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT username, " +
+				lbType +
+				", ROW_NUMBER() OVER(ORDER BY " +
+				lbType +
+				" DESC) AS rank FROM " +
+				mode.toCacheType() +
+				" OFFSET " +
+				rankStart +
+				" LIMIT " +
+				(rankEnd - rankStart)
+			)
+		) {
+			Map<Integer, DataObject> out = new TreeMap<>();
+			try (ResultSet response = statement.executeQuery()) {
+				while (response.next()) {
+					out.put(
+						response.getInt("rank"),
+						DataObject.empty().put("username", response.getString("username")).put(lbType, response.getDouble(lbType))
+					);
+				}
 			}
 			return out;
-		} catch (Exception ignored) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
-	public Map<Integer, Document> getLeaderboard(String lbType, Player.Gamemode mode, String uuid) {
-		try {
-			MongoCollection<Document> lbCollection = getConnection().getCollection(mode.toCacheType());
-
-			Document playerPos = lbCollection
-				.aggregate(
-					List.of(
-						Document.parse("{$project: {\"_id\": 0,\"uuid\":1,\"" + lbType + "\": 1}}"),
-						Document.parse("{$match: {" + lbType + ": {$gte: 0}}}"),
-						Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
-						Document.parse("{$match : {uuid : { $eq : \"" + uuid + "\"}}}")
-					)
-				)
-				.first();
-			int rank = playerPos != null ? playerPos.getInteger("rank") : 0;
+	public Map<Integer, DataObject> getLeaderboard(String lbType, Player.Gamemode mode, String uuid) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY " +
+				lbType +
+				" DESC) AS rank FROM " +
+				mode.toCacheType() +
+				") s WHERE uuid=?"
+			)
+		) {
+			int rank = 0;
+			statement.setString(1, uuid);
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					rank = response.getInt("rank");
+				}
+			}
 
 			return getLeaderboard(lbType, mode, rank - 200, rank + 200);
-		} catch (Exception ignored) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
-	public Map<Integer, Document> getLeaderboard(String lbType, Player.Gamemode mode, double amount) {
-		try {
-			MongoCollection<Document> lbCollection = getConnection().getCollection(mode.toCacheType());
-
-			Document amountPos = lbCollection
-				.aggregate(
-					List.of(
-						Document.parse("{$project: {\"_id\": 0,\"" + lbType + "\": 1}}"),
-						Document.parse("{$match: {" + lbType + ": {$gte: 0}}}"),
-						Document.parse("{$setWindowFields: {sortBy: { " + lbType + ": -1 }, output: {rank: {$documentNumber: {}}}}}"),
-						Document.parse("{$project: {diff: {$abs: {$subtract: [" + amount + ", \"$" + lbType + "\"]}}, rank: \"$rank\"}}"),
-						Document.parse("{$sort: {diff: 1}}"),
-						Document.parse("{$limit: 1}")
-					)
-				)
-				.first();
-			int rank = amountPos != null ? amountPos.getInteger("rank") : 0;
-
-			return getLeaderboard(lbType, mode, rank - 200, rank + 200);
-		} catch (Exception ignored) {}
-		return null;
+	public Map<Integer, DataObject> getLeaderboard(String lbType, Player.Gamemode mode, double amount) {
+		Map<Integer, DataObject> out = new TreeMap<>();
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM (SELECT username, " +
+				lbType +
+				", ROW_NUMBER() OVER(ORDER BY " +
+				lbType +
+				" DESC) AS rank FROM " +
+				mode.toCacheType() +
+				") s WHERE " +
+				lbType +
+				" > " +
+				amount +
+				" ORDER BY rank DESC LIMIT 200"
+			)
+		) {
+			try (ResultSet response = statement.executeQuery()) {
+				while (response.next()) {
+					out.put(
+						response.getInt("rank"),
+						DataObject.empty().put("username", response.getString("username")).put(lbType, response.getDouble(lbType))
+					);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM (SELECT username, " +
+				lbType +
+				", ROW_NUMBER() OVER(ORDER BY " +
+				lbType +
+				" DESC) AS rank FROM " +
+				mode.toCacheType() +
+				") s WHERE " +
+				lbType +
+				" <= " +
+				amount +
+				" LIMIT 200"
+			)
+		) {
+			try (ResultSet response = statement.executeQuery()) {
+				while (response.next()) {
+					out.put(
+						response.getInt("rank"),
+						DataObject.empty().put("username", response.getString("username")).put(lbType, response.getDouble(lbType))
+					);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		return out;
 	}
 
 	public int getNetworthPosition(Player.Gamemode gamemode, String uuid) {
-		try {
-			MongoCollection<Document> lbCollection = getConnection().getCollection(gamemode.toCacheType());
-
-			Document playerPos = lbCollection
-				.aggregate(
-					List.of(
-						Document.parse("{$project: {\"_id\": 0,\"uuid\":1,\"networth\": 1}}"),
-						Document.parse("{$setWindowFields: {sortBy: { networth: -1 }, output: {rank: {$documentNumber: {}}}}}"),
-						Document.parse("{$match : {uuid : { $eq : \"" + uuid + "\"}}}")
-					)
-				)
-				.first();
-			return playerPos != null ? playerPos.getInteger("rank") : -1;
-		} catch (Exception ignored) {}
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS rank FROM " +
+				gamemode.toCacheType() +
+				") s WHERE uuid=?"
+			)
+		) {
+			statement.setString(1, uuid);
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					return response.getInt("rank");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return -1;
 	}
 
@@ -327,18 +400,29 @@ public class LeaderboardDatabase {
 				return;
 			}
 
-			FindIterable<Document> response = getConnection()
-				.getCollection("all_lb")
-				.find(Filters.lt("last_updated", Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli()))
-				.projection(Projections.include("uuid"))
-				.limit(180);
+			List<String> out = new ArrayList<>();
+			try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+					"SELECT uuid FROM all_lb WHERE last_updated < " + Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli() + " LIMIT 180"
+				)
+			) {
+				try (ResultSet response = statement.executeQuery()) {
+					while (response.next()) {
+						out.add(response.getString("uuid"));
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return;
+			}
 
-			for (Document document : response) {
+			for (String uuid : out) {
 				if (count == 90 || System.currentTimeMillis() - start >= 57000) {
 					break;
 				}
 
-				UsernameUuidStruct usernameUuidStruct = uuidToUsername(document.getString("uuid"));
+				UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
 				if (usernameUuidStruct.isValid()) {
 					count++;
 					HypixelResponse profileResponse = skyblockProfilesFromUuid(

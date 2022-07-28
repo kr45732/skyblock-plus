@@ -24,7 +24,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
@@ -47,12 +46,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class Database {
 
 	public final ServerSettingsService settingsService;
-	public final LinkedAccountService linkedAccountService;
+	public final LinkedAccountDatabase linkedAccountDatabase;
 
 	@Autowired
 	public Database(ServerSettingsService settingsService) {
 		this.settingsService = settingsService;
-		this.linkedAccountService = new LinkedAccountService();
+		this.linkedAccountDatabase = new LinkedAccountDatabase();
 	}
 
 	public int removeGuildSettings(String serverId, String name) {
@@ -217,35 +216,35 @@ public class Database {
 	}
 
 	public boolean insertLinkedAccount(LinkedAccount linkedAccount) {
-		return linkedAccountService.insertLinkedAccount(linkedAccount);
+		return linkedAccountDatabase.insertLinkedAccount(linkedAccount);
 	}
 
 	public LinkedAccount getByUsername(String username) {
-		return linkedAccountService.getByUsername(username);
+		return linkedAccountDatabase.getByUsername(username);
 	}
 
 	public LinkedAccount getByUuid(String uuid) {
-		return linkedAccountService.getByUuid(uuid);
+		return linkedAccountDatabase.getByUuid(uuid);
 	}
 
 	public LinkedAccount getByDiscord(String discord) {
-		return linkedAccountService.getByDiscord(discord);
+		return linkedAccountDatabase.getByDiscord(discord);
 	}
 
 	public List<LinkedAccount> getLinkedAccounts() {
-		return linkedAccountService.getAllLinkedAccounts();
+		return linkedAccountDatabase.getAllLinkedAccounts();
 	}
 
 	public boolean deleteByDiscord(String discord) {
-		return linkedAccountService.deleteByDiscord(discord);
+		return linkedAccountDatabase.deleteByDiscord(discord);
 	}
 
 	public boolean deleteByUuid(String uuid) {
-		return linkedAccountService.deleteByUuid(uuid);
+		return linkedAccountDatabase.deleteByUuid(uuid);
 	}
 
 	public boolean deleteByUsername(String username) {
-		return linkedAccountService.deleteByUsername(username);
+		return linkedAccountDatabase.deleteByUsername(username);
 	}
 
 	public int setBotManagerRoles(String serverId, JsonArray newSettings) {
@@ -261,6 +260,6 @@ public class Database {
 	}
 
 	public List<String> getClosestLinkedAccounts(String toMatch) {
-		return linkedAccountService.getClosestLinkedAccounts(toMatch);
+		return linkedAccountDatabase.getClosestLinkedAccounts(toMatch);
 	}
 }

@@ -38,11 +38,11 @@ import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import org.bson.Document;
+import net.dv8tion.jda.api.utils.data.DataObject;
 
 public class LeaderboardPaginator {
 
-	private final Map<Integer, Document> leaderboardCache = new TreeMap<>();
+	private final Map<Integer, DataObject> leaderboardCache = new TreeMap<>();
 	private final Message message;
 	private final String lbType;
 	private final Player.Gamemode gamemode;
@@ -86,11 +86,11 @@ public class LeaderboardPaginator {
 
 		double closestAmt = -1;
 		int idx = 1;
-		for (Map.Entry<Integer, Document> entry : leaderboardCache.entrySet()) {
-			int curRank = entry.getValue().getInteger("rank");
-			double curAmount = entry.getValue().get(lbType, 0.0);
+		for (Map.Entry<Integer, DataObject> entry : leaderboardCache.entrySet()) {
+			int curRank = entry.getKey();
+			double curAmount = entry.getValue().getDouble(lbType, 0.0);
 
-			if (player != null && entry.getValue().get("username", "").equals(player.getUsername())) {
+			if (player != null && entry.getValue().getString("username", "").equals(player.getUsername())) {
 				playerRank = curRank;
 				playerAmount = roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount);
 			}
@@ -123,14 +123,14 @@ public class LeaderboardPaginator {
 		StringBuilder columnOne = new StringBuilder();
 		StringBuilder columnTwo = new StringBuilder();
 		for (int i = pageFirstRank; i < pageFirstRank + 20; i++) {
-			Document curPlayer = leaderboardCache.getOrDefault(i, null);
+			DataObject curPlayer = leaderboardCache.getOrDefault(i, null);
 			if (curPlayer != null) {
-				double curAmount = curPlayer.get(lbType, 0.0);
+				double curAmount = curPlayer.getDouble(lbType, 0.0);
 				String out =
 					"`" +
 					i +
 					")` " +
-					fixUsername(curPlayer.get("username", "?")) +
+					fixUsername(curPlayer.getString("username", "?")) +
 					": " +
 					(roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount));
 
@@ -269,11 +269,11 @@ public class LeaderboardPaginator {
 
 		double closestAmt = -1;
 		int idx = 1;
-		for (Map.Entry<Integer, Document> entry : leaderboardCache.entrySet()) {
-			int curRank = entry.getValue().getInteger("rank");
-			double curAmount = entry.getValue().get(lbType, 0.0);
+		for (Map.Entry<Integer, DataObject> entry : leaderboardCache.entrySet()) {
+			int curRank = entry.getKey();
+			double curAmount = entry.getValue().getDouble(lbType, 0.0);
 
-			if (player != null && entry.getValue().get("username", "").equals(player.username())) {
+			if (player != null && entry.getValue().getString("username", "").equals(player.username())) {
 				playerRank = curRank;
 				playerAmount = roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount);
 			}

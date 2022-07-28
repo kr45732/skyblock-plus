@@ -31,7 +31,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
