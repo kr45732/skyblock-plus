@@ -73,7 +73,7 @@ dependencies {
     implementation 'com.github.chew.jda-chewtils:jda-chewtils:e9fbfeadc3'
 
     // Google libraries
-    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.google.code.gson:gson:2.9.1'
     implementation 'com.google.guava:guava:31.1-jre'
 
     // NBT parser
