@@ -97,7 +97,7 @@ public class SkyblockEventHandler {
 					eb
 						.addField("Guild", "None", false)
 						.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
-					state ++;
+					state++;
 				} else {
 					HypixelResponse response = getGuildFromName(replyMessage);
 					if (!response.isValid()) {
