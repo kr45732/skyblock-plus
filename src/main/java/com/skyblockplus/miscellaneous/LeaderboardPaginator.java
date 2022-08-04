@@ -194,9 +194,9 @@ public class LeaderboardPaginator {
 						.create("leaderboard_paginator_search_modal_" + event.getMessageId(), "Search")
 						.addActionRows(
 							ActionRow.of(TextInput.create("rank", "Rank", TextInputStyle.SHORT).setRequired(false).build()),
-							ActionRow.of(TextInput.create("amount", "Amount", TextInputStyle.SHORT).setRequired(false).build()),
+							ActionRow.of(TextInput.create("player", "Player", TextInputStyle.SHORT).setRequired(false).build()),
 							ActionRow.of(TextInput.create("page", "Page", TextInputStyle.SHORT).setRequired(false).build()),
-							ActionRow.of(TextInput.create("player", "Player", TextInputStyle.SHORT).setRequired(false).build())
+							ActionRow.of(TextInput.create("amount", "Amount", TextInputStyle.SHORT).setRequired(false).build())
 						)
 						.build()
 				)
@@ -230,6 +230,8 @@ public class LeaderboardPaginator {
 	}
 
 	public void actionModal(ModalInteractionEvent event) {
+		event.deferEdit().queue();
+
 		int rank = -1;
 		double amount = -1;
 		int page = -1;

@@ -107,7 +107,10 @@ public class Utils {
 	public static final String BOT_INVITE_LINK =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395540032593&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
-	public static final HttpClient asyncHttpClient = HttpClient.newBuilder().executor(new ExceptionExecutor(0, Integer.MAX_VALUE)).build();
+	public static final HttpClient asyncHttpClient = HttpClient
+		.newBuilder()
+		.executor(new ExceptionExecutor(0, 20, new LinkedBlockingQueue<>()))
+		.build();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
 	public static final ExecutorService executor = new ExceptionExecutor(10, Integer.MAX_VALUE);
@@ -117,10 +120,8 @@ public class Utils {
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final ConcurrentHashMap<String, HypixelKeyRecord> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final List<String> hypixelGuildQueue = Collections.synchronizedList(new ArrayList<>());
-	public static final Cache<String, HypixelGuildCache> hypixelGuildsCacheMap = Caffeine
-		.newBuilder()
-		.expireAfterWrite(15, TimeUnit.MINUTES)
-		.build();
+	public static final ExceptionExecutor playerRequestExecutor = new ExceptionExecutor(0, 2, new LinkedBlockingQueue<>());
+	public static final ExceptionExecutor leaderboardDbInsertQueue = new ExceptionExecutor(0, 50, new LinkedBlockingQueue<>());
 	public static final Gson gson = new Gson();
 	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
 	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[\\dA-FK-OR]");

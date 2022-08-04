@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.Utils.defaultPaginator;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import java.io.File;
 import java.util.Collection;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
@@ -82,6 +83,16 @@ public class PaginatorEvent {
 			builder.build().paginate(loadingMessage, page);
 		} else {
 			builder.build().paginate(command.getChannel(), page);
+		}
+	}
+
+	public void embed(EmbedBuilder eb) {
+		if (isSlashCommand()) {
+			slashCommand.getHook().editOriginalEmbeds(eb.build()).queue();
+		} else if (loadingMessage != null) {
+			loadingMessage.editMessageEmbeds(eb.build()).queue();
+		} else {
+			command.getChannel().sendMessageEmbeds(eb.build()).queue();
 		}
 	}
 

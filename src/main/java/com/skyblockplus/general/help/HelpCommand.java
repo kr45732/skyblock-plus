@@ -177,35 +177,38 @@ public class HelpCommand extends Command {
 					.setCategory("guild"),
 				new HelpData(
 					"guild-leaderboard",
-					"Get a leaderboard for a player's guild. All types can be seen through autocomplete. The mode can be all, ironman, or stranded. A Hypixel API key must be set in settings set hypixel_key <key>.",
-					"guild-leaderboard <type> [player] [mode:all|ironman|stranded]"
+					"Get a leaderboard for a player's guild. All types can be seen through autocomplete. The mode can be all, ironman, or stranded.  Append the `--key` flag to force use the set Hypixel API key for more accurate results.",
+					"guild-leaderboard <type> [player] [mode:all|ironman|stranded] [--key]"
 				)
-					.addSecondData("Get a leaderboard for a guild.", "guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded]")
+					.addSecondData(
+						"Get a leaderboard for a guild.",
+						"guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded] [--key]"
+					)
 					.addAliases("g-lb")
 					.addExamples("guild-leaderboard weight CrypticPlasma", "guild-leaderboard sven CrypticPlasma mode:ironman")
 					.setCategory("guild"),
 				new HelpData(
 					"guild-kicker",
-					"Get all player's who don't meet the provided requirements. The requirement type can be skills, slayer, catacombs, or weight. The requirement value must be an integer. You can have up to 3 sets of requirements. Append the `--usekey` flag to force use the set Hypixel API key.",
-					"guild-kicker <u:player> <[type:value ...]> ..."
+					"Get all player's who don't meet the provided requirements. The requirement type can be skills, slayer, catacombs, or weight. The requirement value must be an integer. You can have up to 3 sets of requirements.  Append the `--key` flag to force use the set Hypixel API key for more accurate results.",
+					"guild-kicker <u:player> <[type:value ...]> ... [--key]"
 				)
 					.addAliases("g-kicker")
 					.addExamples("guild-kicker u:CrypticPlasma [weight:4000 skills:40] [weight:4500]")
 					.setCategory("guild"),
 				new HelpData(
 					"guild-ranks",
-					"A customizable helper that will tell you who to promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" +
+					"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" +
 					DISCORD_SERVER_INVITE_LINK +
-					") to set this up for your guild.",
-					"guild-ranks <u:player> [mode:all|ironman|stranded]"
+					") to set this up for your guild.  Append the `--key` flag to force use the set Hypixel API key for more accurate results.",
+					"guild-ranks <player> [mode:all|ironman|stranded] [--key]"
 				)
 					.addAliases("g-ranks", "g-rank")
-					.addExamples("guild-ranks u:CrypticPlasma")
+					.addExamples("guild-ranks CrypticPlasma")
 					.setCategory("guild"),
 				new HelpData(
 					"guild-statistics",
-					"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight. Requires a Hypixel API key to be set.",
-					"guild-statistics [player] [g:guild_name]"
+					"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight.  Append the `--key` flag to force use the set Hypixel API key for more accurate results.",
+					"guild-statistics [player] [g:guild_name] [--key]"
 				)
 					.addAliases("guild-stats", "g-stats")
 					.addExamples("guild-stats u:CrypticPlasma")
@@ -858,16 +861,22 @@ public class HelpCommand extends Command {
 			help.create("guild members <g:guild_name>", "Get a list of all members in a guild") +
 			help.create("guild experience <player>", "Get the experience leaderboard for a player's guild") +
 			help.create("guild experience <g:guild_name>", "Get the experience leaderboard for a guild") +
-			help.create("g-lb <type> [player] [g:guild_name] [mode:normal|ironman|stranded]", "Get a leaderboard for a player's guild") +
 			help.create(
-				"g-kicker <u:player> <type:value> ...",
+				"g-lb <type> [player] [g:guild_name] [mode:normal|ironman|stranded] [--key]",
+				"Get a leaderboard for a player's guild"
+			) +
+			help.create(
+				"g-kicker <u:player> <type:value> ... [--key]",
 				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer"
 			) +
 			help.create(
-				"g-ranks <u:player> [mode:normal|ironman|stranded]",
-				"A customizable helper that will tell you who to promote or demote in your Hypixel guild"
+				"g-ranks <u:player> [mode:normal|ironman|stranded] [--key]",
+				"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild"
 			) +
-			help.create("g-stats [player] [g:guild_name]", "Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight") +
+			help.create(
+				"g-stats [player] [g:guild_name] [--key]",
+				"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight"
+			) +
 			help.create("check-guild-api <player>", "Get which Skyblock APIs players have enabled or disabled for a guild")
 		);
 

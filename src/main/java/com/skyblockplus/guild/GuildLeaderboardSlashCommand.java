@@ -50,6 +50,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 					null,
 					guild,
 					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+					event.getOptionBoolean("key", false),
 					new PaginatorEvent(event)
 				)
 			);
@@ -66,6 +67,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 				event.player,
 				null,
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+				event.getOptionBoolean("key", false),
 				new PaginatorEvent(event)
 			)
 		);
@@ -83,7 +85,8 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 					.addChoice("All", "all")
 					.addChoice("Ironman", "ironman")
 					.addChoice("Stranded", "stranded")
-			);
+			)
+			.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
 	}
 
 	@Override

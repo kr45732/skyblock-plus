@@ -84,10 +84,7 @@ public class GuildCommand extends Command {
 		guildExpList.sort(Comparator.comparingInt(o1 -> -Integer.parseInt(o1.split("=:=")[1])));
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
-		PaginatorExtras extras = paginateBuilder
-			.getExtras()
-			.setEveryPageTitle(higherDepth(guildJson, "name").getAsString())
-			.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString());
+		PaginatorExtras extras = paginateBuilder.getExtras().setEveryPageTitle(higherDepth(guildJson, "name").getAsString());
 
 		if (playerUsername != null) {
 			int guildRank = -2;
@@ -164,10 +161,7 @@ public class GuildCommand extends Command {
 
 		String guildName = higherDepth(guildJson, "name").getAsString();
 
-		EmbedBuilder eb = defaultEmbed(
-			guildName,
-			"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString()
-		);
+		EmbedBuilder eb = defaultEmbed(guildName);
 		eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
 
 		return eb;
@@ -182,10 +176,7 @@ public class GuildCommand extends Command {
 			JsonElement guildJson = guildResponse.response();
 			guildName = higherDepth(guildJson, "name").getAsString();
 
-			EmbedBuilder eb = defaultEmbed(
-				guildName,
-				"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString()
-			);
+			EmbedBuilder eb = defaultEmbed(guildName);
 			eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
 			return eb;
 		} catch (Exception e) {
@@ -272,7 +263,6 @@ public class GuildCommand extends Command {
 			.getPaginatorExtras()
 			.setEveryPageText("**Size:** " + membersArr.size())
 			.setEveryPageTitle(higherDepth(guildJson, "name").getAsString() + " Members")
-			.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString())
 			.setEveryPageFirstFieldTitle("Members:");
 
 		for (String member : guildMembers

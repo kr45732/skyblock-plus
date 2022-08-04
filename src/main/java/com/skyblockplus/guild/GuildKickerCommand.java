@@ -20,9 +20,7 @@ package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.*;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -30,15 +28,12 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -51,10 +46,16 @@ public class GuildKickerCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getGuildKicker(String username, String reqs, boolean useKey, PaginatorEvent event) {
+	public static EmbedBuilder getGuildKicker(
+		String username,
+		String reqs,
+		Player.Gamemode gamemode,
+		boolean useKey,
+		PaginatorEvent event
+	) {
 		String[] reqsArr = reqs.split("] \\[");
-		if (reqsArr.length > 3) {
-			return invalidEmbed("You can only enter a maximum of 3 sets of requirements");
+		if (reqsArr.length > 5) {
+			return invalidEmbed("You can only enter a maximum of 5 sets of requirements");
 		}
 		for (int i = 0; i < reqsArr.length; i++) {
 			String[] indvReqs = reqsArr[i].replace("[", "").replace("]", "").split("\\s+");
@@ -83,6 +84,16 @@ public class GuildKickerCommand extends Command {
 			reqsArr[i] = reqsArr[i].replace("[", "").replace("]", "");
 		}
 
+		String hypixelKey = null;
+		if (useKey) {
+			hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
+
+			EmbedBuilder eb = checkHypixelKey(hypixelKey);
+			if (eb != null) {
+				return eb;
+			}
+		}
+
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (!usernameUuidStruct.isValid()) {
 			return invalidEmbed(usernameUuidStruct.failCause());
@@ -92,214 +103,73 @@ public class GuildKickerCommand extends Command {
 			return invalidEmbed(guildResponse.failCause());
 		}
 		JsonElement guildJson = guildResponse.response();
-
 		String guildId = higherDepth(guildJson, "_id").getAsString();
-		JsonElement guildLbJson = getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId);
+
+		if (hypixelGuildQueue.contains(guildId)) {
+			return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
+		}
+		hypixelGuildQueue.add(guildId);
+		List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
+			List.of("slayer", "skills", "catacombs", "weight"),
+			gamemode,
+			streamJsonArray(higherDepth(guildJson, "members")).map(u -> higherDepth(u, "uuid", "")).collect(Collectors.toList()),
+			hypixelKey,
+			event
+		);
+		hypixelGuildQueue.remove(guildId);
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
-		if (!useKey) {
-			if (higherDepth(guildLbJson, "data") == null) {
-				return invalidEmbed(
-					"This guild is not on the senither leaderboard so you must set the Hypixel API key for this server and rerun the command with `--usekey` flag"
+
+		for (DataObject guildMember : playerList) {
+			double slayer = guildMember.getDouble("slayer");
+			double skills = guildMember.getDouble("skills");
+			double catacombs = guildMember.getDouble("catacombs");
+			double weight = guildMember.getDouble("weight");
+
+			boolean meetsReqs = false;
+
+			for (String req : reqsArr) {
+				String[] reqSplit = req.split("\\s+");
+				double slayerReq = 0;
+				double skillsReq = 0;
+				double catacombsReq = 0;
+				double weightReq = 0;
+				for (String reqIndividual : reqSplit) {
+					switch (reqIndividual.split(":")[0]) {
+						case "slayer" -> slayerReq = Double.parseDouble(reqIndividual.split(":")[1]);
+						case "skills" -> skillsReq = Double.parseDouble(reqIndividual.split(":")[1]);
+						case "catacombs" -> catacombsReq = Double.parseDouble(reqIndividual.split(":")[1]);
+						case "weight" -> weightReq = Double.parseDouble(reqIndividual.split(":")[1]);
+					}
+				}
+
+				if (slayer >= slayerReq && Math.max(0, skills) >= skillsReq && catacombs >= catacombsReq && weight >= weightReq) {
+					meetsReqs = true;
+					break;
+				}
+			}
+
+			if (!meetsReqs) {
+				paginateBuilder.addItems(
+					"• **" +
+					guildMember.getString("username") +
+					"** | Slayer: " +
+					formatNumber(slayer) +
+					" | Skills: " +
+					roundAndFormat(skills) +
+					" | Cata: " +
+					roundAndFormat(catacombs) +
+					" | Weight: " +
+					roundAndFormat(weight)
 				);
 			}
-
-			JsonArray guildMembers = higherDepth(guildLbJson, "data").getAsJsonArray();
-
-			int missingReqsCount = 0;
-			for (JsonElement guildMember : guildMembers) {
-				double slayer = higherDepth(guildMember, "total_slayer").getAsDouble();
-				double skills = higherDepth(guildMember, "average_skill_progress").getAsDouble();
-				double catacombs = higherDepth(guildMember, "catacomb").getAsDouble();
-				double weight = higherDepth(guildMember, "raw_weight.total").getAsDouble();
-
-				boolean meetsReqs = false;
-
-				for (String req : reqsArr) {
-					String[] reqSplit = req.split("\\s+");
-					double slayerReq = 0;
-					double skillsReq = 0;
-					double catacombsReq = 0;
-					double weightReq = 0;
-					for (String reqIndividual : reqSplit) {
-						switch (reqIndividual.split(":")[0]) {
-							case "slayer" -> slayerReq = Double.parseDouble(reqIndividual.split(":")[1]);
-							case "skills" -> skillsReq = Double.parseDouble(reqIndividual.split(":")[1]);
-							case "catacombs" -> catacombsReq = Double.parseDouble(reqIndividual.split(":")[1]);
-							case "weight" -> weightReq = Double.parseDouble(reqIndividual.split(":")[1]);
-						}
-					}
-
-					if (slayer >= slayerReq && Math.max(0, skills) >= skillsReq && catacombs >= catacombsReq && weight >= weightReq) {
-						meetsReqs = true;
-						break;
-					}
-				}
-
-				if (!meetsReqs) {
-					paginateBuilder.addItems(
-						"• **" +
-						higherDepth(guildMember, "username").getAsString() +
-						"** | Slayer: " +
-						formatNumber(slayer) +
-						" | Skills: " +
-						roundAndFormat(skills) +
-						" | Cata: " +
-						roundAndFormat(catacombs) +
-						" | Weight: " +
-						roundAndFormat(weight)
-					);
-					missingReqsCount++;
-				}
-			}
-
-			paginateBuilder
-				.getPaginatorExtras()
-				.setEveryPageTitle("Guild Kick Helper")
-				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-				.setEveryPageText(
-					"**Total missing requirements:** " +
-					missingReqsCount +
-					"\n**Updated:** <t:" +
-					Instant
-						.parse(
-							higherDepth(
-								streamJsonArray(
-									higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard"), "data").getAsJsonArray()
-								)
-									.filter(g -> higherDepth(g, "id").getAsString().equals(guildId))
-									.findFirst()
-									.get(),
-								"last_updated_at"
-							)
-								.getAsString()
-						)
-						.getEpochSecond() +
-					":R>\n"
-				);
-		} else {
-			String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
-
-			EmbedBuilder eb = checkHypixelKey(hypixelKey);
-			if (eb != null) {
-				return eb;
-			}
-
-			HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
-			List<String> guildMemberPlayersList;
-			Instant lastUpdated = null;
-
-			if (guildCache != null) {
-				guildMemberPlayersList = guildCache.getCache();
-				lastUpdated = guildCache.getLastUpdated();
-			} else {
-				if (hypixelGuildQueue.contains(guildId)) {
-					return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
-				}
-
-				hypixelGuildQueue.add(guildId);
-
-				HypixelGuildCache newGuildCache = new HypixelGuildCache();
-				JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
-				List<CompletableFuture<String>> futuresList = new ArrayList<>();
-
-				for (JsonElement guildMember : guildMembers) {
-					String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
-
-					try {
-						if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
-							System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset() + " seconds");
-							TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset());
-						}
-					} catch (Exception ignored) {}
-
-					futuresList.add(
-						asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey)
-							.thenApply(guildMemberProfileJsonResponse -> {
-								Player guildMemberPlayer = new Player(
-									guildMemberUuid,
-									usernameToUuid(guildMemberUuid).username(),
-									guildMemberProfileJsonResponse
-								);
-
-								if (guildMemberPlayer.isValid()) {
-									newGuildCache.addPlayer(guildMemberPlayer);
-								}
-								return null;
-							})
-					);
-				}
-
-				for (CompletableFuture<String> future : futuresList) {
-					try {
-						future.get();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-
-				guildMemberPlayersList = newGuildCache.getCache();
-				hypixelGuildsCacheMap.put(guildId, newGuildCache.setLastUpdated());
-
-				hypixelGuildQueue.remove(guildId);
-			}
-
-			for (String guildMember : guildMemberPlayersList) {
-				double slayer = getDoubleFromCache(guildMember, "slayer");
-				double skills = getDoubleFromCache(guildMember, "skills");
-				double catacombs = getLevelFromCache(guildMember, "catacombs");
-				double weight = getDoubleFromCache(guildMember, "weight");
-
-				boolean meetsReqs = false;
-
-				for (String req : reqsArr) {
-					String[] reqSplit = req.split("\\s+");
-					double slayerReq = 0;
-					double skillsReq = 0;
-					double catacombsReq = 0;
-					double weightReq = 0;
-					for (String reqIndividual : reqSplit) {
-						switch (reqIndividual.split(":")[0]) {
-							case "slayer" -> slayerReq = Double.parseDouble(reqIndividual.split(":")[1]);
-							case "skills" -> skillsReq = Double.parseDouble(reqIndividual.split(":")[1]);
-							case "catacombs" -> catacombsReq = Double.parseDouble(reqIndividual.split(":")[1]);
-							case "weight" -> weightReq = Double.parseDouble(reqIndividual.split(":")[1]);
-						}
-					}
-
-					if (slayer >= slayerReq && Math.max(0, skills) >= skillsReq && catacombs >= catacombsReq && weight >= weightReq) {
-						meetsReqs = true;
-						break;
-					}
-				}
-
-				if (!meetsReqs) {
-					paginateBuilder.addItems(
-						"• **" +
-						getStringFromCache(guildMember, "username") +
-						"** | Slayer: " +
-						formatNumber(slayer) +
-						" | Skills: " +
-						roundAndFormat(skills) +
-						" | Cata: " +
-						roundAndFormat(catacombs) +
-						" | Weight: " +
-						roundAndFormat(weight)
-					);
-				}
-			}
-
-			paginateBuilder
-				.getPaginatorExtras()
-				.setEveryPageTitle("Guild Kick Helper")
-				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-				.setEveryPageText(
-					"**Total missing requirements:** " +
-					paginateBuilder.size() +
-					(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
-					"\n"
-				);
 		}
+
+		paginateBuilder
+			.getPaginatorExtras()
+			.setEveryPageTitle("Guild Kick Helper")
+			.setEveryPageText("**Total missing requirements:** " + paginateBuilder.size());
+
 		event.paginate(paginateBuilder);
 		return null;
 	}
@@ -311,16 +181,11 @@ public class GuildKickerCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				String content = event.getMessage().getContentRaw();
-				boolean useKey = false;
-				if (content.contains("--usekey")) {
-					useKey = true;
-					content = content.replace("--usekey", "").trim();
-				}
-				args = content.split("\\s+", 3);
+				Player.Gamemode gamemode = getGamemodeOption("mode", Player.Gamemode.ALL);
+				boolean useKey = getBooleanOption("--key");
 
 				if (args.length == 3 && args[1].toLowerCase().startsWith("u:")) {
-					paginate(getGuildKicker(args[1].split(":")[1], args[2], useKey, getPaginatorEvent()));
+					paginate(getGuildKicker(args[1].split(":")[1], args[2], gamemode, useKey, getPaginatorEvent()));
 					return;
 				}
 

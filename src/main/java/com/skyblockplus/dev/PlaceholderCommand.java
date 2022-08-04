@@ -18,8 +18,7 @@
 
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPerms;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -43,28 +42,26 @@ public class PlaceholderCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				eb = defaultEmbed("Debug");
-				eb.addField("Total", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);
-				eb.addField("Free", "" + (Runtime.getRuntime().freeMemory() / 1000000.0) + " MB", false);
-				eb.addField(
-					"Used",
-					"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
-					false
-				);
-				eb.addField("Max", "" + (Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false);
-				if (args.length == 2 && args[1].equals("gc")) {
+				String total = roundAndFormat(Runtime.getRuntime().totalMemory() / 1000000.0) + " MB";
+				String free = roundAndFormat(Runtime.getRuntime().freeMemory() / 1000000.0) + " MB";
+				String used = roundAndFormat((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB";
+				if (args.length >= 2 && args[1].equals("gc")) {
 					System.gc();
-					eb.addField("Total GC", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);
-					eb.addField("Free GC", "" + (Runtime.getRuntime().freeMemory() / 1000000.0) + " MB", false);
-					eb.addField(
-						"Used GC",
-						"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
-						false
-					);
-					eb.addField("Max GC", "" + (Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false);
+					total += " ➜ " + roundAndFormat(Runtime.getRuntime().totalMemory() / 1000000.0) + " MB";
+					free += " ➜ " + roundAndFormat(Runtime.getRuntime().freeMemory() / 1000000.0) + " MB";
+					used +=
+						" ➜ " +
+						roundAndFormat((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) +
+						" MB";
 				}
 
-				embed(eb);
+				embed(
+					defaultEmbed("Debug")
+						.addField("Total", total, false)
+						.addField("Free", free, false)
+						.addField("Used", used, false)
+						.addField("Max", "" + roundAndFormat(Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false)
+				);
 			}
 		}
 			.queue();

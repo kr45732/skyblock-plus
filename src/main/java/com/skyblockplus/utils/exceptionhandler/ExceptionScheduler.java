@@ -37,8 +37,6 @@ public class ExceptionScheduler extends ScheduledThreadPoolExecutor {
 				if (future.isDone()) {
 					future.get();
 				}
-			} catch (CancellationException ce) {
-				t = ce;
 			} catch (ExecutionException ee) {
 				t = ee.getCause();
 			} catch (InterruptedException ie) {
