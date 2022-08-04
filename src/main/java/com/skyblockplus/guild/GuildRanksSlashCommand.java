@@ -48,7 +48,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 			GuildRanksCommand.getRanks(
 				event.player,
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-				event.getOptionBoolean("usekey", false),
+				event.getOptionBoolean("key", false),
 				new PaginatorEvent(event)
 			)
 		);
@@ -65,7 +65,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 					.addChoice("Ironman", "ironman")
 					.addChoice("Stranded", "stranded")
 			)
-			.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
+			.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more accurate results");
 	}
 
 	@Override
