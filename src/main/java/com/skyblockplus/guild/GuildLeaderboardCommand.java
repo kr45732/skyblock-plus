@@ -20,10 +20,8 @@ package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.*;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -31,16 +29,13 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -58,13 +53,17 @@ public class GuildLeaderboardCommand extends Command {
 		String username,
 		String guildName,
 		Player.Gamemode gamemode,
+		boolean useKey,
 		PaginatorEvent event
 	) {
-		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
+		String hypixelKey = null;
+		if (useKey) {
+			hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
-		EmbedBuilder eb = checkHypixelKey(hypixelKey);
-		if (eb != null) {
-			return eb;
+			EmbedBuilder eb = checkHypixelKey(hypixelKey);
+			if (eb != null) {
+				return eb;
+			}
 		}
 
 		lbType = getType(lbType, false);
@@ -88,81 +87,38 @@ public class GuildLeaderboardCommand extends Command {
 		guildName = higherDepth(guildJson, "name").getAsString();
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 
-		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
-		HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
-		List<String> guildMemberPlayersList;
-		Instant lastUpdated = null;
-
-		if (guildCache != null) {
-			guildMemberPlayersList = guildCache.getCache(gamemode);
-			lastUpdated = guildCache.getLastUpdated();
-		} else {
-			if (hypixelGuildQueue.contains(guildId)) {
-				return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
-			}
-
-			hypixelGuildQueue.add(guildId);
-
-			HypixelGuildCache newGuildCache = new HypixelGuildCache();
-			JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
-			List<CompletableFuture<String>> futuresList = new ArrayList<>();
-
-			for (JsonElement guildMember : guildMembers) {
-				String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
-
-				try {
-					if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
-						System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset() + " seconds");
-						TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset());
-					}
-				} catch (Exception ignored) {}
-
-				futuresList.add(
-					asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey)
-						.thenApply(guildMemberProfileJsonResponse -> {
-							Player guildMemberPlayer = new Player(
-								guildMemberUuid,
-								usernameToUuid(guildMemberUuid).username(),
-								guildMemberProfileJsonResponse
-							);
-
-							if (guildMemberPlayer.isValid()) {
-								newGuildCache.addPlayer(guildMemberPlayer);
-							}
-							return null;
-						})
-				);
-			}
-
-			for (CompletableFuture<String> future : futuresList) {
-				try {
-					future.get();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			guildMemberPlayersList = newGuildCache.getCache(gamemode);
-			hypixelGuildsCacheMap.put(guildId, newGuildCache.setLastUpdated());
-
-			hypixelGuildQueue.remove(guildId);
+		if (hypixelGuildQueue.contains(guildId)) {
+			return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
 		}
+		hypixelGuildQueue.add(guildId);
+		List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
+			lbType,
+			gamemode,
+			streamJsonArray(higherDepth(guildJson, "members")).map(u -> higherDepth(u, "uuid", "")).collect(Collectors.toList()),
+			hypixelKey,
+			event
+		);
+		hypixelGuildQueue.remove(guildId);
 
 		String finalLbType = lbType;
-		guildMemberPlayersList.sort(Comparator.comparingDouble(cache -> -getDoubleFromCache(cache, finalLbType)));
+		playerList.sort(Comparator.comparingDouble(cache -> -cache.getDouble(finalLbType)));
+
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
 
 		long total = 0;
 		int guildRank = -1;
-		String amt = "-1";
-		for (int i = 0, guildMemberPlayersListSize = guildMemberPlayersList.size(); i < guildMemberPlayersListSize; i++) {
-			String guildPlayer = guildMemberPlayersList.get(i);
-			double amount = getDoubleFromCache(guildPlayer, lbType);
-			total += amount;
-			String formattedAmt = roundAndFormat(amount);
-			String guildPlayerUsername = getStringFromCache(guildPlayer, "username");
-			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(guildPlayerUsername) + ": " + formattedAmt);
+		String amt = "?";
+		for (int i = 0, guildMemberPlayersListSize = playerList.size(); i < guildMemberPlayersListSize; i++) {
+			DataObject player = playerList.get(i);
+			double amount = player.getDouble(lbType);
+			amount = lbType.equals("networth") ? (long) amount : amount;
+			String formattedAmt = amount == -1 ? "?" : roundAndFormat(amount);
+			String playerUsername = player.getString("username");
 
-			if (username != null && guildPlayerUsername.equals(usernameUuidStruct.username())) {
+			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(playerUsername) + ": " + formattedAmt);
+			total += Math.max(0, amount);
+
+			if (username != null && playerUsername.equals(usernameUuidStruct.username())) {
 				guildRank = i;
 				amt = formattedAmt;
 			}
@@ -184,14 +140,9 @@ public class GuildLeaderboardCommand extends Command {
 					":** " +
 					amt
 					: ""
-			) +
-			(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "");
+			);
 
-		paginateBuilder
-			.getExtras()
-			.setEveryPageTitle(guildName)
-			.setEveryPageText(ebStr)
-			.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId);
+		paginateBuilder.getExtras().setEveryPageTitle(guildName).setEveryPageText(ebStr);
 		event.paginate(paginateBuilder, (guildRank / 20) + 1);
 
 		return null;
@@ -205,16 +156,18 @@ public class GuildLeaderboardCommand extends Command {
 				logCommand();
 
 				Player.Gamemode gamemode = getGamemodeOption("mode", Player.Gamemode.ALL);
+				boolean useKey = getBooleanOption("--key");
+
 				setArgs(3);
 				if (args.length >= 2) {
 					if (args.length >= 3 && args[2].startsWith("g:")) {
-						paginate(getLeaderboard(args[1], null, args[2].split("g:")[1], gamemode, getPaginatorEvent()));
+						paginate(getLeaderboard(args[1], null, args[2].split("g:")[1], gamemode, useKey, getPaginatorEvent()));
 					} else {
 						if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 							return;
 						}
 
-						paginate(getLeaderboard(args[1], player, null, gamemode, getPaginatorEvent()));
+						paginate(getLeaderboard(args[1], player, null, gamemode, useKey, getPaginatorEvent()));
 					}
 					return;
 				}

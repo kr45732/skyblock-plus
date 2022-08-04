@@ -20,25 +20,20 @@ package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.getDoubleFromCache;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.getStringFromCache;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.structs.HypixelGuildCache;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -51,12 +46,21 @@ public class GuildStatisticsCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getStatistics(String username, String guildName, String serverId) {
-		String hypixelKey = database.getServerHypixelApiKey(serverId);
+	public static EmbedBuilder getStatistics(
+		String username,
+		String guildName,
+		boolean useKey,
+		Player.Gamemode gamemode,
+		PaginatorEvent event
+	) {
+		String hypixelKey = null;
+		if (useKey) {
+			hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
-		EmbedBuilder eb = checkHypixelKey(hypixelKey);
-		if (eb != null) {
-			return eb;
+			EmbedBuilder eb = checkHypixelKey(hypixelKey);
+			if (eb != null) {
+				return eb;
+			}
 		}
 
 		HypixelResponse guildResponse;
@@ -78,145 +82,86 @@ public class GuildStatisticsCommand extends Command {
 		guildName = higherDepth(guildJson, "name").getAsString();
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 
-		HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
-		List<String> guildMemberPlayersList;
-		Instant lastUpdated = null;
-
-		if (guildCache != null) {
-			guildMemberPlayersList = guildCache.getCache();
-			lastUpdated = guildCache.getLastUpdated();
-		} else {
-			if (hypixelGuildQueue.contains(guildId)) {
-				return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
-			}
-
-			hypixelGuildQueue.add(guildId);
-
-			HypixelGuildCache newGuildCache = new HypixelGuildCache();
-			JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
-			List<CompletableFuture<String>> futuresList = new ArrayList<>();
-
-			for (JsonElement guildMember : guildMembers) {
-				String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
-
-				try {
-					if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
-						System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset() + " seconds");
-						TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset());
-					}
-				} catch (Exception ignored) {}
-
-				futuresList.add(
-					asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey)
-						.thenApply(guildMemberProfileJsonResponse -> {
-							Player guildMemberPlayer = new Player(
-								guildMemberUuid,
-								usernameToUuid(guildMemberUuid).username(),
-								guildMemberProfileJsonResponse
-							);
-
-							if (guildMemberPlayer.isValid()) {
-								newGuildCache.addPlayer(guildMemberPlayer);
-							}
-							return null;
-						})
-				);
-			}
-
-			for (CompletableFuture<String> future : futuresList) {
-				try {
-					future.get();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			guildMemberPlayersList = newGuildCache.getCache();
-			hypixelGuildsCacheMap.put(guildId, newGuildCache.setLastUpdated());
-
-			hypixelGuildQueue.remove(guildId);
+		if (hypixelGuildQueue.contains(guildId)) {
+			return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
 		}
-
-		List<String> slayerLb = guildMemberPlayersList
-			.stream()
-			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "slayer")))
-			.toList();
-		List<String> skillsLb = guildMemberPlayersList
-			.stream()
-			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "skills")))
-			.toList();
-		List<String> cataLb = guildMemberPlayersList
-			.stream()
-			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "catacombs")))
-			.toList();
-		List<String> weightLb = guildMemberPlayersList
-			.stream()
-			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "weight")))
-			.toList();
-
-		double averageSlayer = slayerLb.stream().mapToDouble(m -> getDoubleFromCache(m, "slayer")).sum() / slayerLb.size();
-		double averageSkills = skillsLb.stream().mapToDouble(m -> getDoubleFromCache(m, "skills")).sum() / skillsLb.size();
-		double averageCata = cataLb.stream().mapToDouble(m -> getDoubleFromCache(m, "catacombs")).sum() / cataLb.size();
-		double averageWeight = weightLb.stream().mapToDouble(m -> getDoubleFromCache(m, "weight")).sum() / weightLb.size();
-
-		eb = defaultEmbed(guildName, "https://hypixel-leaderboard.senither.com/guilds/" + guildId);
-		eb.setDescription(
-			"**Average Slayer XP:** " +
-			roundAndFormat(averageSlayer) +
-			"\n**Average Skills Level:** " +
-			roundAndFormat(averageSkills) +
-			"\n**Average Catacombs XP:** " +
-			roundAndFormat(averageCata) +
-			"\n**Average Weight:** " +
-			roundAndFormat(averageWeight) +
-			(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
+		hypixelGuildQueue.add(guildId);
+		List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
+			List.of("slayer", "skills", "catacombs", "weight"),
+			gamemode,
+			streamJsonArray(higherDepth(guildJson, "members")).map(u -> higherDepth(u, "uuid", "")).collect(Collectors.toList()),
+			hypixelKey,
+			event
 		);
+		hypixelGuildQueue.remove(guildId);
+
+		List<DataObject> slayerLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("slayer"))).toList();
+		List<DataObject> skillsLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("skills"))).toList();
+		List<DataObject> cataLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("catacombs"))).toList();
+		List<DataObject> weightLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("weight"))).toList();
+
+		double averageSlayer = slayerLb.stream().mapToDouble(m -> m.getDouble("slayer")).average().orElse(0);
+		double averageSkills = skillsLb.stream().mapToDouble(m -> m.getDouble("skills")).average().orElse(0);
+		double averageCata = cataLb.stream().mapToDouble(m -> m.getDouble("catacombs")).average().orElse(0);
+		double averageWeight = weightLb.stream().mapToDouble(m -> m.getDouble("weight")).average().orElse(0);
+
+		EmbedBuilder eb = defaultEmbed(guildName)
+			.setDescription(
+				"**Average Slayer XP:** " +
+				roundAndFormat(averageSlayer) +
+				"\n**Average Skills Level:** " +
+				roundAndFormat(averageSkills) +
+				"\n**Average Catacombs XP:** " +
+				roundAndFormat(averageCata) +
+				"\n**Average Weight:** " +
+				roundAndFormat(averageWeight)
+			);
 		StringBuilder slayerStr = new StringBuilder();
 		for (int i = 0; i < Math.min(5, slayerLb.size()); i++) {
-			String cur = slayerLb.get(i);
+			DataObject cur = slayerLb.get(i);
 			slayerStr
 				.append("`")
 				.append(i + 1)
 				.append(")` ")
-				.append(fixUsername(getStringFromCache(cur, "username")))
+				.append(fixUsername(cur.getString("username")))
 				.append(": ")
-				.append(roundAndFormat(getDoubleFromCache(cur, "slayer")))
+				.append(roundAndFormat(cur.getDouble("slayer")))
 				.append("\n");
 		}
 		StringBuilder skillsStr = new StringBuilder();
 		for (int i = 0; i < Math.min(5, skillsLb.size()); i++) {
-			String cur = skillsLb.get(i);
+			DataObject cur = skillsLb.get(i);
 			skillsStr
 				.append("`")
 				.append(i + 1)
 				.append(")` ")
-				.append(fixUsername(getStringFromCache(cur, "username")))
+				.append(fixUsername(cur.getString("username")))
 				.append(": ")
-				.append(roundAndFormat(getDoubleFromCache(cur, "skills")))
+				.append(roundAndFormat(cur.getDouble("skills")))
 				.append("\n");
 		}
 		StringBuilder cataStr = new StringBuilder();
 		for (int i = 0; i < Math.min(5, cataLb.size()); i++) {
-			String cur = cataLb.get(i);
+			DataObject cur = cataLb.get(i);
 			cataStr
 				.append("`")
 				.append(i + 1)
 				.append(")` ")
-				.append(fixUsername(getStringFromCache(cur, "username")))
+				.append(fixUsername(cur.getString("username")))
 				.append(": ")
-				.append(roundAndFormat(getDoubleFromCache(cur, "catacombs")))
+				.append(roundAndFormat(cur.getDouble("catacombs")))
 				.append("\n");
 		}
 		StringBuilder weightStr = new StringBuilder();
 		for (int i = 0; i < Math.min(5, weightLb.size()); i++) {
-			String cur = weightLb.get(i);
+			DataObject cur = weightLb.get(i);
 			weightStr
 				.append("`")
 				.append(i + 1)
 				.append(")` ")
-				.append(fixUsername(getStringFromCache(cur, "username")))
+				.append(fixUsername(cur.getString("username")))
 				.append(": ")
-				.append(roundAndFormat(getDoubleFromCache(cur, "weight")))
+				.append(roundAndFormat(cur.getDouble("weight")))
 				.append("\n");
 		}
 		eb.addField("Top 5 Slayer", slayerStr.toString(), true);
@@ -236,15 +181,18 @@ public class GuildStatisticsCommand extends Command {
 			protected void execute() {
 				logCommand();
 
+				Player.Gamemode gamemode = getGamemodeOption("mode", Player.Gamemode.ALL);
+				boolean useKey = getBooleanOption("--key");
+
 				setArgs(2);
 				if (args.length == 2 && args[1].startsWith("g:")) {
-					embed(getStatistics(null, args[1].split("g:")[1], event.getGuild().getId()));
+					embed(getStatistics(null, args[1].split("g:")[1], useKey, gamemode, getPaginatorEvent()));
 				} else {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					embed(getStatistics(player, null, event.getGuild().getId()));
+					embed(getStatistics(player, null, useKey, gamemode, getPaginatorEvent()));
 				}
 			}
 		}

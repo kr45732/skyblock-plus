@@ -18,6 +18,7 @@
 
 package com.skyblockplus.guild;
 
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -25,6 +26,7 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -46,7 +48,8 @@ public class GuildKickerSlashCommand extends SlashCommand {
 			GuildKickerCommand.getGuildKicker(
 				event.player,
 				event.getOptionStr("requirements"),
-				event.getOptionBoolean("usekey", false),
+				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+				event.getOptionBoolean("key", false),
 				new PaginatorEvent(event)
 			)
 		);
@@ -58,7 +61,13 @@ public class GuildKickerSlashCommand extends SlashCommand {
 			.slash(name, "Get helper which shows who to promote or demote in your guild")
 			.addOption(OptionType.STRING, "requirements", "The requirements a player must meet", true)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
+			.addOptions(
+				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
+					.addChoice("All", "all")
+					.addChoice("Ironman", "ironman")
+					.addChoice("Stranded", "stranded")
+			)
+			.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
 	}
 
 	@Override

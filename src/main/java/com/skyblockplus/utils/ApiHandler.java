@@ -332,36 +332,39 @@ public class ApiHandler {
 		} else {
 			future =
 				asyncGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
-					.thenApply(profilesResponse -> {
-						try {
-							if (Runtime.getRuntime().totalMemory() > 1000000000) {
-								System.gc();
-							}
-
+					.thenApplyAsync(
+						profilesResponse -> {
 							try {
-								keyCooldownMap
-									.get(hypixelApiKey)
-									.remainingLimit()
-									.set(Integer.parseInt(profilesResponse.headers().firstValue("RateLimit-Remaining").get()));
-								keyCooldownMap
-									.get(hypixelApiKey)
-									.timeTillReset()
-									.set(Integer.parseInt(profilesResponse.headers().firstValue("RateLimit-Reset").get()));
+								if (Runtime.getRuntime().totalMemory() > 1000000000) {
+									System.gc();
+								}
+
+								try {
+									keyCooldownMap
+										.get(hypixelApiKey)
+										.remainingLimit()
+										.set(Integer.parseInt(profilesResponse.headers().firstValue("RateLimit-Remaining").get()));
+									keyCooldownMap
+										.get(hypixelApiKey)
+										.timeTillReset()
+										.set(Integer.parseInt(profilesResponse.headers().firstValue("RateLimit-Reset").get()));
+								} catch (Exception ignored) {}
+
+								JsonArray profileArray = processSkyblockProfilesArray(
+									higherDepth(JsonParser.parseReader(new InputStreamReader(profilesResponse.body())), "profiles")
+										.getAsJsonArray()
+								);
+
+								if (cache) {
+									cacheDatabase.cacheJson(uuid, profileArray);
+								}
+
+								return profileArray;
 							} catch (Exception ignored) {}
-
-							JsonArray profileArray = processSkyblockProfilesArray(
-								higherDepth(JsonParser.parseReader(new InputStreamReader(profilesResponse.body())), "profiles")
-									.getAsJsonArray()
-							);
-
-							if (cache) {
-								cacheDatabase.cacheJson(uuid, profileArray);
-							}
-
-							return profileArray;
-						} catch (Exception ignored) {}
-						return null;
-					});
+							return null;
+						},
+						executor
+					);
 		}
 
 		return future;

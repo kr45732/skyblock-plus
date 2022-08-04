@@ -18,12 +18,15 @@
 
 package com.skyblockplus.guild;
 
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,7 +42,15 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 
 		String guild = event.getOptionStr("guild");
 		if (guild != null) {
-			event.embed(GuildStatisticsCommand.getStatistics(null, guild, event.getGuild().getId()));
+			event.embed(
+				GuildStatisticsCommand.getStatistics(
+					null,
+					guild,
+					event.getOptionBoolean("key", false),
+					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+					new PaginatorEvent(event)
+				)
+			);
 			return;
 		}
 
@@ -47,7 +58,15 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(GuildStatisticsCommand.getStatistics(event.player, null, event.getGuild().getId()));
+		event.embed(
+			GuildStatisticsCommand.getStatistics(
+				event.player,
+				null,
+				event.getOptionBoolean("key", false),
+				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+				new PaginatorEvent(event)
+			)
+		);
 	}
 
 	@Override
@@ -55,7 +74,14 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "guild", "Guild name", false);
+			.addOption(OptionType.STRING, "guild", "Guild name", false)
+			.addOptions(
+				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
+					.addChoice("All", "all")
+					.addChoice("Ironman", "ironman")
+					.addChoice("Stranded", "stranded")
+			)
+			.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
 	}
 
 	@Override

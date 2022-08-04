@@ -18,14 +18,15 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Player.STATS_LIST;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
@@ -37,8 +38,10 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
@@ -46,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 public class LeaderboardDatabase {
 
+	private static final Pattern uuidDashRegex = Pattern.compile("(.{8})(.{4})(.{4})(.{4})(.{12})");
 	public static final List<String> types = new ArrayList<>(
 		List.of(
 			"username",
@@ -71,7 +75,8 @@ public class LeaderboardDatabase {
 			"networth",
 			"blaze",
 			"lily_weight",
-			"coins"
+			"coins",
+			"lily_slayer_weight"
 		)
 	);
 	public static final List<String> typesSubList = new ArrayList<>();
@@ -84,7 +89,6 @@ public class LeaderboardDatabase {
 	static {
 		types.addAll(COLLECTION_NAME_TO_ID.keySet());
 		guildTypes.addAll(types);
-		guildTypes.add("lily_slayer_weight");
 		types.addAll(STATS_LIST);
 
 		typesSubList.addAll(types.subList(2, types.size()));
@@ -124,7 +128,7 @@ public class LeaderboardDatabase {
 	}
 
 	public void insertIntoLeaderboard(Player player, boolean makeCopy) {
-		executor.submit(() -> {
+		leaderboardDbInsertQueue.submit(() -> {
 			if (player.isValid()) {
 				Player finalPlayer = makeCopy ? player.copy() : player;
 				for (Player.Gamemode gamemode : leaderboardGamemodes) {
@@ -153,7 +157,7 @@ public class LeaderboardDatabase {
 						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
 				)
 			) {
-				statement.setString(1, player.getUuid());
+				statement.setObject(1, UUID.fromString(uuidDashRegex.matcher(player.getUuid()).replaceAll("$1-$2-$3-$4-$5")));
 				statement.setString(2, player.getUsername());
 				statement.setLong(3, Instant.now().toEpochMilli());
 				for (int i = 0; i < typesSubList.size(); i++) {
@@ -197,7 +201,7 @@ public class LeaderboardDatabase {
 			insertIntoLeaderboard(finalPlayer, requestedGamemode);
 		}
 
-		executor.submit(() -> {
+		leaderboardDbInsertQueue.submit(() -> {
 			for (Player.Gamemode gamemode : leaderboardGamemodes) {
 				if (gamemode != requestedGamemode) {
 					if (player.isValid()) {
@@ -214,6 +218,7 @@ public class LeaderboardDatabase {
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gamemode.toCacheType() + " WHERE uuid = ?")
 		) {
 			statement.setString(1, uuid);
+			statement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -235,7 +240,9 @@ public class LeaderboardDatabase {
 				lbType +
 				" DESC) AS rank FROM " +
 				mode.toCacheType() +
-				" OFFSET " +
+				" WHERE " +
+				lbType +
+				" >= 0 OFFSET " +
 				rankStart +
 				" LIMIT " +
 				(rankEnd - rankStart)
@@ -265,7 +272,9 @@ public class LeaderboardDatabase {
 				lbType +
 				" DESC) AS rank FROM " +
 				mode.toCacheType() +
-				") s WHERE uuid=?"
+				" WHERE " +
+				lbType +
+				" >= 0) s WHERE uuid = ?"
 			)
 		) {
 			int rank = 0;
@@ -284,51 +293,29 @@ public class LeaderboardDatabase {
 	}
 
 	public Map<Integer, DataObject> getLeaderboard(String lbType, Player.Gamemode mode, double amount) {
-		Map<Integer, DataObject> out = new TreeMap<>();
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"SELECT * FROM (SELECT username, " +
+				"WITH s AS (SELECT username, " +
 				lbType +
 				", ROW_NUMBER() OVER(ORDER BY " +
 				lbType +
 				" DESC) AS rank FROM " +
 				mode.toCacheType() +
-				") s WHERE " +
+				" WHERE " +
+				lbType +
+				" >= 0) (SELECT * FROM s WHERE " +
 				lbType +
 				" > " +
 				amount +
-				" ORDER BY rank DESC LIMIT 200"
-			)
-		) {
-			try (ResultSet response = statement.executeQuery()) {
-				while (response.next()) {
-					out.put(
-						response.getInt("rank"),
-						DataObject.empty().put("username", response.getString("username")).put(lbType, response.getDouble(lbType))
-					);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		try (
-			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement(
-				"SELECT * FROM (SELECT username, " +
-				lbType +
-				", ROW_NUMBER() OVER(ORDER BY " +
-				lbType +
-				" DESC) AS rank FROM " +
-				mode.toCacheType() +
-				") s WHERE " +
+				" ORDER BY rank DESC LIMIT 200) UNION ALL (SELECT * FROM s WHERE " +
 				lbType +
 				" <= " +
 				amount +
-				" LIMIT 200"
+				" LIMIT 200)"
 			)
 		) {
+			Map<Integer, DataObject> out = new TreeMap<>();
 			try (ResultSet response = statement.executeQuery()) {
 				while (response.next()) {
 					out.put(
@@ -336,11 +323,147 @@ public class LeaderboardDatabase {
 						DataObject.empty().put("username", response.getString("username")).put(lbType, response.getDouble(lbType))
 					);
 				}
+				return out;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public List<DataObject> getCachedPlayers(
+		String lbType,
+		Player.Gamemode mode,
+		List<String> uuids,
+		String hypixelKey,
+		PaginatorEvent event
+	) {
+		return getCachedPlayers(List.of(lbType), mode, uuids, hypixelKey, event);
+	}
+
+	public List<DataObject> getCachedPlayers(
+		List<String> lbTypes,
+		Player.Gamemode mode,
+		List<String> uuids,
+		String hypixelKey,
+		PaginatorEvent event
+	) {
+		List<DataObject> out = new ArrayList<>();
+
+		String paramsStr = "?,".repeat(uuids.size());
+		paramsStr = paramsStr.endsWith(",") ? paramsStr.substring(0, paramsStr.length() - 1) : paramsStr;
+
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT username, uuid, " +
+				String.join(", ", lbTypes) +
+				" FROM " +
+				mode.toCacheType() +
+				" WHERE uuid IN (" +
+				paramsStr +
+				")" +
+				(hypixelKey != null ? " AND last_updated > " + Instant.now().minus(15, ChronoUnit.MINUTES).toEpochMilli() : "")
+			)
+		) {
+			for (int i = 0; i < uuids.size(); i++) {
+				statement.setString(i + 1, uuids.get(i));
+			}
+
+			try (ResultSet response = statement.executeQuery()) {
+				while (response.next()) {
+					String uuid = response.getString("uuid");
+
+					DataObject playerObj = DataObject.empty().put("username", response.getString("username")).put("uuid", uuid);
+					for (String lbType : lbTypes) {
+						playerObj.put(lbType, response.getDouble(lbType));
+					}
+
+					out.add(playerObj);
+					uuids.remove(uuid);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		if (!uuids.isEmpty()) {
+			List<CompletableFuture<DataObject>> futuresList = new ArrayList<>();
+
+			if (hypixelKey != null) {
+				event.embed(
+					loadingEmbed().setDescription("Retrieving an additional " + uuids.size() + " players. This may take some time.")
+				);
+
+				for (String uuid : uuids) {
+					try {
+						if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
+							long timeTillReset = keyCooldownMap.get(hypixelKey).getTimeTillReset();
+							System.out.println("Sleeping for " + timeTillReset + " seconds");
+							TimeUnit.SECONDS.sleep(timeTillReset);
+						}
+					} catch (Exception ignored) {}
+
+					futuresList.add(
+						asyncSkyblockProfilesFromUuid(uuid, hypixelKey, false)
+							.thenApplyAsync(
+								guildMemberProfileJsonResponse -> {
+									Player player = new Player(uuid, usernameToUuid(uuid).username(), guildMemberProfileJsonResponse);
+
+									if (player.isValid()) {
+										DataObject playerObj = DataObject.empty().put("username", player.getUsername()).put("uuid", uuid);
+										for (String lbType : lbTypes) {
+											playerObj.put(lbType, player.getHighestAmount(lbType, mode));
+										}
+										return playerObj;
+									}
+									return null;
+								},
+								executor
+							)
+					);
+				}
+			} else {
+				event.embed(
+					loadingEmbed()
+						.setDescription(
+							"Retrieving an additional " +
+							uuids.size() +
+							" players. This may take some time. Running this command with key set to true will yield more updated results."
+						)
+				);
+
+				for (String uuid : uuids) {
+					CompletableFuture.supplyAsync(
+						() -> {
+							Player player = new Player(uuid);
+							if (player.isValid()) {
+								DataObject playerObj = DataObject.empty().put("username", player.getUsername()).put("uuid", uuid);
+								for (String lbType : lbTypes) {
+									playerObj.put(lbType, player.getHighestAmount(lbType, mode));
+								}
+								return playerObj;
+							}
+							return null;
+						},
+						playerRequestExecutor
+					);
+				}
+			}
+
+			for (CompletableFuture<DataObject> future : futuresList) {
+				try {
+					DataObject getFuture = future.get();
+					if (getFuture != null) {
+						out.add(getFuture);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
 		return out;
 	}
 

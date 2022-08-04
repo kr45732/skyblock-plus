@@ -28,6 +28,10 @@ public class ExceptionExecutor extends ThreadPoolExecutor {
 		super(corePoolSize, maximumPoolSize, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 	}
 
+	public ExceptionExecutor(int corePoolSize, int maximumPoolSize, BlockingQueue<Runnable> workQueue) {
+		super(corePoolSize, maximumPoolSize, 60L, TimeUnit.SECONDS, workQueue);
+	}
+
 	@Override
 	protected void afterExecute(Runnable r, Throwable t) {
 		super.afterExecute(r, t);

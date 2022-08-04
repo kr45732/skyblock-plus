@@ -26,6 +26,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
+import java.util.List;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
@@ -33,6 +34,51 @@ import net.dv8tion.jda.api.entities.Message;
 
 public abstract class CommandExecute extends CommandEvent {
 
+	private static final List<String> slashOnlyCommands = List.of(
+		"forge",
+		"guild-leaderboard",
+		"calcweight",
+		"sacks",
+		"essence",
+		"talisman",
+		"setup",
+		"armor",
+		"jacob",
+		"average",
+		"event",
+		"calcdrops",
+		"bingo",
+		"profiles",
+		"calendar",
+		"check-api",
+		"party",
+		"guild-statistics",
+		"bids",
+		"unlink",
+		"guild-kicker",
+		"wardrobe",
+		"reload",
+		"fetchur",
+		"coinsperbit",
+		"recipe",
+		"pets",
+		"calcdrags",
+		"enderchest",
+		"collections",
+		"crimson",
+		"viewauction",
+		"uuid",
+		"cakes",
+		"bits",
+		"storage",
+		"guild-ranks",
+		"harp",
+		"check-guild-api",
+		"categories",
+		"bestiary",
+		"reforge",
+		"fix-application"
+	);
 	protected final Command command;
 	protected Message ebMessage;
 	protected String[] args;
@@ -55,6 +101,16 @@ public abstract class CommandExecute extends CommandEvent {
 
 	public void queue() {
 		executor.submit(() -> {
+			if (slashOnlyCommands.contains(command.getName())) {
+				reply(
+					client.getError() +
+					" This command can only be used through slash commands. If you do not see slash commands, make sure `Use Application Commands` is enabled for @ everyone or re-invite the bot using `" +
+					getGuildPrefix(getGuild().getId()) +
+					"invite`"
+				);
+				return;
+			}
+
 			if (adminCommand && !guildMap.get(getGuild().getId()).isAdmin(getMember())) {
 				reply("You are missing the required permissions or roles to use this command");
 				return;
@@ -203,6 +259,9 @@ public abstract class CommandExecute extends CommandEvent {
 		args = newArgs;
 	}
 
+	/**
+	 * Matches a boolean flag
+	 */
 	protected boolean getBooleanOption(String match) {
 		boolean arg = false;
 		for (int i = 0; i < args.length; i++) {
