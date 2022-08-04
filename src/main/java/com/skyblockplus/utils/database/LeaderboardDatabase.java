@@ -157,7 +157,7 @@ public class LeaderboardDatabase {
 						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
 				)
 			) {
-				statement.setObject(1, UUID.fromString(uuidDashRegex.matcher(player.getUuid()).replaceAll("$1-$2-$3-$4-$5")));
+				statement.setObject(1, stringToUuid(player.getUuid()));
 				statement.setString(2, player.getUsername());
 				statement.setLong(3, Instant.now().toEpochMilli());
 				for (int i = 0; i < typesSubList.size(); i++) {
@@ -217,7 +217,7 @@ public class LeaderboardDatabase {
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gamemode.toCacheType() + " WHERE uuid = ?")
 		) {
-			statement.setString(1, uuid);
+			statement.setObject(1, stringToUuid(uuid));
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -278,7 +278,7 @@ public class LeaderboardDatabase {
 			)
 		) {
 			int rank = 0;
-			statement.setString(1, uuid);
+			statement.setObject(1, stringToUuid(uuid));
 			try (ResultSet response = statement.executeQuery()) {
 				if (response.next()) {
 					rank = response.getInt("rank");
@@ -367,12 +367,12 @@ public class LeaderboardDatabase {
 			)
 		) {
 			for (int i = 0; i < uuids.size(); i++) {
-				statement.setString(i + 1, uuids.get(i));
+				statement.setObject(i + 1, stringToUuid(uuids.get(i)));
 			}
 
 			try (ResultSet response = statement.executeQuery()) {
 				while (response.next()) {
-					String uuid = response.getString("uuid");
+					String uuid = response.getString("uuid").replace("-", "");
 
 					DataObject playerObj = DataObject.empty().put("username", response.getString("username")).put("uuid", uuid);
 					for (String lbType : lbTypes) {
@@ -476,7 +476,7 @@ public class LeaderboardDatabase {
 				") s WHERE uuid=?"
 			)
 		) {
-			statement.setString(1, uuid);
+			statement.setObject(1, stringToUuid(uuid));
 			try (ResultSet response = statement.executeQuery()) {
 				if (response.next()) {
 					return response.getInt("rank");
@@ -532,7 +532,7 @@ public class LeaderboardDatabase {
 			) {
 				try (ResultSet response = statement.executeQuery()) {
 					while (response.next()) {
-						out.add(response.getString("uuid"));
+						out.add(response.getString("uuid").replace("-", ""));
 					}
 				}
 			} catch (Exception e) {
@@ -584,6 +584,10 @@ public class LeaderboardDatabase {
 		}
 
 		return lbType;
+	}
+
+	public static UUID stringToUuid(String uuid) {
+		return UUID.fromString(uuidDashRegex.matcher(uuid).replaceAll("$1-$2-$3-$4-$5"));
 	}
 
 	public void close() {

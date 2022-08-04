@@ -285,6 +285,10 @@ public class GuildRanksCommand extends Command {
 				}
 			}
 
+			if (paginateBuilder.size() == 0) {
+				return defaultEmbed("No rank changes");
+			}
+
 			paginateBuilder
 				.getExtras()
 				.setEveryPageTitle("Rank changes for " + guildName)

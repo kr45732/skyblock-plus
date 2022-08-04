@@ -230,8 +230,6 @@ public class LeaderboardPaginator {
 	}
 
 	public void actionModal(ModalInteractionEvent event) {
-		event.deferEdit().queue();
-
 		int rank = -1;
 		double amount = -1;
 		int page = -1;

@@ -101,7 +101,7 @@ public abstract class CommandExecute extends CommandEvent {
 
 	public void queue() {
 		executor.submit(() -> {
-			if (slashOnlyCommands.contains(command.getName())) {
+			if (isMainBot() && slashOnlyCommands.contains(command.getName())) {
 				reply(
 					client.getError() +
 					" This command can only be used through slash commands. If you do not see slash commands, make sure `Use Application Commands` is enabled for @ everyone or re-invite the bot using `" +
