@@ -69,8 +69,11 @@ public class AuctionTracker {
 			}
 
 			JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
-			Instant jsonLastUpdated = Instant.ofEpochMilli(higherDepth(endedAuctionsJson, "lastUpdated").getAsLong());
+			if (endedAuctionsJson == null) {
+				return;
+			}
 
+			Instant jsonLastUpdated = Instant.ofEpochMilli(higherDepth(endedAuctionsJson, "lastUpdated").getAsLong());
 			if (lastUpdated == null || lastUpdated.isBefore(jsonLastUpdated)) {
 				lastUpdated = jsonLastUpdated;
 

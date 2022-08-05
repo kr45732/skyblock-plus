@@ -27,8 +27,6 @@ import static java.util.Collections.nCopies;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
@@ -183,6 +181,7 @@ public class Utils {
 	private static Instant userCountLastUpdated = Instant.now();
 	private static int userCount = -1;
 	public static List<String> queryItems;
+	public static List<String> bazaarItems = new ArrayList<>();
 	public static ShardManager jda;
 	public static Database database;
 	public static EventWaiter waiter;
@@ -282,6 +281,10 @@ public class Utils {
 		if (bazaarJson == null || Duration.between(bazaarJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			bazaarJson = getJsonObject("https://api.hypixel.net/skyblock/bazaar");
 			bazaarJsonLastUpdated = Instant.now();
+			if (higherDepth(bazaarJson, "products") != null) {
+				bazaarItems =
+					higherDepth(bazaarJson, "products").getAsJsonObject().keySet().stream().map(Utils::idToName).distinct().toList();
+			}
 		}
 
 		return bazaarJson;
@@ -532,6 +535,8 @@ public class Utils {
 
 					if (httpResponse.getStatusLine().getStatusCode() == 502) {
 						return JsonParser.parseString("{\"cause\":\"Hypixel API returned 502 bad gateway\"}");
+					} else if (httpResponse.getStatusLine().getStatusCode() == 522) {
+						return JsonParser.parseString("{\"cause\":\"Hypixel API returned 522 connection timed out\"}");
 					}
 				}
 

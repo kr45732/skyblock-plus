@@ -18,8 +18,7 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.getBazaarJson;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -53,16 +52,7 @@ public class BazaarSlashCommand extends SlashCommand {
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			event.replyClosestMatch(
-				event.getFocusedOption().getValue(),
-				higherDepth(getBazaarJson(), "products")
-					.getAsJsonObject()
-					.keySet()
-					.stream()
-					.map(Utils::idToName)
-					.distinct()
-					.collect(Collectors.toList())
-			);
+			event.replyClosestMatch(event.getFocusedOption().getValue(), bazaarItems);
 		}
 	}
 }
