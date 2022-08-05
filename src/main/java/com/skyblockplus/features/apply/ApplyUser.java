@@ -96,25 +96,25 @@ public class ApplyUser implements Serializable {
 				return;
 			}
 
-			ChannelAction<TextChannel> applicationChannelAction = applyCategory
-				.createTextChannel("apply-" + playerUsername)
-				.syncPermissionOverrides()
-				.addPermissionOverride(event.getGuild().getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND), null)
-				.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
-				.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
-			try {
-				for (JsonElement staffPingRole : higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray()) {
-					applicationChannelAction =
-						applicationChannelAction.addPermissionOverride(
-							event.getGuild().getRoleById(staffPingRole.getAsString()),
-							EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND),
-							null
-						);
-				}
-			} catch (Exception ignored) {}
-
 			TextChannel applicationChannel;
 			try {
+				ChannelAction<TextChannel> applicationChannelAction = applyCategory
+						.createTextChannel("apply-" + playerUsername)
+						.syncPermissionOverrides()
+						.addPermissionOverride(event.getGuild().getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND), null)
+						.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
+						.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
+				try {
+					for (JsonElement staffPingRole : higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray()) {
+						applicationChannelAction =
+								applicationChannelAction.addPermissionOverride(
+										event.getGuild().getRoleById(staffPingRole.getAsString()),
+										EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND),
+										null
+								);
+					}
+				} catch (Exception ignored) {}
+
 				applicationChannel = applicationChannelAction.complete();
 			} catch (PermissionException e) {
 				failCause = client.getError() + " Missing permission: " + e.getPermission().getName();
