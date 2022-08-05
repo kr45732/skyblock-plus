@@ -144,7 +144,7 @@ public class AuctionFlipper {
 		}
 
 		JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
-		if(higherDepth(endedAuctionsJson, "auctions") == null) {
+		if (higherDepth(endedAuctionsJson, "auctions") == null) {
 			return;
 		}
 

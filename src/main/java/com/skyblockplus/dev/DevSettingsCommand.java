@@ -88,8 +88,8 @@ public class DevSettingsCommand extends Command {
 							if (args[2].equals("disable")) {
 								setArgs(5);
 								embed(
-										new SettingsExecute(jda.getGuildById(args[3]), event.getEvent())
-												.setApplyEnable(database.getGuildSettings(args[3], args[4]).getAsJsonObject(), false)
+									new SettingsExecute(jda.getGuildById(args[3]), event.getEvent())
+										.setApplyEnable(database.getGuildSettings(args[3], args[4]).getAsJsonObject(), false)
 								);
 								guildMap.get(args[3]).reloadApplyConstructor(args[3]);
 								return;
