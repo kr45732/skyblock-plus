@@ -144,6 +144,10 @@ public class AuctionFlipper {
 		}
 
 		JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
+		if(higherDepth(endedAuctionsJson, "auctions") == null) {
+			return;
+		}
+
 		Instant jsonLastUpdated = Instant.ofEpochMilli(higherDepth(endedAuctionsJson, "lastUpdated").getAsLong());
 		if (lastUpdated == null || lastUpdated.isBefore(jsonLastUpdated)) {
 			lastUpdated = jsonLastUpdated;

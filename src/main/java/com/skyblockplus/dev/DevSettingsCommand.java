@@ -18,6 +18,7 @@
 
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -29,7 +30,6 @@ import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import com.skyblockplus.settings.SettingsExecute;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -50,36 +50,51 @@ public class DevSettingsCommand extends Command {
 				setArgs(4);
 
 				if (args.length == 4) {
-					if (args[1].equals("roles")) {
-						embed(setRoleSettings(args[2], args[3], event));
-						return;
-					} else if (args[1].equals("delete")) {
-						switch (args[2]) {
-							case "server" -> {
-								embed(deleteServer(args[3]));
+					switch (args[1]) {
+						case "roles":
+							embed(setRoleSettings(args[2], args[3], event));
+							return;
+						case "delete":
+							switch (args[2]) {
+								case "server" -> {
+									embed(deleteServer(args[3]));
+									return;
+								}
+								case "apply_cache" -> {
+									setArgs(5);
+									embed(deleteServerApplyCache(args[3], args[4]));
+									return;
+								}
+								case "skyblock_event" -> {
+									embed(deleteSkyblockEvent(args[3]));
+									return;
+								}
+							}
+							break;
+						case "verify":
+							if (args[2].equals("disable")) {
+								embed(new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setVerifyEnable(false));
+								guildMap.get(args[3]).reloadVerifyConstructor(args[3]);
 								return;
 							}
-							case "apply_cache" -> {
+							break;
+						case "jacob":
+							if (args[2].equals("disable")) {
+								embed(new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setJacobEnable(false));
+								return;
+							}
+							break;
+						case "apply":
+							if (args[2].equals("disable")) {
 								setArgs(5);
-								embed(deleteServerApplyCache(args[3], args[4]));
+								embed(
+										new SettingsExecute(jda.getGuildById(args[3]), event.getEvent())
+												.setApplyEnable(database.getGuildSettings(args[3], args[4]).getAsJsonObject(), false)
+								);
+								guildMap.get(args[3]).reloadApplyConstructor(args[3]);
 								return;
 							}
-							case "skyblock_event" -> {
-								embed(deleteSkyblockEvent(args[3]));
-								return;
-							}
-						}
-					} else if (args[1].equals("verify")) {
-						if (args[2].equals("disable")) {
-							embed(new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setVerifyEnable(false));
-						}
-					} else if (args[1].equals("apply")) {
-						if (args[2].equals("disable")) {
-							embed(
-								new SettingsExecute(jda.getGuildById(args[3]), event.getEvent())
-									.setApplyEnable(database.getGuildSettings(args[3], args[4]).getAsJsonObject(), false)
-							);
-						}
+							break;
 					}
 				}
 

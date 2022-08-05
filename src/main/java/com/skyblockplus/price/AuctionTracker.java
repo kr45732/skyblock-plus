@@ -69,7 +69,7 @@ public class AuctionTracker {
 			}
 
 			JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
-			if (endedAuctionsJson == null) {
+			if (higherDepth(endedAuctionsJson, "auctions") == null) {
 				return;
 			}
 

@@ -2425,6 +2425,11 @@ public class SettingsExecute {
 			return defaultEmbed("You have reached the max number of verify roles (3/3)");
 		}
 
+		for (int i = currentVerifyRoles.size() - 1; i >= 0; i--) {
+			if (currentVerifyRoles.get(i).getAsString().equals(role.getId())) {
+				currentVerifyRoles.remove(i);
+			}
+		}
 		currentVerifyRoles.add(role.getId());
 		int responseCode = database.setVerifyRolesSettings(guild.getId(), currentVerifyRoles);
 
