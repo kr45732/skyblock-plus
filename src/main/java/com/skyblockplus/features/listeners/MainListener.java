@@ -18,7 +18,6 @@
 
 package com.skyblockplus.features.listeners;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.inventory.InventoryListPaginator;
@@ -165,6 +164,31 @@ public class MainListener extends ListenerAdapter {
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
 		if (!event.isFromGuild()) {
+			return;
+		}
+
+		if (
+				isMainBot() && event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")
+		) {
+			if (
+					isMainBot() &&
+							!event.getMessage().getEmbeds().isEmpty() &&
+							event.getMessage().getEmbeds().get(0).getDescription() != null &&
+							event.getMessage().getEmbeds().get(0).getTitle() != null &&
+							event
+									.getMessage()
+									.getEmbeds()
+									.get(0)
+									.getDescription()
+									.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/") &&
+							event.getMessage().getEmbeds().get(0).getTitle().contains("master")
+			) {
+				updateItemMappings();
+				internalJsonMappings = null;
+				priceOverrideJson = null;
+				getInternalJsonMappings();
+				getPriceOverride("");
+			}
 			return;
 		}
 

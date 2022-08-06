@@ -50,15 +50,15 @@ public class InformationCommand extends Command {
 					.addField(
 						"Statistics",
 						"**Servers:** " +
-						jda.getGuildCache().size() +
+						formatNumber(jda.getGuildCache().size()) +
 						"\n**Users:** " +
 						formatNumber(getUserCount()) +
 						"\n**Avg Ping:** " +
-						roundAndFormat(
-							jda.getShardCache().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
+								formatNumber(
+										(long) jda.getShardCache().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
 						) +
 						"ms\n**Avg Websocket:** " +
-						roundAndFormat(jda.getAverageGatewayPing()) +
+						formatNumber((long) jda.getAverageGatewayPing()) +
 						"ms",
 						true
 					)
@@ -94,7 +94,12 @@ public class InformationCommand extends Command {
 					Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
 					Button.link(FORUM_POST_LINK, "Forum Post"),
 					Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
-				)
+				),
+					ActionRow.of(
+							Button.link("https://skyblock-plus.vercel.app", "Website Link"),
+							Button.link("https://skyblock-plus.vercel.app/tos", "Terms of Service"),
+							Button.link("https://skyblock-plus.vercel.app/privacy-policy", "Privacy Policy")
+					)
 			);
 	}
 

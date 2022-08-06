@@ -40,7 +40,7 @@ public class JacobHandler {
 		scheduler.scheduleAtFixedRate(
 			() -> {
 				try {
-					jda.getTextChannelById("937894945564545035").sendMessage("<@497789163555389441> Gib jacob data please :D").queue();
+					jda.getTextChannelById("937894945564545035").sendMessage("<@497789163555389441> <@728098698143465472> Gib jacob data please :D").queue();
 				} catch (Exception ignored) {}
 			},
 			YEAR_0 + 446400000L * getSkyblockYear() + 300000 - Instant.now().toEpochMilli(),

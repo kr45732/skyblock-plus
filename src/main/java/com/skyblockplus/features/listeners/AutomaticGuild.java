@@ -23,13 +23,11 @@ import static com.skyblockplus.features.mayor.MayorHandler.jerryEmbed;
 import static com.skyblockplus.features.mayor.MayorHandler.votesEmbed;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
@@ -49,9 +47,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.RoleModifyRecord;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Writer;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -82,9 +77,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -974,28 +966,6 @@ public class AutomaticGuild {
 	}
 
 	public void onGuildMessageReceived(MessageReceivedEvent event) {
-		if (
-			isMainBot() && event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")
-		) {
-			if (
-				event.getMessage().getEmbeds().size() > 0 &&
-				event.getMessage().getEmbeds().get(0).getDescription() != null &&
-				event
-					.getMessage()
-					.getEmbeds()
-					.get(0)
-					.getDescription()
-					.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/") &&
-				isMainBot()
-			) {
-				updateItemMappings();
-				internalJsonMappings = null;
-				getInternalJsonMappings();
-				refreshPriceOverrideJson();
-			}
-			return;
-		}
-
 		if (verifyGuild.onGuildMessageReceived(event)) {
 			return;
 		}
@@ -1223,138 +1193,6 @@ public class AutomaticGuild {
 
 	public void setLogChannel(TextChannel channel) {
 		this.logChannel = channel;
-	}
-
-	public void updateItemMappings() {
-		try {
-			File neuDir = new File("src/main/java/com/skyblockplus/json/neu");
-			if (neuDir.exists()) {
-				FileUtils.deleteDirectory(neuDir);
-			}
-			neuDir.mkdir();
-
-			File skyblockPlusDir = new File("src/main/java/com/skyblockplus/json/skyblock_plus");
-			if (skyblockPlusDir.exists()) {
-				FileUtils.deleteDirectory(skyblockPlusDir);
-			}
-			skyblockPlusDir.mkdir();
-
-			Git neuRepo = Git
-				.cloneRepository()
-				.setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
-				.setDirectory(neuDir)
-				.call();
-
-			Git skyblockPlusDataRepo = Git
-				.cloneRepository()
-				.setURI("https://github.com/kr45732/skyblock-plus-data.git")
-				.setDirectory(skyblockPlusDir)
-				.call();
-
-			JsonElement currentPriceOverrides = JsonParser.parseReader(
-				new FileReader("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")
-			);
-			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")) {
-				formattedGson.toJson(getUpdatedPriceOverridesJson(currentPriceOverrides), writer);
-				writer.flush();
-			}
-
-			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/InternalNameMappings.json")) {
-				formattedGson.toJson(getUpdatedItemMappingsJson(), writer);
-				writer.flush();
-			}
-
-			skyblockPlusDataRepo.add().addFilepattern("InternalNameMappings.json").addFilepattern("PriceOverrides.json").call();
-			skyblockPlusDataRepo
-				.commit()
-				.setAuthor("kr45632", "52721908+kr45732@users.noreply.github.com")
-				.setCommitter("kr45632", "52721908+kr45732@users.noreply.github.com")
-				.setMessage("Automatic update (" + neuRepo.log().setMaxCount(1).call().iterator().next().getName() + ")")
-				.call();
-			skyblockPlusDataRepo.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();
-
-			FileUtils.deleteDirectory(neuDir);
-			FileUtils.deleteDirectory(skyblockPlusDir);
-			neuRepo.close();
-			skyblockPlusDataRepo.close();
-		} catch (Exception e) {
-			log.error("Exception while automatically updating item mappings", e);
-		}
-	}
-
-	public JsonElement getUpdatedItemMappingsJson() {
-		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
-		JsonObject outputObj = new JsonObject();
-
-		for (File child : Arrays.stream(dir.listFiles()).sorted(Comparator.comparing(File::getName)).toList()) {
-			try {
-				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
-				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
-				String itemId = higherDepth(itemJson, "internalname").getAsString();
-				if (itemName.contains("(")) {
-					if (
-						itemId.endsWith("_MINIBOSS") ||
-						itemId.endsWith("_MONSTER") ||
-						itemId.endsWith("_ANIMAL") ||
-						itemId.endsWith("_SC") ||
-						itemId.endsWith("_BOSS")
-					) {
-						continue;
-					}
-				}
-
-				if (itemName.startsWith("[Lvl")) {
-					itemName = capitalizeString(NUMBER_TO_RARITY_MAP.get(itemId.split(";")[1])) + " " + itemName.split("] ")[1];
-				}
-				if (itemName.equals("Enchanted Book")) {
-					itemName = parseMcCodes(higherDepth(itemJson, "lore.[0]").getAsString());
-				}
-				if (itemId.contains("-")) {
-					itemId = itemId.replace("-", ":");
-				}
-
-				JsonObject toAdd = new JsonObject();
-				toAdd.addProperty("name", itemName);
-				if (higherDepth(itemJson, "recipe") != null) {
-					toAdd.add("recipe", higherDepth(itemJson, "recipe"));
-				}
-				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
-
-				outputObj.add(itemId, toAdd);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		return outputObj;
-	}
-
-	public JsonElement getUpdatedPriceOverridesJson(JsonElement currentPriceOverrides) {
-		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
-		JsonObject outputObject = new JsonObject();
-
-		for (File child : dir.listFiles()) {
-			try {
-				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
-				if (
-					higherDepth(itemJson, "vanilla", false) ||
-					(
-						higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture") &&
-						!higherDepth(itemJson, "internalname", "").startsWith("EPOCH_CAKE_")
-					)
-				) {
-					String id = higherDepth(itemJson, "internalname").getAsString().replace("-", ":");
-					outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		JsonObject finalOutput = new JsonObject();
-		finalOutput.add("manual", higherDepth(currentPriceOverrides, "manual"));
-		finalOutput.add("automatic", outputObject);
-		return finalOutput;
 	}
 
 	public void setApplyGuestRole(Role role) {

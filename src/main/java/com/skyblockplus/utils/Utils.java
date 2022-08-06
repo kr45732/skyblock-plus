@@ -92,6 +92,9 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -1244,6 +1247,8 @@ public class Utils {
 							itemInfo.addExtraValue("WOOD_SINGULARITY");
 						}
 
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.thunder_charge", 0) / 50000, "THUNDER_IN_A_BOTTLE");
+
 						if (item.getInt("tag.ExtraAttributes.art_of_war_count", 0) == 1) {
 							itemInfo.addExtraValue("THE_ART_OF_WAR");
 						}
@@ -1593,16 +1598,6 @@ public class Utils {
 		return maxLevel;
 	}
 
-	public static void refreshPriceOverrideJson() {
-		JsonElement splitPriceOverrides = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json")
-			.getAsJsonObject();
-		priceOverrideJson = higherDepth(splitPriceOverrides, "automatic").getAsJsonObject();
-		for (Map.Entry<String, JsonElement> manualOverride : higherDepth(splitPriceOverrides, "manual").getAsJsonObject().entrySet()) {
-			priceOverrideJson.add(manualOverride.getKey(), manualOverride.getValue());
-		}
-		priceOverrideJson.remove("ENCHANTED_BOOK");
-	}
-
 	public static boolean isVanillaItem(String id) {
 		if (vanillaItems == null) {
 			vanillaItems =
@@ -1619,7 +1614,13 @@ public class Utils {
 
 	public static double getPriceOverride(String itemId) {
 		if (priceOverrideJson == null) {
-			refreshPriceOverrideJson();
+			JsonElement splitPriceOverrides = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json")
+					.getAsJsonObject();
+			priceOverrideJson = higherDepth(splitPriceOverrides, "automatic").getAsJsonObject();
+			for (Map.Entry<String, JsonElement> manualOverride : higherDepth(splitPriceOverrides, "manual").getAsJsonObject().entrySet()) {
+				priceOverrideJson.add(manualOverride.getKey(), manualOverride.getValue());
+			}
+			priceOverrideJson.remove("ENCHANTED_BOOK");
 		}
 
 		return priceOverrideJson.has(itemId) ? priceOverrideJson.get(itemId).getAsDouble() : -1;
@@ -1754,5 +1755,136 @@ public class Utils {
 		double progress = xpForNext > 0 ? Math.max(0, Math.min(((double) xpCurrent) / xpForNext, 1)) : 0;
 
 		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
+	}
+
+	public static void updateItemMappings() {
+		try {
+			File neuDir = new File("src/main/java/com/skyblockplus/json/neu");
+			if (neuDir.exists()) {
+				FileUtils.deleteDirectory(neuDir);
+			}
+			neuDir.mkdir();
+
+			File skyblockPlusDir = new File("src/main/java/com/skyblockplus/json/skyblock_plus");
+			if (skyblockPlusDir.exists()) {
+				FileUtils.deleteDirectory(skyblockPlusDir);
+			}
+			skyblockPlusDir.mkdir();
+
+			Git neuRepo = Git
+				.cloneRepository()
+				.setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
+				.setDirectory(neuDir)
+				.call();
+
+			Git skyblockPlusDataRepo = Git
+				.cloneRepository()
+				.setURI("https://github.com/kr45732/skyblock-plus-data.git")
+				.setDirectory(skyblockPlusDir)
+				.call();
+
+			JsonElement currentPriceOverrides = JsonParser.parseReader(
+				new FileReader("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")
+			);
+			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")) {
+				formattedGson.toJson(getUpdatedPriceOverridesJson(currentPriceOverrides), writer);
+				writer.flush();
+			}
+
+			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/InternalNameMappings.json")) {
+				formattedGson.toJson(getUpdatedItemMappingsJson(), writer);
+				writer.flush();
+			}
+
+			skyblockPlusDataRepo.add().addFilepattern("InternalNameMappings.json").addFilepattern("PriceOverrides.json").call();
+			skyblockPlusDataRepo
+				.commit()
+				.setAuthor("kr45632", "52721908+kr45732@users.noreply.github.com")
+				.setCommitter("kr45632", "52721908+kr45732@users.noreply.github.com")
+				.setMessage("Automatic update (" + neuRepo.log().setMaxCount(1).call().iterator().next().getName() + ")")
+				.call();
+			skyblockPlusDataRepo.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();
+
+			FileUtils.deleteDirectory(neuDir);
+			FileUtils.deleteDirectory(skyblockPlusDir);
+			neuRepo.close();
+			skyblockPlusDataRepo.close();
+		} catch (Exception e) {
+			log.error("Exception while automatically updating item mappings", e);
+		}
+	}
+
+	public static JsonElement getUpdatedItemMappingsJson() {
+		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
+		JsonObject outputObj = new JsonObject();
+
+		for (File child : Arrays.stream(dir.listFiles()).sorted(Comparator.comparing(File::getName)).toList()) {
+			try {
+				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
+				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
+				String itemId = higherDepth(itemJson, "internalname").getAsString();
+				if (itemName.contains("(")) {
+					if (
+						itemId.endsWith("_MINIBOSS") ||
+						itemId.endsWith("_MONSTER") ||
+						itemId.endsWith("_ANIMAL") ||
+						itemId.endsWith("_SC") ||
+						itemId.endsWith("_BOSS")
+					) {
+						continue;
+					}
+				}
+
+				if (itemName.startsWith("[Lvl")) {
+					itemName = capitalizeString(NUMBER_TO_RARITY_MAP.get(itemId.split(";")[1])) + " " + itemName.split("] ")[1];
+				}
+				if (itemName.equals("Enchanted Book")) {
+					itemName = parseMcCodes(higherDepth(itemJson, "lore.[0]").getAsString());
+				}
+				if (itemId.contains("-")) {
+					itemId = itemId.replace("-", ":");
+				}
+
+				JsonObject toAdd = new JsonObject();
+				toAdd.addProperty("name", itemName);
+				if (higherDepth(itemJson, "recipe") != null) {
+					toAdd.add("recipe", higherDepth(itemJson, "recipe"));
+				}
+				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
+
+				outputObj.add(itemId, toAdd);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return outputObj;
+	}
+
+	public static JsonElement getUpdatedPriceOverridesJson(JsonElement currentPriceOverrides) {
+		JsonObject outputObject = new JsonObject();
+
+		for (File child:  new File("src/main/java/com/skyblockplus/json/neu/items").listFiles()) {
+			try {
+				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
+				if (
+					higherDepth(itemJson, "vanilla", false) ||
+					(
+						higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture") &&
+						!higherDepth(itemJson, "internalname", "").startsWith("EPOCH_CAKE_")
+					)
+				) {
+					String id = higherDepth(itemJson, "internalname").getAsString().replace("-", ":");
+					outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		JsonObject finalOutput = new JsonObject();
+		finalOutput.add("manual", higherDepth(currentPriceOverrides, "manual"));
+		finalOutput.add("automatic", outputObject);
+		return finalOutput;
 	}
 }
