@@ -168,20 +168,20 @@ public class MainListener extends ListenerAdapter {
 		}
 
 		if (
-				isMainBot() && event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")
+			isMainBot() && event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")
 		) {
 			if (
-					isMainBot() &&
-							!event.getMessage().getEmbeds().isEmpty() &&
-							event.getMessage().getEmbeds().get(0).getDescription() != null &&
-							event.getMessage().getEmbeds().get(0).getTitle() != null &&
-							event
-									.getMessage()
-									.getEmbeds()
-									.get(0)
-									.getDescription()
-									.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/") &&
-							event.getMessage().getEmbeds().get(0).getTitle().contains("master")
+				isMainBot() &&
+				!event.getMessage().getEmbeds().isEmpty() &&
+				event.getMessage().getEmbeds().get(0).getDescription() != null &&
+				event.getMessage().getEmbeds().get(0).getTitle() != null &&
+				event
+					.getMessage()
+					.getEmbeds()
+					.get(0)
+					.getDescription()
+					.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/") &&
+				event.getMessage().getEmbeds().get(0).getTitle().contains("master")
 			) {
 				updateItemMappings();
 				internalJsonMappings = null;

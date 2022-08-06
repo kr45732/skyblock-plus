@@ -54,8 +54,8 @@ public class InformationCommand extends Command {
 						"\n**Users:** " +
 						formatNumber(getUserCount()) +
 						"\n**Avg Ping:** " +
-								formatNumber(
-										(long) jda.getShardCache().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
+						formatNumber(
+							(long) jda.getShardCache().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
 						) +
 						"ms\n**Avg Websocket:** " +
 						formatNumber((long) jda.getAverageGatewayPing()) +
@@ -95,11 +95,11 @@ public class InformationCommand extends Command {
 					Button.link(FORUM_POST_LINK, "Forum Post"),
 					Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
 				),
-					ActionRow.of(
-							Button.link("https://skyblock-plus.vercel.app", "Website Link"),
-							Button.link("https://skyblock-plus.vercel.app/tos", "Terms of Service"),
-							Button.link("https://skyblock-plus.vercel.app/privacy-policy", "Privacy Policy")
-					)
+				ActionRow.of(
+					Button.link("https://skyblock-plus.vercel.app", "Website Link"),
+					Button.link("https://skyblock-plus.vercel.app/tos", "Terms of Service"),
+					Button.link("https://skyblock-plus.vercel.app/privacy-policy", "Privacy Policy")
+				)
 			);
 	}
 

@@ -1614,8 +1614,10 @@ public class Utils {
 
 	public static double getPriceOverride(String itemId) {
 		if (priceOverrideJson == null) {
-			JsonElement splitPriceOverrides = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json")
-					.getAsJsonObject();
+			JsonElement splitPriceOverrides = getJson(
+				"https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json"
+			)
+				.getAsJsonObject();
 			priceOverrideJson = higherDepth(splitPriceOverrides, "automatic").getAsJsonObject();
 			for (Map.Entry<String, JsonElement> manualOverride : higherDepth(splitPriceOverrides, "manual").getAsJsonObject().entrySet()) {
 				priceOverrideJson.add(manualOverride.getKey(), manualOverride.getValue());
@@ -1864,7 +1866,7 @@ public class Utils {
 	public static JsonElement getUpdatedPriceOverridesJson(JsonElement currentPriceOverrides) {
 		JsonObject outputObject = new JsonObject();
 
-		for (File child:  new File("src/main/java/com/skyblockplus/json/neu/items").listFiles()) {
+		for (File child : new File("src/main/java/com/skyblockplus/json/neu/items").listFiles()) {
 			try {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
 				if (

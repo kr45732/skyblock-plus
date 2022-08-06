@@ -291,7 +291,7 @@ public class NetworthExecute {
 			StringBuilder echestStr = getSectionString(enderChestItems);
 			StringBuilder sacksStr = getSectionString(sacksItems);
 			StringBuilder personalVaultStr = getSectionString(personalVaultItems);
-			StringBuilder storageStr =getSectionString(storageItems);
+			StringBuilder storageStr = getSectionString(storageItems);
 			StringBuilder invStr = getSectionString(invItems);
 			StringBuilder armorStr = getSectionString(armorItems);
 			StringBuilder wardrobeStr = getSectionString(wardrobeItems);
@@ -449,7 +449,9 @@ public class NetworthExecute {
 					SelectOption.of("Sacks", "sacks").withEmoji(getEmojiObj("RUNE_SACK")),
 					player
 						.defaultPlayerEmbed(" | Sacks")
-						.setDescription(ebDesc + "\n**Sacks:** " + simplifyNumber(sacksTotal) + "\n\n" + sacksStr.toString().replace("\n\n", "\n"))
+						.setDescription(
+							ebDesc + "\n**Sacks:** " + simplifyNumber(sacksTotal) + "\n\n" + sacksStr.toString().replace("\n\n", "\n")
+						)
 				);
 			}
 
@@ -481,11 +483,7 @@ public class NetworthExecute {
 
 		for (int i = 0; i < items.size(); i++) {
 			String item = items.get(i);
-			str
-					.append(item.split("=:=")[0])
-					.append(" ➜ ")
-					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
-					.append("\n");
+			str.append(item.split("=:=")[0]).append(" ➜ ").append(simplifyNumber(Double.parseDouble(item.split("=:=")[1]))).append("\n");
 			if (i == 4) {
 				str.append("\n");
 			} else if (i == 24) {
@@ -517,14 +515,15 @@ public class NetworthExecute {
 	}
 
 	private void calculatePetPrice(String location, String auctionName, double auctionPrice) {
-		List<InvItem> petsList = switch (location){
-			case "inventory" -> invPets;
-			case "pets" -> petsPets;
-			case "enderchest" -> enderChestPets;
-			case "storage" -> storagePets;
-			case "personal_vault" -> personalVaultPets;
-			default -> throw new IllegalStateException("Unexpected value: " + location);
-		};
+		List<InvItem> petsList =
+			switch (location) {
+				case "inventory" -> invPets;
+				case "pets" -> petsPets;
+				case "enderchest" -> enderChestPets;
+				case "storage" -> storagePets;
+				case "personal_vault" -> personalVaultPets;
+				default -> throw new IllegalStateException("Unexpected value: " + location);
+			};
 
 		for (Iterator<InvItem> iterator = petsList.iterator(); iterator.hasNext();) {
 			InvItem item = iterator.next();
@@ -537,11 +536,11 @@ public class NetworthExecute {
 						double miscPrice = getLowestPrice(extraItem);
 						miscExtras += miscPrice;
 						miscStr
-								.append("{\"name\":\"")
-								.append(extraItem)
-								.append("\",\"price\":\"")
-								.append(simplifyNumber(miscPrice))
-								.append("\"},");
+							.append("{\"name\":\"")
+							.append(extraItem)
+							.append("\",\"price\":\"")
+							.append(simplifyNumber(miscPrice))
+							.append("\"},");
 					}
 				} catch (Exception ignored) {}
 				if (miscStr.toString().endsWith(",")) {
@@ -576,19 +575,17 @@ public class NetworthExecute {
 
 				if (verbose) {
 					calcItemsJsonStr
-							.append("{\"name\":\"")
-							.append(item.getName())
-							.append("\",\"total\":\"")
-							.append(simplifyNumber(auctionPrice + miscExtras))
-							.append("\",\"base_cost\":\"")
-							.append(simplifyNumber(auctionPrice))
-							.append("\"")
-							.append(
-									miscExtras > 0
-											? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
-											: ""
-							)
-							.append("},");
+						.append("{\"name\":\"")
+						.append(item.getName())
+						.append("\",\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("\",\"base_cost\":\"")
+						.append(simplifyNumber(auctionPrice))
+						.append("\"")
+						.append(
+							miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}" : ""
+						)
+						.append("},");
 				}
 
 				iterator.remove();
@@ -597,18 +594,19 @@ public class NetworthExecute {
 	}
 
 	private void calculateDefaultPetPrices(String location) {
-		List<InvItem> petsList = switch (location){
-			case "inventory" -> invPets;
-			case "pets" -> petsPets;
-			case "enderchest" -> enderChestPets;
-			case "storage" -> storagePets;
-			case "personal_vault" -> personalVaultPets;
-			default -> throw new IllegalStateException("Unexpected value: " + location);
-		};
+		List<InvItem> petsList =
+			switch (location) {
+				case "inventory" -> invPets;
+				case "pets" -> petsPets;
+				case "enderchest" -> enderChestPets;
+				case "storage" -> storagePets;
+				case "personal_vault" -> personalVaultPets;
+				default -> throw new IllegalStateException("Unexpected value: " + location);
+			};
 
 		for (InvItem item : petsList) {
 			double auctionPrice = getMinBinAvg(
-					item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity())
+				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity())
 			);
 			if (auctionPrice != -1) {
 				StringBuilder miscStr = new StringBuilder("[");
@@ -619,11 +617,11 @@ public class NetworthExecute {
 						double miscPrice = getLowestPrice(extraItem);
 						miscExtras += miscPrice;
 						miscStr
-								.append("{\"name\":\"")
-								.append(extraItem)
-								.append("\",\"price\":\"")
-								.append(simplifyNumber(miscPrice))
-								.append("\"},");
+							.append("{\"name\":\"")
+							.append(extraItem)
+							.append("\",\"price\":\"")
+							.append(simplifyNumber(miscPrice))
+							.append("\"},");
 					}
 				} catch (Exception ignored) {}
 				if (miscStr.toString().endsWith(",")) {
@@ -658,17 +656,17 @@ public class NetworthExecute {
 
 				if (verbose) {
 					calcItemsJsonStr
-							.append("{\"name\":\"")
-							.append(item.getName())
-							.append("\",\"total\":\"")
-							.append(simplifyNumber(auctionPrice + miscExtras))
-							.append("\",\"base_cost\":\"")
-							.append(simplifyNumber(auctionPrice))
-							.append("\",")
-							.append(
-									miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
-							)
-							.append("\"fail_calc_lvl_cost\":true},");
+						.append("{\"name\":\"")
+						.append(item.getName())
+						.append("\",\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("\",\"base_cost\":\"")
+						.append(simplifyNumber(auctionPrice))
+						.append("\",")
+						.append(
+							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
+						)
+						.append("\"fail_calc_lvl_cost\":true},");
 				}
 			}
 		}
@@ -887,7 +885,12 @@ public class NetworthExecute {
 			out.append(",\"id\":\"").append(item.getId()).append("\"");
 			out.append(",\"total\":\"").append(simplifyNumber(totalPrice)).append("\"");
 			out.append(",\"count\":").append(itemCount);
-			out.append(",\"base_cost\":{\"cost\":\"").append(simplifyNumber(itemCost)).append("\",\"location\":\"").append(source).append("\"}");
+			out
+				.append(",\"base_cost\":{\"cost\":\"")
+				.append(simplifyNumber(itemCost))
+				.append("\",\"location\":\"")
+				.append(source)
+				.append("\"}");
 			out.append(recombobulatedExtra > 0 ? ",\"recomb\":\"" + simplifyNumber(recombobulatedExtra) + "\"" : "");
 			out.append(
 				essenceExtras > 0
@@ -1034,8 +1037,8 @@ public class NetworthExecute {
 
 			double minBinAverage = getMin(lowestBin, averageAuction);
 			if (minBinAverage != -1) {
-				if (source != null){
-					if (minBinAverage == lowestBin ){
+				if (source != null) {
+					if (minBinAverage == lowestBin) {
 						source.append("lowest BIN");
 					} else {
 						source.append("average auction");
