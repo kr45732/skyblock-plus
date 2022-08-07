@@ -148,7 +148,7 @@ public class LeaderboardDatabase {
 				PreparedStatement statement = connection.prepareStatement(
 					"INSERT INTO " +
 					gamemode.toCacheType() +
-					" VALUES (" +
+					"(uuid,username,last_updated," + String.join(",", typesSubList) + ") VALUES (" +
 					paramStr +
 					") ON CONFLICT (uuid) DO UPDATE SET " +
 					typesSubList
