@@ -491,7 +491,8 @@ public class EmojiUpdater {
 						.replace("travel_scroll_to_the_crystal_hollows", "travel_scroll_crystal_hollows")
 						.replace("travel_scroll_to_the_dwarven_forge", "travel_scroll_dwarven_forge")
 						.replace("dusty_travel_scroll_to_the_kuudra_skull", "travel_scroll_kuudra_skull")
-						.replace("pink_crab_hat_of_celebration_2022_edition", "pink_crab_hat_of_celebration_22");
+						.replace("pink_crab_hat_of_celebration_2022_edition", "pink_crab_hat_of_celebration_22")
+						.replace("travel_scroll_to_the_crystal_nucleus", "travel_scroll_crystal_nucleus");
 					name =
 						switch (name = name.startsWith("_") ? name.substring(1) : name) {
 							case "x" -> "xx";

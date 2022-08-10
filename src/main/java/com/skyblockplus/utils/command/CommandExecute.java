@@ -77,7 +77,11 @@ public abstract class CommandExecute extends CommandEvent {
 		"categories",
 		"bestiary",
 		"reforge",
-		"fix-application"
+		"fix-application",
+		"skyblock",
+		"hotm",
+		"hypixel",
+			"inventory", "coins", "scammer", "calcslayer", "calcruns"
 	);
 	protected final Command command;
 	protected Message ebMessage;

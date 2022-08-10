@@ -599,7 +599,7 @@ public class ApiHandler {
 				.filter(linkedAccountModel ->
 					Duration.between(Instant.ofEpochMilli(linkedAccountModel.lastUpdated()), Instant.now()).toDays() > 5
 				)
-				.limit(15)
+				.limit(60)
 				.forEach(o ->
 					asyncUuidToUsername(o.uuid())
 						.thenApply(username ->

@@ -278,9 +278,6 @@ public class SkyblockEventCommand extends Command {
 
 		guildMemberPlayersList.sort(Comparator.comparingDouble(o1 -> -Double.parseDouble(o1.getStartingAmount())));
 
-		if (guildId.equals("602137436490956820")) {
-			executor.submit(() -> postJson("https://soopymc.my.to/api/soopyv2/lbdatathing", gson.toJsonTree(guildMemberPlayersList)));
-		}
 		guildMap.get(guildId).setEventCurrentlyUpdating(false);
 		return guildMemberPlayersList;
 	}

@@ -1687,7 +1687,7 @@ public class Utils {
 			.getCommands()
 			.stream()
 			.collect(Collectors.toMap(SlashCommand::getName, command -> slashCommandClient.getCommandUses(command), (a, b) -> b))
-			.forEach((key, value) -> commandUses.merge(key, value, Integer::sum));
+			.forEach((key, value) -> commandUses.compute(key, (k, v) -> (v != null ? v : 0) + value));
 		return commandUses;
 	}
 
