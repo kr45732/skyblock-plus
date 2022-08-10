@@ -81,7 +81,11 @@ public abstract class CommandExecute extends CommandEvent {
 		"skyblock",
 		"hotm",
 		"hypixel",
-			"inventory", "coins", "scammer", "calcslayer", "calcruns"
+		"inventory",
+		"coins",
+		"scammer",
+		"calcslayer",
+		"calcruns"
 	);
 	protected final Command command;
 	protected Message ebMessage;
