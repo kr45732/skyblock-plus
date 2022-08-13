@@ -1352,15 +1352,7 @@ public class Player {
 	 * @param slayerName sven, rev, tara, enderman
 	 */
 	public int getSlayer(String slayerName) {
-		JsonElement profileSlayer = higherDepth(profileJson(), "slayer_bosses");
-		return switch (slayerName) {
-			case "sven" -> higherDepth(profileSlayer, "wolf.xp", 0);
-			case "rev" -> higherDepth(profileSlayer, "zombie.xp", 0);
-			case "tara" -> higherDepth(profileSlayer, "spider.xp", 0);
-			case "enderman" -> higherDepth(profileSlayer, "enderman.xp", 0);
-			case "blaze" -> higherDepth(profileSlayer, "blaze.xp", 0);
-			default -> 0;
-		};
+		return higherDepth(profileJson(), "slayer_bosses." + SLAYER_NAMES_MAP.get(slayerName) + ".xp", 0);
 	}
 
 	public int getSlayerLevel(String slayerName) {
@@ -1371,12 +1363,7 @@ public class Player {
 		JsonArray levelArray = higherDepth(
 			getLevelingJson(),
 			"slayer_xp." +
-			switch (slayerName) {
-				case "sven" -> "wolf";
-				case "rev" -> "zombie";
-				case "tara" -> "spider";
-				default -> slayerName;
-			}
+					SLAYER_NAMES_MAP.get(slayerName)
 		)
 			.getAsJsonArray();
 		int level = 0;

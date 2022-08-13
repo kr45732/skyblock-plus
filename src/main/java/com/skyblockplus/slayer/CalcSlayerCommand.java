@@ -18,8 +18,7 @@
 
 package com.skyblockplus.slayer;
 
-import static com.skyblockplus.utils.Constants.SLAYER_EMOJI_MAP;
-import static com.skyblockplus.utils.Constants.SLAYER_NAMES;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -59,13 +58,7 @@ public class CalcSlayerCommand extends Command {
 				targetLevel != -1
 					? higherDepth(
 						getLevelingJson(),
-						"slayer_xp." +
-						switch (slayerType) {
-							case "sven" -> "wolf";
-							case "rev" -> "zombie";
-							case "tara" -> "spider";
-							default -> slayerType;
-						} +
+						"slayer_xp." + SLAYER_NAMES_MAP.get(slayerType) +
 						".[" +
 						(targetLevel - 1) +
 						"]"

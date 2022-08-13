@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous.weight.lily;
 
+import static com.skyblockplus.utils.Constants.SLAYER_NAMES_MAP;
 import static com.skyblockplus.utils.Utils.getWeightJson;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
@@ -47,7 +48,7 @@ public class LilySlayerWeight extends SlayerWeight {
 			score = Math.sqrt(4.0 / 3) * Math.cos(Math.acos(d * Math.pow(3, 5.0 / 2)) / 3) - 1;
 		}
 
-		double scaleFactor = higherDepth(getWeightJson(), "lily.slayer." + slayerName).getAsDouble();
+		double scaleFactor = higherDepth(getWeightJson(), "lily.slayer." + SLAYER_NAMES_MAP.get(slayerName)).getAsDouble();
 		int intScore = (int) score;
 		double distance = currentSlayerXp - actualInt(intScore);
 		double effectiveDistance = distance * Math.pow(scaleFactor, intScore);

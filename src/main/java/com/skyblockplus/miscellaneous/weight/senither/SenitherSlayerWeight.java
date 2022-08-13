@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous.weight.senither;
 
+import static com.skyblockplus.utils.Constants.SLAYER_NAMES_MAP;
 import static com.skyblockplus.utils.Utils.getWeightJson;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
@@ -41,7 +42,7 @@ public class SenitherSlayerWeight extends SlayerWeight {
 			return new WeightStruct();
 		}
 
-		JsonArray curWeights = higherDepth(getWeightJson(), "senither.slayer." + slayerName).getAsJsonArray();
+		JsonArray curWeights = higherDepth(getWeightJson(), "senither.slayer." + SLAYER_NAMES_MAP.get(slayerName)).getAsJsonArray();
 		double divider = curWeights.get(0).getAsDouble();
 		double modifier = curWeights.get(1).getAsDouble();
 
