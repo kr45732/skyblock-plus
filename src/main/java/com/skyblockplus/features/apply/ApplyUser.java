@@ -701,10 +701,10 @@ public class ApplyUser implements Serializable {
 						.getTextChannelById(event.getChannel().getId())
 						.delete()
 						.reason("Application canceled")
-						.queueAfter(10, TimeUnit.SECONDS);
+						.queueAfter(10, TimeUnit.SECONDS, ignore, ignore);
 
 					String[] channelMessageSplit = event.getComponentId().split("apply_user_cancel_")[1].split("_");
-					event.getGuild().getTextChannelById(channelMessageSplit[0]).deleteMessageById(channelMessageSplit[1]).queue();
+					event.getGuild().getTextChannelById(channelMessageSplit[0]).deleteMessageById(channelMessageSplit[1]).queue(ignore, ignore);
 					return true;
 				}
 
