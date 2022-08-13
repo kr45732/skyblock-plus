@@ -1360,12 +1360,7 @@ public class Player {
 	}
 
 	public int getSlayerLevel(String slayerName, int xp) {
-		JsonArray levelArray = higherDepth(
-			getLevelingJson(),
-			"slayer_xp." +
-					SLAYER_NAMES_MAP.get(slayerName)
-		)
-			.getAsJsonArray();
+		JsonArray levelArray = higherDepth(getLevelingJson(), "slayer_xp." + SLAYER_NAMES_MAP.get(slayerName)).getAsJsonArray();
 		int level = 0;
 		for (int i = 0; i < levelArray.size(); i++) {
 			if (xp >= levelArray.get(i).getAsInt()) {

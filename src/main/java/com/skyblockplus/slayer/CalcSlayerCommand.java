@@ -56,13 +56,7 @@ public class CalcSlayerCommand extends Command {
 			int curXp = player.getSlayer(slayerType);
 			targetXp =
 				targetLevel != -1
-					? higherDepth(
-						getLevelingJson(),
-						"slayer_xp." + SLAYER_NAMES_MAP.get(slayerType) +
-						".[" +
-						(targetLevel - 1) +
-						"]"
-					)
+					? higherDepth(getLevelingJson(), "slayer_xp." + SLAYER_NAMES_MAP.get(slayerType) + ".[" + (targetLevel - 1) + "]")
 						.getAsLong()
 					: targetXp;
 
