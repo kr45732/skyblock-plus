@@ -432,7 +432,8 @@ public class SkyblockEventHandler {
 					announcementEb.addField("Prizes", ebString.toString(), false);
 					announcementEb.addField(
 						"Join the event",
-						"Click the join button below or run `/event join` to join! You must be linked to the bot" + (eventSettings.getEventGuildId().isEmpty() ? "" : " and in the guild."),
+						"Click the join button below or run `/event join` to join! You must be linked to the bot" +
+						(eventSettings.getEventGuildId().isEmpty() ? "" : " and in the guild."),
 						false
 					);
 					announcementEb.addField(
