@@ -52,14 +52,15 @@ public class LilySlayerWeight extends SlayerWeight {
 		double distance = currentSlayerXp - actualInt(intScore);
 		double effectiveDistance = distance * Math.pow(scaleFactor, intScore);
 		double effectiveScore = effectiveInt(intScore, scaleFactor) + effectiveDistance;
-		double weight = switch (slayerName) {
-			case "rev" -> (effectiveScore / 9250) + (currentSlayerXp / 1000000.0);
-			case "tara" -> (effectiveScore / 7019.57) + ((currentSlayerXp * 1.6) / 1000000);
-			case "sven" -> (effectiveScore / 2982.06) + ((currentSlayerXp * 3.6) / 1000000);
-			case "enderman" -> (effectiveScore / 996.3003) + ((currentSlayerXp * 10.0) / 1000000);
-			case "blaze" -> (effectiveScore / 935.0455) + ((currentSlayerXp * 10.0) / 1000000);
-			default -> throw new IllegalStateException("Unexpected value: " + slayerName);
-		};
+		double weight =
+			switch (slayerName) {
+				case "rev" -> (effectiveScore / 9250) + (currentSlayerXp / 1000000.0);
+				case "tara" -> (effectiveScore / 7019.57) + ((currentSlayerXp * 1.6) / 1000000);
+				case "sven" -> (effectiveScore / 2982.06) + ((currentSlayerXp * 3.6) / 1000000);
+				case "enderman" -> (effectiveScore / 996.3003) + ((currentSlayerXp * 10.0) / 1000000);
+				case "blaze" -> (effectiveScore / 935.0455) + ((currentSlayerXp * 10.0) / 1000000);
+				default -> throw new IllegalStateException("Unexpected value: " + slayerName);
+			};
 
 		return weightStruct.add(new WeightStruct(2 * weight));
 	}

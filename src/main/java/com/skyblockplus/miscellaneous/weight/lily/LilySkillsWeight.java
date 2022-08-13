@@ -66,7 +66,9 @@ public class LilySkillsWeight extends SkillsWeight {
 		if (skillsStruct.totalExp() > SKILLS_LEVEL_60_XP) {
 			double factor = higherDepth(getWeightJson(), "lily.skills.factors." + skillName).getAsDouble();
 			double effectiveOver = effectiveXP(skillsStruct.totalExp() - SKILLS_LEVEL_60_XP, factor);
-			double t = (effectiveOver / SKILLS_LEVEL_60_XP) * (higherDepth(getWeightJson(), "lily.skills.overflow_multipliers." + skillName).getAsDouble());
+			double t =
+				(effectiveOver / SKILLS_LEVEL_60_XP) *
+				(higherDepth(getWeightJson(), "lily.skills.overflow_multipliers." + skillName).getAsDouble());
 			if (t > 0) {
 				overflow += overall * t;
 			}

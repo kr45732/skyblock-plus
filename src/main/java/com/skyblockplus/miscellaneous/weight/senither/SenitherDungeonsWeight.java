@@ -37,7 +37,8 @@ public class SenitherDungeonsWeight extends DungeonsWeight {
 		SkillsStruct dungeonSkill = player.getDungeonClass(className);
 		double currentClassLevel = dungeonSkill.getProgressLevel();
 		double currentClassXp = dungeonSkill.totalExp();
-		double base = Math.pow(currentClassLevel, 4.5) * higherDepth(getWeightJson(), "senither.dungeons.classes." + className).getAsDouble();
+		double base =
+			Math.pow(currentClassLevel, 4.5) * higherDepth(getWeightJson(), "senither.dungeons.classes." + className).getAsDouble();
 
 		if (currentClassXp <= Constants.CATACOMBS_LEVEL_50_XP) {
 			return weightStruct.add(new WeightStruct(base));

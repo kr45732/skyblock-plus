@@ -57,7 +57,10 @@ public class LilyDungeonsWeight extends DungeonsWeight {
 		if (level != 0) {
 			if (cataXP < 569809640) {
 				return weightStruct.add(
-					new WeightStruct(higherDepth(getWeightJson(), "lily.dungeons.overall").getAsDouble() * ((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n)))
+					new WeightStruct(
+						higherDepth(getWeightJson(), "lily.dungeons.overall").getAsDouble() *
+						((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n))
+					)
 				);
 			} else {
 				return weightStruct.add(new WeightStruct((4100 + extra) * 2));

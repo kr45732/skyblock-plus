@@ -370,7 +370,8 @@ public class Utils {
 
 	public static JsonObject getWeightJson() {
 		if (weightJson == null) {
-			weightJson = getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/weight.json");
+			weightJson =
+				getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/weight.json");
 		}
 
 		return weightJson;

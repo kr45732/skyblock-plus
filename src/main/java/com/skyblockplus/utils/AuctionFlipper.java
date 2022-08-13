@@ -103,11 +103,14 @@ public class AuctionFlipper {
 		if (underBinJson != null) {
 			JsonElement avgAuctionJson = getAverageAuctionJson();
 
-			for (JsonElement auction :
-					underBinJson.getAsJsonObject().entrySet().stream().map(Map.Entry::getValue)
-							.sorted(Comparator.comparingLong(c -> -higherDepth(c, "profit", 0L)))
-							.limit(15).toList()
-			) {
+			for (JsonElement auction : underBinJson
+				.getAsJsonObject()
+				.entrySet()
+				.stream()
+				.map(Map.Entry::getValue)
+				.sorted(Comparator.comparingLong(c -> -higherDepth(c, "profit", 0L)))
+				.limit(15)
+				.toList()) {
 				String itemId = higherDepth(auction, "id").getAsString();
 				if (isVanillaItem(itemId) || itemId.equals("BEDROCK")) {
 					continue;
