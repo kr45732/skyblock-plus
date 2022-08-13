@@ -150,7 +150,7 @@ public class SkyblockEventCommand extends Command {
 		String key = null;
 		if (membersArr.size() > 45) {
 			key = database.getServerHypixelApiKey(guildId);
-			if (key == null) {
+			if (key == null || checkHypixelKey(key) != null) {
 				return null;
 			}
 		}
