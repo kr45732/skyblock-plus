@@ -18,7 +18,7 @@
 
 package com.skyblockplus.miscellaneous.weight.lily;
 
-import static com.skyblockplus.utils.Constants.SLAYER_DEPRECATION_SCALING;
+import static com.skyblockplus.utils.Utils.getWeightJson;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.skyblockplus.miscellaneous.weight.weight.SlayerWeight;
@@ -47,31 +47,19 @@ public class LilySlayerWeight extends SlayerWeight {
 			score = Math.sqrt(4.0 / 3) * Math.cos(Math.acos(d * Math.pow(3, 5.0 / 2)) / 3) - 1;
 		}
 
-		double scaleFactor = higherDepth(SLAYER_DEPRECATION_SCALING, slayerName).getAsDouble();
+		double scaleFactor = higherDepth(getWeightJson(), "lily.slayer." + slayerName).getAsDouble();
 		int intScore = (int) score;
 		double distance = currentSlayerXp - actualInt(intScore);
 		double effectiveDistance = distance * Math.pow(scaleFactor, intScore);
 		double effectiveScore = effectiveInt(intScore, scaleFactor) + effectiveDistance;
-		double weight;
-		switch (slayerName) {
-			case "rev":
-				weight = (effectiveScore / 8390.64) + (currentSlayerXp / 1000000.0);
-				break;
-			case "tara":
-				weight = (effectiveScore / 7019.57) + ((currentSlayerXp * 1.6) / 1000000);
-				break;
-			case "sven":
-				weight = (effectiveScore / 2982.06) + ((currentSlayerXp * 3.6) / 1000000);
-				break;
-			case "enderman":
-				weight = (effectiveScore / 1118.81) + ((currentSlayerXp * 10.0) / 1000000);
-				break;
-			case "blaze":
-				weight = (effectiveScore / 751.281) + ((currentSlayerXp * 15.0) / 1000000);
-				break;
-			default:
-				return null;
-		}
+		double weight = switch (slayerName) {
+			case "rev" -> (effectiveScore / 9250) + (currentSlayerXp / 1000000.0);
+			case "tara" -> (effectiveScore / 7019.57) + ((currentSlayerXp * 1.6) / 1000000);
+			case "sven" -> (effectiveScore / 2982.06) + ((currentSlayerXp * 3.6) / 1000000);
+			case "enderman" -> (effectiveScore / 996.3003) + ((currentSlayerXp * 10.0) / 1000000);
+			case "blaze" -> (effectiveScore / 935.0455) + ((currentSlayerXp * 10.0) / 1000000);
+			default -> throw new IllegalStateException("Unexpected value: " + slayerName);
+		};
 
 		return weightStruct.add(new WeightStruct(2 * weight));
 	}

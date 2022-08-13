@@ -18,8 +18,10 @@
 
 package com.skyblockplus.miscellaneous.weight.senither;
 
-import static com.skyblockplus.utils.Constants.SLAYER_WEIGHTS;
+import static com.skyblockplus.utils.Utils.getWeightJson;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
+import com.google.gson.JsonArray;
 import com.skyblockplus.miscellaneous.weight.weight.SlayerWeight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
@@ -39,9 +41,9 @@ public class SenitherSlayerWeight extends SlayerWeight {
 			return new WeightStruct();
 		}
 
-		Double[] curWeights = SLAYER_WEIGHTS.get(slayerName);
-		double divider = curWeights[0];
-		double modifier = curWeights[1];
+		JsonArray curWeights = higherDepth(getWeightJson(), "senither.slayer." + slayerName).getAsJsonArray();
+		double divider = curWeights.get(0).getAsDouble();
+		double modifier = curWeights.get(1).getAsDouble();
 
 		if (currentSlayerXp <= 1000000) {
 			return weightStruct.add(new WeightStruct(currentSlayerXp == 0 ? 0 : currentSlayerXp / divider));

@@ -18,7 +18,9 @@
 
 package com.skyblockplus.miscellaneous.weight.lily;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.SKILLS_LEVEL_60_XP;
+import static com.skyblockplus.utils.Constants.SKILL_NAMES;
+import static com.skyblockplus.utils.Utils.getWeightJson;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonArray;
@@ -50,7 +52,7 @@ public class LilySkillsWeight extends SkillsWeight {
 		}
 		skillAverage /= SKILL_NAMES.size();
 
-		JsonArray srwTable = higherDepth(SKILL_RATIO_WEIGHT, skillName).getAsJsonArray();
+		JsonArray srwTable = higherDepth(getWeightJson(), "lily.skills.ratio_weight." + skillName).getAsJsonArray();
 		double base =
 			(
 				(12 * Math.pow((skillAverage / 60), 2.44780217148309)) *
@@ -58,14 +60,15 @@ public class LilySkillsWeight extends SkillsWeight {
 				srwTable.get(srwTable.size() - 1).getAsDouble()
 			) +
 			(srwTable.get(srwTable.size() - 1).getAsDouble() * Math.pow(skillsStruct.currentLevel() / 60.0, Math.pow(2, 0.5)));
-		base *= 1.8162162162162162;
+		double overall = higherDepth(getWeightJson(), "lily.skills.overall").getAsDouble();
+		base *= overall;
 		double overflow = 0;
 		if (skillsStruct.totalExp() > SKILLS_LEVEL_60_XP) {
-			double factor = higherDepth(SKILL_FACTORS, skillName).getAsDouble();
+			double factor = higherDepth(getWeightJson(), "lily.skills.factors." + skillName).getAsDouble();
 			double effectiveOver = effectiveXP(skillsStruct.totalExp() - SKILLS_LEVEL_60_XP, factor);
-			double t = (effectiveOver / SKILLS_LEVEL_60_XP) * (higherDepth(SKILL_OVERFLOW_MULTIPLIERS, skillName).getAsDouble());
+			double t = (effectiveOver / SKILLS_LEVEL_60_XP) * (higherDepth(getWeightJson(), "lily.skills.overflow_multipliers." + skillName).getAsDouble());
 			if (t > 0) {
-				overflow += 1.8162162162162162 * t;
+				overflow += overall * t;
 			}
 		}
 
@@ -73,18 +76,6 @@ public class LilySkillsWeight extends SkillsWeight {
 	}
 
 	private double effectiveXP(double xp, double factor) {
-		if (xp < SKILLS_LEVEL_60_XP) {
-			return xp;
-		} else {
-			double remainingXP = xp;
-			double z = 0;
-			for (int i = 0; i <= (int) (xp / SKILLS_LEVEL_60_XP); i++) {
-				if (remainingXP >= SKILLS_LEVEL_60_XP) {
-					remainingXP -= SKILLS_LEVEL_60_XP;
-					z += Math.pow(factor, i);
-				}
-			}
-			return z * SKILLS_LEVEL_60_XP;
-		}
+		return Math.pow(xp, factor);
 	}
 }

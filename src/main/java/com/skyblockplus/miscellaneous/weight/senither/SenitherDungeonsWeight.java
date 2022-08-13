@@ -18,8 +18,8 @@
 
 package com.skyblockplus.miscellaneous.weight.senither;
 
-import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_WEIGHTS;
-import static com.skyblockplus.utils.Constants.DUNGEON_WEIGHTS;
+import static com.skyblockplus.utils.Utils.getWeightJson;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.skyblockplus.miscellaneous.weight.weight.DungeonsWeight;
 import com.skyblockplus.utils.Constants;
@@ -37,7 +37,7 @@ public class SenitherDungeonsWeight extends DungeonsWeight {
 		SkillsStruct dungeonSkill = player.getDungeonClass(className);
 		double currentClassLevel = dungeonSkill.getProgressLevel();
 		double currentClassXp = dungeonSkill.totalExp();
-		double base = Math.pow(currentClassLevel, 4.5) * DUNGEON_CLASS_WEIGHTS.get(className);
+		double base = Math.pow(currentClassLevel, 4.5) * higherDepth(getWeightJson(), "senither.dungeons.classes." + className).getAsDouble();
 
 		if (currentClassXp <= Constants.CATACOMBS_LEVEL_50_XP) {
 			return weightStruct.add(new WeightStruct(base));
@@ -57,7 +57,7 @@ public class SenitherDungeonsWeight extends DungeonsWeight {
 	public WeightStruct getDungeonWeight(SkillsStruct catacombs) {
 		double catacombsSkillXp = catacombs.totalExp();
 		double level = catacombs.getProgressLevel();
-		double base = Math.pow(level, 4.5) * DUNGEON_WEIGHTS.get("catacombs");
+		double base = Math.pow(level, 4.5) * higherDepth(getWeightJson(), "senither.dungeons.catacombs").getAsDouble();
 
 		if (catacombsSkillXp <= Constants.CATACOMBS_LEVEL_50_XP) {
 			return weightStruct.add(new WeightStruct(base));

@@ -172,6 +172,7 @@ public class Utils {
 	public static JsonObject bingoInfoJson;
 	public static JsonObject dungeonLootJson;
 	public static JsonObject dragonLootJson;
+	public static JsonObject weightJson;
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
@@ -365,6 +366,14 @@ public class Utils {
 		}
 
 		return dragonLootJson;
+	}
+
+	public static JsonObject getWeightJson() {
+		if (weightJson == null) {
+			weightJson = getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/weight.json");
+		}
+
+		return weightJson;
 	}
 
 	public static JsonObject getTalismanJson() {

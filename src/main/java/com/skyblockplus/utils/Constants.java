@@ -43,19 +43,9 @@ public class Constants {
 	public static List<String> DUNGEON_CLASS_NAMES;
 	public static List<String> SLAYER_NAMES;
 	public static List<Integer> GUILD_EXP_TO_LEVEL;
-	public static Map<String, Double[]> SLAYER_WEIGHTS;
-	public static Map<String, Double[]> SKILL_WEIGHTS;
-	public static Map<String, Double> DUNGEON_CLASS_WEIGHTS;
-	public static Map<String, Double> DUNGEON_WEIGHTS;
 	public static Map<String, String> DUNGEON_EMOJI_MAP;
 	public static List<String> FETCHUR_ITEMS;
 	public static Map<String, String> HARP_SONG_ID_TO_NAME;
-	public static JsonElement SLAYER_DEPRECATION_SCALING;
-	public static JsonElement SKILL_RATIO_WEIGHT;
-	public static JsonElement SKILL_FACTORS;
-	public static JsonElement SKILL_OVERFLOW_MULTIPLIERS;
-	public static JsonObject DUNGEON_COMPLETION_WORTH;
-	public static JsonObject DUNGEON_COMPLETION_BUFFS;
 	public static Map<String, String> HOTM_PERK_ID_TO_NAME;
 	public static Map<String, Integer> HOTM_PERK_MAX_LEVEL;
 	public static Map<String, String> SLAYER_EMOJI_MAP;
@@ -85,8 +75,6 @@ public class Constants {
 			Type mapStringString = new TypeToken<Map<String, String>>() {}.getType();
 			Type listInteger = new TypeToken<List<Integer>>() {}.getType();
 			Type listString = new TypeToken<List<String>>() {}.getType();
-			Type mapStringDoubleArray = new TypeToken<Map<String, Double[]>>() {}.getType();
-			Type mapStringDouble = new TypeToken<Map<String, Double>>() {}.getType();
 			Type mapStringInteger = new TypeToken<Map<String, Integer>>() {}.getType();
 			Type mapStringLong = new TypeToken<Map<String, Long>>() {}.getType();
 
@@ -120,18 +108,6 @@ public class Constants {
 			/* GUILD_EXP_TO_LEVEL */
 			GUILD_EXP_TO_LEVEL = gson.fromJson(higherDepth(CONSTANTS, "GUILD_EXP_TO_LEVEL"), listInteger);
 
-			/* SLAYER_WEIGHTS */
-			SLAYER_WEIGHTS = gson.fromJson(higherDepth(CONSTANTS, "SLAYER_WEIGHTS"), mapStringDoubleArray);
-
-			/* SKILL_WEIGHTS */
-			SKILL_WEIGHTS = gson.fromJson(higherDepth(CONSTANTS, "SKILL_WEIGHTS"), mapStringDoubleArray);
-
-			/* DUNGEON_CLASS_WEIGHTS */
-			DUNGEON_CLASS_WEIGHTS = gson.fromJson(higherDepth(CONSTANTS, "DUNGEON_CLASS_WEIGHTS"), mapStringDouble);
-
-			/* DUNGEON_WEIGHTS */
-			DUNGEON_WEIGHTS = gson.fromJson(higherDepth(CONSTANTS, "DUNGEON_WEIGHTS"), mapStringDouble);
-
 			/* DUNGEON_EMOJI_MAP */
 			DUNGEON_EMOJI_MAP = gson.fromJson(higherDepth(CONSTANTS, "DUNGEON_EMOJI_MAP"), mapStringString);
 
@@ -140,24 +116,6 @@ public class Constants {
 
 			/* HARP_SONG_ID_TO_NAME */
 			HARP_SONG_ID_TO_NAME = gson.fromJson(higherDepth(CONSTANTS, "HARP_SONG_ID_TO_NAME"), mapStringString);
-
-			/* SLAYER_DEPRECATION_SCALING */
-			SLAYER_DEPRECATION_SCALING = higherDepth(CONSTANTS, "SLAYER_DEPRECATION_SCALING");
-
-			/* SKILL_RATIO_WEIGHT */
-			SKILL_RATIO_WEIGHT = higherDepth(CONSTANTS, "SKILL_RATIO_WEIGHT");
-
-			/* SKILL_FACTORS */
-			SKILL_FACTORS = higherDepth(CONSTANTS, "SKILL_FACTORS");
-
-			/* SKILL_OVERFLOW_MULTIPLIERS */
-			SKILL_OVERFLOW_MULTIPLIERS = higherDepth(CONSTANTS, "SKILL_OVERFLOW_MULTIPLIERS");
-
-			/* DUNGEON_COMPLETION_WORTH */
-			DUNGEON_COMPLETION_WORTH = higherDepth(CONSTANTS, "DUNGEON_COMPLETION_WORTH").getAsJsonObject();
-
-			/* DUNGEON_COMPLETION_BUFFS */
-			DUNGEON_COMPLETION_BUFFS = higherDepth(CONSTANTS, "DUNGEON_COMPLETION_BUFFS").getAsJsonObject();
 
 			/* HOTM_PERK_ID_TO_NAME */
 			HOTM_PERK_ID_TO_NAME = gson.fromJson(higherDepth(CONSTANTS, "HOTM_PERK_ID_TO_NAME"), mapStringString);
