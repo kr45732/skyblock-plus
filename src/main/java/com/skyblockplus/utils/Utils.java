@@ -120,7 +120,7 @@ public class Utils {
 	public static final ExecutorService executor = new ExceptionExecutor(
 		10,
 		Integer.MAX_VALUE,
-		20L,
+		15L,
 		TimeUnit.SECONDS,
 		new SynchronousQueue<>()
 	);
@@ -604,7 +604,7 @@ public class Utils {
 	}
 
 	public static CompletableFuture<JsonElement> asyncGetJson(String url) {
-		return asyncGet(url).thenApplyAsync(r -> JsonParser.parseReader(new InputStreamReader(r.body())));
+		return asyncGet(url).thenApplyAsync(r -> JsonParser.parseReader(new InputStreamReader(r.body())), executor);
 	}
 
 	public static String getSkyCryptData(String dataUrl) {

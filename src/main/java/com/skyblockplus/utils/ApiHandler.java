@@ -259,7 +259,7 @@ public class ApiHandler {
 				asyncGetJson(
 					(useAlternativeApi ? "https://playerdb.co/api/player/minecraft/" : "https://api.ashcon.app/mojang/v2/user/") + uuid
 				)
-					.thenApply(uuidToUsernameJson -> {
+					.thenApplyAsync(uuidToUsernameJson -> {
 						try {
 							String username = Utils
 								.higherDepth(uuidToUsernameJson, (useAlternativeApi ? "data.player." : "") + "username")
@@ -268,7 +268,7 @@ public class ApiHandler {
 							return username;
 						} catch (Exception ignored) {}
 						return null;
-					});
+					}, executor);
 		}
 
 		return future;
@@ -598,9 +598,9 @@ public class ApiHandler {
 				.limit(60)
 				.forEach(o ->
 					asyncUuidToUsername(o.uuid())
-						.thenApply(username ->
+						.thenApplyAsync(username ->
 							username != null &&
-							database.insertLinkedAccount(new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username))
+							database.insertLinkedAccount(new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username)), executor
 						)
 				);
 		} catch (Exception e) {

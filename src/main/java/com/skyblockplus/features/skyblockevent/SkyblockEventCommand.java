@@ -175,7 +175,7 @@ public class SkyblockEventCommand extends Command {
 
 			futuresList.add(
 				asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey != null ? hypixelKey : HYPIXEL_API_KEY)
-					.thenApply(guildMemberProfileJsonResponse -> {
+					.thenApplyAsync(guildMemberProfileJsonResponse -> {
 						Player guildMemberPlayer = new Player(
 							guildMemberUuid,
 							usernameToUuid(guildMemberUuid).username(),
@@ -265,7 +265,7 @@ public class SkyblockEventCommand extends Command {
 							}
 						}
 						return null;
-					})
+					}, executor)
 			);
 		}
 
