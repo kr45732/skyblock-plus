@@ -175,97 +175,100 @@ public class SkyblockEventCommand extends Command {
 
 			futuresList.add(
 				asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey != null ? hypixelKey : HYPIXEL_API_KEY)
-					.thenApplyAsync(guildMemberProfileJsonResponse -> {
-						Player guildMemberPlayer = new Player(
-							guildMemberUuid,
-							usernameToUuid(guildMemberUuid).username(),
-							guildMemberProfile,
-							guildMemberProfileJsonResponse,
-							false
-						);
+					.thenApplyAsync(
+						guildMemberProfileJsonResponse -> {
+							Player guildMemberPlayer = new Player(
+								guildMemberUuid,
+								usernameToUuid(guildMemberUuid).username(),
+								guildMemberProfile,
+								guildMemberProfileJsonResponse,
+								false
+							);
 
-						if (guildMemberPlayer.isValid()) {
-							players.add(guildMemberPlayer);
+							if (guildMemberPlayer.isValid()) {
+								players.add(guildMemberPlayer);
 
-							switch (eventType) {
-								case "slayer" -> {
-									return new EventMember(
-										guildMemberPlayer.getUsername(),
-										guildMemberUuid,
-										"" +
-										(guildMemberPlayer.getTotalSlayer() - higherDepth(guildMember, "startingAmount").getAsDouble()),
-										higherDepth(guildMember, "profileName").getAsString()
-									);
-								}
-								case "catacombs" -> {
-									return new EventMember(
-										guildMemberPlayer.getUsername(),
-										guildMemberUuid,
-										"" +
-										(
-											guildMemberPlayer.getCatacombs().totalExp() -
-											higherDepth(guildMember, "startingAmount").getAsDouble()
-										),
-										higherDepth(guildMember, "profileName").getAsString()
-									);
-								}
-								case "weight" -> {
-									return new EventMember(
-										guildMemberPlayer.getUsername(),
-										guildMemberUuid,
-										"" + (guildMemberPlayer.getWeight() - higherDepth(guildMember, "startingAmount").getAsDouble()),
-										higherDepth(guildMember, "profileName").getAsString()
-									);
-								}
-								default -> {
-									if (eventType.startsWith("collection.")) {
+								switch (eventType) {
+									case "slayer" -> {
+										return new EventMember(
+											guildMemberPlayer.getUsername(),
+											guildMemberUuid,
+											"" +
+											(guildMemberPlayer.getTotalSlayer() - higherDepth(guildMember, "startingAmount").getAsDouble()),
+											higherDepth(guildMember, "profileName").getAsString()
+										);
+									}
+									case "catacombs" -> {
 										return new EventMember(
 											guildMemberPlayer.getUsername(),
 											guildMemberUuid,
 											"" +
 											(
-												(
-													higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0]) != null
-														? higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0])
-															.getAsDouble()
-														: 0
-												) -
+												guildMemberPlayer.getCatacombs().totalExp() -
 												higherDepth(guildMember, "startingAmount").getAsDouble()
 											),
 											higherDepth(guildMember, "profileName").getAsString()
 										);
-									} else if (eventType.startsWith("skills.")) {
-										String skillType = eventType.split("skills.")[1];
-										double skillXp = skillType.equals("all")
-											? guildMemberPlayer.getTotalSkillsXp()
-											: guildMemberPlayer.getSkillXp(skillType);
-
-										if (skillXp != -1) {
+									}
+									case "weight" -> {
+										return new EventMember(
+											guildMemberPlayer.getUsername(),
+											guildMemberUuid,
+											"" + (guildMemberPlayer.getWeight() - higherDepth(guildMember, "startingAmount").getAsDouble()),
+											higherDepth(guildMember, "profileName").getAsString()
+										);
+									}
+									default -> {
+										if (eventType.startsWith("collection.")) {
 											return new EventMember(
 												guildMemberPlayer.getUsername(),
 												guildMemberUuid,
-												"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
+												"" +
+												(
+													(
+														higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0]) != null
+															? higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0])
+																.getAsDouble()
+															: 0
+													) -
+													higherDepth(guildMember, "startingAmount").getAsDouble()
+												),
 												higherDepth(guildMember, "profileName").getAsString()
 											);
-										}
-									} else if (eventType.startsWith("weight.")) {
-										String weightTypes = eventType.split("weight.")[1];
-										double skillXp = guildMemberPlayer.getWeight(weightTypes.split("-"));
+										} else if (eventType.startsWith("skills.")) {
+											String skillType = eventType.split("skills.")[1];
+											double skillXp = skillType.equals("all")
+												? guildMemberPlayer.getTotalSkillsXp()
+												: guildMemberPlayer.getSkillXp(skillType);
 
-										if (skillXp != -1) {
-											return new EventMember(
-												guildMemberPlayer.getUsername(),
-												guildMemberUuid,
-												"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
-												higherDepth(guildMember, "profileName").getAsString()
-											);
+											if (skillXp != -1) {
+												return new EventMember(
+													guildMemberPlayer.getUsername(),
+													guildMemberUuid,
+													"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
+													higherDepth(guildMember, "profileName").getAsString()
+												);
+											}
+										} else if (eventType.startsWith("weight.")) {
+											String weightTypes = eventType.split("weight.")[1];
+											double skillXp = guildMemberPlayer.getWeight(weightTypes.split("-"));
+
+											if (skillXp != -1) {
+												return new EventMember(
+													guildMemberPlayer.getUsername(),
+													guildMemberUuid,
+													"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
+													higherDepth(guildMember, "profileName").getAsString()
+												);
+											}
 										}
 									}
 								}
 							}
-						}
-						return null;
-					}, executor)
+							return null;
+						},
+						executor
+					)
 			);
 		}
 

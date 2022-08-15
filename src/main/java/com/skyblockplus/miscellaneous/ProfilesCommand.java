@@ -66,14 +66,19 @@ public class ProfilesCommand extends Command {
 			for (String uuid : uuids) {
 				profileUsernameFutureList.add(
 					asyncUuidToUsername(uuid)
-						.thenApplyAsync(playerUsername -> {
-							String lastLogin =
-								"<t:" +
-								Instant.ofEpochMilli(higherDepth(profile, "members." + uuid + ".last_save").getAsLong()).getEpochSecond() +
-								">";
+						.thenApplyAsync(
+							playerUsername -> {
+								String lastLogin =
+									"<t:" +
+									Instant
+										.ofEpochMilli(higherDepth(profile, "members." + uuid + ".last_save").getAsLong())
+										.getEpochSecond() +
+									">";
 
-							return "\n• " + fixUsername(playerUsername) + " played on " + lastLogin;
-						}, executor)
+								return "\n• " + fixUsername(playerUsername) + " played on " + lastLogin;
+							},
+							executor
+						)
 				);
 			}
 		}

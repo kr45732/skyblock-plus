@@ -58,17 +58,20 @@ public class GuildCommand extends Command {
 			int finalI = i;
 			futures.add(
 				asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString())
-					.thenApplyAsync(currentUsername -> {
-						JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
-						List<String> keys = getJsonKeys(expHistory);
-						int totalPlayerExp = 0;
+					.thenApplyAsync(
+						currentUsername -> {
+							JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
+							List<String> keys = getJsonKeys(expHistory);
+							int totalPlayerExp = 0;
 
-						for (int j = 0; j < days; j++) {
-							String value = keys.get(j);
-							totalPlayerExp += higherDepth(expHistory, value, 0);
-						}
-						return currentUsername + "=:=" + totalPlayerExp;
-					}, executor)
+							for (int j = 0; j < days; j++) {
+								String value = keys.get(j);
+								totalPlayerExp += higherDepth(expHistory, value, 0);
+							}
+							return currentUsername + "=:=" + totalPlayerExp;
+						},
+						executor
+					)
 			);
 		}
 

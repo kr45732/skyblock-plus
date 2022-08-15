@@ -259,16 +259,19 @@ public class ApiHandler {
 				asyncGetJson(
 					(useAlternativeApi ? "https://playerdb.co/api/player/minecraft/" : "https://api.ashcon.app/mojang/v2/user/") + uuid
 				)
-					.thenApplyAsync(uuidToUsernameJson -> {
-						try {
-							String username = Utils
-								.higherDepth(uuidToUsernameJson, (useAlternativeApi ? "data.player." : "") + "username")
-								.getAsString();
-							uuidToUsernameCache.put(uuid, username);
-							return username;
-						} catch (Exception ignored) {}
-						return null;
-					}, executor);
+					.thenApplyAsync(
+						uuidToUsernameJson -> {
+							try {
+								String username = Utils
+									.higherDepth(uuidToUsernameJson, (useAlternativeApi ? "data.player." : "") + "username")
+									.getAsString();
+								uuidToUsernameCache.put(uuid, username);
+								return username;
+							} catch (Exception ignored) {}
+							return null;
+						},
+						executor
+					);
 		}
 
 		return future;
@@ -346,8 +349,8 @@ public class ApiHandler {
 								} catch (Exception ignored) {}
 
 								JsonArray profiles = processSkyblockProfilesArray(
-										higherDepth(JsonParser.parseReader(new InputStreamReader(profilesResponse.body())), "profiles")
-												.getAsJsonArray()
+									higherDepth(JsonParser.parseReader(new InputStreamReader(profilesResponse.body())), "profiles")
+										.getAsJsonArray()
 								);
 
 								// Json parsing probably takes more memory than the HTTP request
@@ -598,9 +601,13 @@ public class ApiHandler {
 				.limit(60)
 				.forEach(o ->
 					asyncUuidToUsername(o.uuid())
-						.thenApplyAsync(username ->
-							username != null &&
-							database.insertLinkedAccount(new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username)), executor
+						.thenApplyAsync(
+							username ->
+								username != null &&
+								database.insertLinkedAccount(
+									new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username)
+								),
+							executor
 						)
 				);
 		} catch (Exception e) {
