@@ -157,6 +157,7 @@ public class Utils {
 	private static JsonObject enchantsJson;
 	private static JsonObject petNumsJson;
 	private static JsonObject petsJson;
+	private static JsonObject parentsJson;
 	private static JsonObject reforgeStonesJson;
 	private static JsonObject bitsJson;
 	private static JsonObject miscJson;
@@ -419,6 +420,13 @@ public class Utils {
 			petsJson = getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/pets.json");
 		}
 		return petsJson;
+	}
+
+	public static JsonObject getParentsJson() {
+		if (parentsJson == null) {
+			parentsJson = getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/parents.json");
+		}
+		return parentsJson;
 	}
 
 	public static JsonObject getPetNumsJson() {
