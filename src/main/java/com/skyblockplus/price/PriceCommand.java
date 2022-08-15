@@ -18,6 +18,7 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
@@ -42,6 +43,10 @@ public class PriceCommand extends Command {
 	}
 
 	public static EmbedBuilder queryAuctions(String query, AuctionType auctionType) {
+		if (currentMayor.equals("Derpy")) {
+			return invalidEmbed("The price command does not work during Derpy");
+		}
+
 		JsonArray lowestBinArr = null;
 		for (String enchantId : ENCHANT_NAMES) {
 			if (query.replace(" ", "_").toUpperCase().contains(enchantId)) {

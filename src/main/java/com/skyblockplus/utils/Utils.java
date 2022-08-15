@@ -120,7 +120,7 @@ public class Utils {
 	public static final ExecutorService executor = new ExceptionExecutor(
 		10,
 		Integer.MAX_VALUE,
-		30L,
+		20L,
 		TimeUnit.SECONDS,
 		new SynchronousQueue<>()
 	);

@@ -183,7 +183,7 @@ public class Main {
 		if (isMainBot()) {
 			scheduler.scheduleWithFixedDelay(
 				() -> {
-					if (Runtime.getRuntime().totalMemory() > 1200000000) {
+					if (Runtime.getRuntime().totalMemory() > 1250000000) {
 						System.gc();
 					}
 				},

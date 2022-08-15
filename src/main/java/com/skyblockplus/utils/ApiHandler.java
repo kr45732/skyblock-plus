@@ -334,10 +334,6 @@ public class ApiHandler {
 					.thenApplyAsync(
 						profilesResponse -> {
 							try {
-								if (Runtime.getRuntime().totalMemory() > 1000000000) {
-									System.gc();
-								}
-
 								try {
 									keyCooldownMap
 										.get(hypixelApiKey)
@@ -349,12 +345,17 @@ public class ApiHandler {
 										.set(Integer.parseInt(profilesResponse.headers().firstValue("RateLimit-Reset").get()));
 								} catch (Exception ignored) {}
 
-								JsonArray profileArray = processSkyblockProfilesArray(
-									higherDepth(JsonParser.parseReader(new InputStreamReader(profilesResponse.body())), "profiles")
-										.getAsJsonArray()
+								JsonArray profiles = processSkyblockProfilesArray(
+										higherDepth(JsonParser.parseReader(new InputStreamReader(profilesResponse.body())), "profiles")
+												.getAsJsonArray()
 								);
 
-								return profileArray;
+								// Json parsing probably takes more memory than the HTTP request
+								if (Runtime.getRuntime().totalMemory() > 1250000000) {
+									System.gc();
+								}
+
+								return profiles;
 							} catch (Exception ignored) {}
 							return null;
 						},
