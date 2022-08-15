@@ -184,25 +184,25 @@ public class LeaderboardDatabase {
 					for (int i = 0; i < typesSubList.size(); i++) {
 						String type = typesSubList.get(i);
 						statement.setDouble(
-								i + 4 + offset,
-								player.getHighestAmount(
-										type +
-												switch (type) {
-													case "catacombs",
-															"alchemy",
-															"combat",
-															"fishing",
-															"farming",
-															"foraging",
-															"carpentry",
-															"mining",
-															"taming",
-															"social",
-															"enchanting" -> "_xp";
-													default -> "";
-												},
-										gamemode
-								)
+							i + 4 + offset,
+							player.getHighestAmount(
+								type +
+								switch (type) {
+									case "catacombs",
+										"alchemy",
+										"combat",
+										"fishing",
+										"farming",
+										"foraging",
+										"carpentry",
+										"mining",
+										"taming",
+										"social",
+										"enchanting" -> "_xp";
+									default -> "";
+								},
+								gamemode
+							)
 						);
 					}
 				}

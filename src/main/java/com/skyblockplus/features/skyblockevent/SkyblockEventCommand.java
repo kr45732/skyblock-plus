@@ -180,7 +180,8 @@ public class SkyblockEventCommand extends Command {
 							guildMemberUuid,
 							usernameToUuid(guildMemberUuid).username(),
 							guildMemberProfile,
-							guildMemberProfileJsonResponse, false
+							guildMemberProfileJsonResponse,
+							false
 						);
 
 						if (guildMemberPlayer.isValid()) {
@@ -262,7 +263,6 @@ public class SkyblockEventCommand extends Command {
 									}
 								}
 							}
-
 						}
 						return null;
 					})

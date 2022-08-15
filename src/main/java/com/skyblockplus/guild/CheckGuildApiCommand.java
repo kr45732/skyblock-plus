@@ -97,7 +97,8 @@ public class CheckGuildApiCommand extends Command {
 							Player player = new Player(
 								guildMemberUuid,
 								usernameToUuid(guildMemberUuid).username(),
-								guildMemberProfileJsonResponse, false
+								guildMemberProfileJsonResponse,
+								false
 							);
 
 							if (player.isValid()) {

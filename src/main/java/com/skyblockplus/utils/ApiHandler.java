@@ -296,8 +296,8 @@ public class ApiHandler {
 
 		try {
 			JsonElement profilesJson = getJson(
-					"https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid,
-					hypixelApiKey
+				"https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid,
+				hypixelApiKey
 			);
 
 			try {
@@ -314,8 +314,7 @@ public class ApiHandler {
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(profilesJson, "cause").getAsString());
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		return new HypixelResponse();
 	}
