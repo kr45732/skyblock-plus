@@ -76,7 +76,10 @@ import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -110,16 +113,36 @@ public class Utils {
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static final HttpClient asyncHttpClient = HttpClient
 		.newBuilder()
-		.executor(new ExceptionExecutor(20, 20, new LinkedBlockingQueue<>(), true))
+		.executor(new ExceptionExecutor(20, 20, 45L, TimeUnit.SECONDS, new LinkedBlockingQueue<>()).setAllowCoreThreadTimeOut(true))
 		.build();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
-	public static final ExecutorService executor = new ExceptionExecutor(10, Integer.MAX_VALUE);
+	public static final ExecutorService executor = new ExceptionExecutor(
+		10,
+		Integer.MAX_VALUE,
+		30L,
+		TimeUnit.SECONDS,
+		new SynchronousQueue<>()
+	);
 	public static final ScheduledExecutorService scheduler = new ExceptionScheduler(7);
 	public static final ConcurrentHashMap<String, HypixelKeyRecord> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final List<String> hypixelGuildQueue = Collections.synchronizedList(new ArrayList<>());
-	public static final ExceptionExecutor playerRequestExecutor = new ExceptionExecutor(3, 3, new LinkedBlockingQueue<>(), true);
-	public static final ExceptionExecutor leaderboardDbInsertQueue = new ExceptionExecutor(30, 30, new LinkedBlockingQueue<>(), true);
+	public static final ExceptionExecutor playerRequestExecutor = new ExceptionExecutor(
+		3,
+		3,
+		45L,
+		TimeUnit.SECONDS,
+		new LinkedBlockingQueue<>()
+	)
+		.setAllowCoreThreadTimeOut(true);
+	public static final ExceptionExecutor leaderboardDbInsertQueue = new ExceptionExecutor(
+		30,
+		30,
+		45L,
+		TimeUnit.SECONDS,
+		new LinkedBlockingQueue<>()
+	)
+		.setAllowCoreThreadTimeOut(true);
 	public static final Gson gson = new Gson();
 	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
 	public static final Consumer<Object> ignore = ignored -> {};

@@ -18,7 +18,8 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Utils.*;
 

@@ -18,9 +18,7 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.ignore;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Utils;

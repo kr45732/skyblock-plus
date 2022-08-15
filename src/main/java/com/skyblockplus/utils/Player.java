@@ -18,7 +18,8 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.miscellaneous.BestiaryCommand.*;
+import static com.skyblockplus.miscellaneous.BestiaryCommand.bosses;
+import static com.skyblockplus.miscellaneous.BestiaryCommand.locations;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;

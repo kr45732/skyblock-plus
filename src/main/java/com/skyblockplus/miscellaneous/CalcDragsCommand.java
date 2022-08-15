@@ -29,7 +29,6 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
 

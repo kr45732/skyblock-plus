@@ -19,7 +19,7 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.nameToId;
 
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.PaginatorEvent;

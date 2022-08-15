@@ -19,7 +19,6 @@
 package com.skyblockplus.utils.database;
 
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Player.STATS_LIST;
 import static com.skyblockplus.utils.Utils.*;
@@ -50,6 +49,7 @@ import org.slf4j.LoggerFactory;
 public class LeaderboardDatabase {
 
 	private static final Pattern uuidDashRegex = Pattern.compile("(.{8})(.{4})(.{4})(.{4})(.{12})");
+	private static final int MAX_INSERT_COUNT = 75;
 	public static final List<String> types = new ArrayList<>(
 		List.of(
 			"username",
@@ -112,6 +112,7 @@ public class LeaderboardDatabase {
 	public LeaderboardDatabase() {
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(LEADERBOARD_DB_URL);
+		config.setMaximumPoolSize(30);
 		dataSource = new HikariDataSource(config);
 
 		if (isMainBot()) {
@@ -129,12 +130,10 @@ public class LeaderboardDatabase {
 
 	public void insertIntoLeaderboard(Player player, boolean makeCopy) {
 		if (player.isValid()) {
-			leaderboardDbInsertQueue.submit(() -> {
-				List<Player> players = List.of(makeCopy ? player.copy() : player);
-				for (Player.Gamemode gamemode : leaderboardGamemodes) {
-					insertIntoLeaderboard(players, gamemode);
-				}
-			});
+			List<Player> players = List.of(makeCopy ? player.copy() : player);
+			for (Player.Gamemode gamemode : leaderboardGamemodes) {
+				leaderboardDbInsertQueue.submit(() -> insertIntoLeaderboard(players, gamemode));
+			}
 		}
 	}
 
@@ -144,19 +143,27 @@ public class LeaderboardDatabase {
 	public void insertIntoLeaderboard(List<Player> players) {
 		players.removeIf(p -> !p.isValid());
 		if (!players.isEmpty()) {
-			leaderboardDbInsertQueue.submit(() -> {
+			for (int i = 0; i < players.size(); i += MAX_INSERT_COUNT) {
 				for (Player.Gamemode gamemode : leaderboardGamemodes) {
-					insertIntoLeaderboard(players, gamemode);
+					int finalI = i;
+					leaderboardDbInsertQueue.submit(() -> insertIntoLeaderboard(players, finalI, gamemode));
 				}
-			});
+			}
 		}
 	}
 
 	private void insertIntoLeaderboard(List<Player> players, Player.Gamemode gamemode) {
+		insertIntoLeaderboard(players, 0, gamemode);
+	}
+
+	private void insertIntoLeaderboard(List<Player> players, int startingIndex, Player.Gamemode gamemode) {
 		try {
 			String paramStr = "?,".repeat(types.size() + 1); // Add 1 for last_updated
 			paramStr = paramStr.substring(0, paramStr.length() - 1);
-			String multiParamsStr = ("(" + paramStr + "),").repeat(players.size());
+			String multiParamsStr =
+				("(" + paramStr + "),").repeat(
+						startingIndex + MAX_INSERT_COUNT <= players.size() ? MAX_INSERT_COUNT : (players.size() - startingIndex)
+					);
 			multiParamsStr = multiParamsStr.substring(0, multiParamsStr.length() - 1);
 
 			try (
@@ -175,9 +182,11 @@ public class LeaderboardDatabase {
 						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
 				)
 			) {
-				for (int j = 0; j < players.size(); j++) {
+				// J is for the list while K is for the params offset
+				for (int j = startingIndex, k = 0; j < Math.min(startingIndex + MAX_INSERT_COUNT, players.size()); j++, k++) {
 					Player player = players.get(j);
-					int offset = j * (3 + typesSubList.size());
+					int offset = k * (3 + typesSubList.size());
+
 					statement.setObject(1 + offset, stringToUuid(player.getUuid()));
 					statement.setString(2 + offset, player.getUsername());
 					statement.setLong(3 + offset, Instant.now().toEpochMilli());
@@ -519,6 +528,7 @@ public class LeaderboardDatabase {
 		try {
 			int count = 0;
 			long start = System.currentTimeMillis();
+			List<Player> players = new ArrayList<>();
 
 			if (userCount != -1) {
 				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/users.json")
@@ -527,7 +537,7 @@ public class LeaderboardDatabase {
 					log.info("Finished updating all users: " + userCount);
 					userCount = -1;
 				} else {
-					for (count = 0; count <= 90 && userCount < members.size() && System.currentTimeMillis() - start < 57000; userCount++) {
+					for (count = 0; count <= 90 && userCount < members.size() && System.currentTimeMillis() - start < 50000; userCount++) {
 						UsernameUuidStruct usernameUuidStruct = uuidToUsername(members.get(userCount).getAsString());
 						if (usernameUuidStruct.isValid()) {
 							count++;
@@ -538,15 +548,16 @@ public class LeaderboardDatabase {
 								false
 							);
 							if (profileResponse.isValid()) {
-								insertIntoLeaderboard(
-									new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), false),
-									false
+								players.add(
+									new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), false)
 								);
 							}
 						}
 					}
 					System.out.println("Finished up to user count: " + userCount);
 				}
+
+				insertIntoLeaderboard(players);
 				return;
 			}
 
@@ -582,14 +593,15 @@ public class LeaderboardDatabase {
 						false
 					);
 					if (profileResponse.isValid()) {
-						insertIntoLeaderboard(
-							new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), false),
-							false
+						players.add(
+							new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), false)
 						);
 					}
 				}
 			}
-			//			System.out.println("Updated " + count + " users in " + (System.currentTimeMillis() - start) + "ms");
+
+			insertIntoLeaderboard(players);
+			//	System.out.println("Updated " + count + " users in " + (System.currentTimeMillis() - start) + "ms");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

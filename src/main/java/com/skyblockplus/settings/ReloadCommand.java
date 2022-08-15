@@ -18,7 +18,8 @@
 
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.features.listeners.MainListener.*;
+import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
+import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.defaultPerms;
 

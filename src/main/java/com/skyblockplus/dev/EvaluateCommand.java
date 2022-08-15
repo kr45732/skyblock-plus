@@ -19,9 +19,7 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.defaultPerms;
-import static com.skyblockplus.utils.Utils.makeHastePost;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

@@ -19,7 +19,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.*;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

@@ -18,12 +18,15 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.LINKED_USER_URL;
 
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 

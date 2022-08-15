@@ -18,12 +18,14 @@
 
 package com.skyblockplus.utils.rendering;
 
-import java.awt.image.*;
-import java.io.*;
+import java.awt.image.RenderedImage;
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Iterator;
 import javax.imageio.*;
-import javax.imageio.metadata.*;
-import javax.imageio.stream.*;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
+import javax.imageio.stream.ImageOutputStream;
 
 public class GifWriter implements Closeable {
 

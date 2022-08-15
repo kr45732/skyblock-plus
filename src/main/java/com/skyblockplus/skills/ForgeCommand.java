@@ -18,7 +18,7 @@
 
 package com.skyblockplus.skills;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.FORGE_TIMES;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -28,7 +28,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.time.Instant;
 import java.util.Map;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
 

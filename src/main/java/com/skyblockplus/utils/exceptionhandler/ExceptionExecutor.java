@@ -24,13 +24,13 @@ import java.util.concurrent.*;
 
 public class ExceptionExecutor extends ThreadPoolExecutor {
 
-	public ExceptionExecutor(int corePoolSize, int maximumPoolSize) {
-		super(corePoolSize, maximumPoolSize, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
+	public ExceptionExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
 	}
 
-	public ExceptionExecutor(int corePoolSize, int maximumPoolSize, BlockingQueue<Runnable> workQueue, boolean allowCoreThreadTimeOut) {
-		super(corePoolSize, maximumPoolSize, 60L, TimeUnit.SECONDS, workQueue);
-		super.allowCoreThreadTimeOut(allowCoreThreadTimeOut);
+	public ExceptionExecutor setAllowCoreThreadTimeOut(boolean value) {
+		super.allowCoreThreadTimeOut(value);
+		return this;
 	}
 
 	@Override
