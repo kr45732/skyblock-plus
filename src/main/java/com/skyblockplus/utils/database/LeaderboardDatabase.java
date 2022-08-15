@@ -130,10 +130,12 @@ public class LeaderboardDatabase {
 
 	public void insertIntoLeaderboard(Player player, boolean makeCopy) {
 		if (player.isValid()) {
-			List<Player> players = List.of(makeCopy ? player.copy() : player);
-			for (Player.Gamemode gamemode : leaderboardGamemodes) {
-				leaderboardDbInsertQueue.submit(() -> insertIntoLeaderboard(players, gamemode));
-			}
+			leaderboardDbInsertQueue.submit(() -> {
+				List<Player> players = List.of(makeCopy ? player.copy() : player);
+				for (Player.Gamemode gamemode : leaderboardGamemodes) {
+					insertIntoLeaderboard(players, gamemode);
+				}
+			});
 		}
 	}
 
@@ -144,10 +146,12 @@ public class LeaderboardDatabase {
 		players.removeIf(p -> !p.isValid());
 		if (!players.isEmpty()) {
 			for (int i = 0; i < players.size(); i += MAX_INSERT_COUNT) {
-				for (Player.Gamemode gamemode : leaderboardGamemodes) {
-					int finalI = i;
-					leaderboardDbInsertQueue.submit(() -> insertIntoLeaderboard(players, finalI, gamemode));
-				}
+				int finalI = i;
+				leaderboardDbInsertQueue.submit(() -> {
+					for (Player.Gamemode gamemode : leaderboardGamemodes) {
+						insertIntoLeaderboard(players, finalI, gamemode);
+					}
+				});
 			}
 		}
 	}
