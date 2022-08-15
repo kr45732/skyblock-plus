@@ -424,7 +424,8 @@ public class Utils {
 
 	public static JsonObject getParentsJson() {
 		if (parentsJson == null) {
-			parentsJson = getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/parents.json");
+			parentsJson =
+				getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/parents.json");
 		}
 		return parentsJson;
 	}

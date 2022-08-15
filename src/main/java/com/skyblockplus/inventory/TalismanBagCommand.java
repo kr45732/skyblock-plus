@@ -31,7 +31,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.InvItem;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -177,7 +176,12 @@ public class TalismanBagCommand extends Command {
 			Map<Integer, InvItem> accessoryBagMap = player.getTalismanBagMap();
 			List<InvItem> accessoryBag = accessoryBagMap == null
 				? new ArrayList<>()
-				: accessoryBagMap.values().stream().filter(Objects::nonNull).sorted(Comparator.comparingInt(o -> Integer.parseInt(RARITY_TO_NUMBER_MAP.get(o.getRarity()).replace(";", "")))).collect(Collectors.toCollection(ArrayList::new));
+				: accessoryBagMap
+					.values()
+					.stream()
+					.filter(Objects::nonNull)
+					.sorted(Comparator.comparingInt(o -> Integer.parseInt(RARITY_TO_NUMBER_MAP.get(o.getRarity()).replace(";", ""))))
+					.collect(Collectors.toCollection(ArrayList::new));
 			// Don't reverse the rarity because we are iterating reverse order
 			Set<String> ignoredTalismans = new HashSet<>();
 			for (int i = accessoryBag.size() - 1; i >= 0; i--) {
@@ -211,13 +215,13 @@ public class TalismanBagCommand extends Command {
 					.append(" magic power)");
 				magicPower += power;
 			}
-			int hegemony = rarityToMagicPower.getOrDefault(accessoryBag.stream().filter(a -> a.getId().equals("HEGEMONY_ARTIFACT")).map(a -> a.getRarity()).findFirst().orElse(""), 0);
+			int hegemony = rarityToMagicPower.getOrDefault(
+				accessoryBag.stream().filter(a -> a.getId().equals("HEGEMONY_ARTIFACT")).map(a -> a.getRarity()).findFirst().orElse(""),
+				0
+			);
 			if (hegemony != 0) {
 				magicPower += hegemony;
-				accessoryStr
-						.append("\n• Hegemony Artifact: ")
-						.append(hegemony)
-						.append(" magic power");
+				accessoryStr.append("\n• Hegemony Artifact: ").append(hegemony).append(" magic power");
 			}
 			double scaling = Math.pow(29.97 * (Math.log(0.0019 * magicPower + 1)), 1.2);
 
