@@ -937,6 +937,13 @@ public class Player {
 	}
 
 	public Player(String username) {
+		this(username, true);
+	}
+
+	/**
+	 * @param updateLb insert into database if true
+	 */
+	public Player(String username, boolean updateLb) {
 		if (usernameToUuid(username)) {
 			return;
 		}
@@ -958,11 +965,13 @@ public class Player {
 		}
 
 		this.valid = true;
-		leaderboardDatabase.insertIntoLeaderboard(this);
+		if (updateLb) {
+			leaderboardDatabase.insertIntoLeaderboard(this);
+		}
 	}
 
 	/**
-	 * Meant to only be used for leaderboard command
+	 * Ignores profile cache and updates provided gamemode synchronously
 	 */
 	public Player(String username, Gamemode gamemode) {
 		if (usernameToUuid(username)) {
@@ -1016,10 +1025,13 @@ public class Player {
 	}
 
 	public Player(String uuid, String username, JsonElement profileArray) {
-		this(uuid, username, profileArray, false);
+		this(uuid, username, profileArray, true);
 	}
 
-	public Player(String uuid, String username, JsonElement profileArray, boolean isCopy) {
+	/**
+	 * @param updateLb insert into database if true
+	 */
+	public Player(String uuid, String username, JsonElement profileArray, boolean updateLb) {
 		this.uuid = uuid;
 		this.username = username;
 
@@ -1038,16 +1050,19 @@ public class Player {
 		}
 
 		this.valid = true;
-		if (!isCopy) {
+		if (updateLb) {
 			leaderboardDatabase.insertIntoLeaderboard(this);
 		}
 	}
 
 	public Player(String uuid, String username, String profileName, JsonElement profileArray) {
-		this(uuid, username, profileName, profileArray, false);
+		this(uuid, username, profileName, profileArray, true);
 	}
 
-	public Player(String uuid, String username, String profileName, JsonElement profileArray, boolean isCopy) {
+	/**
+	 * @param updateLb insert into database if true
+	 */
+	public Player(String uuid, String username, String profileName, JsonElement profileArray, boolean updateLb) {
 		this.uuid = uuid;
 		this.username = username;
 
@@ -1067,13 +1082,13 @@ public class Player {
 		}
 
 		this.valid = true;
-		if (!isCopy) {
+		if (updateLb) {
 			leaderboardDatabase.insertIntoLeaderboard(this);
 		}
 	}
 
 	public Player copy() {
-		return new Player(getUuid(), getUsername(), getProfileName(), getProfileArray(), true);
+		return new Player(getUuid(), getUsername(), getProfileName(), getProfileArray(), false);
 	}
 
 	/* Constructor helper methods */

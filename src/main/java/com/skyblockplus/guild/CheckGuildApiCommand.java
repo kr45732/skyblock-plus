@@ -78,6 +78,7 @@ public class CheckGuildApiCommand extends Command {
 
 		JsonArray guildMembers = guildResponse.get("members").getAsJsonArray();
 		List<CompletableFuture<String>> futuresList = new ArrayList<>();
+		List<Player> players = new ArrayList<>();
 
 		for (JsonElement guildMember : guildMembers) {
 			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
@@ -96,7 +97,7 @@ public class CheckGuildApiCommand extends Command {
 							Player player = new Player(
 								guildMemberUuid,
 								usernameToUuid(guildMemberUuid).username(),
-								guildMemberProfileJsonResponse
+								guildMemberProfileJsonResponse, false
 							);
 
 							if (player.isValid()) {
@@ -136,6 +137,8 @@ public class CheckGuildApiCommand extends Command {
 				e.printStackTrace();
 			}
 		}
+
+		leaderboardDatabase.insertIntoLeaderboard(players);
 
 		out.sort(Comparator.comparing(o -> !o.contains(client.getError())));
 		CustomPaginator.Builder paginator = event.getPaginator().setItemsPerPage(20);

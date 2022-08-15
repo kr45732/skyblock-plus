@@ -144,6 +144,7 @@ public class SkyblockEventCommand extends Command {
 	public static List<EventMember> getEventLeaderboardList(JsonElement runningSettings, String guildId) {
 		List<EventMember> guildMemberPlayersList = new ArrayList<>();
 		List<CompletableFuture<EventMember>> futuresList = new ArrayList<>();
+		List<Player> players = new ArrayList<>();
 		JsonArray membersArr = higherDepth(runningSettings, "membersList").getAsJsonArray();
 		String eventType = higherDepth(runningSettings, "eventType").getAsString();
 
@@ -179,10 +180,12 @@ public class SkyblockEventCommand extends Command {
 							guildMemberUuid,
 							usernameToUuid(guildMemberUuid).username(),
 							guildMemberProfile,
-							guildMemberProfileJsonResponse
+							guildMemberProfileJsonResponse, false
 						);
 
 						if (guildMemberPlayer.isValid()) {
+							players.add(guildMemberPlayer);
+
 							switch (eventType) {
 								case "slayer" -> {
 									return new EventMember(
@@ -259,6 +262,7 @@ public class SkyblockEventCommand extends Command {
 									}
 								}
 							}
+
 						}
 						return null;
 					})
@@ -275,6 +279,8 @@ public class SkyblockEventCommand extends Command {
 				e.printStackTrace();
 			}
 		}
+
+		leaderboardDatabase.insertIntoLeaderboard(players);
 
 		guildMemberPlayersList.sort(Comparator.comparingDouble(o1 -> -Double.parseDouble(o1.getStartingAmount())));
 

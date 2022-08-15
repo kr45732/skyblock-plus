@@ -296,8 +296,8 @@ public class ApiHandler {
 
 		try {
 			JsonElement profilesJson = getJson(
-				"https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid,
-				hypixelApiKey
+					"https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid,
+					hypixelApiKey
 			);
 
 			try {
@@ -314,16 +314,16 @@ public class ApiHandler {
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(profilesJson, "cause").getAsString());
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 
 		return new HypixelResponse();
 	}
 
+	/**
+	 * Does not cache the profiles json
+	 */
 	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
-		return asyncSkyblockProfilesFromUuid(uuid, hypixelApiKey, true);
-	}
-
-	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean cache) {
 		CompletableFuture<JsonElement> future = new CompletableFuture<>();
 
 		JsonElement cachedResponse = cacheDatabase.getCachedJson(uuid);
@@ -354,10 +354,6 @@ public class ApiHandler {
 									higherDepth(JsonParser.parseReader(new InputStreamReader(profilesResponse.body())), "profiles")
 										.getAsJsonArray()
 								);
-
-								if (cache) {
-									cacheDatabase.cacheJson(uuid, profileArray);
-								}
 
 								return profileArray;
 							} catch (Exception ignored) {}

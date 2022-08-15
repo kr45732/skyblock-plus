@@ -128,20 +128,36 @@ public class LeaderboardDatabase {
 	}
 
 	public void insertIntoLeaderboard(Player player, boolean makeCopy) {
-		leaderboardDbInsertQueue.submit(() -> {
-			if (player.isValid()) {
-				Player finalPlayer = makeCopy ? player.copy() : player;
+		if (player.isValid()) {
+			leaderboardDbInsertQueue.submit(() -> {
+				List<Player> players = List.of(makeCopy ? player.copy() : player);
 				for (Player.Gamemode gamemode : leaderboardGamemodes) {
-					insertIntoLeaderboard(finalPlayer, gamemode);
+					insertIntoLeaderboard(players, gamemode);
 				}
-			}
-		});
+			});
+		}
 	}
 
-	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
+	/**
+	 * Once called, these players should not be used again to access stats (does not copy)
+	 */
+	public void insertIntoLeaderboard(List<Player> players) {
+		players.removeIf(p -> !p.isValid());
+		if (!players.isEmpty()) {
+			leaderboardDbInsertQueue.submit(() -> {
+				for (Player.Gamemode gamemode : leaderboardGamemodes) {
+					insertIntoLeaderboard(players, gamemode);
+				}
+			});
+		}
+	}
+
+	private void insertIntoLeaderboard(List<Player> players, Player.Gamemode gamemode) {
 		try {
 			String paramStr = "?,".repeat(types.size() + 1); // Add 1 for last_updated
 			paramStr = paramStr.substring(0, paramStr.length() - 1);
+			String multiParamsStr = ("(" + paramStr + "),").repeat(players.size());
+			multiParamsStr = multiParamsStr.substring(0, multiParamsStr.length() - 1);
 
 			try (
 				Connection connection = getConnection();
@@ -150,41 +166,45 @@ public class LeaderboardDatabase {
 					gamemode.toCacheType() +
 					"(uuid,username,last_updated," +
 					String.join(",", typesSubList) +
-					") VALUES (" +
-					paramStr +
-					") ON CONFLICT (uuid) DO UPDATE SET " +
+					") VALUES " +
+					multiParamsStr +
+					" ON CONFLICT (uuid) DO UPDATE SET " +
 					typesSubList
 						.stream()
 						.map(t -> t + "=EXCLUDED." + t)
 						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
 				)
 			) {
-				statement.setObject(1, stringToUuid(player.getUuid()));
-				statement.setString(2, player.getUsername());
-				statement.setLong(3, Instant.now().toEpochMilli());
-				for (int i = 0; i < typesSubList.size(); i++) {
-					String type = typesSubList.get(i);
-					statement.setDouble(
-						i + 4,
-						player.getHighestAmount(
-							type +
-							switch (type) {
-								case "catacombs",
-									"alchemy",
-									"combat",
-									"fishing",
-									"farming",
-									"foraging",
-									"carpentry",
-									"mining",
-									"taming",
-									"social",
-									"enchanting" -> "_xp";
-								default -> "";
-							},
-							gamemode
-						)
-					);
+				for (int j = 0; j < players.size(); j++) {
+					Player player = players.get(j);
+					int offset = j * (3 + typesSubList.size());
+					statement.setObject(1 + offset, stringToUuid(player.getUuid()));
+					statement.setString(2 + offset, player.getUsername());
+					statement.setLong(3 + offset, Instant.now().toEpochMilli());
+					for (int i = 0; i < typesSubList.size(); i++) {
+						String type = typesSubList.get(i);
+						statement.setDouble(
+								i + 4 + offset,
+								player.getHighestAmount(
+										type +
+												switch (type) {
+													case "catacombs",
+															"alchemy",
+															"combat",
+															"fishing",
+															"farming",
+															"foraging",
+															"carpentry",
+															"mining",
+															"taming",
+															"social",
+															"enchanting" -> "_xp";
+													default -> "";
+												},
+										gamemode
+								)
+						);
+					}
 				}
 				statement.executeUpdate();
 			}
@@ -194,21 +214,19 @@ public class LeaderboardDatabase {
 	}
 
 	/**
-	 * Sync insert into requestedGamemode and async insert for other gamemodes (makes copy of player)
+	 * Sync insert into requestedGamemode and async insert for other gamemodes
 	 */
 	public void insertIntoLeaderboardSync(Player player, Player.Gamemode requestedGamemode) {
-		Player finalPlayer = player.copy();
-
-		if (player.isValid()) {
-			insertIntoLeaderboard(finalPlayer, requestedGamemode);
+		if (!player.isValid()) {
+			return;
 		}
 
+		List<Player> players = List.of(player);
+		insertIntoLeaderboard(players, requestedGamemode);
 		leaderboardDbInsertQueue.submit(() -> {
 			for (Player.Gamemode gamemode : leaderboardGamemodes) {
 				if (gamemode != requestedGamemode) {
-					if (player.isValid()) {
-						insertIntoLeaderboard(finalPlayer, gamemode);
-					}
+					insertIntoLeaderboard(players, gamemode);
 				}
 			}
 		});
@@ -391,6 +409,7 @@ public class LeaderboardDatabase {
 		}
 
 		if (!uuids.isEmpty()) {
+			List<Player> players = new ArrayList<>();
 			List<CompletableFuture<DataObject>> futuresList = new ArrayList<>();
 
 			if (hypixelKey != null) {
@@ -408,12 +427,14 @@ public class LeaderboardDatabase {
 					} catch (Exception ignored) {}
 
 					futuresList.add(
-						asyncSkyblockProfilesFromUuid(uuid, hypixelKey, false)
+						asyncSkyblockProfilesFromUuid(uuid, hypixelKey)
 							.thenApplyAsync(
-								guildMemberProfileJsonResponse -> {
-									Player player = new Player(uuid, usernameToUuid(uuid).username(), guildMemberProfileJsonResponse);
+								profilesJson -> {
+									Player player = new Player(uuid, usernameToUuid(uuid).username(), profilesJson, false);
 
 									if (player.isValid()) {
+										players.add(player);
+
 										DataObject playerObj = DataObject.empty().put("username", player.getUsername()).put("uuid", uuid);
 										for (String lbType : lbTypes) {
 											playerObj.put(lbType, player.getHighestAmount(lbType, mode));
@@ -439,8 +460,10 @@ public class LeaderboardDatabase {
 				for (String uuid : uuids) {
 					CompletableFuture.supplyAsync(
 						() -> {
-							Player player = new Player(uuid);
+							Player player = new Player(uuid, false);
 							if (player.isValid()) {
+								players.add(player);
+
 								DataObject playerObj = DataObject.empty().put("username", player.getUsername()).put("uuid", uuid);
 								for (String lbType : lbTypes) {
 									playerObj.put(lbType, player.getHighestAmount(lbType, mode));
@@ -464,6 +487,8 @@ public class LeaderboardDatabase {
 					e.printStackTrace();
 				}
 			}
+
+			insertIntoLeaderboard(players);
 		}
 
 		return out;
@@ -514,7 +539,7 @@ public class LeaderboardDatabase {
 							);
 							if (profileResponse.isValid()) {
 								insertIntoLeaderboard(
-									new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), true),
+									new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), false),
 									false
 								);
 							}
@@ -558,7 +583,7 @@ public class LeaderboardDatabase {
 					);
 					if (profileResponse.isValid()) {
 						insertIntoLeaderboard(
-							new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), true),
+							new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), false),
 							false
 						);
 					}
