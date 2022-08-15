@@ -110,29 +110,29 @@ public class Utils {
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static final HttpClient asyncHttpClient = HttpClient
 		.newBuilder()
-		.executor(new ExceptionExecutor(0, 20, new LinkedBlockingQueue<>()))
+		.executor(new ExceptionExecutor(20, 20, new LinkedBlockingQueue<>(), true))
 		.build();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
 	public static final ExecutorService executor = new ExceptionExecutor(10, Integer.MAX_VALUE);
 	public static final ScheduledExecutorService scheduler = new ExceptionScheduler(7);
+	public static final ConcurrentHashMap<String, HypixelKeyRecord> keyCooldownMap = new ConcurrentHashMap<>();
+	public static final List<String> hypixelGuildQueue = Collections.synchronizedList(new ArrayList<>());
+	public static final ExceptionExecutor playerRequestExecutor = new ExceptionExecutor(3, 3, new LinkedBlockingQueue<>(), true);
+	public static final ExceptionExecutor leaderboardDbInsertQueue = new ExceptionExecutor(30, 30, new LinkedBlockingQueue<>(), true);
+	public static final Gson gson = new Gson();
+	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
+	public static final Consumer<Object> ignore = ignored -> {};
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
 	public static final AtomicInteger remainingLimit = new AtomicInteger(240);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
-	public static final ConcurrentHashMap<String, HypixelKeyRecord> keyCooldownMap = new ConcurrentHashMap<>();
-	public static final List<String> hypixelGuildQueue = Collections.synchronizedList(new ArrayList<>());
-	public static final ExceptionExecutor playerRequestExecutor = new ExceptionExecutor(0, 2, new LinkedBlockingQueue<>());
-	public static final ExceptionExecutor leaderboardDbInsertQueue = new ExceptionExecutor(0, 50, new LinkedBlockingQueue<>());
-	public static final Gson gson = new Gson();
-	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
-	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[\\dA-FK-OR]");
-	private static final Logger log = LoggerFactory.getLogger(Utils.class);
-	public static final Consumer<Object> ignore = ignored -> {};
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
 	public static final JDAWebhookClient botStatusWebhook = new WebhookClientBuilder(
 		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
 	)
 		.buildJDA();
+	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[\\dA-FK-OR]");
+	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -166,25 +166,25 @@ public class Utils {
 	private static JsonObject bazaarJson;
 	private static JsonArray sbzPricesJson;
 	private static JsonObject emojiMap;
-	public static JsonArray skyblockItemsJson;
+	private static JsonArray skyblockItemsJson;
 	public static JsonObject internalJsonMappings;
 	public static JsonObject priceOverrideJson;
-	public static JsonObject bingoInfoJson;
-	public static JsonObject dungeonLootJson;
-	public static JsonObject dragonLootJson;
-	public static JsonObject weightJson;
+	private static JsonObject bingoInfoJson;
+	private static JsonObject dungeonLootJson;
+	private static JsonObject dragonLootJson;
+	private static JsonObject weightJson;
 	/* Miscellaneous */
-	public static TextChannel botLogChannel;
+	private static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
-	public static Instant lowestBinJsonLastUpdated = Instant.now();
-	public static Instant averageAuctionJsonLastUpdated = Instant.now();
-	public static Instant bingoJsonLastUpdated = Instant.now();
-	public static Instant bazaarJsonLastUpdated = Instant.now();
-	public static Instant sbzPricesJsonLastUpdated = Instant.now();
-	public static Set<String> vanillaItems;
+	private static Instant lowestBinJsonLastUpdated = Instant.now();
+	private static Instant averageAuctionJsonLastUpdated = Instant.now();
+	private static Instant bingoJsonLastUpdated = Instant.now();
+	private static Instant bazaarJsonLastUpdated = Instant.now();
+	private static Instant sbzPricesJsonLastUpdated = Instant.now();
 	private static Instant userCountLastUpdated = Instant.now();
+	private static Set<String> vanillaItems;
 	private static int userCount = -1;
-	public static List<String> queryItems;
+	public static List<String> queryItems = new ArrayList<>();
 	public static List<String> bazaarItems = new ArrayList<>();
 	public static ShardManager jda;
 	public static Database database;
