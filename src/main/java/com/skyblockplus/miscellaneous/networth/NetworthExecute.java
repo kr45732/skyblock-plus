@@ -205,6 +205,7 @@ public class NetworthExecute {
 					}
 				}
 			}
+
 			Map<Integer, InvItem> equipmentMap = player.getEquipmentMap();
 			if (equipmentMap != null) {
 				for (InvItem item : equipmentMap.values()) {

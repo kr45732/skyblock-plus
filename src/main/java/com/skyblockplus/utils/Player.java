@@ -1159,6 +1159,10 @@ public class Player {
 		return profileName;
 	}
 
+	public int getProfileIndex() {
+		return profileIndex;
+	}
+
 	public String getUuid() {
 		return uuid;
 	}

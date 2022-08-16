@@ -112,7 +112,7 @@ public class LeaderboardDatabase {
 	public LeaderboardDatabase() {
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(LEADERBOARD_DB_URL);
-		config.setMaximumPoolSize(60);
+		config.setMaximumPoolSize(65);
 		dataSource = new HikariDataSource(config);
 
 		if (isMainBot()) {
