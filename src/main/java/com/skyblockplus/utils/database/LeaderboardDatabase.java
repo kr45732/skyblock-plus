@@ -72,7 +72,7 @@ public class LeaderboardDatabase {
 			"taming",
 			"social",
 			"enchanting",
-			// "networth",
+			"networth",
 			"blaze",
 			"lily_weight",
 			"coins",
@@ -182,7 +182,7 @@ public class LeaderboardDatabase {
 					" ON CONFLICT (uuid) DO UPDATE SET " +
 					typesSubList
 						.stream()
-						.map(t -> t + "=EXCLUDED." + t)
+						.map(t -> t.equals("networth") ? ("networth=" + gamemode.toCacheType() + ".networth") : (t + "=EXCLUDED." + t))
 						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
 				)
 			) {
@@ -196,6 +196,7 @@ public class LeaderboardDatabase {
 					statement.setLong(3 + offset, Instant.now().toEpochMilli());
 					for (int i = 0; i < typesSubList.size(); i++) {
 						String type = typesSubList.get(i);
+						if (type.equals("networth")) {statement.setDouble(i + 4 + offset, 0);}
 						statement.setDouble(
 							i + 4 + offset,
 							player.getHighestAmount(
