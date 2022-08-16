@@ -196,7 +196,10 @@ public class LeaderboardDatabase {
 					statement.setLong(3 + offset, Instant.now().toEpochMilli());
 					for (int i = 0; i < typesSubList.size(); i++) {
 						String type = typesSubList.get(i);
-						if (type.equals("networth")) {statement.setDouble(i + 4 + offset, 0);}
+						if (type.equals("networth")) {
+							statement.setDouble(i + 4 + offset, 0);
+							continue;
+						}
 						statement.setDouble(
 							i + 4 + offset,
 							player.getHighestAmount(
