@@ -136,8 +136,8 @@ public class Utils {
 	)
 		.setAllowCoreThreadTimeOut(true);
 	public static final ExceptionExecutor leaderboardDbInsertQueue = new ExceptionExecutor(
-		30,
-		30,
+		20,
+		20,
 		45L,
 		TimeUnit.SECONDS,
 		new LinkedBlockingQueue<>()
