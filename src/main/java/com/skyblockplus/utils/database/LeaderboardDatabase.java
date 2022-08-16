@@ -72,7 +72,7 @@ public class LeaderboardDatabase {
 			"taming",
 			"social",
 			"enchanting",
-			"networth",
+			// "networth",
 			"blaze",
 			"lily_weight",
 			"coins",
