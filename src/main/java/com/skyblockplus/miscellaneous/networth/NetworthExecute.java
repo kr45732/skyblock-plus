@@ -187,10 +187,12 @@ public class NetworthExecute {
 			Map<Integer, InvItem> playerTalismans = player.getTalismanBagMap();
 			if (playerTalismans != null) {
 				for (InvItem item : playerTalismans.values()) {
-					double itemPrice = calculateItemPrice(item);
-					talismanTotal += itemPrice;
-					if (!onlyTotal && item != null) {
-						talismanItems.add(addItemStr(item, itemPrice));
+					if (item != null) {
+						double itemPrice = calculateItemPrice(item);
+						talismanTotal += itemPrice;
+						if (!onlyTotal) {
+							talismanItems.add(addItemStr(item, itemPrice));
+						}
 					}
 				}
 			}
@@ -198,10 +200,12 @@ public class NetworthExecute {
 			Map<Integer, InvItem> invArmorMap = player.getArmorMap();
 			if (invArmorMap != null) {
 				for (InvItem item : invArmorMap.values()) {
-					double itemPrice = calculateItemPrice(item);
-					invArmor += itemPrice;
-					if (!onlyTotal && item != null) {
-						armorItems.add(addItemStr(item, itemPrice));
+					if (item != null) {
+						double itemPrice = calculateItemPrice(item);
+						invArmor += itemPrice;
+						if (!onlyTotal) {
+							armorItems.add(addItemStr(item, itemPrice));
+						}
 					}
 				}
 			}
@@ -209,10 +213,12 @@ public class NetworthExecute {
 			Map<Integer, InvItem> equipmentMap = player.getEquipmentMap();
 			if (equipmentMap != null) {
 				for (InvItem item : equipmentMap.values()) {
-					double itemPrice = calculateItemPrice(item);
-					invArmor += itemPrice;
-					if (!onlyTotal && item != null) {
-						armorItems.add(addItemStr(item, itemPrice));
+					if (item != null) {
+						double itemPrice = calculateItemPrice(item);
+						invArmor += itemPrice;
+						if (!onlyTotal) {
+							armorItems.add(addItemStr(item, itemPrice));
+						}
 					}
 				}
 			}
@@ -220,10 +226,12 @@ public class NetworthExecute {
 			Map<Integer, InvItem> wardrobeMap = player.getWardrobeMap();
 			if (wardrobeMap != null) {
 				for (InvItem item : wardrobeMap.values()) {
-					double itemPrice = calculateItemPrice(item);
-					wardrobeTotal += itemPrice;
-					if (!onlyTotal && item != null) {
-						wardrobeItems.add(addItemStr(item, itemPrice));
+					if (item != null) {
+						double itemPrice = calculateItemPrice(item);
+						wardrobeTotal += itemPrice;
+						if (!onlyTotal) {
+							wardrobeItems.add(addItemStr(item, itemPrice));
+						}
 					}
 				}
 			}
@@ -238,10 +246,12 @@ public class NetworthExecute {
 			Map<Integer, InvItem> enderChest = player.getEnderChestMap();
 			if (enderChest != null) {
 				for (InvItem item : enderChest.values()) {
-					double itemPrice = calculateItemPrice(item, "enderchest");
-					enderChestTotal += itemPrice;
-					if (!onlyTotal && item != null) {
-						enderChestItems.add(addItemStr(item, itemPrice));
+					if (item != null) {
+						double itemPrice = calculateItemPrice(item, "enderchest");
+						enderChestTotal += itemPrice;
+						if (!onlyTotal) {
+							enderChestItems.add(addItemStr(item, itemPrice));
+						}
 					}
 				}
 			}
@@ -249,10 +259,12 @@ public class NetworthExecute {
 			Map<Integer, InvItem> personalVault = player.getPersonalVaultMap();
 			if (personalVault != null) {
 				for (InvItem item : personalVault.values()) {
-					double itemPrice = calculateItemPrice(item, "personal_vault");
-					personalVaultTotal += itemPrice;
-					if (!onlyTotal && item != null) {
-						personalVaultItems.add(addItemStr(item, itemPrice));
+					if (item != null) {
+						double itemPrice = calculateItemPrice(item, "personal_vault");
+						personalVaultTotal += itemPrice;
+						if (!onlyTotal) {
+							personalVaultItems.add(addItemStr(item, itemPrice));
+						}
 					}
 				}
 			}
@@ -260,10 +272,12 @@ public class NetworthExecute {
 			Map<Integer, InvItem> storageMap = player.getStorageMap();
 			if (storageMap != null) {
 				for (InvItem item : storageMap.values()) {
-					double itemPrice = calculateItemPrice(item, "storage");
-					storageTotal += itemPrice;
-					if (!onlyTotal && item != null) {
-						storageItems.add(addItemStr(item, itemPrice));
+					if (item != null) {
+						double itemPrice = calculateItemPrice(item, "storage");
+						storageTotal += itemPrice;
+						if (!onlyTotal) {
+							storageItems.add(addItemStr(item, itemPrice));
+						}
 					}
 				}
 			}
@@ -272,7 +286,7 @@ public class NetworthExecute {
 			if (sacksMap != null) {
 				for (Map.Entry<String, Integer> sackEntry : sacksMap.entrySet()) {
 					if (sackEntry.getValue() > 0) {
-						double itemPrice = getLowestPrice(sackEntry.getKey(), true) * sackEntry.getValue();
+						double itemPrice = getLowestPrice(sackEntry.getKey(), true, true, null) * sackEntry.getValue();
 						sacksTotal += itemPrice;
 						if (!onlyTotal) {
 							String emoji = higherDepth(getEmojiMap(), sackEntry.getKey(), null);
@@ -796,7 +810,7 @@ public class NetworthExecute {
 					itemCost = item.getDarkAuctionPrice();
 					source.append("dark auction price paid");
 				} else {
-					itemCost = getLowestPrice(item.getId().toUpperCase(), source);
+					itemCost = getLowestPrice(item.getId().toUpperCase(), false, true, source);
 				}
 			}
 		} catch (Exception ignored) {}
@@ -992,14 +1006,6 @@ public class NetworthExecute {
 
 	public double getLowestPrice(String itemId) {
 		return getLowestPrice(itemId, false, true, null);
-	}
-
-	public double getLowestPrice(String itemId, StringBuilder source) {
-		return getLowestPrice(itemId, false, true, source);
-	}
-
-	public double getLowestPrice(String itemId, boolean onlyBazaar) {
-		return getLowestPrice(itemId, onlyBazaar, true, null);
 	}
 
 	public double getLowestPrice(String itemId, boolean onlyBazaar, boolean useRecipe, StringBuilder source) {

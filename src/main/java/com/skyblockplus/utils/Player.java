@@ -1567,22 +1567,20 @@ public class Player {
 
 		for (JsonElement pet : petsArr) {
 			try {
+				String tier = higherDepth(pet, "tier").getAsString();
+				String type = higherDepth(pet, "type").getAsString();
 				InvItem invItemStruct = new InvItem();
 				invItemStruct.setName(
 					"[Lvl " +
-					petLevelFromXp(
-						higherDepth(pet, "exp", 0L),
-						higherDepth(pet, "tier").getAsString().toLowerCase(),
-						higherDepth(pet, "type").getAsString()
-					) +
+					petLevelFromXp(higherDepth(pet, "exp", 0L), tier.toLowerCase(), type) +
 					"] " +
-					capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase().replace("_", " "))
+					capitalizeString(type.toUpperCase().replace("_", " "))
 				);
 				invItemStruct.setId("PET");
 				if (higherDepth(pet, "skin", null) != null) {
 					invItemStruct.addExtraValue("PET_SKIN_" + higherDepth(pet, "skin").getAsString());
 				}
-				invItemStruct.setRarity(higherDepth(pet, "tier").getAsString());
+				invItemStruct.setRarity(tier);
 				if (higherDepth(pet, "heldItem", null) != null) {
 					invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
 				}
