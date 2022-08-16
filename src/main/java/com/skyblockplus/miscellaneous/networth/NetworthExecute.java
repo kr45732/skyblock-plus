@@ -276,11 +276,11 @@ public class NetworthExecute {
 						if (!onlyTotal) {
 							String emoji = higherDepth(getEmojiMap(), sackEntry.getKey(), null);
 							sacksItems.add(
-									(emoji == null ? "" : emoji + " ") +
-											(sackEntry.getValue() != 1 ? sackEntry.getValue() + "x " : "") +
-											idToName(sackEntry.getKey()) +
-											"=:=" +
-											itemPrice
+								(emoji == null ? "" : emoji + " ") +
+								(sackEntry.getValue() != 1 ? sackEntry.getValue() + "x " : "") +
+								idToName(sackEntry.getKey()) +
+								"=:=" +
+								itemPrice
 							);
 						}
 					}

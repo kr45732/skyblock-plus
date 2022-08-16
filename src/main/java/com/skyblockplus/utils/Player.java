@@ -2376,7 +2376,7 @@ public class Player {
 	}
 
 	public double getNetworth() {
-		return profileToNetworth.computeIfAbsent(profileIndex, (k) -> NetworthExecute.getTotalNetworth(this));
+		return profileToNetworth.computeIfAbsent(profileIndex, k -> NetworthExecute.getTotalNetworth(this));
 	}
 
 	public int getMageRep() {
