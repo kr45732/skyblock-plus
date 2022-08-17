@@ -1689,8 +1689,8 @@ public class Utils {
 
 	public static Permission[] defaultPerms(boolean isSlash) {
 		return isSlash
-			? new Permission[] { Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION }
-			: new Permission[] { Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_EMBED_LINKS };
+			? new Permission[] { Permission.MESSAGE_SEND }
+			: new Permission[] { Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS };
 	}
 
 	public static Stream<JsonElement> streamJsonArray(JsonArray array) {

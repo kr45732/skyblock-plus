@@ -132,22 +132,25 @@ public class AutomaticGuild {
 
 		if (guildId.equals("796790757947867156") && isMainBot()) {
 			try {
-				botStatusWebhook.send(
-					client.getSuccess() +
-					" Restarted in " +
-					Duration
+				long seconds = Duration
 						.between(
-							((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
-								.retrievePast(1)
-								.complete()
-								.get(0)
-								.getTimeCreated()
-								.toInstant(),
-							Instant.now()
+								((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
+										.retrievePast(1)
+										.complete()
+										.get(0)
+										.getTimeCreated()
+										.toInstant(),
+								Instant.now()
 						)
-						.toSeconds() +
-					" seconds"
-				);
+						.toSeconds();
+				if (seconds < 900) {
+					botStatusWebhook.send(
+							client.getSuccess() +
+									" Restarted in " + seconds
+									+
+									" seconds"
+					);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

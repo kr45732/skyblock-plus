@@ -534,7 +534,7 @@ public class NetworthExecute {
 			personalVaultTotal;
 	}
 
-	private void calculatePetPrice(String location, String auctionName, double auctionPrice) {
+	public void calculatePetPrice(String location, String auctionName, double auctionPrice) {
 		List<InvItem> petsList =
 			switch (location) {
 				case "inventory" -> invPets;
@@ -613,7 +613,7 @@ public class NetworthExecute {
 		}
 	}
 
-	private void calculateDefaultPetPrices(String location) {
+	public void calculateDefaultPetPrices(String location) {
 		List<InvItem> petsList =
 			switch (location) {
 				case "inventory" -> invPets;
@@ -692,7 +692,7 @@ public class NetworthExecute {
 		}
 	}
 
-	private void calculatePetPrices() {
+	public void calculatePetPrices() {
 		StringBuilder queryStr = new StringBuilder();
 		for (InvItem item : invPets) {
 			queryStr.append(item.getPetApiName()).append(",");
@@ -737,14 +737,14 @@ public class NetworthExecute {
 		calculateDefaultPetPrices("personal_vault");
 	}
 
-	private double getMinBinAvg(String id) {
+	public double getMinBinAvg(String id) {
 		return getMin(
 			higherDepth(lowestBinJson, id, -1.0),
 			getMin(higherDepth(averageAuctionJson, id + ".clean_price", -1.0), higherDepth(averageAuctionJson, id + ".price", -1.0))
 		);
 	}
 
-	private String addItemStr(InvItem item, double itemPrice) {
+	public String addItemStr(InvItem item, double itemPrice) {
 		String emoji = higherDepth(getEmojiMap(), item.getFormattedId(), null);
 		String formattedStr =
 			(emoji == null ? "" : emoji + " ") +
@@ -772,7 +772,7 @@ public class NetworthExecute {
 		return calculateItemPrice(item, location, calcItemsJsonStr);
 	}
 
-	private double calculateItemPrice(InvItem item, String location, StringBuilder out) {
+	public double calculateItemPrice(InvItem item, String location, StringBuilder out) {
 		if (item == null || item.getName().equalsIgnoreCase("null") || item.getId().equals("None")) {
 			return 0;
 		}
@@ -792,7 +792,7 @@ public class NetworthExecute {
 		double backpackExtras = 0;
 		double essenceExtras = 0;
 
-		StringBuilder source = new StringBuilder();
+		StringBuilder source = verbose ? new StringBuilder() : null;
 		try {
 			if (item.getId().equals("PET") && location != null) {
 				if (!item.getName().startsWith("Mystery ") && !item.getName().equals("Unknown Pet")) {
@@ -808,7 +808,9 @@ public class NetworthExecute {
 			} else {
 				if (item.getDarkAuctionPrice() != -1) {
 					itemCost = item.getDarkAuctionPrice();
-					source.append("dark auction price paid");
+					if (verbose) {
+						source.append("dark auction price paid");
+					}
 				} else {
 					itemCost = getLowestPrice(item.getId().toUpperCase(), false, true, source);
 				}
@@ -833,7 +835,7 @@ public class NetworthExecute {
 			fumingExtras = item.getFumingCount() * fumingPrice * 0.66;
 		} catch (Exception ignored) {}
 
-		StringBuilder enchStr = new StringBuilder("[");
+		StringBuilder enchStr = verbose ? new StringBuilder("[") : null;
 		try {
 			List<String> enchants = item.getEnchantsFormatted();
 			for (String enchant : enchants) {
@@ -847,19 +849,23 @@ public class NetworthExecute {
 						enchantPrice *= enchant.startsWith("ULTIMATE_SOUL_EATER") || enchant.startsWith("OVERLOAD") ? 0.40 : 0.90;
 					}
 					enchantsExtras += enchantPrice;
-					enchStr
-						.append("{\"type\":\"")
-						.append(enchant)
-						.append("\",\"price\":\"")
-						.append(simplifyNumber(enchantPrice))
-						.append("\"},");
+					if (verbose) {
+						enchStr
+								.append("{\"type\":\"")
+								.append(enchant)
+								.append("\",\"price\":\"")
+								.append(simplifyNumber(enchantPrice))
+								.append("\"},");
+					}
 				} catch (Exception ignored) {}
 			}
 		} catch (Exception ignored) {}
-		if (enchStr.toString().endsWith(",")) {
-			enchStr = new StringBuilder(enchStr.substring(0, enchStr.length() - 1));
+		if (verbose) {
+			if (enchStr.toString().endsWith(",")) {
+				enchStr = new StringBuilder(enchStr.substring(0, enchStr.length() - 1));
+			}
+			enchStr.append("]");
 		}
-		enchStr.append("]");
 
 		try {
 			reforgeExtras = calculateReforgePrice(item.getModifier(), item.getRarity());
@@ -869,31 +875,37 @@ public class NetworthExecute {
 			essenceExtras = item.getEssenceCount() * essencePrices.get(item.getEssenceType());
 		} catch (Exception ignored) {}
 
-		StringBuilder miscStr = new StringBuilder("[");
+		StringBuilder miscStr = verbose ? new StringBuilder("[") : null;
 		try {
 			List<String> extraStats = item.getExtraStats();
 			for (String extraItem : extraStats) {
 				double miscPrice = getLowestPrice(extraItem);
 				miscExtras += miscPrice;
-				miscStr.append("{\"name\":\"").append(extraItem).append("\",\"price\":\"").append(simplifyNumber(miscPrice)).append("\"},");
+				if (verbose) {
+					miscStr.append("{\"name\":\"").append(extraItem).append("\",\"price\":\"").append(simplifyNumber(miscPrice)).append("\"},");
+				}
 			}
 		} catch (Exception ignored) {}
-		if (miscStr.toString().endsWith(",")) {
-			miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+		if (verbose) {
+			if (miscStr.toString().endsWith(",")) {
+				miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+			}
+			miscStr.append("]");
 		}
-		miscStr.append("]");
 
-		StringBuilder bpStr = new StringBuilder("[");
+		StringBuilder bpStr = verbose ? new StringBuilder("[") : null;
 		try {
 			List<InvItem> backpackItems = item.getBackpackItems();
 			for (InvItem backpackItem : backpackItems) {
 				backpackExtras += calculateItemPrice(backpackItem, location, bpStr);
 			}
 		} catch (Exception ignored) {}
-		if (bpStr.toString().endsWith(",")) {
-			bpStr = new StringBuilder(bpStr.substring(0, bpStr.length() - 1));
+		if (verbose) {
+			if (bpStr.toString().endsWith(",")) {
+				bpStr = new StringBuilder(bpStr.substring(0, bpStr.length() - 1));
+			}
+			bpStr.append("]");
 		}
-		bpStr.append("]");
 
 		double totalPrice =
 			itemCount *
@@ -944,7 +956,7 @@ public class NetworthExecute {
 		return totalPrice;
 	}
 
-	private double calculateReforgePrice(String reforgeName, String itemRarity) {
+	public double calculateReforgePrice(String reforgeName, String itemRarity) {
 		JsonElement reforgesStonesJson = getReforgeStonesJson();
 
 		for (String reforgeStone : REFORGE_STONE_NAMES) {
@@ -963,7 +975,7 @@ public class NetworthExecute {
 		return 0;
 	}
 
-	private double getLowestPriceEnchant(String enchantId) {
+	public double getLowestPriceEnchant(String enchantId) {
 		double lowestBin = -1;
 		double averageAuction = -1;
 		String enchantName = enchantId.split(";")[0];
@@ -1008,7 +1020,7 @@ public class NetworthExecute {
 		return getLowestPrice(itemId, false, true, null);
 	}
 
-	public double getLowestPrice(String itemId, boolean onlyBazaar, boolean useRecipe, StringBuilder source) {
+	public double getLowestPrice(String itemId, boolean ignoreAh, boolean useRecipe, StringBuilder source) {
 		double priceOverride = getPriceOverride(itemId);
 		if (priceOverride != -1) {
 			if (source != null) {
@@ -1034,7 +1046,7 @@ public class NetworthExecute {
 			}
 		} catch (Exception ignored) {}
 
-		if (!onlyBazaar) {
+		if (!ignoreAh) {
 			double lowestBin = -1;
 			double averageAuction = -1;
 

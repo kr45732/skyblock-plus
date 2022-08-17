@@ -18,7 +18,6 @@
 
 package com.skyblockplus.features.event;
 
-import static com.google.common.base.Strings.padStart;
 import static com.skyblockplus.features.mayor.MayorHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -319,6 +318,10 @@ public class CalendarCommand extends Command {
 		} catch (Exception e) {
 			return n + "th";
 		}
+	}
+
+	private static String padStart(String string, int minLength, char padChar) {
+		return string.length() >= minLength ? string : (String.valueOf(padChar).repeat(minLength - string.length()) + string);
 	}
 
 	@Override

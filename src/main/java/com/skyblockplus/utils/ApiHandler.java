@@ -119,7 +119,7 @@ public class ApiHandler {
 				dscBotListJson,
 				new BasicHeader(
 					"Authorization",
-					"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0IjoxLCJpZCI6Ijc5Njc5MTE2NzM2NjU5NDU5MiIsImlhdCI6MTYzOTUyODcwNn0.eJ6ikA4fIPJI9W-lJkHs-oxNNGKsWPbH8cU7oVEbNYY"
+					"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0IjoxLCJpZCI6Ijc5Njc5MTE2NzM2NjU5NDU5MiIsImlhdCI6MTY2MDc0ODQ0OH0._yWDDG-qXfYAyKzjYw5n76hQgyqEQ5ysbLwu1nRmKOo"
 				)
 			);
 
@@ -130,7 +130,7 @@ public class ApiHandler {
 				dscBotsJson,
 				new BasicHeader(
 					"Authorization",
-					"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGkiOnRydWUsImlkIjoiMzg1OTM5MDMxNTk2NDY2MTc2IiwiaWF0IjoxNjM5NTI5NjAyfQ.OsD5zgKVTgSh6IG34GGBsHPGoK7QTlkcHeksKRnIcWA"
+					"eyJhbGciOiJIUzI1NiJ9.eyJhcGkiOnRydWUsImlkIjoiMzg1OTM5MDMxNTk2NDY2MTc2IiwiaWF0IjoxNjYwNzQ4NTk0fQ.F1r05If3Sizp9M4MfBpzvrxi854HrPpcw5fINZcpEj8"
 				)
 			);
 

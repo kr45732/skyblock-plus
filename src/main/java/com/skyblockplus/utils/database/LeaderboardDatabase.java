@@ -182,7 +182,7 @@ public class LeaderboardDatabase {
 					" ON CONFLICT (uuid) DO UPDATE SET " +
 					typesSubList
 						.stream()
-						.map(t -> t.equals("networth") ? ("networth=" + gamemode.toCacheType() + ".networth") : (t + "=EXCLUDED." + t))
+						.map(t -> t.equals("networth") && players.size() > 1 ? ("networth=" + gamemode.toCacheType() + ".networth") : (t + "=EXCLUDED." + t))
 						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
 				)
 			) {
@@ -196,7 +196,7 @@ public class LeaderboardDatabase {
 					statement.setLong(3 + offset, Instant.now().toEpochMilli());
 					for (int i = 0; i < typesSubList.size(); i++) {
 						String type = typesSubList.get(i);
-						if (type.equals("networth")) {
+						if (type.equals("networth") && players.size() > 1) {
 							statement.setDouble(i + 4 + offset, 0);
 							continue;
 						}
