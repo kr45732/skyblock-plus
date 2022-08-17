@@ -85,7 +85,17 @@ public abstract class CommandExecute extends CommandEvent {
 		"coins",
 		"scammer",
 		"calcslayer",
-		"calcruns"
+		"calcruns",
+		"information",
+		"slayer",
+		"skills",
+		"guild",
+		"mayor",
+		"price",
+		"bazaar",
+		"missing",
+		"dungeons",
+		"roles"
 	);
 	protected final Command command;
 	protected Message ebMessage;
