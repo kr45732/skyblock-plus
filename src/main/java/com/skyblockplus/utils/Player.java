@@ -980,7 +980,7 @@ public class Player {
 		}
 
 		try {
-			HypixelResponse response = skyblockProfilesFromUuid(uuid, HYPIXEL_API_KEY, false);
+			HypixelResponse response = skyblockProfilesFromUuid(uuid, HYPIXEL_API_KEY, false, true);
 			if (!response.isValid()) {
 				failCause = response.failCause();
 				return;

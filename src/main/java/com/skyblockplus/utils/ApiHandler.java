@@ -282,11 +282,7 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
-		return skyblockProfilesFromUuid(uuid, hypixelApiKey, true);
-	}
-
-	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean useCache) {
-		return skyblockProfilesFromUuid(uuid, hypixelApiKey, useCache, true);
+		return skyblockProfilesFromUuid(uuid, hypixelApiKey, true, true);
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean useCache, boolean shouldCache) {
