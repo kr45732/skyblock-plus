@@ -182,7 +182,11 @@ public class LeaderboardDatabase {
 					" ON CONFLICT (uuid) DO UPDATE SET " +
 					typesSubList
 						.stream()
-						.map(t -> t.equals("networth") && players.size() > 1 ? ("networth=" + gamemode.toCacheType() + ".networth") : (t + "=EXCLUDED." + t))
+						.map(t ->
+							t.equals("networth") && players.size() > 1
+								? ("networth=" + gamemode.toCacheType() + ".networth")
+								: (t + "=EXCLUDED." + t)
+						)
 						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
 				)
 			) {

@@ -851,11 +851,11 @@ public class NetworthExecute {
 					enchantsExtras += enchantPrice;
 					if (verbose) {
 						enchStr
-								.append("{\"type\":\"")
-								.append(enchant)
-								.append("\",\"price\":\"")
-								.append(simplifyNumber(enchantPrice))
-								.append("\"},");
+							.append("{\"type\":\"")
+							.append(enchant)
+							.append("\",\"price\":\"")
+							.append(simplifyNumber(enchantPrice))
+							.append("\"},");
 					}
 				} catch (Exception ignored) {}
 			}
@@ -882,7 +882,12 @@ public class NetworthExecute {
 				double miscPrice = getLowestPrice(extraItem);
 				miscExtras += miscPrice;
 				if (verbose) {
-					miscStr.append("{\"name\":\"").append(extraItem).append("\",\"price\":\"").append(simplifyNumber(miscPrice)).append("\"},");
+					miscStr
+						.append("{\"name\":\"")
+						.append(extraItem)
+						.append("\",\"price\":\"")
+						.append(simplifyNumber(miscPrice))
+						.append("\"},");
 				}
 			}
 		} catch (Exception ignored) {}
