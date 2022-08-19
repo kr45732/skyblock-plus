@@ -37,26 +37,9 @@ import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import org.apache.groovy.util.Maps;
 
 public class NetworthExecute {
 
-	private static final Map<String, Integer> essencePrices = Maps.of(
-		"WITHER",
-		3500,
-		"UNDEAD",
-		800,
-		"DIAMOND",
-		4000,
-		"GOLD",
-		3500,
-		"ICE",
-		4000,
-		"SPIDER",
-		3000,
-		"DRAGON",
-		750
-	);
 	//	private final Set<String> tempSet = new HashSet<>();
 	private final List<InvItem> invPets = new ArrayList<>();
 	private final List<InvItem> petsPets = new ArrayList<>();
@@ -872,7 +855,9 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			essenceExtras = item.getEssenceCount() * essencePrices.get(item.getEssenceType());
+			essenceExtras =
+				item.getEssenceCount() *
+				higherDepth(bazaarJson, "ESSENCE_" + item.getEssenceType() + ".sell_summary.[0].pricePerUnit", 0.0);
 		} catch (Exception ignored) {}
 
 		StringBuilder miscStr = verbose ? new StringBuilder("[") : null;

@@ -107,6 +107,9 @@ public class MayorHandler {
 	}
 
 	public static void mayorElected() {
+		MessageEmbed embed;
+		Button button = null;
+
 		try {
 			JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor");
 			JsonArray mayors = collectJsonArray(
@@ -161,21 +164,26 @@ public class MayorHandler {
 				false
 			);
 
-			MessageEmbed embed = eb.build();
-			Button button = null;
+			embed = eb.build();
 			if (currentMayor.equals("Jerry")) {
 				button = Button.primary("mayor_jerry_button", "Current Jerry Mayor");
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			scheduler.schedule(MayorHandler::mayorElected, 5, TimeUnit.MINUTES);
+			return;
+		}
 
+		try {
 			int updateCount = 0;
 			for (AutomaticGuild guild : guildMap.values()) {
 				if (guild.onMayorElected(embed, button)) { // Send and ping
 					updateCount++;
 				}
 
-				if (updateCount != 0 && updateCount % 25 == 0) {
+				if (updateCount != 0 && updateCount % 20 == 0) {
 					try {
-						TimeUnit.SECONDS.sleep(2);
+						TimeUnit.SECONDS.sleep(1);
 					} catch (Exception ignored) {}
 				}
 			}
@@ -271,9 +279,9 @@ public class MayorHandler {
 					updateCount++;
 				}
 
-				if (updateCount != 0 && updateCount % 25 == 0) {
+				if (updateCount != 0 && updateCount % 20 == 0) {
 					try {
-						TimeUnit.SECONDS.sleep(2);
+						TimeUnit.SECONDS.sleep(1);
 					} catch (Exception ignored) {}
 				}
 			}
