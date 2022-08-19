@@ -186,8 +186,6 @@ public class MainListener extends ListenerAdapter {
 				updateItemMappings();
 				internalJsonMappings = null;
 				priceOverrideJson = null;
-				getInternalJsonMappings();
-				getPriceOverride("");
 			}
 			return;
 		}

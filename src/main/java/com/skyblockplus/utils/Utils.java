@@ -1840,14 +1840,17 @@ public class Utils {
 				writer.flush();
 			}
 
-			skyblockPlusDataRepo.add().addFilepattern("InternalNameMappings.json").addFilepattern("PriceOverrides.json").call();
-			skyblockPlusDataRepo
-				.commit()
-				.setAuthor("kr45632", "52721908+kr45732@users.noreply.github.com")
-				.setCommitter("kr45632", "52721908+kr45732@users.noreply.github.com")
-				.setMessage("Automatic update (" + neuRepo.log().setMaxCount(1).call().iterator().next().getName() + ")")
-				.call();
-			skyblockPlusDataRepo.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();
+			try {
+				skyblockPlusDataRepo.add().addFilepattern("InternalNameMappings.json").addFilepattern("PriceOverrides.json").call();
+				skyblockPlusDataRepo
+					.commit()
+					.setAllowEmpty(false)
+					.setAuthor("kr45632", "52721908+kr45732@users.noreply.github.com")
+					.setCommitter("kr45632", "52721908+kr45732@users.noreply.github.com")
+					.setMessage("Automatic update (" + neuRepo.log().setMaxCount(1).call().iterator().next().getName() + ")")
+					.call();
+				skyblockPlusDataRepo.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();
+			} catch (Exception ignored) {}
 
 			FileUtils.deleteDirectory(neuDir);
 			FileUtils.deleteDirectory(skyblockPlusDir);

@@ -65,10 +65,11 @@ public class AuctionFlipper {
 			) {
 				lastUpdated = Instant.now();
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
+				if (desc.contains(" query auctions into database in ")) {
+					queryItems = null;
+				}
 				if (enable && isMainBot() && desc.contains("Successfully updated under bins file in ")) {
 					flip();
-				} else if (desc.contains(" query auctions into database in ")) {
-					queryItems = null;
 				}
 			}
 		} catch (Exception ignored) {}

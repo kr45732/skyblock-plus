@@ -95,7 +95,8 @@ public abstract class CommandExecute extends CommandEvent {
 		"bazaar",
 		"missing",
 		"dungeons",
-		"roles"
+		"roles",
+		"settings"
 	);
 	protected final Command command;
 	protected Message ebMessage;
