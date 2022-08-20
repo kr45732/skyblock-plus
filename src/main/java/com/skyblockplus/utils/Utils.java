@@ -1364,6 +1364,13 @@ public class Utils {
 							JsonElement itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items");
 							if (itemUpgrades != null) {
 								int crimsonStar = item.getInt("tag.ExtraAttributes.upgrade_level", 0);
+
+								int crimsonEssence = 0;
+								for (int j = 1; j <= crimsonStar; j++) {
+									crimsonEssence += higherDepth(getEssenceCostsJson(), itemInfo.getId() + "." + j, 0);
+								}
+								itemInfo.setEssence(crimsonEssence, "CRIMSON");
+
 								for (Map.Entry<String, JsonElement> entry : itemUpgrades.getAsJsonObject().entrySet()) {
 									if (Integer.parseInt(entry.getKey()) > crimsonStar) {
 										break;
