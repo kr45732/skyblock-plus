@@ -243,13 +243,6 @@ public class Utils {
 		if (internalJsonMappings == null) {
 			internalJsonMappings =
 				getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json");
-			for (String s : getJsonObject("https://api.hypixel.net/skyblock/bazaar").get("products").getAsJsonObject().keySet()) {
-				if (s.startsWith("ESSENCE_")) {
-					JsonObject obj = new JsonObject();
-					obj.addProperty("name", capitalizeString(s.split("ESSENCE_")[1].replace("_", " ")) + " Essence");
-					internalJsonMappings.add(s, obj);
-				}
-			}
 		}
 
 		return internalJsonMappings;

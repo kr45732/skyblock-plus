@@ -230,6 +230,8 @@ public class LeaderboardPaginator {
 	}
 
 	public void actionModal(ModalInteractionEvent event) {
+		event.deferEdit().queue();
+
 		int rank = -1;
 		double amount = -1;
 		int page = -1;
@@ -294,7 +296,7 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
-		event.editMessageEmbeds(getRender().build()).setActionRows(getActionRow()).queue(ignored -> waitForEvent(), ignore);
+		event.getHook().editOriginalEmbeds(getRender().build()).setActionRows(getActionRow()).queue(ignored -> waitForEvent(), ignore);
 	}
 
 	private ActionRow getActionRow() {
