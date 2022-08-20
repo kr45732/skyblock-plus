@@ -966,13 +966,8 @@ public class NetworthExecute {
 	}
 
 	public double getLowestPriceEnchant(String enchantId) {
-		double lowestBin = -1;
-		double averageAuction = -1;
 		String enchantName = enchantId.split(";")[0];
 		int enchantLevel = Integer.parseInt(enchantId.split(";")[1]);
-		if (enchantLevel > 10) {
-			return 0;
-		}
 
 		int ignoredLevels = IGNORED_ENCHANTS.getOrDefault(enchantName, 0);
 		if (enchantLevel <= ignoredLevels) {
@@ -982,7 +977,9 @@ public class NetworthExecute {
 		if (
 			enchantName.equalsIgnoreCase("compact") ||
 			enchantName.equalsIgnoreCase("expertise") ||
-			enchantName.equalsIgnoreCase("cultivating")
+			enchantName.equalsIgnoreCase("cultivating") ||
+			enchantName.equalsIgnoreCase("champion") ||
+			enchantName.equalsIgnoreCase("hecatomb")
 		) {
 			enchantLevel = 1;
 		}
@@ -994,20 +991,6 @@ public class NetworthExecute {
 					higherDepth(bazaarJson, enchantName + ";" + i + ".sell_summary.[0].pricePerUnit").getAsDouble()
 				);
 			} catch (Exception ignored) {}
-
-			try {
-				lowestBin = higherDepth(lowestBinJson, enchantName + ";" + i).getAsDouble();
-			} catch (Exception ignored) {}
-
-			try {
-				JsonElement avgInfo = higherDepth(averageAuctionJson, enchantName + ";" + i);
-				averageAuction = getMin(higherDepth(avgInfo, "clean_price", -1.0), higherDepth(avgInfo, "price", -1.0));
-			} catch (Exception ignored) {}
-
-			double min = getMin(lowestBin, averageAuction);
-			if (min != -1) {
-				return Math.pow(2, enchantLevel - i) * min;
-			}
 		}
 
 		//		tempSet.add(enchantId);
