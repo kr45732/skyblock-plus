@@ -42,6 +42,13 @@ public class LilySkillsWeight extends SkillsWeight {
 
 	@Override
 	public WeightStruct getSkillsWeight(String skillName, SkillsStruct skillsStruct) {
+		JsonArray srwTable;
+		try {
+			srwTable = higherDepth(getWeightJson(), "lily.skills.ratio_weight." + skillName).getAsJsonArray();
+		} catch (Exception e) {
+			return new WeightStruct();
+		}
+
 		double skillAverage = 0;
 		for (String skill : SKILL_NAMES) {
 			try {
@@ -52,7 +59,6 @@ public class LilySkillsWeight extends SkillsWeight {
 		}
 		skillAverage /= SKILL_NAMES.size();
 
-		JsonArray srwTable = higherDepth(getWeightJson(), "lily.skills.ratio_weight." + skillName).getAsJsonArray();
 		double base =
 			(
 				(12 * Math.pow((skillAverage / 60), 2.44780217148309)) *

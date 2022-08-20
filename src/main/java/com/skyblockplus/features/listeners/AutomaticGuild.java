@@ -814,7 +814,7 @@ public class AutomaticGuild {
 			if (database.getSkyblockEventActive(guildId)) {
 				JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
 				Instant endingTime = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
-				if (Duration.between(Instant.now(), endingTime).toMinutes() <= 5) {
+				if (Instant.now().isAfter(endingTime)) {
 					endSkyblockEvent(guildId);
 				}
 			}
@@ -1182,7 +1182,7 @@ public class AutomaticGuild {
 	public void schedulerConstructor() {
 		int eventDelay = (int) (Math.random() * 60 + 5);
 		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 180, TimeUnit.MINUTES));
-		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES));
+		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateSkyblockEvent, eventDelay, 30, TimeUnit.MINUTES));
 	}
 
 	public void setPrefix(String prefix) {

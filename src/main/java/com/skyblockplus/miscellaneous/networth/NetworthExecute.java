@@ -988,6 +988,10 @@ public class NetworthExecute {
 
 		for (int i = enchantLevel; i >= 1; i--) {
 			try {
+				return higherDepth(bazaarJson, enchantName + ";" + i + ".sell_summary.[0].pricePerUnit").getAsDouble();
+			} catch (Exception ignored) {}
+
+			try {
 				lowestBin = higherDepth(lowestBinJson, enchantName + ";" + i).getAsDouble();
 			} catch (Exception ignored) {}
 

@@ -63,6 +63,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -150,6 +151,7 @@ public class Utils {
 	public static final AtomicInteger remainingLimit = new AtomicInteger(240);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
+	private static final Pattern bazaarEnchantPattern = Pattern.compile("ENCHANTMENT_(\\D*)_(\\d+)");
 	public static final JDAWebhookClient botStatusWebhook = new WebhookClientBuilder(
 		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
 	)
@@ -208,8 +210,8 @@ public class Utils {
 	private static Instant userCountLastUpdated = Instant.now();
 	private static Set<String> vanillaItems;
 	private static int userCount = -1;
+	private static List<String> bazaarItems = new ArrayList<>();
 	public static List<String> queryItems = new ArrayList<>();
-	public static List<String> bazaarItems = new ArrayList<>();
 	public static ShardManager jda;
 	public static Database database;
 	public static EventWaiter waiter;
@@ -241,6 +243,13 @@ public class Utils {
 		if (internalJsonMappings == null) {
 			internalJsonMappings =
 				getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json");
+			for (String s : getBazaarJson().keySet()) {
+				if (s.startsWith("ESSENCE_")) {
+					JsonObject obj = new JsonObject();
+					obj.addProperty("name", capitalizeString(s.split("ESSENCE_")[1].replace("_", " ")) + " Essence");
+					internalJsonMappings.add(s, obj);
+				}
+			}
 		}
 
 		return internalJsonMappings;
@@ -307,7 +316,17 @@ public class Utils {
 
 	public static JsonObject getBazaarJson() {
 		if (bazaarJson == null || Duration.between(bazaarJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			bazaarJson = getJsonObject("https://api.hypixel.net/skyblock/bazaar");
+			// Don't set the static one to a new JsonObject in case of exception during below code
+			JsonObject tempBazaarJson = new JsonObject();
+			for (Map.Entry<String, JsonElement> entry : getJsonObject("https://api.hypixel.net/skyblock/bazaar").entrySet()) {
+				String id = entry.getKey();
+				Matcher matcher = bazaarEnchantPattern.matcher(entry.getKey());
+				if (matcher.matches()) {
+					id = matcher.group(1) + ";" + matcher.group(2);
+				}
+				tempBazaarJson.add(id, entry.getValue());
+			}
+			bazaarJson = tempBazaarJson;
 			bazaarJsonLastUpdated = Instant.now();
 			if (higherDepth(bazaarJson, "products") != null) {
 				bazaarItems =
@@ -316,6 +335,11 @@ public class Utils {
 		}
 
 		return bazaarJson;
+	}
+
+	public static List<String> getBazaarItems() {
+		getBazaarJson();
+		return bazaarItems;
 	}
 
 	public static List<String> getQueryItems() {
@@ -980,8 +1004,6 @@ public class Utils {
 	}
 
 	public static String nameToId(String itemName, boolean strict) {
-		getInternalJsonMappings();
-
 		String id = itemName.trim().toUpperCase().replace(" ", "_").replace("'S", "").replace("FRAG", "FRAGMENT").replace(".", "");
 
 		switch (id) {
@@ -1013,7 +1035,7 @@ public class Utils {
 				return "NECRON_HANDLE";
 		}
 
-		for (Map.Entry<String, JsonElement> entry : internalJsonMappings.entrySet()) {
+		for (Map.Entry<String, JsonElement> entry : getInternalJsonMappings().entrySet()) {
 			if (higherDepth(entry.getValue(), "name").getAsString().equalsIgnoreCase(itemName)) {
 				return entry.getKey();
 			}
@@ -1023,10 +1045,8 @@ public class Utils {
 	}
 
 	public static String idToName(String id) {
-		getInternalJsonMappings();
-
 		id = id.toUpperCase();
-		return higherDepth(internalJsonMappings, id + ".name", capitalizeString(id.replace("_", " ")));
+		return higherDepth(getInternalJsonMappings(), id + ".name", capitalizeString(id.replace("_", " ")));
 	}
 
 	public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {

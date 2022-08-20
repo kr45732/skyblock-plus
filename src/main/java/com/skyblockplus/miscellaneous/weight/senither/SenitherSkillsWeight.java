@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.Utils.getWeightJson;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.skyblockplus.miscellaneous.weight.weight.SkillsWeight;
 import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
@@ -41,7 +42,13 @@ public class SenitherSkillsWeight extends SkillsWeight {
 
 	@Override
 	public WeightStruct getSkillsWeight(String skillName, SkillsStruct skillsStruct) {
-		JsonArray curWeights = higherDepth(getWeightJson(), "senither.skills." + skillName).getAsJsonArray();
+		JsonArray curWeights;
+		try {
+			curWeights = higherDepth(getWeightJson(), "senither.skills." + skillName).getAsJsonArray();
+		} catch (Exception e) {
+			return new WeightStruct();
+		}
+
 		double exponent = curWeights.get(0).getAsDouble();
 		double divider = curWeights.get(1).getAsDouble();
 
