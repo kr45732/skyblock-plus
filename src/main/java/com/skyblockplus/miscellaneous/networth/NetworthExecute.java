@@ -102,7 +102,7 @@ public class NetworthExecute {
 	public NetworthExecute initPrices() {
 		lowestBinJson = getLowestBinJson();
 		averageAuctionJson = getAverageAuctionJson();
-		bazaarJson = higherDepth(getBazaarJson(), "products");
+		bazaarJson = getBazaarJson();
 		sbzPrices = getSbzPricesJson();
 
 		recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary.[0].pricePerUnit", 0.0);
@@ -974,7 +974,8 @@ public class NetworthExecute {
 			return 0;
 		}
 
-		if (enchantLevel <= IGNORED_ENCHANTS.getOrDefault(enchantName, 0)) {
+		int ignoredLevels = IGNORED_ENCHANTS.getOrDefault(enchantName, 0);
+		if (enchantLevel <= ignoredLevels) {
 			return 0;
 		}
 
@@ -986,9 +987,12 @@ public class NetworthExecute {
 			enchantLevel = 1;
 		}
 
-		for (int i = enchantLevel; i >= 1; i--) {
+		for (int i = enchantLevel; i >= Math.max(1, ignoredLevels); i--) {
 			try {
-				return higherDepth(bazaarJson, enchantName + ";" + i + ".sell_summary.[0].pricePerUnit").getAsDouble();
+				return (
+					Math.pow(2, enchantLevel - i) *
+					higherDepth(bazaarJson, enchantName + ";" + i + ".sell_summary.[0].pricePerUnit").getAsDouble()
+				);
 			} catch (Exception ignored) {}
 
 			try {
@@ -1000,9 +1004,9 @@ public class NetworthExecute {
 				averageAuction = getMin(higherDepth(avgInfo, "clean_price", -1.0), higherDepth(avgInfo, "price", -1.0));
 			} catch (Exception ignored) {}
 
-			double min = getMin(Math.pow(2, enchantLevel - i) * lowestBin, Math.pow(2, enchantLevel - i) * averageAuction);
+			double min = getMin(lowestBin, averageAuction);
 			if (min != -1) {
-				return min;
+				return Math.pow(2, enchantLevel - i) * min;
 			}
 		}
 

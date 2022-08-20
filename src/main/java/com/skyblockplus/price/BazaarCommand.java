@@ -38,7 +38,7 @@ public class BazaarCommand extends Command {
 	}
 
 	public static EmbedBuilder getBazaarItem(String itemNameU) {
-		JsonElement bazaarItems = higherDepth(getBazaarJson(), "products");
+		JsonElement bazaarItems = getBazaarJson();
 		if (bazaarItems == null) {
 			return invalidEmbed("Error getting bazaar data");
 		}

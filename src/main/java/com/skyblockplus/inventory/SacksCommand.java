@@ -51,7 +51,7 @@ public class SacksCommand extends Command {
 
 			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(20);
 
-			JsonElement bazaarPrices = higherDepth(getBazaarJson(), "products");
+			JsonElement bazaarPrices = getBazaarJson();
 
 			final double[] total = { 0, 0 };
 			sacksMap

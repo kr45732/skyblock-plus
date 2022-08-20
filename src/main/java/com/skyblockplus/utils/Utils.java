@@ -243,7 +243,7 @@ public class Utils {
 		if (internalJsonMappings == null) {
 			internalJsonMappings =
 				getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json");
-			for (String s : getBazaarJson().keySet()) {
+			for (String s : getJsonObject("https://api.hypixel.net/skyblock/bazaar").get("products").getAsJsonObject().keySet()) {
 				if (s.startsWith("ESSENCE_")) {
 					JsonObject obj = new JsonObject();
 					obj.addProperty("name", capitalizeString(s.split("ESSENCE_")[1].replace("_", " ")) + " Essence");
@@ -318,7 +318,10 @@ public class Utils {
 		if (bazaarJson == null || Duration.between(bazaarJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			// Don't set the static one to a new JsonObject in case of exception during below code
 			JsonObject tempBazaarJson = new JsonObject();
-			for (Map.Entry<String, JsonElement> entry : getJsonObject("https://api.hypixel.net/skyblock/bazaar").entrySet()) {
+			for (Map.Entry<String, JsonElement> entry : getJsonObject("https://api.hypixel.net/skyblock/bazaar")
+				.get("products")
+				.getAsJsonObject()
+				.entrySet()) {
 				String id = entry.getKey();
 				Matcher matcher = bazaarEnchantPattern.matcher(entry.getKey());
 				if (matcher.matches()) {
@@ -328,10 +331,7 @@ public class Utils {
 			}
 			bazaarJson = tempBazaarJson;
 			bazaarJsonLastUpdated = Instant.now();
-			if (higherDepth(bazaarJson, "products") != null) {
-				bazaarItems =
-					higherDepth(bazaarJson, "products").getAsJsonObject().keySet().stream().map(Utils::idToName).distinct().toList();
-			}
+			bazaarItems = bazaarJson.keySet().stream().map(Utils::idToName).distinct().toList();
 		}
 
 		return bazaarJson;
