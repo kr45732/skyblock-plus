@@ -309,22 +309,23 @@ public class Utils {
 
 	public static JsonObject getBazaarJson() {
 		if (bazaarJson == null || Duration.between(bazaarJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			// Don't set the static one to a new JsonObject in case of exception during below code
-			JsonObject tempBazaarJson = new JsonObject();
-			for (Map.Entry<String, JsonElement> entry : getJsonObject("https://api.hypixel.net/skyblock/bazaar")
-				.get("products")
-				.getAsJsonObject()
-				.entrySet()) {
-				String id = entry.getKey();
-				Matcher matcher = bazaarEnchantPattern.matcher(entry.getKey());
-				if (matcher.matches()) {
-					id = matcher.group(1) + ";" + matcher.group(2);
+			try {
+				JsonObject tempBazaarJson = new JsonObject();
+				for (Map.Entry<String, JsonElement> entry : getJsonObject("https://api.hypixel.net/skyblock/bazaar")
+					.get("products")
+					.getAsJsonObject()
+					.entrySet()) {
+					String id = entry.getKey();
+					Matcher matcher = bazaarEnchantPattern.matcher(entry.getKey());
+					if (matcher.matches()) {
+						id = matcher.group(1) + ";" + matcher.group(2);
+					}
+					tempBazaarJson.add(id, entry.getValue());
 				}
-				tempBazaarJson.add(id, entry.getValue());
-			}
-			bazaarJson = tempBazaarJson;
-			bazaarJsonLastUpdated = Instant.now();
-			bazaarItems = bazaarJson.keySet().stream().map(Utils::idToName).distinct().toList();
+				bazaarJson = tempBazaarJson;
+				bazaarJsonLastUpdated = Instant.now();
+				bazaarItems = bazaarJson.keySet().stream().map(Utils::idToName).distinct().toList();
+			} catch (Exception ignored) {}
 		}
 
 		return bazaarJson;
