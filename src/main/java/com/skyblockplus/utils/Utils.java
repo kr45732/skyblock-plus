@@ -28,6 +28,7 @@ import static java.util.Collections.nCopies;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -345,11 +346,12 @@ public class Utils {
 				URI uri = new URIBuilder(httpGet.getURI()).addParameter("key", AUCTION_API_KEY).build();
 				httpGet.setURI(uri);
 
-				try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
+				try (
+					CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+					InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+				) {
 					queryItems =
-						streamJsonArray(
-							JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray()
-						)
+						streamJsonArray(JsonParser.parseReader(in).getAsJsonArray())
 							.map(JsonElement::getAsString)
 							.collect(Collectors.toList());
 				}
@@ -565,6 +567,10 @@ public class Utils {
 	}
 
 	public static JsonElement getJson(String jsonUrl, String hypixelApiKey) {
+		return getJson(jsonUrl, hypixelApiKey, false);
+	}
+
+	public static JsonElement getJson(String jsonUrl, String hypixelApiKey, boolean isSkyblockProfiles) {
 		boolean isMain = hypixelApiKey.equals(HYPIXEL_API_KEY);
 		try {
 			if (
@@ -584,7 +590,7 @@ public class Utils {
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
+				if (jsonUrl.contains("api.hypixel.net")) {
 					if (jsonUrl.contains(hypixelApiKey)) {
 						try {
 							(isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).set(
@@ -597,13 +603,22 @@ public class Utils {
 					}
 
 					if (httpResponse.getStatusLine().getStatusCode() == 502) {
-						return JsonParser.parseString("{\"cause\":\"Hypixel API returned 502 bad gateway\"}");
+						JsonObject obj = new JsonObject();
+						obj.addProperty("cause", "Hypixel API returned 502 bad gateway");
+						return obj;
 					} else if (httpResponse.getStatusLine().getStatusCode() == 522) {
-						return JsonParser.parseString("{\"cause\":\"Hypixel API returned 522 connection timed out\"}");
+						JsonObject obj = new JsonObject();
+						obj.addProperty("cause", "Hypixel API returned 522 connection timed out");
+						return obj;
 					}
 				}
 
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+				try (
+					InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent());
+					JsonReader jsonIn = new JsonReader(in)
+				) {
+					return isSkyblockProfiles ? SkyblockProfilesParser.parse(jsonIn) : JsonParser.parseReader(jsonIn);
+				}
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -622,7 +637,17 @@ public class Utils {
 	}
 
 	public static CompletableFuture<JsonElement> asyncGetJson(String url) {
-		return asyncGet(url).thenApplyAsync(r -> JsonParser.parseReader(new InputStreamReader(r.body())), executor);
+		return asyncGet(url)
+			.thenApplyAsync(
+				r -> {
+					try (InputStreamReader in = new InputStreamReader(r.body())) {
+						return JsonParser.parseReader(in);
+					} catch (Exception e) {
+						return null;
+					}
+				},
+				executor
+			);
 	}
 
 	public static String getSkyCryptData(String dataUrl) {
@@ -655,11 +680,11 @@ public class Utils {
 			StringEntity entity = new StringEntity(body.toString(), "UTF-8");
 			httpPost.setEntity(entity);
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
-				return (
-					"https://hst.sh/" +
-					higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "key").getAsString()
-				);
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return ("https://hst.sh/" + higherDepth(JsonParser.parseReader(in), "key").getAsString());
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -675,8 +700,11 @@ public class Utils {
 			httpPost.setHeader("Accept", "application/json");
 			httpPost.setHeaders(headers);
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in);
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -690,8 +718,11 @@ public class Utils {
 			httpDelete.setHeader("Accept", "application/json");
 			httpDelete.setHeaders(headers);
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpDelete)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpDelete);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in);
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -744,11 +775,12 @@ public class Utils {
 			HttpGet httpGet = new HttpGet(url);
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()))
-					.lines()
-					.parallel()
-					.collect(Collectors.joining("\n"));
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent());
+				BufferedReader buff = new BufferedReader(in)
+			) {
+				return buff.lines().parallel().collect(Collectors.joining("\n"));
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -1098,8 +1130,9 @@ public class Utils {
 					return invalidEmbed("That command is on cooldown for " + timeTillReset + " more seconds");
 				}
 
-				higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "record.key")
-					.getAsString();
+				try (InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())) {
+					higherDepth(JsonParser.parseReader(in), "record.key").getAsString();
+				}
 
 				if (!keyCooldownMap.containsKey(hypixelKey)) {
 					keyCooldownMap.put(

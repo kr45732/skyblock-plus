@@ -851,7 +851,7 @@ public class NetworthExecute {
 		}
 
 		try {
-			reforgeExtras = calculateReforgePrice(item.getModifier(), item.getRarity());
+			reforgeExtras = getLowestPriceModifier(item.getModifier(), item.getRarity());
 		} catch (Exception ignored) {}
 
 		try {
@@ -946,7 +946,7 @@ public class NetworthExecute {
 		return totalPrice;
 	}
 
-	public double calculateReforgePrice(String reforgeName, String itemRarity) {
+	public double getLowestPriceModifier(String reforgeName, String itemRarity) {
 		JsonElement reforgesStonesJson = getReforgeStonesJson();
 
 		for (String reforgeStone : REFORGE_STONE_NAMES) {

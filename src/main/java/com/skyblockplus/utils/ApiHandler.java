@@ -26,6 +26,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.price.PriceCommand;
 import com.skyblockplus.utils.database.CacheDatabase;
@@ -296,7 +297,8 @@ public class ApiHandler {
 		try {
 			JsonElement profilesJson = getJson(
 				"https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid,
-				hypixelApiKey
+				hypixelApiKey,
+				true
 			);
 
 			try {
@@ -305,7 +307,7 @@ public class ApiHandler {
 					return new HypixelResponse((username != null ? username : "Player") + " has no SkyBlock profiles");
 				}
 
-				JsonArray profileArray = processSkyblockProfilesArray(higherDepth(profilesJson, "profiles").getAsJsonArray());
+				JsonArray profileArray = higherDepth(profilesJson, "profiles").getAsJsonArray();
 				if (shouldCache) {
 					cacheDatabase.cacheJson(uuid, profileArray);
 				}
@@ -344,17 +346,19 @@ public class ApiHandler {
 										.set(Integer.parseInt(profilesResponse.headers().firstValue("RateLimit-Reset").get()));
 								} catch (Exception ignored) {}
 
-								JsonArray profiles = processSkyblockProfilesArray(
-									higherDepth(JsonParser.parseReader(new InputStreamReader(profilesResponse.body())), "profiles")
-										.getAsJsonArray()
-								);
+								try (
+									InputStreamReader in = new InputStreamReader(profilesResponse.body());
+									JsonReader jsonIn = new JsonReader(in)
+								) {
+									JsonElement profiles = SkyblockProfilesParser.parse(jsonIn, uuid);
 
-								// Json parsing probably takes more memory than the HTTP request
-								if (Runtime.getRuntime().totalMemory() > 1250000000) {
-									System.gc();
+									// Json parsing probably takes more memory than the HTTP request
+									if (Runtime.getRuntime().totalMemory() > 1250000000) {
+										System.gc();
+									}
+
+									return higherDepth(profiles, "profiles").getAsJsonArray();
 								}
-
-								return profiles;
 							} catch (Exception ignored) {}
 							return null;
 						},
@@ -458,8 +462,11 @@ public class ApiHandler {
 				.build();
 			httpGet.setURI(uri);
 
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			try (
+				CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -487,8 +494,11 @@ public class ApiHandler {
 			}
 			httpGet.setURI(uriBuilder.build());
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -542,8 +552,11 @@ public class ApiHandler {
 			}
 			httpGet.setURI(uriBuilder.build());
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -557,33 +570,14 @@ public class ApiHandler {
 			URI uri = new URIBuilder(httpGet.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY).build();
 			httpGet.setURI(uri);
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
 		return null;
-	}
-
-	public static JsonArray processSkyblockProfilesArray(JsonArray array) {
-		for (int i = 0; i < array.size(); i++) {
-			JsonObject currentProfile = array.get(i).getAsJsonObject();
-			currentProfile.remove("community_upgrades");
-
-			JsonObject currentProfileMembers = higherDepth(currentProfile, "members").getAsJsonObject();
-			for (String currentProfileMemberUuid : currentProfileMembers.keySet()) {
-				JsonObject currentProfileMember = currentProfileMembers.getAsJsonObject(currentProfileMemberUuid);
-				currentProfileMember.remove("objectives");
-				currentProfileMember.remove("tutorial");
-				currentProfileMember.remove("quests");
-				currentProfileMember.remove("visited_zones");
-				currentProfileMember.remove("griffin");
-				currentProfileMember.remove("experimentation");
-				currentProfileMember.remove("unlocked_coll_tiers");
-				currentProfileMember.remove("backpack_icons");
-				currentProfileMember.remove("slayer_quest");
-			}
-		}
-		return array;
 	}
 
 	public static void updateLinkedAccounts() {

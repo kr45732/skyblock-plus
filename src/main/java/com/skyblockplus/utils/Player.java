@@ -1138,7 +1138,9 @@ public class Player {
 				}
 			}
 			return false;
-		} catch (Exception ignored) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 
