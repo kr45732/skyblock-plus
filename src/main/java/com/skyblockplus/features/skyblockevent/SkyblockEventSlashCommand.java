@@ -20,7 +20,6 @@ package com.skyblockplus.features.skyblockevent;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -30,7 +29,6 @@ import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;

@@ -19,7 +19,6 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.capitalizeString;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;

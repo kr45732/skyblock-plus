@@ -20,10 +20,8 @@ package com.skyblockplus.price;
 
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.ApiHandler.queryLowestBin;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

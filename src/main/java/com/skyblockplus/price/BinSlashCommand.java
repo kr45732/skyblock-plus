@@ -19,9 +19,7 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.idToName;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Utils;

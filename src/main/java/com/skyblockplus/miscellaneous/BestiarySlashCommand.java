@@ -19,7 +19,6 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.formatNumber;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.*;

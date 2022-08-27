@@ -19,7 +19,6 @@
 package com.skyblockplus.skills;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Constants.SKILL_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;

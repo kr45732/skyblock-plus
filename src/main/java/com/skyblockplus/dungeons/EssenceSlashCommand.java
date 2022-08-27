@@ -19,9 +19,7 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Constants.ESSENCE_EMOJI_MAP;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

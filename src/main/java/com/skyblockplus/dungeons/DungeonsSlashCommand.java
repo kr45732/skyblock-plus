@@ -21,7 +21,6 @@ package com.skyblockplus.dungeons;
 import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
 import static com.skyblockplus.utils.Constants.DUNGEON_EMOJI_MAP;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;

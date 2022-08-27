@@ -20,7 +20,6 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.ALL_TALISMANS;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

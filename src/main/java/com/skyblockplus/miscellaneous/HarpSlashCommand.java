@@ -20,7 +20,6 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.HARP_SONG_ID_TO_NAME;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;

@@ -19,7 +19,6 @@
 package com.skyblockplus.miscellaneous.weight;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Constants.DUNGEON_EMOJI_MAP;
 import static com.skyblockplus.utils.Utils.capitalizeString;
 
 import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;

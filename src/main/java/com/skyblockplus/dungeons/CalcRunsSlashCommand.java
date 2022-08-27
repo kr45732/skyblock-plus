@@ -19,7 +19,6 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.formatNumber;
 
 import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
 import com.skyblockplus.utils.Player;

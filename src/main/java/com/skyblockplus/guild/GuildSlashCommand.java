@@ -19,10 +19,8 @@
 package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromName;
 import static com.skyblockplus.utils.Constants.GUILD_EXP_TO_LEVEL;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

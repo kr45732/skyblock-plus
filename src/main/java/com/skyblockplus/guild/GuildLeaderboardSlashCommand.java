@@ -19,9 +19,7 @@
 package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.capitalizeString;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedGuildTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 

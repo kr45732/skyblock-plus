@@ -19,7 +19,6 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Constants.DUNGEON_EMOJI_MAP;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;

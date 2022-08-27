@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
-import com.skyblockplus.general.help.HelpCommand;
 import com.skyblockplus.general.help.HelpSlashCommand;
 import java.time.Instant;
 import java.util.List;

@@ -19,7 +19,6 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

@@ -18,18 +18,11 @@
 
 package com.skyblockplus.general.help;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
