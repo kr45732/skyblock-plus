@@ -20,11 +20,11 @@ package com.skyblockplus.features.verify;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.general.LinkCommand.updateLinkedUser;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.general.LinkSlashCommand;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -98,7 +98,7 @@ public class VerifyGuild {
 			return;
 		}
 
-		String[] result = updateLinkedUser(verifySettings, linkedUser, event.getMember(), true);
+		String[] result = LinkSlashCommand.updateLinkedUser(verifySettings, linkedUser, event.getMember(), true);
 
 		if (higherDepth(verifySettings, "dmOnSync", true)) {
 			event

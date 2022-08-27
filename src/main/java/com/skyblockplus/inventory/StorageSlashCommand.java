@@ -18,10 +18,16 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
+
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.List;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -42,7 +48,7 @@ public class StorageSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(StorageCommand.getPlayerStorage(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true);
+		event.paginate(getPlayerStorage(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true);
 	}
 
 	@Override
@@ -58,5 +64,22 @@ public class StorageSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getPlayerStorage(String username, String profileName, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			List<String[]> storagePages = player.getStorage();
+			if (storagePages != null) {
+				if (player.invMissing.length() > 0) {
+					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
+				}
+
+				new InventoryEmojiPaginator(storagePages, "Storage", player, event);
+				return null;
+			}
+			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+		}
+		return player.getFailEmbed();
 	}
 }

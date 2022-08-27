@@ -35,7 +35,7 @@ public class InviteSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(InformationCommand.getInformation());
+		event.embed(InformationSlashCommand.getInformation());
 	}
 
 	@Override

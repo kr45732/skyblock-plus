@@ -18,10 +18,21 @@
 
 package com.skyblockplus.miscellaneous;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.higherDepth;
+
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.HypixelResponse;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -42,7 +53,7 @@ public class ProfilesSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(ProfilesCommand.getPlayerProfiles(event.player, new PaginatorEvent(event)));
+		event.paginate(getPlayerProfiles(event.player, new PaginatorEvent(event)));
 	}
 
 	@Override
@@ -57,5 +68,71 @@ public class ProfilesSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getPlayerProfiles(String username, PaginatorEvent event) {
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (!usernameUuid.isValid()) {
+			return invalidEmbed(usernameUuid.failCause());
+		}
+
+		HypixelResponse profilesJson = skyblockProfilesFromUuid(usernameUuid.uuid());
+		if (!profilesJson.isValid()) {
+			return invalidEmbed(profilesJson.failCause());
+		}
+
+		List<CompletableFuture<String>> profileUsernameFutureList = new ArrayList<>();
+
+		for (JsonElement profile : profilesJson.response().getAsJsonArray()) {
+			List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
+
+			for (String uuid : uuids) {
+				profileUsernameFutureList.add(
+					asyncUuidToUsername(uuid)
+						.thenApplyAsync(
+							playerUsername -> {
+								String lastLogin =
+									"<t:" +
+									Instant
+										.ofEpochMilli(higherDepth(profile, "members." + uuid + ".last_save").getAsLong())
+										.getEpochSecond() +
+									">";
+
+								return "\n• " + fixUsername(playerUsername) + " played on " + lastLogin;
+							},
+							executor
+						)
+				);
+			}
+		}
+
+		CustomPaginator.Builder paginateBuilder = event.getPaginator();
+
+		List<String> pageTitlesUrls = new ArrayList<>();
+		int count = 0;
+		for (JsonElement profile : profilesJson.response().getAsJsonArray()) {
+			pageTitlesUrls.add(skyblockStatsLink(usernameUuid.username(), higherDepth(profile, "cute_name").getAsString()));
+			StringBuilder profileStr = new StringBuilder(
+				"• **Profile Name:** " +
+				higherDepth(profile, "cute_name").getAsString() +
+				Player.Gamemode.of(higherDepth(profile, "game_mode", "regular")).getSymbol(" ")
+			);
+			List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
+			profileStr.append("\n• **Member Count:** ").append(uuids.size());
+			profileStr.append("\n\n**Members:** ");
+
+			for (String ignored1 : uuids) {
+				try {
+					profileStr.append(profileUsernameFutureList.get(count).get());
+				} catch (Exception ignored) {}
+				count++;
+			}
+			paginateBuilder.addItems(profileStr.toString());
+		}
+
+		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle(usernameUuid.username()).setTitleUrls(pageTitlesUrls));
+
+		event.paginate(paginateBuilder);
+		return null;
 	}
 }

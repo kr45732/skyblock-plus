@@ -197,28 +197,6 @@ public class MainListener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onMessageUpdate(MessageUpdateEvent event) {
-		if (!event.isFromGuild()) {
-			return;
-		}
-
-		if (guildMap.containsKey(event.getGuild().getId())) {
-			guildMap.get(event.getGuild().getId()).onGuildMessageUpdate(event);
-		}
-	}
-
-	@Override
-	public void onMessageDelete(MessageDeleteEvent event) {
-		if (!event.isFromGuild()) {
-			return;
-		}
-
-		if (guildMap.containsKey(event.getGuild().getId())) {
-			guildMap.get(event.getGuild().getId()).onGuildMessageDelete(event);
-		}
-	}
-
-	@Override
 	public void onChannelDelete(ChannelDeleteEvent event) {
 		if (!event.isFromType(ChannelType.TEXT)) {
 			return;

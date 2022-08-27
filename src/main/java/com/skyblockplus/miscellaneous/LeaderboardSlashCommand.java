@@ -19,12 +19,14 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -47,7 +49,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			LeaderboardCommand.getLeaderboard(
+			getLeaderboard(
 				event.getOptionStr("type"),
 				event.player,
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
@@ -83,5 +85,28 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		} else if (event.getFocusedOption().getName().equals("type")) {
 			event.replyClosestMatch(event.getFocusedOption().getValue(), formattedTypesSubList);
 		}
+	}
+
+	public static EmbedBuilder getLeaderboard(
+		String lbType,
+		String username,
+		Player.Gamemode gamemode,
+		int page,
+		int rank,
+		double amount,
+		PaginatorEvent event
+	) {
+		lbType = getType(lbType, true);
+
+		Player player = null;
+		if (username != null) {
+			player = new Player(username, gamemode);
+			if (!player.isValid()) {
+				return player.getFailEmbed();
+			}
+		}
+
+		new LeaderboardPaginator(lbType, gamemode, player, page, rank, amount, event);
+		return null;
 	}
 }

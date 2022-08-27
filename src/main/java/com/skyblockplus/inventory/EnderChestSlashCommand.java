@@ -18,10 +18,18 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
+
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.InvItem;
+import java.util.List;
+import java.util.Map;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -45,7 +53,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "list" -> event.paginate(
-				EnderChestCommand.getPlayerEnderChestList(
+				getPlayerEnderChestList(
 					event.player,
 					event.getOptionStr("profile"),
 					event.getOptionInt("slot", 0),
@@ -53,7 +61,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 				)
 			);
 			case "emoji" -> event.paginate(
-				EnderChestCommand.getPlayerEnderChest(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
+				getPlayerEnderChest(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
 				true
 			);
 			default -> event.embed(event.invalidCommandMessage());
@@ -80,5 +88,34 @@ public class EnderChestSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getPlayerEnderChest(String username, String profileName, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			List<String[]> enderChestPages = player.getEnderChest();
+			if (enderChestPages != null) {
+				if (player.invMissing.length() > 0) {
+					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
+				}
+
+				new InventoryEmojiPaginator(enderChestPages, "Ender Chest", player, event);
+				return null;
+			}
+			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+		}
+		return player.getFailEmbed();
+	}
+
+	public static EmbedBuilder getPlayerEnderChestList(String username, String profileName, int slotNum, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			Map<Integer, InvItem> echestMap = player.getEnderChestMap();
+			if (echestMap != null) {
+				new InventoryListPaginator(player, echestMap, slotNum, event);
+				return null;
+			}
+		}
+		return player.getFailEmbed();
 	}
 }

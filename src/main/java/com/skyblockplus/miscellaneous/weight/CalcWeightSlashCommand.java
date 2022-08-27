@@ -18,10 +18,18 @@
 
 package com.skyblockplus.miscellaneous.weight;
 
+import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
+import static com.skyblockplus.utils.Constants.SLAYER_NAMES;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.skyblockplus.miscellaneous.weight.weight.Weight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.SkillsStruct;
+import com.skyblockplus.utils.structs.WeightStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -44,7 +52,7 @@ public class CalcWeightSlashCommand extends SlashCommand {
 		}
 
 		event.embed(
-			CalcWeightCommand.calculateWeight(
+			calculateWeight(
 				event.player,
 				event.getOptionStr("profile"),
 				event.getOptionStr("type"),
@@ -87,5 +95,142 @@ public class CalcWeightSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder calculateWeight(String username, String profileName, String type, int amount, Player.WeightType weightType) {
+		if ((SLAYER_NAMES.contains(type) && amount > 500000000) || (!SLAYER_NAMES.contains(type) && amount > 100)) {
+			return invalidEmbed("Invalid amount");
+		}
+
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+			if (type.equals("catacombs")) {
+				SkillsStruct current = player.getCatacombs();
+				SkillsStruct target = player.skillInfoFromLevel(amount, type);
+				eb.addField(
+					"Current",
+					"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+					false
+				);
+				eb.addField(
+					"Target",
+					"Level: " +
+					amount +
+					"\nXP: " +
+					formatNumber(target.totalExp()) +
+					" (+" +
+					formatNumber(target.totalExp() - current.totalExp()) +
+					")",
+					false
+				);
+				Weight weight = Weight.of(weightType, player).calculateWeight(type);
+				Weight predictedWeight = Weight.of(weightType, player).calculateWeight(type);
+				WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight();
+				WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight(target);
+				eb.addField(
+					capitalizeString(weightType.name()) + " Weight Change",
+					"Total: " +
+					weight.getTotalWeight().getFormatted(false) +
+					" ➜ " +
+					predictedWeight.getTotalWeight().getFormatted(false) +
+					"\n" +
+					capitalizeString(type) +
+					": " +
+					pre.getFormatted(false) +
+					" ➜ " +
+					post.getFormatted(false),
+					false
+				);
+				return eb;
+			} else if (ALL_SKILL_NAMES.contains(type)) {
+				SkillsStruct current = player.getSkill(type);
+				if (current == null) {
+					return invalidEmbed("Skills API disabled");
+				}
+				SkillsStruct target = player.skillInfoFromLevel(amount, type);
+				eb.addField(
+					"Current",
+					"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+					false
+				);
+				eb.addField(
+					"Target",
+					"Level: " +
+					amount +
+					"\nXP: " +
+					formatNumber(target.totalExp()) +
+					" (+" +
+					formatNumber(target.totalExp() - current.totalExp()) +
+					")",
+					false
+				);
+				Weight weight = Weight.of(weightType, player).calculateWeight(type);
+				Weight predictedWeight = Weight.of(weightType, player).calculateWeight(type);
+				WeightStruct pre = weight.getSkillsWeight().getSkillsWeight(type);
+				WeightStruct post = predictedWeight.getSkillsWeight().getSkillsWeight(type, target);
+				eb.addField(
+					"Skill Average Change",
+					roundAndFormat(player.getSkillAverage()) + " ➜ " + roundAndFormat(player.getSkillAverage(type, amount)),
+					false
+				);
+				eb.addField(
+					capitalizeString(weightType.name()) + " Weight Change",
+					"Total: " +
+					weight.getTotalWeight().getFormatted(false) +
+					" ➜ " +
+					predictedWeight.getTotalWeight().getFormatted(false) +
+					"\n" +
+					capitalizeString(type) +
+					": " +
+					pre.getFormatted(false) +
+					" ➜ " +
+					post.getFormatted(false),
+					false
+				);
+				return eb;
+			} else if (SLAYER_NAMES.contains(type)) {
+				int curXp = player.getSlayer(type);
+				eb.addField("Current", "Level: " + player.getSlayerLevel(type) + "\nXP: " + formatNumber(curXp), false);
+				eb.addField(
+					"Target",
+					"Level: " +
+					player.getSlayerLevel(type, amount) +
+					"\nXP: " +
+					formatNumber(amount) +
+					" (+" +
+					formatNumber(amount - curXp) +
+					")",
+					false
+				);
+				Weight weight = Weight.of(weightType, player).calculateWeight(type);
+				Weight predictedWeight = Weight.of(weightType, player).calculateWeight(type);
+				WeightStruct pre = weight.getSlayerWeight().getSlayerWeight(type);
+				WeightStruct post = predictedWeight.getSlayerWeight().getSlayerWeight(type, amount);
+				eb.addField(
+					"Total Slayer XP Change",
+					roundAndFormat(player.getTotalSlayer()) + " ➜ " + roundAndFormat(player.getTotalSlayer(type, amount)),
+					false
+				);
+				eb.addField(
+					capitalizeString(weightType.name()) + " Weight Change",
+					"Total: " +
+					weight.getTotalWeight().getFormatted(false) +
+					" ➜ " +
+					predictedWeight.getTotalWeight().getFormatted(false) +
+					"\n" +
+					capitalizeString(type) +
+					": " +
+					pre.getFormatted(false) +
+					" ➜ " +
+					post.getFormatted(false),
+					false
+				);
+				return eb;
+			} else {
+				return invalidEmbed("Invalid type");
+			}
+		}
+		return player.getFailEmbed();
 	}
 }

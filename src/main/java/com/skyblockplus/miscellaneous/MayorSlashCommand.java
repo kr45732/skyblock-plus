@@ -18,10 +18,21 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.features.mayor.MayorHandler.mayorNameToEmoji;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+
+import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import java.time.Instant;
+import java.util.List;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,11 +46,55 @@ public class MayorSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(MayorCommand.getMayor());
+		event.embed(getMayor());
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands.slash(name, "Get the current mayor and their perks");
+	}
+
+	public static MessageBuilder getMayor() {
+		AutomaticGuild automaticGuild = guildMap.get("796790757947867156");
+
+		List<Button> buttons = automaticGuild.lastMayorElectedMessage.getButtons();
+		if (automaticGuild.lastMayorElectionOpenMessage != null) {
+			buttons.add(Button.primary("mayor_current_election_button", "Current Election"));
+		}
+		buttons.add(Button.primary("mayor_special_button", "Special Mayors"));
+
+		return new MessageBuilder().setEmbeds(automaticGuild.lastMayorElectedMessage.getEmbeds()).setActionRows(ActionRow.of(buttons));
+	}
+
+	public static EmbedBuilder getSpecialMayors() {
+		long newYearToElectionOpen = 217200000;
+		long newYearToElectionClose = 105600000;
+		int year = CalendarSlashCommand.getSkyblockYear();
+		int nextSpecial = year % 8 == 0 ? year : ((year + 8) - (year % 8));
+
+		String[] mayorNames = new String[] { "Scorpius", "Derpy", "Jerry" };
+		EmbedBuilder eb = defaultEmbed("Special Mayors");
+		for (int i = nextSpecial; i < nextSpecial + 24; i += 8) {
+			int mayorIndex = 0;
+			if ((i - 8) % 24 == 0) {
+				mayorIndex = 1;
+			} else if ((i - 16) % 24 == 0) {
+				mayorIndex = 2;
+			}
+			eb.addField(
+				mayorNameToEmoji.get(mayorNames[mayorIndex].toUpperCase()) + " " + mayorNames[mayorIndex],
+				"Election Opens: <t:" +
+				Instant
+					.ofEpochMilli((CalendarSlashCommand.YEAR_0 + CalendarSlashCommand.YEAR_MS * (i - 1)) + newYearToElectionOpen)
+					.getEpochSecond() +
+				":R>\nElection Closes: <t:" +
+				Instant
+					.ofEpochMilli((CalendarSlashCommand.YEAR_0 + CalendarSlashCommand.YEAR_MS * (i)) + newYearToElectionClose)
+					.getEpochSecond() +
+				":R>",
+				false
+			);
+		}
+		return eb;
 	}
 }

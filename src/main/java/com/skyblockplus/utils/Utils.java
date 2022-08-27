@@ -1988,4 +1988,8 @@ public class Utils {
 		finalOutput.add("automatic", outputObject);
 		return finalOutput;
 	}
+
+	public static String padStart(String string, int minLength, char padChar) {
+		return string.length() >= minLength ? string : (String.valueOf(padChar).repeat(minLength - string.length()) + string);
+	}
 }

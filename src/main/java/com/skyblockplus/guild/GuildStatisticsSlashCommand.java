@@ -18,15 +18,28 @@
 
 package com.skyblockplus.guild;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.roundAndFormat;
+
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.HypixelResponse;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -43,7 +56,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		String guild = event.getOptionStr("guild");
 		if (guild != null) {
 			event.embed(
-				GuildStatisticsCommand.getStatistics(
+				getStatistics(
 					null,
 					guild,
 					event.getOptionBoolean("key", false),
@@ -59,7 +72,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		}
 
 		event.embed(
-			GuildStatisticsCommand.getStatistics(
+			getStatistics(
 				event.player,
 				null,
 				event.getOptionBoolean("key", false),
@@ -89,5 +102,133 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getStatistics(
+		String username,
+		String guildName,
+		boolean useKey,
+		Player.Gamemode gamemode,
+		PaginatorEvent event
+	) {
+		String hypixelKey = null;
+		if (useKey) {
+			hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
+
+			EmbedBuilder eb = checkHypixelKey(hypixelKey);
+			if (eb != null) {
+				return eb;
+			}
+		}
+
+		HypixelResponse guildResponse;
+		if (username != null) {
+			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+			if (!usernameUuidStruct.isValid()) {
+				return invalidEmbed(usernameUuidStruct.failCause());
+			}
+
+			guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
+		} else {
+			guildResponse = getGuildFromName(guildName);
+		}
+		if (!guildResponse.isValid()) {
+			return invalidEmbed(guildResponse.failCause());
+		}
+
+		JsonElement guildJson = guildResponse.response();
+		guildName = higherDepth(guildJson, "name").getAsString();
+		String guildId = higherDepth(guildJson, "_id").getAsString();
+
+		if (hypixelGuildQueue.contains(guildId)) {
+			return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
+		}
+		hypixelGuildQueue.add(guildId);
+		List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
+			List.of("slayer", "skills", "catacombs", "weight"),
+			gamemode,
+			streamJsonArray(higherDepth(guildJson, "members")).map(u -> higherDepth(u, "uuid", "")).collect(Collectors.toList()),
+			hypixelKey,
+			event
+		);
+		hypixelGuildQueue.remove(guildId);
+
+		List<DataObject> slayerLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("slayer"))).toList();
+		List<DataObject> skillsLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("skills"))).toList();
+		List<DataObject> cataLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("catacombs"))).toList();
+		List<DataObject> weightLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("weight"))).toList();
+
+		double averageSlayer = slayerLb.stream().mapToDouble(m -> m.getDouble("slayer")).average().orElse(0);
+		double averageSkills = skillsLb.stream().mapToDouble(m -> m.getDouble("skills")).average().orElse(0);
+		double averageCata = cataLb.stream().mapToDouble(m -> m.getDouble("catacombs")).average().orElse(0);
+		double averageWeight = weightLb.stream().mapToDouble(m -> m.getDouble("weight")).average().orElse(0);
+
+		EmbedBuilder eb = defaultEmbed(guildName)
+			.setDescription(
+				"**Average Slayer XP:** " +
+				roundAndFormat(averageSlayer) +
+				"\n**Average Skills Level:** " +
+				roundAndFormat(averageSkills) +
+				"\n**Average Catacombs XP:** " +
+				roundAndFormat(averageCata) +
+				"\n**Average Weight:** " +
+				roundAndFormat(averageWeight)
+			);
+		StringBuilder slayerStr = new StringBuilder();
+		for (int i = 0; i < Math.min(5, slayerLb.size()); i++) {
+			DataObject cur = slayerLb.get(i);
+			slayerStr
+				.append("`")
+				.append(i + 1)
+				.append(")` ")
+				.append(fixUsername(cur.getString("username")))
+				.append(": ")
+				.append(roundAndFormat(cur.getDouble("slayer")))
+				.append("\n");
+		}
+		StringBuilder skillsStr = new StringBuilder();
+		for (int i = 0; i < Math.min(5, skillsLb.size()); i++) {
+			DataObject cur = skillsLb.get(i);
+			skillsStr
+				.append("`")
+				.append(i + 1)
+				.append(")` ")
+				.append(fixUsername(cur.getString("username")))
+				.append(": ")
+				.append(roundAndFormat(cur.getDouble("skills")))
+				.append("\n");
+		}
+		StringBuilder cataStr = new StringBuilder();
+		for (int i = 0; i < Math.min(5, cataLb.size()); i++) {
+			DataObject cur = cataLb.get(i);
+			cataStr
+				.append("`")
+				.append(i + 1)
+				.append(")` ")
+				.append(fixUsername(cur.getString("username")))
+				.append(": ")
+				.append(roundAndFormat(cur.getDouble("catacombs")))
+				.append("\n");
+		}
+		StringBuilder weightStr = new StringBuilder();
+		for (int i = 0; i < Math.min(5, weightLb.size()); i++) {
+			DataObject cur = weightLb.get(i);
+			weightStr
+				.append("`")
+				.append(i + 1)
+				.append(")` ")
+				.append(fixUsername(cur.getString("username")))
+				.append(": ")
+				.append(roundAndFormat(cur.getDouble("weight")))
+				.append("\n");
+		}
+		eb.addField("Top 5 Slayer", slayerStr.toString(), true);
+		eb.addField("Top 5 Skills", skillsStr.toString(), true);
+		eb.addBlankField(true);
+		eb.addField("Top 5 Catacombs", cataStr.toString(), true);
+		eb.addField("Top 5 Weight", weightStr.toString(), true);
+		eb.addBlankField(true);
+
+		return eb;
 	}
 }

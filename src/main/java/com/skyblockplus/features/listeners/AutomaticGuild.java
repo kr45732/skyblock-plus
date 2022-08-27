@@ -21,7 +21,6 @@ package com.skyblockplus.features.listeners;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.jerryEmbed;
 import static com.skyblockplus.features.mayor.MayorHandler.votesEmbed;
-import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -38,10 +37,10 @@ import com.skyblockplus.features.event.EventGuild;
 import com.skyblockplus.features.jacob.JacobGuild;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
-import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
+import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
 import com.skyblockplus.features.verify.VerifyGuild;
-import com.skyblockplus.miscellaneous.MayorCommand;
+import com.skyblockplus.miscellaneous.MayorSlashCommand;
 import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -65,9 +64,7 @@ import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -815,7 +812,7 @@ public class AutomaticGuild {
 				JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
 				Instant endingTime = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 				if (Instant.now().isAfter(endingTime)) {
-					endSkyblockEvent(guildId);
+					SkyblockEventSlashCommand.endSkyblockEvent(guildId);
 				}
 			}
 		} catch (Exception ignored) {}
@@ -964,19 +961,7 @@ public class AutomaticGuild {
 	}
 
 	public void onGuildMessageReceived(MessageReceivedEvent event) {
-		if (verifyGuild.onGuildMessageReceived(event)) {
-			return;
-		}
-
-		if (event.getAuthor().isBot() && !event.getAuthor().getId().equals(selfUserId)) {
-			return;
-		}
-
-		for (ApplyGuild guild : applyGuild) {
-			if (guild.onGuildMessageReceived(event)) {
-				return;
-			}
-		}
+		verifyGuild.onGuildMessageReceived(event);
 	}
 
 	public void onTextChannelDelete(ChannelDeleteEvent event) {
@@ -996,7 +981,7 @@ public class AutomaticGuild {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().equals("mayor_special_button")) {
-			event.replyEmbeds(MayorCommand.getSpecialMayors().build()).setEphemeral(true).queue();
+			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {
 			Message msg = guildMap.get("796790757947867156").lastMayorElectionOpenMessage;
@@ -1077,11 +1062,11 @@ public class AutomaticGuild {
 						event
 							.getHook()
 							.editOriginalEmbeds(
-								SkyblockEventCommand.joinSkyblockEvent(null, null, event.getMember(), event.getGuild().getId()).build()
+								SkyblockEventSlashCommand.joinSkyblockEvent(null, null, event.getMember(), event.getGuild().getId()).build()
 							)
 							.queue();
 					} else {
-						EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event.getGuild(), event.getUser(), null, event);
+						EmbedBuilder eb = SkyblockEventSlashCommand.getEventLeaderboard(event.getGuild(), event.getUser(), null, event);
 						if (eb != null) {
 							event.getHook().editOriginalEmbeds(eb.build()).queue();
 						}
@@ -1159,22 +1144,6 @@ public class AutomaticGuild {
 		verifyGuild.onGuildMemberJoin(event);
 		if (applyGuestRole != null) {
 			event.getGuild().addRoleToMember(event.getMember(), applyGuestRole).queue();
-		}
-	}
-
-	public void onGuildMessageUpdate(MessageUpdateEvent event) {
-		for (ApplyGuild guild : applyGuild) {
-			if (guild.onGuildMessageUpdate(event)) {
-				return;
-			}
-		}
-	}
-
-	public void onGuildMessageDelete(MessageDeleteEvent event) {
-		for (ApplyGuild guild : applyGuild) {
-			if (guild.onGuildMessageDelete(event)) {
-				return;
-			}
 		}
 	}
 

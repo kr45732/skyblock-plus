@@ -18,9 +18,9 @@
 
 package com.skyblockplus.features.jacob;
 
-import static com.skyblockplus.features.event.CalendarCommand.YEAR_0;
-import static com.skyblockplus.features.event.CalendarCommand.getSkyblockYear;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.miscellaneous.CalendarSlashCommand.YEAR_0;
+import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;

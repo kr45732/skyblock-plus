@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,27 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous.networth;
+package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.defaultPerms;
-import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NetworthCommand extends Command {
+public class CalendarCommand extends Command {
 
-	public NetworthCommand() {
-		this.name = "networth";
-		this.cooldown = globalCooldown + 1;
-		this.aliases = new String[] { "nw", "n" };
-		this.botPermissions = defaultPerms();
+	public CalendarCommand() {
+		this.name = "calendar";
+		this.cooldown = globalCooldown;
+		this.aliases = new String[] { "cal" };
 	}
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new NetworthExecute().execute(this, event);
+		new CommandExecute.SlashOnlyCommandExecute(this, event).queue();
 	}
 }

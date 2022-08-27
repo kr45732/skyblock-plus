@@ -18,9 +18,18 @@
 
 package com.skyblockplus.general;
 
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.stereotype.Component;
@@ -35,11 +44,42 @@ public class UnlinkSlashCommand extends SlashCommand {
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
-		event.embed(UnlinkCommand.unlinkAccount(new PaginatorEvent(event)));
+		event.embed(unlinkAccount(new PaginatorEvent(event)));
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands.slash(name, "Unlink your account from this bot");
+	}
+
+	public static EmbedBuilder unlinkAccount(PaginatorEvent event) {
+		database.deleteByDiscord(event.getUser().getId());
+
+		JsonElement verifySettings = database.getVerifySettings(event.getGuild().getId());
+		if (verifySettings != null && !verifySettings.isJsonNull()) {
+			List<Role> toAdd = new ArrayList<>();
+			try {
+				toAdd.add(event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
+			} catch (Exception ignored) {}
+			event
+				.getGuild()
+				.modifyMemberRoles(
+					event.getMember(),
+					toAdd,
+					streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
+						.map(r -> {
+							try {
+								return event.getGuild().getRoleById(r.getAsString());
+							} catch (Exception e) {
+								return null;
+							}
+						})
+						.filter(Objects::nonNull)
+						.collect(Collectors.toList())
+				)
+				.queue();
+		}
+
+		return defaultEmbed("Success").setDescription("You were unlinked");
 	}
 }

@@ -18,13 +18,21 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.getLowestBinJson;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.idToName;
 
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -41,7 +49,7 @@ public class BinSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(BinCommand.getLowestBin(event.getOptionStr("item")));
+		event.embed(getLowestBin(event.getOptionStr("item")));
 	}
 
 	@Override
@@ -59,5 +67,91 @@ public class BinSlashCommand extends SlashCommand {
 				);
 			}
 		}
+	}
+
+	public static EmbedBuilder getLowestBin(String item) {
+		JsonElement lowestBinJson = getLowestBinJson();
+		if (lowestBinJson == null) {
+			return invalidEmbed("Error fetching auctions");
+		}
+
+		EmbedBuilder eb = defaultEmbed("Lowest bin");
+		String itemId = nameToId(item);
+		if (higherDepth(lowestBinJson, itemId) != null) {
+			eb.addField(idToName(itemId), formatNumber(higherDepth(lowestBinJson, itemId, 0L)), false);
+			eb.setThumbnail(getItemThumbnail(itemId));
+			return eb;
+		}
+
+		for (String i : ENCHANT_NAMES) {
+			if (itemId.contains(i)) {
+				try {
+					String enchantedBookId = i + ";" + Integer.parseInt(itemId.replaceAll("\\D+", ""));
+					if (higherDepth(lowestBinJson, enchantedBookId) != null) {
+						eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(lowestBinJson, enchantedBookId, 0L)), false);
+						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
+						return eb;
+					}
+				} catch (NumberFormatException e) {
+					for (int j = 10; j > 0; j--) {
+						String enchantedBookId = i + ";" + j;
+						if (higherDepth(lowestBinJson, enchantedBookId) != null) {
+							eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(lowestBinJson, enchantedBookId, 0L)), false);
+						}
+					}
+
+					if (eb.getFields().size() != 0) {
+						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
+						return eb;
+					}
+				}
+			}
+		}
+
+		JsonElement petJson = getPetNumsJson();
+		for (String i : PET_NAMES) {
+			if (itemId.contains(i)) {
+				String petId = i;
+				boolean raritySpecified = false;
+				for (Map.Entry<String, String> j : RARITY_TO_NUMBER_MAP.entrySet()) {
+					if (itemId.contains(j.getKey())) {
+						petId += j.getValue();
+						raritySpecified = true;
+						break;
+					}
+				}
+
+				if (!raritySpecified) {
+					List<String> petRarities = higherDepth(petJson, petId)
+						.getAsJsonObject()
+						.keySet()
+						.stream()
+						.map(String::toUpperCase)
+						.collect(Collectors.toCollection(ArrayList::new));
+
+					for (String j : petRarities) {
+						if (higherDepth(lowestBinJson, petId + RARITY_TO_NUMBER_MAP.get(j)) != null) {
+							petId += RARITY_TO_NUMBER_MAP.get(j);
+							break;
+						}
+					}
+				}
+
+				if (higherDepth(lowestBinJson, petId) != null) {
+					eb.addField(idToName(petId), formatNumber(higherDepth(lowestBinJson, petId, 0L)), false);
+					eb.setThumbnail(getItemThumbnail(petId));
+					return eb;
+				}
+			}
+		}
+
+		String closestMatch = getClosestMatchFromIds(itemId, getJsonKeys(lowestBinJson));
+		if (closestMatch != null) {
+			eb.addField(idToName(closestMatch), formatNumber(higherDepth(lowestBinJson, closestMatch, 0L)), false);
+			eb.setThumbnail(getItemThumbnail(closestMatch));
+			return eb;
+		}
+
+		return defaultEmbed("No bin found for " + idToName(item));
 	}
 }

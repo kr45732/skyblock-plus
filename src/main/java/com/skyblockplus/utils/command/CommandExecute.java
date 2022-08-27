@@ -19,7 +19,6 @@
 package com.skyblockplus.utils.command;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -77,7 +76,6 @@ public abstract class CommandExecute extends CommandEvent {
 		"categories",
 		"bestiary",
 		"reforge",
-		"fix-application",
 		"skyblock",
 		"hotm",
 		"hypixel",
@@ -98,7 +96,12 @@ public abstract class CommandExecute extends CommandEvent {
 		"roles",
 		"settings",
 		"bin",
-		"link"
+		"link",
+		"help",
+		"leaderboard",
+		"weight",
+		"auctions",
+		"networth"
 	);
 	protected final Command command;
 	protected Message ebMessage;
@@ -106,7 +109,6 @@ public abstract class CommandExecute extends CommandEvent {
 	protected String player;
 	protected EmbedBuilder eb;
 	private final boolean sendLoadingEmbed;
-	private boolean adminCommand;
 
 	public CommandExecute(Command command, CommandEvent event) {
 		this(command, event, true);
@@ -121,32 +123,21 @@ public abstract class CommandExecute extends CommandEvent {
 	protected abstract void execute();
 
 	public void queue() {
-		executor.submit(() -> {
-			if (isMainBot() && slashOnlyCommands.contains(command.getName())) {
-				reply(
+		if (isMainBot() && slashOnlyCommands.contains(command.getName())) {
+			getMessage()
+				.reply(
 					client.getError() +
 					" This command can only be used through slash commands. If you do not see slash commands, make sure `Use Application Commands` is enabled for @ everyone or re-invite the bot using `" +
 					getGuildPrefix(getGuild().getId()) +
 					"invite`"
-				);
-				return;
-			}
+				)
+				.queue(ignore, ignore);
+			return;
+		}
 
-			if (adminCommand && !guildMap.get(getGuild().getId()).isAdmin(getMember())) {
-				reply("You are missing the required permissions or roles to use this command");
-				return;
-			}
-
+		executor.submit(() -> {
 			if (sendLoadingEmbed) {
-				this.ebMessage =
-					getChannel()
-						.sendMessage(
-							"**⚠️ Skyblock Plus will stop responding to message commands <t:1662004740:R>!** Please use slash commands instead. If you do not see slash commands, make sure `Use Application Commands` is enabled for @ everyone or re-invite the bot using `" +
-							getGuildPrefix(getGuild().getId()) +
-							"invite`"
-						)
-						.setEmbeds(loadingEmbed().build())
-						.complete();
+				this.ebMessage = getChannel().sendMessageEmbeds(loadingEmbed().build()).complete();
 			}
 			this.args = getMessage().getContentRaw().split("\\s+");
 			execute();
@@ -373,12 +364,21 @@ public abstract class CommandExecute extends CommandEvent {
 		return defaultValue;
 	}
 
-	public CommandExecute setAdminCommand(boolean adminCommand) {
-		this.adminCommand = adminCommand;
-		return this;
-	}
-
 	public PaginatorEvent getPaginatorEvent() {
 		return new PaginatorEvent(this);
+	}
+
+	public static class SlashOnlyCommandExecute extends CommandExecute {
+
+		public SlashOnlyCommandExecute(Command command, CommandEvent event) {
+			super(command, event);
+		}
+
+		public SlashOnlyCommandExecute(Command command, CommandEvent event, boolean sendLoadingEmbed) {
+			super(command, event, sendLoadingEmbed);
+		}
+
+		@Override
+		protected void execute() {}
 	}
 }

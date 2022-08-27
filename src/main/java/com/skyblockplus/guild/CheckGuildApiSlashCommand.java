@@ -18,10 +18,26 @@
 
 package com.skyblockplus.guild;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.client;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.HypixelResponse;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -42,7 +58,7 @@ public class CheckGuildApiSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(CheckGuildApiCommand.getGuildCheckApi(event.player, event.getOptionStr("exclude", ""), new PaginatorEvent(event)));
+		event.paginate(getGuildCheckApi(event.player, event.getOptionStr("exclude", ""), new PaginatorEvent(event)));
 	}
 
 	@Override
@@ -58,5 +74,116 @@ public class CheckGuildApiSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getGuildCheckApi(String username, String exclude, PaginatorEvent event) {
+		List<String> excludeArr = new ArrayList<>();
+		if (!exclude.isEmpty()) {
+			excludeArr.addAll(List.of(exclude.toLowerCase().split(",")));
+			for (String s : excludeArr) {
+				if (!List.of("inventory", "bank", "collections", "vault", "skills").contains(s)) {
+					return invalidEmbed("Invalid exclude type: " + s);
+				}
+			}
+		}
+
+		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
+
+		EmbedBuilder eb = checkHypixelKey(hypixelKey);
+		if (eb != null) {
+			return eb;
+		}
+
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (!usernameUuid.isValid()) {
+			return invalidEmbed(usernameUuid.failCause());
+		}
+
+		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.uuid());
+		if (!guildResponse.isValid()) {
+			return invalidEmbed(guildResponse.failCause());
+		}
+
+		JsonArray guildMembers = guildResponse.get("members").getAsJsonArray();
+		List<CompletableFuture<String>> futuresList = new ArrayList<>();
+		List<Player> players = new ArrayList<>();
+
+		for (JsonElement guildMember : guildMembers) {
+			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
+
+			try {
+				if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
+					System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset() + " seconds");
+					TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset());
+				}
+			} catch (Exception ignored) {}
+
+			futuresList.add(
+				asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey)
+					.thenApplyAsync(
+						guildMemberProfileJsonResponse -> {
+							Player player = new Player(
+								guildMemberUuid,
+								usernameToUuid(guildMemberUuid).username(),
+								guildMemberProfileJsonResponse,
+								false
+							);
+
+							if (player.isValid()) {
+								boolean invEnabled = excludeArr.contains("inventory") || player.isInventoryApiEnabled();
+								boolean bankEnabled = excludeArr.contains("bank") || player.isBankApiEnabled();
+								boolean collectionsEnabled = excludeArr.contains("collections") || player.isCollectionsApiEnabled();
+								boolean vaultEnabled = excludeArr.contains("vault") || player.isVaultApiEnabled();
+								boolean skillsEnabled = excludeArr.contains("skills") || player.isSkillsApiEnabled();
+
+								if (invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) {
+									return client.getSuccess() + " **" + player.getUsernameFixed() + ":** all APIs enabled";
+								} else {
+									String out =
+										(invEnabled ? "" : "Inventory API, ") +
+										(bankEnabled ? "" : "Bank API, ") +
+										(collectionsEnabled ? "" : "Collections API, ") +
+										(vaultEnabled ? "" : "Vault API, ") +
+										(skillsEnabled ? "" : "Skills API, ");
+
+									return (
+										client.getError() + " **" + player.getUsernameFixed() + ":** " + out.substring(0, out.length() - 2)
+									);
+								}
+							}
+							return client.getError() + " **" + player.getUsernameFixed() + ":** unable to get data";
+						},
+						executor
+					)
+			);
+		}
+
+		List<String> out = new ArrayList<>();
+		for (CompletableFuture<String> future : futuresList) {
+			try {
+				out.add(future.get());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		leaderboardDatabase.insertIntoLeaderboard(players);
+
+		out.sort(Comparator.comparing(o -> !o.contains(client.getError())));
+		CustomPaginator.Builder paginator = event.getPaginator().setItemsPerPage(20);
+		paginator.addItems(out);
+		event.paginate(
+			paginator.updateExtras(extra ->
+				extra
+					.setEveryPageTitle(guildResponse.get("name").getAsString())
+					.setEveryPageText(
+						"**API Disabled Count:** " +
+						out.stream().filter(o -> o.contains(client.getError())).count() +
+						"\n" +
+						(!excludeArr.isEmpty() ? "**Excluded APIs:** " + String.join(", ", excludeArr) + "\n" : "")
+					)
+			)
+		);
+		return null;
 	}
 }

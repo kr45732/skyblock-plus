@@ -18,10 +18,16 @@
 
 package com.skyblockplus.miscellaneous.weight;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.DUNGEON_EMOJI_MAP;
+import static com.skyblockplus.utils.Utils.capitalizeString;
+
+import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
+import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -42,7 +48,7 @@ public class WeightSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 	}
 
 	@Override
@@ -58,5 +64,111 @@ public class WeightSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getPlayerWeight(String username, String profileName, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(3);
+			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+
+			SenitherWeight weight = new SenitherWeight(player);
+			EmbedBuilder eb = player.defaultPlayerEmbed(" | Senither Weight");
+			StringBuilder slayerStr = new StringBuilder();
+			for (String slayerName : SLAYER_NAMES) {
+				if (slayerName.equals("blaze")) {
+					continue;
+				}
+				slayerStr
+					.append(SLAYER_EMOJI_MAP.get(slayerName))
+					.append(" ")
+					.append(capitalizeString(slayerName))
+					.append(": ")
+					.append(weight.getSlayerWeight().getSlayerWeight(slayerName).getFormatted())
+					.append("\n");
+			}
+			StringBuilder skillsStr = new StringBuilder();
+			for (String skillName : SKILL_NAMES) {
+				skillsStr
+					.append(SKILLS_EMOJI_MAP.get(skillName))
+					.append(" ")
+					.append(capitalizeString(skillName))
+					.append(": ")
+					.append(weight.getSkillsWeight().getSkillsWeight(skillName).getFormatted())
+					.append("\n");
+			}
+			StringBuilder dungeonsStr = new StringBuilder();
+
+			dungeonsStr
+				.append(DUNGEON_EMOJI_MAP.get("catacombs"))
+				.append(" ")
+				.append(capitalizeString("catacombs"))
+				.append(": ")
+				.append(weight.getDungeonsWeight().getDungeonWeight().getFormatted())
+				.append("\n");
+			for (String dungeonClassName : DUNGEON_CLASS_NAMES) {
+				dungeonsStr
+					.append(DUNGEON_EMOJI_MAP.get(dungeonClassName))
+					.append(" ")
+					.append(capitalizeString(dungeonClassName))
+					.append(": ")
+					.append(weight.getDungeonsWeight().getClassWeight(dungeonClassName).getFormatted())
+					.append("\n");
+			}
+
+			eb.addField("Slayer | " + weight.getSlayerWeight().getWeightStruct().getFormatted(), slayerStr.toString(), false);
+			eb.addField("Skills | " + weight.getSkillsWeight().getWeightStruct().getFormatted(), skillsStr.toString(), false);
+			eb.addField("Dungeons | " + weight.getDungeonsWeight().getWeightStruct().getFormatted(), dungeonsStr.toString(), false);
+			eb.setDescription("**Total Weight:** " + weight.getTotalWeight().getFormatted() + "\n**Stage:** " + weight.getStage());
+			extras.addEmbedPage(eb);
+
+			LilyWeight lilyWeight = new LilyWeight(player);
+			EmbedBuilder lilyEb = player.defaultPlayerEmbed(" | Lily Weight");
+			StringBuilder lilySlayerStr = new StringBuilder();
+			for (String slayerName : SLAYER_NAMES) {
+				lilySlayerStr
+					.append(SLAYER_EMOJI_MAP.get(slayerName))
+					.append(" ")
+					.append(capitalizeString(slayerName))
+					.append(": ")
+					.append(lilyWeight.getSlayerWeight().getSlayerWeight(slayerName).getFormatted())
+					.append("\n");
+			}
+			StringBuilder lilySkillsStr = new StringBuilder();
+			for (String skillName : SKILL_NAMES) {
+				lilySkillsStr
+					.append(SKILLS_EMOJI_MAP.get(skillName))
+					.append(" ")
+					.append(capitalizeString(skillName))
+					.append(": ")
+					.append(lilyWeight.getSkillsWeight().getSkillsWeight(skillName).getFormatted())
+					.append("\n");
+			}
+			String lilyDungeonsStr =
+				DUNGEON_EMOJI_MAP.get("catacombs") +
+				" Catacombs: " +
+				lilyWeight.getDungeonsWeight().getDungeonWeight().getFormatted() +
+				"\n" +
+				DUNGEON_EMOJI_MAP.get("catacombs_1") +
+				" Normal floor completions: " +
+				lilyWeight.getDungeonsWeight().getDungeonCompletionWeight("normal").getFormatted() +
+				"\n" +
+				DUNGEON_EMOJI_MAP.get("master_catacombs_1") +
+				" Master floor completions: " +
+				lilyWeight.getDungeonsWeight().getDungeonCompletionWeight("master").getFormatted() +
+				"\n";
+
+			lilyEb.addField("Slayer | " + lilyWeight.getSlayerWeight().getWeightStruct().getFormatted(), lilySlayerStr.toString(), false);
+			lilyEb.addField("Skills | " + lilyWeight.getSkillsWeight().getWeightStruct().getFormatted(), lilySkillsStr.toString(), false);
+			lilyEb.addField("Dungeons | " + lilyWeight.getDungeonsWeight().getWeightStruct().getFormatted(), lilyDungeonsStr, false);
+			lilyEb.setDescription(
+				"**Total Weight:** " + lilyWeight.getTotalWeight().getFormatted() + "\n**Stage:** " + lilyWeight.getStage()
+			);
+			extras.addEmbedPage(lilyEb);
+
+			event.paginate(paginateBuilder.setPaginatorExtras(extras));
+			return null;
+		}
+		return player.getFailEmbed();
 	}
 }

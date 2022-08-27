@@ -24,6 +24,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.general.help.HelpCommand;
+import com.skyblockplus.general.help.HelpSlashCommand;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class PublicEndpoints {
 
 	public static void initialize() {
 		apiCommandList =
-			HelpCommand.helpDataList
+			HelpSlashCommand.helpDataList
 				.stream()
 				.map(helpData -> DataObject.fromJson(gson.toJson(helpData)).toMap())
 				.collect(Collectors.toList());

@@ -300,31 +300,4 @@ public class ApplyGuild {
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
 		return client.getSuccess() + " Player was invited";
 	}
-
-	public boolean onGuildMessageReceived(MessageReceivedEvent event) {
-		for (ApplyUser applyUser : applyUserList) {
-			if (applyUser.onGuildMessageReceived(event)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean onGuildMessageUpdate(MessageUpdateEvent event) {
-		for (ApplyUser applyUser : applyUserList) {
-			if (applyUser.onGuildMessageUpdate(event)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean onGuildMessageDelete(MessageDeleteEvent event) {
-		for (ApplyUser applyUser : applyUserList) {
-			if (applyUser.onGuildMessageDelete(event)) {
-				return true;
-			}
-		}
-		return false;
-	}
 }

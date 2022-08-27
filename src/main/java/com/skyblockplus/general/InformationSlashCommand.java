@@ -18,10 +18,17 @@
 
 package com.skyblockplus.general;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import java.util.Comparator;
+import java.util.stream.Collectors;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,11 +42,74 @@ public class InformationSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(InformationCommand.getInformation());
+		event.embed(getInformation());
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands.slash(name, "Get information about this bot");
+	}
+
+	public static MessageBuilder getInformation() {
+		return new MessageBuilder()
+			.setEmbeds(
+				defaultEmbed("Skyblock Plus")
+					.setDescription(
+						"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
+					)
+					.addField(
+						"Statistics",
+						"**Servers:** " +
+						formatNumber(jda.getGuildCache().size()) +
+						"\n**Users:** " +
+						formatNumber(getUserCount()) +
+						"\n**Avg Ping:** " +
+						formatNumber(
+							(long) jda.getShardCache().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
+						) +
+						"ms\n**Avg Websocket:** " +
+						formatNumber((long) jda.getAverageGatewayPing()) +
+						"ms",
+						true
+					)
+					.addField(
+						"Shards",
+						jda
+							.getShardCache()
+							.stream()
+							.sorted(Comparator.comparingInt(s -> s.getShardInfo().getShardId()))
+							.map(s -> "**Shard " + (s.getShardInfo().getShardId() + 1) + ":** " + s.getGuildCache().size() + " servers")
+							.collect(Collectors.joining("\n")),
+						true
+					)
+					.addField(
+						"Usage",
+						"**Memory:** " +
+						roundAndFormat(
+							100.0 *
+							(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) /
+							(Runtime.getRuntime().maxMemory())
+						) +
+						"%",
+						true
+					)
+					.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif")
+					.setFooter("dsc.gg/sb+ • Last restart")
+					.setTimestamp(client.getStartTime())
+					.build()
+			)
+			.setActionRows(
+				ActionRow.of(
+					Button.link(BOT_INVITE_LINK, "Invite Link"),
+					Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
+					Button.link(FORUM_POST_LINK, "Forum Post"),
+					Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
+				),
+				ActionRow.of(
+					Button.link("https://skyblock-plus.vercel.app", "Website Link"),
+					Button.link("https://skyblock-plus.vercel.app/tos", "Terms of Service"),
+					Button.link("https://skyblock-plus.vercel.app/privacy-policy", "Privacy Policy")
+				)
+			);
 	}
 }

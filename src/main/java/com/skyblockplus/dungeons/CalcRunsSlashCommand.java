@@ -18,14 +18,24 @@
 
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.formatNumber;
+
+import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.SkillsStruct;
+import com.skyblockplus.utils.structs.WeightStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,7 +54,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			CalcRunsCommand.getCalcRuns(
+			getCalcRuns(
 				event.player,
 				event.getOptionStr("profile"),
 				event.getOptionInt("level", 1),
@@ -86,5 +96,150 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static Object getCalcRuns(String username, String profileName, int targetLevel, int floor, PaginatorEvent event) {
+		if (targetLevel <= 0 || targetLevel > 50) {
+			return invalidEmbed("Target level must be between 1 and 50");
+		}
+		if (floor < 0 || floor > 14) {
+			return invalidEmbed("Invalid floor");
+		}
+
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			EmbedBuilder regEmbed = getCalcRunsEmbed(player, targetLevel, floor, false);
+			EmbedBuilder ringEmbed = getCalcRunsEmbed(player, targetLevel, floor, true)
+				.setDescription("**Note:** Calculating with catacombs expert ring");
+
+			event.paginate(
+				defaultPaginator(event.getUser())
+					.showPageNumbers(false)
+					.setPaginatorExtras(
+						new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES)
+							.addEmbedPage(regEmbed)
+							.addReactiveButtons(
+								new PaginatorExtras.ReactiveButton(
+									Button.primary("reactive_calc_runs_ring", "Calculate With Catacombs Expert Ring"),
+									paginator ->
+										paginator
+											.getExtras()
+											.setEmbedPages(ringEmbed)
+											.toggleReactiveButton("reactive_calc_runs_ring", false)
+											.toggleReactiveButton("reactive_calc_runs_reg", true),
+									true
+								),
+								new PaginatorExtras.ReactiveButton(
+									Button.primary("reactive_calc_runs_reg", "Calculate Without Catacombs Expert Ring"),
+									paginator ->
+										paginator
+											.getExtras()
+											.setEmbedPages(regEmbed)
+											.toggleReactiveButton("reactive_calc_runs_ring", true)
+											.toggleReactiveButton("reactive_calc_runs_reg", false),
+									false
+								)
+							)
+					)
+			);
+			return null;
+		}
+
+		return player.getFailEmbed();
+	}
+
+	public static EmbedBuilder getCalcRunsEmbed(Player player, int targetLevel, int floor, boolean useRing) {
+		SkillsStruct current = player.getCatacombs();
+		SkillsStruct target = player.skillInfoFromLevel(targetLevel, "catacombs");
+		if (current.totalExp() >= target.totalExp()) {
+			return invalidEmbed("You are already level " + targetLevel);
+		}
+
+		int completions = higherDepth(
+			player.profileJson(),
+			floor > 7
+				? "dungeons.dungeon_types.master_catacombs.tier_completions." + (floor - 7)
+				: "dungeons.dungeon_types.catacombs.tier_completions." + floor,
+			0
+		);
+		int runs = 0;
+
+		int completionsCap =
+			switch (floor) {
+				case 0, 1, 2, 3, 4, 5 -> 150;
+				case 6 -> 100;
+				default -> 50;
+			};
+		int baseXp =
+			switch (floor) {
+				case 0 -> 50;
+				case 1 -> 80;
+				case 2 -> 160;
+				case 3 -> 400;
+				case 4 -> 1420;
+				case 5 -> 2000;
+				case 6 -> 4000;
+				case 7 -> 20000;
+				case 8 -> 10000;
+				case 9 -> 15000;
+				case 10 -> 36500;
+				case 11 -> 48500;
+				case 12 -> 70000;
+				default -> 100000;
+			};
+
+		double xpNeeded = target.totalExp() - current.totalExp();
+		for (int i = completions + 1; i <= completionsCap; i++) { // First 0 to completionsCap give different xp per run than after completionsCap
+			double xpPerRun = (useRing ? 1.1 : 1.0) * baseXp * (i / 100.0 + 1);
+			xpNeeded -= xpPerRun;
+			if (xpNeeded <= 0) {
+				runs = i;
+				break;
+			}
+		}
+
+		if (xpNeeded > 0) {
+			double xpPerRun = (useRing ? 1.1 : 1.0) * baseXp * (completionsCap / 100.0 + 1);
+			runs = Math.max(0, completionsCap - completions) + (int) Math.ceil(xpNeeded / xpPerRun);
+		}
+
+		SenitherWeight weight = new SenitherWeight(player).calculateWeight("catacombs");
+		SenitherWeight predictedWeight = new SenitherWeight(player).calculateWeight("catacombs");
+		WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight();
+		WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight(target);
+
+		return player
+			.defaultPlayerEmbed()
+			.addField(
+				"Current",
+				"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+				false
+			)
+			.addField(
+				"Target",
+				"Level: " +
+				target.currentLevel() +
+				"\nXP: " +
+				formatNumber(target.totalExp()) +
+				" (+" +
+				formatNumber(target.totalExp() - current.totalExp()) +
+				")\n" +
+				(floor > 7 ? "M" + (floor - 7) : "F" + floor) +
+				" Runs Needed: " +
+				formatNumber(runs),
+				false
+			)
+			.addField(
+				"Weight Change",
+				"Total: " +
+				weight.getTotalWeight().getFormatted(false) +
+				" ➜ " +
+				predictedWeight.getTotalWeight().getFormatted(false) +
+				"\nCatacombs: " +
+				pre.getFormatted(false) +
+				" ➜ " +
+				post.getFormatted(false),
+				false
+			);
 	}
 }

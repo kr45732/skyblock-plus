@@ -18,8 +18,14 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
+
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -40,7 +46,7 @@ public class UuidSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(UuidCommand.getUuidPlayer(event.player));
+		event.embed(getUuidPlayer(event.player));
 	}
 
 	@Override
@@ -48,5 +54,16 @@ public class UuidSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Convert a username to UUID or UUID to username")
 			.addOption(OptionType.STRING, "player", "Username or UUID");
+	}
+
+	public static EmbedBuilder getUuidPlayer(String username) {
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (!usernameUuid.isValid()) {
+			return invalidEmbed(usernameUuid.failCause());
+		}
+
+		return defaultEmbed(usernameUuid.username(), "https://plancke.io/hypixel/player/stats/" + usernameUuid.username())
+			.setDescription("**Username:** " + usernameUuid.username() + "\n**Uuid:** " + usernameUuid.uuid())
+			.setThumbnail(usernameUuid.getAvatarlUrl());
 	}
 }

@@ -18,14 +18,22 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
+
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.InvItem;
+import java.util.Map;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,7 +53,7 @@ public class InventorySlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "list" -> event.paginate(
-				InventoryCommand.getPlayerInventoryList(
+				getPlayerInventoryList(
 					event.player,
 					event.getOptionStr("profile"),
 					event.getOptionInt("slot", 0),
@@ -53,7 +61,7 @@ public class InventorySlashCommand extends SlashCommand {
 				)
 			);
 			case "emoji" -> event.paginate(
-				InventoryCommand.getPlayerInventory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
+				getPlayerInventory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
 				true
 			);
 			default -> event.embed(event.invalidCommandMessage());
@@ -80,5 +88,38 @@ public class InventorySlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getPlayerInventoryList(String username, String profileName, int slotNum, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			Map<Integer, InvItem> inventoryMap = player.getInventoryMap(true);
+			if (inventoryMap != null) {
+				new InventoryListPaginator(player, inventoryMap, slotNum, event);
+				return null;
+			}
+		}
+		return player.getFailEmbed();
+	}
+
+	public static EmbedBuilder getPlayerInventory(String username, String profileName, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			String[] playerInventory = player.getInventory();
+			if (playerInventory != null) {
+				if (player.invMissing.length() > 0) {
+					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
+				}
+				event.getChannel().sendMessage(playerInventory[0]).complete();
+				event
+					.getChannel()
+					.sendMessage(playerInventory[1])
+					.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Inventory"))
+					.queue();
+				return null;
+			}
+			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+		}
+		return player.getFailEmbed();
 	}
 }

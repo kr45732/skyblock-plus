@@ -28,7 +28,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import com.skyblockplus.price.PriceCommand;
+import com.skyblockplus.price.PriceSlashCommand;
 import com.skyblockplus.utils.database.CacheDatabase;
 import com.skyblockplus.utils.database.LeaderboardDatabase;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -472,7 +472,7 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonArray queryLowestBin(String query, boolean isName, PriceCommand.AuctionType auctionType) {
+	public static JsonArray queryLowestBin(String query, boolean isName, PriceSlashCommand.AuctionType auctionType) {
 		try {
 			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
@@ -487,9 +487,9 @@ public class ApiHandler {
 			} else {
 				uriBuilder.addParameter("item_id", query);
 			}
-			if (auctionType == PriceCommand.AuctionType.BIN) {
+			if (auctionType == PriceSlashCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");
-			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
+			} else if (auctionType == PriceSlashCommand.AuctionType.AUCTION) {
 				uriBuilder.addParameter("bin", "false");
 			}
 			httpGet.setURI(uriBuilder.build());
@@ -504,7 +504,7 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonArray queryLowestBinPet(String petName, String rarity, PriceCommand.AuctionType auctionType) {
+	public static JsonArray queryLowestBinPet(String petName, String rarity, PriceSlashCommand.AuctionType auctionType) {
 		try {
 			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
@@ -519,9 +519,9 @@ public class ApiHandler {
 			if (!rarity.equals("ANY")) {
 				uriBuilder.addParameter("tier", rarity);
 			}
-			if (auctionType == PriceCommand.AuctionType.BIN) {
+			if (auctionType == PriceSlashCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");
-			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
+			} else if (auctionType == PriceSlashCommand.AuctionType.AUCTION) {
 				uriBuilder.addParameter("bin", "false");
 			}
 			httpGet.setURI(uriBuilder.build());
@@ -533,7 +533,7 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel, PriceCommand.AuctionType auctionType) {
+	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel, PriceSlashCommand.AuctionType auctionType) {
 		try {
 			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
@@ -545,9 +545,9 @@ public class ApiHandler {
 				.addParameter("sort", "ASC")
 				.addParameter("limit", "5")
 				.addParameter("key", AUCTION_API_KEY);
-			if (auctionType == PriceCommand.AuctionType.BIN) {
+			if (auctionType == PriceSlashCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");
-			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
+			} else if (auctionType == PriceSlashCommand.AuctionType.AUCTION) {
 				uriBuilder.addParameter("bin", "false");
 			}
 			httpGet.setURI(uriBuilder.build());

@@ -18,13 +18,26 @@
 
 package com.skyblockplus.features.party;
 
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,13 +52,13 @@ public class PartySlashCommand extends SlashCommand {
 		event.logCommand();
 
 		switch (event.getSubcommandName()) {
-			case "create" -> event.paginate(PartyCommand.createParty(new PaginatorEvent(event)), true);
-			case "list" -> event.embed(PartyCommand.getPartyList(event.getGuild().getId()));
-			case "leave" -> event.embed(PartyCommand.leaveParty(new PaginatorEvent(event)));
-			case "disband" -> event.embed(PartyCommand.disbandParty(new PaginatorEvent(event)));
-			case "join" -> event.embed(PartyCommand.joinParty(event.getOptionStr("username"), new PaginatorEvent(event)));
-			case "kick" -> event.embed(PartyCommand.kickMemberFromParty(event.getOptionStr("username"), new PaginatorEvent(event)));
-			case "current" -> event.embed(PartyCommand.getCurrentParty(new PaginatorEvent(event)));
+			case "create" -> event.paginate(createParty(new PaginatorEvent(event)), true);
+			case "list" -> event.embed(getPartyList(event.getGuild().getId()));
+			case "leave" -> event.embed(leaveParty(new PaginatorEvent(event)));
+			case "disband" -> event.embed(disbandParty(new PaginatorEvent(event)));
+			case "join" -> event.embed(joinParty(event.getOptionStr("username"), new PaginatorEvent(event)));
+			case "kick" -> event.embed(kickMemberFromParty(event.getOptionStr("username"), new PaginatorEvent(event)));
+			case "current" -> event.embed(getCurrentParty(new PaginatorEvent(event)));
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -64,5 +77,248 @@ public class PartySlashCommand extends SlashCommand {
 				new SubcommandData("kick", "Kick a member from your party")
 					.addOption(OptionType.STRING, "username", "The party member's username", true)
 			);
+	}
+
+	public static EmbedBuilder getCurrentParty(PaginatorEvent event) {
+		Party party = guildMap
+			.get(event.getGuild().getId())
+			.partyList.stream()
+			.filter(p ->
+				p.getPartyLeaderId().equals(event.getUser().getId()) ||
+				p.getPartyMembers().stream().anyMatch(pm -> pm.getDiscordId().equalsIgnoreCase(event.getUser().getId()))
+			)
+			.findFirst()
+			.orElse(null);
+		if (party == null) {
+			return invalidEmbed("Your are not in a party");
+		}
+
+		return defaultEmbed("Party Finder")
+			.addField(
+				party.getPartyLeaderUsername() + "'s party",
+				"Floor: " +
+				party.getFloor().replace("_", " ") +
+				"\nCapacity: " +
+				party.getPartyMembers().size() +
+				"/5\nMembers: <@" +
+				party.getPartyLeaderId() +
+				"> " +
+				party
+					.getPartyMembers()
+					.stream()
+					.map(m -> "<@" + m.getDiscordId() + "> (" + m.getClassName() + ")")
+					.collect(Collectors.joining(" ")),
+				false
+			);
+	}
+
+	public static EmbedBuilder kickMemberFromParty(String username, PaginatorEvent event) {
+		Party party = guildMap
+			.get(event.getGuild().getId())
+			.partyList.stream()
+			.filter(p -> p.getPartyLeaderId().equals(event.getUser().getId()))
+			.findFirst()
+			.orElse(null);
+		if (party == null) {
+			return invalidEmbed("You are not the leader of a party");
+		}
+
+		String kickedUsername = party.kickFromParty(username);
+		if (kickedUsername != null) {
+			return defaultEmbed("Party Finder").setDescription("Kicked " + kickedUsername + " from the party");
+		} else {
+			return invalidEmbed(username + " is not in your party");
+		}
+	}
+
+	public static EmbedBuilder leaveParty(PaginatorEvent event) {
+		List<Party> partyList = guildMap.get(event.getGuild().getId()).partyList;
+		for (Party party : partyList) {
+			if (party.leaveParty(event.getUser().getId())) {
+				return defaultEmbed("Party Finder").setDescription("Left " + party.getPartyLeaderUsername() + "'s party");
+			}
+		}
+
+		return invalidEmbed("You are not in a party");
+	}
+
+	public static EmbedBuilder disbandParty(PaginatorEvent event) {
+		List<Party> partyList = guildMap.get(event.getGuild().getId()).partyList;
+		Party party = partyList.stream().filter(p -> p.getPartyLeaderId().equals(event.getUser().getId())).findFirst().orElse(null);
+		if (party == null) {
+			return invalidEmbed("You are not the leader of a party");
+		}
+
+		partyList.remove(party);
+		return defaultEmbed("Party Finder").setDescription("Disbanded the party");
+	}
+
+	public static EmbedBuilder createParty(PaginatorEvent event) {
+		if (
+			guildMap
+				.get(event.getGuild().getId())
+				.partyList.stream()
+				.anyMatch(p ->
+					p.getPartyLeaderId().equals(event.getUser().getId()) ||
+					p.getPartyMembers().stream().anyMatch(pm -> pm.getDiscordId().equals(event.getUser().getId()))
+				)
+		) {
+			return invalidEmbed("You are already a party leader or in a party");
+		}
+
+		LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());
+		if (linkedAccount == null) {
+			return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
+		}
+
+		new PartyHandler(linkedAccount.username(), event);
+		return null;
+	}
+
+	public static EmbedBuilder getPartyList(String guildId) {
+		List<Party> partyList = guildMap.get(guildId).partyList;
+		if (partyList.size() == 0) {
+			return invalidEmbed("No active parties");
+		}
+
+		EmbedBuilder eb = defaultEmbed("Party List");
+		for (Party party : partyList) {
+			eb.addField(
+				party.getPartyLeaderUsername() + "'s party",
+				"Join: `/party join " +
+				party.getPartyLeaderUsername() +
+				"`\nFloor: " +
+				party.getFloor().replace("_", " ") +
+				"\nRequested classes: " +
+				String.join(", ", party.getRequestedClasses()) +
+				"\nMembers: <@" +
+				party.getPartyLeaderId() +
+				"> " +
+				party.getPartyMembers().stream().map(m -> "<@" + m.getDiscordId() + ">").collect(Collectors.joining(" ")),
+				false
+			);
+		}
+		return eb;
+	}
+
+	public static EmbedBuilder joinParty(String id, PaginatorEvent event) {
+		List<Party> partyList = guildMap.get(event.getGuild().getId()).partyList;
+		if (
+			partyList
+				.stream()
+				.anyMatch(p ->
+					p.getPartyLeaderId().equals(event.getUser().getId()) ||
+					p.getPartyMembers().stream().anyMatch(pm -> pm.getDiscordId().equals(event.getUser().getId()))
+				)
+		) {
+			return invalidEmbed("You are already a party leader or in a party");
+		}
+
+		Party party = partyList.stream().filter(p -> p.getPartyLeaderUsername().equalsIgnoreCase(id)).findFirst().orElse(null);
+		if (party == null) {
+			return invalidEmbed("Invalid party id. You can get a list of all parties using `/party list`");
+		}
+
+		LinkedAccount linkedUser = database.getByDiscord(event.getUser().getId());
+		if (linkedUser == null) {
+			return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
+		}
+
+		Player player = new Player(linkedUser.uuid());
+		if (player.getHighestPlayedDungeonFloor() + 1 < party.getFloorInt()) {
+			return invalidEmbed("You have not unlocked this floor");
+		}
+
+		String selectedClass = player.getSelectedDungeonClass();
+		if (party.getMissingClasses().contains(selectedClass) || party.getMissingClasses().contains("any")) {
+			party.joinParty(
+				player.getUsername(),
+				event.getUser().getId(),
+				selectedClass,
+				!party.getMissingClasses().contains(selectedClass)
+			);
+			TextChannel channel = event.getGuild().getTextChannelById(party.getMessageChannelId());
+			channel
+				.sendMessage("<@" + party.getPartyLeaderId() + "> ")
+				.setEmbeds(
+					defaultEmbed("Party Finder")
+						.setDescription(
+							"**" +
+							player.getUsernameFixed() +
+							" joined your party**\nCatacombs: " +
+							roundAndFormat(player.getCatacombs().getProgressLevel()) +
+							"\nSecrets: " +
+							formatNumber(player.getDungeonSecrets()) +
+							"\nClass: " +
+							selectedClass
+						)
+						.build()
+				)
+				.queueAfter(1, TimeUnit.SECONDS);
+			if (party.getPartyMembers().size() == 4) {
+				try {
+					channel
+						.createThreadChannel("pf-" + party.getPartyLeaderUsername())
+						.queue(threadChannel ->
+							threadChannel
+								.sendMessage(
+									"<@" +
+									party.getPartyLeaderId() +
+									"> " +
+									party
+										.getPartyMembers()
+										.stream()
+										.map(m -> "<@" + m.getDiscordId() + ">")
+										.collect(Collectors.joining(" "))
+								)
+								.setEmbeds(
+									defaultEmbed("Party Finder")
+										.setDescription(
+											"Your party has reached 5/5 players and has been unlisted. The party leader can click the button below to close this channel."
+										)
+										.build()
+								)
+								.setActionRow(Button.danger("party_finder_channel_close_" + party.getPartyLeaderId(), "Archive Thraed"))
+								.queueAfter(1, TimeUnit.SECONDS)
+						);
+				} catch (PermissionException e) {
+					channel
+						.sendMessage(
+							"<@" +
+							party.getPartyLeaderId() +
+							"> " +
+							party.getPartyMembers().stream().map(m -> "<@" + m.getDiscordId() + ">").collect(Collectors.joining(" "))
+						)
+						.setEmbeds(
+							defaultEmbed("Party Finder")
+								.setDescription(
+									"Your party has reached 5/5 players and has been unlisted. Missing permissions: `" +
+									e.getPermission().getName() +
+									"`"
+								)
+								.build()
+						)
+						.queueAfter(1, TimeUnit.SECONDS);
+				}
+
+				partyList.remove(party);
+			}
+
+			return defaultEmbed("Party Finder")
+				.setDescription(
+					"Joined " +
+					party.getPartyLeaderUsername() +
+					"'s party. The party is at " +
+					(party.getPartyMembers().size() + 1) +
+					"/5 members"
+				);
+		} else {
+			return invalidEmbed(
+				"The party needs a " +
+				String.join(", or ", new HashSet<>(party.getMissingClasses())) +
+				", however, your selected class is a " +
+				selectedClass
+			);
+		}
 	}
 }

@@ -18,13 +18,20 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.getAverageAuctionJson;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
+import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -41,7 +48,7 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(AverageAuctionCommand.getAverageAuctionPrice(event.getOptionStr("item")));
+		event.embed(getAverageAuctionPrice(event.getOptionStr("item")));
 	}
 
 	@Override
@@ -61,5 +68,112 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 				);
 			}
 		}
+	}
+
+	public static EmbedBuilder getAverageAuctionPrice(String item) {
+		JsonElement averageAhJson = getAverageAuctionJson();
+		if (averageAhJson == null) {
+			return defaultEmbed("Error fetching auctions");
+		}
+
+		EmbedBuilder eb = defaultEmbed("Average auction");
+		String itemId = nameToId(item);
+		if (higherDepth(averageAhJson, itemId) != null) {
+			JsonElement itemJson = higherDepth(averageAhJson, itemId);
+			eb.addField(idToName(itemId), formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))), false);
+			eb.setThumbnail(getItemThumbnail(itemId));
+			return eb;
+		}
+
+		for (String i : ENCHANT_NAMES) {
+			if (itemId.contains(i)) {
+				try {
+					String enchantedBookId = i + ";" + Integer.parseInt(itemId.replaceAll("\\D+", ""));
+					if (higherDepth(averageAhJson, enchantedBookId) != null) {
+						JsonElement itemJson = higherDepth(averageAhJson, enchantedBookId);
+						eb.addField(
+							idToName(enchantedBookId),
+							formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))),
+							false
+						);
+						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
+						return eb;
+					}
+				} catch (NumberFormatException e) {
+					for (int j = 10; j > 0; j--) {
+						String enchantedBookId = i + ";" + j;
+						if (higherDepth(averageAhJson, enchantedBookId) != null) {
+							JsonElement itemJson = higherDepth(averageAhJson, enchantedBookId);
+							eb.addField(
+								idToName(enchantedBookId),
+								formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))),
+								false
+							);
+						}
+					}
+
+					if (eb.getFields().size() != 0) {
+						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
+						return eb;
+					}
+				}
+			}
+		}
+
+		JsonElement petJson = getPetNumsJson();
+		for (String i : PET_NAMES) {
+			if (itemId.contains(i)) {
+				String petId = i;
+				boolean raritySpecified = false;
+				for (Map.Entry<String, String> j : RARITY_TO_NUMBER_MAP.entrySet()) {
+					if (itemId.contains(j.getKey())) {
+						petId += j.getValue();
+						raritySpecified = true;
+						break;
+					}
+				}
+
+				if (!raritySpecified) {
+					List<String> petRarities = higherDepth(petJson, petId)
+						.getAsJsonObject()
+						.keySet()
+						.stream()
+						.map(String::toUpperCase)
+						.collect(Collectors.toCollection(ArrayList::new));
+
+					for (String j : petRarities) {
+						if (higherDepth(averageAhJson, petId + RARITY_TO_NUMBER_MAP.get(j)) != null) {
+							petId += RARITY_TO_NUMBER_MAP.get(j);
+							break;
+						}
+					}
+				}
+
+				if (higherDepth(averageAhJson, petId) != null) {
+					JsonElement itemJson = higherDepth(averageAhJson, petId);
+					eb.addField(
+						idToName(petId),
+						formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))),
+						false
+					);
+					eb.setThumbnail(getItemThumbnail(petId));
+					return eb;
+				}
+			}
+		}
+
+		String closestMatch = getClosestMatchFromIds(itemId, getJsonKeys(averageAhJson));
+		if (closestMatch != null) {
+			JsonElement itemJson = higherDepth(averageAhJson, closestMatch);
+			eb.addField(
+				idToName(closestMatch),
+				formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))),
+				false
+			);
+			eb.setThumbnail(getItemThumbnail(closestMatch));
+			return eb;
+		}
+
+		return defaultEmbed("No auctions found for " + idToName(item));
 	}
 }

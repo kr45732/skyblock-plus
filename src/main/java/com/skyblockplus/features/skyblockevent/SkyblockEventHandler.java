@@ -19,7 +19,7 @@
 package com.skyblockplus.features.skyblockevent;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.getEventTypeFormatted;
+import static com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand.getEventTypeFormatted;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromName;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;

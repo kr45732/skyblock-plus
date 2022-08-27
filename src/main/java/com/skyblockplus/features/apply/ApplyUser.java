@@ -25,8 +25,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.skyblockplus.features.apply.log.ApplyLog;
-import com.skyblockplus.features.apply.log.LogMessage;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
@@ -65,8 +63,6 @@ public class ApplyUser implements Serializable {
 	public String reactMessageId;
 	public int state = 0;
 	public String staffChannelId;
-	public boolean logApplication = false;
-	public final List<LogMessage> logs = new ArrayList<>();
 	public String applySubmitedMessageId;
 	// Embed
 	public String playerSlayer;
@@ -89,9 +85,6 @@ public class ApplyUser implements Serializable {
 			this.currentSettingsString = gson.toJson(currentSettings);
 			this.guildId = event.getGuild().getId();
 			this.playerUsername = playerUsername;
-			try {
-				this.logApplication = jda.getTextChannelById(higherDepth(currentSettings, "applyLogChannel").getAsString()) != null;
-			} catch (Exception ignored) {}
 			Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
 
 			if (applyCategory.getChannels().size() == 50) {
@@ -726,101 +719,9 @@ public class ApplyUser implements Serializable {
 				}
 				appChannel.delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
 				parent.applyUserList.remove(this);
-				if (logApplication) {
-					try {
-						File logFile = new File(
-							"src/main/java/com/skyblockplus/json/application_transcripts/" + applicationChannelId + ".json"
-						);
-						try (Writer writer = new FileWriter(logFile)) {
-							formattedGson.toJson(logs, writer);
-							writer.flush();
-						}
-						event
-							.getGuild()
-							.getTextChannelById(higherDepth(currentSettings, "applyLogChannel").getAsString())
-							.sendFile(logFile, playerUsername + ".json")
-							.queue(m ->
-								m
-									.editMessageEmbeds(
-										defaultEmbed("Application Log")
-											.addField("Applicant", playerUsername, true)
-											.addField(
-												"Guild Name",
-												capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " ")),
-												true
-											)
-											.addField(
-												"Direct Transcript",
-												"[Link](https://skyblock-plus-logs.vercel.app/logs?url=" +
-												m.getAttachments().get(0).getUrl() +
-												")",
-												true
-											)
-											.addField(
-												"Users in Transcript",
-												String.join(
-													"\n",
-													logs.stream().map(logM -> logM.getUser().getName()).collect(Collectors.toSet())
-												),
-												true
-											)
-											.build()
-									)
-									.queue()
-							);
-
-						logFile.delete();
-					} catch (Exception e) {
-						AutomaticGuild.getLogger().error(guildId, e);
-					}
-				}
 				return true;
 		}
 
 		return false;
-	}
-
-	public boolean onGuildMessageReceived(MessageReceivedEvent event) {
-		if (!event.getChannel().getId().equals(applicationChannelId)) {
-			return false;
-		}
-
-		if (!logApplication) {
-			return true;
-		}
-
-		logs.add(ApplyLog.toLog(event.getMessage()));
-		return true;
-	}
-
-	public boolean onGuildMessageUpdate(MessageUpdateEvent event) {
-		if (!event.getChannel().getId().equals(applicationChannelId)) {
-			return false;
-		}
-
-		if (!logApplication) {
-			return true;
-		}
-
-		for (int i = 0; i < logs.size(); i++) {
-			if (logs.get(i).getId().equals(event.getMessage().getId())) {
-				logs.set(i, ApplyLog.toLog(event.getMessage()));
-				break;
-			}
-		}
-		return true;
-	}
-
-	public boolean onGuildMessageDelete(MessageDeleteEvent event) {
-		if (!event.getChannel().getId().equals(applicationChannelId)) {
-			return false;
-		}
-
-		if (!logApplication) {
-			return true;
-		}
-
-		logs.removeIf(m -> m.getId().equals(event.getMessageId()));
-		return true;
 	}
 }

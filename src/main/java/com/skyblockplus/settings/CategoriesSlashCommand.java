@@ -18,9 +18,13 @@
 
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.stereotype.Component;
@@ -37,11 +41,20 @@ public class CategoriesSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(CategoriesCommand.getCategories(event.getGuild()));
+		event.embed(getCategories(event.getGuild()));
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands.slash(name, "Get a list mapping all visible category names to their ids'");
+	}
+
+	public static EmbedBuilder getCategories(Guild guild) {
+		StringBuilder ebString = new StringBuilder();
+		for (net.dv8tion.jda.api.entities.Category category : guild.getCategories()) {
+			ebString.append("\n• ").append(category.getName()).append(" ⇢ `").append(category.getId()).append("`");
+		}
+
+		return defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString());
 	}
 }

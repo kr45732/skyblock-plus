@@ -18,9 +18,14 @@
 
 package com.skyblockplus.dungeons;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.higherDepth;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.skyblockplus.utils.command.*;
+import java.util.Arrays;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -39,7 +44,7 @@ public class CalcDropsSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		event.paginate(
-			CalcDropsCommand.getCalcDrops(
+			getCalcDrops(
 				event.getOptionInt("floor", 1),
 				event.getOptionInt("luck", 1),
 				event.getOptionStr("accessory", "A"),
@@ -75,5 +80,50 @@ public class CalcDropsSlashCommand extends SlashCommand {
 					.addChoice("Artifact", "D"),
 				new OptionData(OptionType.INTEGER, "luck", "Boss luck level").setRequiredRange(1, 5)
 			);
+	}
+
+	public static EmbedBuilder getCalcDrops(int floor, int bossLuck, String talisman, PaginatorEvent event) {
+		if (floor < 0 || floor > 14) {
+			return invalidEmbed("Invalid floor");
+		}
+		if (bossLuck < 1 || bossLuck > 5) {
+			return invalidEmbed("Invalid boss luck level");
+		}
+		boolean isMaster = floor > 7;
+
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
+		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+
+		JsonObject data = getDungeonLootJson().get("" + floor).getAsJsonObject();
+		String combo = talisman + bossLuck;
+		for (String chest : Arrays.asList("Wood", "Gold", "Diamond", "Emerald", "Obsidian", "Bedrock")) {
+			if (higherDepth(data, chest) == null) {
+				continue;
+			}
+			EmbedBuilder eb = defaultEmbed(
+				(isMaster ? "Master " : "") + "Floor " + (isMaster ? floor - 7 : floor) + " Loot",
+				"https://wiki.hypixel.net/Catacombs_Floor_" + toRomanNumerals(isMaster ? floor - 7 : floor).toUpperCase()
+			)
+				.setDescription("**Chest:** " + chest + "\nDrop chances listed as `not S+, S+`\n");
+			for (JsonElement itemData : higherDepth(data, chest).getAsJsonArray()) {
+				String name = higherDepth(itemData, "item").getAsString();
+				eb.appendDescription(
+					"\n" +
+					higherDepth(getEmojiMap(), nameToId(name), "") +
+					" **" +
+					name +
+					"**: " +
+					higherDepth(itemData, "drop_chances.S" + combo).getAsString() +
+					", " +
+					higherDepth(itemData, "drop_chances.S+" + combo).getAsString() +
+					" ($" +
+					formatNumber(higherDepth(itemData, "cost").getAsLong()) +
+					")"
+				);
+			}
+			extras.addEmbedPage(eb);
+		}
+		event.paginate(paginateBuilder.setPaginatorExtras(extras));
+		return null;
 	}
 }

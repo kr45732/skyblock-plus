@@ -466,7 +466,6 @@ public class SettingsExecute {
 								eb = setApplyCheckApiEnable(guildSettings.getAsJsonObject(), false);
 							}
 						}
-						case "log_channel" -> eb = setApplyLogChannel(guildSettings.getAsJsonObject(), args[5]);
 					}
 				}
 			} else if ((args = content.split("\\s+", 7)).length == 7) {
@@ -1317,32 +1316,6 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Set apply message channel to: " + channel.getAsMention());
-	}
-
-	public EmbedBuilder setApplyLogChannel(JsonObject guildSettings, String textChannel) {
-		if (textChannel.equalsIgnoreCase("none")) {
-			guildSettings.addProperty("applyLogChannel", "none");
-			int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
-
-			return defaultSettingsEmbed("Set apply log channel to: none");
-		}
-
-		Object eb = checkTextChannel(textChannel);
-		if (eb instanceof EmbedBuilder e) {
-			return e;
-		}
-		TextChannel channel = ((TextChannel) eb);
-
-		guildSettings.addProperty("applyLogChannel", channel.getId());
-		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Set apply log channel to: " + channel.getAsMention());
 	}
 
 	public EmbedBuilder setApplyCategory(JsonObject guildSettings, String messageCategory) {
