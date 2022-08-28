@@ -118,7 +118,6 @@ public class AutomaticGuild {
 	public final List<String> channelBlacklist = new ArrayList<>();
 	public final String guildId;
 	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
-	public String prefix;
 	public TextChannel logChannel = null;
 	public final List<MessageEmbed> logQueue = new ArrayList<>();
 	public JsonArray blacklist = new JsonArray();
@@ -153,8 +152,6 @@ public class AutomaticGuild {
 		applyConstructor(event, serverSettings);
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
 		schedulerConstructor();
-		prefix = higherDepth(serverSettings, "prefix", "");
-		prefix = (prefix.length() > 0 && prefix.length() <= 5) ? prefix : DEFAULT_PREFIX;
 		jacobGuild = new JacobGuild(higherDepth(serverSettings, "jacobSettings"), this);
 		eventGuild = new EventGuild(higherDepth(serverSettings, "eventNotif"), this);
 		try {
@@ -220,11 +217,6 @@ public class AutomaticGuild {
 		if (cacheDatabase.partyCaches.containsKey(guildId)) {
 			this.partyList.addAll(cacheDatabase.partyCaches.get(guildId));
 		}
-	}
-
-	public static String getGuildPrefix(String guildId) {
-		AutomaticGuild automaticGuild = guildMap.getOrDefault(guildId, null);
-		return automaticGuild != null ? automaticGuild.prefix : DEFAULT_PREFIX;
 	}
 
 	/* Apply Methods */
@@ -1165,10 +1157,6 @@ public class AutomaticGuild {
 		int eventDelay = (int) (Math.random() * 60 + 5);
 		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 180, TimeUnit.MINUTES));
 		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateSkyblockEvent, eventDelay, 30, TimeUnit.MINUTES));
-	}
-
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
 	}
 
 	public void setLogChannel(TextChannel channel) {

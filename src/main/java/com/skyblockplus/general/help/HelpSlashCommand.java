@@ -18,9 +18,7 @@
 
 package com.skyblockplus.general.help;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.DISCORD_SERVER_INVITE_LINK;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
@@ -479,11 +477,6 @@ public class HelpSlashCommand extends SlashCommand {
 									"hypixel_key <key>"
 								),
 								new HelpData(
-									"prefix",
-									"Set the prefix of the bot. Must be a least one character and no more than five.",
-									"prefix <prefix>"
-								),
-								new HelpData(
 									"fetchur_channel",
 									"Set the channel where fetchur notifications will be posted at 12 am EST every day.",
 									"fetchur_channel <#channel>"
@@ -813,7 +806,7 @@ public class HelpSlashCommand extends SlashCommand {
 			if (pageStrSplit.length >= 1) {
 				HelpData matchCmd = helpDataList.stream().filter(cmd -> cmd.matchTo(pageStrSplit[0])).findFirst().orElse(null);
 				if (matchCmd != null) {
-					return matchCmd.getHelp(pageStrSplit.length == 2 ? pageStrSplit[1] : null, getGuildPrefix(event.getGuild().getId()));
+					return matchCmd.getHelp(pageStrSplit.length == 2 ? pageStrSplit[1] : null, DEFAULT_PREFIX);
 				}
 			}
 
@@ -830,7 +823,7 @@ public class HelpSlashCommand extends SlashCommand {
 			"Use the arrow buttons to navigate through the pages" + generatePageMap() + "\n\n<> = required [] = optional"
 		);
 
-		HelpGenerator help = new HelpGenerator(getGuildPrefix(event.getGuild().getId()));
+		HelpGenerator help = new HelpGenerator(DEFAULT_PREFIX);
 		paginateBuilder.addItems(
 			help.create("help", "Show the help menu with all the commands") +
 			help.create("help <command>", "Show the help menu for a certain command") +
@@ -990,7 +983,6 @@ public class HelpSlashCommand extends SlashCommand {
 			help.create("categories", "Get the name and id of all categories in this server") +
 			help.create("reload", "Reload the guild application and verification settings") +
 			help.create("settings set hypixel_key <key>", "Set a Hypixel API key for this server") +
-			help.create("settings set prefix <prefix>", "Set the prefix of the bot") +
 			help.create(
 				"settings set fetchur_channel <#channel>",
 				"Set the channel where fetchur item notifications will be sent every day at 12 am EST"

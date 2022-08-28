@@ -98,15 +98,7 @@ public class MainListener extends ListenerAdapter {
 					.setDescription(
 						"- Thank you for adding me to " +
 						event.getGuild().getName() +
-						"\n- My prefix is `" +
-						DEFAULT_PREFIX +
-						"` and can be changed using `" +
-						DEFAULT_PREFIX +
-						"settings set prefix <prefix>`\n- You can view my commands by running `" +
-						DEFAULT_PREFIX +
-						"help`\n- Make sure to check out `" +
-						DEFAULT_PREFIX +
-						"setup` or the forum post [**here**](" +
+						"`\n- You can view my commands by running `/help`\n- Make sure to check out `/setup` or the forum post [**here**](" +
 						FORUM_POST_LINK +
 						") on how to setup the customizable features of this bot!"
 					);

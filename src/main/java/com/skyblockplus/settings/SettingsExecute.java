@@ -104,7 +104,6 @@ public class SettingsExecute {
 			eb =
 				switch (args[2]) {
 					case "hypixel_key" -> setHypixelKey(args[3]);
-					case "prefix" -> setPrefix(content.split("\\s+", 4)[3]);
 					case "guest_role" -> setApplyGuestRole(args[3]);
 					case "fetchur_channel" -> setFetchurChannel(args[3]);
 					case "fetchur_ping" -> setFetchurPing(args[3]);
@@ -173,7 +172,6 @@ public class SettingsExecute {
 					.addField("Roles Settings", "Use `/settings roles` to see the current settings", false);
 		} else if (args.length == 2 && args[1].equals("general")) {
 			eb = defaultSettingsEmbed();
-			eb.addField("Prefix", higherDepth(currentSettings, "prefix", DEFAULT_PREFIX), false);
 			String hypixelKey = database.getServerHypixelApiKey(guild.getId());
 			eb.addField("Hypixel API Key", hypixelKey != null && !hypixelKey.isEmpty() ? "Hidden" : "Not set", false);
 			String fetchurChannel = higherDepth(currentSettings, "fetchurChannel", "none");
@@ -2534,20 +2532,6 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Deleted the server's Hypixel API key.");
-	}
-
-	public EmbedBuilder setPrefix(String prefix) {
-		if (prefix.length() == 0 || prefix.length() > 5) {
-			return invalidEmbed("The prefix must be a least one character and no more than five.");
-		}
-
-		int responseCode = database.setPrefix(guild.getId(), prefix);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		guildMap.get(guild.getId()).setPrefix(prefix);
-		return defaultSettingsEmbed("**Set the server's prefix to:** " + prefix);
 	}
 
 	public EmbedBuilder setFetchurChannel(String channelMention) {

@@ -18,7 +18,6 @@
 
 package com.skyblockplus;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
@@ -92,7 +91,7 @@ public class Main {
 				.setOwnerId("385939031596466176")
 				.setEmojis("<:yes:948359788889251940>", "⚠️", "<:no:948359781125607424>")
 				.useHelpBuilder(false)
-				.setPrefixFunction(event -> event.isFromGuild() ? getGuildPrefix(event.getGuild().getId()) : DEFAULT_PREFIX)
+				.setPrefixFunction(event -> DEFAULT_PREFIX)
 				.setListener(
 					new CommandListener() {
 						@Override

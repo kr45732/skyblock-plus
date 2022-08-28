@@ -43,8 +43,7 @@ public class SetupSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(invalidEmbed("This command is disabled"));
-		//		event.embed(getSetupEmbed());
+		event.embed(getSetupEmbed());
 	}
 
 	@Override
@@ -65,8 +64,7 @@ public class SetupSlashCommand extends SlashCommand {
 				ActionRow.of(
 					Button.primary("setup_command_verify", "Verification"),
 					Button.primary("setup_command_guild", "Guild Application, Roles & Ranks"),
-					Button.primary("setup_command_roles", "Skyblock Roles"),
-					Button.primary("setup_command_prefix", "Prefix")
+					Button.primary("setup_command_roles", "Skyblock Roles")
 				),
 				ActionRow.of(
 					Button.primary("setup_command_jacob", "Farming Event Notifications"),

@@ -102,19 +102,6 @@ public class SetupCommandHandler {
 					.queue();
 				this.featureType = featureType;
 				return;
-			case "prefix":
-				buttonEvent
-					.getHook()
-					.editOriginalEmbeds(
-						defaultEmbed("Setup")
-							.setDescription(
-								"Reply with the prefix you want to set. The prefix must be a least one character and no more than five."
-							)
-							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
-							.build()
-					)
-					.queue();
-				break;
 			case "fetchur":
 				buttonEvent
 					.getHook()
@@ -461,13 +448,6 @@ public class SetupCommandHandler {
 					} else {
 						sendEmbed(eb);
 					}
-					return;
-				}
-				break;
-			case "prefix":
-				eb = settings.setPrefix(event.getMessage().getContentRaw());
-				if (eb.build().getTitle().equals("Settings")) {
-					sendEmbed(eb);
 					return;
 				}
 				break;

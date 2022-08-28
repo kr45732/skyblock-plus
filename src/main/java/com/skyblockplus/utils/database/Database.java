@@ -163,10 +163,6 @@ public class Database {
 		return settingsService.setServerHypixelApiKey(serverId, newKey).getStatusCodeValue();
 	}
 
-	public int setPrefix(String serverId, String prefix) {
-		return settingsService.setPrefix(serverId, prefix).getStatusCodeValue();
-	}
-
 	public JsonElement getBlacklistSettings(String serverId) {
 		return gson.toJsonTree(settingsService.getBlacklistSettings(serverId).getBody());
 	}

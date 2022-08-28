@@ -18,7 +18,6 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -33,76 +32,6 @@ import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 public abstract class CommandExecute extends CommandEvent {
 
-	private static final List<String> slashOnlyCommands = List.of(
-		"forge",
-		"guild-leaderboard",
-		"calcweight",
-		"sacks",
-		"essence",
-		"talisman",
-		"setup",
-		"armor",
-		"jacob",
-		"average",
-		"event",
-		"calcdrops",
-		"bingo",
-		"profiles",
-		"calendar",
-		"check-api",
-		"party",
-		"guild-statistics",
-		"bids",
-		"unlink",
-		"guild-kicker",
-		"wardrobe",
-		"reload",
-		"fetchur",
-		"coinsperbit",
-		"recipe",
-		"pets",
-		"calcdrags",
-		"enderchest",
-		"collections",
-		"crimson",
-		"viewauction",
-		"uuid",
-		"cakes",
-		"bits",
-		"storage",
-		"guild-ranks",
-		"harp",
-		"check-guild-api",
-		"categories",
-		"bestiary",
-		"reforge",
-		"skyblock",
-		"hotm",
-		"hypixel",
-		"inventory",
-		"coins",
-		"scammer",
-		"calcslayer",
-		"calcruns",
-		"information",
-		"slayer",
-		"skills",
-		"guild",
-		"mayor",
-		"price",
-		"bazaar",
-		"missing",
-		"dungeons",
-		"roles",
-		"settings",
-		"bin",
-		"link",
-		"help",
-		"leaderboard",
-		"weight",
-		"auctions",
-		"networth"
-	);
 	protected final Command command;
 	protected Message ebMessage;
 	protected String[] args;
@@ -123,18 +52,6 @@ public abstract class CommandExecute extends CommandEvent {
 	protected abstract void execute();
 
 	public void queue() {
-		if (isMainBot() && slashOnlyCommands.contains(command.getName())) {
-			getMessage()
-				.reply(
-					client.getError() +
-					" This command can only be used through slash commands. If you do not see slash commands, make sure `Use Application Commands` is enabled for @ everyone or re-invite the bot using `" +
-					getGuildPrefix(getGuild().getId()) +
-					"invite`"
-				)
-				.queue(ignore, ignore);
-			return;
-		}
-
 		executor.submit(() -> {
 			if (sendLoadingEmbed) {
 				this.ebMessage = getChannel().sendMessageEmbeds(loadingEmbed().build()).complete();
