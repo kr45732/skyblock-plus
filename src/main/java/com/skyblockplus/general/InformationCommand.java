@@ -38,7 +38,7 @@ public class InformationCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute.SlashOnlyCommandExecute(this, event) {
+		new CommandExecute(this, event) {
 			@Override
 			protected void execute() {
 				logCommand();
