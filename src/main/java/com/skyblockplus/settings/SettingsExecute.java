@@ -2261,19 +2261,17 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setVerifyMessageText(String verifyText) {
-		if (verifyText.length() > 0) {
-			if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
-				return invalidEmbed("Text cannot be longer than 1500 letters!");
-			}
-
-			int responseCode = updateVerifySettings("messageText", EmojiParser.parseToAliases(verifyText));
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
-
-			return defaultSettingsEmbed("**Verify message set to:** " + verifyText);
+		String verifyTextEmoj = EmojiParser.parseToAliases(verifyText);
+		if (verifyText.isEmpty() || verifyTextEmoj.length() > 1500) {
+			return invalidEmbed("Text must be between 1 to 1500 characters");
 		}
-		return defaultEmbed("Invalid Input");
+
+		int responseCode = updateVerifySettings("messageText", verifyTextEmoj);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("**Verify message set to:** " + verifyText);
 	}
 
 	public EmbedBuilder setVerifyMessageTextChannelId(String textChannel) {

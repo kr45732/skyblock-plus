@@ -43,7 +43,8 @@ public class SetupSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(getSetupEmbed());
+		event.embed(invalidEmbed("This command is disabled"));
+		//		event.embed(getSetupEmbed());
 	}
 
 	@Override

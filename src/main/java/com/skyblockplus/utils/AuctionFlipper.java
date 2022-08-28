@@ -181,7 +181,7 @@ public class AuctionFlipper {
 				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
 				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
 			) {
-				return JsonParser.parseReader(in).getAsJsonArray();
+				return JsonParser.parseReader(in);
 			}
 		} catch (Exception ignored) {}
 		return null;

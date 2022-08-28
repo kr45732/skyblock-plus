@@ -790,8 +790,7 @@ public class HelpSlashCommand extends SlashCommand {
 		);
 
 		paginateBuilder.addItems(
-			create("help", "Show the help menu with all the commands") +
-			create("help <command>", "Show the help menu for a certain command") +
+			create("help [command]", "Show the help menu for all commands or a specific command") +
 			create("information", "Show information and statistics about the bot") +
 			create("invite", "Get the invite link and Discord link for the bot") +
 			create("link <player>", "Link your Hypixel account to the bot") +
@@ -801,7 +800,7 @@ public class HelpSlashCommand extends SlashCommand {
 		paginateBuilder.addItems(
 			create("slayer [player] [profile]", "Get the slayer data of a player") +
 			create(
-				"calcslayer <type> [player] [profile] [level:level] [xp:xp]",
+				"calcslayer <type> [player] [profile] [level] [xp]",
 				"Calculate the number of bosses needed to reach a level or xp amount"
 			)
 		);
@@ -819,58 +818,57 @@ public class HelpSlashCommand extends SlashCommand {
 			create("essence information <item>", "Get the amount of essence to upgrade an item for each level") +
 			create("essence [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
 			create(
-				"calcruns [player] [profile] <level:level> <floor:floor>",
+				"calcruns <level> <floor> [player] [profile]",
 				"Calculate the number of runs needed to reach a certain catacombs level"
 			) +
-			create("calcdrops <floor> [luck:boss_luck] [accessory:accessory]", "Calculate the drop rate and cost of all chests for a floor")
+			create("calcdrops <floor> [luck] [accessory]", "Calculate the drop rate and cost of all chests for a floor")
 		);
 
 		paginateBuilder.addItems(
-			create("guild <player>", "Get information and statistics about a player's guild") +
-			create("guild <g:guild_name>", "Get information and statistics about a guild") +
-			create("guild members <player>", "Get a list of all members in a player's guild") +
-			create("guild members <g:guild_name>", "Get a list of all members in a guild") +
-			create("guild experience <player>", "Get the experience leaderboard for a player's guild") +
-			create("guild experience <g:guild_name>", "Get the experience leaderboard for a guild") +
-			create("g-lb <type> [player] [g:guild_name] [mode:normal|ironman|stranded] [key]", "Get a leaderboard for a player's guild") +
+			create("guild information [player] [guild]", "Get information and statistics about a guild") +
+			create("guild members [player] [guild]", "Get a list of all members in a guild") +
+			create("guild experience [player] [guild]", "Get the experience leaderboard for a guild") +
+			create("guild-leaderboard <type> [player] [guild] [mode] [key]", "Get a leaderboard for a player's guild") +
 			create(
-				"g-kicker <u:player> <type:value> ... [key]",
+				"guild-kicker <requirements> [player] [gamemode] [key]",
 				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer"
 			) +
 			create(
-				"g-ranks <u:player> [mode:normal|ironman|stranded] [key]",
+				"guild-ranks [player] [gamemode] [key]",
 				"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild"
 			) +
-			create("g-stats [player] [g:guild_name] [key]", "Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight") +
-			create("check-guild-api <player>", "Get which Skyblock APIs players have enabled or disabled for a guild")
+			create(
+				"guild-statistics [player] [guild] [gamemode] [key]",
+				"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight"
+			) +
+			create("check-guild-api [player] [exclude]", "Get which Skyblock APIs players have enabled or disabled for a guild")
 		);
 
 		paginateBuilder.addItems(
-			create(
-				"auctions [player] [sort:low|high] [filter:unsold|sold] [verbose]",
-				"Get a player's unclaimed auctions on all profiles"
-			) +
-			create("viewauction <UUID>", "Get an auction by its UUID") +
+			create("auctions [player] [filter] [sort] [verbose]", "Get a player's unclaimed auctions on all profiles") +
+			create("viewauction <uuid>", "Get an auction by its UUID") +
 			create("bin <item>", "Get the lowest bin of an item") +
-			create("bazaar <item]", "Get bazaar prices of an item") +
+			create("bazaar <item>", "Get bazaar prices of an item") +
 			create("average <item>", "Get the average auction price of an item") +
 			create("bids [player]", "Get a player's auction house bids") +
-			create("price <item> [type:bin|auction|both]", "Query the auction house for the lowest bin of an item") +
+			create("price <item> [auction_type]", "Query the auction house for the lowest bin of an item") +
 			create("bits <item>", "Get the bits cost of an item from the bits shop") +
 			create("coinsperbit <item>", "Get the coins to bits ratio for items in the bits shop")
 		);
 
 		paginateBuilder.addItems(
-			create("inventory [player] [profile]", "Get a player's inventory represented in emojis") +
-			create("inventory [player] [profile] <slot:number>", "Get a player's inventory with lore") +
+			create("inventory emoji [player] [profile]", "Get a player's inventory represented in emojis") +
+			create("inventory list [player] [profile] [slot]", "Get a player's inventory with lore") +
+			create("armor emoji [player] [profile] [slot]", "Get a player's equipped armor & equipment represented in emojis") +
 			create("armor list [player] [profile]", "Get a player's equipped armor & equipment with lore") +
-			create("armor [player] [profile]", "Get a player's equipped armor & equipment represented in emojis") +
-			create("enderchest [player] <profile]", "Get a player's ender chest represented in emojis") +
+			create("enderchest emoji [player] [profile]", "Get a player's ender chest represented in emojis") +
+			create("enderchest list [player] [profile] [slot]", "Get a player's enderchest lore") +
 			create("storage [player] <profile]", "Get a player's storage represented in emojis") +
-			create("talisman [player] [profile]", "Get a player's talisman bag represented in emojis") +
-			create("talisman [player] [profile] <slot:number>", "Get a player's talisman bag with lore") +
-			create("sacks [player] [profile]", "Get a player's sacks' content bag represented in a list") +
-			create("wardrobe [player] [profile]", "Get a player's wardrobe armors represented in emojis") +
+			create("talisman emoji [player] [profile]", "Get a player's talisman bag represented in emojis") +
+			create("talisman list [player] [profile] [slot]", "Get a player's talisman bag with lore") +
+			create("talisman tuning [player] [profile]", "Get a player's power stone stats and tuning stats") +
+			create("sacks [player] [profile] [npc]", "Get a player's sacks' content bag represented in a list") +
+			create("wardrobe emoji [player] [profile]", "Get a player's wardrobe armors represented in emojis") +
 			create("wardrobe list [player] [profile]", "Get a player's wardrobe armors represented in a list") +
 			create("pets [player] [profile]", "Get a player's pets")
 		);
@@ -878,13 +876,12 @@ public class HelpSlashCommand extends SlashCommand {
 		paginateBuilder.addItems(
 			create("roles claim [profile]", "Claim your automatic Skyblock roles based on your statistics") +
 			create("roles list", "List all roles that can be claimed through the bot") +
-			create("coins [player] [profile]", "Get a player's bank and purse coins") +
+			create("coins total [player] [profile]", "Get a player's bank and purse coins") +
 			create("coins history [player] [profile]", "Get a player's bank transaction history") +
-			create("networth [player] [profile]", "Calculate a player's networth") +
-			create("networth [player] [profile] verbose:true", "Calculate a player's networth with a detailed JSON of each item cost") +
+			create("networth [player] [profile] [verbose]", "Calculate a player's networth") +
 			create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +
 			create(
-				"calcweight [player] [profile] <type:type> <amount:amount>",
+				"calcweight <type> <amount> [player] [profile] [system]",
 				"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount"
 			) +
 			create("hypixel [player]", "Get Hypixel information about a player") +
@@ -894,19 +891,19 @@ public class HelpSlashCommand extends SlashCommand {
 			create("cakes [player] [profile]", "Get a player's inactive and active cake buffs") +
 			create("bestiary [player] [profile]", "Get a player's bestiary stats") +
 			create("harp [player] [profile]", "Get a player's harp statistics") +
-			create("uuid [username|uuid]", "Convert username to UUID or UUID to username") +
+			create("uuid [player]", "Convert username to UUID or UUID to username") +
 			create("calendar", "Get the current Skyblock datetime and running or upcoming events") +
 			create("scammer [player]", "Check if a player is marked as a scamer in the SBZ database") +
 			create("jacob [crop]", "Get the upcoming contests and their crops") +
 			create("mayor", "Get information about the current mayor or the running election") +
 			create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
-			create("leaderboard <type> [u:player] [page:page] [rank:rank] [amount:amount]", "Get a global leaderboard") +
+			create("leaderboard <type> [player] [gamemode] [page] [rank] [amount]", "Get a global leaderboard") +
 			create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
 			create("recipe <item>", "Get the crafting recipe of an item") +
 			create("check-api [player]", "Check which Skyblock APIs a player has enabled or disabled") +
-			create("calcdrags [eyes:eyes] [position:position] [ratio:ratio]", "Calculate loot quality and loot from dragons in the end") +
-			create("reforgestone <stone>", "Get the reforge stone stats for each rarity") +
-			create("collections [player] [profile]", "Get a player's collection counts")
+			create("calcdrags [position] [ratio] [eyes]", "Calculate loot quality and loot from dragons in the end") +
+			create("reforge <stone>", "Get the reforge stone stats for each rarity") +
+			create("collections [player] [profile]", "Get a player's island collection counts")
 		);
 
 		paginateBuilder.addItems(
@@ -923,6 +920,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("event create", "Interactive message to create a Skyblock event") +
 			create("event current", "Get information about the current event") +
 			create("event join [profile]", "Join the current event") +
+			create("event add <player> [profile]", "Force add a player to the event") +
 			create("event leave", "Leave the current event") +
 			create("event leaderboard", "Get the leaderboard for current event") +
 			create("event end", "Force end the event") +

@@ -1087,7 +1087,6 @@ public class AutomaticGuild {
 				return;
 			}
 
-			event.deferReply().complete();
 			SetupCommandHandler handler = new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
 			if (handler.isValid()) {
 				return;

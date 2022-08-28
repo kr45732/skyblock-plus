@@ -51,7 +51,14 @@ public class ArmorSlashCommand extends SlashCommand {
 		}
 
 		switch (event.getSubcommandName()) {
-			case "list" -> event.paginate(getPlayerEquippedArmor(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+			case "list" -> event.paginate(
+				getPlayerEquippedArmor(
+					event.player,
+					event.getOptionStr("profile"),
+					event.getOptionInt("slot", 0),
+					new PaginatorEvent(event)
+				)
+			);
 			case "emoji" -> event.paginate(getPlayerArmor(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true);
 			default -> event.embed(event.invalidCommandMessage());
 		}
@@ -79,7 +86,7 @@ public class ArmorSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerEquippedArmor(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerEquippedArmor(String username, String profileName, int slot, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, InvItem> inventoryMap = player.getArmorMap();
@@ -90,7 +97,7 @@ public class ArmorSlashCommand extends SlashCommand {
 						inventoryMap.put(entry.getKey() + 4, entry.getValue());
 					}
 				}
-				new InventoryListPaginator(player, inventoryMap, 0, event);
+				new InventoryListPaginator(player, inventoryMap, slot, event);
 				return null;
 			}
 		}

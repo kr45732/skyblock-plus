@@ -27,7 +27,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import groovy.lang.GroovyShell;
 import java.util.Arrays;
 import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -128,19 +127,17 @@ public class EvaluateCommand extends Command {
 					arg = arg.replaceAll("```(.*)\n", "").replaceAll("\n?```", "");
 				}
 
-				MessageReceivedEvent jdaEvent = event.getEvent();
-
 				try {
-					shell.setProperty("event", jdaEvent);
+					shell.setProperty("event", event.getEvent());
 					shell.setProperty("cmdEvent", event);
-					shell.setProperty("message", jdaEvent.getMessage());
-					shell.setProperty("channel", jdaEvent.getChannel());
-					shell.setProperty("jda", jdaEvent.getJDA());
+					shell.setProperty("message", event.getMessage());
+					shell.setProperty("channel", event.getChannel());
+					shell.setProperty("jda", event.getJDA());
 					shell.setProperty("guilds", guildMap);
 					shell.setProperty("db", database);
-					if (jdaEvent.isFromType(ChannelType.TEXT)) {
-						shell.setProperty("guild", jdaEvent.getGuild());
-						shell.setProperty("member", jdaEvent.getMember());
+					if (event.isFromType(ChannelType.TEXT)) {
+						shell.setProperty("guild", event.getGuild());
+						shell.setProperty("member", event.getMember());
 					}
 
 					String script = importString + arg;
