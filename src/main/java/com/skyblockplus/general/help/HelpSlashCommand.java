@@ -730,7 +730,6 @@ public class HelpSlashCommand extends SlashCommand {
 											"settings guild <name> apply requirements",
 											true
 										)
-											.addAliases("reqs", "req")
 											.addSubcommands(
 												new HelpData(
 													"add",
