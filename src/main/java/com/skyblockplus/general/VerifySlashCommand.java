@@ -16,26 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.general;
 
-import static com.skyblockplus.utils.Utils.globalCooldown;
-
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.command.CommandExecute;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CalendarCommand extends Command {
+public class VerifySlashCommand extends SlashCommand {
 
-	public CalendarCommand() {
-		this.name = "calendar";
-		this.cooldown = globalCooldown;
-		this.aliases = new String[] { "cal" };
+	public VerifySlashCommand() {
+		this.name = "verify";
 	}
 
 	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute.SlashOnlyCommandExecute(this, event).queue();
+	protected void execute(SlashCommandEvent event) {
+		event.logCommand();
+
+		event.embed(LinkSlashCommand.linkAccount(event.getOptionStr("player"), event.getMember(), event.getGuild()));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return Commands
+			.slash(name, "Link your Hypixel account to this bot (same as /link)")
+			.addOption(OptionType.STRING, "player", "Player username", true);
 	}
 }
