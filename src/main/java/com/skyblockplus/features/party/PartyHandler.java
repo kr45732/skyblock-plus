@@ -134,7 +134,7 @@ public class PartyHandler {
 									)
 									.build()
 							)
-							.setActionRows()
+							.setComponents()
 							.queue();
 						return;
 					}
@@ -144,7 +144,7 @@ public class PartyHandler {
 							.editOriginalEmbeds(
 								defaultEmbed("Party Finder Creator").setDescription("Canceled the creation process").build()
 							)
-							.setActionRows()
+							.setComponents()
 							.queue();
 						return;
 					}
@@ -204,7 +204,7 @@ public class PartyHandler {
 			this::action,
 			2,
 			TimeUnit.MINUTES,
-			() -> message.editMessageEmbeds(invalidEmbed("Party creation timeout").build()).setActionRows().queue()
+			() -> message.editMessageEmbeds(invalidEmbed("Party creation timeout").build()).setComponents().queue()
 		);
 	}
 

@@ -38,13 +38,12 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -211,9 +210,9 @@ public class AuctionsSlashCommand extends SlashCommand {
 					Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(), "Track Auctions");
 			}
 			if (extras.getEmbedFields().size() == 0) {
-				return new MessageBuilder()
+				return new MessageEditBuilder()
 					.setEmbeds(invalidEmbed("No auctions found for " + usernameUuidStruct.usernameFixed()).build())
-					.setActionRows(ActionRow.of(button));
+					.setActionRow(button);
 			}
 
 			extras

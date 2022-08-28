@@ -194,8 +194,8 @@ public class Utils {
 	private static JsonArray sbzPricesJson;
 	private static JsonObject emojiMap;
 	private static JsonArray skyblockItemsJson;
-	public static JsonObject internalJsonMappings;
-	public static JsonObject priceOverrideJson;
+	private static JsonObject internalJsonMappings;
+	private static JsonObject priceOverrideJson;
 	private static JsonObject bingoInfoJson;
 	private static JsonObject dungeonLootJson;
 	private static JsonObject dragonLootJson;
@@ -1910,6 +1910,9 @@ public class Utils {
 			FileUtils.deleteDirectory(skyblockPlusDir);
 			neuRepo.close();
 			skyblockPlusDataRepo.close();
+
+			internalJsonMappings = null;
+			priceOverrideJson = null;
 		} catch (Exception e) {
 			log.error("Exception while automatically updating item mappings", e);
 		}

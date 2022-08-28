@@ -24,6 +24,7 @@ import com.skyblockplus.inventory.InventoryListPaginator;
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -45,6 +46,7 @@ import org.jetbrains.annotations.NotNull;
 public class MainListener extends ListenerAdapter {
 
 	public static final Map<String, AutomaticGuild> guildMap = new ConcurrentHashMap<>();
+	private static String lastRepoComitSha = null;
 
 	public static String onApplyReload(String guildId) {
 		String reloadStatus = "Error reloading";
@@ -168,30 +170,25 @@ public class MainListener extends ListenerAdapter {
 		if (
 			isMainBot() && event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")
 		) {
-			if (
-				isMainBot() &&
-				!event.getMessage().getEmbeds().isEmpty() &&
-				event.getMessage().getEmbeds().get(0).getDescription() != null &&
-				event.getMessage().getEmbeds().get(0).getTitle() != null &&
-				event
-					.getMessage()
-					.getEmbeds()
-					.get(0)
-					.getDescription()
-					.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/") &&
-				event.getMessage().getEmbeds().get(0).getTitle().contains("master")
-			) {
+			String commitSha = higherDepth(
+				getJson("https://api.github.com/repos/NotEnoughUpdates/NotEnoughUpdates-REPO/commits?per_page=1"),
+				"[0].sha",
+				null
+			);
+			if (!Objects.equals(commitSha, lastRepoComitSha)) {
+				lastRepoComitSha = commitSha;
 				updateItemMappings();
-				internalJsonMappings = null;
-				priceOverrideJson = null;
 			}
+			return;
+		}
+
+		if (AuctionFlipper.onGuildMessageReceived(event)) {
 			return;
 		}
 
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onGuildMessageReceived(event);
 		}
-		AuctionFlipper.onGuildMessageReceived(event);
 	}
 
 	@Override

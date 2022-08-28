@@ -19,15 +19,16 @@
 package com.skyblockplus.features.setup;
 
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -42,7 +43,8 @@ public class SetupSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(getSetupEmbed());
+		event.embed(invalidEmbed("This command is disabled"));
+		//		event.embed(getSetupEmbed());
 	}
 
 	@Override
@@ -50,8 +52,8 @@ public class SetupSlashCommand extends SlashCommand {
 		return Commands.slash(name, "A short walk-through on how to setup the bot");
 	}
 
-	public static MessageBuilder getSetupEmbed() {
-		return new MessageBuilder()
+	public static MessageEditBuilder getSetupEmbed() {
+		return new MessageEditBuilder()
 			.setEmbeds(
 				defaultEmbed("Setup")
 					.setDescription(
@@ -59,7 +61,7 @@ public class SetupSlashCommand extends SlashCommand {
 					)
 					.build()
 			)
-			.setActionRows(
+			.setComponents(
 				ActionRow.of(
 					Button.primary("setup_command_verify", "Verification"),
 					Button.primary("setup_command_guild", "Guild Application, Roles & Ranks"),

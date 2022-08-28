@@ -28,11 +28,11 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.time.Instant;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -54,7 +54,7 @@ public class MayorSlashCommand extends SlashCommand {
 		return Commands.slash(name, "Get the current mayor and their perks");
 	}
 
-	public static MessageBuilder getMayor() {
+	public static MessageEditBuilder getMayor() {
 		AutomaticGuild automaticGuild = guildMap.get("796790757947867156");
 
 		List<Button> buttons = automaticGuild.lastMayorElectedMessage.getButtons();
@@ -63,7 +63,7 @@ public class MayorSlashCommand extends SlashCommand {
 		}
 		buttons.add(Button.primary("mayor_special_button", "Special Mayors"));
 
-		return new MessageBuilder().setEmbeds(automaticGuild.lastMayorElectedMessage.getEmbeds()).setActionRows(ActionRow.of(buttons));
+		return new MessageEditBuilder().setEmbeds(automaticGuild.lastMayorElectedMessage.getEmbeds()).setActionRow(buttons);
 	}
 
 	public static EmbedBuilder getSpecialMayors() {

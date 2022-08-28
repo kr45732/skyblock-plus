@@ -46,6 +46,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class InventoryListPaginator {
 
@@ -196,11 +197,11 @@ public class InventoryListPaginator {
 					)
 					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
 					.setImage("attachment://lore.png");
-				action = event.editMessageEmbeds(eb.build()).addFile(new File(getRenderedLore()), "lore.png");
+				action = event.editMessageEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
 			}
 			action
-				.retainFiles()
-				.setActionRows(
+				.setFiles()
+				.setComponents(
 					ActionRow.of(
 						curButtons.get(0).withDisabled(pageNumber == 0),
 						curButtons.get(1).withDisabled(pageNumber == (maxPageNumber))
@@ -274,10 +275,10 @@ public class InventoryListPaginator {
 				)
 				.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
 				.setImage("attachment://lore.png");
-			action = event.editMessageEmbeds(eb.build()).addFile(new File(getRenderedLore()), "lore.png");
+			action = event.editMessageEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
 		}
 		action
-			.retainFiles()
+			.setFiles()
 			.setActionRow(
 				Button
 					.primary("inv_list_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))

@@ -45,7 +45,7 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
 public class ApplyUser implements Serializable {
 
@@ -516,7 +516,7 @@ public class ApplyUser implements Serializable {
 							waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 						} catch (Exception ignored) {}
 
-						MessageAction action = applicationChannel
+						MessageCreateAction action = applicationChannel
 							.sendMessage("<@" + applyingUserId + ">")
 							.setEmbeds(
 								defaultEmbed("Application Accepted")

@@ -155,7 +155,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			announcementChannel
 				.retrieveMessageById(higherDepth(runningEventSettings, "announcementMessageId").getAsString())
 				.queue(m ->
-					m.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Event has ended").build()).setActionRows().queue()
+					m.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Event has ended").build()).setComponents().queue()
 				);
 		} catch (Exception ignored) {}
 
@@ -697,7 +697,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				.getTextChannelById(higherDepth(settings, "announcementId").getAsString())
 				.retrieveMessageById(higherDepth(settings, "announcementMessageId").getAsString())
 				.queue(m ->
-					m.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Event has ended").build()).setActionRows().queue()
+					m.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Event has ended").build()).setComponents().queue()
 				);
 			guildMap.get(guild.getId()).setEventMemberListLastUpdated(null);
 			int code = database.setSkyblockEventSettings(guild.getId(), new EventSettings());

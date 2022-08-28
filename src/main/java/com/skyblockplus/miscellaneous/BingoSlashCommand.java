@@ -28,12 +28,11 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -154,6 +153,6 @@ public class BingoSlashCommand extends SlashCommand {
 		eb.appendDescription("\n\n**Self Goals:**" + regGoals);
 		eb.appendDescription("\n\n**Community Goals:**" + communityGoals);
 		eb.setThumbnail(usernameUuidStruct.getAvatarlUrl());
-		return new MessageBuilder().setEmbeds(eb.build()).setActionRows(ActionRow.of(Button.primary("bingo_" + cardStr, "Bingo Card")));
+		return new MessageEditBuilder().setEmbeds(eb.build()).setActionRow(Button.primary("bingo_" + cardStr, "Bingo Card"));
 	}
 }

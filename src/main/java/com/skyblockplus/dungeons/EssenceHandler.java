@@ -177,7 +177,7 @@ public class EssenceHandler {
 					)
 					.build()
 			)
-			.setActionRows()
+			.setComponents()
 			.queue();
 	}
 }

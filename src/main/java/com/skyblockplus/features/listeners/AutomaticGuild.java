@@ -57,7 +57,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
@@ -72,8 +71,10 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -393,9 +394,12 @@ public class AutomaticGuild {
 					}
 				} catch (Exception ignored) {}
 
-				MessageAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				MessageCreateAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
 				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
-					action = action.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"));
+					action =
+						action.addFiles(
+							FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
+						);
 				}
 				Message reactMessage = action.complete();
 
@@ -438,9 +442,12 @@ public class AutomaticGuild {
 
 				verifyGuild = new VerifyGuild(); // Prevent the old settings from deleting the new message
 
-				MessageAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				MessageCreateAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
 				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
-					action = action.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"));
+					action =
+						action.addFiles(
+							FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
+						);
 				}
 				Message reactMessage = action.complete();
 
@@ -933,12 +940,12 @@ public class AutomaticGuild {
 					return false;
 				}
 
-				MessageAction action = mayorChannel.sendMessageEmbeds(embed);
+				MessageCreateAction action = mayorChannel.sendMessageEmbeds(embed);
 				if (button != null) {
 					action = action.setActionRow(button);
 				}
 				if (mayorPing != null) {
-					action = action.content(mayorPing.getAsMention());
+					action = action.setContent(mayorPing.getAsMention());
 				}
 				action.queue(m -> lastMayorElectedMessage = m);
 
@@ -986,7 +993,13 @@ public class AutomaticGuild {
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {
 			Message msg = guildMap.get("796790757947867156").lastMayorElectionOpenMessage;
 			event
-				.reply(msg != null ? msg : new MessageBuilder().setEmbeds(invalidEmbed("Election is not open").build()).build())
+				.reply(
+					(
+						msg != null
+							? new MessageCreateBuilder().applyMessage(msg)
+							: new MessageCreateBuilder().setEmbeds(invalidEmbed("Election is not open").build())
+					).build()
+				)
 				.setEphemeral(true)
 				.queue();
 			return;
@@ -1034,7 +1047,7 @@ public class AutomaticGuild {
 							}
 						} else if (event.getComponentId().startsWith("track_auctions_stop_")) {
 							MessageEmbed eb = AuctionTracker.stopTrackingAuctions(event.getUser().getId()).build();
-							WebhookMessageUpdateAction<Message> action = event.getHook().editOriginalEmbeds(eb);
+							WebhookMessageEditAction<Message> action = event.getHook().editOriginalEmbeds(eb);
 							if (!eb.getTitle().equals("Error")) {
 								ActionRow updatedButton = ActionRow.of(
 									Button.primary(

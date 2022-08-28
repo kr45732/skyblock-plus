@@ -24,11 +24,11 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Utils;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 public class SlashCommandEvent extends SlashCommandInteractionEvent {
 
@@ -89,7 +89,7 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	public void embed(Object ebOrMb) {
 		if (ebOrMb instanceof EmbedBuilder eb) {
 			embed(eb);
-		} else if (ebOrMb instanceof MessageBuilder mb) {
+		} else if (ebOrMb instanceof MessageEditBuilder mb) {
 			getHook().editOriginal(mb.build()).queue(ignore, ignore);
 		} else {
 			throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
@@ -152,7 +152,7 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 		if (ebOrMb != null) {
 			if (ebOrMb instanceof EmbedBuilder eb) {
 				getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
-			} else if (ebOrMb instanceof MessageBuilder mb) {
+			} else if (ebOrMb instanceof MessageEditBuilder mb) {
 				getHook().editOriginal(mb.build()).queue(ignore, ignore);
 			} else {
 				throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());

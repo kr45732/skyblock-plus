@@ -114,7 +114,7 @@ public class LeaderboardPaginator {
 		event
 			.getAction()
 			.editMessageEmbeds(getRender().build())
-			.setActionRows(getActionRow())
+			.setComponents(getActionRow())
 			.get()
 			.queue(ignored -> waitForEvent(), ignore);
 	}
@@ -152,7 +152,7 @@ public class LeaderboardPaginator {
 					? "**Player:** " +
 					fixUsername(player) +
 					"\n**Rank:** " +
-					(playerRank == -1 ? "Not on leaderboard" : "#" + formatNumber(playerRank)) +
+					(playerRank == -1 ? "Not on leaderboard (are APIs enabled?)" : "#" + formatNumber(playerRank)) +
 					"\n**" +
 					capitalizeString(lbType.replace("_", " ")) +
 					":** " +
@@ -206,7 +206,7 @@ public class LeaderboardPaginator {
 
 		event
 			.editMessageEmbeds(getRender().build())
-			.setActionRows(getActionRow())
+			.setComponents(getActionRow())
 			.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
 	}
 
@@ -296,7 +296,7 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
-		event.getHook().editOriginalEmbeds(getRender().build()).setActionRows(getActionRow()).queue(ignored -> waitForEvent(), ignore);
+		event.getHook().editOriginalEmbeds(getRender().build()).setComponents(getActionRow()).queue(ignored -> waitForEvent(), ignore);
 	}
 
 	private ActionRow getActionRow() {

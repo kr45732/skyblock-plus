@@ -24,11 +24,11 @@ import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.Comparator;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -50,8 +50,8 @@ public class InformationSlashCommand extends SlashCommand {
 		return Commands.slash(name, "Get information about this bot");
 	}
 
-	public static MessageBuilder getInformation() {
-		return new MessageBuilder()
+	public static MessageEditBuilder getInformation() {
+		return new MessageEditBuilder()
 			.setEmbeds(
 				defaultEmbed("Skyblock Plus")
 					.setDescription(
@@ -98,7 +98,7 @@ public class InformationSlashCommand extends SlashCommand {
 					.setTimestamp(client.getStartTime())
 					.build()
 			)
-			.setActionRows(
+			.setComponents(
 				ActionRow.of(
 					Button.link(BOT_INVITE_LINK, "Invite Link"),
 					Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),

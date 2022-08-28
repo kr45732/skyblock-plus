@@ -225,7 +225,7 @@ public class ApplyGuild {
 						applyUser.playerUsername + " (<@" + applyUser.applyingUserId + ">) canceled their application"
 					)
 					.setEmbeds()
-					.setActionRows()
+					.setComponents()
 					.queue();
 				event
 					.getGuild()
@@ -290,7 +290,7 @@ public class ApplyGuild {
 					() ->
 						toCloseChannel
 							.sendMessageEmbeds(defaultEmbed("Closing Channel").build())
-							.queue(m -> m.getTextChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS))
+							.queue(m -> m.getGuildChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS))
 				);
 		} catch (Exception ignored) {}
 

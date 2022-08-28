@@ -25,11 +25,11 @@ import java.io.File;
 import java.util.Collection;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
+import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageEditRequest;
 
 public class PaginatorEvent {
 
@@ -119,7 +119,7 @@ public class PaginatorEvent {
 	public static class PaginatorAction {
 
 		private final PaginatorEvent event;
-		private RestAction<Message> action;
+		private MessageEditRequest<?> action;
 
 		public PaginatorAction(PaginatorEvent event) {
 			this.event = event;
@@ -134,35 +134,26 @@ public class PaginatorEvent {
 		}
 
 		public PaginatorAction setActionRow(ItemComponent... components) {
-			action =
-				event.isSlashCommand() ? getSlashCommandAction().setActionRow(components) : getCommandAction().setActionRow(components);
+			action = action.setActionRow(components);
 			return this;
 		}
 
-		public PaginatorAction setActionRows(ActionRow... rows) {
-			action = event.isSlashCommand() ? getSlashCommandAction().setActionRows(rows) : getCommandAction().setActionRows(rows);
+		public PaginatorAction setComponents(LayoutComponent... components) {
+			action = action.setComponents(components);
 			return this;
 		}
 
-		public PaginatorAction setActionRows(Collection<ActionRow> rows) {
-			action = event.isSlashCommand() ? getSlashCommandAction().setActionRows(rows) : getCommandAction().setActionRows(rows);
+		public PaginatorAction setComponents(Collection<LayoutComponent> components) {
+			action = action.setComponents(components);
 			return this;
-		}
-
-		public WebhookMessageUpdateAction<Message> getSlashCommandAction() {
-			return (WebhookMessageUpdateAction<Message>) action;
-		}
-
-		public MessageAction getCommandAction() {
-			return (MessageAction) action;
 		}
 
 		public RestAction<Message> get() {
-			return action;
+			return (RestAction<Message>) action;
 		}
 
 		public PaginatorAction addFile(File file, String name) {
-			action = event.isSlashCommand() ? getSlashCommandAction().addFile(file, name) : getCommandAction().addFile(file, name);
+			action = action.setFiles(FileUpload.fromData(file, name));
 			return this;
 		}
 	}

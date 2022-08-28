@@ -92,7 +92,7 @@ public class EvaluateCommand extends Command {
 		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
-				setArgs(2);
+				setArgs(2, true);
 				ebMessage = event.getChannel().sendMessage("Loading").complete();
 
 				if (args.length < 2) {
@@ -123,7 +123,7 @@ public class EvaluateCommand extends Command {
 					shell = new GroovyShell();
 				}
 
-				String arg = getEvent().getMessage().getContentRaw().split(" ", 2)[1].trim();
+				String arg = args[1].trim();
 				if (arg.startsWith("```") && arg.endsWith("```")) {
 					arg = arg.replaceAll("```(.*)\n", "").replaceAll("\n?```", "");
 				}

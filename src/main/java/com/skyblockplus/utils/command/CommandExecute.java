@@ -24,12 +24,12 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.Utils;
 import java.util.List;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 public abstract class CommandExecute extends CommandEvent {
 
@@ -139,18 +139,32 @@ public abstract class CommandExecute extends CommandEvent {
 			if (sendLoadingEmbed) {
 				this.ebMessage = getChannel().sendMessageEmbeds(loadingEmbed().build()).complete();
 			}
-			this.args = getMessage().getContentRaw().split("\\s+");
+			String content = getMessage().getContentRaw();
+			if (content.startsWith(getSelfUser().getAsMention())) {
+				content = content.substring(getSelfUser().getAsMention().length() + 1);
+			}
+			this.args = content.split("\\s+");
 			execute();
 		});
 	}
 
 	protected void logCommand() {
-		com.skyblockplus.utils.Utils.logCommand(getGuild(), getAuthor(), getMessage().getContentRaw());
+		Utils.logCommand(getGuild(), getAuthor(), getMessage().getContentRaw());
 	}
 
-	protected String[] setArgs(int limit) {
-		args = String.join(" ", args).split(" ", limit);
-		return args;
+	protected void setArgs(int limit) {
+		setArgs(limit, false);
+	}
+
+	protected void setArgs(int limit, boolean useOriginal) {
+		String content = String.join(" ", args);
+		if (useOriginal) {
+			content = getMessage().getContentRaw();
+			if (content.startsWith(getSelfUser().getAsMention())) {
+				content = content.substring(getSelfUser().getAsMention().length() + 1);
+			}
+		}
+		args = content.split(" ", limit);
 	}
 
 	protected void embed(EmbedBuilder embedBuilder) {
@@ -158,12 +172,12 @@ public abstract class CommandExecute extends CommandEvent {
 	}
 
 	/**
-	 * @param ebOrMb EmbedBuilder or MessageBuilder (for buttons)
+	 * @param ebOrMb EmbedBuilder or MessageEditBuilder (for buttons)
 	 */
 	protected void embed(Object ebOrMb) {
 		if (ebOrMb instanceof EmbedBuilder eb) {
 			embed(eb);
-		} else if (ebOrMb instanceof MessageBuilder mb) {
+		} else if (ebOrMb instanceof MessageEditBuilder mb) {
 			ebMessage.editMessage(mb.build()).queue(ignore, ignore);
 		} else {
 			throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
@@ -181,7 +195,7 @@ public abstract class CommandExecute extends CommandEvent {
 			}
 		} else if (ebOrMb instanceof EmbedBuilder eb) {
 			ebMessage.editMessageEmbeds(eb.build()).queue(ignore, ignore);
-		} else if (ebOrMb instanceof MessageBuilder mb) {
+		} else if (ebOrMb instanceof MessageEditBuilder mb) {
 			ebMessage.editMessage(mb.build()).queue(ignore, ignore);
 		} else {
 			throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
@@ -258,127 +272,5 @@ public abstract class CommandExecute extends CommandEvent {
 			)
 			.queue(ignore, ignore);
 		return true;
-	}
-
-	protected void removeArg(int index) {
-		String[] newArgs = new String[args.length - 1];
-		for (int i = 0, j = 0; i < args.length; i++) {
-			if (i != index) {
-				newArgs[j] = args[i];
-				j++;
-			}
-		}
-		args = newArgs;
-	}
-
-	/**
-	 * Matches a boolean flag
-	 */
-	protected boolean getBooleanOption(String match) {
-		boolean arg = false;
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals(match)) {
-				arg = true;
-				removeArg(i);
-			}
-		}
-
-		return arg;
-	}
-
-	protected String getStringOption(String match) {
-		return getStringOption(match, null);
-	}
-
-	protected String getStringOption(String match, String defaultValue) {
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].startsWith(match + ":")) {
-				try {
-					String arg = args[i].split(match + ":")[1];
-					removeArg(i);
-					return arg;
-				} catch (Exception ignored) {}
-			}
-		}
-
-		return defaultValue;
-	}
-
-	protected Player.Gamemode getGamemodeOption(String match, Player.Gamemode defaultValue) {
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].startsWith(match + ":")) {
-				try {
-					Player.Gamemode arg = Player.Gamemode.of(args[i].split(match + ":")[1]);
-					removeArg(i);
-					return arg;
-				} catch (Exception ignored) {}
-			}
-		}
-
-		return defaultValue;
-	}
-
-	protected Player.WeightType getWeightTypeOption(String match, Player.WeightType defaultValue) {
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].startsWith(match + ":")) {
-				try {
-					Player.WeightType arg = Player.WeightType.of(args[i].split(match + ":")[1]);
-					removeArg(i);
-					return arg;
-				} catch (Exception ignored) {}
-			}
-		}
-
-		return defaultValue;
-	}
-
-	protected int getIntOption(String match) {
-		return getIntOption(match, -1);
-	}
-
-	protected int getIntOption(String match, int defaultValue) {
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].startsWith(match + ":")) {
-				try {
-					int arg = Integer.parseInt(args[i].split(match + ":")[1]);
-					removeArg(i);
-					return arg;
-				} catch (Exception ignored) {}
-			}
-		}
-
-		return defaultValue;
-	}
-
-	protected double getDoubleOption(String match, double defaultValue) {
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].startsWith(match + ":")) {
-				try {
-					double arg = Double.parseDouble(args[i].split(match + ":")[1]);
-					removeArg(i);
-					return arg;
-				} catch (Exception ignored) {}
-			}
-		}
-
-		return defaultValue;
-	}
-
-	public PaginatorEvent getPaginatorEvent() {
-		return new PaginatorEvent(this);
-	}
-
-	public static class SlashOnlyCommandExecute extends CommandExecute {
-
-		public SlashOnlyCommandExecute(Command command, CommandEvent event) {
-			super(command, event);
-		}
-
-		public SlashOnlyCommandExecute(Command command, CommandEvent event, boolean sendLoadingEmbed) {
-			super(command, event, sendLoadingEmbed);
-		}
-
-		@Override
-		protected void execute() {}
 	}
 }

@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
@@ -47,7 +48,7 @@ public class SelectMenuPaginator {
 		this.page = page;
 		this.event = event;
 
-		List<ActionRow> actionRows = new ArrayList<>();
+		List<LayoutComponent> actionRows = new ArrayList<>();
 		if (!extras.getButtons().isEmpty()) {
 			actionRows.add(ActionRow.of(extras.getButtons()));
 		}
@@ -55,7 +56,7 @@ public class SelectMenuPaginator {
 		event
 			.getAction()
 			.editMessageEmbeds(this.pages.get(page).build())
-			.setActionRows(actionRows)
+			.setComponents(actionRows)
 			.get()
 			.queue(m -> {
 				message = m;

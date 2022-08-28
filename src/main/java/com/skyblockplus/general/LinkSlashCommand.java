@@ -37,15 +37,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -73,14 +72,14 @@ public class LinkSlashCommand extends SlashCommand {
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
 		if (!playerInfo.isValid()) {
 			return playerInfo.failCause().endsWith(" is not linked on Hypixel")
-				? new MessageBuilder()
+				? new MessageEditBuilder()
 					.setEmbeds(invalidEmbed(playerInfo.failCause()).build())
-					.setActionRows(ActionRow.of(Button.link("https://streamable.com/sdq8tp", "Help Linking")))
+					.setActionRow(Button.link("https://streamable.com/sdq8tp", "Help Linking"))
 				: invalidEmbed(playerInfo.failCause());
 		}
 
 		if (!member.getUser().getAsTag().equals(playerInfo.discordTag())) {
-			return new MessageBuilder()
+			return new MessageEditBuilder()
 				.setEmbeds(
 					defaultEmbed("Discord tag mismatch")
 						.setDescription(
@@ -94,7 +93,7 @@ public class LinkSlashCommand extends SlashCommand {
 						)
 						.build()
 				)
-				.setActionRows(ActionRow.of(Button.link("https://streamable.com/sdq8tp", "Help Linking")));
+				.setActionRow(Button.link("https://streamable.com/sdq8tp", "Help Linking"));
 		}
 
 		LinkedAccount toAdd = new LinkedAccount(Instant.now().toEpochMilli(), member.getId(), playerInfo.uuid(), playerInfo.username());

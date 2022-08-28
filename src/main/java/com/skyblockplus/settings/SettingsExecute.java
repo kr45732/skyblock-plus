@@ -835,10 +835,14 @@ public class SettingsExecute {
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(30);
 		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Settings"));
 		String canUse = streamJsonArray(higherDepth(blacklistSettings, "canUse").getAsJsonArray())
-			.map(g -> jda.getGuildById(g.getAsString()).getName())
+			.map(g -> jda.getGuildById(g.getAsString()))
+			.filter(Objects::nonNull)
+			.map(Guild::getName)
 			.collect(Collectors.joining(", "));
 		String isUsing = streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray())
-			.map(g -> jda.getGuildById(g.getAsString()).getName())
+			.map(g -> jda.getGuildById(g.getAsString()))
+			.filter(Objects::nonNull)
+			.map(Guild::getName)
 			.collect(Collectors.joining(", "));
 
 		paginateBuilder.addItems(
