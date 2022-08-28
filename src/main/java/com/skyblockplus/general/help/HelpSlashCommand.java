@@ -105,18 +105,15 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("help", "Show the help menu with all the commands.", "help")
 					.addSecondData("Show the help menu for a certain command.", "help <command>")
 					.addExamples("help", "help guild experience")
-					.addAliases("commands")
 					.setCategory("general"),
-				new HelpData("information", "Get information about this bot.").addAliases("info", "about").setCategory("general"),
+				new HelpData("information", "Get information about this bot.").setCategory("general"),
 				new HelpData("invite", "Get the invite link and support server link for the bot.").setCategory("general"),
 				new HelpData("link", "Link your Hypixel account to the bot.", "link <player>")
-					.addAliases("verify")
 					.addExamples("link CrypticPlasma")
 					.setCategory("general"),
-				new HelpData("unlink", "Unlink your account from the bot.").addAliases("unverify").setCategory("general"),
+				new HelpData("unlink", "Unlink your account from the bot.").setCategory("general"),
 				// Slayer
 				new HelpData("slayer", "Get the slayer data of a player.", "slayer [player] [profile]")
-					.addAliases("slayers")
 					.addPlayerExamples()
 					.setCategory("slayer"),
 				new HelpData(
@@ -128,7 +125,6 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("slayer"),
 				// Skills
 				new HelpData("skills", "Get the skills data of a player.", "skills [player] [profile]")
-					.addAliases("skill")
 					.addPlayerExamples()
 					.setCategory("skills"),
 				new HelpData("hotm", "Get a player's heart of the mountain statistics.", "hotm [player] [profile]")
@@ -142,7 +138,6 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("skills"),
 				// Dungeons
 				new HelpData("dungeons", "Get the dungeons data of a player.", "dungeons [player] [profile]")
-					.addAliases("cata", "catacombs")
 					.addPlayerExamples()
 					.setCategory("dungeons"),
 				new HelpData("essence", "Main essence command.")
@@ -151,8 +146,7 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("upgrade", "Interactive message to find the essence amount to upgrade an item.", "upgrade <item>")
 							.addExamples("upgrade Hyperion"),
 						new HelpData("information", "Get the amount of essence to upgrade an item for each level.", "information <item>")
-							.addExamples("information Hyperion")
-							.addAliases("info"),
+							.addExamples("information Hyperion"),
 						new HelpData("player", "Get a player's essence amounts and their essence shop upgrades.", "[player] [profile]")
 							.addPlayerExamples()
 					),
@@ -161,14 +155,12 @@ public class HelpSlashCommand extends SlashCommand {
 					"Calculate the number of runs needed to reach a certain catacombs level. The floor can be from F1 to F7 or M1 to M6.",
 					"calcruns [player] [profile] <level:level> <floor:floor>"
 				)
-					.addAliases("runs")
 					.setCategory("dungeons"),
 				new HelpData(
 					"calcdrops",
 					"Calculate the drop rate and cost of all chests for a floor",
 					"calcdrops <floor> [luck:1|2|3|4|5] [accessory:none|talisman|ring|artifact]"
 				)
-					.addAliases("drops")
 					.setCategory("dungeons"),
 				// Guild
 				new HelpData("guild", "Main guild command")
@@ -176,7 +168,6 @@ public class HelpSlashCommand extends SlashCommand {
 					.addSubcommands(
 						new HelpData("information", "Get information and statistics about a player's guild.", "information [player]")
 							.addSecondData("Get information and statistics about a guild.", "information <g:guild_name>")
-							.addAliases("info")
 							.addExamples("information CrypticPlasma", "information g:Skyblock_Forceful"),
 						new HelpData("members", "Get a list of all members in a player's guild.", "members [player]")
 							.addSecondData("Get a list of all members in a guild.", "members <g:guild_name>")
@@ -186,51 +177,45 @@ public class HelpSlashCommand extends SlashCommand {
 							"Get the experience leaderboard for a player's guild. Days can range from 1 to 7, default number of days is 7.",
 							"experience [player] [days:days]"
 						)
-							.addAliases("exp")
 							.addSecondData(
 								"Get the experience leaderboard for a guild. Days can range from 1 to 7, default number of days is 7.",
 								"experience <g:guild_name> [days:days]"
 							)
 							.addExamples("experience CrypticPlasma", "experience g:Skyblock Forceful days:4")
 					)
-					.addAliases("g")
 					.setCategory("guild"),
 				new HelpData(
 					"guild-leaderboard",
-					"Get a leaderboard for a player's guild. All types can be seen through autocomplete. The mode can be all, ironman, or stranded.  Append the `--key` flag to force use the set Hypixel API key for more accurate results.",
-					"guild-leaderboard <type> [player] [mode:all|ironman|stranded] [--key]"
+					"Get a leaderboard for a player's guild. All types can be seen through autocomplete. The mode can be all, ironman, or stranded.  Set key to true to force use the set Hypixel API key for more accurate results.",
+					"guild-leaderboard <type> [player] [mode:all|ironman|stranded] [key]"
 				)
 					.addSecondData(
 						"Get a leaderboard for a guild.",
-						"guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded] [--key]"
+						"guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded] [key]"
 					)
-					.addAliases("g-lb")
 					.addExamples("guild-leaderboard weight CrypticPlasma", "guild-leaderboard sven CrypticPlasma mode:ironman")
 					.setCategory("guild"),
 				new HelpData(
 					"guild-kicker",
-					"Get all player's who don't meet the provided requirements. The requirement type can be skills, slayer, catacombs, or weight. The requirement value must be an integer. You can have up to 3 sets of requirements.  Append the `--key` flag to force use the set Hypixel API key for more accurate results.",
-					"guild-kicker <u:player> <[type:value ...]> ... [--key]"
+					"Get all player's who don't meet the provided requirements. The requirement type can be skills, slayer, catacombs, or weight. The requirement value must be an integer. You can have up to 3 sets of requirements.  Set key to true to force use the set Hypixel API key for more accurate results.",
+					"guild-kicker <u:player> <[type:value ...]> ... [key]"
 				)
-					.addAliases("g-kicker")
 					.addExamples("guild-kicker u:CrypticPlasma [weight:4000 skills:40] [weight:4500]")
 					.setCategory("guild"),
 				new HelpData(
 					"guild-ranks",
 					"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" +
 					DISCORD_SERVER_INVITE_LINK +
-					") to set this up for your guild.  Append the `--key` flag to force use the set Hypixel API key for more accurate results.",
-					"guild-ranks <player> [mode:all|ironman|stranded] [--key]"
+					") to set this up for your guild. Set key to true to force use the set Hypixel API key for more accurate results.",
+					"guild-ranks <player> [mode:all|ironman|stranded] [key]"
 				)
-					.addAliases("g-ranks", "g-rank")
 					.addExamples("guild-ranks CrypticPlasma")
 					.setCategory("guild"),
 				new HelpData(
 					"guild-statistics",
-					"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight.  Append the `--key` flag to force use the set Hypixel API key for more accurate results.",
-					"guild-statistics [player] [g:guild_name] [--key]"
+					"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight. Set key to true to force use the set Hypixel API key for more accurate results.",
+					"guild-statistics [player] [g:guild_name] [key]"
 				)
-					.addAliases("guild-stats", "g-stats")
 					.addExamples("guild-stats u:CrypticPlasma")
 					.setCategory("guild"),
 				new HelpData(
@@ -244,25 +229,20 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData(
 					"auctions",
 					"Get (and/or track) a player's unclaimed auctions on all profiles. Can be sorted ascending or descending. Can be filtered by sold or unsold. Add verbose flag to show estimated price of each auction.",
-					"auctions [player] [sort:low|high] [filter:unsold|sold] [--verbose]"
+					"auctions [player] [sort:low|high] [filter:unsold|sold] [verbose]"
 				)
-					.addAliases("auction", "ah")
-					.addExamples("auctions CrypticPlasma", "auctions CrypticPlasma filter:sold --verbose")
+					.addExamples("auctions CrypticPlasma", "auctions CrypticPlasma filter:sold verbose:true")
 					.setCategory("price"),
 				new HelpData("viewauction", "Get information about an auction by it's UUID.", "viewauction <uuid>")
-					.addAliases("viewah")
 					.addExamples("auctions uuid 77df55d9c0084473b113265ef48fb396")
 					.setCategory("price"),
 				new HelpData("bin", "Get the lowest bin of an item.", "bin <item>")
-					.addAliases("lbin")
 					.addExamples("bin Necron Chestplate")
 					.setCategory("price"),
 				new HelpData("bazaar", "Get the bazaar prices of an item.", "bazaar <item>")
-					.addAliases("bz")
 					.addExamples("bazaar Booster Cookie")
 					.setCategory("price"),
 				new HelpData("average", "Get the average auction price of an item.", "average <item>")
-					.addAliases("avg")
 					.addExamples("average Necron's Handle")
 					.setCategory("price"),
 				new HelpData("bids", "Get a player's auction house bids", "bids [player].")
@@ -277,15 +257,12 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("price"),
 				new HelpData("bits", "Get the bits cost of an item from the bits shop.", "bits <item>")
 					.addExamples("bits God Potion")
-					.addAliases("bit")
 					.setCategory("price"),
 				new HelpData("coinsperbit", "Get the coins to bits ratio for items in the bits shop.", "coinsperbit <item>")
-					.addAliases("cpb")
 					.setCategory("price"),
 				// Inventory
 				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory [player] [profile]")
 					.addSecondData("Get a player's inventory with lore.", "inventory [player] [profile] <slot:number>")
-					.addAliases("inv")
 					.addExamples(
 						"inventory CrypticPlasma",
 						"inventory CrypticPlasma Zucchini",
@@ -297,7 +274,6 @@ public class HelpSlashCommand extends SlashCommand {
 					.addPlayerExamples()
 					.setCategory("inventory"),
 				new HelpData("enderchest", "Get a player's ender chest represented in emojis.", "enderchest [player] [profile]")
-					.addAliases("ec", "echest")
 					.addPlayerExamples()
 					.setCategory("inventory"),
 				new HelpData("storage", "Get a player's storage represented in emojis.", "storage [player] [profile]")
@@ -311,7 +287,6 @@ public class HelpSlashCommand extends SlashCommand {
 						"talisman CrypticPlasma slot:1",
 						"talisman CrypticPlasma Zucchini slot:1"
 					)
-					.addAliases("talismans")
 					.setCategory("inventory"),
 				new HelpData(
 					"sacks",
@@ -331,7 +306,6 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("pets", "Get a player's pets.", "pets [player] [profile]").addPlayerExamples().setCategory("inventory"),
 				// Misc
 				new HelpData("roles", "Main roles command.")
-					.addAliases("role")
 					.addSubcommands(
 						new HelpData("claim", "Claim your automatic Skyblock roles. You must be linked to the bot.", "claim <profile>")
 							.addExamples("claim", "claim Zucchini"),
@@ -352,7 +326,6 @@ public class HelpSlashCommand extends SlashCommand {
 						"Calculate a player's networth with a detailed JSON of each item cost.",
 						"networth [player] [profile] --verbose"
 					)
-					.addAliases("nw", "n")
 					.addExamples(
 						"networth CrypticPlasma",
 						"networth CrypticPlasma Zucchini",
@@ -365,7 +338,6 @@ public class HelpSlashCommand extends SlashCommand {
 					"Get a player's slayer, skills, dungeons, and total weight. Shows both senither and lily weight.",
 					"weight [player] [profile]"
 				)
-					.addAliases("we")
 					.addPlayerExamples()
 					.setCategory("miscellaneous"),
 				new HelpData(
@@ -383,7 +355,6 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("miscellaneous"),
 				new HelpData("check-api", "Get a player's enabled and/or disabled Skyblock APIs", "check-api [player] [profile]")
 					.addPlayerExamples()
-					.addAliases("api")
 					.setCategory("miscellaneous"),
 				new HelpData("profiles", "Get information about all of a player's profiles.", "missing [player] [profile]")
 					.addPlayerExamples()
@@ -408,11 +379,9 @@ public class HelpSlashCommand extends SlashCommand {
 					"Get a global leaderboard. All types can be seen through autocomplete. The mode can be all, ironman, or stranded.",
 					"leaderboard <type> [u:player] [mode:all|ironman|stranded] [page:page] [rank:rank] [amount:amount]"
 				)
-					.addAliases("lb")
 					.setCategory("miscellaneous"),
 				new HelpData("skyblock", "Get an overview of a player's Skyblock statistics", "skyblock [player] [profile]")
 					.addPlayerExamples()
-					.addAliases("sb")
 					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
 					.setCategory("miscellaneous"),
@@ -430,7 +399,6 @@ public class HelpSlashCommand extends SlashCommand {
 					"Calculate your loot quality and loot from dragons in the end. The ratio is your damage divided by first place damage.",
 					"calcdrags [position:position] [eyes:eyes] [ratio:ratio]"
 				)
-					.addAliases("drags")
 					.setCategory("miscellaneous"),
 				new HelpData("reforge", "Get the reforge stone stats for each rarity.", "reforge <stone>").setCategory("miscellaneous"),
 				// Party
@@ -453,7 +421,7 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("current", "Get information about the current event."),
 						new HelpData("join", "Join the current event."),
 						new HelpData("leave", "Leave the current event."),
-						new HelpData("leaderboard", "Get the leaderboard for current event.").addAliases("lb"),
+						new HelpData("leaderboard", "Get the leaderboard for current event."),
 						new HelpData("end", "Force end the event."),
 						new HelpData("cancel", "Cancel the event. No prizes or winners will be announced.")
 					)
@@ -461,7 +429,6 @@ public class HelpSlashCommand extends SlashCommand {
 				// Settings
 				new HelpData("settings", "Main settings command.")
 					.setCategory("settings")
-					.addAliases("config", "configuration")
 					.addSecondData("View the current settings for the Discord server.", "settings")
 					.addSubcommands(
 						new HelpData("delete", "Delete certain settings or all settings from the database.")
@@ -806,7 +773,7 @@ public class HelpSlashCommand extends SlashCommand {
 			if (pageStrSplit.length >= 1) {
 				HelpData matchCmd = helpDataList.stream().filter(cmd -> cmd.matchTo(pageStrSplit[0])).findFirst().orElse(null);
 				if (matchCmd != null) {
-					return matchCmd.getHelp(pageStrSplit.length == 2 ? pageStrSplit[1] : null, DEFAULT_PREFIX);
+					return matchCmd.getHelp(pageStrSplit.length == 2 ? pageStrSplit[1] : null);
 				}
 			}
 
@@ -823,295 +790,294 @@ public class HelpSlashCommand extends SlashCommand {
 			"Use the arrow buttons to navigate through the pages" + generatePageMap() + "\n\n<> = required [] = optional"
 		);
 
-		HelpGenerator help = new HelpGenerator(DEFAULT_PREFIX);
 		paginateBuilder.addItems(
-			help.create("help", "Show the help menu with all the commands") +
-			help.create("help <command>", "Show the help menu for a certain command") +
-			help.create("information", "Show information and statistics about the bot") +
-			help.create("invite", "Get the invite link and Discord link for the bot") +
-			help.create("link <player>", "Link your Hypixel account to the bot") +
-			help.create("unlink", "Unlink your account from the bot")
+			create("help", "Show the help menu with all the commands") +
+			create("help <command>", "Show the help menu for a certain command") +
+			create("information", "Show information and statistics about the bot") +
+			create("invite", "Get the invite link and Discord link for the bot") +
+			create("link <player>", "Link your Hypixel account to the bot") +
+			create("unlink", "Unlink your account from the bot")
 		);
 
 		paginateBuilder.addItems(
-			help.create("slayer [player] [profile]", "Get the slayer data of a player") +
-			help.create(
+			create("slayer [player] [profile]", "Get the slayer data of a player") +
+			create(
 				"calcslayer <type> [player] [profile] [level:level] [xp:xp]",
 				"Calculate the number of bosses needed to reach a level or xp amount"
 			)
 		);
 
 		paginateBuilder.addItems(
-			help.create("skills [player] [profile]", "Get the skills data of a player") +
-			help.create("hotm [player] [profile]", "Get a player's heart of the mountain statistics") +
-			help.create("forge [player] [profile]", "Get a player's forge items & ending times") +
-			help.create("crimson [player] [profile]", "Get the crimson isle stats of a player")
+			create("skills [player] [profile]", "Get the skills data of a player") +
+			create("hotm [player] [profile]", "Get a player's heart of the mountain statistics") +
+			create("forge [player] [profile]", "Get a player's forge items & ending times") +
+			create("crimson [player] [profile]", "Get the crimson isle stats of a player")
 		);
 
 		paginateBuilder.addItems(
-			help.create("dungeons [player] [profile]", "Get the dungeons data of a player") +
-			help.create("essence upgrade <item>", "Interactive message to find the essence amount to upgrade an item") +
-			help.create("essence information <item>", "Get the amount of essence to upgrade an item for each level") +
-			help.create("essence [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
-			help.create(
+			create("dungeons [player] [profile]", "Get the dungeons data of a player") +
+			create("essence upgrade <item>", "Interactive message to find the essence amount to upgrade an item") +
+			create("essence information <item>", "Get the amount of essence to upgrade an item for each level") +
+			create("essence [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
+			create(
 				"calcruns [player] [profile] <level:level> <floor:floor>",
 				"Calculate the number of runs needed to reach a certain catacombs level"
 			) +
-			help.create(
+			create(
 				"calcdrops <floor> [luck:boss_luck] [accessory:accessory]",
 				"Calculate the drop rate and cost of all chests for a floor"
 			)
 		);
 
 		paginateBuilder.addItems(
-			help.create("guild <player>", "Get information and statistics about a player's guild") +
-			help.create("guild <g:guild_name>", "Get information and statistics about a guild") +
-			help.create("guild members <player>", "Get a list of all members in a player's guild") +
-			help.create("guild members <g:guild_name>", "Get a list of all members in a guild") +
-			help.create("guild experience <player>", "Get the experience leaderboard for a player's guild") +
-			help.create("guild experience <g:guild_name>", "Get the experience leaderboard for a guild") +
-			help.create(
-				"g-lb <type> [player] [g:guild_name] [mode:normal|ironman|stranded] [--key]",
+			create("guild <player>", "Get information and statistics about a player's guild") +
+			create("guild <g:guild_name>", "Get information and statistics about a guild") +
+			create("guild members <player>", "Get a list of all members in a player's guild") +
+			create("guild members <g:guild_name>", "Get a list of all members in a guild") +
+			create("guild experience <player>", "Get the experience leaderboard for a player's guild") +
+			create("guild experience <g:guild_name>", "Get the experience leaderboard for a guild") +
+			create(
+				"g-lb <type> [player] [g:guild_name] [mode:normal|ironman|stranded] [key]",
 				"Get a leaderboard for a player's guild"
 			) +
-			help.create(
-				"g-kicker <u:player> <type:value> ... [--key]",
+			create(
+				"g-kicker <u:player> <type:value> ... [key]",
 				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer"
 			) +
-			help.create(
-				"g-ranks <u:player> [mode:normal|ironman|stranded] [--key]",
+			create(
+				"g-ranks <u:player> [mode:normal|ironman|stranded] [key]",
 				"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild"
 			) +
-			help.create(
-				"g-stats [player] [g:guild_name] [--key]",
+			create(
+				"g-stats [player] [g:guild_name] [key]",
 				"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight"
 			) +
-			help.create("check-guild-api <player>", "Get which Skyblock APIs players have enabled or disabled for a guild")
+			create("check-guild-api <player>", "Get which Skyblock APIs players have enabled or disabled for a guild")
 		);
 
 		paginateBuilder.addItems(
-			help.create(
-				"auctions [player] [sort:low|high] [filter:unsold|sold] [--verbose]",
+			create(
+				"auctions [player] [sort:low|high] [filter:unsold|sold] [verbose]",
 				"Get a player's unclaimed auctions on all profiles"
 			) +
-			help.create("viewauction <UUID>", "Get an auction by its UUID") +
-			help.create("bin <item>", "Get the lowest bin of an item") +
-			help.create("bazaar <item]", "Get bazaar prices of an item") +
-			help.create("average <item>", "Get the average auction price of an item") +
-			help.create("bids [player]", "Get a player's auction house bids") +
-			help.create("price <item> [type:bin|auction|both]", "Query the auction house for the lowest bin of an item") +
-			help.create("bits <item>", "Get the bits cost of an item from the bits shop") +
-			help.create("coinsperbit <item>", "Get the coins to bits ratio for items in the bits shop")
+			create("viewauction <UUID>", "Get an auction by its UUID") +
+			create("bin <item>", "Get the lowest bin of an item") +
+			create("bazaar <item]", "Get bazaar prices of an item") +
+			create("average <item>", "Get the average auction price of an item") +
+			create("bids [player]", "Get a player's auction house bids") +
+			create("price <item> [type:bin|auction|both]", "Query the auction house for the lowest bin of an item") +
+			create("bits <item>", "Get the bits cost of an item from the bits shop") +
+			create("coinsperbit <item>", "Get the coins to bits ratio for items in the bits shop")
 		);
 
 		paginateBuilder.addItems(
-			help.create("inventory [player] [profile]", "Get a player's inventory represented in emojis") +
-			help.create("inventory [player] [profile] <slot:number>", "Get a player's inventory with lore") +
-			help.create("armor list [player] [profile]", "Get a player's equipped armor & equipment with lore") +
-			help.create("armor [player] [profile]", "Get a player's equipped armor & equipment represented in emojis") +
-			help.create("enderchest [player] <profile]", "Get a player's ender chest represented in emojis") +
-			help.create("storage [player] <profile]", "Get a player's storage represented in emojis") +
-			help.create("talisman [player] [profile]", "Get a player's talisman bag represented in emojis") +
-			help.create("talisman [player] [profile] <slot:number>", "Get a player's talisman bag with lore") +
-			help.create("sacks [player] [profile]", "Get a player's sacks' content bag represented in a list") +
-			help.create("wardrobe [player] [profile]", "Get a player's wardrobe armors represented in emojis") +
-			help.create("wardrobe list [player] [profile]", "Get a player's wardrobe armors represented in a list") +
-			help.create("pets [player] [profile]", "Get a player's pets")
+			create("inventory [player] [profile]", "Get a player's inventory represented in emojis") +
+			create("inventory [player] [profile] <slot:number>", "Get a player's inventory with lore") +
+			create("armor list [player] [profile]", "Get a player's equipped armor & equipment with lore") +
+			create("armor [player] [profile]", "Get a player's equipped armor & equipment represented in emojis") +
+			create("enderchest [player] <profile]", "Get a player's ender chest represented in emojis") +
+			create("storage [player] <profile]", "Get a player's storage represented in emojis") +
+			create("talisman [player] [profile]", "Get a player's talisman bag represented in emojis") +
+			create("talisman [player] [profile] <slot:number>", "Get a player's talisman bag with lore") +
+			create("sacks [player] [profile]", "Get a player's sacks' content bag represented in a list") +
+			create("wardrobe [player] [profile]", "Get a player's wardrobe armors represented in emojis") +
+			create("wardrobe list [player] [profile]", "Get a player's wardrobe armors represented in a list") +
+			create("pets [player] [profile]", "Get a player's pets")
 		);
 
 		paginateBuilder.addItems(
-			help.create("roles claim [profile]", "Claim your automatic Skyblock roles based on your statistics") +
-			help.create("roles list", "List all roles that can be claimed through the bot") +
-			help.create("coins [player] [profile]", "Get a player's bank and purse coins") +
-			help.create("coins history [player] [profile]", "Get a player's bank transaction history") +
-			help.create("networth [player] [profile]", "Calculate a player's networth") +
-			help.create("networth [player] [profile] --verbose", "Calculate a player's networth with a detailed JSON of each item cost") +
-			help.create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +
-			help.create(
+			create("roles claim [profile]", "Claim your automatic Skyblock roles based on your statistics") +
+			create("roles list", "List all roles that can be claimed through the bot") +
+			create("coins [player] [profile]", "Get a player's bank and purse coins") +
+			create("coins history [player] [profile]", "Get a player's bank transaction history") +
+			create("networth [player] [profile]", "Calculate a player's networth") +
+			create("networth [player] [profile] verbose:true", "Calculate a player's networth with a detailed JSON of each item cost") +
+			create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +
+			create(
 				"calcweight [player] [profile] <type:type> <amount:amount>",
 				"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount"
 			) +
-			help.create("hypixel [player]", "Get Hypixel information about a player") +
-			help.create("profiles [player]", "Get information about all of a player's profiles") +
-			help.create("missing [player] [profile]", "Get a player's missing talismans") +
-			help.create("fetchur", "Get the item that fetchur wants today") +
-			help.create("cakes [player] [profile]", "Get a player's inactive and active cake buffs") +
-			help.create("bestiary [player] [profile]", "Get a player's bestiary stats") +
-			help.create("harp [player] [profile]", "Get a player's harp statistics") +
-			help.create("uuid [username|uuid]", "Convert username to UUID or UUID to username") +
-			help.create("calendar", "Get the current Skyblock datetime and running or upcoming events") +
-			help.create("scammer [player]", "Check if a player is marked as a scamer in the SBZ database") +
-			help.create("jacob [crop]", "Get the upcoming contests and their crops") +
-			help.create("mayor", "Get information about the current mayor or the running election") +
-			help.create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
-			help.create("leaderboard <type> [u:player] [page:page] [rank:rank] [amount:amount]", "Get a global leaderboard") +
-			help.create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
-			help.create("recipe <item>", "Get the crafting recipe of an item") +
-			help.create("check-api [player]", "Check which Skyblock APIs a player has enabled or disabled") +
-			help.create(
+			create("hypixel [player]", "Get Hypixel information about a player") +
+			create("profiles [player]", "Get information about all of a player's profiles") +
+			create("missing [player] [profile]", "Get a player's missing talismans") +
+			create("fetchur", "Get the item that fetchur wants today") +
+			create("cakes [player] [profile]", "Get a player's inactive and active cake buffs") +
+			create("bestiary [player] [profile]", "Get a player's bestiary stats") +
+			create("harp [player] [profile]", "Get a player's harp statistics") +
+			create("uuid [username|uuid]", "Convert username to UUID or UUID to username") +
+			create("calendar", "Get the current Skyblock datetime and running or upcoming events") +
+			create("scammer [player]", "Check if a player is marked as a scamer in the SBZ database") +
+			create("jacob [crop]", "Get the upcoming contests and their crops") +
+			create("mayor", "Get information about the current mayor or the running election") +
+			create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
+			create("leaderboard <type> [u:player] [page:page] [rank:rank] [amount:amount]", "Get a global leaderboard") +
+			create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
+			create("recipe <item>", "Get the crafting recipe of an item") +
+			create("check-api [player]", "Check which Skyblock APIs a player has enabled or disabled") +
+			create(
 				"calcdrags [eyes:eyes] [position:position] [ratio:ratio]",
 				"Calculate loot quality and loot from dragons in the end"
 			) +
-			help.create("reforgestone <stone>", "Get the reforge stone stats for each rarity") +
-			help.create("collections [player] [profile]", "Get a player's collection counts")
+			create("reforgestone <stone>", "Get the reforge stone stats for each rarity") +
+			create("collections [player] [profile]", "Get a player's collection counts")
 		);
 
 		paginateBuilder.addItems(
-			help.create("party create", "Interactive message to create a party") +
-			help.create("party current", "Get information about your current party") +
-			help.create("party join <username>", "Join a party") +
-			help.create("party leave", "Leave your current party") +
-			help.create("party list", "List all active parties") +
-			help.create("party disband", "Disband your party") +
-			help.create("party kick <username>", "Kick a member from your party")
+			create("party create", "Interactive message to create a party") +
+			create("party current", "Get information about your current party") +
+			create("party join <username>", "Join a party") +
+			create("party leave", "Leave your current party") +
+			create("party list", "List all active parties") +
+			create("party disband", "Disband your party") +
+			create("party kick <username>", "Kick a member from your party")
 		);
 
 		paginateBuilder.addItems(
-			help.create("event create", "Interactive message to create a Skyblock event") +
-			help.create("event current", "Get information about the current event") +
-			help.create("event join [profile]", "Join the current event") +
-			help.create("event leave", "Leave the current event") +
-			help.create("event leaderboard", "Get the leaderboard for current event") +
-			help.create("event end", "Force end the event") +
-			help.create("event cancel", "Cancel the event. No announcement will be made")
+			create("event create", "Interactive message to create a Skyblock event") +
+			create("event current", "Get information about the current event") +
+			create("event join [profile]", "Join the current event") +
+			create("event leave", "Leave the current event") +
+			create("event leaderboard", "Get the leaderboard for current event") +
+			create("event end", "Force end the event") +
+			create("event cancel", "Cancel the event. No announcement will be made")
 		);
 
 		paginateBuilder.addItems(
-			help.create("settings", "View the current settings for the Discord server") +
-			help.create("settings general", "View the bot's general settings for this server") +
-			help.create("setup", "A short walk-through on how to setup the bot") +
-			help.create("categories", "Get the name and id of all categories in this server") +
-			help.create("reload", "Reload the guild application and verification settings") +
-			help.create("settings set hypixel_key <key>", "Set a Hypixel API key for this server") +
-			help.create(
+			create("settings", "View the current settings for the Discord server") +
+			create("settings general", "View the bot's general settings for this server") +
+			create("setup", "A short walk-through on how to setup the bot") +
+			create("categories", "Get the name and id of all categories in this server") +
+			create("reload", "Reload the guild application and verification settings") +
+			create("settings set hypixel_key <key>", "Set a Hypixel API key for this server") +
+			create(
 				"settings set fetchur_channel <#channel>",
 				"Set the channel where fetchur item notifications will be sent every day at 12 am EST"
 			) +
-			help.create("settings set fetchur_ping <@role>", "Role that will be pinged when the fetchur item notifications is sent") +
-			help.create(
+			create("settings set fetchur_ping <@role>", "Role that will be pinged when the fetchur item notifications is sent") +
+			create(
 				"settings set mayor_channel <#channel>",
 				"Set the channel where notifications will be sent when a new mayor is elected"
 			) +
-			help.create("settings set mayor_ping <@role>", "Role that will be pinged when mayor notifications are sent") +
-			help.create("settings set guest_role <@role>", "Set the guest role") +
-			help.create("settings set log_channel <#channel>", "Set the action log channel") +
-			help.create("settings bot_manager add <@role>", "Add a bot manager role") +
-			help.create("settings bot_manager remove <@role>", "Remove a bot manager role") +
-			help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
-			help.create("settings delete all", "Delete the current server settings") +
-			help.create("settings channel_blacklist add <#channel>", "Blacklist a channel from running bot commands") +
-			help.create("settings channel_blacklist remove <#channel>", "Unblacklist a channel from running bot commands") +
-			help.create("settings blacklist", "List all players that are blacklisted") +
-			help.create("settings blacklist add <player> [reason]", "Blacklist a player from using the application system on this server") +
-			help.create("settings blacklist remove <player>", "Remove a player from the blacklist") +
-			help.create("settings blacklist search <player>", "Remove a player from the blacklist") +
-			help.create("settings blacklist share <server_id>", "Share your blacklist with another server") +
-			help.create("settings blacklist unshare <server_id>", "Stop sharing your blacklist with another server") +
-			help.create("settings blacklist use <server_id>", "Use a shared blacklist from another server") +
-			help.create("settings blacklist stop_using <server_id>", "Stop using a shared blacklist from another server")
+			create("settings set mayor_ping <@role>", "Role that will be pinged when mayor notifications are sent") +
+			create("settings set guest_role <@role>", "Set the guest role") +
+			create("settings set log_channel <#channel>", "Set the action log channel") +
+			create("settings bot_manager add <@role>", "Add a bot manager role") +
+			create("settings bot_manager remove <@role>", "Remove a bot manager role") +
+			create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
+			create("settings delete all", "Delete the current server settings") +
+			create("settings channel_blacklist add <#channel>", "Blacklist a channel from running bot commands") +
+			create("settings channel_blacklist remove <#channel>", "Unblacklist a channel from running bot commands") +
+			create("settings blacklist", "List all players that are blacklisted") +
+			create("settings blacklist add <player> [reason]", "Blacklist a player from using the application system on this server") +
+			create("settings blacklist remove <player>", "Remove a player from the blacklist") +
+			create("settings blacklist search <player>", "Remove a player from the blacklist") +
+			create("settings blacklist share <server_id>", "Share your blacklist with another server") +
+			create("settings blacklist unshare <server_id>", "Stop sharing your blacklist with another server") +
+			create("settings blacklist use <server_id>", "Use a shared blacklist from another server") +
+			create("settings blacklist stop_using <server_id>", "Stop using a shared blacklist from another server")
 		);
 
 		paginateBuilder.addItems(
-			help.create("settings jacob", "View the current settings for farming event notifications") +
-			help.create("settings jacob <enable|disable>", "Enable or disable farming event notifications") +
-			help.create("settings jacob channel <#channel>", "Set the channel where farming event notifications will be sent") +
-			help.create("settings jacob add <crop|all> [@role]", "Added a crop to be tracked. Role will automatically be created") +
-			help.create("settings jacob remove <crop>", "Remove a crop from the tracking list")
+			create("settings jacob", "View the current settings for farming event notifications") +
+			create("settings jacob <enable|disable>", "Enable or disable farming event notifications") +
+			create("settings jacob channel <#channel>", "Set the channel where farming event notifications will be sent") +
+			create("settings jacob add <crop|all> [@role]", "Added a crop to be tracked. Role will automatically be created") +
+			create("settings jacob remove <crop>", "Remove a crop from the tracking list")
 		);
 
 		paginateBuilder.addItems(
-			help.create("settings event", "View the current settings for event notifications") +
-			help.create("settings event <enable|disable>", "Enable or disable event notifications") +
-			help.create("settings event channel <#channel>", "Set the channel where event notifications will be sent") +
-			help.create("settings event add <event|all> [@role]", "Added an event to be notified for") +
-			help.create("settings event remove <event>", "Remove an event from the notification list")
+			create("settings event", "View the current settings for event notifications") +
+			create("settings event <enable|disable>", "Enable or disable event notifications") +
+			create("settings event channel <#channel>", "Set the channel where event notifications will be sent") +
+			create("settings event add <event|all> [@role]", "Added an event to be notified for") +
+			create("settings event remove <event>", "Remove an event from the notification list")
 		);
 
 		paginateBuilder.addItems(
-			help.create("settings verify", "Get the current verify settings for the bot") +
-			help.create("settings verify <enable|disable>", "Enable or disable automatic verify") +
-			help.create("settings verify message <message>", "The message that users will see when verifying") +
-			help.create("settings verify role add <@role>", "Add a role that user will receive upon being verified") +
-			help.create("settings verify role remove <@role>", "Remove a verify role") +
-			help.create(
+			create("settings verify", "Get the current verify settings for the bot") +
+			create("settings verify <enable|disable>", "Enable or disable automatic verify") +
+			create("settings verify message <message>", "The message that users will see when verifying") +
+			create("settings verify role add <@role>", "Add a role that user will receive upon being verified") +
+			create("settings verify role remove <@role>", "Remove a verify role") +
+			create(
 				"settings verify channel <#channel>",
 				"Channel where the verify message will be sent and messages will be auto deleted"
 			) +
-			help.create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none") +
-			help.create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
-			help.create("settings verify sync <enable|disable>", "Enable or disable automatic verify role and nickname syncing") +
-			help.create("settings verify dm_on_sync <enable|disable>", "Enable or disable DMing the user on syncing") +
-			help.create("settings verify roles_claim <enable|disable>", "Enable or disable automatic role syncing")
+			create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none") +
+			create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
+			create("settings verify sync <enable|disable>", "Enable or disable automatic verify role and nickname syncing") +
+			create("settings verify dm_on_sync <enable|disable>", "Enable or disable DMing the user on syncing") +
+			create("settings verify roles_claim <enable|disable>", "Enable or disable automatic role syncing")
 		);
 
 		paginateBuilder.addItems(
-			help.create("settings guild create <name>", "Create a new automatic guild where name is the guild's name") +
-			help.create("settings guild remove <name>", "Remove an automatic guild") +
-			help.create("settings guild <name>", "View the settings for a specific automatic guild") +
-			help.create("settings guild <name> member_role <enable|disable>", "Enable or disable automatic guild role assigning") +
-			help.create("settings guild <name> member_role <@role>", "Set the role to give guild members") +
-			help.create("settings guild <name> ranks <enable|disable>", "Enable or disable automatic guild rank assigning") +
-			help.create("settings guild <name> ranks add <rank_name> <@role>", "Add an automatic guild rank") +
-			help.create("settings guild <name> ranks remove <rank_name>", "Remove an automatic guild rank") +
-			help.create("settings guild <name> counter <enable|disable>", "Enable or disable guild members counter")
+			create("settings guild create <name>", "Create a new automatic guild where name is the guild's name") +
+			create("settings guild remove <name>", "Remove an automatic guild") +
+			create("settings guild <name>", "View the settings for a specific automatic guild") +
+			create("settings guild <name> member_role <enable|disable>", "Enable or disable automatic guild role assigning") +
+			create("settings guild <name> member_role <@role>", "Set the role to give guild members") +
+			create("settings guild <name> ranks <enable|disable>", "Enable or disable automatic guild rank assigning") +
+			create("settings guild <name> ranks add <rank_name> <@role>", "Add an automatic guild rank") +
+			create("settings guild <name> ranks remove <rank_name>", "Remove an automatic guild rank") +
+			create("settings guild <name> counter <enable|disable>", "Enable or disable guild members counter")
 		);
 
 		paginateBuilder.addItems(
-			help.create("settings guild <name> apply <enable|disable>", "Enable or disable automatic apply") +
-			help.create("settings guild <name> apply message <message>", "The message that users will see when verifying") +
-			help.create(
+			create("settings guild <name> apply <enable|disable>", "Enable or disable automatic apply") +
+			create("settings guild <name> apply message <message>", "The message that users will see when verifying") +
+			create(
 				"settings guild <name> apply staff_roles add <@role>",
 				"Add a role that will be pinged when a new application is submitted"
 			) +
-			help.create("settings guild <name> apply staff_roles remove <@role>", "Remove a staff ping role") +
-			help.create("settings guild <name> apply channel <#channel>", "Channel where the message to click for applying will sent") +
-			help.create("settings guild <name> apply category <category>", "Category where new apply channels will be made") +
-			help.create(
+			create("settings guild <name> apply staff_roles remove <@role>", "Remove a staff ping role") +
+			create("settings guild <name> apply channel <#channel>", "Channel where the message to click for applying will sent") +
+			create("settings guild <name> apply category <category>", "Category where new apply channels will be made") +
+			create(
 				"settings guild <name> apply staff_channel <#channel>",
 				"Channel where new applications will be sent to be reviewed by staff"
 			) +
-			help.create(
+			create(
 				"settings guild <name> apply waiting_channel <#channel>",
 				"Channel where the players who were accepted or waitlisted will be sent. Can be set to none"
 			) +
-			help.create("settings guild <name> apply accept_message <message>", "Message that will be sent if applicant is accepted") +
-			help.create(
+			create("settings guild <name> apply accept_message <message>", "Message that will be sent if applicant is accepted") +
+			create(
 				"settings guild <name> apply waitlist_message <message>",
 				"Message that will be sent if applicant is waitlisted. Can be set to none"
 			) +
-			help.create(
+			create(
 				"settings guild <name> apply gamemode <true|false>",
 				"Whether applicants must use a certain gamemode profile in their application. Defaults to 'all'"
 			) +
-			help.create("settings guild <name> apply deny_message <message>", "Message that will be sent if applicant is denied") +
-			help.create(
+			create("settings guild <name> apply deny_message <message>", "Message that will be sent if applicant is denied") +
+			create(
 				"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount]",
 				"Add a requirement that applicant must meet. At least one of the requirement types must be set. Can be empty"
 			) +
-			help.create(
+			create(
 				"settings guild <name> apply requirements remove <index>",
 				"Remove a requirement. Run `settings guild <name>` to see the index for all current requirements"
 			) +
-			help.create(
+			create(
 				"settings guild <name> apply scammer_check <enable|disable>",
 				"Whether the applicant should be automatically be denied if marked a scammer in the SkyblockZ database"
 			)
 		);
 
 		paginateBuilder.addItems(
-			help.create("settings roles", "Get the current roles settings for the bot") +
-			help.create("settings roles <enable|disable>", "Enable or disable automatic roles") +
-			help.create(
+			create("settings roles", "Get the current roles settings for the bot") +
+			create("settings roles <enable|disable>", "Enable or disable automatic roles") +
+			create(
 				"settings roles use_highest <enable|disable>",
 				"Enable or disable using the highest values or last played on profile. Default is false"
 			) +
-			help.create(
+			create(
 				"settings roles <enable|disable> <role_name|all>",
 				"Enable or disable a specific automatic role or enable or disable all applicable automatic roles"
 			) +
-			help.create("settings roles add <role_name> <value> <@role>", "Add a new level to a role with its corresponding Discord role") +
-			help.create("settings roles remove <role_name> <value>", "Remove a role level for a role") +
-			help.create("settings roles set <role_name> <@role>", "Set a one level role's role")
+			create("settings roles add <role_name> <value> <@role>", "Add a new level to a role with its corresponding Discord role") +
+			create("settings roles remove <role_name> <value>", "Remove a role level for a role") +
+			create("settings roles set <role_name> <@role>", "Set a one level role's role")
 		);
 
 		event.paginate(paginateBuilder, startingPage);
@@ -1126,9 +1092,7 @@ public class HelpSlashCommand extends SlashCommand {
 		return generatedStr.toString();
 	}
 
-	private record HelpGenerator(String prefix) {
-		public String create(String commandName, String desc) {
-			return "`" + prefix + commandName + "`: " + desc + "\n";
-		}
+	private static String create(String commandName, String desc) {
+		return "`/" + commandName + "`: " + desc + "\n";
 	}
 }
