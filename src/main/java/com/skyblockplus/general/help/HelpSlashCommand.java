@@ -823,10 +823,7 @@ public class HelpSlashCommand extends SlashCommand {
 				"calcruns [player] [profile] <level:level> <floor:floor>",
 				"Calculate the number of runs needed to reach a certain catacombs level"
 			) +
-			create(
-				"calcdrops <floor> [luck:boss_luck] [accessory:accessory]",
-				"Calculate the drop rate and cost of all chests for a floor"
-			)
+			create("calcdrops <floor> [luck:boss_luck] [accessory:accessory]", "Calculate the drop rate and cost of all chests for a floor")
 		);
 
 		paginateBuilder.addItems(
@@ -836,10 +833,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("guild members <g:guild_name>", "Get a list of all members in a guild") +
 			create("guild experience <player>", "Get the experience leaderboard for a player's guild") +
 			create("guild experience <g:guild_name>", "Get the experience leaderboard for a guild") +
-			create(
-				"g-lb <type> [player] [g:guild_name] [mode:normal|ironman|stranded] [key]",
-				"Get a leaderboard for a player's guild"
-			) +
+			create("g-lb <type> [player] [g:guild_name] [mode:normal|ironman|stranded] [key]", "Get a leaderboard for a player's guild") +
 			create(
 				"g-kicker <u:player> <type:value> ... [key]",
 				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer"
@@ -848,10 +842,7 @@ public class HelpSlashCommand extends SlashCommand {
 				"g-ranks <u:player> [mode:normal|ironman|stranded] [key]",
 				"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild"
 			) +
-			create(
-				"g-stats [player] [g:guild_name] [key]",
-				"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight"
-			) +
+			create("g-stats [player] [g:guild_name] [key]", "Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight") +
 			create("check-guild-api <player>", "Get which Skyblock APIs players have enabled or disabled for a guild")
 		);
 
@@ -914,10 +905,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
 			create("recipe <item>", "Get the crafting recipe of an item") +
 			create("check-api [player]", "Check which Skyblock APIs a player has enabled or disabled") +
-			create(
-				"calcdrags [eyes:eyes] [position:position] [ratio:ratio]",
-				"Calculate loot quality and loot from dragons in the end"
-			) +
+			create("calcdrags [eyes:eyes] [position:position] [ratio:ratio]", "Calculate loot quality and loot from dragons in the end") +
 			create("reforgestone <stone>", "Get the reforge stone stats for each rarity") +
 			create("collections [player] [profile]", "Get a player's collection counts")
 		);

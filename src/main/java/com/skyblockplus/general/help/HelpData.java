@@ -133,20 +133,10 @@ public class HelpData {
 
 	public String getUsageFormatted(HelpData command) {
 		if (command.subcommands.size() == 0) {
-			return (
-				"`/" +
-				command.getUsage() +
-				"`" +
-				(command.secondUsage != null ? "\n`/" + getSecondUsage(command) + "`" : "")
-			);
+			return ("`/" + command.getUsage() + "`" + (command.secondUsage != null ? "\n`/" + getSecondUsage(command) + "`" : ""));
 		}
 
-		return (
-			"`/" +
-			command.getUsage() +
-			" <subcommand>`" +
-			(command.secondUsage != null ? "\n`/"  + getSecondUsage(command) + "`" : "")
-		);
+		return ("`/" + command.getUsage() + " <subcommand>`" + (command.secondUsage != null ? "\n`/" + getSecondUsage(command) + "`" : ""));
 	}
 
 	public List<HelpData> getSubcommands() {
