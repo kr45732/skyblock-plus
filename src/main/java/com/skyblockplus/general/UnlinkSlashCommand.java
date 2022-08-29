@@ -21,7 +21,6 @@ package com.skyblockplus.general;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class UnlinkSlashCommand extends SlashCommand {
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
-		event.embed(unlinkAccount(new PaginatorEvent(event)));
+		event.embed(unlinkAccount(event));
 	}
 
 	@Override
@@ -52,7 +51,7 @@ public class UnlinkSlashCommand extends SlashCommand {
 		return Commands.slash(name, "Unlink your account from this bot");
 	}
 
-	public static EmbedBuilder unlinkAccount(PaginatorEvent event) {
+	public static EmbedBuilder unlinkAccount(SlashCommandEvent event) {
 		database.deleteByDiscord(event.getUser().getId());
 
 		JsonElement verifySettings = database.getVerifySettings(event.getGuild().getId());

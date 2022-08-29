@@ -53,7 +53,7 @@ public class MissingSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(getMissingTalismans(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(getMissingTalismans(event.player, event.getOptionStr("profile"), event));
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class MissingSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getMissingTalismans(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getMissingTalismans(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			if (!player.isInventoryApiEnabled()) {

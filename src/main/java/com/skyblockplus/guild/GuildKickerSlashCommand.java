@@ -24,7 +24,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -61,7 +60,7 @@ public class GuildKickerSlashCommand extends SlashCommand {
 				event.getOptionStr("requirements"),
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 				event.getOptionBoolean("key", false),
-				new PaginatorEvent(event)
+				event
 			)
 		);
 	}
@@ -93,7 +92,7 @@ public class GuildKickerSlashCommand extends SlashCommand {
 		String reqs,
 		Player.Gamemode gamemode,
 		boolean useKey,
-		PaginatorEvent event
+		SlashCommandEvent event
 	) {
 		String[] reqsArr = reqs.split("] \\[");
 		if (reqsArr.length > 5) {

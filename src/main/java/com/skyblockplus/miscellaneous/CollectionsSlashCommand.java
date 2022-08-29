@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -50,7 +49,7 @@ public class CollectionsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(getCollections(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(getCollections(event.player, event.getOptionStr("profile"), event));
 	}
 
 	@Override
@@ -68,7 +67,7 @@ public class CollectionsSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getCollections(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getCollections(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();

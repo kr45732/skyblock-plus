@@ -25,7 +25,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
@@ -377,7 +377,7 @@ public class LeaderboardDatabase {
 		Player.Gamemode mode,
 		List<String> uuids,
 		String hypixelKey,
-		PaginatorEvent event
+		SlashCommandEvent event
 	) {
 		return getCachedPlayers(List.of(lbType), mode, uuids, hypixelKey, event);
 	}
@@ -387,7 +387,7 @@ public class LeaderboardDatabase {
 		Player.Gamemode mode,
 		List<String> uuids,
 		String hypixelKey,
-		PaginatorEvent event
+		SlashCommandEvent event
 	) {
 		List<DataObject> out = new ArrayList<>();
 

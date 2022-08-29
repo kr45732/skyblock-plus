@@ -27,7 +27,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -62,12 +61,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			getRanks(
-				event.player,
-				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-				event.getOptionBoolean("key", false),
-				new PaginatorEvent(event)
-			)
+			getRanks(event.player, Player.Gamemode.of(event.getOptionStr("gamemode", "all")), event.getOptionBoolean("key", false), event)
 		);
 	}
 
@@ -92,7 +86,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getRanks(String username, Player.Gamemode gamemode, boolean useKey, PaginatorEvent event) {
+	public static EmbedBuilder getRanks(String username, Player.Gamemode gamemode, boolean useKey, SlashCommandEvent event) {
 		String hypixelKey = null;
 		if (useKey) {
 			hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());

@@ -25,7 +25,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -57,7 +56,7 @@ public class CheckGuildApiSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(getGuildCheckApi(event.player, event.getOptionStr("exclude", ""), new PaginatorEvent(event)));
+		event.paginate(getGuildCheckApi(event.player, event.getOptionStr("exclude", ""), event));
 	}
 
 	@Override
@@ -75,7 +74,7 @@ public class CheckGuildApiSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getGuildCheckApi(String username, String exclude, PaginatorEvent event) {
+	public static EmbedBuilder getGuildCheckApi(String username, String exclude, SlashCommandEvent event) {
 		List<String> excludeArr = new ArrayList<>();
 		if (!exclude.isEmpty()) {
 			excludeArr.addAll(List.of(exclude.toLowerCase().split(",")));

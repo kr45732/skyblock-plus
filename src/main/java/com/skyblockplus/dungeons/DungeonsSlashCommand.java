@@ -48,7 +48,7 @@ public class DungeonsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(getPlayerDungeons(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(getPlayerDungeons(event.player, event.getOptionStr("profile"), event));
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class DungeonsSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerDungeons(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerDungeons(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			try {

@@ -21,7 +21,6 @@ package com.skyblockplus.general.help;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -71,7 +70,7 @@ public class HelpSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.paginate(getHelp(event.getOptionStr("command"), new PaginatorEvent(event)));
+		event.paginate(getHelp(event.getOptionStr("command"), event));
 	}
 
 	@Override
@@ -764,7 +763,7 @@ public class HelpSlashCommand extends SlashCommand {
 		);
 	}
 
-	public static EmbedBuilder getHelp(String pageStr, PaginatorEvent event) {
+	public static EmbedBuilder getHelp(String pageStr, SlashCommandEvent event) {
 		int startingPage = 0;
 		if (pageStr != null) {
 			String[] pageStrSplit = pageStr.split("\\s+", 2);

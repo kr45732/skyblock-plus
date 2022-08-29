@@ -21,7 +21,7 @@ package com.skyblockplus.inventory;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.rendering.LoreRenderer;
 import com.skyblockplus.utils.structs.InvItem;
 import java.awt.image.BufferedImage;
@@ -45,6 +45,7 @@ import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 
@@ -54,7 +55,7 @@ public class InventoryListPaginator {
 	private static final File loreRenderDir = new File("src/main/java/com/skyblockplus/json/lore_renders");
 	private final String key;
 	private final Map<Integer, InvItem> items;
-	private final PaginatorEvent event;
+	private final SlashCommandEvent event;
 	private final Map<String, String> renderedCache;
 	private final Player player;
 	private final Message message;
@@ -62,7 +63,7 @@ public class InventoryListPaginator {
 	private Instant lastEdit;
 	private int pageNumber;
 
-	public InventoryListPaginator(Player player, Map<Integer, InvItem> items, int slot, PaginatorEvent event) {
+	public InventoryListPaginator(Player player, Map<Integer, InvItem> items, int slot, SlashCommandEvent event) {
 		this.items = items;
 		this.event = event;
 		this.renderedCache = new HashMap<>();
@@ -71,9 +72,9 @@ public class InventoryListPaginator {
 		this.maxPageNumber = items.size() - 1;
 		this.lastEdit = Instant.now();
 		this.pageNumber = Math.min(Math.max(0, slot - 1), maxPageNumber);
-		this.message = event.getLoadingMessage();
+		this.message = event.getHook().retrieveOriginal().complete();
 
-		PaginatorEvent.PaginatorAction action;
+		WebhookMessageEditAction<Message> action;
 		EmbedBuilder eb = player
 			.defaultPlayerEmbed()
 			.setThumbnail(null)
@@ -81,7 +82,7 @@ public class InventoryListPaginator {
 		InvItem item = items.get(pageNumber);
 		if (item == null) {
 			eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
-			action = event.getAction().editMessageEmbeds(eb.build());
+			action = event.getHook().editOriginalEmbeds(eb.build());
 		} else {
 			eb
 				.setDescription(
@@ -95,7 +96,7 @@ public class InventoryListPaginator {
 				)
 				.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
 				.setImage("attachment://lore.png");
-			action = event.getAction().editMessageEmbeds(eb.build()).addFile(new File(getRenderedLore()), "lore.png");
+			action = event.getHook().editOriginalEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
 		}
 
 		action
@@ -108,7 +109,6 @@ public class InventoryListPaginator {
 					.primary("inv_list_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 					.withDisabled(pageNumber == maxPageNumber)
 			)
-			.get()
 			.queue(ignored -> {
 				waitForEvent();
 				paginators.add(this);

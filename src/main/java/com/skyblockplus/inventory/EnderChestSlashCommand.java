@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -53,17 +52,9 @@ public class EnderChestSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "list" -> event.paginate(
-				getPlayerEnderChestList(
-					event.player,
-					event.getOptionStr("profile"),
-					event.getOptionInt("slot", 0),
-					new PaginatorEvent(event)
-				)
+				getPlayerEnderChestList(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event)
 			);
-			case "emoji" -> event.paginate(
-				getPlayerEnderChest(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
-				true
-			);
+			case "emoji" -> event.paginate(getPlayerEnderChest(event.player, event.getOptionStr("profile"), event), true);
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -90,7 +81,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerEnderChest(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerEnderChest(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			List<String[]> enderChestPages = player.getEnderChest();
@@ -107,7 +98,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static EmbedBuilder getPlayerEnderChestList(String username, String profileName, int slotNum, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerEnderChestList(String username, String profileName, int slotNum, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, InvItem> echestMap = player.getEnderChestMap();

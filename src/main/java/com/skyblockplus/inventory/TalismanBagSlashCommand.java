@@ -25,7 +25,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -107,18 +106,10 @@ public class TalismanBagSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "list" -> event.paginate(
-				getPlayerTalismansList(
-					event.player,
-					event.getOptionStr("profile"),
-					event.getOptionInt("slot", 0),
-					new PaginatorEvent(event)
-				)
+				getPlayerTalismansList(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event)
 			);
-			case "emoji" -> event.paginate(
-				getPlayerTalismansEmoji(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
-				true
-			);
-			case "tuning" -> event.paginate(getPlayerTuning(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+			case "emoji" -> event.paginate(getPlayerTalismansEmoji(event.player, event.getOptionStr("profile"), event), true);
+			case "tuning" -> event.paginate(getPlayerTuning(event.player, event.getOptionStr("profile"), event));
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -148,7 +139,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerTalismansList(String username, String profileName, int slotNum, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerTalismansList(String username, String profileName, int slotNum, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();
@@ -160,7 +151,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static EmbedBuilder getPlayerTalismansEmoji(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerTalismansEmoji(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			List<String[]> talismanBag = player.getTalismanBag();
@@ -177,7 +168,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static EmbedBuilder getPlayerTuning(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerTuning(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			JsonElement tuningJson = higherDepth(player.profileJson(), "accessory_bag_storage");

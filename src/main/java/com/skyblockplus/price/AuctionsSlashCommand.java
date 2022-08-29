@@ -66,7 +66,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 				AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
 				AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),
 				event.getOptionBoolean("verbose", false),
-				new PaginatorEvent(event)
+				event
 			)
 		);
 	}
@@ -101,7 +101,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 		AuctionFilterType filterType,
 		AuctionSortType sortType,
 		boolean verbose,
-		PaginatorEvent event
+		SlashCommandEvent event
 	) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (!usernameUuidStruct.isValid()) {

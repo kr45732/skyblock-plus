@@ -25,7 +25,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.Utils;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -51,7 +50,7 @@ public class EssenceSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		switch (event.getSubcommandName()) {
-			case "upgrade" -> new EssenceHandler(nameToId(event.getOptionStr("item")), new PaginatorEvent(event));
+			case "upgrade" -> new EssenceHandler(nameToId(event.getOptionStr("item")), event);
 			case "information" -> event.embed(getEssenceInformation(event.getOptionStr("item")));
 			case "player" -> {
 				if (event.invalidPlayerOption()) {

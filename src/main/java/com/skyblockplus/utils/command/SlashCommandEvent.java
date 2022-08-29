@@ -162,6 +162,14 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 		}
 	}
 
+	public void paginate(CustomPaginator.Builder builder) {
+		paginate(builder, 1);
+	}
+
+	public void paginate(CustomPaginator.Builder builder, int page) {
+		builder.build().paginate(getHook(), page);
+	}
+
 	public void string(String string) {
 		getHook().editOriginal(string).queue(ignore, ignore);
 	}
@@ -172,5 +180,9 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 
 	public boolean isOwner() {
 		return slashCommandClient.isOwner(getUser().getId());
+	}
+
+	public CustomPaginator.Builder getPaginator() {
+		return defaultPaginator(getUser()).setColumns(1).setItemsPerPage(1);
 	}
 }

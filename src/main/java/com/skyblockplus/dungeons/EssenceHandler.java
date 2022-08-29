@@ -22,7 +22,7 @@ import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -37,10 +37,10 @@ public class EssenceHandler {
 	private final String itemName;
 	private final JsonElement itemJson;
 	private final Message reactMessage;
-	private final PaginatorEvent event;
+	private final SlashCommandEvent event;
 	private int startingLevel;
 
-	public EssenceHandler(String itemId, PaginatorEvent event) {
+	public EssenceHandler(String itemId, SlashCommandEvent event) {
 		if (higherDepth(getEssenceCostsJson(), itemId) == null) {
 			itemId = getClosestMatchFromIds(itemId, ESSENCE_ITEM_NAMES);
 		}
@@ -49,7 +49,7 @@ public class EssenceHandler {
 		this.itemName = idToName(itemId);
 		this.itemJson = higherDepth(getEssenceCostsJson(), itemId);
 		this.event = event;
-		this.reactMessage = event.getLoadingMessage();
+		this.reactMessage = event.getHook().retrieveOriginal().complete();
 
 		int max = 0;
 		for (int i = 1; i <= 10; i++) {
@@ -67,15 +67,14 @@ public class EssenceHandler {
 		}
 
 		event
-			.getAction()
-			.editMessageEmbeds(
+			.getHook()
+			.editOriginalEmbeds(
 				defaultEmbed("Essence upgrade for " + itemName)
 					.setDescription("Choose the current item level")
 					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
 					.build()
 			)
 			.setActionRow(menuBuilder.build())
-			.get()
 			.queue();
 
 		waiter.waitForEvent(

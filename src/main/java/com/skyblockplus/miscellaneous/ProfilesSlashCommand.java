@@ -52,7 +52,7 @@ public class ProfilesSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(getPlayerProfiles(event.player, new PaginatorEvent(event)));
+		event.paginate(getPlayerProfiles(event.player, event));
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class ProfilesSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerProfiles(String username, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerProfiles(String username, SlashCommandEvent event) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (!usernameUuid.isValid()) {
 			return invalidEmbed(usernameUuid.failCause());

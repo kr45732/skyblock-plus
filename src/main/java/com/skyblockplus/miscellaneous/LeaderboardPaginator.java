@@ -23,7 +23,7 @@ import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.util.Map;
 import java.util.TreeMap;
@@ -46,7 +46,7 @@ public class LeaderboardPaginator {
 	private final Message message;
 	private final String lbType;
 	private final Player.Gamemode gamemode;
-	private final PaginatorEvent event;
+	private final SlashCommandEvent event;
 	private String player;
 	private int pageFirstRank = 1;
 	private int playerRank = -1;
@@ -60,13 +60,13 @@ public class LeaderboardPaginator {
 		int page,
 		int rank,
 		double amount,
-		PaginatorEvent event
+		SlashCommandEvent event
 	) {
 		this.lbType = lbType;
 		this.gamemode = gamemode;
 		this.player = player != null ? player.getUsername() : null;
 		this.event = event;
-		this.message = event.getLoadingMessage();
+		this.message = event.getHook().retrieveOriginal().complete();
 
 		if (rank != -1) {
 			rank = Math.max(1, rank);
@@ -111,12 +111,7 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
-		event
-			.getAction()
-			.editMessageEmbeds(getRender().build())
-			.setComponents(getActionRow())
-			.get()
-			.queue(ignored -> waitForEvent(), ignore);
+		event.getHook().editOriginalEmbeds(getRender().build()).setComponents(getActionRow()).queue(ignored -> waitForEvent(), ignore);
 	}
 
 	private EmbedBuilder getRender() {

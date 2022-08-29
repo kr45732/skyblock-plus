@@ -68,7 +68,7 @@ public class GuildSlashCommand extends SlashCommand {
 			case "members" -> {
 				String guild = event.getOptionStr("guild");
 				if (guild != null) {
-					event.paginate(getGuildMembersFromName(guild, new PaginatorEvent(event)));
+					event.paginate(getGuildMembersFromName(guild, event));
 					return;
 				}
 
@@ -76,21 +76,21 @@ public class GuildSlashCommand extends SlashCommand {
 					return;
 				}
 
-				event.paginate(getGuildMembersFromPlayer(event.player, new PaginatorEvent(event)));
+				event.paginate(getGuildMembersFromPlayer(event.player, event));
 			}
 			case "experience" -> {
 				int numDays = event.getOptionInt("days", 7);
 
 				String guild = event.getOptionStr("guild");
 				if (guild != null) {
-					event.paginate(getGuildExpFromPlayer(guild, numDays, new PaginatorEvent(event)));
+					event.paginate(getGuildExpFromPlayer(guild, numDays, event));
 					return;
 				}
 
 				if (event.invalidPlayerOption()) {
 					return;
 				}
-				event.paginate(getGuildExpFromPlayer(event.player, numDays, new PaginatorEvent(event)));
+				event.paginate(getGuildExpFromPlayer(event.player, numDays, event));
 			}
 			default -> event.embed(event.invalidCommandMessage());
 		}
@@ -121,7 +121,7 @@ public class GuildSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getGuildExp(JsonElement guildJson, long days, String playerUsername, PaginatorEvent event) {
+	public static EmbedBuilder getGuildExp(JsonElement guildJson, long days, String playerUsername, SlashCommandEvent event) {
 		JsonElement members = higherDepth(guildJson, "members");
 		JsonArray membersArr = members.getAsJsonArray();
 		List<String> guildExpList = new ArrayList<>();
@@ -189,7 +189,7 @@ public class GuildSlashCommand extends SlashCommand {
 		return null;
 	}
 
-	public static EmbedBuilder getGuildExpFromPlayer(String username, long days, PaginatorEvent event) {
+	public static EmbedBuilder getGuildExpFromPlayer(String username, long days, SlashCommandEvent event) {
 		if (days < 1 || days > 7) {
 			return invalidEmbed("Days must be between 1 to 7");
 		}
@@ -208,7 +208,7 @@ public class GuildSlashCommand extends SlashCommand {
 		return getGuildExp(guildJson, days, usernameUuid.username(), event);
 	}
 
-	public static EmbedBuilder getGuildExpFromName(String guildName, long days, PaginatorEvent event) {
+	public static EmbedBuilder getGuildExpFromName(String guildName, long days, SlashCommandEvent event) {
 		if (days < 1 || days > 7) {
 			return invalidEmbed("Days must be between 1 to 7");
 		}
@@ -312,7 +312,7 @@ public class GuildSlashCommand extends SlashCommand {
 		return guildInfo;
 	}
 
-	public static EmbedBuilder getGuildMembers(JsonElement guildJson, PaginatorEvent event) {
+	public static EmbedBuilder getGuildMembers(JsonElement guildJson, SlashCommandEvent event) {
 		JsonArray membersArr = higherDepth(guildJson, "members").getAsJsonArray();
 		Map<CompletableFuture<String>, Integer> futures = new HashMap<>();
 		Map<String, Integer> guildMembers = new HashMap<>();
@@ -355,7 +355,7 @@ public class GuildSlashCommand extends SlashCommand {
 		return null;
 	}
 
-	public static EmbedBuilder getGuildMembersFromPlayer(String username, PaginatorEvent event) {
+	public static EmbedBuilder getGuildMembersFromPlayer(String username, SlashCommandEvent event) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (!usernameUuid.isValid()) {
 			return invalidEmbed(usernameUuid.failCause());
@@ -370,7 +370,7 @@ public class GuildSlashCommand extends SlashCommand {
 		return getGuildMembers(guildJson, event);
 	}
 
-	public static EmbedBuilder getGuildMembersFromName(String guildName, PaginatorEvent event) {
+	public static EmbedBuilder getGuildMembersFromName(String guildName, SlashCommandEvent event) {
 		HypixelResponse hypixelResponse = getGuildFromName(guildName);
 		if (!hypixelResponse.isValid()) {
 			return invalidEmbed(hypixelResponse.failCause());

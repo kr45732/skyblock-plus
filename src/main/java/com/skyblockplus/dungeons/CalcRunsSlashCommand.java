@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -53,13 +52,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			getCalcRuns(
-				event.player,
-				event.getOptionStr("profile"),
-				event.getOptionInt("level", 1),
-				event.getOptionInt("floor", 0),
-				new PaginatorEvent(event)
-			)
+			getCalcRuns(event.player, event.getOptionStr("profile"), event.getOptionInt("level", 1), event.getOptionInt("floor", 0), event)
 		);
 	}
 
@@ -97,7 +90,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static Object getCalcRuns(String username, String profileName, int targetLevel, int floor, PaginatorEvent event) {
+	public static Object getCalcRuns(String username, String profileName, int targetLevel, int floor, SlashCommandEvent event) {
 		if (targetLevel <= 0 || targetLevel > 50) {
 			return invalidEmbed("Target level must be between 1 and 50");
 		}

@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypes
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -56,7 +55,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 				event.getOptionInt("page", -1),
 				event.getOptionInt("rank", -1),
 				event.getOptionDouble("amount", -1),
-				new PaginatorEvent(event)
+				event
 			)
 		);
 	}
@@ -94,7 +93,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		int page,
 		int rank,
 		double amount,
-		PaginatorEvent event
+		SlashCommandEvent event
 	) {
 		lbType = getType(lbType, true);
 

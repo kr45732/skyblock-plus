@@ -58,7 +58,7 @@ public class RolesSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "claim" -> event.embed(updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember()));
-			case "list" -> event.paginate(listRoles(new PaginatorEvent(event)));
+			case "list" -> event.paginate(listRoles(event));
 			default -> event.invalidCommandMessage();
 		}
 	}
@@ -562,7 +562,7 @@ public class RolesSlashCommand extends SlashCommand {
 		return "• <@&" + name + "\n";
 	}
 
-	public static EmbedBuilder listRoles(PaginatorEvent event) {
+	public static EmbedBuilder listRoles(SlashCommandEvent event) {
 		JsonElement rolesJson = database.getRolesSettings(event.getGuild().getId());
 		if (rolesJson == null || !higherDepth(rolesJson, "enable", false)) {
 			return defaultEmbed("Automatic roles not enabled for this server");

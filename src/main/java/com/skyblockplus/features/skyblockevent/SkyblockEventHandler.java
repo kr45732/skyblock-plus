@@ -27,7 +27,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -43,7 +43,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class SkyblockEventHandler {
 
-	private final PaginatorEvent paginatorEvent;
+	private final SlashCommandEvent slashCommandEvent;
 	private final EventSettings eventSettings;
 	private final EmbedBuilder eb;
 	public GuildMessageChannel announcementChannel;
@@ -51,18 +51,14 @@ public class SkyblockEventHandler {
 	private int state = 0;
 	private int attemptsLeft = 3;
 
-	public SkyblockEventHandler(PaginatorEvent paginatorEvent) {
-		this.paginatorEvent = paginatorEvent;
+	public SkyblockEventHandler(SlashCommandEvent slashCommandEvent) {
+		this.slashCommandEvent = slashCommandEvent;
 		this.eb =
 			defaultEmbed("Skyblock Event")
 				.setFooter("Type 'cancel' to stop the process • dsc.gg/sb+")
 				.setDescription("Reply with the name of the guild I should track or 'none' to let anyone join.");
 
-		if (paginatorEvent.isSlashCommand()) {
-			paginatorEvent.getSlashCommand().getHook().editOriginalEmbeds(eb.build()).queue();
-		} else {
-			paginatorEvent.getChannel().sendMessageEmbeds(eb.build()).queue();
-		}
+		slashCommandEvent.getHook().editOriginalEmbeds(eb.build()).queue();
 
 		this.eventSettings = new EventSettings();
 		waiter.waitForEvent(
@@ -78,8 +74,8 @@ public class SkyblockEventHandler {
 	private boolean condition(MessageReceivedEvent event) {
 		return (
 			event.isFromGuild() &&
-			paginatorEvent.getChannel().getId().equals(event.getChannel().getId()) &&
-			paginatorEvent.getUser().getId().equals(event.getAuthor().getId())
+			slashCommandEvent.getChannel().getId().equals(event.getChannel().getId()) &&
+			slashCommandEvent.getUser().getId().equals(event.getAuthor().getId())
 		);
 	}
 
@@ -474,13 +470,13 @@ public class SkyblockEventHandler {
 	}
 
 	private void sendEmbedMessage(EmbedBuilder eb, boolean waitForReply) {
-		paginatorEvent.getChannel().sendMessageEmbeds(eb.build()).queue();
+		slashCommandEvent.getChannel().sendMessageEmbeds(eb.build()).queue();
 		if (attemptsLeft == 0) {
-			paginatorEvent
+			slashCommandEvent
 				.getChannel()
 				.sendMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Canceled event creation (3/3 failed attempts)").build())
 				.queue();
-			guildMap.get(paginatorEvent.getGuild().getId()).setSkyblockEventHandler(null);
+			guildMap.get(slashCommandEvent.getGuild().getId()).setSkyblockEventHandler(null);
 		} else if (waitForReply) {
 			waiter.waitForEvent(
 				MessageReceivedEvent.class,
@@ -491,18 +487,18 @@ public class SkyblockEventHandler {
 				() -> sendEmbedMessage(defaultEmbed("Skyblock Event").setDescription("Event creation timed out"), false)
 			);
 		} else {
-			guildMap.get(paginatorEvent.getGuild().getId()).setSkyblockEventHandler(null);
+			guildMap.get(slashCommandEvent.getGuild().getId()).setSkyblockEventHandler(null);
 		}
 	}
 
 	private boolean setSkyblockEventInDatabase() {
-		if (!database.serverByServerIdExists(paginatorEvent.getGuild().getId())) {
+		if (!database.serverByServerIdExists(slashCommandEvent.getGuild().getId())) {
 			database.newServerSettings(
-				paginatorEvent.getGuild().getId(),
-				new ServerSettingsModel(paginatorEvent.getGuild().getName(), paginatorEvent.getGuild().getId())
+				slashCommandEvent.getGuild().getId(),
+				new ServerSettingsModel(slashCommandEvent.getGuild().getName(), slashCommandEvent.getGuild().getId())
 			);
 		}
 
-		return database.setSkyblockEventSettings(paginatorEvent.getGuild().getId(), eventSettings) == 200;
+		return database.setSkyblockEventSettings(slashCommandEvent.getGuild().getId(), eventSettings) == 200;
 	}
 }

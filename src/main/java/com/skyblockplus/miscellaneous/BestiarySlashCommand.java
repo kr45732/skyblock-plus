@@ -180,7 +180,7 @@ public class BestiarySlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(getBestiary(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(getBestiary(event.player, event.getOptionStr("profile"), event));
 	}
 
 	@Override
@@ -198,7 +198,7 @@ public class BestiarySlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getBestiary(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getBestiary(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();

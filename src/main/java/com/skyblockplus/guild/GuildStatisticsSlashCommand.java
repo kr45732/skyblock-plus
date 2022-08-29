@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -59,7 +58,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 					guild,
 					event.getOptionBoolean("key", false),
 					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-					new PaginatorEvent(event)
+					event
 				)
 			);
 			return;
@@ -75,7 +74,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 				null,
 				event.getOptionBoolean("key", false),
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-				new PaginatorEvent(event)
+				event
 			)
 		);
 	}
@@ -107,7 +106,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		String guildName,
 		boolean useKey,
 		Player.Gamemode gamemode,
-		PaginatorEvent event
+		SlashCommandEvent event
 	) {
 		String hypixelKey = null;
 		if (useKey) {

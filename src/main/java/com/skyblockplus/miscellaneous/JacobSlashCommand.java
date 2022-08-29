@@ -45,7 +45,7 @@ public class JacobSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.paginate(getJacobEmbed(event.getOptionStr("crop", "all"), new PaginatorEvent(event)));
+		event.paginate(getJacobEmbed(event.getOptionStr("crop", "all"), event));
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class JacobSlashCommand extends SlashCommand {
 			);
 	}
 
-	public static EmbedBuilder getJacobEmbed(String crop, PaginatorEvent event) {
+	public static EmbedBuilder getJacobEmbed(String crop, SlashCommandEvent event) {
 		crop = capitalizeString(crop);
 		if (!CROP_NAME_TO_EMOJI.containsKey(crop) && !crop.equals("All")) {
 			return invalidEmbed("Invalid crop");

@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -50,9 +49,7 @@ public class SacksSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(
-			getPlayerSacks(event.player, event.getOptionStr("profile"), event.getOptionBoolean("npc", false), new PaginatorEvent(event))
-		);
+		event.paginate(getPlayerSacks(event.player, event.getOptionStr("profile"), event.getOptionBoolean("npc", false), event));
 	}
 
 	@Override
@@ -71,7 +68,7 @@ public class SacksSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerSacks(String username, String profileName, boolean useNpcPrice, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerSacks(String username, String profileName, boolean useNpcPrice, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<String, Integer> sacksMap = player.getPlayerSacks();

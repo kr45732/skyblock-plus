@@ -43,12 +43,7 @@ public class CalcDragsSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		event.paginate(
-			getCalcDrags(
-				event.getOptionInt("position", 1),
-				event.getOptionDouble("ratio", 1),
-				event.getOptionInt("eyes", 8),
-				new PaginatorEvent(event)
-			)
+			getCalcDrags(event.getOptionInt("position", 1), event.getOptionDouble("ratio", 1), event.getOptionInt("eyes", 8), event)
 		);
 	}
 
@@ -63,7 +58,7 @@ public class CalcDragsSlashCommand extends SlashCommand {
 			);
 	}
 
-	public static EmbedBuilder getCalcDrags(int position, double damageRatio, int eyesPlaced, PaginatorEvent event) {
+	public static EmbedBuilder getCalcDrags(int position, double damageRatio, int eyesPlaced, SlashCommandEvent event) {
 		position = damageRatio == 1 ? 1 : position;
 		damageRatio = position == 1 ? 1 : damageRatio;
 		int estimatedQuality = (int) (

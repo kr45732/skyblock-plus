@@ -26,9 +26,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -112,7 +112,7 @@ public class NetworthExecute {
 		getPlayerNetworth(username, profileName, null);
 	}
 
-	public Object getPlayerNetworth(String username, String profileName, PaginatorEvent event) {
+	public Object getPlayerNetworth(String username, String profileName, SlashCommandEvent event) {
 		return getPlayerNetworth(profileName == null ? new Player(username) : new Player(username, profileName), event);
 	}
 
@@ -120,7 +120,7 @@ public class NetworthExecute {
 		getPlayerNetworth(player, null);
 	}
 
-	public Object getPlayerNetworth(Player player, PaginatorEvent event) {
+	public Object getPlayerNetworth(Player player, SlashCommandEvent event) {
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 

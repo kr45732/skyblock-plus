@@ -39,11 +39,11 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 public class SelectMenuPaginator {
 
 	private final Map<String, EmbedBuilder> pages;
-	private final PaginatorEvent event;
+	private final SlashCommandEvent event;
 	private Message message;
 	private String page;
 
-	public SelectMenuPaginator(Map<SelectOption, EmbedBuilder> pages, String page, PaginatorExtras extras, PaginatorEvent event) {
+	public SelectMenuPaginator(Map<SelectOption, EmbedBuilder> pages, String page, PaginatorExtras extras, SlashCommandEvent event) {
 		this.pages = pages.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getValue(), Map.Entry::getValue));
 		this.page = page;
 		this.event = event;
@@ -54,10 +54,9 @@ public class SelectMenuPaginator {
 		}
 		actionRows.add(ActionRow.of(SelectMenu.create("select_menu_paginator").addOptions(pages.keySet()).build()));
 		event
-			.getAction()
-			.editMessageEmbeds(this.pages.get(page).build())
+			.getHook()
+			.editOriginalEmbeds(this.pages.get(page).build())
 			.setComponents(actionRows)
-			.get()
 			.queue(m -> {
 				message = m;
 				waitForEvent();

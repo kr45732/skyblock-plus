@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.ArmorStruct;
@@ -53,8 +52,8 @@ public class WardrobeSlashCommand extends SlashCommand {
 		}
 
 		switch (event.getSubcommandName()) {
-			case "list" -> event.paginate(getPlayerWardrobeList(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
-			case "emoji" -> event.paginate(getPlayerWardrobe(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true);
+			case "list" -> event.paginate(getPlayerWardrobeList(event.player, event.getOptionStr("profile"), event));
+			case "emoji" -> event.paginate(getPlayerWardrobe(event.player, event.getOptionStr("profile"), event), true);
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -80,7 +79,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerWardrobeList(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerWardrobeList(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
@@ -110,7 +109,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static EmbedBuilder getPlayerWardrobe(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerWardrobe(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			List<String[]> wardrobe = player.getWardrobe();

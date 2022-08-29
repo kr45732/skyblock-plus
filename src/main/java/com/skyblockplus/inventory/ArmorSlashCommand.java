@@ -21,7 +21,6 @@ package com.skyblockplus.inventory;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -52,14 +51,9 @@ public class ArmorSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "list" -> event.paginate(
-				getPlayerEquippedArmor(
-					event.player,
-					event.getOptionStr("profile"),
-					event.getOptionInt("slot", 0),
-					new PaginatorEvent(event)
-				)
+				getPlayerEquippedArmor(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event)
 			);
-			case "emoji" -> event.paginate(getPlayerArmor(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true);
+			case "emoji" -> event.paginate(getPlayerArmor(event.player, event.getOptionStr("profile"), event), true);
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -86,7 +80,7 @@ public class ArmorSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerEquippedArmor(String username, String profileName, int slot, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerEquippedArmor(String username, String profileName, int slot, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, InvItem> inventoryMap = player.getArmorMap();
@@ -104,7 +98,7 @@ public class ArmorSlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static EmbedBuilder getPlayerArmor(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerArmor(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, InvItem> playerArmor = player.getArmorMap();

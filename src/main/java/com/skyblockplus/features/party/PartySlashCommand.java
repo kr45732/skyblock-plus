@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.HashSet;
@@ -52,13 +51,13 @@ public class PartySlashCommand extends SlashCommand {
 		event.logCommand();
 
 		switch (event.getSubcommandName()) {
-			case "create" -> event.paginate(createParty(new PaginatorEvent(event)), true);
+			case "create" -> event.paginate(createParty(event), true);
 			case "list" -> event.embed(getPartyList(event.getGuild().getId()));
-			case "leave" -> event.embed(leaveParty(new PaginatorEvent(event)));
-			case "disband" -> event.embed(disbandParty(new PaginatorEvent(event)));
-			case "join" -> event.embed(joinParty(event.getOptionStr("username"), new PaginatorEvent(event)));
-			case "kick" -> event.embed(kickMemberFromParty(event.getOptionStr("username"), new PaginatorEvent(event)));
-			case "current" -> event.embed(getCurrentParty(new PaginatorEvent(event)));
+			case "leave" -> event.embed(leaveParty(event));
+			case "disband" -> event.embed(disbandParty(event));
+			case "join" -> event.embed(joinParty(event.getOptionStr("username"), event));
+			case "kick" -> event.embed(kickMemberFromParty(event.getOptionStr("username"), event));
+			case "current" -> event.embed(getCurrentParty(event));
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -79,7 +78,7 @@ public class PartySlashCommand extends SlashCommand {
 			);
 	}
 
-	public static EmbedBuilder getCurrentParty(PaginatorEvent event) {
+	public static EmbedBuilder getCurrentParty(SlashCommandEvent event) {
 		Party party = guildMap
 			.get(event.getGuild().getId())
 			.partyList.stream()
@@ -112,7 +111,7 @@ public class PartySlashCommand extends SlashCommand {
 			);
 	}
 
-	public static EmbedBuilder kickMemberFromParty(String username, PaginatorEvent event) {
+	public static EmbedBuilder kickMemberFromParty(String username, SlashCommandEvent event) {
 		Party party = guildMap
 			.get(event.getGuild().getId())
 			.partyList.stream()
@@ -131,7 +130,7 @@ public class PartySlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder leaveParty(PaginatorEvent event) {
+	public static EmbedBuilder leaveParty(SlashCommandEvent event) {
 		List<Party> partyList = guildMap.get(event.getGuild().getId()).partyList;
 		for (Party party : partyList) {
 			if (party.leaveParty(event.getUser().getId())) {
@@ -142,7 +141,7 @@ public class PartySlashCommand extends SlashCommand {
 		return invalidEmbed("You are not in a party");
 	}
 
-	public static EmbedBuilder disbandParty(PaginatorEvent event) {
+	public static EmbedBuilder disbandParty(SlashCommandEvent event) {
 		List<Party> partyList = guildMap.get(event.getGuild().getId()).partyList;
 		Party party = partyList.stream().filter(p -> p.getPartyLeaderId().equals(event.getUser().getId())).findFirst().orElse(null);
 		if (party == null) {
@@ -153,7 +152,7 @@ public class PartySlashCommand extends SlashCommand {
 		return defaultEmbed("Party Finder").setDescription("Disbanded the party");
 	}
 
-	public static EmbedBuilder createParty(PaginatorEvent event) {
+	public static EmbedBuilder createParty(SlashCommandEvent event) {
 		if (
 			guildMap
 				.get(event.getGuild().getId())
@@ -201,7 +200,7 @@ public class PartySlashCommand extends SlashCommand {
 		return eb;
 	}
 
-	public static EmbedBuilder joinParty(String id, PaginatorEvent event) {
+	public static EmbedBuilder joinParty(String id, SlashCommandEvent event) {
 		List<Party> partyList = guildMap.get(event.getGuild().getId()).partyList;
 		if (
 			partyList

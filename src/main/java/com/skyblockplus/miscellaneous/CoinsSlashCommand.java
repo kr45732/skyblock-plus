@@ -25,7 +25,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -56,7 +55,7 @@ public class CoinsSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "total" -> event.embed(getPlayerBalance(event.player, event.getOptionStr("profile")));
-			case "history" -> event.paginate(getPlayerBankHistory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+			case "history" -> event.paginate(getPlayerBankHistory(event.player, event.getOptionStr("profile"), event));
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -128,7 +127,7 @@ public class CoinsSlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static EmbedBuilder getPlayerBankHistory(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerBankHistory(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			JsonArray bankHistoryArray = player.getBankHistory();

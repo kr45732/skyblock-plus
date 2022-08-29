@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -53,17 +52,9 @@ public class InventorySlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "list" -> event.paginate(
-				getPlayerInventoryList(
-					event.player,
-					event.getOptionStr("profile"),
-					event.getOptionInt("slot", 0),
-					new PaginatorEvent(event)
-				)
+				getPlayerInventoryList(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event)
 			);
-			case "emoji" -> event.paginate(
-				getPlayerInventory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
-				true
-			);
+			case "emoji" -> event.paginate(getPlayerInventory(event.player, event.getOptionStr("profile"), event), true);
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -90,7 +81,7 @@ public class InventorySlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerInventoryList(String username, String profileName, int slotNum, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerInventoryList(String username, String profileName, int slotNum, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, InvItem> inventoryMap = player.getInventoryMap(true);
@@ -102,7 +93,7 @@ public class InventorySlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static EmbedBuilder getPlayerInventory(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerInventory(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			String[] playerInventory = player.getInventory();

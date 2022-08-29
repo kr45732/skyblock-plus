@@ -50,7 +50,7 @@ public class SkillsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(getPlayerSkill(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(getPlayerSkill(event.player, event.getOptionStr("profile"), event));
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class SkillsSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerSkill(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerSkill(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 
 		if (player.isValid()) {

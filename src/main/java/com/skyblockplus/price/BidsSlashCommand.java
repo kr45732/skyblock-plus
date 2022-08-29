@@ -49,7 +49,7 @@ public class BidsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(getPlayerBids(event.player, new PaginatorEvent(event)));
+		event.paginate(getPlayerBids(event.player, event));
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class BidsSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getPlayerBids(String username, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerBids(String username, SlashCommandEvent event) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (!usernameUuidStruct.isValid()) {
 			return invalidEmbed(usernameUuidStruct.failCause());

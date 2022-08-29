@@ -30,7 +30,6 @@ import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -82,7 +81,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		switch (subcommandName) {
 			case "create":
-				event.paginate(createSkyblockEvent(new PaginatorEvent(event)));
+				event.paginate(createSkyblockEvent(event));
 				break;
 			case "current":
 				event.embed(getCurrentSkyblockEvent(event.getGuild().getId()));
@@ -101,7 +100,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				break;
 			case "leaderboard":
 			case "lb":
-				event.paginate(getEventLeaderboard(event.getGuild(), event.getUser(), new PaginatorEvent(event), null));
+				event.paginate(getEventLeaderboard(event.getGuild(), event.getUser(), event, null));
 				break;
 			case "end":
 				if (database.getSkyblockEventActive(event.getGuild().getId())) {
@@ -371,7 +370,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 	public static EmbedBuilder getEventLeaderboard(
 		Guild guild,
 		User user,
-		PaginatorEvent paginatorEvent,
+		SlashCommandEvent slashCommandEvent,
 		ButtonInteractionEvent buttonEvent
 	) {
 		String guildId = guild.getId();
@@ -402,8 +401,8 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			}
 
 			if (paginateBuilder.size() > 0) {
-				if (paginatorEvent != null) {
-					paginatorEvent.paginate(
+				if (slashCommandEvent != null) {
+					slashCommandEvent.paginate(
 						paginateBuilder.updateExtras(extra ->
 							extra
 								.setEveryPageTitle("Event Leaderboard")
@@ -458,8 +457,8 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
 
 		if (paginateBuilder.size() > 0) {
-			if (paginatorEvent != null) {
-				paginatorEvent.paginate(paginateBuilder);
+			if (slashCommandEvent != null) {
+				slashCommandEvent.paginate(paginateBuilder);
 			} else {
 				paginateBuilder.build().paginate(buttonEvent.getHook(), 0);
 			}
@@ -712,7 +711,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder createSkyblockEvent(PaginatorEvent event) {
+	public static EmbedBuilder createSkyblockEvent(SlashCommandEvent event) {
 		boolean sbEventActive = database.getSkyblockEventActive(event.getGuild().getId());
 		if (sbEventActive) {
 			return invalidEmbed("Event already running");

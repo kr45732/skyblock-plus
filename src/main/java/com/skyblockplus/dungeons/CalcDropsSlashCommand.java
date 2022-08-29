@@ -43,12 +43,7 @@ public class CalcDropsSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		event.paginate(
-			getCalcDrops(
-				event.getOptionInt("floor", 1),
-				event.getOptionInt("luck", 1),
-				event.getOptionStr("accessory", "A"),
-				new PaginatorEvent(event)
-			)
+			getCalcDrops(event.getOptionInt("floor", 1), event.getOptionInt("luck", 1), event.getOptionStr("accessory", "A"), event)
 		);
 	}
 
@@ -81,7 +76,7 @@ public class CalcDropsSlashCommand extends SlashCommand {
 			);
 	}
 
-	public static EmbedBuilder getCalcDrops(int floor, int bossLuck, String talisman, PaginatorEvent event) {
+	public static EmbedBuilder getCalcDrops(int floor, int bossLuck, String talisman, SlashCommandEvent event) {
 		if (floor < 0 || floor > 14) {
 			return invalidEmbed("Invalid floor");
 		}
