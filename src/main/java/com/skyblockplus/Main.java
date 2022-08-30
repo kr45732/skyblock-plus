@@ -76,7 +76,7 @@ public class Main {
 
 	public static void main(String[] args) throws LoginException, IllegalArgumentException {
 		globalExceptionHandler = new GlobalExceptionHandler();
-		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
+//		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
 		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
 
 		Utils.initialize();
