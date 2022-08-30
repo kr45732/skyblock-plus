@@ -40,6 +40,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MissingSlashCommand extends SlashCommand {
+
 	private static List<String> soulboundItems;
 
 	public MissingSlashCommand() {
@@ -79,7 +80,13 @@ public class MissingSlashCommand extends SlashCommand {
 				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 			}
 
-			Set<String> playerItems = player.getTalismanBagMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet());
+			Set<String> playerItems = player
+				.getTalismanBagMap()
+				.values()
+				.stream()
+				.filter(Objects::nonNull)
+				.map(InvItem::getId)
+				.collect(Collectors.toSet());
 
 			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
 			Set<String> missingInternal = new HashSet<>(ALL_TALISMANS);
@@ -112,15 +119,18 @@ public class MissingSlashCommand extends SlashCommand {
 
 			missingInternalArr.removeAll(List.of("BURNING_KUUDRA_CORE", "FIERY_KUUDRA_CORE", "INFERNAL_KUUDRA_CORE")); // TODO: remove when obtainable
 			if (soulboundItems == null) {
-				soulboundItems = streamJsonArray(getSkyblockItemsJson()).filter(e -> higherDepth(e, "soulbound", null) != null).map(e -> higherDepth(e, "id").getAsString()).toList();
+				soulboundItems =
+					streamJsonArray(getSkyblockItemsJson())
+						.filter(e -> higherDepth(e, "soulbound", null) != null)
+						.map(e -> higherDepth(e, "id").getAsString())
+						.toList();
 			}
 			List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");
 
 			NetworthExecute calc = new NetworthExecute().initPrices();
 			missingInternalArr.sort(
 				Comparator.comparingDouble(o1 ->
-						soulboundItems.contains(o1) ||
-						(player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
+					soulboundItems.contains(o1) || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
 						? Double.MAX_VALUE
 						: calc.getLowestPrice(o1)
 				)
@@ -160,8 +170,7 @@ public class MissingSlashCommand extends SlashCommand {
 			}
 			missingInternalArr.sort(
 				Comparator.comparingDouble(o1 ->
-						soulboundItems.contains(o1) ||
-						(player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
+					soulboundItems.contains(o1) || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
 						? Double.MAX_VALUE
 						: calc.getLowestPrice(o1)
 				)

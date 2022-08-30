@@ -1923,7 +1923,15 @@ public class Utils {
 				if (PET_NAMES.contains(itemId)) {
 					Matcher matcher = NEU_TEXTURE_PATTERN.matcher(higherDepth(itemJson, "nbttag").getAsString());
 					if (matcher.find()) {
-						toAdd.addProperty("texture", higherDepth(JsonParser.parseString(new String(Base64.getDecoder().decode(matcher.group(1)))), "textures.SKIN.url").getAsString().split("http://textures.minecraft.net/texture/")[1]);
+						toAdd.addProperty(
+							"texture",
+							higherDepth(
+								JsonParser.parseString(new String(Base64.getDecoder().decode(matcher.group(1)))),
+								"textures.SKIN.url"
+							)
+								.getAsString()
+								.split("http://textures.minecraft.net/texture/")[1]
+						);
 					}
 				}
 				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);

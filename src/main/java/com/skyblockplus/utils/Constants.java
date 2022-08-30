@@ -180,7 +180,11 @@ public class Constants {
 			BITS_ITEM_NAMES = new ArrayList<>(getBitsJson().getAsJsonObject().keySet());
 
 			/* PET_ITEM_NAMES */
-			PET_ITEM_NAMES = streamJsonArray(getSkyblockItemsJson()).filter(e -> higherDepth(e, "category", "").equals("PET_ITEM")).map(e -> higherDepth(e, "id").getAsString()).collect(Collectors.toList());
+			PET_ITEM_NAMES =
+				streamJsonArray(getSkyblockItemsJson())
+					.filter(e -> higherDepth(e, "category", "").equals("PET_ITEM"))
+					.map(e -> higherDepth(e, "id").getAsString())
+					.collect(Collectors.toList());
 
 			/* ALL_TALISMANS */
 			ALL_TALISMANS = new HashSet<>();

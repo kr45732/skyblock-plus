@@ -159,7 +159,7 @@ public class LeaderboardPaginator {
 
 		return defaultEmbed("Global Leaderboard | " + capitalizeString(gamemode.toString()))
 			.setDescription(
-					player != null
+				player != null
 					? "**Player:** " +
 					fixUsername(player) +
 					"\n**Rank:** " +
