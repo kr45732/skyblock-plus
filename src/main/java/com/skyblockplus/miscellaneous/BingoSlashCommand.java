@@ -77,6 +77,9 @@ public class BingoSlashCommand extends SlashCommand {
 		JsonElement bingoJson = null;
 		JsonArray bingoArr = new JsonArray();
 		JsonElement bingoInfo = getBingoInfoJson();
+		if (bingoInfo == null) {
+			return invalidEmbed("Error fetching current bingo data");
+		}
 		try {
 			bingoJson =
 				streamJsonArray(

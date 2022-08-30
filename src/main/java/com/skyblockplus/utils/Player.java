@@ -2501,7 +2501,7 @@ public class Player {
 	}
 
 	public boolean isVaultApiEnabled() {
-		return getPersonalVaultMap() != null;
+		return higherDepth(profileJson(), "personal_vault_contents.data", null) != null;
 	}
 
 	public boolean isSkillsApiEnabled() {

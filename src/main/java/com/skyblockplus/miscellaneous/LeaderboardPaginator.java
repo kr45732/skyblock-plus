@@ -20,6 +20,8 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
+import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
@@ -51,7 +53,6 @@ public class LeaderboardPaginator {
 	private int pageFirstRank = 1;
 	private int playerRank = -1;
 	private String playerAmount = "Not on leaderboard";
-	private boolean isPlayer = false;
 
 	public LeaderboardPaginator(
 		String lbType,
@@ -79,7 +80,6 @@ public class LeaderboardPaginator {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
 		} else if (player != null) {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.getUuid()));
-			isPlayer = true;
 		} else {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, 0, 201));
 		}
@@ -98,6 +98,22 @@ public class LeaderboardPaginator {
 			if (amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)) {
 				closestAmt = Math.abs(curAmount - amount);
 				idx = curRank;
+			}
+		}
+
+		if (player != null && playerAmount.equals("Not on leaderboard")) {
+			if (lbType.equals("networth")) {
+				if (!player.isInventoryApiEnabled()) {
+					playerAmount = "Inventory API disabled";
+				}
+			} else if (ALL_SKILL_NAMES.contains(lbType)) {
+				if (!player.isSkillsApiEnabled()) {
+					playerAmount = "Skills API Disabled";
+				}
+			} else if (COLLECTION_NAME_TO_ID.containsKey(lbType)) {
+				if (!player.isCollectionsApiEnabled()) {
+					playerAmount = "Collections API disabled";
+				}
 			}
 		}
 
@@ -143,11 +159,11 @@ public class LeaderboardPaginator {
 
 		return defaultEmbed("Global Leaderboard | " + capitalizeString(gamemode.toString()))
 			.setDescription(
-				isPlayer
+					player != null
 					? "**Player:** " +
 					fixUsername(player) +
 					"\n**Rank:** " +
-					(playerRank == -1 ? "Not on leaderboard (are APIs enabled?)" : "#" + formatNumber(playerRank)) +
+					(playerRank == -1 ? "Not on leaderboard" : "#" + formatNumber(playerRank)) +
 					"\n**" +
 					capitalizeString(lbType.replace("_", " ")) +
 					":** " +
@@ -249,19 +265,18 @@ public class LeaderboardPaginator {
 		if (rank != -1) {
 			rank = Math.max(1, rank);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, rank - 200, rank + 200));
-			isPlayer = false;
+			this.player = null;
 		} else if (amount != -1) {
 			amount = Math.max(0, amount);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, amount));
-			isPlayer = false;
+			this.player = null;
 		} else if (page != -1) {
 			page = Math.max(1, page);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
-			isPlayer = false;
+			this.player = null;
 		} else if (player != null) {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.uuid()));
 			this.player = player.username();
-			isPlayer = true;
 		}
 
 		double closestAmt = -1;

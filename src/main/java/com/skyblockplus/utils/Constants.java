@@ -180,7 +180,7 @@ public class Constants {
 			BITS_ITEM_NAMES = new ArrayList<>(getBitsJson().getAsJsonObject().keySet());
 
 			/* PET_ITEM_NAMES */
-			PET_ITEM_NAMES = new ArrayList<>(higherDepth(getSkyCryptPetJson(), "pet_items").getAsJsonObject().keySet());
+			PET_ITEM_NAMES = streamJsonArray(getSkyblockItemsJson()).filter(e -> higherDepth(e, "category", "").equals("PET_ITEM")).map(e -> higherDepth(e, "id").getAsString()).collect(Collectors.toList());
 
 			/* ALL_TALISMANS */
 			ALL_TALISMANS = new HashSet<>();
@@ -195,6 +195,7 @@ public class Constants {
 					}
 				}
 			}
+			ALL_TALISMANS.addAll(List.of("ARTIFACT_OF_CONTROL", "PANDORAS_BOX", "SHENS_REGALIA"));
 
 			/* NUMBER_TO_RARITY_MAP */
 			NUMBER_TO_RARITY_MAP =

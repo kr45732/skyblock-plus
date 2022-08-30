@@ -179,7 +179,6 @@ public class Utils {
 	private static JsonObject essenceCostsJson;
 	private static JsonObject levelingJson;
 	private static JsonObject collectionsJson;
-	private static JsonObject skyCryptPetJson;
 	private static JsonObject enchantsJson;
 	private static JsonObject petNumsJson;
 	private static JsonObject petsJson;
@@ -537,30 +536,6 @@ public class Utils {
 		return collectionsJson;
 	}
 
-	public static JsonObject getSkyCryptPetJson() {
-		if (skyCryptPetJson == null) {
-			skyCryptPetJson =
-				parseJsString(
-					Pattern
-						.compile("/\\*(.*?)\\*/", Pattern.DOTALL)
-						.matcher(
-							"{" +
-							getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/development/src/constants/pets.js")
-								.split("];")[1].replace("export const ", "")
-								.replace(" = ", ": ")
-								.replace(";", ",") +
-							"}"
-						)
-						.replaceAll("")
-						.replace("//(.*)", "")
-						.replaceAll("(description: `)(.*?)(\\s*`,)", "")
-				)
-					.getAsJsonObject();
-		}
-
-		return skyCryptPetJson;
-	}
-
 	/* Http requests */
 	public static JsonElement getJson(String jsonUrl) {
 		return getJson(jsonUrl, HYPIXEL_API_KEY);
@@ -753,18 +728,9 @@ public class Utils {
 		}
 	}
 
-	public static String getPetUrl(String petName, String tier) {
-		if (skyCryptPetJson == null) {
-			skyCryptPetJson = getSkyCryptPetJson();
-		}
-
-		JsonElement headData = higherDepth(skyCryptPetJson, "pet_data." + petName.toUpperCase() + ".head");
+	public static String getPetUrl(String petId) {
 		try {
-			if (headData.isJsonObject()) {
-				return "https://sky.shiiyu.moe" + higherDepth(headData, tier.toLowerCase(), higherDepth(headData, "default").getAsString());
-			} else {
-				return "https://sky.shiiyu.moe" + headData.getAsString();
-			}
+			return "https://sky.shiiyu.moe" + higherDepth(getInternalJsonMappings(), petId + ".texture").getAsString();
 		} catch (Exception e) {
 			return null;
 		}
@@ -1798,8 +1764,7 @@ public class Utils {
 
 	public static String getItemThumbnail(String id) {
 		if (PET_NAMES.contains(id.split(";")[0].trim())) {
-			String[] idRaritySplit = id.split(";");
-			return getPetUrl(idRaritySplit[0], NUMBER_TO_RARITY_MAP.get(idRaritySplit[1]));
+			return getPetUrl(id);
 		} else if (ENCHANT_NAMES.contains(id.split(";")[0].trim())) {
 			return "https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK";
 		}
@@ -1953,6 +1918,13 @@ public class Utils {
 				toAdd.addProperty("name", itemName);
 				if (higherDepth(itemJson, "recipe") != null) {
 					toAdd.add("recipe", higherDepth(itemJson, "recipe"));
+				}
+				Pattern NEU_TEXTURE_PATTERN = Pattern.compile("Properties:\\{textures:\\[0:\\{Value:\"(.*)\"\\}\\]\\}");
+				if (PET_NAMES.contains(itemId)) {
+					Matcher matcher = NEU_TEXTURE_PATTERN.matcher(higherDepth(itemJson, "nbttag").getAsString());
+					if (matcher.find()) {
+						toAdd.addProperty("texture", higherDepth(JsonParser.parseString(new String(Base64.getDecoder().decode(matcher.group(1)))), "textures.SKIN.url").getAsString().split("http://textures.minecraft.net/texture/")[1]);
+					}
 				}
 				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
 

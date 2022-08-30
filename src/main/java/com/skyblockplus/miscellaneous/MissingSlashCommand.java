@@ -40,6 +40,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MissingSlashCommand extends SlashCommand {
+	private static List<String> soulboundItems;
 
 	public MissingSlashCommand() {
 		this.name = "missing";
@@ -78,27 +79,7 @@ public class MissingSlashCommand extends SlashCommand {
 				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 			}
 
-			Set<String> playerItems = new HashSet<>();
-			try {
-				playerItems.addAll(
-					player.getInventoryMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
-				);
-			} catch (Exception ignored) {}
-			try {
-				playerItems.addAll(
-					player.getEnderChestMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
-				);
-			} catch (Exception ignored) {}
-			try {
-				playerItems.addAll(
-					player.getStorageMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
-				);
-			} catch (Exception ignored) {}
-			try {
-				playerItems.addAll(
-					player.getTalismanBagMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
-				);
-			} catch (Exception ignored) {}
+			Set<String> playerItems = player.getTalismanBagMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet());
 
 			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
 			Set<String> missingInternal = new HashSet<>(ALL_TALISMANS);
@@ -130,32 +111,15 @@ public class MissingSlashCommand extends SlashCommand {
 			});
 
 			missingInternalArr.removeAll(List.of("BURNING_KUUDRA_CORE", "FIERY_KUUDRA_CORE", "INFERNAL_KUUDRA_CORE")); // TODO: remove when obtainable
-
-			List<String> soulboundTalisman = List.of(
-				"ODGERS_BRONZE_TOOTH",
-				"WOLF_PAW",
-				"ODGERS_GOLD_TOOTH",
-				"FROZEN_CHICKEN",
-				"CHEETAH_TALISMAN",
-				"ODGERS_DIAMOND_TOOTH",
-				"JACOBUS_REGISTER",
-				"PIGS_FOOT",
-				"ODGERS_SILVER_TOOTH",
-				"LYNX_TALISMAN",
-				"KING_TALISMAN",
-				"CAT_TALISMAN",
-				"MELODY_HAIR",
-				"SURVIVOR_CUBE",
-				"NETHERRACK_LOOKING_SUNSHADE"
-			);
+			if (soulboundItems == null) {
+				soulboundItems = streamJsonArray(getSkyblockItemsJson()).filter(e -> higherDepth(e, "soulbound", null) != null).map(e -> higherDepth(e, "id").getAsString()).toList();
+			}
 			List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");
 
 			NetworthExecute calc = new NetworthExecute().initPrices();
 			missingInternalArr.sort(
 				Comparator.comparingDouble(o1 ->
-					soulboundTalisman.contains(o1) ||
-						o1.startsWith("WEDDING_RING_") ||
-						o1.startsWith("CAMPFIRE_TALISMAN_") ||
+						soulboundItems.contains(o1) ||
 						(player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
 						? Double.MAX_VALUE
 						: calc.getLowestPrice(o1)
@@ -172,7 +136,7 @@ public class MissingSlashCommand extends SlashCommand {
 				totalCost += cost;
 				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
 				String name = idToName(curId);
-				if (soulboundTalisman.contains(curId) || curId.startsWith("WEDDING_RING_") || curId.startsWith("CAMPFIRE_TALISMAN_")) {
+				if (soulboundItems.contains(curId)) {
 					costOut = (cost != 0 ? " ➜ " + roundAndFormat(cost) : "") + " (Soulbound)";
 				} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
 					costOut = " (Unobtainable)";
@@ -196,9 +160,7 @@ public class MissingSlashCommand extends SlashCommand {
 			}
 			missingInternalArr.sort(
 				Comparator.comparingDouble(o1 ->
-					soulboundTalisman.contains(o1) ||
-						o1.startsWith("WEDDING_RING_") ||
-						o1.startsWith("CAMPFIRE_TALISMAN_") ||
+						soulboundItems.contains(o1) ||
 						(player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
 						? Double.MAX_VALUE
 						: calc.getLowestPrice(o1)
@@ -214,7 +176,7 @@ public class MissingSlashCommand extends SlashCommand {
 				String name = idToName(curId);
 
 				String costOut;
-				if (soulboundTalisman.contains(curId) || curId.startsWith("WEDDING_RING_") || curId.startsWith("CAMPFIRE_TALISMAN_")) {
+				if (soulboundItems.contains(curId)) {
 					costOut = (cost != 0 ? " ➜ " + roundAndFormat(cost) : "") + " (Soulbound)";
 				} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
 					costOut = " (Unobtainable)";
