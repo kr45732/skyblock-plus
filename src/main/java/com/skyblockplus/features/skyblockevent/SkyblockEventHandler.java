@@ -264,7 +264,7 @@ public class SkyblockEventHandler {
 							event
 								.replyModal(
 									Modal
-										.create("skyblock_event" + modalState, "Skyblock Event")
+										.create("skyblock_event_" + modalState, "Skyblock Event")
 										.addActionRow(TextInput.create("value", "Guild Name", TextInputStyle.SHORT).build())
 										.build()
 								)
@@ -275,7 +275,7 @@ public class SkyblockEventHandler {
 							event
 								.replyModal(
 									Modal
-										.create("skyblock_event" + modalState, "Skyblock Event")
+										.create("skyblock_event_" + modalState, "Skyblock Event")
 										.addActionRow(
 											TextInput
 												.create("value", "Duration", TextInputStyle.SHORT)
@@ -291,7 +291,7 @@ public class SkyblockEventHandler {
 							event
 								.replyModal(
 									Modal
-										.create("skyblock_event" + modalState, "Skyblock Event")
+										.create("skyblock_event_" + modalState, "Skyblock Event")
 										.addActionRow(TextInput.create("value", "Channel", TextInputStyle.SHORT).build())
 										.build()
 								)
@@ -302,7 +302,7 @@ public class SkyblockEventHandler {
 							event
 								.replyModal(
 									Modal
-										.create("skyblock_event" + modalState, "Skyblock Event")
+										.create("skyblock_event_" + modalState, "Skyblock Event")
 										.addActionRow(
 											TextInput
 												.create("value", "Prizes", TextInputStyle.PARAGRAPH)
@@ -318,7 +318,7 @@ public class SkyblockEventHandler {
 							event
 								.replyModal(
 									Modal
-										.create("skyblock_event" + modalState, "Skyblock Event")
+										.create("skyblock_event_" + modalState, "Skyblock Event")
 										.addActionRow(TextInput.create("value", "Minimum Amount", TextInputStyle.SHORT).build())
 										.build()
 								)
@@ -329,7 +329,7 @@ public class SkyblockEventHandler {
 							event
 								.replyModal(
 									Modal
-										.create("skyblock_event" + modalState, "Skyblock Event")
+										.create("skyblock_event_" + modalState, "Skyblock Event")
 										.addActionRow(TextInput.create("value", "Maximum Amount", TextInputStyle.SHORT).build())
 										.build()
 								)
@@ -340,7 +340,7 @@ public class SkyblockEventHandler {
 							event
 								.replyModal(
 									Modal
-										.create("skyblock_event" + modalState, "Skyblock Event")
+										.create("skyblock_event_" + modalState, "Skyblock Event")
 										.addActionRow(TextInput.create("value", "Whitelist Role", TextInputStyle.SHORT).build())
 										.build()
 								)
@@ -539,7 +539,7 @@ public class SkyblockEventHandler {
 			.setEmbeds(eb.setDescription("Use the menu below to configure the event settings and start the event").build())
 			.setActionRow(
 				SelectMenu
-					.create("skyblock_event" + selectMenuState)
+					.create("skyblock_event_" + selectMenuState)
 					.addOption("Create Event", "create_event")
 					.addOption("Guild", "guild")
 					.addOption("Duration", "duration")
