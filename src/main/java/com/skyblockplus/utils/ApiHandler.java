@@ -26,8 +26,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import com.skyblockplus.price.PriceCommand;
+import com.skyblockplus.price.PriceSlashCommand;
 import com.skyblockplus.utils.database.CacheDatabase;
 import com.skyblockplus.utils.database.LeaderboardDatabase;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -296,7 +297,8 @@ public class ApiHandler {
 		try {
 			JsonElement profilesJson = getJson(
 				"https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid,
-				hypixelApiKey
+				hypixelApiKey,
+				true
 			);
 
 			try {
@@ -305,7 +307,7 @@ public class ApiHandler {
 					return new HypixelResponse((username != null ? username : "Player") + " has no SkyBlock profiles");
 				}
 
-				JsonArray profileArray = processSkyblockProfilesArray(higherDepth(profilesJson, "profiles").getAsJsonArray());
+				JsonArray profileArray = higherDepth(profilesJson, "profiles").getAsJsonArray();
 				if (shouldCache) {
 					cacheDatabase.cacheJson(uuid, profileArray);
 				}
@@ -344,17 +346,19 @@ public class ApiHandler {
 										.set(Integer.parseInt(profilesResponse.headers().firstValue("RateLimit-Reset").get()));
 								} catch (Exception ignored) {}
 
-								JsonArray profiles = processSkyblockProfilesArray(
-									higherDepth(JsonParser.parseReader(new InputStreamReader(profilesResponse.body())), "profiles")
-										.getAsJsonArray()
-								);
+								try (
+									InputStreamReader in = new InputStreamReader(profilesResponse.body());
+									JsonReader jsonIn = new JsonReader(in)
+								) {
+									JsonElement profiles = SkyblockProfilesParser.parse(jsonIn, uuid);
 
-								// Json parsing probably takes more memory than the HTTP request
-								if (Runtime.getRuntime().totalMemory() > 1250000000) {
-									System.gc();
+									// Json parsing probably takes more memory than the HTTP request
+									if (Runtime.getRuntime().totalMemory() > 1250000000) {
+										System.gc();
+									}
+
+									return higherDepth(profiles, "profiles").getAsJsonArray();
 								}
-
-								return profiles;
 							} catch (Exception ignored) {}
 							return null;
 						},
@@ -458,14 +462,17 @@ public class ApiHandler {
 				.build();
 			httpGet.setURI(uri);
 
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			try (
+				CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
 		return null;
 	}
 
-	public static JsonArray queryLowestBin(String query, boolean isName, PriceCommand.AuctionType auctionType) {
+	public static JsonArray queryLowestBin(String query, boolean isName, PriceSlashCommand.AuctionType auctionType) {
 		try {
 			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
@@ -480,21 +487,24 @@ public class ApiHandler {
 			} else {
 				uriBuilder.addParameter("item_id", query);
 			}
-			if (auctionType == PriceCommand.AuctionType.BIN) {
+			if (auctionType == PriceSlashCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");
-			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
+			} else if (auctionType == PriceSlashCommand.AuctionType.AUCTION) {
 				uriBuilder.addParameter("bin", "false");
 			}
 			httpGet.setURI(uriBuilder.build());
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
 		return null;
 	}
 
-	public static JsonArray queryLowestBinPet(String petName, String rarity, PriceCommand.AuctionType auctionType) {
+	public static JsonArray queryLowestBinPet(String petName, String rarity, PriceSlashCommand.AuctionType auctionType) {
 		try {
 			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
@@ -509,9 +519,9 @@ public class ApiHandler {
 			if (!rarity.equals("ANY")) {
 				uriBuilder.addParameter("tier", rarity);
 			}
-			if (auctionType == PriceCommand.AuctionType.BIN) {
+			if (auctionType == PriceSlashCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");
-			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
+			} else if (auctionType == PriceSlashCommand.AuctionType.AUCTION) {
 				uriBuilder.addParameter("bin", "false");
 			}
 			httpGet.setURI(uriBuilder.build());
@@ -523,7 +533,7 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel, PriceCommand.AuctionType auctionType) {
+	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel, PriceSlashCommand.AuctionType auctionType) {
 		try {
 			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
@@ -535,15 +545,18 @@ public class ApiHandler {
 				.addParameter("sort", "ASC")
 				.addParameter("limit", "5")
 				.addParameter("key", AUCTION_API_KEY);
-			if (auctionType == PriceCommand.AuctionType.BIN) {
+			if (auctionType == PriceSlashCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");
-			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
+			} else if (auctionType == PriceSlashCommand.AuctionType.AUCTION) {
 				uriBuilder.addParameter("bin", "false");
 			}
 			httpGet.setURI(uriBuilder.build());
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -557,33 +570,14 @@ public class ApiHandler {
 			URI uri = new URIBuilder(httpGet.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY).build();
 			httpGet.setURI(uri);
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
 		return null;
-	}
-
-	public static JsonArray processSkyblockProfilesArray(JsonArray array) {
-		for (int i = 0; i < array.size(); i++) {
-			JsonObject currentProfile = array.get(i).getAsJsonObject();
-			currentProfile.remove("community_upgrades");
-
-			JsonObject currentProfileMembers = higherDepth(currentProfile, "members").getAsJsonObject();
-			for (String currentProfileMemberUuid : currentProfileMembers.keySet()) {
-				JsonObject currentProfileMember = currentProfileMembers.getAsJsonObject(currentProfileMemberUuid);
-				currentProfileMember.remove("objectives");
-				currentProfileMember.remove("tutorial");
-				currentProfileMember.remove("quests");
-				currentProfileMember.remove("visited_zones");
-				currentProfileMember.remove("griffin");
-				currentProfileMember.remove("experimentation");
-				currentProfileMember.remove("unlocked_coll_tiers");
-				currentProfileMember.remove("backpack_icons");
-				currentProfileMember.remove("slayer_quest");
-			}
-		}
-		return array;
 	}
 
 	public static void updateLinkedAccounts() {

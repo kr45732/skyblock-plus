@@ -20,10 +20,12 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
+import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.util.Map;
 import java.util.TreeMap;
@@ -46,12 +48,11 @@ public class LeaderboardPaginator {
 	private final Message message;
 	private final String lbType;
 	private final Player.Gamemode gamemode;
-	private final PaginatorEvent event;
+	private final SlashCommandEvent event;
 	private String player;
 	private int pageFirstRank = 1;
 	private int playerRank = -1;
 	private String playerAmount = "Not on leaderboard";
-	private boolean isPlayer = false;
 
 	public LeaderboardPaginator(
 		String lbType,
@@ -60,13 +61,13 @@ public class LeaderboardPaginator {
 		int page,
 		int rank,
 		double amount,
-		PaginatorEvent event
+		SlashCommandEvent event
 	) {
 		this.lbType = lbType;
 		this.gamemode = gamemode;
 		this.player = player != null ? player.getUsername() : null;
 		this.event = event;
-		this.message = event.getLoadingMessage();
+		this.message = event.getHook().retrieveOriginal().complete();
 
 		if (rank != -1) {
 			rank = Math.max(1, rank);
@@ -79,7 +80,6 @@ public class LeaderboardPaginator {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
 		} else if (player != null) {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.getUuid()));
-			isPlayer = true;
 		} else {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, 0, 201));
 		}
@@ -101,6 +101,22 @@ public class LeaderboardPaginator {
 			}
 		}
 
+		if (player != null && playerAmount.equals("Not on leaderboard")) {
+			if (lbType.equals("networth")) {
+				if (!player.isInventoryApiEnabled()) {
+					playerAmount = "Inventory API disabled";
+				}
+			} else if (ALL_SKILL_NAMES.contains(lbType)) {
+				if (!player.isSkillsApiEnabled()) {
+					playerAmount = "Skills API Disabled";
+				}
+			} else if (COLLECTION_NAME_TO_ID.containsKey(lbType)) {
+				if (!player.isCollectionsApiEnabled()) {
+					playerAmount = "Collections API disabled";
+				}
+			}
+		}
+
 		if (rank != -1) {
 			pageFirstRank = ((rank - 1) / 20) * 20 + 1;
 		} else if (amount != -1) {
@@ -111,12 +127,7 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
-		event
-			.getAction()
-			.editMessageEmbeds(getRender().build())
-			.setActionRows(getActionRow())
-			.get()
-			.queue(ignored -> waitForEvent(), ignore);
+		event.getHook().editOriginalEmbeds(getRender().build()).setComponents(getActionRow()).queue(ignored -> waitForEvent(), ignore);
 	}
 
 	private EmbedBuilder getRender() {
@@ -148,7 +159,7 @@ public class LeaderboardPaginator {
 
 		return defaultEmbed("Global Leaderboard | " + capitalizeString(gamemode.toString()))
 			.setDescription(
-				isPlayer
+				player != null
 					? "**Player:** " +
 					fixUsername(player) +
 					"\n**Rank:** " +
@@ -206,7 +217,7 @@ public class LeaderboardPaginator {
 
 		event
 			.editMessageEmbeds(getRender().build())
-			.setActionRows(getActionRow())
+			.setComponents(getActionRow())
 			.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
 	}
 
@@ -254,19 +265,18 @@ public class LeaderboardPaginator {
 		if (rank != -1) {
 			rank = Math.max(1, rank);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, rank - 200, rank + 200));
-			isPlayer = false;
+			this.player = null;
 		} else if (amount != -1) {
 			amount = Math.max(0, amount);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, amount));
-			isPlayer = false;
+			this.player = null;
 		} else if (page != -1) {
 			page = Math.max(1, page);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
-			isPlayer = false;
+			this.player = null;
 		} else if (player != null) {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.uuid()));
 			this.player = player.username();
-			isPlayer = true;
 		}
 
 		double closestAmt = -1;
@@ -296,7 +306,7 @@ public class LeaderboardPaginator {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
-		event.getHook().editOriginalEmbeds(getRender().build()).setActionRows(getActionRow()).queue(ignored -> waitForEvent(), ignore);
+		event.getHook().editOriginalEmbeds(getRender().build()).setComponents(getActionRow()).queue(ignored -> waitForEvent(), ignore);
 	}
 
 	private ActionRow getActionRow() {

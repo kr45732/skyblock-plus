@@ -22,7 +22,7 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +35,7 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectMenuInteract
 
 public class PartyHandler {
 
-	private final PaginatorEvent paginatorEvent;
+	private final SlashCommandEvent slashCommandEvent;
 	private final Message message;
 	private final String username;
 	private final List<String> classes = new ArrayList<>(Arrays.asList("any", "any", "any", "any"));
@@ -43,14 +43,14 @@ public class PartyHandler {
 	private int classIndex = 0;
 	private String floor;
 
-	public PartyHandler(String username, PaginatorEvent paginatorEvent) {
+	public PartyHandler(String username, SlashCommandEvent slashCommandEvent) {
 		this.username = username;
-		this.paginatorEvent = paginatorEvent;
+		this.slashCommandEvent = slashCommandEvent;
 
 		SelectMenu menu = getMainSelectionMenu();
 		this.menuId = menu.getId();
 		this.message =
-			paginatorEvent
+			slashCommandEvent
 				.getChannel()
 				.sendMessageEmbeds(
 					defaultEmbed("Party Finder Creator").setDescription("Choose an option from the menu below to get started!").build()
@@ -63,8 +63,8 @@ public class PartyHandler {
 	private boolean condition(SelectMenuInteraction event) {
 		return (
 			event.isFromGuild() &&
-			event.getUser().getId().equals(paginatorEvent.getUser().getId()) &&
-			event.getChannel().getId().equals(paginatorEvent.getChannel().getId()) &&
+			event.getUser().getId().equals(slashCommandEvent.getUser().getId()) &&
+			event.getChannel().getId().equals(slashCommandEvent.getChannel().getId()) &&
 			event.getComponentId().equals(menuId)
 		);
 	}
@@ -134,7 +134,7 @@ public class PartyHandler {
 									)
 									.build()
 							)
-							.setActionRows()
+							.setComponents()
 							.queue();
 						return;
 					}
@@ -144,7 +144,7 @@ public class PartyHandler {
 							.editOriginalEmbeds(
 								defaultEmbed("Party Finder Creator").setDescription("Canceled the creation process").build()
 							)
-							.setActionRows()
+							.setComponents()
 							.queue();
 						return;
 					}
@@ -204,7 +204,7 @@ public class PartyHandler {
 			this::action,
 			2,
 			TimeUnit.MINUTES,
-			() -> message.editMessageEmbeds(invalidEmbed("Party creation timeout").build()).setActionRows().queue()
+			() -> message.editMessageEmbeds(invalidEmbed("Party creation timeout").build()).setComponents().queue()
 		);
 	}
 

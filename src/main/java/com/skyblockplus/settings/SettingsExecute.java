@@ -104,7 +104,6 @@ public class SettingsExecute {
 			eb =
 				switch (args[2]) {
 					case "hypixel_key" -> setHypixelKey(args[3]);
-					case "prefix" -> setPrefix(content.split("\\s+", 4)[3]);
 					case "guest_role" -> setApplyGuestRole(args[3]);
 					case "fetchur_channel" -> setFetchurChannel(args[3]);
 					case "fetchur_ping" -> setFetchurPing(args[3]);
@@ -173,7 +172,6 @@ public class SettingsExecute {
 					.addField("Roles Settings", "Use `/settings roles` to see the current settings", false);
 		} else if (args.length == 2 && args[1].equals("general")) {
 			eb = defaultSettingsEmbed();
-			eb.addField("Prefix", higherDepth(currentSettings, "prefix", DEFAULT_PREFIX), false);
 			String hypixelKey = database.getServerHypixelApiKey(guild.getId());
 			eb.addField("Hypixel API Key", hypixelKey != null && !hypixelKey.isEmpty() ? "Hidden" : "Not set", false);
 			String fetchurChannel = higherDepth(currentSettings, "fetchurChannel", "none");
@@ -466,7 +464,6 @@ public class SettingsExecute {
 								eb = setApplyCheckApiEnable(guildSettings.getAsJsonObject(), false);
 							}
 						}
-						case "log_channel" -> eb = setApplyLogChannel(guildSettings.getAsJsonObject(), args[5]);
 					}
 				}
 			} else if ((args = content.split("\\s+", 7)).length == 7) {
@@ -836,10 +833,14 @@ public class SettingsExecute {
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(30);
 		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Settings"));
 		String canUse = streamJsonArray(higherDepth(blacklistSettings, "canUse").getAsJsonArray())
-			.map(g -> jda.getGuildById(g.getAsString()).getName())
+			.map(g -> jda.getGuildById(g.getAsString()))
+			.filter(Objects::nonNull)
+			.map(Guild::getName)
 			.collect(Collectors.joining(", "));
 		String isUsing = streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray())
-			.map(g -> jda.getGuildById(g.getAsString()).getName())
+			.map(g -> jda.getGuildById(g.getAsString()))
+			.filter(Objects::nonNull)
+			.map(Guild::getName)
 			.collect(Collectors.joining(", "));
 
 		paginateBuilder.addItems(
@@ -1317,32 +1318,6 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Set apply message channel to: " + channel.getAsMention());
-	}
-
-	public EmbedBuilder setApplyLogChannel(JsonObject guildSettings, String textChannel) {
-		if (textChannel.equalsIgnoreCase("none")) {
-			guildSettings.addProperty("applyLogChannel", "none");
-			int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
-
-			return defaultSettingsEmbed("Set apply log channel to: none");
-		}
-
-		Object eb = checkTextChannel(textChannel);
-		if (eb instanceof EmbedBuilder e) {
-			return e;
-		}
-		TextChannel channel = ((TextChannel) eb);
-
-		guildSettings.addProperty("applyLogChannel", channel.getId());
-		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Set apply log channel to: " + channel.getAsMention());
 	}
 
 	public EmbedBuilder setApplyCategory(JsonObject guildSettings, String messageCategory) {
@@ -2286,19 +2261,17 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setVerifyMessageText(String verifyText) {
-		if (verifyText.length() > 0) {
-			if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
-				return invalidEmbed("Text cannot be longer than 1500 letters!");
-			}
-
-			int responseCode = updateVerifySettings("messageText", EmojiParser.parseToAliases(verifyText));
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
-
-			return defaultSettingsEmbed("**Verify message set to:** " + verifyText);
+		String verifyTextEmoj = EmojiParser.parseToAliases(verifyText);
+		if (verifyText.isEmpty() || verifyTextEmoj.length() > 1500) {
+			return invalidEmbed("Text must be between 1 to 1500 characters");
 		}
-		return defaultEmbed("Invalid Input");
+
+		int responseCode = updateVerifySettings("messageText", verifyTextEmoj);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("**Verify message set to:** " + verifyText);
 	}
 
 	public EmbedBuilder setVerifyMessageTextChannelId(String textChannel) {
@@ -2557,20 +2530,6 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Deleted the server's Hypixel API key.");
-	}
-
-	public EmbedBuilder setPrefix(String prefix) {
-		if (prefix.length() == 0 || prefix.length() > 5) {
-			return invalidEmbed("The prefix must be a least one character and no more than five.");
-		}
-
-		int responseCode = database.setPrefix(guild.getId(), prefix);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		guildMap.get(guild.getId()).setPrefix(prefix);
-		return defaultSettingsEmbed("**Set the server's prefix to:** " + prefix);
 	}
 
 	public EmbedBuilder setFetchurChannel(String channelMention) {

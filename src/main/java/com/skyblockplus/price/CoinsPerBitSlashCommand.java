@@ -18,8 +18,16 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
+import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.stereotype.Component;
@@ -35,11 +43,24 @@ public class CoinsPerBitSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(CoinsPerBitCommand.getCoinsPerBit());
+		event.embed(getCoinsPerBit());
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands.slash(name, "Get the coins to bits ratio for items in the bits shop");
+	}
+
+	public static EmbedBuilder getCoinsPerBit() {
+		Map<String, Double> values = new HashMap<>();
+		NetworthExecute calc = new NetworthExecute().initPrices();
+		for (Map.Entry<String, JsonElement> entry : getBitsJson().entrySet()) {
+			values.put(entry.getKey(), calc.getLowestPrice(entry.getKey()) / entry.getValue().getAsLong());
+		}
+		EmbedBuilder eb = defaultEmbed("Coins Per Bit");
+		for (Map.Entry<String, Double> entry : values.entrySet().stream().sorted(Comparator.comparingDouble(v -> -v.getValue())).toList()) {
+			eb.appendDescription(getEmoji(entry.getKey()) + " " + idToName(entry.getKey()) + " ➜ " + formatNumber(entry.getValue()) + "\n");
+		}
+		return eb;
 	}
 }

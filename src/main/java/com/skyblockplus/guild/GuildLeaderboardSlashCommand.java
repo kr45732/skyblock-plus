@@ -18,17 +18,28 @@
 
 package com.skyblockplus.guild;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedGuildTypesSubList;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.HypixelResponse;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,13 +56,13 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 		String guild = event.getOptionStr("guild");
 		if (guild != null) {
 			event.paginate(
-				GuildLeaderboardCommand.getLeaderboard(
+				getLeaderboard(
 					event.getOptionStr("type"),
 					null,
 					guild,
 					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 					event.getOptionBoolean("key", false),
-					new PaginatorEvent(event)
+					event
 				)
 			);
 			return;
@@ -62,13 +73,13 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			GuildLeaderboardCommand.getLeaderboard(
+			getLeaderboard(
 				event.getOptionStr("type"),
 				event.player,
 				null,
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 				event.getOptionBoolean("key", false),
-				new PaginatorEvent(event)
+				event
 			)
 		);
 	}
@@ -96,5 +107,105 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 		} else if (event.getFocusedOption().getName().equals("type")) {
 			event.replyClosestMatch(event.getFocusedOption().getValue(), formattedGuildTypesSubList);
 		}
+	}
+
+	public static EmbedBuilder getLeaderboard(
+		String lbType,
+		String username,
+		String guildName,
+		Player.Gamemode gamemode,
+		boolean useKey,
+		SlashCommandEvent event
+	) {
+		String hypixelKey = null;
+		if (useKey) {
+			hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
+
+			EmbedBuilder eb = checkHypixelKey(hypixelKey);
+			if (eb != null) {
+				return eb;
+			}
+		}
+
+		lbType = getType(lbType, false);
+
+		UsernameUuidStruct usernameUuidStruct = null;
+		HypixelResponse guildResponse;
+		if (username != null) {
+			usernameUuidStruct = usernameToUuid(username);
+			if (!usernameUuidStruct.isValid()) {
+				return invalidEmbed(usernameUuidStruct.failCause());
+			}
+			guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
+		} else {
+			guildResponse = getGuildFromName(guildName);
+		}
+		if (!guildResponse.isValid()) {
+			return invalidEmbed(guildResponse.failCause());
+		}
+
+		JsonElement guildJson = guildResponse.response();
+		guildName = higherDepth(guildJson, "name").getAsString();
+		String guildId = higherDepth(guildJson, "_id").getAsString();
+
+		if (hypixelGuildQueue.contains(guildId)) {
+			return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
+		}
+		hypixelGuildQueue.add(guildId);
+		List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
+			lbType,
+			gamemode,
+			streamJsonArray(higherDepth(guildJson, "members")).map(u -> higherDepth(u, "uuid", "")).collect(Collectors.toList()),
+			hypixelKey,
+			event
+		);
+		hypixelGuildQueue.remove(guildId);
+
+		String finalLbType = lbType;
+		playerList.sort(Comparator.comparingDouble(cache -> -cache.getDouble(finalLbType)));
+
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
+
+		long total = 0;
+		int guildRank = -1;
+		String amt = "?";
+		for (int i = 0, guildMemberPlayersListSize = playerList.size(); i < guildMemberPlayersListSize; i++) {
+			DataObject player = playerList.get(i);
+			double amount = player.getDouble(lbType);
+			amount = lbType.equals("networth") ? (long) amount : amount;
+			String formattedAmt = amount == -1 ? "?" : roundAndFormat(amount);
+			String playerUsername = player.getString("username");
+
+			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(playerUsername) + ": " + formattedAmt);
+			total += Math.max(0, amount);
+
+			if (username != null && playerUsername.equals(usernameUuidStruct.username())) {
+				guildRank = i;
+				amt = formattedAmt;
+			}
+		}
+
+		String ebStr =
+			"**Total " +
+			capitalizeString(lbType.replace("_", " ")) +
+			":** " +
+			formatNumber(total) +
+			(
+				username != null
+					? "\n**Player:** " +
+					usernameUuidStruct.username() +
+					"\n**Guild Rank:** #" +
+					(guildRank + 1) +
+					"\n**" +
+					capitalizeString(lbType.replace("_", " ")) +
+					":** " +
+					amt
+					: ""
+			);
+
+		paginateBuilder.getExtras().setEveryPageTitle(guildName).setEveryPageText(ebStr);
+		event.paginate(paginateBuilder, (guildRank / 20) + 1);
+
+		return null;
 	}
 }

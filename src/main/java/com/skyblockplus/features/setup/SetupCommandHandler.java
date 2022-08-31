@@ -34,37 +34,60 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 
 public class SetupCommandHandler {
 
 	private final ButtonInteractionEvent buttonEvent;
-	private final SettingsExecute settings;
+	private SettingsExecute settings;
 	private int state = 0;
 	private String featureType = null;
 	private int attemptsLeft = 3;
 	private String name;
 
 	public SetupCommandHandler(ButtonInteractionEvent buttonEvent, String featureType) {
-		this.settings = new SettingsExecute(buttonEvent.getGuild(), buttonEvent.getChannel(), buttonEvent.getUser());
 		this.buttonEvent = buttonEvent;
 
 		switch (featureType) {
 			case "verify":
 				buttonEvent
-					.getHook()
-					.editOriginalEmbeds(
-						defaultEmbed("Setup")
-							.setDescription("Reply with the message that users will see when verifying.")
-							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
+					.replyModal(
+						Modal
+							.create("setup_command_verify_modal", "Verify Setup")
+							.addActionRows(
+								ActionRow.of(
+									TextInput
+										.create("message", "Verification Message", TextInputStyle.PARAGRAPH)
+										.setValue("Run `/verify <IGN>` to verify and gain access to the server!")
+										.build()
+								),
+								ActionRow.of(
+									TextInput
+										.create("roles", "Verified Roles", TextInputStyle.PARAGRAPH)
+										.setPlaceholder("Roles given when verifying seperated by commas\ne.g. @role1, @role two")
+										.build()
+								),
+								ActionRow.of(
+									TextInput
+										.create("nickname", "Nickname Template", TextInputStyle.PARAGRAPH)
+										.setRequired(false)
+										.setPlaceholder(
+											"Template to nick user when verifying.\nFormat: <PREFIX> [IGN] <POSTFIX>\ne.g. [[GUILD.RANK]] [IGN]"
+										)
+										.build()
+								)
+							)
 							.build()
 					)
 					.queue();
 				break;
 			case "guild":
 				buttonEvent
-					.getHook()
-					.editOriginalEmbeds(
+					.replyEmbeds(
 						defaultEmbed("Setup")
 							.setDescription("Reply with the name of the Hypixel guild you are setting this up for.")
 							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
@@ -74,25 +97,24 @@ public class SetupCommandHandler {
 				break;
 			case "roles":
 				buttonEvent
-					.getHook()
-					.editOriginalEmbeds(
+					.replyEmbeds(
 						defaultEmbed("Setup")
 							.setDescription(
 								"""
                                                         **__Overview__**
-                                                        1) When a user runs `roles claim [ign]` their stats are fetched
+                                                        1) When a user runs `roles claim [player]` their stats are fetched
                                                         2) Depending on the roles setup for this server and the users stats, the corresponding roles will be given
 
                                                         **__Setup__**
                                                         - In order to enable automatic roles, there must be at least one role setting enabled:
-                                                        - `settings roles add [role_name] [value] [@role]` - add a level to a role. Maximum for all roles __combined__ is 120.
-                                                        - `settings roles remove [role_name] [value]` - remove a level from a role.
+                                                        - `settings roles add [role_name] [value] [@role]` - add a level to a role
+                                                        - `settings roles remove [role_name] [value]` - remove a level from a role
                                                         - `settings roles set [role_name] [@role]` - set a one level role's role
                                                         - `settings roles enable [role_name]` - enable a role.
                                                         • Tutorial video linked [__here__](https://streamable.com/wninsw)
 
                                                         **__Enable__**
-                                                        - Once all these settings are set run `settings roles enable` to enable roles.
+                                                        - Once all these settings are set run `settings roles enable` to enable roles
                                                         - To view all the roles, their descriptions, and examples, type `settings roles`
                                                         - For more help type `help settings roles` or watch the video linked above
                                                         """
@@ -102,23 +124,9 @@ public class SetupCommandHandler {
 					.queue();
 				this.featureType = featureType;
 				return;
-			case "prefix":
-				buttonEvent
-					.getHook()
-					.editOriginalEmbeds(
-						defaultEmbed("Setup")
-							.setDescription(
-								"Reply with the prefix you want to set. The prefix must be a least one character and no more than five."
-							)
-							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
-							.build()
-					)
-					.queue();
-				break;
 			case "fetchur":
 				buttonEvent
-					.getHook()
-					.editOriginalEmbeds(
+					.replyEmbeds(
 						defaultEmbed("Setup")
 							.setDescription("Reply with the channel where fetchur notifications should be sent.")
 							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
@@ -128,8 +136,7 @@ public class SetupCommandHandler {
 				break;
 			case "mayor":
 				buttonEvent
-					.getHook()
-					.editOriginalEmbeds(
+					.replyEmbeds(
 						defaultEmbed("Setup")
 							.setDescription("Reply with the channel where mayor notifications should be sent.")
 							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
@@ -139,8 +146,7 @@ public class SetupCommandHandler {
 				break;
 			case "jacob":
 				buttonEvent
-					.getHook()
-					.editOriginalEmbeds(
+					.replyEmbeds(
 						defaultEmbed("Setup")
 							.setDescription("Reply with the channel where farming event notifications should be sent.")
 							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
@@ -206,6 +212,7 @@ public class SetupCommandHandler {
 				break;
 		}
 
+		this.settings = new SettingsExecute(buttonEvent.getGuild(), buttonEvent.getChannel(), buttonEvent.getUser());
 		this.featureType = this.featureType != null ? this.featureType : featureType;
 		waitForReply();
 	}
@@ -461,13 +468,6 @@ public class SetupCommandHandler {
 					} else {
 						sendEmbed(eb);
 					}
-					return;
-				}
-				break;
-			case "prefix":
-				eb = settings.setPrefix(event.getMessage().getContentRaw());
-				if (eb.build().getTitle().equals("Settings")) {
-					sendEmbed(eb);
 					return;
 				}
 				break;

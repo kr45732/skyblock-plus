@@ -25,13 +25,10 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -111,33 +108,11 @@ public class NetworthExecute {
 		return this;
 	}
 
-	public void execute(Command command, CommandEvent event) {
-		new CommandExecute(command, event) {
-			@Override
-			protected void execute() {
-				logCommand();
-				verbose = getBooleanOption("--verbose");
-
-				if (args.length == 3 || args.length == 2 || args.length == 1) {
-					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-						return;
-					}
-
-					paginate(getPlayerNetworth(player, args.length == 3 ? args[2] : null, getPaginatorEvent()));
-					return;
-				}
-
-				sendErrorEmbed();
-			}
-		}
-			.queue();
-	}
-
 	public void getPlayerNetworth(String username, String profileName) {
 		getPlayerNetworth(username, profileName, null);
 	}
 
-	public Object getPlayerNetworth(String username, String profileName, PaginatorEvent event) {
+	public Object getPlayerNetworth(String username, String profileName, SlashCommandEvent event) {
 		return getPlayerNetworth(profileName == null ? new Player(username) : new Player(username, profileName), event);
 	}
 
@@ -145,7 +120,7 @@ public class NetworthExecute {
 		getPlayerNetworth(player, null);
 	}
 
-	public Object getPlayerNetworth(Player player, PaginatorEvent event) {
+	public Object getPlayerNetworth(Player player, SlashCommandEvent event) {
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
@@ -474,7 +449,6 @@ public class NetworthExecute {
 			}
 			extras.addButton(Button.link("https://forms.gle/RBmN2AFBLafGyx5E7", "Bug In Calculations?"));
 			new SelectMenuPaginator(pages, "overview", extras, event);
-			//			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 			return null;
 		}
 		return player.getFailEmbed();
@@ -546,8 +520,8 @@ public class NetworthExecute {
 							.append("\"},");
 					}
 				} catch (Exception ignored) {}
-				if (miscStr.toString().endsWith(",")) {
-					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+				if (miscStr.charAt(miscStr.length() - 1) == ',') {
+					miscStr.deleteCharAt(miscStr.length() - 1);
 				}
 				miscStr.append("]");
 
@@ -627,8 +601,8 @@ public class NetworthExecute {
 							.append("\"},");
 					}
 				} catch (Exception ignored) {}
-				if (miscStr.toString().endsWith(",")) {
-					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+				if (miscStr.charAt(miscStr.length() - 1) == ',') {
+					miscStr.deleteCharAt(miscStr.length() - 1);
 				}
 				miscStr.append("]");
 
@@ -693,13 +667,14 @@ public class NetworthExecute {
 			queryStr.append(item.getPetApiName()).append(",");
 		}
 
-		if (queryStr.length() == 0) {
+		if (queryStr.isEmpty()) {
 			return;
 		}
+		if (queryStr.charAt(queryStr.length() - 1) == ',') {
+			queryStr.deleteCharAt(queryStr.length() - 1);
+		}
 
-		queryStr = new StringBuilder(queryStr.substring(0, queryStr.length() - 1));
 		JsonArray ahQuery = getAuctionPetsByName(queryStr.toString());
-
 		if (ahQuery != null) {
 			for (JsonElement auction : ahQuery) {
 				String auctionName = higherDepth(auction, "name").getAsString();
@@ -844,14 +819,14 @@ public class NetworthExecute {
 			}
 		} catch (Exception ignored) {}
 		if (verbose) {
-			if (enchStr.toString().endsWith(",")) {
-				enchStr = new StringBuilder(enchStr.substring(0, enchStr.length() - 1));
+			if (enchStr.charAt(enchStr.length() - 1) == ',') {
+				enchStr.deleteCharAt(enchStr.length() - 1);
 			}
 			enchStr.append("]");
 		}
 
 		try {
-			reforgeExtras = calculateReforgePrice(item.getModifier(), item.getRarity());
+			reforgeExtras = getLowestPriceModifier(item.getModifier(), item.getRarity());
 		} catch (Exception ignored) {}
 
 		try {
@@ -877,8 +852,8 @@ public class NetworthExecute {
 			}
 		} catch (Exception ignored) {}
 		if (verbose) {
-			if (miscStr.toString().endsWith(",")) {
-				miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+			if (miscStr.charAt(miscStr.length() - 1) == ',') {
+				miscStr.deleteCharAt(miscStr.length() - 1);
 			}
 			miscStr.append("]");
 		}
@@ -891,8 +866,8 @@ public class NetworthExecute {
 			}
 		} catch (Exception ignored) {}
 		if (verbose) {
-			if (bpStr.toString().endsWith(",")) {
-				bpStr = new StringBuilder(bpStr.substring(0, bpStr.length() - 1));
+			if (bpStr.charAt(bpStr.length() - 1) == ',') {
+				bpStr.deleteCharAt(bpStr.length() - 1);
 			}
 			bpStr.append("]");
 		}
@@ -946,7 +921,7 @@ public class NetworthExecute {
 		return totalPrice;
 	}
 
-	public double calculateReforgePrice(String reforgeName, String itemRarity) {
+	public double getLowestPriceModifier(String reforgeName, String itemRarity) {
 		JsonElement reforgesStonesJson = getReforgeStonesJson();
 
 		for (String reforgeStone : REFORGE_STONE_NAMES) {

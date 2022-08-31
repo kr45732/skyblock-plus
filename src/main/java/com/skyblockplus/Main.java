@@ -18,7 +18,6 @@
 
 package com.skyblockplus;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
@@ -92,7 +91,7 @@ public class Main {
 				.setOwnerId("385939031596466176")
 				.setEmojis("<:yes:948359788889251940>", "⚠️", "<:no:948359781125607424>")
 				.useHelpBuilder(false)
-				.setPrefixFunction(event -> event.isFromGuild() ? getGuildPrefix(event.getGuild().getId()) : DEFAULT_PREFIX)
+				.setPrefixFunction(event -> DEFAULT_PREFIX)
 				.setListener(
 					new CommandListener() {
 						@Override
@@ -159,16 +158,6 @@ public class Main {
 		MayorHandler.initialize();
 		JacobHandler.initialize();
 		EventHandler.initialize();
-
-		File transcriptDir = new File("src/main/java/com/skyblockplus/json/application_transcripts/");
-		if (!transcriptDir.exists()) {
-			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
-		} else {
-			File[] transcriptDirFiles = transcriptDir.listFiles();
-			if (transcriptDirFiles != null) {
-				Arrays.stream(transcriptDirFiles).forEach(File::delete);
-			}
-		}
 
 		File loreRendersDir = new File("src/main/java/com/skyblockplus/json/lore_renders/");
 		if (!loreRendersDir.exists()) {

@@ -18,11 +18,19 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.getQueryItems;
+import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.time.Instant;
+import java.util.List;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -41,10 +49,7 @@ public class PriceSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		event.embed(
-			PriceCommand.queryAuctions(
-				event.getOptionStr("item"),
-				PriceCommand.AuctionType.valueOf(event.getOptionStr("auction_type", "bin").toUpperCase())
-			)
+			queryAuctions(event.getOptionStr("item"), AuctionType.valueOf(event.getOptionStr("auction_type", "bin").toUpperCase()))
 		);
 	}
 
@@ -65,6 +70,120 @@ public class PriceSlashCommand extends SlashCommand {
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(event.getFocusedOption().getValue(), getQueryItems());
+		}
+	}
+
+	public static EmbedBuilder queryAuctions(String query, AuctionType auctionType) {
+		if (currentMayor.equals("Derpy")) {
+			return invalidEmbed("The price command does not work during Derpy");
+		}
+
+		JsonArray lowestBinArr = null;
+		for (String enchantId : ENCHANT_NAMES) {
+			if (query.replace(" ", "_").toUpperCase().contains(enchantId)) {
+				int enchantLevel;
+				try {
+					enchantLevel = Integer.parseInt(query.replaceAll("\\D+", "").trim());
+				} catch (NumberFormatException e) {
+					enchantLevel = 1;
+				}
+
+				lowestBinArr = queryLowestBinEnchant(enchantId, enchantLevel, auctionType);
+				if (lowestBinArr == null) {
+					return invalidEmbed("Error fetching auctions data");
+				}
+				break;
+			}
+		}
+
+		if (lowestBinArr == null) {
+			for (String pet : PET_NAMES) {
+				if (query.replace(" ", "_").toUpperCase().contains(pet)) {
+					query = query.toLowerCase();
+
+					String rarity = "ANY";
+					for (String rarityName : RARITY_TO_NUMBER_MAP.keySet()) {
+						if (query.contains(rarityName.toLowerCase())) {
+							rarity = rarityName;
+							query = query.replace(rarityName.toLowerCase(), "").trim().replaceAll("\\s+", " ");
+							break;
+						}
+					}
+
+					lowestBinArr = queryLowestBinPet(query, rarity, auctionType);
+					if (lowestBinArr == null) {
+						return invalidEmbed("Error fetching auctions data");
+					}
+					break;
+				}
+			}
+		}
+
+		String matchedQuery = null;
+		if (lowestBinArr == null) {
+			String idStrict = nameToId(query, true);
+			if (idStrict != null) {
+				lowestBinArr = queryLowestBin(idStrict, false, auctionType);
+			} else {
+				String finalQuery = query;
+				List<String> queryItems = getQueryItems();
+				if (queryItems != null && queryItems.stream().noneMatch(q -> q.equalsIgnoreCase(finalQuery))) {
+					matchedQuery = getClosestMatch(query, queryItems);
+				}
+				lowestBinArr = queryLowestBin(matchedQuery != null ? matchedQuery : query, true, auctionType);
+			}
+
+			if (lowestBinArr == null) {
+				return invalidEmbed("Error fetching auctions data");
+			}
+		}
+
+		if (lowestBinArr.size() == 0) {
+			return invalidEmbed("No " + auctionType.getName() + " matching '" + query + "' found");
+		}
+		EmbedBuilder eb = defaultEmbed("Auction Searcher");
+		if (matchedQuery != null) {
+			eb.setDescription(
+				"Searched for '" + matchedQuery + "' since no " + auctionType.getName() + " matching '" + query + "' were found"
+			);
+		}
+		for (JsonElement auction : lowestBinArr) {
+			String ahStr =
+				"**Price:** " +
+				roundAndFormat(higherDepth(auction, "starting_bid").getAsDouble()) +
+				"\n**Rarity:** " +
+				higherDepth(auction, "tier").getAsString().toLowerCase() +
+				//	ahStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString()).username();
+				"\n**" +
+				(higherDepth(auction, "bin", false) ? "Bin" : "Auction") +
+				":** `/viewauction " +
+				higherDepth(auction, "uuid").getAsString() +
+				"`" +
+				"\n**Ends:** <t:" +
+				Instant.ofEpochMilli(higherDepth(auction, "end_t").getAsLong()).getEpochSecond() +
+				":R>";
+
+			eb.addField(
+				getEmoji(higherDepth(auction, "item_id").getAsString()) + " " + higherDepth(auction, "item_name").getAsString(),
+				ahStr,
+				false
+			);
+		}
+
+		return eb;
+	}
+
+	public enum AuctionType {
+		BIN,
+		AUCTION,
+		BOTH;
+
+		public String getName() {
+			return switch (this) {
+				case BIN -> "bins";
+				case AUCTION -> "auctions";
+				case BOTH -> "bins or auctions";
+			};
 		}
 	}
 }

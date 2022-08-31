@@ -24,6 +24,7 @@ import com.skyblockplus.inventory.InventoryListPaginator;
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -36,9 +37,8 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -47,6 +47,7 @@ import org.jetbrains.annotations.NotNull;
 public class MainListener extends ListenerAdapter {
 
 	public static final Map<String, AutomaticGuild> guildMap = new ConcurrentHashMap<>();
+	private static String lastRepoComitSha = null;
 
 	public static String onApplyReload(String guildId) {
 		String reloadStatus = "Error reloading";
@@ -98,15 +99,7 @@ public class MainListener extends ListenerAdapter {
 					.setDescription(
 						"- Thank you for adding me to " +
 						event.getGuild().getName() +
-						"\n- My prefix is `" +
-						DEFAULT_PREFIX +
-						"` and can be changed using `" +
-						DEFAULT_PREFIX +
-						"settings set prefix <prefix>`\n- You can view my commands by running `" +
-						DEFAULT_PREFIX +
-						"help`\n- Make sure to check out `" +
-						DEFAULT_PREFIX +
-						"setup` or the forum post [**here**](" +
+						"`\n- You can view my commands by running `/help`\n- Make sure to check out `/setup` or the forum post [**here**](" +
 						FORUM_POST_LINK +
 						") on how to setup the customizable features of this bot!"
 					);
@@ -170,51 +163,24 @@ public class MainListener extends ListenerAdapter {
 		if (
 			isMainBot() && event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")
 		) {
-			if (
-				isMainBot() &&
-				!event.getMessage().getEmbeds().isEmpty() &&
-				event.getMessage().getEmbeds().get(0).getDescription() != null &&
-				event.getMessage().getEmbeds().get(0).getTitle() != null &&
-				event
-					.getMessage()
-					.getEmbeds()
-					.get(0)
-					.getDescription()
-					.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/") &&
-				event.getMessage().getEmbeds().get(0).getTitle().contains("master")
-			) {
+			String commitSha = higherDepth(
+				getJson("https://api.github.com/repos/NotEnoughUpdates/NotEnoughUpdates-REPO/commits?per_page=1"),
+				"[0].sha",
+				null
+			);
+			if (!Objects.equals(commitSha, lastRepoComitSha)) {
+				lastRepoComitSha = commitSha;
 				updateItemMappings();
-				internalJsonMappings = null;
-				priceOverrideJson = null;
 			}
+			return;
+		}
+
+		if (AuctionFlipper.onGuildMessageReceived(event)) {
 			return;
 		}
 
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onGuildMessageReceived(event);
-		}
-		AuctionFlipper.onGuildMessageReceived(event);
-	}
-
-	@Override
-	public void onMessageUpdate(MessageUpdateEvent event) {
-		if (!event.isFromGuild()) {
-			return;
-		}
-
-		if (guildMap.containsKey(event.getGuild().getId())) {
-			guildMap.get(event.getGuild().getId()).onGuildMessageUpdate(event);
-		}
-	}
-
-	@Override
-	public void onMessageDelete(MessageDeleteEvent event) {
-		if (!event.isFromGuild()) {
-			return;
-		}
-
-		if (guildMap.containsKey(event.getGuild().getId())) {
-			guildMap.get(event.getGuild().getId()).onGuildMessageDelete(event);
 		}
 	}
 
@@ -256,6 +222,21 @@ public class MainListener extends ListenerAdapter {
 			if (paginator.onModalInteraction(event)) {
 				return;
 			}
+		}
+
+		if (guildMap.containsKey(event.getGuild().getId())) {
+			guildMap.get(event.getGuild().getId()).onModalInteraction(event);
+		}
+	}
+
+	@Override
+	public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+		if (event.getUser().isBot() || event.getGuild() == null) {
+			return;
+		}
+
+		if (guildMap.containsKey(event.getGuild().getId())) {
+			guildMap.get(event.getGuild().getId()).onSelectMenuInteraction(event);
 		}
 	}
 

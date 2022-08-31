@@ -153,14 +153,14 @@ public class EmojiUpdater {
 				out.addProperty("ENCHANTED_BOOK", enchantedBook.getPath());
 			}
 			for (String sbItem : allSbItems) {
-				String[] split = sbItem.split(";");
-				if (PET_NAMES.contains(split[0])) {
+				String name = sbItem.split(";")[0];
+				if (PET_NAMES.contains(name)) {
 					try {
 						File imgFile;
 						File[] imgFiles = skyCryptFiles.listFiles(f -> f.getName().split(".png")[0].equals(sbItem));
 						if (imgFiles.length == 0) {
 							imgFile = new File(skyCryptFiles.getPath() + "/" + sbItem + ".png");
-							ImageIO.write(ImageIO.read(new URL(getPetUrl(split[0], NUMBER_TO_RARITY_MAP.get(split[1])))), "png", imgFile);
+							ImageIO.write(ImageIO.read(new URL(getPetUrl(sbItem))), "png", imgFile);
 							TimeUnit.MILLISECONDS.sleep(250);
 						} else {
 							imgFile = imgFiles[0];
@@ -169,7 +169,7 @@ public class EmojiUpdater {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-				} else if (ENCHANT_NAMES.contains(split[0])) {
+				} else if (ENCHANT_NAMES.contains(name)) {
 					out.addProperty(sbItem, enchantedBook.getPath());
 				}
 			}

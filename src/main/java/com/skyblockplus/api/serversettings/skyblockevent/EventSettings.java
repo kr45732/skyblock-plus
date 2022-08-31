@@ -59,4 +59,19 @@ public class EventSettings {
 	private String whitelistRole = "";
 
 	private String announcementMessageId = "";
+
+	public boolean isMinMaxValid() {
+		int minValue = -1;
+		int maxValue = -1;
+		try {
+			minValue = Integer.parseInt(minAmount);
+		} catch (Exception ignored) {}
+		try {
+			maxValue = Integer.parseInt(maxAmount);
+		} catch (Exception ignored) {}
+		if (minValue == -1 || maxValue == -1) {
+			return true;
+		}
+		return minValue <= maxValue;
+	}
 }

@@ -34,9 +34,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.eclipse.jgit.util.StringUtils;
 
@@ -228,7 +225,7 @@ public class ApplyGuild {
 						applyUser.playerUsername + " (<@" + applyUser.applyingUserId + ">) canceled their application"
 					)
 					.setEmbeds()
-					.setActionRows()
+					.setComponents()
 					.queue();
 				event
 					.getGuild()
@@ -293,38 +290,11 @@ public class ApplyGuild {
 					() ->
 						toCloseChannel
 							.sendMessageEmbeds(defaultEmbed("Closing Channel").build())
-							.queue(m -> m.getTextChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS))
+							.queue(m -> m.getGuildChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS))
 				);
 		} catch (Exception ignored) {}
 
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
 		return client.getSuccess() + " Player was invited";
-	}
-
-	public boolean onGuildMessageReceived(MessageReceivedEvent event) {
-		for (ApplyUser applyUser : applyUserList) {
-			if (applyUser.onGuildMessageReceived(event)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean onGuildMessageUpdate(MessageUpdateEvent event) {
-		for (ApplyUser applyUser : applyUserList) {
-			if (applyUser.onGuildMessageUpdate(event)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean onGuildMessageDelete(MessageDeleteEvent event) {
-		for (ApplyUser applyUser : applyUserList) {
-			if (applyUser.onGuildMessageDelete(event)) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

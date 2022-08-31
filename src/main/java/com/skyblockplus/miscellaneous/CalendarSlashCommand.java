@@ -16,24 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.features.event;
+package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.features.mayor.MayorHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.command.CommandExecute;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CalendarCommand extends Command {
+public class CalendarSlashCommand extends SlashCommand {
 
 	public static final String[] SEASONS = new String[] {
 		"Early Spring",
@@ -55,11 +56,20 @@ public class CalendarCommand extends Command {
 	public static final long YEAR_MS = SEASONS.length * MONTH_MS;
 	public static final long YEAR_0 = 1560275700000L;
 
-	public CalendarCommand() {
+	public CalendarSlashCommand() {
 		this.name = "calendar";
-		this.cooldown = globalCooldown;
-		this.aliases = new String[] { "cal" };
-		this.botPermissions = defaultPerms();
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.logCommand();
+
+		event.embed(getCalendar());
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return Commands.slash(name, "Get current and upcoming Skyblock events");
 	}
 
 	public static EmbedBuilder getCalendar() {
@@ -318,22 +328,5 @@ public class CalendarCommand extends Command {
 		} catch (Exception e) {
 			return n + "th";
 		}
-	}
-
-	private static String padStart(String string, int minLength, char padChar) {
-		return string.length() >= minLength ? string : (String.valueOf(padChar).repeat(minLength - string.length()) + string);
-	}
-
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
-
-				embed(getCalendar());
-			}
-		}
-			.queue();
 	}
 }

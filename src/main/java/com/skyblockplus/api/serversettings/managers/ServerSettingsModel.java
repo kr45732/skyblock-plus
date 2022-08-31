@@ -72,8 +72,6 @@ public class ServerSettingsModel {
 
 	private String hypixelApiKey = "";
 
-	private String prefix = null;
-
 	private String applyGuestRole = "";
 
 	private String fetchurChannel = "";
@@ -118,7 +116,6 @@ public class ServerSettingsModel {
 		copy.setSbEvent(sbEvent);
 		copy.setJacobSettings(jacobSettings);
 		copy.setHypixelApiKey(nullHypixelApiKey ? null : hypixelApiKey);
-		copy.setPrefix(prefix);
 		copy.setApplyGuestRole(applyGuestRole);
 		copy.setFetchurChannel(fetchurChannel);
 		copy.setFetchurRole(fetchurRole);

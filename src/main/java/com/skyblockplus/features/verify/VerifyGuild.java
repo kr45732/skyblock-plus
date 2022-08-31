@@ -18,13 +18,12 @@
 
 package com.skyblockplus.features.verify;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.general.LinkCommand.updateLinkedUser;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.general.LinkSlashCommand;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -49,36 +48,24 @@ public class VerifyGuild {
 		this.enable = false;
 	}
 
-	public boolean onGuildMessageReceived(MessageReceivedEvent event) {
+	public void onGuildMessageReceived(MessageReceivedEvent event) {
 		if (!enable) {
-			return false;
+			return;
 		}
 
 		if (!event.getChannel().getId().equals(messageChannel.getId())) {
-			return false;
+			return;
 		}
 
 		if (event.getMessage().getId().equals(originalMessage.getId())) {
-			return false;
+			return;
 		}
 
-		if (!event.getAuthor().getId().equals(selfUserId)) {
-			if (event.getAuthor().isBot()) {
-				return false;
-			}
-
-			String guildPrefix = getGuildPrefix(event.getGuild().getId());
-			if (
-				!event.getMessage().getContentRaw().startsWith(guildPrefix + "link ") ||
-				!event.getMessage().getContentRaw().startsWith(guildPrefix + "verify ")
-			) {
-				event.getMessage().delete().queue(ignore, ignore);
-				return true;
-			}
+		if (!event.getAuthor().getId().equals(selfUserId) && event.getAuthor().isBot()) {
+			return;
 		}
 
-		event.getMessage().delete().queueAfter(8, TimeUnit.SECONDS, ignore, ignore);
-		return true;
+		event.getMessage().delete().queueAfter(7, TimeUnit.SECONDS, ignore, ignore);
 	}
 
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
@@ -98,7 +85,7 @@ public class VerifyGuild {
 			return;
 		}
 
-		String[] result = updateLinkedUser(verifySettings, linkedUser, event.getMember(), true);
+		String[] result = LinkSlashCommand.updateLinkedUser(verifySettings, linkedUser, event.getMember(), true);
 
 		if (higherDepth(verifySettings, "dmOnSync", true)) {
 			event

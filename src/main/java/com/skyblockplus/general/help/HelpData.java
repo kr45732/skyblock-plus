@@ -30,14 +30,12 @@ public class HelpData {
 	private final String name;
 	private final String description;
 	private final String usage;
-	private final List<String> aliases = new ArrayList<>();
 	private final List<String> examples = new ArrayList<>();
 	private final List<HelpData> subcommands = new ArrayList<>();
 	private boolean ignoreSuperCommand;
 	private transient HelpData superCommand;
 	private String secondDescription;
 	private String secondUsage;
-	private String prefix;
 	private String category;
 
 	public HelpData(String name, String description, String usage, boolean ignoreSuperCommand) {
@@ -69,23 +67,18 @@ public class HelpData {
 		return this;
 	}
 
-	public EmbedBuilder getHelp(String subcommandName, String prefix) {
+	public EmbedBuilder getHelp(String subcommandName) {
 		if (subcommandName != null) {
 			HelpData subcommand = subcommands.stream().filter(cmd -> cmd.matchTo(subcommandName.split("\\s+")[0])).findFirst().orElse(null);
 			if (subcommand != null) {
-				return subcommand.getHelp(subcommandName.split("\\s+", 2).length == 2 ? subcommandName.split("\\s+", 2)[1] : null, prefix);
+				return subcommand.getHelp(subcommandName.split("\\s+", 2).length == 2 ? subcommandName.split("\\s+", 2)[1] : null);
 			}
 			return defaultEmbed("Invalid Command");
 		}
 
-		this.prefix = prefix;
-
 		EmbedBuilder eb = defaultEmbed(getCategory() + " | " + getName());
 		eb.addField("Description", getDescription(), false);
 		eb.addField("Usage", getUsageFormatted(), false);
-		if (aliases.size() > 0) {
-			eb.addField(aliases.size() == 1 ? "Alias" : "Aliases", getAliases(), false);
-		}
 		if (examples.size() > 0) {
 			eb.addField(examples.size() == 1 ? "Example" : "Examples", getExamples(), false);
 		}
@@ -140,22 +133,10 @@ public class HelpData {
 
 	public String getUsageFormatted(HelpData command) {
 		if (command.subcommands.size() == 0) {
-			return (
-				"`" +
-				prefix +
-				command.getUsage() +
-				"`" +
-				(command.secondUsage != null ? "\n`" + prefix + getSecondUsage(command) + "`" : "")
-			);
+			return ("`/" + command.getUsage() + "`" + (command.secondUsage != null ? "\n`/" + getSecondUsage(command) + "`" : ""));
 		}
 
-		return (
-			"`" +
-			prefix +
-			command.getUsage() +
-			" <subcommand>`" +
-			(command.secondUsage != null ? "\n`" + prefix + getSecondUsage(command) + "`" : "")
-		);
+		return ("`/" + command.getUsage() + " <subcommand>`" + (command.secondUsage != null ? "\n`/" + getSecondUsage(command) + "`" : ""));
 	}
 
 	public List<HelpData> getSubcommands() {
@@ -173,11 +154,6 @@ public class HelpData {
 		}
 
 		return subcommandsStr.toString();
-	}
-
-	public HelpData addAliases(String... aliases) {
-		this.aliases.addAll(Arrays.asList(aliases));
-		return this;
 	}
 
 	public HelpData addExamples(String... examples) {
@@ -198,19 +174,6 @@ public class HelpData {
 		return this;
 	}
 
-	public String getAliases() {
-		StringBuilder aliasesStr = new StringBuilder();
-		for (int i = 0; i < aliases.size(); i++) {
-			if (i != 0) {
-				aliasesStr.append(", ");
-			}
-
-			aliasesStr.append(aliases.get(i));
-		}
-
-		return aliasesStr.toString();
-	}
-
 	public String getExamples() {
 		StringBuilder examplesStr = new StringBuilder();
 		for (int i = 0; i < examples.size(); i++) {
@@ -219,8 +182,7 @@ public class HelpData {
 			}
 
 			examplesStr
-				.append("`")
-				.append(prefix)
+				.append("`/")
 				.append(superCommand != null && !ignoreSuperCommand ? superCommand.getUsage() + " " : "")
 				.append(examples.get(i))
 				.append("`");
@@ -235,16 +197,6 @@ public class HelpData {
 	}
 
 	public boolean matchTo(String cmd) {
-		if (name.equalsIgnoreCase(cmd)) {
-			return true;
-		}
-
-		for (String alias : aliases) {
-			if (alias.equalsIgnoreCase(cmd)) {
-				return true;
-			}
-		}
-
-		return false;
+		return name.equalsIgnoreCase(cmd);
 	}
 }

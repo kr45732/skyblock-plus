@@ -18,8 +18,8 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.miscellaneous.BestiaryCommand.bosses;
-import static com.skyblockplus.miscellaneous.BestiaryCommand.locations;
+import static com.skyblockplus.miscellaneous.BestiarySlashCommand.bosses;
+import static com.skyblockplus.miscellaneous.BestiarySlashCommand.locations;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
@@ -2501,7 +2501,7 @@ public class Player {
 	}
 
 	public boolean isVaultApiEnabled() {
-		return getPersonalVaultMap() != null;
+		return higherDepth(profileJson(), "personal_vault_contents.data", null) != null;
 	}
 
 	public boolean isSkillsApiEnabled() {

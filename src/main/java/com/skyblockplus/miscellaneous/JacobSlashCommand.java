@@ -19,11 +19,14 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.features.jacob.JacobContest.CROP_NAME_TO_EMOJI;
+import static com.skyblockplus.utils.Utils.*;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.features.jacob.JacobContest;
+import com.skyblockplus.features.jacob.JacobData;
+import com.skyblockplus.features.jacob.JacobHandler;
+import com.skyblockplus.utils.command.*;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -42,7 +45,7 @@ public class JacobSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.paginate(JacobCommand.getJacobEmbed(event.getOptionStr("crop", "all"), new PaginatorEvent(event)));
+		event.paginate(getJacobEmbed(event.getOptionStr("crop", "all"), event));
 	}
 
 	@Override
@@ -53,5 +56,38 @@ public class JacobSlashCommand extends SlashCommand {
 				new OptionData(OptionType.STRING, "crop", "Crop to filter by")
 					.addChoices(CROP_NAME_TO_EMOJI.keySet().stream().map(c -> new Command.Choice(c, c)).collect(Collectors.toList()))
 			);
+	}
+
+	public static EmbedBuilder getJacobEmbed(String crop, SlashCommandEvent event) {
+		crop = capitalizeString(crop);
+		if (!CROP_NAME_TO_EMOJI.containsKey(crop) && !crop.equals("All")) {
+			return invalidEmbed("Invalid crop");
+		}
+
+		JacobData data = JacobHandler.getJacobData();
+
+		if (data.getContests().isEmpty()) {
+			return defaultEmbed("Jacob Contests")
+				.setDescription("**Year:** " + data.getYear())
+				.addField("Contests", "None left for this year!", false);
+		}
+
+		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS).setEveryPageTitle("Jacob Contests");
+		String finalCrop = crop;
+		for (JacobContest contest : crop.equals("All")
+			? data.getContests()
+			: data.getContests().stream().filter(c -> c.getCrops().stream().anyMatch(thisCrop -> thisCrop.equals(finalCrop))).toList()) {
+			extras.addEmbedField(
+				"Contest",
+				"**In:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(false),
+				true
+			);
+		}
+		for (int i = 0; i < 3 - extras.getEmbedFields().size() % 3; i++) {
+			extras.addBlankField(true);
+		}
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(12);
+		event.paginate(paginateBuilder.setPaginatorExtras(extras));
+		return null;
 	}
 }

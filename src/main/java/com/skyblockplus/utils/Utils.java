@@ -28,6 +28,7 @@ import static java.util.Collections.nCopies;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -178,7 +179,6 @@ public class Utils {
 	private static JsonObject essenceCostsJson;
 	private static JsonObject levelingJson;
 	private static JsonObject collectionsJson;
-	private static JsonObject skyCryptPetJson;
 	private static JsonObject enchantsJson;
 	private static JsonObject petNumsJson;
 	private static JsonObject petsJson;
@@ -193,8 +193,8 @@ public class Utils {
 	private static JsonArray sbzPricesJson;
 	private static JsonObject emojiMap;
 	private static JsonArray skyblockItemsJson;
-	public static JsonObject internalJsonMappings;
-	public static JsonObject priceOverrideJson;
+	private static JsonObject internalJsonMappings;
+	private static JsonObject priceOverrideJson;
 	private static JsonObject bingoInfoJson;
 	private static JsonObject dungeonLootJson;
 	private static JsonObject dragonLootJson;
@@ -345,11 +345,12 @@ public class Utils {
 				URI uri = new URIBuilder(httpGet.getURI()).addParameter("key", AUCTION_API_KEY).build();
 				httpGet.setURI(uri);
 
-				try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
+				try (
+					CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+					InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+				) {
 					queryItems =
-						streamJsonArray(
-							JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray()
-						)
+						streamJsonArray(JsonParser.parseReader(in).getAsJsonArray())
 							.map(JsonElement::getAsString)
 							.collect(Collectors.toList());
 				}
@@ -535,36 +536,16 @@ public class Utils {
 		return collectionsJson;
 	}
 
-	public static JsonObject getSkyCryptPetJson() {
-		if (skyCryptPetJson == null) {
-			skyCryptPetJson =
-				parseJsString(
-					Pattern
-						.compile("/\\*(.*?)\\*/", Pattern.DOTALL)
-						.matcher(
-							"{" +
-							getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/development/src/constants/pets.js")
-								.split("];")[1].replace("export const ", "")
-								.replace(" = ", ": ")
-								.replace(";", ",") +
-							"}"
-						)
-						.replaceAll("")
-						.replace("//(.*)", "")
-						.replaceAll("(description: `)(.*?)(\\s*`,)", "")
-				)
-					.getAsJsonObject();
-		}
-
-		return skyCryptPetJson;
-	}
-
 	/* Http requests */
 	public static JsonElement getJson(String jsonUrl) {
 		return getJson(jsonUrl, HYPIXEL_API_KEY);
 	}
 
 	public static JsonElement getJson(String jsonUrl, String hypixelApiKey) {
+		return getJson(jsonUrl, hypixelApiKey, false);
+	}
+
+	public static JsonElement getJson(String jsonUrl, String hypixelApiKey, boolean isSkyblockProfiles) {
 		boolean isMain = hypixelApiKey.equals(HYPIXEL_API_KEY);
 		try {
 			if (
@@ -584,7 +565,7 @@ public class Utils {
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
+				if (jsonUrl.contains("api.hypixel.net")) {
 					if (jsonUrl.contains(hypixelApiKey)) {
 						try {
 							(isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).set(
@@ -597,13 +578,22 @@ public class Utils {
 					}
 
 					if (httpResponse.getStatusLine().getStatusCode() == 502) {
-						return JsonParser.parseString("{\"cause\":\"Hypixel API returned 502 bad gateway\"}");
+						JsonObject obj = new JsonObject();
+						obj.addProperty("cause", "Hypixel API returned 502 bad gateway");
+						return obj;
 					} else if (httpResponse.getStatusLine().getStatusCode() == 522) {
-						return JsonParser.parseString("{\"cause\":\"Hypixel API returned 522 connection timed out\"}");
+						JsonObject obj = new JsonObject();
+						obj.addProperty("cause", "Hypixel API returned 522 connection timed out");
+						return obj;
 					}
 				}
 
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+				try (
+					InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent());
+					JsonReader jsonIn = new JsonReader(in)
+				) {
+					return isSkyblockProfiles ? SkyblockProfilesParser.parse(jsonIn) : JsonParser.parseReader(jsonIn);
+				}
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -622,7 +612,17 @@ public class Utils {
 	}
 
 	public static CompletableFuture<JsonElement> asyncGetJson(String url) {
-		return asyncGet(url).thenApplyAsync(r -> JsonParser.parseReader(new InputStreamReader(r.body())), executor);
+		return asyncGet(url)
+			.thenApplyAsync(
+				r -> {
+					try (InputStreamReader in = new InputStreamReader(r.body())) {
+						return JsonParser.parseReader(in);
+					} catch (Exception e) {
+						return null;
+					}
+				},
+				executor
+			);
 	}
 
 	public static String getSkyCryptData(String dataUrl) {
@@ -655,11 +655,11 @@ public class Utils {
 			StringEntity entity = new StringEntity(body.toString(), "UTF-8");
 			httpPost.setEntity(entity);
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
-				return (
-					"https://hst.sh/" +
-					higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "key").getAsString()
-				);
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return ("https://hst.sh/" + higherDepth(JsonParser.parseReader(in), "key").getAsString());
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -675,8 +675,11 @@ public class Utils {
 			httpPost.setHeader("Accept", "application/json");
 			httpPost.setHeaders(headers);
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in);
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -690,8 +693,11 @@ public class Utils {
 			httpDelete.setHeader("Accept", "application/json");
 			httpDelete.setHeaders(headers);
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpDelete)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpDelete);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in);
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -722,18 +728,9 @@ public class Utils {
 		}
 	}
 
-	public static String getPetUrl(String petName, String tier) {
-		if (skyCryptPetJson == null) {
-			skyCryptPetJson = getSkyCryptPetJson();
-		}
-
-		JsonElement headData = higherDepth(skyCryptPetJson, "pet_data." + petName.toUpperCase() + ".head");
+	public static String getPetUrl(String petId) {
 		try {
-			if (headData.isJsonObject()) {
-				return "https://sky.shiiyu.moe" + higherDepth(headData, tier.toLowerCase(), higherDepth(headData, "default").getAsString());
-			} else {
-				return "https://sky.shiiyu.moe" + headData.getAsString();
-			}
+			return "https://sky.shiiyu.moe" + higherDepth(getInternalJsonMappings(), petId + ".texture").getAsString();
 		} catch (Exception e) {
 			return null;
 		}
@@ -744,11 +741,12 @@ public class Utils {
 			HttpGet httpGet = new HttpGet(url);
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()))
-					.lines()
-					.parallel()
-					.collect(Collectors.joining("\n"));
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent());
+				BufferedReader buff = new BufferedReader(in)
+			) {
+				return buff.lines().parallel().collect(Collectors.joining("\n"));
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -1098,8 +1096,9 @@ public class Utils {
 					return invalidEmbed("That command is on cooldown for " + timeTillReset + " more seconds");
 				}
 
-				higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "record.key")
-					.getAsString();
+				try (InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())) {
+					higherDepth(JsonParser.parseReader(in), "record.key").getAsString();
+				}
 
 				if (!keyCooldownMap.containsKey(hypixelKey)) {
 					keyCooldownMap.put(
@@ -1421,19 +1420,37 @@ public class Utils {
 							NBTCompound gems = item.getCompound("tag.ExtraAttributes.gems");
 							for (Map.Entry<String, Object> gem : gems.entrySet()) {
 								if (!gem.getKey().endsWith("_gem")) {
-									if (gem.getKey().equals("unlocked_slots")) {
+									if (gem.getKey().equals("unlocked_slots") && gem.getValue() instanceof NBTList slotsList) {
 										if (
 											itemInfo.getId().equals("DIVAN_HELMET") ||
 											itemInfo.getId().equals("DIVAN_CHESTPLATE") ||
 											itemInfo.getId().equals("DIVAN_LEGGINGS") ||
 											itemInfo.getId().equals("DIVAN_BOOTS")
 										) {
-											itemInfo.addExtraValues(gems.getList(gem.getKey()).size(), "GEMSTONE_CHAMBER");
+											itemInfo.addExtraValues(slotsList.size(), "GEMSTONE_CHAMBER");
 										}
-									} else if (gems.containsKey(gem.getKey() + "_gem")) {
-										itemInfo.addExtraValue(gem.getValue() + "_" + gems.get(gem.getKey() + "_gem") + "_GEM");
-									} else {
-										itemInfo.addExtraValue(gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
+									} else if (gems.containsKey(gem.getKey() + "_gem")) { // "COMBAT_0": "PERFECT" & "COMBAT_0_gem": "JASPER"
+										itemInfo.addExtraValue(
+											(
+												gem.getValue() instanceof NBTCompound gemQualityNbt
+													? gemQualityNbt.getString("quality", "UNKNOWN")
+													: gem.getValue()
+											) +
+											"_" +
+											gems.get(gem.getKey() + "_gem") +
+											"_GEM"
+										);
+									} else { // "RUBY_0": "PERFECT"
+										itemInfo.addExtraValue(
+											(
+												gem.getValue() instanceof NBTCompound gemQualityNbt
+													? gemQualityNbt.getString("quality", "UNKNOWN")
+													: gem.getValue()
+											) +
+											"_" +
+											gem.getKey().split("_")[0] +
+											"_GEM"
+										);
 									}
 								}
 							}
@@ -1765,8 +1782,7 @@ public class Utils {
 
 	public static String getItemThumbnail(String id) {
 		if (PET_NAMES.contains(id.split(";")[0].trim())) {
-			String[] idRaritySplit = id.split(";");
-			return getPetUrl(idRaritySplit[0], NUMBER_TO_RARITY_MAP.get(idRaritySplit[1]));
+			return getPetUrl(id);
 		} else if (ENCHANT_NAMES.contains(id.split(";")[0].trim())) {
 			return "https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK";
 		}
@@ -1877,6 +1893,9 @@ public class Utils {
 			FileUtils.deleteDirectory(skyblockPlusDir);
 			neuRepo.close();
 			skyblockPlusDataRepo.close();
+
+			internalJsonMappings = null;
+			priceOverrideJson = null;
 		} catch (Exception e) {
 			log.error("Exception while automatically updating item mappings", e);
 		}
@@ -1918,6 +1937,21 @@ public class Utils {
 				if (higherDepth(itemJson, "recipe") != null) {
 					toAdd.add("recipe", higherDepth(itemJson, "recipe"));
 				}
+				Pattern NEU_TEXTURE_PATTERN = Pattern.compile("Properties:\\{textures:\\[0:\\{Value:\"(.*)\"\\}\\]\\}");
+				if (PET_NAMES.contains(itemId)) {
+					Matcher matcher = NEU_TEXTURE_PATTERN.matcher(higherDepth(itemJson, "nbttag").getAsString());
+					if (matcher.find()) {
+						toAdd.addProperty(
+							"texture",
+							higherDepth(
+								JsonParser.parseString(new String(Base64.getDecoder().decode(matcher.group(1)))),
+								"textures.SKIN.url"
+							)
+								.getAsString()
+								.split("http://textures.minecraft.net/texture/")[1]
+						);
+					}
+				}
 				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
 
 				outputObj.add(itemId, toAdd);
@@ -1954,5 +1988,9 @@ public class Utils {
 		finalOutput.add("manual", higherDepth(currentPriceOverrides, "manual"));
 		finalOutput.add("automatic", outputObject);
 		return finalOutput;
+	}
+
+	public static String padStart(String string, int minLength, char padChar) {
+		return string.length() >= minLength ? string : (String.valueOf(padChar).repeat(minLength - string.length()) + string);
 	}
 }

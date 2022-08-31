@@ -18,10 +18,16 @@
 
 package com.skyblockplus.dungeons;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
+import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
+import static com.skyblockplus.utils.Constants.DUNGEON_EMOJI_MAP;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.SkillsStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -42,7 +48,7 @@ public class DungeonsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(DungeonsCommand.getPlayerDungeons(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(getPlayerDungeons(event.player, event.getOptionStr("profile"), event));
 	}
 
 	@Override
@@ -58,5 +64,87 @@ public class DungeonsSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getPlayerDungeons(String username, String profileName, SlashCommandEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			try {
+				CustomPaginator.Builder paginateBuilder = player
+					.defaultPlayerPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS, event.getUser())
+					.setColumns(3)
+					.setItemsPerPage(9);
+				PaginatorExtras extras = paginateBuilder
+					.getPaginatorExtras()
+					.setEveryPageText(
+						"**Secrets:** " +
+						formatNumber(player.getDungeonSecrets()) +
+						"\n**Selected Class:** " +
+						player.getSelectedDungeonClass()
+					);
+
+				SkillsStruct skillInfo = player.getCatacombs();
+				extras.addEmbedField(
+					DUNGEON_EMOJI_MAP.get("catacombs") + " " + capitalizeString(skillInfo.name()) + " (" + skillInfo.currentLevel() + ")",
+					simplifyNumber(skillInfo.expCurrent()) +
+					" / " +
+					simplifyNumber(skillInfo.expForNext()) +
+					"\nTotal XP: " +
+					simplifyNumber(skillInfo.totalExp()) +
+					"\nProgress: " +
+					(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
+					true
+				);
+
+				extras.addBlankField(true).addBlankField(true);
+
+				for (String className : DUNGEON_CLASS_NAMES) {
+					skillInfo = player.getDungeonClass(className);
+					extras.addEmbedField(
+						DUNGEON_EMOJI_MAP.get(className) + " " + capitalizeString(className) + " (" + skillInfo.currentLevel() + ")",
+						simplifyNumber(skillInfo.expCurrent()) +
+						" / " +
+						simplifyNumber(skillInfo.expForNext()) +
+						"\nTotal XP: " +
+						simplifyNumber(skillInfo.totalExp()) +
+						"\nProgress: " +
+						(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
+						true
+					);
+				}
+
+				extras.addBlankField(true);
+
+				for (String dungeonType : getJsonKeys(higherDepth(player.profileJson(), "dungeons.dungeon_types"))) {
+					JsonElement curDungeonType = higherDepth(player.profileJson(), "dungeons.dungeon_types." + dungeonType);
+					int min = (dungeonType.equals("catacombs") ? 0 : 1);
+					for (int i = min; i < 8; i++) {
+						int fastestSPlusInt = higherDepth(curDungeonType, "fastest_time_s_plus." + i, -1);
+						int minutes = fastestSPlusInt / 1000 / 60;
+						int seconds = fastestSPlusInt / 1000 % 60;
+						String name = i == 0 ? "Entrance" : ((dungeonType.equals("catacombs") ? "Floor " : "Master ") + i);
+
+						String ebStr = "Completions: " + higherDepth(curDungeonType, "tier_completions." + i, 0);
+						ebStr += "\nBest Score: " + higherDepth(curDungeonType, "best_score." + i, 0);
+						ebStr +=
+							"\nFastest S+: " + (fastestSPlusInt != -1 ? minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds) : "None");
+
+						extras.addEmbedField(DUNGEON_EMOJI_MAP.get(dungeonType + "_" + i) + " " + capitalizeString(name), ebStr, true);
+					}
+
+					extras.addBlankField(true);
+					if (dungeonType.equals("master_catacombs")) {
+						extras.addBlankField(true);
+					}
+				}
+
+				event.paginate(paginateBuilder);
+				return null;
+			} catch (Exception e) {
+				return invalidEmbed(player.getUsernameFixed() + " has not played dungeons");
+			}
+		}
+
+		return player.getFailEmbed();
 	}
 }

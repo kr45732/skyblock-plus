@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,8 +18,14 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.stereotype.Component;
@@ -35,11 +41,23 @@ public class FetchurSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(FetchurCommand.getFetchurItem());
+		event.embed(getFetchurItem());
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands.slash(name, "Get the item that fetchur wants today");
+	}
+
+	public static EmbedBuilder getFetchurItem() {
+		int index = LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() % FETCHUR_ITEMS.size() - 1;
+		if (index == -1) {
+			index = FETCHUR_ITEMS.size() - 1;
+		}
+
+		String[] fetchurItem = FETCHUR_ITEMS.get(index).split("\\|");
+		return defaultEmbed("Fetchur item")
+			.setDescription(fetchurItem[0])
+			.setThumbnail("https://sky.shiiyu.moe/item.gif/" + fetchurItem[1]);
 	}
 }

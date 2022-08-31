@@ -18,11 +18,13 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.getBazaarItems;
+import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -39,7 +41,7 @@ public class BazaarSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(BazaarCommand.getBazaarItem(event.getOptionStr("item")));
+		event.embed(getBazaarItem(event.getOptionStr("item")));
 	}
 
 	@Override
@@ -52,5 +54,28 @@ public class BazaarSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(event.getFocusedOption().getValue(), getBazaarItems());
 		}
+	}
+
+	public static EmbedBuilder getBazaarItem(String itemNameU) {
+		JsonElement bazaarItems = getBazaarJson();
+		if (bazaarItems == null) {
+			return invalidEmbed("Error getting bazaar data");
+		}
+
+		String itemId = nameToId(itemNameU);
+		if (higherDepth(bazaarItems, itemId) == null) {
+			itemId = getClosestMatchFromIds(itemId, getJsonKeys(bazaarItems));
+		}
+
+		JsonElement itemInfo = higherDepth(bazaarItems, itemId);
+		EmbedBuilder eb = defaultEmbed(idToName(itemId), "https://bazaartracker.com/product/" + itemId);
+		eb.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buy_summary.[0].pricePerUnit", 0.0)), true);
+		eb.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sell_summary.[0].pricePerUnit", 0.0)), true);
+		eb.addBlankField(true);
+		eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.buyVolume", 0L)), true);
+		eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.sellVolume", 0L)), true);
+		eb.addBlankField(true);
+		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
+		return eb;
 	}
 }

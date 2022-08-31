@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,27 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous.networth;
+package com.skyblockplus.general;
 
-import static com.skyblockplus.utils.Utils.defaultPerms;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NetworthCommand extends Command {
+public class VerifySlashCommand extends SlashCommand {
 
-	public NetworthCommand() {
-		this.name = "networth";
-		this.cooldown = globalCooldown + 1;
-		this.aliases = new String[] { "nw", "n" };
-		this.botPermissions = defaultPerms();
+	public VerifySlashCommand() {
+		this.name = "verify";
 	}
 
 	@Override
-	protected void execute(CommandEvent event) {
-		new NetworthExecute().execute(this, event);
+	protected void execute(SlashCommandEvent event) {
+		event.logCommand();
+
+		event.embed(LinkSlashCommand.linkAccount(event.getOptionStr("player"), event.getMember(), event.getGuild()));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return Commands
+			.slash(name, "Link your Hypixel account to this bot (same as /link)")
+			.addOption(OptionType.STRING, "player", "Player username", true);
 	}
 }

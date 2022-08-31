@@ -57,7 +57,7 @@ public class AuctionFlipper {
 	private static boolean enable = false;
 	private static Instant lastUpdated = Instant.now();
 
-	public static void onGuildMessageReceived(MessageReceivedEvent event) {
+	public static boolean onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
 			if (
 				event.getChannel().getId().equals((useAlternativeAhApi ? "958904253299167262" : "958771784004567063")) &&
@@ -71,8 +71,10 @@ public class AuctionFlipper {
 				if (enable && isMainBot() && desc.contains("Successfully updated under bins file in ")) {
 					flip();
 				}
+				return true;
 			}
 		} catch (Exception ignored) {}
+		return false;
 	}
 
 	public static void initialize(boolean enable) {
@@ -175,8 +177,11 @@ public class AuctionFlipper {
 			URI uri = new URIBuilder(httpGet.getURI()).addParameter("key", AUCTION_API_KEY).build();
 			httpGet.setURI(uri);
 
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in);
 			}
 		} catch (Exception ignored) {}
 		return null;

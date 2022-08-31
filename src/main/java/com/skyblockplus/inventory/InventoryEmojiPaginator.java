@@ -21,7 +21,7 @@ package com.skyblockplus.inventory;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +42,7 @@ public class InventoryEmojiPaginator {
 	private int pageNumber = 0;
 	private Instant lastEdit;
 
-	public InventoryEmojiPaginator(List<String[]> inventoryPages, String type, Player player, PaginatorEvent event) {
+	public InventoryEmojiPaginator(List<String[]> inventoryPages, String type, Player player, SlashCommandEvent event) {
 		this.inventoryPages = inventoryPages;
 		this.user = event.getUser();
 		this.maxPageNumber = inventoryPages.size() - 1;

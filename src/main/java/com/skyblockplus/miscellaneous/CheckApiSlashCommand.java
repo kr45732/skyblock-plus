@@ -18,9 +18,13 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.client;
+
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -41,7 +45,7 @@ public class CheckApiSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(CheckApiCommand.getCheckApi(event.player, event.getOptionStr("profile")));
+		event.embed(getCheckApi(event.player, event.getOptionStr("profile")));
 	}
 
 	@Override
@@ -57,5 +61,41 @@ public class CheckApiSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getCheckApi(String username, String profileName) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+
+			boolean invEnabled = player.isInventoryApiEnabled();
+			boolean bankEnabled = player.isBankApiEnabled();
+			boolean collectionsEnabled = player.isCollectionsApiEnabled();
+			boolean vaultEnabled = player.isVaultApiEnabled();
+			boolean skillsEnabled = player.isSkillsApiEnabled();
+
+			eb.setDescription(
+				"**All APIs Enabled:** " +
+				(invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) +
+				"\n" +
+				(invEnabled ? client.getSuccess() : client.getError()) +
+				" Inventory API" +
+				"\n" +
+				(bankEnabled ? client.getSuccess() : client.getError()) +
+				" Bank API" +
+				"\n" +
+				(collectionsEnabled ? client.getSuccess() : client.getError()) +
+				" Collections API" +
+				"\n" +
+				(skillsEnabled ? client.getSuccess() : client.getError()) +
+				" Skills API" +
+				"\n" +
+				(vaultEnabled ? client.getSuccess() : client.getError()) +
+				" Personal Vault API"
+			);
+
+			return eb;
+		}
+		return player.getFailEmbed();
 	}
 }

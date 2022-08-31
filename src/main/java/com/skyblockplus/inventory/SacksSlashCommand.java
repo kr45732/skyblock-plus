@@ -18,10 +18,17 @@
 
 package com.skyblockplus.inventory;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.Comparator;
+import java.util.Map;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -42,14 +49,7 @@ public class SacksSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(
-			SacksCommand.getPlayerSacks(
-				event.player,
-				event.getOptionStr("profile"),
-				event.getOptionBoolean("npc", false),
-				new PaginatorEvent(event)
-			)
-		);
+		event.paginate(getPlayerSacks(event.player, event.getOptionStr("profile"), event.getOptionBoolean("npc", false), event));
 	}
 
 	@Override
@@ -66,5 +66,84 @@ public class SacksSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getPlayerSacks(String username, String profileName, boolean useNpcPrice, SlashCommandEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			Map<String, Integer> sacksMap = player.getPlayerSacks();
+			if (sacksMap == null) {
+				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+			}
+
+			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(20);
+
+			JsonElement bazaarPrices = getBazaarJson();
+
+			final double[] total = { 0, 0 };
+			sacksMap
+				.entrySet()
+				.stream()
+				.filter(entry -> entry.getValue() > 0)
+				.sorted(
+					Comparator.comparingDouble(entry -> {
+						double npcPrice = -1;
+						if (useNpcPrice) {
+							npcPrice = getNpcSellPrice(entry.getKey());
+						}
+
+						return (
+							-(
+								npcPrice != -1
+									? npcPrice
+									: higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0)
+							) *
+							entry.getValue()
+						);
+					})
+				)
+				.forEach(currentSack -> {
+					double npcPrice = -1;
+					if (useNpcPrice) {
+						npcPrice = getNpcSellPrice(currentSack.getKey());
+					}
+					double sackPrice =
+						(
+							npcPrice != -1
+								? npcPrice
+								: higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0)
+						) *
+						currentSack.getValue();
+
+					String emoji = higherDepth(
+						getEmojiMap(),
+						currentSack.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : currentSack.getKey(),
+						null
+					);
+
+					paginateBuilder.addItems(
+						(emoji != null ? emoji + " " : "") +
+						"**" +
+						convertSkyblockIdName(currentSack.getKey()) +
+						":** " +
+						formatNumber(currentSack.getValue()) +
+						" ➜ " +
+						simplifyNumber(sackPrice)
+					);
+					total[npcPrice != -1 ? 1 : 0] += sackPrice;
+				});
+
+			paginateBuilder
+				.getPaginatorExtras()
+				.setEveryPageText(
+					"**Total value:** " +
+					roundAndFormat(total[0] + total[1]) +
+					(useNpcPrice ? " (" + roundAndFormat(total[1]) + " npc + " + roundAndFormat(total[0]) + " bazaar)" : "") +
+					"\n"
+				);
+			event.paginate(paginateBuilder);
+			return null;
+		}
+		return player.getFailEmbed();
 	}
 }

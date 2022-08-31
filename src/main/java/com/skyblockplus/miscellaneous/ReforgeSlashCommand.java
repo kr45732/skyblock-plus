@@ -18,20 +18,62 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.getReforgeStonesJson;
+import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.apache.groovy.util.Maps;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ReforgeSlashCommand extends SlashCommand {
+
+	public static final Map<String, String> statToEmoji = Maps.of(
+		"HEALTH",
+		"❤️",
+		"DEFENSE",
+		getEmoji("IRON_CHESTPLATE"),
+		"STRENGTH",
+		getEmoji("BLAZE_POWDER"),
+		"SPEED",
+		getEmoji("SUGAR"),
+		"CRIT_CHANCE",
+		"☣️",
+		"CRIT_DAMAGE",
+		"☠️",
+		"INTELLIGENCE",
+		getEmoji("ENCHANTED_BOOK"),
+		"MINING_SPEED",
+		"⛏️",
+		"BONUS_ATTACK_SPEED",
+		"⚔️",
+		"SEA_CREATURE_CHANCE",
+		"\uD83D\uDC20",
+		"MAGIC_FIND",
+		"\uD83C\uDF1F",
+		"PET_LUCK",
+		"♣️",
+		"TRUE_DEFENSE",
+		getEmoji("DIAMOND_CHESTPLATE"),
+		"FEROCITY",
+		"\uD83D\uDDE1️",
+		"MINING_FORTUNE",
+		"☘️",
+		"DAMAGE",
+		getEmoji("IRON_SWORD")
+	);
 
 	public ReforgeSlashCommand() {
 		this.name = "reforge";
@@ -41,7 +83,7 @@ public class ReforgeSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(ReforgeCommand.getReforgeStone(event.getOptionStr("item")));
+		event.embed(getReforgeStone(event.getOptionStr("item")));
 	}
 
 	@Override
@@ -59,5 +101,61 @@ public class ReforgeSlashCommand extends SlashCommand {
 				getReforgeStonesJson().keySet().stream().map(Utils::idToName).collect(Collectors.toList())
 			);
 		}
+	}
+
+	public static EmbedBuilder getReforgeStone(String reforgeStone) {
+		JsonObject reforgeStonesJson = getReforgeStonesJson();
+		String closestMatch = getClosestMatchFromIds(nameToId(reforgeStone), reforgeStonesJson.keySet());
+		JsonElement reforgeStoneJson = higherDepth(reforgeStonesJson, closestMatch);
+
+		EmbedBuilder eb = defaultEmbed(idToName(closestMatch));
+		eb.setDescription(
+			"**Reforge:** " +
+			higherDepth(reforgeStoneJson, "reforgeName").getAsString() +
+			"\n**Item Types:** " +
+			Arrays
+				.stream(higherDepth(reforgeStoneJson, "itemTypes").getAsString().split("\n"))
+				.map(Utils::capitalizeString)
+				.collect(Collectors.joining(", "))
+		);
+		if (higherDepth(reforgeStoneJson, "reforgeAbility", null) != null) {
+			eb.appendDescription("\n**Ability:** " + parseMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility").getAsString()));
+		}
+		JsonElement reforgeStats = higherDepth(reforgeStoneJson, "reforgeStats");
+		if (reforgeStats == null) {
+			reforgeStats = JsonParser.parseString("{\"COMMON\":{},\"UNCOMMON\":{},\"RARE\":{},\"EPIC\":{},\"LEGENDARY\":{},\"MYTHIC\":{}}");
+		}
+		for (Map.Entry<String, JsonElement> stat : reforgeStats.getAsJsonObject().entrySet()) {
+			eb.addField(
+				capitalizeString(stat.getKey()),
+				"Cost: " +
+				formatNumber(higherDepth(reforgeStoneJson, "reforgeCosts." + stat.getKey()).getAsLong()) +
+				"\n" +
+				(
+					higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null) != null
+						? (
+							"➜ Ability: " +
+							parseMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null)).replace("\n", " ") +
+							"\n"
+						)
+						: ""
+				) +
+				stat
+					.getValue()
+					.getAsJsonObject()
+					.entrySet()
+					.stream()
+					.map(e ->
+						statToEmoji.get(e.getKey().toUpperCase()) +
+						" " +
+						capitalizeString(e.getKey().replace("_", " ")) +
+						" ➜ " +
+						e.getValue().getAsInt()
+					)
+					.collect(Collectors.joining("\n")),
+				false
+			);
+		}
+		return eb.setThumbnail(getItemThumbnail(closestMatch));
 	}
 }

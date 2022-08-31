@@ -18,9 +18,16 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Constants.HARP_SONG_ID_TO_NAME;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.Map;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -41,7 +48,7 @@ public class HarpSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(HarpCommand.getHarp(event.player, event.getOptionStr("profile")));
+		event.embed(getHarp(event.player, event.getOptionStr("profile")));
 	}
 
 	@Override
@@ -57,5 +64,48 @@ public class HarpSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getHarp(String username, String profileName) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			JsonElement harpJson = higherDepth(player.profileJson(), "harp_quest");
+			if (harpJson == null) {
+				return defaultEmbed("Player has not used the harp");
+			}
+
+			EmbedBuilder eb = player
+				.defaultPlayerEmbed()
+				.setDescription(
+					"**Last Played Song:** " +
+					HARP_SONG_ID_TO_NAME.get(higherDepth(harpJson, "selected_song", "None")) +
+					"\n**Claimed Melody's Hair:** " +
+					higherDepth(harpJson, "claimed_talisman", false)
+				);
+
+			for (Map.Entry<String, JsonElement> song : harpJson.getAsJsonObject().entrySet()) {
+				if (song.getKey().startsWith("song_") && song.getKey().endsWith("_completions")) {
+					String songId = song.getKey().split("song_")[1].split("_completions")[0];
+					if (HARP_SONG_ID_TO_NAME.containsKey(songId)) {
+						eb.addField(
+							HARP_SONG_ID_TO_NAME.get(songId),
+							"Completions: " +
+							song.getValue().getAsInt() +
+							"\nBest Score: " +
+							roundAndFormat(higherDepth(harpJson, "song_" + songId + "_best_completion", 0.0) * 100) +
+							"%\nPerfect Completions: " +
+							higherDepth(harpJson, "song_" + songId + "_perfect_completions", 0),
+							true
+						);
+					}
+				}
+			}
+			for (int i = 0; i < 3 - eb.getFields().size() % 3; i++) {
+				eb.addBlankField(true);
+			}
+
+			return eb;
+		}
+		return player.getFailEmbed();
 	}
 }

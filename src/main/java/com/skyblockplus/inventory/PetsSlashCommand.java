@@ -18,10 +18,17 @@
 
 package com.skyblockplus.inventory;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
+import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -42,7 +49,7 @@ public class PetsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(PetsCommand.getPlayerPets(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(getPlayerPets(event.player, event.getOptionStr("profile"), event));
 	}
 
 	@Override
@@ -58,5 +65,38 @@ public class PetsSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getPlayerPets(String username, String profileName, SlashCommandEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
+
+			JsonArray playerPets = player.getPets();
+			for (JsonElement pet : playerPets) {
+				String petItem = null;
+				try {
+					petItem = higherDepth(pet, "heldItem").getAsString();
+				} catch (Exception ignored) {}
+
+				String petName = higherDepth(pet, "type").getAsString();
+				String rarity = higherDepth(pet, "tier").getAsString();
+
+				paginateBuilder.addItems(
+					getEmoji(petName + RARITY_TO_NUMBER_MAP.get(rarity)) +
+					" " +
+					capitalizeString(rarity) +
+					" [Lvl " +
+					petLevelFromXp(higherDepth(pet, "exp", 0L), rarity, petName) +
+					"] " +
+					capitalizeString(petName.toLowerCase().replace("_", " ")) +
+					" " +
+					(petItem != null ? getEmoji(petItem) : "")
+				);
+			}
+			event.paginate(paginateBuilder);
+			return null;
+		}
+		return player.getFailEmbed();
 	}
 }

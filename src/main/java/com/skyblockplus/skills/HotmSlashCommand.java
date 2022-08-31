@@ -18,9 +18,18 @@
 
 package com.skyblockplus.skills;
 
+import static com.skyblockplus.utils.Constants.HOTM_PERK_ID_TO_NAME;
+import static com.skyblockplus.utils.Constants.HOTM_PERK_MAX_LEVEL;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.SkillsStruct;
+import java.util.Map;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -41,7 +50,7 @@ public class HotmSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(HotmCommand.getHotm(event.player, event.getOptionStr("profile")));
+		event.embed(getHotm(event.player, event.getOptionStr("profile")));
 	}
 
 	@Override
@@ -57,5 +66,61 @@ public class HotmSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getHotm(String username, String profileName) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			SkillsStruct skillInfo = player.getHOTM();
+			if (skillInfo == null) {
+				return invalidEmbed("Player has not unlocked heart of the mountain");
+			}
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+			JsonElement miningJson = higherDepth(player.profileJson(), "mining_core");
+
+			eb.addField(
+				"Statistics",
+				"• **HOTM level:** " +
+				skillInfo.currentLevel() +
+				" (**Progress:** " +
+				roundProgress(skillInfo.progressToNext()) +
+				")\n• **Tokens:** " +
+				higherDepth(miningJson, "tokens", 0) +
+				" (**Spent:** " +
+				higherDepth(miningJson, "tokens_spent", 0) +
+				")\n• **Mithril Powder:** " +
+				formatNumber(higherDepth(miningJson, "powder_mithril", 0)) +
+				" (**Spent:** " +
+				formatNumber(higherDepth(miningJson, "powder_spent_mithril", 0)) +
+				")\n• **Gemstone Powder:** " +
+				formatNumber(higherDepth(miningJson, "powder_gemstone", 0)) +
+				" (**Spent:** " +
+				formatNumber(higherDepth(miningJson, "powder_spent_gemstone", 0)) +
+				")\n• **Selected ability:** " +
+				capitalizeString(higherDepth(miningJson, "selected_pickaxe_ability", "none").replace("_", " ")),
+				false
+			);
+
+			StringBuilder perksStr = new StringBuilder();
+			for (Map.Entry<String, JsonElement> perk : higherDepth(miningJson, "nodes").getAsJsonObject().entrySet()) {
+				if (!perk.getValue().getAsJsonPrimitive().isNumber()) {
+					continue;
+				}
+				if (HOTM_PERK_MAX_LEVEL.getOrDefault(perk.getKey(), 50) == 1) {
+					continue;
+				}
+				perksStr
+					.append("• **")
+					.append(capitalizeString(HOTM_PERK_ID_TO_NAME.getOrDefault(perk.getKey(), perk.getKey().replace("_", " "))))
+					.append(":** ")
+					.append(perk.getValue().getAsInt())
+					.append("/")
+					.append(HOTM_PERK_MAX_LEVEL.getOrDefault(perk.getKey(), 50))
+					.append("\n");
+			}
+			eb.addField("Perks", perksStr.toString(), false);
+			return eb;
+		}
+		return player.getFailEmbed();
 	}
 }

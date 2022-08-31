@@ -22,7 +22,7 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.scheduler;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;
-import com.skyblockplus.miscellaneous.FetchurCommand;
+import com.skyblockplus.miscellaneous.FetchurSlashCommand;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -39,7 +39,7 @@ public class FetchurHandler {
 
 		scheduler.scheduleAtFixedRate(
 			() -> {
-				MessageEmbed embed = FetchurCommand.getFetchurItem().build();
+				MessageEmbed embed = FetchurSlashCommand.getFetchurItem().build();
 
 				int updateCount = 0;
 				for (AutomaticGuild guild : guildMap.values()) {

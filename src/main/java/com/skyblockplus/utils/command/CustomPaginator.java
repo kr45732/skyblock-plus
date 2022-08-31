@@ -32,7 +32,6 @@ import java.util.function.Function;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -42,8 +41,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
+import net.dv8tion.jda.api.utils.messages.*;
 import net.dv8tion.jda.internal.utils.Checks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,25 +110,25 @@ public class CustomPaginator extends Menu {
 	public void paginate(MessageChannel channel, int pageNum) {
 		pageNum = Math.min(Math.max(pageNum, 1), pages);
 
-		Message msg = new MessageBuilder().setEmbeds(getEmbedRender(pageNum)).build();
+		MessageCreateData msg = new MessageCreateBuilder().setEmbeds(getEmbedRender(pageNum)).build();
 		initialize(channel.sendMessage(msg), pageNum);
 	}
 
 	public void paginate(InteractionHook channel, int pageNum) {
 		pageNum = Math.min(Math.max(pageNum, 1), pages);
 
-		Message msg = new MessageBuilder().setEmbeds(getEmbedRender(pageNum)).build();
+		MessageEditData msg = new MessageEditBuilder().setEmbeds(getEmbedRender(pageNum)).build();
 		initialize(channel.editOriginal(msg), pageNum);
 	}
 
 	public void paginate(Message message, int pageNum) {
 		pageNum = Math.min(Math.max(pageNum, 1), pages);
 
-		Message msg = new MessageBuilder().setEmbeds(getEmbedRender(pageNum)).build();
+		MessageEditData msg = new MessageEditBuilder().setEmbeds(getEmbedRender(pageNum)).build();
 		initialize(message.editMessage(msg), pageNum);
 	}
 
-	private void initialize(RestAction<Message> action, int pageNum) {
+	private void initialize(MessageRequest<?> action, int pageNum) {
 		List<ActionRow> actionRows = new ArrayList<>();
 		if (pages > 1) {
 			actionRows.add(
@@ -144,21 +142,12 @@ public class CustomPaginator extends Menu {
 			actionRows.add(ActionRow.of(extras.getButtons()));
 		}
 
-		if (action instanceof MessageAction a) {
-			action = a.setActionRows(actionRows);
-		} else if (action instanceof WebhookMessageUpdateAction<Message> a) {
-			action = a.setActionRows(actionRows);
-		}
+		action.setComponents(actionRows);
 
 		if (pages == 0) {
-			if (action instanceof MessageAction a) {
-				action = a.setEmbeds(defaultEmbed("No items to paginate").build());
-			} else if (action instanceof WebhookMessageUpdateAction<Message> a) {
-				action = a.setEmbeds(defaultEmbed("No items to paginate").build());
-			}
-			action.queue();
+			((RestAction<?>) action.setEmbeds(defaultEmbed("No items to paginate").build())).queue();
 		} else {
-			action.queue(m -> pagination(m, pageNum), throwableConsumer);
+			((RestAction<?>) action).queue(m -> pagination((Message) m, pageNum), throwableConsumer);
 		}
 	}
 
@@ -257,7 +246,7 @@ public class CustomPaginator extends Menu {
 		int finalPageNum = pageNum;
 		event
 			.editMessageEmbeds(getEmbedRender(pageNum))
-			.setActionRows(actionRows)
+			.setComponents(actionRows)
 			.queue(hook -> pagination(event.getMessage(), finalPageNum), throwableConsumer);
 	}
 

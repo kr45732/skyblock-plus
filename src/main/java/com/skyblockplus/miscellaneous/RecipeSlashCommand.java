@@ -18,11 +18,17 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -31,15 +37,24 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecipeSlashCommand extends SlashCommand {
 
+	public static List<String> allRecipeIds;
+
 	public RecipeSlashCommand() {
 		this.name = "recipe";
+		allRecipeIds =
+			getInternalJsonMappings()
+				.entrySet()
+				.stream()
+				.filter(e -> higherDepth(e.getValue(), "recipe") != null)
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(RecipeCommand.getRecipe(event.getOptionStr("item")));
+		event.embed(getRecipe(event.getOptionStr("item")));
 	}
 
 	@Override
@@ -52,8 +67,40 @@ public class RecipeSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
 				event.getFocusedOption().getValue(),
-				RecipeCommand.allRecipeIds.stream().map(Utils::idToName).collect(Collectors.toList())
+				allRecipeIds.stream().map(Utils::idToName).collect(Collectors.toList())
 			);
 		}
+	}
+
+	public static EmbedBuilder getRecipe(String item) {
+		String id = nameToId(item);
+
+		if (higherDepth(getInternalJsonMappings(), id) == null) {
+			id = getClosestMatchFromIds(item, allRecipeIds);
+		}
+		String name = idToName(id);
+
+		JsonElement infoJson = getInternalJsonMappings().get(id);
+		if (higherDepth(infoJson, "recipe") == null) {
+			return invalidEmbed("No recipe found for " + name);
+		}
+
+		EmbedBuilder eb = defaultEmbed("Recipe of " + name);
+		for (Map.Entry<String, JsonElement> entry : higherDepth(infoJson, "recipe").getAsJsonObject().entrySet()) {
+			String[] idCountSplit = entry.getValue().getAsString().split(":");
+			if (entry.getKey().equals("B1") || entry.getKey().equals("C1")) {
+				eb.appendDescription("\n");
+			}
+			if (idCountSplit.length == 1) {
+				eb.appendDescription(getEmojiOr("EMPTY", "❓"));
+				eb.addBlankField(true);
+			} else {
+				String entryId = idCountSplit[0].replace("-", ":");
+				eb.appendDescription(getEmojiOr(entryId, "❓"));
+				eb.addField(idToName(entryId), idCountSplit[1], true);
+			}
+		}
+		eb.setThumbnail(getItemThumbnail(id));
+		return eb;
 	}
 }

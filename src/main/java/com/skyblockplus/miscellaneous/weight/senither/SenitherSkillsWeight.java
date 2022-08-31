@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Utils.getWeightJson;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.skyblockplus.miscellaneous.weight.weight.SkillsWeight;
 import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;

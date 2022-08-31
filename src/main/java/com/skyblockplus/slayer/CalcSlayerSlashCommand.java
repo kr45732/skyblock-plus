@@ -18,9 +18,15 @@
 
 package com.skyblockplus.slayer;
 
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonArray;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -43,7 +49,7 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 		}
 
 		event.embed(
-			CalcSlayerCommand.getCalcSlayer(
+			getCalcSlayer(
 				event.player,
 				event.getOptionStr("profile"),
 				event.getOptionStr("type"),
@@ -76,5 +82,78 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getCalcSlayer(String username, String profileName, String slayerType, int targetLevel, long targetXp) {
+		slayerType = slayerType.toLowerCase();
+		if (!SLAYER_NAMES.contains(slayerType)) {
+			return invalidEmbed("Invalid slayer type");
+		}
+
+		if (targetXp <= 0 && targetLevel <= 0) {
+			return invalidEmbed("Target xp or target level must be provided and at least 1");
+		}
+		if (targetLevel != -1 && (targetLevel <= 0 || targetLevel > 9)) {
+			return invalidEmbed("Target level must be between 1 and 9");
+		}
+
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			int curXp = player.getSlayer(slayerType);
+			targetXp =
+				targetLevel != -1
+					? higherDepth(getLevelingJson(), "slayer_xp." + SLAYER_NAMES_MAP.get(slayerType) + ".[" + (targetLevel - 1) + "]")
+						.getAsLong()
+					: targetXp;
+
+			if (curXp >= targetXp) {
+				return invalidEmbed("You already have " + roundAndFormat(targetXp) + " xp");
+			}
+
+			long xpNeeded = targetXp - curXp;
+			JsonArray bossXpArr = higherDepth(getLevelingJson(), "slayer_boss_xp").getAsJsonArray();
+			StringBuilder out = new StringBuilder();
+			for (int i = 0; i < (slayerType.equals("rev") ? 5 : 4); i++) {
+				double xpPerBoss = bossXpArr.get(i).getAsInt();
+				int killsNeeded = (int) Math.ceil(xpNeeded / xpPerBoss);
+				long cost =
+					killsNeeded *
+					switch (i) {
+						case 0 -> 2000L;
+						case 1 -> 7500L;
+						case 2 -> 20000L;
+						case 3 -> 50000L;
+						default -> 100000L;
+					};
+
+				out
+					.append("\n")
+					.append(SLAYER_EMOJI_MAP.get(slayerType))
+					.append(" Tier ")
+					.append(toRomanNumerals(i + 1).toUpperCase())
+					.append(" ")
+					.append(capitalizeString(slayerType))
+					.append(": ")
+					.append(formatNumber(killsNeeded))
+					.append(" ($")
+					.append(formatNumber(cost))
+					.append(")");
+			}
+
+			return player
+				.defaultPlayerEmbed()
+				.setDescription(
+					"**Current XP:** " +
+					roundAndFormat(curXp) +
+					"\n**Target XP:** " +
+					roundAndFormat(targetXp) +
+					"\n**XP Needed:** " +
+					formatNumber(xpNeeded) +
+					"\n**Bosses Needed:**" +
+					out
+				);
+		}
+
+		return player.getFailEmbed();
 	}
 }

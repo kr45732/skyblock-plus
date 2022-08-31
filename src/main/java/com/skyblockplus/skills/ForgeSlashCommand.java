@@ -18,9 +18,17 @@
 
 package com.skyblockplus.skills;
 
+import static com.skyblockplus.utils.Constants.FORGE_TIMES;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.time.Instant;
+import java.util.Map;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -41,7 +49,7 @@ public class ForgeSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(ForgeCommand.getForge(event.player, event.getOptionStr("profile")));
+		event.embed(getForge(event.player, event.getOptionStr("profile")));
 	}
 
 	@Override
@@ -57,5 +65,51 @@ public class ForgeSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getForge(String username, String profileName) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+			JsonElement forgeItems = higherDepth(player.profileJson(), "forge.forge_processes.forge_1");
+			if (forgeItems == null) {
+				return defaultEmbed(player.getUsernameFixed() + " has no items in the forge");
+			}
+			int forgeTime = higherDepth(player.profileJson(), "mining_core.nodes.forge_time", 0);
+			double bonus;
+			if (forgeTime <= 1) {
+				bonus = 1;
+			} else if (forgeTime <= 10) {
+				bonus = 0.85;
+			} else if (forgeTime <= 19) {
+				bonus = 0.805;
+			} else {
+				bonus = 0.7;
+			}
+			for (JsonElement forgeItem : forgeItems.getAsJsonObject().entrySet().stream().map(Map.Entry::getValue).toList()) {
+				String itemId = higherDepth(forgeItem, "id").getAsString();
+				itemId = itemId.equals("PET") ? "AMMONITE;4" : itemId;
+				eb.addField(
+					getEmoji(itemId) + " " + idToName(itemId),
+					"Slot: " +
+					higherDepth(forgeItem, "slot", 0) +
+					"\nEnd: <t:" +
+					Instant
+						.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong())
+						.plusMillis((long) (FORGE_TIMES.get(itemId) * bonus))
+						.getEpochSecond() +
+					":R>",
+					false
+				);
+			}
+			if (eb.getFields().size() == 0) {
+				return defaultEmbed(player.getUsernameFixed() + " has no items in the forge");
+			}
+			if (bonus != 1) {
+				eb.setDescription("**Quick Forge:** " + roundAndFormat(100 - bonus * 100.0) + "% less forge time");
+			}
+			return eb;
+		}
+		return player.getFailEmbed();
 	}
 }

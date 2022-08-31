@@ -41,29 +41,6 @@ public abstract class SlashCommand {
 			cooldown = command != null ? command.getCooldown() : globalCooldown;
 		}
 
-		if (!event.isOwner()) {
-			for (Permission p : userPermissions) {
-				if (p.isChannel()) {
-					if (!event.getMember().hasPermission(event.getTextChannel(), p)) {
-						event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
-						return;
-					}
-				} else {
-					if (p == Permission.ADMINISTRATOR) {
-						if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
-							event.embed(invalidEmbed("You are missing the required permissions or roles to use this command"));
-							return;
-						}
-					} else {
-						if (!event.getMember().hasPermission(p)) {
-							event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
-							return;
-						}
-					}
-				}
-			}
-		}
-
 		for (Permission p : botPermissions) {
 			if (p.isChannel()) {
 				if (!event.getSelfMember().hasPermission(event.getGuildChannel(), p)) {
@@ -90,6 +67,33 @@ public abstract class SlashCommand {
 				if (!event.getSelfMember().hasPermission(p)) {
 					event.embed(invalidEmbed("I need the " + p.getName() + " permission in this server!"));
 					return;
+				}
+			}
+		}
+
+		if (!event.isOwner()) {
+			for (Permission p : userPermissions) {
+				if (event.getMember() == null) {
+					continue;
+				}
+
+				if (p.isChannel()) {
+					if (!event.getMember().hasPermission(event.getGuildChannel(), p)) {
+						event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
+						return;
+					}
+				} else {
+					if (p == Permission.ADMINISTRATOR) {
+						if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
+							event.embed(invalidEmbed("You are missing the required permissions or roles to use this command"));
+							return;
+						}
+					} else {
+						if (!event.getMember().hasPermission(p)) {
+							event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
+							return;
+						}
+					}
 				}
 			}
 		}

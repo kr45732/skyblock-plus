@@ -19,12 +19,14 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.Constants.BITS_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -41,7 +43,7 @@ public class BitsSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(BitsCommand.getBitPrices(event.getOptionStr("item")));
+		event.embed(getBitPrices(event.getOptionStr("item")));
 	}
 
 	@Override
@@ -59,5 +61,15 @@ public class BitsSlashCommand extends SlashCommand {
 				BITS_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toList())
 			);
 		}
+	}
+
+	public static EmbedBuilder getBitPrices(String itemName) {
+		String closestMatch = getClosestMatchFromIds(nameToId(itemName), BITS_ITEM_NAMES);
+		if (closestMatch != null) {
+			return defaultEmbed("Bits Price")
+				.addField(idToName(closestMatch), formatNumber(higherDepth(getBitsJson(), closestMatch, 0L)), false);
+		}
+
+		return defaultEmbed("No bit price found for " + capitalizeString(itemName));
 	}
 }

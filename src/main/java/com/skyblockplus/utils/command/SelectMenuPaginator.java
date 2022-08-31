@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
@@ -38,25 +39,24 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 public class SelectMenuPaginator {
 
 	private final Map<String, EmbedBuilder> pages;
-	private final PaginatorEvent event;
+	private final SlashCommandEvent event;
 	private Message message;
 	private String page;
 
-	public SelectMenuPaginator(Map<SelectOption, EmbedBuilder> pages, String page, PaginatorExtras extras, PaginatorEvent event) {
+	public SelectMenuPaginator(Map<SelectOption, EmbedBuilder> pages, String page, PaginatorExtras extras, SlashCommandEvent event) {
 		this.pages = pages.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getValue(), Map.Entry::getValue));
 		this.page = page;
 		this.event = event;
 
-		List<ActionRow> actionRows = new ArrayList<>();
+		List<LayoutComponent> actionRows = new ArrayList<>();
 		if (!extras.getButtons().isEmpty()) {
 			actionRows.add(ActionRow.of(extras.getButtons()));
 		}
 		actionRows.add(ActionRow.of(SelectMenu.create("select_menu_paginator").addOptions(pages.keySet()).build()));
 		event
-			.getAction()
-			.editMessageEmbeds(this.pages.get(page).build())
-			.setActionRows(actionRows)
-			.get()
+			.getHook()
+			.editOriginalEmbeds(this.pages.get(page).build())
+			.setComponents(actionRows)
 			.queue(m -> {
 				message = m;
 				waitForEvent();

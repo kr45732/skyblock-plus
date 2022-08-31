@@ -18,10 +18,17 @@
 
 package com.skyblockplus.price;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import java.time.Duration;
+import java.time.Instant;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -42,7 +49,7 @@ public class BidsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(BidsCommand.getPlayerBids(event.player, new PaginatorEvent(event)));
+		event.paginate(getPlayerBids(event.player, event));
 	}
 
 	@Override
@@ -57,5 +64,64 @@ public class BidsSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getPlayerBids(String username, SlashCommandEvent event) {
+		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+		if (!usernameUuidStruct.isValid()) {
+			return invalidEmbed(usernameUuidStruct.failCause());
+		}
+
+		JsonArray bids = getBidsFromPlayer(usernameUuidStruct.uuid());
+		if (bids == null || bids.size() == 0) {
+			return defaultEmbed("No bids found for " + usernameUuidStruct.username());
+		}
+
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(10);
+		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
+
+		for (JsonElement bid : bids) {
+			String auctionDesc;
+			String itemName = getEmoji(higherDepth(bid, "item_id").getAsString()) + " ";
+			boolean isPet = higherDepth(bid, "item_id").getAsString().equals("PET");
+
+			Instant endingAt = Instant.ofEpochMilli(higherDepth(bid, "end_t").getAsLong());
+			Duration duration = Duration.between(Instant.now(), endingAt);
+
+			itemName +=
+				(isPet ? capitalizeString(higherDepth(bid, "tier").getAsString()) + " " : "") + higherDepth(bid, "item_name").getAsString();
+
+			JsonArray bidsArr = higherDepth(bid, "bids").getAsJsonArray();
+			long highestBid = higherDepth(bidsArr, "[" + (bidsArr.size() - 1) + "].amount").getAsLong();
+			if (duration.toMillis() > 0) {
+				auctionDesc = "Current bid: " + simplifyNumber(highestBid);
+				auctionDesc += " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
+				auctionDesc +=
+					"\nHighest bidder: " + uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username();
+				for (int i = bidsArr.size() - 1; i >= 0; i--) {
+					JsonElement curBid = bidsArr.get(i);
+					if (higherDepth(curBid, "bidder").getAsString().equals(usernameUuidStruct.uuid())) {
+						auctionDesc += "\nYour highest bid: " + simplifyNumber(higherDepth(curBid, "amount").getAsDouble());
+						break;
+					}
+				}
+			} else {
+				auctionDesc = "Auction sold for " + simplifyNumber(highestBid) + " coins";
+				auctionDesc +=
+					"\n " +
+					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username() +
+					" won the auction";
+			}
+
+			extras.addEmbedField(itemName, auctionDesc, false);
+		}
+
+		extras
+			.setEveryPageTitle(usernameUuidStruct.username())
+			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.username(), null))
+			.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl());
+
+		event.paginate(paginateBuilder.setPaginatorExtras(extras));
+		return null;
 	}
 }

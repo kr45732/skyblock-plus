@@ -21,7 +21,6 @@ package com.skyblockplus.features.listeners;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.jerryEmbed;
 import static com.skyblockplus.features.mayor.MayorHandler.votesEmbed;
-import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -38,10 +37,10 @@ import com.skyblockplus.features.event.EventGuild;
 import com.skyblockplus.features.jacob.JacobGuild;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
-import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
+import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
 import com.skyblockplus.features.verify.VerifyGuild;
-import com.skyblockplus.miscellaneous.MayorCommand;
+import com.skyblockplus.miscellaneous.MayorSlashCommand;
 import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -58,16 +57,15 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -75,8 +73,10 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +120,6 @@ public class AutomaticGuild {
 	public final List<String> channelBlacklist = new ArrayList<>();
 	public final String guildId;
 	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
-	public String prefix;
 	public TextChannel logChannel = null;
 	public final List<MessageEmbed> logQueue = new ArrayList<>();
 	public JsonArray blacklist = new JsonArray();
@@ -155,8 +154,6 @@ public class AutomaticGuild {
 		applyConstructor(event, serverSettings);
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
 		schedulerConstructor();
-		prefix = higherDepth(serverSettings, "prefix", "");
-		prefix = (prefix.length() > 0 && prefix.length() <= 5) ? prefix : DEFAULT_PREFIX;
 		jacobGuild = new JacobGuild(higherDepth(serverSettings, "jacobSettings"), this);
 		eventGuild = new EventGuild(higherDepth(serverSettings, "eventNotif"), this);
 		try {
@@ -222,11 +219,6 @@ public class AutomaticGuild {
 		if (cacheDatabase.partyCaches.containsKey(guildId)) {
 			this.partyList.addAll(cacheDatabase.partyCaches.get(guildId));
 		}
-	}
-
-	public static String getGuildPrefix(String guildId) {
-		AutomaticGuild automaticGuild = guildMap.getOrDefault(guildId, null);
-		return automaticGuild != null ? automaticGuild.prefix : DEFAULT_PREFIX;
 	}
 
 	/* Apply Methods */
@@ -396,9 +388,12 @@ public class AutomaticGuild {
 					}
 				} catch (Exception ignored) {}
 
-				MessageAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				MessageCreateAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
 				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
-					action = action.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"));
+					action =
+						action.addFiles(
+							FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
+						);
 				}
 				Message reactMessage = action.complete();
 
@@ -441,9 +436,12 @@ public class AutomaticGuild {
 
 				verifyGuild = new VerifyGuild(); // Prevent the old settings from deleting the new message
 
-				MessageAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				MessageCreateAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
 				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
-					action = action.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"));
+					action =
+						action.addFiles(
+							FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
+						);
 				}
 				Message reactMessage = action.complete();
 
@@ -811,11 +809,15 @@ public class AutomaticGuild {
 
 	public void updateSkyblockEvent() {
 		try {
+			if (skyblockEventHandler != null && skyblockEventHandler.hasTimedOut()) {
+				skyblockEventHandler = null;
+			}
+
 			if (database.getSkyblockEventActive(guildId)) {
 				JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
 				Instant endingTime = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 				if (Instant.now().isAfter(endingTime)) {
-					endSkyblockEvent(guildId);
+					SkyblockEventSlashCommand.endSkyblockEvent(guildId);
 				}
 			}
 		} catch (Exception ignored) {}
@@ -936,12 +938,12 @@ public class AutomaticGuild {
 					return false;
 				}
 
-				MessageAction action = mayorChannel.sendMessageEmbeds(embed);
+				MessageCreateAction action = mayorChannel.sendMessageEmbeds(embed);
 				if (button != null) {
 					action = action.setActionRow(button);
 				}
 				if (mayorPing != null) {
-					action = action.content(mayorPing.getAsMention());
+					action = action.setContent(mayorPing.getAsMention());
 				}
 				action.queue(m -> lastMayorElectedMessage = m);
 
@@ -964,23 +966,23 @@ public class AutomaticGuild {
 	}
 
 	public void onGuildMessageReceived(MessageReceivedEvent event) {
-		if (verifyGuild.onGuildMessageReceived(event)) {
-			return;
-		}
-
-		if (event.getAuthor().isBot() && !event.getAuthor().getId().equals(selfUserId)) {
-			return;
-		}
-
-		for (ApplyGuild guild : applyGuild) {
-			if (guild.onGuildMessageReceived(event)) {
-				return;
-			}
-		}
+		verifyGuild.onGuildMessageReceived(event);
 	}
 
 	public void onTextChannelDelete(ChannelDeleteEvent event) {
 		applyGuild.forEach(o1 -> o1.onTextChannelDelete(event));
+	}
+
+	public void onModalInteraction(ModalInteractionEvent event) {
+		if (skyblockEventHandler != null) {
+			skyblockEventHandler.onModalInteraction(event);
+		}
+	}
+
+	public void onSelectMenuInteraction(SelectMenuInteractionEvent event) {
+		if (skyblockEventHandler != null) {
+			skyblockEventHandler.onSelectMenuInteraction(event);
+		}
 	}
 
 	public void onButtonClick(ButtonInteractionEvent event) {
@@ -996,12 +998,18 @@ public class AutomaticGuild {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().equals("mayor_special_button")) {
-			event.replyEmbeds(MayorCommand.getSpecialMayors().build()).setEphemeral(true).queue();
+			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {
 			Message msg = guildMap.get("796790757947867156").lastMayorElectionOpenMessage;
 			event
-				.reply(msg != null ? msg : new MessageBuilder().setEmbeds(invalidEmbed("Election is not open").build()).build())
+				.reply(
+					(
+						msg != null
+							? new MessageCreateBuilder().applyMessage(msg)
+							: new MessageCreateBuilder().setEmbeds(invalidEmbed("Election is not open").build())
+					).build()
+				)
 				.setEphemeral(true)
 				.queue();
 			return;
@@ -1049,7 +1057,7 @@ public class AutomaticGuild {
 							}
 						} else if (event.getComponentId().startsWith("track_auctions_stop_")) {
 							MessageEmbed eb = AuctionTracker.stopTrackingAuctions(event.getUser().getId()).build();
-							WebhookMessageUpdateAction<Message> action = event.getHook().editOriginalEmbeds(eb);
+							WebhookMessageEditAction<Message> action = event.getHook().editOriginalEmbeds(eb);
 							if (!eb.getTitle().equals("Error")) {
 								ActionRow updatedButton = ActionRow.of(
 									Button.primary(
@@ -1077,11 +1085,11 @@ public class AutomaticGuild {
 						event
 							.getHook()
 							.editOriginalEmbeds(
-								SkyblockEventCommand.joinSkyblockEvent(null, null, event.getMember(), event.getGuild().getId()).build()
+								SkyblockEventSlashCommand.joinSkyblockEvent(null, null, event.getMember(), event.getGuild().getId()).build()
 							)
 							.queue();
 					} else {
-						EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event.getGuild(), event.getUser(), null, event);
+						EmbedBuilder eb = SkyblockEventSlashCommand.getEventLeaderboard(event.getGuild(), event.getUser(), null, event);
 						if (eb != null) {
 							event.getHook().editOriginalEmbeds(eb.build()).queue();
 						}
@@ -1097,7 +1105,6 @@ public class AutomaticGuild {
 				return;
 			}
 
-			event.deferReply().complete();
 			SetupCommandHandler handler = new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
 			if (handler.isValid()) {
 				return;
@@ -1162,31 +1169,11 @@ public class AutomaticGuild {
 		}
 	}
 
-	public void onGuildMessageUpdate(MessageUpdateEvent event) {
-		for (ApplyGuild guild : applyGuild) {
-			if (guild.onGuildMessageUpdate(event)) {
-				return;
-			}
-		}
-	}
-
-	public void onGuildMessageDelete(MessageDeleteEvent event) {
-		for (ApplyGuild guild : applyGuild) {
-			if (guild.onGuildMessageDelete(event)) {
-				return;
-			}
-		}
-	}
-
 	/* Miscellaneous */
 	public void schedulerConstructor() {
 		int eventDelay = (int) (Math.random() * 60 + 5);
 		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 180, TimeUnit.MINUTES));
 		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateSkyblockEvent, eventDelay, 30, TimeUnit.MINUTES));
-	}
-
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
 	}
 
 	public void setLogChannel(TextChannel channel) {

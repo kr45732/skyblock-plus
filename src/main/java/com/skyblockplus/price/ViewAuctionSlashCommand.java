@@ -18,8 +18,19 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.ApiHandler.getAuctionFromUuid;
+import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.utils.structs.HypixelResponse;
+import java.time.Duration;
+import java.time.Instant;
+import me.nullicorn.nedit.NBTReader;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -36,7 +47,7 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(ViewAuctionCommand.getAuctionByUuid(event.getOptionStr("uuid")));
+		event.embed(getAuctionByUuid(event.getOptionStr("uuid")));
 	}
 
 	@Override
@@ -44,5 +55,71 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get information about an auction by it's UUID")
 			.addOption(OptionType.STRING, "uuid", "Auction UUID", true);
+	}
+
+	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
+		HypixelResponse auctionResponse = getAuctionFromUuid(auctionUuid);
+		if (!auctionResponse.isValid()) {
+			return invalidEmbed(auctionResponse.failCause());
+		}
+
+		JsonElement auctionJson = auctionResponse.get("[0]");
+		EmbedBuilder eb = defaultEmbed("Auction from UUID");
+		String itemName = higherDepth(auctionJson, "item_name").getAsString();
+
+		String itemId = "None";
+		try {
+			itemId =
+				NBTReader
+					.readBase64(higherDepth(auctionJson, "item_bytes.data").getAsString())
+					.getList("i")
+					.getCompound(0)
+					.getString("tag.ExtraAttributes.id", "None");
+		} catch (Exception ignored) {}
+
+		if (itemId.equals("ENCHANTED_BOOK")) {
+			itemName = parseMcCodes(higherDepth(auctionJson, "item_lore").getAsString().split("\n")[0]);
+		} else {
+			itemName =
+				(itemId.equals("PET") ? capitalizeString(higherDepth(auctionJson, "tier").getAsString().toLowerCase()) + " " : "") +
+				itemName;
+		}
+
+		Instant endingAt = Instant.ofEpochMilli(higherDepth(auctionJson, "end").getAsLong());
+		Duration duration = Duration.between(Instant.now(), endingAt);
+
+		String ebStr = "**Item name:** " + itemName;
+		ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString()).username();
+		ebStr += "\n**Command:** `/viewauction " + higherDepth(auctionJson, "uuid").getAsString() + "`";
+		long highestBid = higherDepth(auctionJson, "highest_bid_amount", 0L);
+		long startingBid = higherDepth(auctionJson, "starting_bid", 0L);
+		JsonArray bidsArr = higherDepth(auctionJson, "bids").getAsJsonArray();
+		boolean bin = higherDepth(auctionJson, "bin", false);
+
+		if (duration.toMillis() > 0) {
+			if (bin) {
+				ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending <t:" + endingAt.getEpochSecond() + ":R>";
+			} else {
+				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
+				ebStr +=
+					bidsArr.size() > 0
+						? "\n**Highest bidder:** " +
+						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username()
+						: "";
+			}
+		} else {
+			if (highestBid >= startingBid) {
+				ebStr +=
+					"\n**Auction sold** for " +
+					simplifyNumber(highestBid) +
+					" coins to " +
+					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username();
+			} else {
+				ebStr = "\n**Auction did not sell**";
+			}
+		}
+
+		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
+		return eb.setDescription(ebStr);
 	}
 }

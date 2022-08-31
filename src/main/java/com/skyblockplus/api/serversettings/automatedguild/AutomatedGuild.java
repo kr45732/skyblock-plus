@@ -48,7 +48,6 @@ public class AutomatedGuild {
 	private String applyWaitingChannel = "";
 	private String applyGamemode = "";
 	private String applyScammerCheck = "false";
-	private String applyLogChannel = "";
 	private String applyCheckApi = "false";
 
 	@Column(length = 2048)

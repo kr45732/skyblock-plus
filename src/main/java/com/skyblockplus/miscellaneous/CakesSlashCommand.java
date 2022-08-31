@@ -18,9 +18,17 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -41,7 +49,7 @@ public class CakesSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(CakesCommand.getCakes(event.player, event.getOptionStr("profile")));
+		event.embed(getCakes(event.player, event.getOptionStr("profile")));
 	}
 
 	@Override
@@ -57,5 +65,58 @@ public class CakesSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
+	}
+
+	public static EmbedBuilder getCakes(String username, String profileName) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+
+			Map<String, String> cakeNameToId = new HashMap<>();
+			cakeNameToId.put("cake_strength", "EPOCH_CAKE_RED");
+			cakeNameToId.put("cake_pet_luck", "EPOCH_CAKE_PURPLE");
+			cakeNameToId.put("cake_health", "EPOCH_CAKE_PINK");
+			cakeNameToId.put("cake_walk_speed", "EPOCH_CAKE_YELLOW");
+			cakeNameToId.put("cake_magic_find", "EPOCH_CAKE_BLACK");
+			cakeNameToId.put("cake_ferocity", "EPOCH_CAKE_ORANGE");
+			cakeNameToId.put("cake_defense", "EPOCH_CAKE_GREEN");
+			cakeNameToId.put("cake_sea_creature_chance", "EPOCH_CAKE_BLUE");
+			cakeNameToId.put("cake_intelligence", "EPOCH_CAKE_AQUA");
+			cakeNameToId.put("cake_farming_fortune", "EPOCH_CAKE_BROWN");
+			cakeNameToId.put("cake_foraging_fortune", "EPOCH_CAKE_WHITE");
+			cakeNameToId.put("cake_mining_fortune", "EPOCH_CAKE_CYAN");
+
+			StringBuilder activeCakes = new StringBuilder();
+			if (higherDepth(player.profileJson(), "temp_stat_buffs") != null) {
+				for (JsonElement cake : higherDepth(player.profileJson(), "temp_stat_buffs").getAsJsonArray()) {
+					Instant expires = Instant.ofEpochMilli(higherDepth(cake, "expire_at").getAsLong());
+					if (expires.isAfter(Instant.now())) {
+						String cakeName = higherDepth(cake, "key").getAsString();
+						activeCakes
+							.append(getEmoji(cakeNameToId.get(cakeName)))
+							.append(" ")
+							.append(capitalizeString(cakeName.split("cake_")[1].replace("_", " ")))
+							.append(" Cake: expires <t:")
+							.append(Instant.ofEpochMilli(higherDepth(cake, "expire_at").getAsLong()).getEpochSecond())
+							.append(":R>\n");
+						cakeNameToId.remove(cakeName);
+					}
+				}
+			}
+			eb.appendDescription("**Active Cakes**\n" + (activeCakes.length() > 0 ? activeCakes.toString() : "None\n"));
+
+			StringBuilder missingCakesStr = new StringBuilder();
+			for (Map.Entry<String, String> missingCake : cakeNameToId.entrySet()) {
+				missingCakesStr
+					.append(getEmoji(missingCake.getValue()))
+					.append(" ")
+					.append(capitalizeString(missingCake.getKey().split("cake_")[1].replace("_", " ")))
+					.append(" Cake\n");
+			}
+			eb.appendDescription("\n**Inactive Cakes**\n" + (missingCakesStr.length() > 0 ? missingCakesStr.toString() : "None"));
+
+			return eb;
+		}
+		return player.getFailEmbed();
 	}
 }
