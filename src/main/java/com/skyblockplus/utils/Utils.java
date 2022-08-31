@@ -1441,7 +1441,16 @@ public class Utils {
 											"_GEM"
 										);
 									} else { // "RUBY_0": "PERFECT"
-										itemInfo.addExtraValue(gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
+										itemInfo.addExtraValue(
+											(
+												gem.getValue() instanceof NBTCompound gemQualityNbt
+													? gemQualityNbt.getString("quality", "UNKNOWN")
+													: gem.getValue()
+											) +
+											"_" +
+											gem.getKey().split("_")[0] +
+											"_GEM"
+										);
 									}
 								}
 							}

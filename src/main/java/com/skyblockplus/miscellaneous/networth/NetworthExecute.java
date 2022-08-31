@@ -449,7 +449,6 @@ public class NetworthExecute {
 			}
 			extras.addButton(Button.link("https://forms.gle/RBmN2AFBLafGyx5E7", "Bug In Calculations?"));
 			new SelectMenuPaginator(pages, "overview", extras, event);
-			//			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 			return null;
 		}
 		return player.getFailEmbed();

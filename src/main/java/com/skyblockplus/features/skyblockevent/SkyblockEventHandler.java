@@ -205,6 +205,7 @@ public class SkyblockEventHandler {
 									.queue();
 								return;
 							}
+							event.deferEdit().queue();
 
 							String eventTypeFormatted = getEventTypeFormatted(eventSettings.getEventType());
 
@@ -244,7 +245,8 @@ public class SkyblockEventHandler {
 							eventSettings.setAnnouncementMessageId(announcementMessage.getId());
 							if (setSkyblockEventInDatabase()) {
 								event
-									.editMessageEmbeds(
+									.getHook()
+									.editOriginalEmbeds(
 										defaultEmbed("Skyblock Event")
 											.setDescription("Event successfully started in " + announcementChannel.getAsMention())
 											.build()
@@ -255,7 +257,8 @@ public class SkyblockEventHandler {
 							} else {
 								announcementMessage.delete().queue(ignore, ignore);
 								event
-									.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Error starting event").build())
+									.getHook()
+									.editOriginalEmbeds(defaultEmbed("Skyblock Event").setDescription("Error starting event").build())
 									.setComponents()
 									.queue();
 								guildMap.get(event.getGuild().getId()).setSkyblockEventHandler(null);
@@ -308,7 +311,7 @@ public class SkyblockEventHandler {
 										.addActionRow(
 											TextInput
 												.create("value", "Prizes", TextInputStyle.PARAGRAPH)
-												.setPlaceholder("Use the format, separating each prize with a new line, position:prize")
+												.setPlaceholder("Use the format position:prize, separating each prize with a new line")
 												.build()
 										)
 										.build()
