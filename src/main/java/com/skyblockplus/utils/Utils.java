@@ -732,7 +732,7 @@ public class Utils {
 
 	public static String getPetUrl(String petId) {
 		try {
-			return "https://sky.shiiyu.moe" + higherDepth(getInternalJsonMappings(), petId + ".texture").getAsString();
+			return "https://sky.shiiyu.moe/head/" + higherDepth(getInternalJsonMappings(), petId + ".texture").getAsString();
 		} catch (Exception e) {
 			return null;
 		}
