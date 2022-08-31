@@ -82,21 +82,6 @@ public class SettingsExecute {
 		this.serverSettings = database.getServerSettings(guild.getId()).getAsJsonObject();
 	}
 
-	public void execute(Command command, CommandEvent event) {
-		new CommandExecute(command, event) {
-			@Override
-			protected void execute() {
-				String content = event.getMessage().getContentRaw();
-				if (!content.contains("hypixel_key")) {
-					logCommand();
-				}
-
-				paginate(getSettingsEmbed(content, args), true);
-			}
-		}
-			.queue();
-	}
-
 	public EmbedBuilder getSettingsEmbed(String content, String[] args) {
 		EmbedBuilder eb = null;
 		JsonElement currentSettings = database.getServerSettings(guild.getId());
@@ -1269,6 +1254,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setApplyMessage(JsonObject guildSettings, String message) {
+		message = message.replace("\\n", "\n");
 		if (message.isEmpty() || EmojiParser.parseToAliases(message).length() > 1500) {
 			return invalidEmbed("Message cannot by empty or longer than 1500 characters");
 		}
@@ -2261,6 +2247,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setVerifyMessageText(String verifyText) {
+		verifyText = verifyText.replace("\\n", "\n");
 		String verifyTextEmoj = EmojiParser.parseToAliases(verifyText);
 		if (verifyText.isEmpty() || verifyTextEmoj.length() > 1500) {
 			return invalidEmbed("Text must be between 1 to 1500 characters");
