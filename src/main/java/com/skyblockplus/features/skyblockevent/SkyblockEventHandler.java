@@ -249,12 +249,14 @@ public class SkyblockEventHandler {
 											.setDescription("Event successfully started in " + announcementChannel.getAsMention())
 											.build()
 									)
+									.setComponents()
 									.queue();
 								guildMap.get(event.getGuild().getId()).setSkyblockEventHandler(null);
 							} else {
 								announcementMessage.delete().queue(ignore, ignore);
 								event
 									.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Error starting event").build())
+									.setComponents()
 									.queue();
 								guildMap.get(event.getGuild().getId()).setSkyblockEventHandler(null);
 							}
@@ -531,7 +533,16 @@ public class SkyblockEventHandler {
 	}
 
 	public boolean hasTimedOut() {
-		return Duration.between(lastAction, Instant.now()).abs().toMinutes() > 2;
+		if (Duration.between(lastAction, Instant.now()).abs().toMinutes() > 2) {
+			try {
+				message
+					.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Timeout").build())
+					.setComponents()
+					.queue(ignore, ignore);
+			} catch (Exception ignored) {}
+			return true;
+		}
+		return false;
 	}
 
 	private MessageEditData getGenericConfigMessage() {
