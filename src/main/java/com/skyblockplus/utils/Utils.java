@@ -153,6 +153,8 @@ public class Utils {
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
 	private static final Pattern bazaarEnchantPattern = Pattern.compile("ENCHANTMENT_(\\D*)_(\\d+)");
+	private static final Pattern neuTexturePattern = Pattern.compile("Properties:\\{textures:\\[0:\\{Value:\"(.*)\"}]}");
+
 	public static final JDAWebhookClient botStatusWebhook = new WebhookClientBuilder(
 		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
 	)
@@ -1937,20 +1939,21 @@ public class Utils {
 				if (higherDepth(itemJson, "recipe") != null) {
 					toAdd.add("recipe", higherDepth(itemJson, "recipe"));
 				}
-				Pattern NEU_TEXTURE_PATTERN = Pattern.compile("Properties:\\{textures:\\[0:\\{Value:\"(.*)\"\\}\\]\\}");
-				if (PET_NAMES.contains(itemId)) {
-					Matcher matcher = NEU_TEXTURE_PATTERN.matcher(higherDepth(itemJson, "nbttag").getAsString());
-					if (matcher.find()) {
-						toAdd.addProperty(
-							"texture",
-							higherDepth(
-								JsonParser.parseString(new String(Base64.getDecoder().decode(matcher.group(1)))),
-								"textures.SKIN.url"
-							)
-								.getAsString()
-								.split("http://textures.minecraft.net/texture/")[1]
-						);
-					}
+				if (PET_NAMES.contains(itemId.split(";")[0])) {
+					try {
+						Matcher matcher = neuTexturePattern.matcher(higherDepth(itemJson, "nbttag").getAsString());
+						if (matcher.find()) {
+							toAdd.addProperty(
+								"texture",
+								higherDepth(
+									JsonParser.parseString(new String(Base64.getDecoder().decode(matcher.group(1)))),
+									"textures.SKIN.url"
+								)
+									.getAsString()
+									.split("http://textures.minecraft.net/texture/")[1]
+							);
+						}
+					} catch (Exception ignored) {}
 				}
 				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
 
