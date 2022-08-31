@@ -542,7 +542,7 @@ public class SkyblockEventHandler {
 					.create("skyblock_event" + selectMenuState)
 					.addOption("Create Event", "create_event")
 					.addOption("Guild", "guild")
-					.addOption("Time", "time")
+					.addOption("Duration", "duration")
 					.addOption("Channel", "channel")
 					.addOption("Prizes", "prizes")
 					.addOption("Minimum Amount", "minimum_amount")
