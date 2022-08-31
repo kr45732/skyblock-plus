@@ -62,7 +62,9 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
@@ -807,6 +809,10 @@ public class AutomaticGuild {
 
 	public void updateSkyblockEvent() {
 		try {
+			if (skyblockEventHandler != null && skyblockEventHandler.hasTimedOut()) {
+				skyblockEventHandler = null;
+			}
+
 			if (database.getSkyblockEventActive(guildId)) {
 				JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
 				Instant endingTime = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
@@ -965,6 +971,18 @@ public class AutomaticGuild {
 
 	public void onTextChannelDelete(ChannelDeleteEvent event) {
 		applyGuild.forEach(o1 -> o1.onTextChannelDelete(event));
+	}
+
+	public void onModalInteraction(ModalInteractionEvent event) {
+		if (skyblockEventHandler != null) {
+			skyblockEventHandler.onModalInteraction(event);
+		}
+	}
+
+	public void onSelectMenuInteraction(SelectMenuInteractionEvent event) {
+		if (skyblockEventHandler != null) {
+			skyblockEventHandler.onSelectMenuInteraction(event);
+		}
 	}
 
 	public void onButtonClick(ButtonInteractionEvent event) {

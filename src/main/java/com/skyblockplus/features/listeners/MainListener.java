@@ -37,6 +37,7 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -221,6 +222,21 @@ public class MainListener extends ListenerAdapter {
 			if (paginator.onModalInteraction(event)) {
 				return;
 			}
+		}
+
+		if (guildMap.containsKey(event.getGuild().getId())) {
+			guildMap.get(event.getGuild().getId()).onModalInteraction(event);
+		}
+	}
+
+	@Override
+	public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+		if (event.getUser().isBot() || event.getGuild() == null) {
+			return;
+		}
+
+		if (guildMap.containsKey(event.getGuild().getId())) {
+			guildMap.get(event.getGuild().getId()).onSelectMenuInteraction(event);
 		}
 	}
 

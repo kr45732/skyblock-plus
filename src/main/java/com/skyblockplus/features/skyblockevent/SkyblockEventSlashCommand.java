@@ -716,8 +716,9 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		if (sbEventActive) {
 			return invalidEmbed("Event already running");
 		} else if (guildMap.containsKey(event.getGuild().getId())) {
-			if (guildMap.get(event.getGuild().getId()).skyblockEventHandler == null) {
-				guildMap.get(event.getGuild().getId()).setSkyblockEventHandler(new SkyblockEventHandler(event));
+			AutomaticGuild automaticGuild = guildMap.get(event.getGuild().getId());
+			if (automaticGuild.skyblockEventHandler == null || automaticGuild.skyblockEventHandler.hasTimedOut()) {
+				automaticGuild.setSkyblockEventHandler(new SkyblockEventHandler(event));
 				return null;
 			} else {
 				return invalidEmbed("Someone is already creating an event in this server");
