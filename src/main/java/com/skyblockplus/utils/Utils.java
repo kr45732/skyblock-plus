@@ -1420,18 +1420,27 @@ public class Utils {
 							NBTCompound gems = item.getCompound("tag.ExtraAttributes.gems");
 							for (Map.Entry<String, Object> gem : gems.entrySet()) {
 								if (!gem.getKey().endsWith("_gem")) {
-									if (gem.getKey().equals("unlocked_slots")) {
+									if (gem.getKey().equals("unlocked_slots") && gem.getValue() instanceof NBTList slotsList) {
 										if (
 											itemInfo.getId().equals("DIVAN_HELMET") ||
 											itemInfo.getId().equals("DIVAN_CHESTPLATE") ||
 											itemInfo.getId().equals("DIVAN_LEGGINGS") ||
 											itemInfo.getId().equals("DIVAN_BOOTS")
 										) {
-											itemInfo.addExtraValues(gems.getList(gem.getKey()).size(), "GEMSTONE_CHAMBER");
+											itemInfo.addExtraValues(slotsList.size(), "GEMSTONE_CHAMBER");
 										}
-									} else if (gems.containsKey(gem.getKey() + "_gem")) {
-										itemInfo.addExtraValue(gem.getValue() + "_" + gems.get(gem.getKey() + "_gem") + "_GEM");
-									} else {
+									} else if (gems.containsKey(gem.getKey() + "_gem")) { // "COMBAT_0": "PERFECT" & "COMBAT_0_gem": "JASPER"
+										itemInfo.addExtraValue(
+											(
+												gem.getValue() instanceof NBTCompound gemQualityNbt
+													? gemQualityNbt.getString("quality", "UNKNOWN")
+													: gem.getValue()
+											) +
+											"_" +
+											gems.get(gem.getKey() + "_gem") +
+											"_GEM"
+										);
+									} else { // "RUBY_0": "PERFECT"
 										itemInfo.addExtraValue(gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
 									}
 								}
