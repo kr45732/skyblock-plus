@@ -536,6 +536,23 @@ public class LeaderboardDatabase {
 		return -1;
 	}
 
+	public List<String> getClosestPlayers(String toMatch) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT username FROM all_lb ORDER BY username <-> ? LIMIT 25")
+		) {
+			statement.setString(1, toMatch);
+			try (ResultSet response = statement.executeQuery()) {
+				List<String> usernames = new ArrayList<>();
+				while (response.next()) {
+					usernames.add(response.getString("username"));
+				}
+				return usernames;
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
 	public void updateLeaderboard() {
 		try {
 			int count = 0;

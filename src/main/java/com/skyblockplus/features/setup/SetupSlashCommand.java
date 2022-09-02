@@ -43,13 +43,13 @@ public class SetupSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(invalidEmbed("This command is disabled"));
+		event.embed(invalidEmbed("This command is being rewritten. Please use the `/settings` command in the meanwhile."));
 		//		event.embed(getSetupEmbed());
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "A short walk-through on how to setup the bot");
+		return Commands.slash(name, "Interactive walk-throughs on how to setup different features");
 	}
 
 	public static MessageEditBuilder getSetupEmbed() {

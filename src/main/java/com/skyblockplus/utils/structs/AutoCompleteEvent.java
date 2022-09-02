@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils.structs;
 
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.Utils.*;
 
 import java.util.List;
@@ -30,13 +31,14 @@ public class AutoCompleteEvent extends CommandAutoCompleteInteractionEvent {
 	}
 
 	public void replyClosestMatch(String toMatch, List<String> matchFrom) {
-		List<String> match = getClosestMatch(toMatch, matchFrom, 25);
-		if (match.stream().noneMatch(String::isEmpty)) {
-			replyChoiceStrings(match).queue(ignore, ignore);
+		List<String> matches = getClosestMatch(toMatch, matchFrom, 25);
+		matches.removeIf(String::isEmpty);
+		if (!matches.isEmpty()) {
+			replyChoiceStrings(matches).queue(ignore, ignore);
 		}
 	}
 
 	public void replyClosestPlayer() {
-		replyChoiceStrings(database.getClosestLinkedAccounts(getOption("player").getAsString())).queue(ignore, ignore);
+		replyChoiceStrings(leaderboardDatabase.getClosestPlayers(getOption("player").getAsString())).queue(ignore, ignore);
 	}
 }

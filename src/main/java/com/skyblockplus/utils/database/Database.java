@@ -254,8 +254,4 @@ public class Database {
 	public int setLogChannel(String serverId, String newSettings) {
 		return settingsService.setLogChannel(serverId, newSettings).getStatusCodeValue();
 	}
-
-	public List<String> getClosestLinkedAccounts(String toMatch) {
-		return linkedAccountDatabase.getClosestLinkedAccounts(toMatch);
-	}
 }
