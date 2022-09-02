@@ -2896,7 +2896,11 @@ public class SettingsExecute {
 		try {
 			role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
 		} catch (Exception e) {
-			return invalidEmbed("The provided role is invalid");
+			try {
+				role = guild.getRolesByName(roleMention.replaceAll("[<#>]", ""), true).get(0);
+			} catch (Exception ex) {
+				return invalidEmbed("The provided role is invalid");
+			}
 		}
 
 		if (role == null) {
@@ -2915,7 +2919,11 @@ public class SettingsExecute {
 		try {
 			channel = guild.getTextChannelById(channelMention.replaceAll("[<#>]", ""));
 		} catch (Exception e) {
-			return invalidEmbed("The provided text channel is invalid");
+			try {
+				channel = guild.getTextChannelsByName(channelMention.replaceAll("[<#>]", ""), true).get(0);
+			} catch (Exception ex) {
+				return invalidEmbed("The provided text channel is invalid");
+			}
 		}
 
 		if (channel == null) {

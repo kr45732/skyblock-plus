@@ -75,7 +75,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			) &&
 			!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
 		) {
-			event.string(client.getError() + " You must have the administrator permission in this guild to use that!");
+			event.string(client.getError() + " You are missing the required permissions or roles to use this command");
 			return;
 		}
 

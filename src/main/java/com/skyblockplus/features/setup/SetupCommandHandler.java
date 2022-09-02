@@ -25,63 +25,63 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.settings.SettingsExecute;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 
 public class SetupCommandHandler {
 
 	private final ButtonInteractionEvent buttonEvent;
-	private SettingsExecute settings;
-	private int state = 0;
+	private final SettingsExecute settings;
 	private String featureType = null;
-	private int attemptsLeft = 3;
 	private String name;
+	private MessageEditData originalMb;
+	private Instant lastAction = Instant.now();
 
 	public SetupCommandHandler(ButtonInteractionEvent buttonEvent, String featureType) {
 		this.buttonEvent = buttonEvent;
+		this.buttonEvent.deferEdit().queue();
+		this.settings = new SettingsExecute(buttonEvent.getGuild(), buttonEvent.getChannel(), buttonEvent.getUser());
 
 		switch (featureType) {
 			case "verify":
 				buttonEvent
-					.replyModal(
-						Modal
-							.create("setup_command_verify_modal", "Verify Setup")
-							.addActionRows(
-								ActionRow.of(
-									TextInput
-										.create("message", "Verification Message", TextInputStyle.PARAGRAPH)
-										.setValue("Run `/verify <IGN>` to verify and gain access to the server!")
-										.build()
-								),
-								ActionRow.of(
-									TextInput
-										.create("roles", "Verified Roles", TextInputStyle.PARAGRAPH)
-										.setPlaceholder("Roles given when verifying seperated by commas\ne.g. @role1, @role two")
-										.build()
-								),
-								ActionRow.of(
-									TextInput
-										.create("nickname", "Nickname Template", TextInputStyle.PARAGRAPH)
-										.setRequired(false)
-										.setPlaceholder(
-											"Template to nick user when verifying.\nFormat: <PREFIX> [IGN] <POSTFIX>\ne.g. [[GUILD.RANK]] [IGN]"
-										)
+					.getHook()
+					.editOriginal(
+						originalMb =
+							new MessageEditBuilder()
+								.setEmbeds(
+									defaultEmbed("Setup")
+										.setDescription("Use the menu below to configure the verification settings")
 										.build()
 								)
-							)
-							.build()
+								.setActionRow(
+									SelectMenu
+										.create("setup_command_" + featureType)
+										.addOption("Enable", "enable")
+										.addOption("Verification Message", "message")
+										.addOption("Verified Roles", "roles")
+										.addOption("Verification Channel", "roles")
+										.addOption("Nickname Template", "nickname")
+										.build()
+								)
+								.build()
 					)
 					.queue();
 				break;
@@ -97,7 +97,8 @@ public class SetupCommandHandler {
 				break;
 			case "roles":
 				buttonEvent
-					.replyEmbeds(
+					.getHook()
+					.editOriginalEmbeds(
 						defaultEmbed("Setup")
 							.setDescription(
 								"""
@@ -126,31 +127,64 @@ public class SetupCommandHandler {
 				return;
 			case "fetchur":
 				buttonEvent
-					.replyEmbeds(
-						defaultEmbed("Setup")
-							.setDescription("Reply with the channel where fetchur notifications should be sent.")
-							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
-							.build()
+					.getHook()
+					.editOriginal(
+						originalMb =
+							new MessageEditBuilder()
+								.setEmbeds(
+									defaultEmbed("Setup").setDescription("Use the menu below to configure the fetchur settings").build()
+								)
+								.setActionRow(
+									SelectMenu
+										.create("setup_command_" + featureType)
+										.addOption("Enable", "enable")
+										.addOption("Ping Role", "roles")
+										.addOption("Fetchur Channel", "roles")
+										.build()
+								)
+								.build()
 					)
 					.queue();
 				break;
 			case "mayor":
 				buttonEvent
-					.replyEmbeds(
-						defaultEmbed("Setup")
-							.setDescription("Reply with the channel where mayor notifications should be sent.")
-							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
-							.build()
+					.getHook()
+					.editOriginal(
+						originalMb =
+							new MessageEditBuilder()
+								.setEmbeds(
+									defaultEmbed("Setup").setDescription("Use the menu below to configure the mayor settings").build()
+								)
+								.setActionRow(
+									SelectMenu
+										.create("setup_command_" + featureType)
+										.addOption("Enable", "enable")
+										.addOption("Ping Role", "roles")
+										.addOption("Mayor Channel", "roles")
+										.build()
+								)
+								.build()
 					)
 					.queue();
 				break;
 			case "jacob":
 				buttonEvent
-					.replyEmbeds(
-						defaultEmbed("Setup")
-							.setDescription("Reply with the channel where farming event notifications should be sent.")
-							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
-							.build()
+					.getHook()
+					.editOriginal(
+						originalMb =
+							new MessageEditBuilder()
+								.setEmbeds(
+									defaultEmbed("Setup").setDescription("Use the menu below to configure the jacob settings").build()
+								)
+								.setActionRow(
+									SelectMenu
+										.create("setup_command_" + featureType)
+										.addOption("Enable", "enable")
+										.addOption("Crops", "crops")
+										.addOption("Mayor Channel", "roles")
+										.build()
+								)
+								.build()
 					)
 					.queue();
 				break;
@@ -200,7 +234,7 @@ public class SetupCommandHandler {
 					if (eb.build().getTitle().equals("Settings")) {
 						buttonEvent
 							.getHook()
-							.editOriginalEmbeds(defaultEmbed("Success").setDescription("Enabled guild member counter.").build())
+							.editOriginalEmbeds(defaultEmbed("Success").setDescription("Enabled guild member counter").build())
 							.queue();
 					} else {
 						buttonEvent.getHook().editOriginalEmbeds(eb.build()).queue();
@@ -212,100 +246,150 @@ public class SetupCommandHandler {
 				break;
 		}
 
-		this.settings = new SettingsExecute(buttonEvent.getGuild(), buttonEvent.getChannel(), buttonEvent.getUser());
 		this.featureType = this.featureType != null ? this.featureType : featureType;
-		waitForReply();
 	}
 
-	private boolean checkReply(MessageReceivedEvent event) {
-		return (
+	public void onSelectMenuInteraction(SelectMenuInteractionEvent event) {
+		if (
 			event.isFromGuild() &&
-			event.getChannel().getId().equals(buttonEvent.getChannel().getId()) &&
-			event.getAuthor().getId().equals(buttonEvent.getUser().getId())
-		);
+			event.getMessageId().equals(buttonEvent.getMessageId()) &&
+			event.getUser().getId().equals(buttonEvent.getUser().getId())
+		) {
+			switch (featureType) {
+				case "verify" -> {
+					String selectedOption = event.getSelectedOptions().get(0).getValue();
+					Modal.Builder modalBuilder = Modal.create("setup_command_" + selectedOption, "Setup");
+					switch (selectedOption) {
+						case "enable" -> {
+							EmbedBuilder eb = settings.setVerifyEnable(true);
+							if (!eb.build().getTitle().equals("Settings")) {
+								event.editMessageEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
+							} else {
+								String msg = onVerifyReload(event.getGuild().getId());
+								if (msg.equals("Reloaded")) {
+									event
+										.editMessageEmbeds(
+											defaultEmbed("Success").setDescription("Successfully enabled the verification feature").build()
+										)
+										.setComponents()
+										.queue();
+								} else {
+									event.editMessageEmbeds(defaultEmbed("Error").setDescription(msg).build()).setComponents().queue();
+								}
+							}
+						}
+						case "message" -> event
+							.replyModal(
+								modalBuilder
+									.addActionRow(TextInput.create("value", "Verification Message", TextInputStyle.PARAGRAPH).build())
+									.build()
+							)
+							.queue();
+						case "roles" -> event
+							.replyModal(
+								modalBuilder
+									.addActionRow(
+										TextInput
+											.create("value", "Verified Roles", TextInputStyle.SHORT)
+											.setPlaceholder("Roles given when verifying seperated by commas")
+											.build()
+									)
+									.build()
+							)
+							.queue();
+						case "channel" -> event
+							.replyModal(
+								modalBuilder
+									.addActionRow(TextInput.create("value", "Verification Channel", TextInputStyle.SHORT).build())
+									.build()
+							)
+							.queue();
+						case "nickname" -> event
+							.replyModal(
+								modalBuilder
+									.addActionRow(
+										TextInput
+											.create("value", "Verified Nickname", TextInputStyle.SHORT)
+											.setPlaceholder("Template to nick after verifying ([PREFIX] [IGN] [POSTFIX])")
+											.build()
+									)
+									.build()
+							)
+							.queue();
+					}
+				}
+			}
+		}
 	}
 
-	private void cancel() {
-		switch (featureType) {
-			case "verify":
-				database.setVerifySettings(buttonEvent.getGuild().getId(), gson.toJsonTree(new AutomatedVerify()));
-				break;
-			case "apply":
-			case "guild":
-				if (name != null) {
-					database.removeGuildSettings(buttonEvent.getGuild().getId(), name);
+	public void onModalInteraction(ModalInteractionEvent event) {
+		if (
+			event.isFromGuild() &&
+			event.getMessage() != null &&
+			event.getMessage().getId().equals(buttonEvent.getMessageId()) &&
+			event.getUser().getId().equals(buttonEvent.getUser().getId())
+		) {
+			switch (featureType) {
+				case "verify" -> {
+					switch (event.getModalId().split("setup_command_")[1]) {
+						case "message" -> {
+							EmbedBuilder eb = settings.setVerifyMessageText(event.getValues().get(0).getAsString());
+							if (!eb.build().getTitle().equals("Settings")) {
+								event.editMessageEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
+							} else {
+								event.editMessage(originalMb).queue();
+							}
+						}
+						case "roles" -> {
+							EmbedBuilder eb = null;
+							String[] verifyRoles = event.getValues().get(0).getAsString().split(",");
+							if (verifyRoles.length == 0 || verifyRoles.length > 3) {
+								eb =
+									defaultEmbed(
+										"You must add at least one verification role and at most three verification roles. (Example: `@role1, @role2`)"
+									);
+							} else {
+								database.setVerifyRolesSettings(event.getGuild().getId(), new JsonArray());
+								for (String verifyRole : verifyRoles) {
+									eb = settings.addVerifyRole(verifyRole.trim());
+									if (!eb.build().getTitle().equals("Settings")) {
+										break;
+									}
+								}
+							}
+							if (!eb.build().getTitle().equals("Settings")) {
+								event.editMessageEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
+							} else {
+								event.editMessage(originalMb).queue();
+							}
+						}
+						case "channel" -> {
+							EmbedBuilder eb = settings.setVerifyMessageTextChannelId(event.getValues().get(0).getAsString());
+							if (!eb.build().getTitle().equals("Settings")) {
+								event.editMessageEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
+							} else {
+								event.editMessage(originalMb).queue();
+							}
+						}
+						case "nickname" -> {
+							EmbedBuilder eb = settings.setVerifyNickname(event.getValues().get(0).getAsString());
+							if (!eb.build().getTitle().equals("Settings")) {
+								event.editMessageEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
+							} else {
+								event.editMessage(originalMb).queue();
+							}
+						}
+					}
 				}
-				break;
+			}
 		}
 	}
 
 	private void handleReply(MessageReceivedEvent event) {
-		if (event.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
-			sendEmbed(defaultEmbed("Canceled the process"));
-			cancel();
-			return;
-		}
-
 		EmbedBuilder eb = null;
 		EmbedBuilder eb2 = defaultEmbed("Setup").setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+");
+		int state = 0;
 		switch (featureType) {
-			case "verify":
-				switch (state) {
-					case 0 -> {
-						eb = settings.setVerifyMessageText(event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with the channel where the message should be sent.");
-					}
-					case 1 -> {
-						eb = settings.setVerifyMessageTextChannelId(event.getMessage().getContentRaw());
-						eb2.setDescription(
-							"Reply with the role(s) a user should be given once verified. Separate multiple roles with a space."
-						);
-					}
-					case 2 -> {
-						String[] verifyRoles = event.getMessage().getContentRaw().split("\\s+");
-						if (verifyRoles.length == 0 || verifyRoles.length > 3) {
-							eb =
-								defaultEmbed(
-									"You must add at least one verification role and at most three verification roles. (Example: `@role1, @role2`)"
-								);
-						} else {
-							database.setVerifyRolesSettings(event.getGuild().getId(), new JsonArray());
-							for (String verifyRole : verifyRoles) {
-								eb = settings.addVerifyRole(verifyRole);
-								if (!eb.build().getTitle().equals("Settings")) {
-									break;
-								}
-							}
-						}
-						eb2.setDescription(
-							"Reply with the template that will be used to nick a user after verification. This follows the format `<PREFIX> [IGN] <POSTFIX>` where the prefix and postfix can be set. Reply with 'none' if you do not want this."
-						);
-					}
-					case 3 -> {
-						eb = settings.setVerifyNickname(event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with 'enable' to enable verification or anything else to cancel.");
-					}
-					case 4 -> {
-						if (event.getMessage().getContentRaw().equalsIgnoreCase("enable")) {
-							eb = settings.setVerifyEnable(true);
-							if (eb.build().getTitle().equals("Settings")) {
-								String msg = onVerifyReload(event.getGuild().getId());
-								if (msg.equals("Reloaded")) {
-									sendEmbed(defaultEmbed("Success").setDescription("Enabled automatic verification."));
-								} else {
-									sendEmbed(defaultEmbed("Error").setDescription(msg));
-								}
-							} else {
-								sendEmbed(eb);
-							}
-						} else {
-							sendEmbed(defaultEmbed("Canceled the process"));
-							cancel();
-						}
-						return;
-					}
-				}
-				break;
 			case "guild":
 				if (state == 0) {
 					eb = settings.createNewGuild(event.getMessage().getContentRaw());
@@ -420,7 +504,6 @@ public class SetupCommandHandler {
 							}
 						} else {
 							sendEmbed(defaultEmbed("Canceled the process"));
-							cancel();
 						}
 						return;
 					}
@@ -531,29 +614,12 @@ public class SetupCommandHandler {
 							sendEmbed(settings.setJacobEnable(true));
 						} else {
 							sendEmbed(defaultEmbed("Canceled the process"));
-							cancel();
 						}
 						return;
 					}
 				}
 				break;
 		}
-
-		if (!eb.build().getTitle().equals("Settings")) {
-			attemptsLeft--;
-			if (attemptsLeft == 0) {
-				sendEmbed(defaultEmbed("Canceled (3/3 failed attempts)"));
-				cancel();
-				return;
-			} else {
-				sendEmbed(eb.appendDescription("\nPlease try again."));
-			}
-		} else {
-			state++;
-			sendEmbed(eb2);
-		}
-
-		waitForReply();
 	}
 
 	public boolean isValid() {
@@ -564,21 +630,21 @@ public class SetupCommandHandler {
 		buttonEvent.getChannel().sendMessageEmbeds(eb.build()).queue();
 	}
 
-	private void waitForReply() {
-		waiter.waitForEvent(
-			MessageReceivedEvent.class,
-			this::checkReply,
-			this::handleReply,
-			2,
-			TimeUnit.MINUTES,
-			() -> {
-				cancel();
-				buttonEvent.getChannel().sendMessageEmbeds(defaultEmbed("Timeout").build()).queue();
-			}
-		);
-	}
-
 	private JsonObject getSettings() {
 		return database.getGuildSettings(buttonEvent.getGuild().getId(), name).getAsJsonObject();
+	}
+
+	public boolean hasTimedOut() {
+		if (Duration.between(lastAction, Instant.now()).abs().toMinutes() > 2) {
+			try {
+				buttonEvent
+					.getMessage()
+					.editMessageEmbeds(defaultEmbed("Setup").setDescription("Timeout").build())
+					.setComponents()
+					.queue(ignore, ignore);
+			} catch (Exception ignored) {}
+			return true;
+		}
+		return false;
 	}
 }

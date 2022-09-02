@@ -1099,7 +1099,7 @@ public class AutomaticGuild {
 		} else if (event.getComponentId().startsWith("setup_command_")) {
 			if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
 				event
-					.reply(client.getError() + " You must have the administrator permission in this guild to use that!")
+					.reply(client.getError() + " You are missing the required permissions or roles to use this")
 					.setEphemeral(true)
 					.queue();
 				return;
@@ -1111,10 +1111,11 @@ public class AutomaticGuild {
 			}
 		} else if (event.getComponentId().startsWith("party_finder_channel_close_")) {
 			if (event.getUser().getId().equals(event.getComponentId().split("party_finder_channel_close_")[1])) {
-				event.replyEmbeds(defaultEmbed("Party Finder").setDescription("Archiving thread...").build()).queue();
-				((ThreadChannel) event.getChannel()).getManager().setArchived(true).queueAfter(3, TimeUnit.SECONDS);
+				event
+					.reply(client.getSuccess() + " Archiving thread")
+					.queue(ignored -> ((ThreadChannel) event.getChannel()).getManager().setArchived(true).queueAfter(3, TimeUnit.SECONDS));
 			} else {
-				event.replyEmbeds(invalidEmbed("Only the party leader can close the channel").build()).setEphemeral(true).queue();
+				event.reply(client.getError() + " Only the party leader can archive the thread").setEphemeral(true).queue();
 			}
 			return;
 		} else {
@@ -1124,8 +1125,8 @@ public class AutomaticGuild {
 				event.deferReply(true).complete();
 			}
 
-			for (ApplyGuild o1 : applyGuild) {
-				String buttonClickReply = o1.onButtonClick(event);
+			for (ApplyGuild applyG : applyGuild) {
+				String buttonClickReply = applyG.onButtonClick(event);
 				if (buttonClickReply != null) {
 					if (buttonClickReply.equals("IGNORE_INTERNAL")) {
 						return;
@@ -1152,7 +1153,7 @@ public class AutomaticGuild {
 			}
 		}
 
-		event.editButton(event.getButton().asDisabled().withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
+		event.editButton(event.getButton().asDisabled()).queue();
 		event.getHook().editOriginal(client.getError() + " This button has been disabled").queue();
 	}
 

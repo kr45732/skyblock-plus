@@ -84,8 +84,8 @@ public class SkyblockEventHandler {
 	public void onSelectMenuInteraction(SelectMenuInteractionEvent event) {
 		if (
 			event.isFromGuild() &&
-			message.getId().equals(event.getMessageId()) &&
-			slashCommandEvent.getUser().getId().equals(event.getUser().getId())
+			event.getMessageId().equals(message.getId()) &&
+			event.getUser().getId().equals(slashCommandEvent.getUser().getId())
 		) {
 			lastAction = Instant.now();
 
@@ -362,8 +362,8 @@ public class SkyblockEventHandler {
 			modalState != null &&
 			event.isFromGuild() &&
 			event.getMessage() != null &&
-			message.getId().equals(event.getMessage().getId()) &&
-			slashCommandEvent.getUser().getId().equals(event.getUser().getId())
+			event.getMessage().getId().equals(message.getId()) &&
+			event.getUser().getId().equals(slashCommandEvent.getUser().getId())
 		) {
 			lastAction = Instant.now();
 

@@ -20,11 +20,15 @@ package com.skyblockplus.features.listeners;
 
 import static com.skyblockplus.utils.Utils.*;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Expiry;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.inventory.InventoryListPaginator;
+import com.skyblockplus.utils.AbstractEventListener;
 import com.skyblockplus.utils.AuctionFlipper;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -42,11 +46,14 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 public class MainListener extends ListenerAdapter {
 
 	public static final Map<String, AutomaticGuild> guildMap = new ConcurrentHashMap<>();
+	public static final List<SetupCommandHandler> listeners = new ArrayList<>();
 	private static String lastRepoComitSha = null;
 
 	public static String onApplyReload(String guildId) {
@@ -202,7 +209,7 @@ public class MainListener extends ListenerAdapter {
 		}
 
 		if (event.getGuild() == null) {
-			event.editButton(event.getButton().asDisabled().withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
+			event.editButton(event.getButton().asDisabled()).queue();
 			event.getHook().editOriginal(client.getError() + " This button has been disabled").queue();
 			return;
 		}
