@@ -145,8 +145,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 						.build()
 				)
 				.queue();
-			case JACOB -> // TODO: select menu with each crop and then press on crop to set role
-			buttonEvent
+			case JACOB -> buttonEvent // TODO: select menu with each crop and then press on crop to set role
 				.editMessage(
 					new MessageEditBuilder()
 						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the jacob settings").build())
