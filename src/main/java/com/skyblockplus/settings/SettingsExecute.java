@@ -1041,10 +1041,11 @@ public class SettingsExecute {
 		}
 
 		String guildNameFormatted = guildResponse.get("name").getAsString();
-		AutomatedGuild guildSettings = new AutomatedGuild(
-			guildNameFormatted.toLowerCase().replace(" ", "_"),
-			guildResponse.get("_id").getAsString()
-		);
+		String guildNameStripped = guildNameFormatted.toLowerCase().replace(" ", "_");
+		if (higherDepth(database.getGuildSettings(guild.getId(), guildNameStripped), "guildName", null) != null) {
+			return invalidEmbed("An automated guild already exists for this guild");
+		}
+		AutomatedGuild guildSettings = new AutomatedGuild(guildNameStripped, guildResponse.get("_id").getAsString());
 
 		int responseCode = database.setGuildSettings(guild.getId(), gson.toJsonTree(guildSettings));
 		if (responseCode != 200) {
@@ -1307,18 +1308,25 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setApplyCategory(JsonObject guildSettings, String messageCategory) {
+		Category applyCategory = null;
 		try {
-			Category applyCategory = guild.getCategoryById(messageCategory.replaceAll("[<#>]", ""));
-			guildSettings.addProperty("applyCategory", applyCategory.getId());
-
-			int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
-
-			return defaultSettingsEmbed("Set apply category to: <#" + applyCategory.getId() + ">");
+			applyCategory = guild.getCategoryById(messageCategory.replaceAll("[<#>]", ""));
 		} catch (Exception ignored) {}
-		return invalidEmbed("Invalid guild category");
+		try {
+			applyCategory = guild.getCategoriesByName(messageCategory.replaceAll("[<#>]", ""), true).get(0);
+		} catch (Exception ignored) {}
+		if (applyCategory == null) {
+			return invalidEmbed("Invalid server category");
+		}
+
+		guildSettings.addProperty("applyCategory", applyCategory.getId());
+
+		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Set apply category to: <#" + applyCategory.getId() + ">");
 	}
 
 	public EmbedBuilder setApplyStaffChannel(JsonObject guildSettings, String textChannel) {

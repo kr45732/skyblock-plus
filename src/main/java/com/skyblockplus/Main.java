@@ -150,6 +150,7 @@ public class Main {
 			}
 		}
 
+		MainListener.initialize();
 		ApiHandler.initialize();
 		AuctionTracker.initialize();
 		AuctionFlipper.initialize(true);

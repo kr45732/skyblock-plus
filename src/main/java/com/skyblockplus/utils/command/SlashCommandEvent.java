@@ -24,7 +24,6 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Utils;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -82,65 +81,13 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 		return invalidEmbed("Invalid Command");
 	}
 
-	public void embed(EmbedBuilder eb) {
-		getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
-	}
-
 	public void embed(Object ebOrMb) {
 		if (ebOrMb instanceof EmbedBuilder eb) {
-			embed(eb);
+			getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
 		} else if (ebOrMb instanceof MessageEditBuilder mb) {
 			getHook().editOriginal(mb.build()).queue(ignore, ignore);
 		} else {
 			throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
-		}
-	}
-
-	private boolean getLinkedUser(String id) {
-		LinkedAccount linkedUserUsername = database.getByDiscord(id);
-		if (linkedUserUsername != null) {
-			player = linkedUserUsername.uuid();
-			return false;
-		}
-
-		embed(
-			invalidEmbed(
-				"<@" +
-				id +
-				"> is not linked to the bot. Please specify a username or " +
-				(getUser().getId().equals(id) ? "" : "have them ") +
-				"link using `/link`"
-			)
-		);
-		return true;
-	}
-
-	public boolean invalidPlayerOption() {
-		OptionMapping option = getOption("player");
-
-		if (option == null) {
-			return getLinkedUser(getUser().getId());
-		}
-
-		player = option.getAsString();
-
-		Matcher matcher = Message.MentionType.USER.getPattern().matcher(option.getAsString());
-		if (matcher.matches()) {
-			return getLinkedUser(matcher.group(1));
-		}
-
-		return false;
-	}
-
-	public void paginate(EmbedBuilder failEmbed) {
-		paginate(failEmbed, false);
-	}
-
-	public void paginate(EmbedBuilder failEmbed, boolean deleteOriginal) {
-		if (failEmbed != null) {
-			getHook().editOriginalEmbeds(failEmbed.build()).queue(ignore, ignore);
-		} else if (deleteOriginal) {
-			getHook().deleteOriginal().queue();
 		}
 	}
 
@@ -174,8 +121,46 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 		getHook().editOriginal(string).queue(ignore, ignore);
 	}
 
-	public Member getSelfMember() {
-		return getGuild().getSelfMember();
+	public boolean invalidPlayerOption() {
+		return invalidPlayerOption(false);
+	}
+
+	public boolean invalidPlayerOption(boolean onlyCheck) {
+		OptionMapping option = getOption("player");
+
+		if (option == null) {
+			return getLinkedUser(getUser().getId(), onlyCheck);
+		}
+
+		player = option.getAsString();
+
+		Matcher matcher = Message.MentionType.USER.getPattern().matcher(option.getAsString());
+		if (matcher.matches()) {
+			return getLinkedUser(matcher.group(1), onlyCheck);
+		}
+
+		return false;
+	}
+
+	private boolean getLinkedUser(String id, boolean onlyCheck) {
+		LinkedAccount linkedUserUsername = database.getByDiscord(id);
+		if (linkedUserUsername != null) {
+			player = linkedUserUsername.uuid();
+			return false;
+		}
+
+		if (!onlyCheck) {
+			embed(
+				invalidEmbed(
+					"<@" +
+					id +
+					"> is not linked to the bot. Please specify a username or " +
+					(getUser().getId().equals(id) ? "" : "have them ") +
+					"link using `/link`."
+				)
+			);
+		}
+		return true;
 	}
 
 	public boolean isOwner() {

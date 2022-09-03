@@ -20,16 +20,12 @@ package com.skyblockplus.features.listeners;
 
 import static com.skyblockplus.utils.Utils.*;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Expiry;
-import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.github.benmanes.caffeine.cache.RemovalListener;
-import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.inventory.InventoryListPaginator;
 import com.skyblockplus.utils.AbstractEventListener;
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
@@ -45,16 +41,26 @@ import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
-import org.checkerframework.checker.index.qual.NonNegative;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 public class MainListener extends ListenerAdapter {
 
 	public static final Map<String, AutomaticGuild> guildMap = new ConcurrentHashMap<>();
-	public static final List<SetupCommandHandler> listeners = new ArrayList<>();
-	private static String lastRepoComitSha = null;
+	public static final List<AbstractEventListener> eventListeners = new ArrayList<>();
+	private static String lastRepoCommitSha = null;
+
+	public static void initialize() {
+		scheduler.scheduleAtFixedRate(
+			() -> {
+				try {
+					eventListeners.removeIf(AbstractEventListener::hasTimedOut);
+				} catch (Exception ignored) {}
+			},
+			0,
+			30,
+			TimeUnit.SECONDS
+		);
+	}
 
 	public static String onApplyReload(String guildId) {
 		String reloadStatus = "Error reloading";
@@ -175,8 +181,8 @@ public class MainListener extends ListenerAdapter {
 				"[0].sha",
 				null
 			);
-			if (!Objects.equals(commitSha, lastRepoComitSha)) {
-				lastRepoComitSha = commitSha;
+			if (!Objects.equals(commitSha, lastRepoCommitSha)) {
+				lastRepoCommitSha = commitSha;
 				updateItemMappings();
 			}
 			return;
@@ -234,6 +240,8 @@ public class MainListener extends ListenerAdapter {
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onModalInteraction(event);
 		}
+
+		eventListeners.forEach(o -> o.onModalInteraction(event));
 	}
 
 	@Override
@@ -245,6 +253,8 @@ public class MainListener extends ListenerAdapter {
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onSelectMenuInteraction(event);
 		}
+
+		eventListeners.forEach(o -> o.onSelectMenuInteraction(event));
 	}
 
 	@Override

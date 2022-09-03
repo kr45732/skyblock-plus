@@ -19,7 +19,6 @@
 package com.skyblockplus.features.setup;
 
 import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -43,8 +42,7 @@ public class SetupSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(invalidEmbed("This command is being rewritten. Please use the `/settings` command in the meanwhile."));
-		//		event.embed(getSetupEmbed());
+		event.embed(getSetupEmbed());
 	}
 
 	@Override
@@ -57,7 +55,7 @@ public class SetupSlashCommand extends SlashCommand {
 			.setEmbeds(
 				defaultEmbed("Setup")
 					.setDescription(
-						"Choose one of the buttons below to setup the corresponding feature. Note that setting up a feature can/will override previous settings."
+						"Choose one of the buttons below to setup the corresponding feature. Note that setting up a feature may override previous settings."
 					)
 					.build()
 			)

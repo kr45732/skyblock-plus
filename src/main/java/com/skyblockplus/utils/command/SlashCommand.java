@@ -43,7 +43,7 @@ public abstract class SlashCommand {
 
 		for (Permission p : botPermissions) {
 			if (p.isChannel()) {
-				if (!event.getSelfMember().hasPermission(event.getGuildChannel(), p)) {
+				if (!event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), p)) {
 					if (p == Permission.MESSAGE_SEND) {
 						event
 							.getUser()
@@ -64,7 +64,7 @@ public abstract class SlashCommand {
 					return;
 				}
 			} else {
-				if (!event.getSelfMember().hasPermission(p)) {
+				if (!event.getGuild().getSelfMember().hasPermission(p)) {
 					event.embed(invalidEmbed("I need the " + p.getName() + " permission in this server!"));
 					return;
 				}

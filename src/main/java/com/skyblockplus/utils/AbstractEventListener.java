@@ -18,7 +18,23 @@
 
 package com.skyblockplus.utils;
 
+import com.skyblockplus.features.listeners.MainListener;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+
 public abstract class AbstractEventListener {
 
+	public AbstractEventListener() {
+		MainListener.eventListeners.add(this);
+	}
+
 	public abstract boolean hasTimedOut();
+
+	public void completed() {
+		MainListener.eventListeners.remove(this);
+	}
+
+	public void onSelectMenuInteraction(SelectMenuInteractionEvent event) {}
+
+	public void onModalInteraction(ModalInteractionEvent event) {}
 }

@@ -1105,10 +1105,8 @@ public class AutomaticGuild {
 				return;
 			}
 
-			SetupCommandHandler handler = new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
-			if (handler.isValid()) {
-				return;
-			}
+			new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
+			return;
 		} else if (event.getComponentId().startsWith("party_finder_channel_close_")) {
 			if (event.getUser().getId().equals(event.getComponentId().split("party_finder_channel_close_")[1])) {
 				event

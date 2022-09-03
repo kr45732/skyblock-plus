@@ -177,7 +177,8 @@ public class CalcRunsSlashCommand extends SlashCommand {
 				case 10 -> 36500;
 				case 11 -> 48500;
 				case 12 -> 70000;
-				default -> 100000;
+				case 13 -> 100000;
+				default -> 300000;
 			};
 
 		double xpNeeded = target.totalExp() - current.totalExp();

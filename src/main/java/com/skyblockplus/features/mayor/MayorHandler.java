@@ -181,7 +181,7 @@ public class MayorHandler {
 					updateCount++;
 				}
 
-				if (updateCount != 0 && updateCount % 7 == 0) {
+				if (updateCount != 0 && updateCount % 10 == 0) {
 					try {
 						TimeUnit.SECONDS.sleep(1);
 					} catch (Exception ignored) {}
@@ -279,7 +279,7 @@ public class MayorHandler {
 					updateCount++;
 				}
 
-				if (updateCount != 0 && updateCount % 7 == 0) {
+				if (updateCount != 0 && updateCount % 10 == 0) {
 					try {
 						TimeUnit.SECONDS.sleep(1);
 					} catch (Exception ignored) {}
