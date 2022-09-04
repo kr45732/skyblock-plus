@@ -101,7 +101,7 @@ public class Main {
 						}
 					}
 				)
-				.setCommandPreProcessBiFunction((event, command) -> !event.isFromGuild())
+				.setCommandPreProcessBiFunction((event, command) -> event.isFromGuild())
 				.setActivity(Activity.playing("Loading..."))
 				.setManualUpsert(true)
 				.addCommands(springContext.getBeansOfType(Command.class).values().toArray(new Command[0]))
