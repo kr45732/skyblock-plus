@@ -20,6 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.getItemThumbnail;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -56,8 +57,6 @@ public class FetchurSlashCommand extends SlashCommand {
 		}
 
 		String[] fetchurItem = FETCHUR_ITEMS.get(index).split("\\|");
-		return defaultEmbed("Fetchur item")
-			.setDescription(fetchurItem[0])
-			.setThumbnail("https://sky.shiiyu.moe/item.gif/" + fetchurItem[1]);
+		return defaultEmbed("Fetchur item").setDescription(fetchurItem[0]).setThumbnail(getItemThumbnail(fetchurItem[1]));
 	}
 }

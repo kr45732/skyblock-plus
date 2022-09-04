@@ -22,6 +22,7 @@ import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.ApiHandler.useAlternativeAhApi;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.getItemThumbnail;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
@@ -138,7 +139,7 @@ public class AuctionFlipper {
 							.addField("Estimated Profit", roundAndFormat(profit), true)
 							.addField("Sales Per Day", formatNumber(sales), true)
 							.addField("Command", "`/viewauction " + auctionUuid + "`", true)
-							.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+							.setThumbnail(getItemThumbnail(itemId))
 							.build()
 					)
 					.whenComplete((m, e) -> {

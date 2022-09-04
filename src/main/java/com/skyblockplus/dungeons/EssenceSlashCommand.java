@@ -20,6 +20,7 @@ package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.getItemThumbnail;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -143,7 +144,7 @@ public class EssenceSlashCommand extends SlashCommand {
 					);
 				}
 			}
-			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
+			eb.setThumbnail(getItemThumbnail(itemId));
 			return eb;
 		}
 		return defaultEmbed("Invalid item name");

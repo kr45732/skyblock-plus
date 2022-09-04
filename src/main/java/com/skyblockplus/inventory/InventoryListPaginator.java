@@ -18,8 +18,8 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.Utils.client;
-import static com.skyblockplus.utils.Utils.ignore;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.getItemThumbnail;
 
 import com.skyblockplus.utils.AbstractEventListener;
 import com.skyblockplus.utils.Player;
@@ -94,7 +94,7 @@ public class InventoryListPaginator extends AbstractEventListener {
 					"\n**Item Creation:** " +
 					item.getCreationTimestamp()
 				)
-				.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
+				.setThumbnail(getItemThumbnail(item.getId()))
 				.setImage("attachment://lore.png");
 			action = event.getHook().editOriginalEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
 		}
@@ -190,7 +190,7 @@ public class InventoryListPaginator extends AbstractEventListener {
 							"\n**Item Creation:** " +
 							item.getCreationTimestamp()
 						)
-						.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
+						.setThumbnail(getItemThumbnail(item.getId()))
 						.setImage("attachment://lore.png");
 					action = event.editMessageEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
 				}
@@ -243,7 +243,7 @@ public class InventoryListPaginator extends AbstractEventListener {
 						"\n**Item Creation:** " +
 						item.getCreationTimestamp()
 					)
-					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
+					.setThumbnail(getItemThumbnail(item.getId()))
 					.setImage("attachment://lore.png");
 				action = event.editMessageEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
 			}

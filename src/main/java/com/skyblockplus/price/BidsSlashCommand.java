@@ -121,7 +121,7 @@ public class BidsSlashCommand extends SlashCommand {
 
 		extras
 			.setEveryPageTitle(usernameUuidStruct.username())
-			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.username(), null))
+			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.uuid(), null))
 			.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl());
 
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));

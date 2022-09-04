@@ -1193,7 +1193,7 @@ public class Player {
 
 	/* Links */
 	public String skyblockStatsLink() {
-		return Utils.skyblockStatsLink(username, profileName);
+		return Utils.skyblockStatsLink(uuid, profileName);
 	}
 
 	public String getThumbnailUrl() {

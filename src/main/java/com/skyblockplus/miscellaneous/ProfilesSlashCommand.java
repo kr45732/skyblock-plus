@@ -113,7 +113,7 @@ public class ProfilesSlashCommand extends SlashCommand {
 		List<String> pageTitlesUrls = new ArrayList<>();
 		int count = 0;
 		for (JsonElement profile : profilesJson.response().getAsJsonArray()) {
-			pageTitlesUrls.add(skyblockStatsLink(usernameUuid.username(), higherDepth(profile, "cute_name").getAsString()));
+			pageTitlesUrls.add(skyblockStatsLink(usernameUuid.uuid(), higherDepth(profile, "cute_name").getAsString()));
 			StringBuilder profileStr = new StringBuilder(
 				"• **Profile Name:** " +
 				higherDepth(profile, "cute_name").getAsString() +

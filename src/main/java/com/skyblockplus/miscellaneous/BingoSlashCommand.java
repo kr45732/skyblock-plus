@@ -95,7 +95,7 @@ public class BingoSlashCommand extends SlashCommand {
 			bingoArr = higherDepth(bingoJson, "completed_goals").getAsJsonArray();
 		} catch (Exception ignored) {}
 
-		EmbedBuilder eb = defaultEmbed(usernameUuidStruct.username(), skyblockStatsLink(usernameUuidStruct.username(), null));
+		EmbedBuilder eb = defaultEmbed(usernameUuidStruct.username(), skyblockStatsLink(usernameUuidStruct.uuid(), null));
 		StringBuilder regGoals = new StringBuilder();
 		StringBuilder communityGoals = new StringBuilder();
 		StringBuilder cardStr = new StringBuilder(); // C = community done, c = community not done, S = self done, s = self not done

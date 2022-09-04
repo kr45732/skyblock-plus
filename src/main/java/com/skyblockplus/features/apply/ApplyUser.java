@@ -152,7 +152,7 @@ public class ApplyUser implements Serializable {
 						" - [" +
 						capitalizeString(profileName) +
 						"](" +
-						skyblockStatsLink(player.getUsername(), profileName) +
+						skyblockStatsLink(player.getUuid(), profileName) +
 						")"
 					);
 				}
@@ -160,7 +160,7 @@ public class ApplyUser implements Serializable {
 					"\n↩️ - [Last played profile (" +
 					player.getProfileName() +
 					")](" +
-					skyblockStatsLink(player.getUsername(), player.getProfileName()) +
+					skyblockStatsLink(player.getUuid(), player.getProfileName()) +
 					")"
 				);
 				profileEmojiToName.put("↩️", player.getProfileName());

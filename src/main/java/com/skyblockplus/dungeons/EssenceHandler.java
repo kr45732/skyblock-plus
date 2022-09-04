@@ -20,6 +20,7 @@ package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.getItemThumbnail;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -71,7 +72,7 @@ public class EssenceHandler {
 			.editOriginalEmbeds(
 				defaultEmbed("Essence upgrade for " + itemName)
 					.setDescription("Choose the current item level")
-					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+					.setThumbnail(getItemThumbnail(itemId))
 					.build()
 			)
 			.setActionRow(menuBuilder.build())
@@ -110,7 +111,7 @@ public class EssenceHandler {
 			.editMessageEmbeds(
 				defaultEmbed("Essence upgrade for " + itemName)
 					.setDescription("Choose the ending item level")
-					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+					.setThumbnail(getItemThumbnail(itemId))
 					.build()
 			)
 			.setActionRow(menuBuilder.build())
@@ -160,7 +161,7 @@ public class EssenceHandler {
 		event
 			.editMessageEmbeds(
 				defaultEmbed("Essence upgrade for " + itemName)
-					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+					.setThumbnail(getItemThumbnail(itemId))
 					.addField(
 						"From " +
 						(startingLevel == -1 ? "not dungeonized" : startingLevel + (startingLevel == 1 ? " star" : " stars")) +

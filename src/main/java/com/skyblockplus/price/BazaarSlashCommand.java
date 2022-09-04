@@ -19,6 +19,7 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.getItemThumbnail;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -68,14 +69,13 @@ public class BazaarSlashCommand extends SlashCommand {
 		}
 
 		JsonElement itemInfo = higherDepth(bazaarItems, itemId);
-		EmbedBuilder eb = defaultEmbed(idToName(itemId), "https://bazaartracker.com/product/" + itemId);
-		eb.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buy_summary.[0].pricePerUnit", 0.0)), true);
-		eb.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sell_summary.[0].pricePerUnit", 0.0)), true);
-		eb.addBlankField(true);
-		eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.buyVolume", 0L)), true);
-		eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.sellVolume", 0L)), true);
-		eb.addBlankField(true);
-		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
-		return eb;
+		return defaultEmbed(idToName(itemId), "https://bazaartracker.com/product/" + itemId)
+			.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buy_summary.[0].pricePerUnit", 0.0)), true)
+			.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sell_summary.[0].pricePerUnit", 0.0)), true)
+			.addBlankField(true)
+			.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.buyVolume", 0L)), true)
+			.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.sellVolume", 0L)), true)
+			.addBlankField(true)
+			.setThumbnail(getItemThumbnail(itemId));
 	}
 }
