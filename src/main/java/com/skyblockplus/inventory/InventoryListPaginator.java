@@ -111,6 +111,9 @@ public class InventoryListPaginator extends AbstractEventListener {
 			.queue(ignore, ignore);
 	}
 
+	/**
+	 * @return path to image file
+	 */
 	public String getRenderedLore() {
 		return renderedCache.computeIfAbsent(key + pageNumber, ignored -> computeRenderedLore());
 	}
@@ -166,7 +169,6 @@ public class InventoryListPaginator extends AbstractEventListener {
 					}
 				}
 
-				List<Button> curButtons = event.getMessage().getButtons();
 				MessageEditCallbackAction action;
 				EmbedBuilder eb = player
 					.defaultPlayerEmbed()
@@ -175,7 +177,7 @@ public class InventoryListPaginator extends AbstractEventListener {
 				InvItem item = items.get(pageNumber);
 				if (item == null) {
 					eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
-					action = event.editMessageEmbeds(eb.build());
+					action = event.editMessageEmbeds(eb.build()).setFiles();
 				} else {
 					eb
 						.setDescription(
@@ -191,8 +193,8 @@ public class InventoryListPaginator extends AbstractEventListener {
 						.setImage("attachment://lore.png");
 					action = event.editMessageEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
 				}
+				List<Button> curButtons = event.getMessage().getButtons();
 				action
-					.setFiles()
 					.setActionRow(
 						curButtons.get(0).withDisabled(pageNumber == 0),
 						curButtons.get(1),
@@ -228,7 +230,7 @@ public class InventoryListPaginator extends AbstractEventListener {
 			InvItem item = items.get(pageNumber);
 			if (item == null) {
 				eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
-				action = event.editMessageEmbeds(eb.build());
+				action = event.editMessageEmbeds(eb.build()).setFiles();
 			} else {
 				eb
 					.setDescription(
@@ -245,7 +247,6 @@ public class InventoryListPaginator extends AbstractEventListener {
 				action = event.editMessageEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
 			}
 			action
-				.setFiles()
 				.setActionRow(
 					Button
 						.primary("inv_list_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))

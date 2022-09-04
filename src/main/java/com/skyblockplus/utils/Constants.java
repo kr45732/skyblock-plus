@@ -188,18 +188,17 @@ public class Constants {
 
 			/* ALL_TALISMANS */
 			ALL_TALISMANS = new HashSet<>();
-			for (Map.Entry<String, JsonElement> talismanUpgrade : higherDepth(getTalismanJson(), "accessories")
+			for (Map.Entry<String, JsonElement> talismanUpgrade : higherDepth(getTalismanJson(), "ACCESSORIES")
 				.getAsJsonObject()
 				.entrySet()) {
 				ALL_TALISMANS.add(talismanUpgrade.getKey());
-				if (higherDepth(getTalismanJson(), "accessory_duplicates." + talismanUpgrade.getKey()) != null) {
-					for (JsonElement duplicate : higherDepth(getTalismanJson(), "accessory_duplicates." + talismanUpgrade.getKey())
+				if (higherDepth(getTalismanJson(), "ACCESSORY_DUPLICATES." + talismanUpgrade.getKey()) != null) {
+					for (JsonElement duplicate : higherDepth(getTalismanJson(), "ACCESSORY_DUPLICATES." + talismanUpgrade.getKey())
 						.getAsJsonArray()) {
 						ALL_TALISMANS.add(duplicate.getAsString());
 					}
 				}
 			}
-			ALL_TALISMANS.addAll(List.of("ARTIFACT_OF_CONTROL", "PANDORAS_BOX", "SHENS_REGALIA"));
 
 			/* NUMBER_TO_RARITY_MAP */
 			NUMBER_TO_RARITY_MAP =
