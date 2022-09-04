@@ -217,7 +217,9 @@ public class MainListener extends ListenerAdapter {
 			guildMap.get(event.getGuild().getId()).onButtonClick(event);
 		}
 
-		eventListeners.forEach(o -> o.onButtonInteraction(event));
+		for (AbstractEventListener listener : eventListeners) {
+			listener.onButtonInteraction(event);
+		}
 	}
 
 	@Override
@@ -230,7 +232,9 @@ public class MainListener extends ListenerAdapter {
 			guildMap.get(event.getGuild().getId()).onModalInteraction(event);
 		}
 
-		eventListeners.forEach(o -> o.onModalInteraction(event));
+		for (AbstractEventListener listener : eventListeners) {
+			listener.onModalInteraction(event);
+		}
 	}
 
 	@Override
@@ -243,7 +247,9 @@ public class MainListener extends ListenerAdapter {
 			guildMap.get(event.getGuild().getId()).onSelectMenuInteraction(event);
 		}
 
-		eventListeners.forEach(o -> o.onSelectMenuInteraction(event));
+		for (AbstractEventListener listener : eventListeners) {
+			listener.onSelectMenuInteraction(event);
+		}
 	}
 
 	@Override
