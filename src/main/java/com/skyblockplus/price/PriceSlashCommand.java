@@ -79,43 +79,25 @@ public class PriceSlashCommand extends SlashCommand {
 		}
 
 		JsonArray lowestBinArr = null;
-		for (String enchantId : ENCHANT_NAMES) {
-			if (query.replace(" ", "_").toUpperCase().contains(enchantId)) {
-				int enchantLevel;
-				try {
-					enchantLevel = Integer.parseInt(query.replaceAll("\\D+", "").trim());
-				} catch (NumberFormatException e) {
-					enchantLevel = 1;
+		for (String pet : PET_NAMES) {
+			if (query.replace(" ", "_").toUpperCase().contains(pet)) {
+				String queryFmt = query.toLowerCase();
+
+				String rarity = "ANY";
+				for (String rarityName : RARITY_TO_NUMBER_MAP.keySet()) {
+					if (queryFmt.contains(rarityName.toLowerCase())) {
+						rarity = rarityName;
+						queryFmt = queryFmt.replace(rarityName.toLowerCase(), "").trim().replaceAll("\\s+", " ");
+						break;
+					}
 				}
 
-				lowestBinArr = queryLowestBinEnchant(enchantId, enchantLevel, auctionType);
+				lowestBinArr = queryLowestBinPet(queryFmt, rarity, auctionType);
 				if (lowestBinArr == null) {
 					return invalidEmbed("Error fetching auctions data");
 				}
+				query = queryFmt;
 				break;
-			}
-		}
-
-		if (lowestBinArr == null) {
-			for (String pet : PET_NAMES) {
-				if (query.replace(" ", "_").toUpperCase().contains(pet)) {
-					query = query.toLowerCase();
-
-					String rarity = "ANY";
-					for (String rarityName : RARITY_TO_NUMBER_MAP.keySet()) {
-						if (query.contains(rarityName.toLowerCase())) {
-							rarity = rarityName;
-							query = query.replace(rarityName.toLowerCase(), "").trim().replaceAll("\\s+", " ");
-							break;
-						}
-					}
-
-					lowestBinArr = queryLowestBinPet(query, rarity, auctionType);
-					if (lowestBinArr == null) {
-						return invalidEmbed("Error fetching auctions data");
-					}
-					break;
-				}
 			}
 		}
 
@@ -141,7 +123,8 @@ public class PriceSlashCommand extends SlashCommand {
 		if (lowestBinArr.size() == 0) {
 			return invalidEmbed("No " + auctionType.getName() + " matching '" + query + "' found");
 		}
-		EmbedBuilder eb = defaultEmbed("Auction Searcher");
+
+		EmbedBuilder eb = defaultEmbed("Auction Searcher (" + capitalizeString(auctionType.getName()) + ")");
 		if (matchedQuery != null) {
 			eb.setDescription(
 				"Searched for '" + matchedQuery + "' since no " + auctionType.getName() + " matching '" + query + "' were found"

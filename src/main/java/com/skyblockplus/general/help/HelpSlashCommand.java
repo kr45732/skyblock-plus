@@ -477,11 +477,6 @@ public class HelpSlashCommand extends SlashCommand {
 								),
 								new HelpData("remove", "Remove a bot manager role.", "remove <@role>")
 							),
-						new HelpData("channel_blacklist", "Blacklisted command channels.")
-							.addSubcommands(
-								new HelpData("add", "Blacklist a channel from be able to run bot commands in it.", "add <#channel>"),
-								new HelpData("remove", "Unblacklist a channel", "remove <#channel>")
-							),
 						new HelpData("blacklist", "View or manage the application blacklist for this server.")
 							.addSecondData(
 								"Get a list of all the blacklisted players on this server with the reasons and NameMC links.",
@@ -949,8 +944,6 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings bot_manager remove <@role>", "Remove a bot manager role") +
 			create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 			create("settings delete all", "Delete the current server settings") +
-			create("settings channel_blacklist add <#channel>", "Blacklist a channel from running bot commands") +
-			create("settings channel_blacklist remove <#channel>", "Unblacklist a channel from running bot commands") +
 			create("settings blacklist", "List all players that are blacklisted") +
 			create("settings blacklist add <player> [reason]", "Blacklist a player from using the application system on this server") +
 			create("settings blacklist remove <player>", "Remove a player from the blacklist") +

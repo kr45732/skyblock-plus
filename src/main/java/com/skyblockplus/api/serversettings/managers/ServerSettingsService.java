@@ -417,7 +417,7 @@ public class ServerSettingsService {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			return new ResponseEntity<>(currentServerSettings.getHypixelApiKeyInt(), HttpStatus.OK);
+			return new ResponseEntity<>(currentServerSettings.getHypixelApiKeyInternal(), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
@@ -522,18 +522,6 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			currentServerSettings.setBotManagerRoles(new ArrayList<>(Arrays.asList(newSettings)));
-			settingsRepository.save(currentServerSettings);
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	public ResponseEntity<Object> setChannelBlacklist(String serverId, String[] newSettings) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			currentServerSettings.setChannelBlacklist(new ArrayList<>(Arrays.asList(newSettings)));
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}

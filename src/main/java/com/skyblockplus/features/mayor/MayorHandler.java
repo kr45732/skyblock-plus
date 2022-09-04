@@ -43,7 +43,7 @@ public class MayorHandler {
 	public static String currentJerryMayor = "";
 	public static int currentMayorYear = 0;
 	public static ScheduledFuture<?> jerryFuture;
-	public static MessageEmbed jerryEmbed = invalidEmbed("Jerry is not the current mayor").build();
+	public static MessageEmbed jerryEmbed = invalidEmbed("Jerry is not currently mayor").build();
 	public static MessageEmbed votesEmbed = defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build();
 	public static final Map<String, String> mayorNameToEmoji = Maps.of(
 		"DERPY",
@@ -181,7 +181,7 @@ public class MayorHandler {
 					updateCount++;
 				}
 
-				if (updateCount != 0 && updateCount % 10 == 0) {
+				if (updateCount != 0 && updateCount % 12 == 0) {
 					try {
 						TimeUnit.SECONDS.sleep(1);
 					} catch (Exception ignored) {}
@@ -279,7 +279,7 @@ public class MayorHandler {
 					updateCount++;
 				}
 
-				if (updateCount != 0 && updateCount % 10 == 0) {
+				if (updateCount != 0 && updateCount % 12 == 0) {
 					try {
 						TimeUnit.SECONDS.sleep(1);
 					} catch (Exception ignored) {}

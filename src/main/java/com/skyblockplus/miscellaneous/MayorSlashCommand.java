@@ -73,7 +73,7 @@ public class MayorSlashCommand extends SlashCommand {
 					field.getName().equals("Next Election") &&
 					(Instant.now().getEpochSecond() > Long.parseLong(field.getValue().split("Opens <t:")[1].split(":R>")[0]))
 				) {
-					eb.getFields().set(i, new MessageEmbed.Field("Next Election", "Open", false));
+					eb.getFields().remove(i);
 				}
 			}
 		} catch (Exception ignored) {}

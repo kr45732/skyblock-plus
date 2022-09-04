@@ -85,7 +85,7 @@ public class LinkSlashCommand extends SlashCommand {
 						.setDescription(
 							"**Player Username:** `" +
 							playerInfo.username() +
-							"`\n**API Discord Tag:** `" +
+							"`\n**In-Game Discord Tag:** `" +
 							playerInfo.discordTag() +
 							"`\n**Your Discord Tag:** `" +
 							member.getUser().getAsTag() +

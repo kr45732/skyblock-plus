@@ -533,35 +533,6 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel, PriceSlashCommand.AuctionType auctionType) {
-		try {
-			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
-				.addParameter("end", "" + Instant.now().toEpochMilli())
-				.addParameter("item_id", "ENCHANTED_BOOK")
-				.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
-				.addParameter("sort", "ASC")
-				.addParameter("limit", "5")
-				.addParameter("key", AUCTION_API_KEY);
-			if (auctionType == PriceSlashCommand.AuctionType.BIN) {
-				uriBuilder.addParameter("bin", "true");
-			} else if (auctionType == PriceSlashCommand.AuctionType.AUCTION) {
-				uriBuilder.addParameter("bin", "false");
-			}
-			httpGet.setURI(uriBuilder.build());
-
-			try (
-				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
-				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
-			) {
-				return JsonParser.parseReader(in).getAsJsonArray();
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
-
 	public static JsonArray getAuctionPetsByName(String query) {
 		try {
 			HttpGet httpGet = new HttpGet(getQueryApiUrl("pets"));

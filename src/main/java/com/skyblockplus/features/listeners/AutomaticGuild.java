@@ -116,7 +116,6 @@ public class AutomaticGuild {
 	public final JacobGuild jacobGuild;
 	/* Miscellaneous */
 	public final List<String> botManagerRoles = new ArrayList<>();
-	public final List<String> channelBlacklist = new ArrayList<>();
 	public final String guildId;
 	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	public TextChannel logChannel = null;
@@ -216,11 +215,6 @@ public class AutomaticGuild {
 		try {
 			botManagerRoles.addAll(
 				streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray()).map(JsonElement::getAsString).toList()
-			);
-		} catch (Exception ignored) {}
-		try {
-			channelBlacklist.addAll(
-				streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray()).map(JsonElement::getAsString).toList()
 			);
 		} catch (Exception ignored) {}
 		try {
@@ -1213,11 +1207,6 @@ public class AutomaticGuild {
 		} catch (Exception e) {
 			log.error(guildId, e);
 		}
-	}
-
-	public void setChannelBlacklist(List<String> channelBlacklist) {
-		this.channelBlacklist.clear();
-		this.channelBlacklist.addAll(channelBlacklist);
 	}
 
 	public void setIsUsing(JsonArray arr) {

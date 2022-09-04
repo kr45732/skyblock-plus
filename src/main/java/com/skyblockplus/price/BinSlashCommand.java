@@ -81,31 +81,6 @@ public class BinSlashCommand extends SlashCommand {
 			return eb;
 		}
 
-		for (String i : ENCHANT_NAMES) {
-			if (itemId.contains(i)) {
-				try {
-					String enchantedBookId = i + ";" + Integer.parseInt(itemId.replaceAll("\\D+", ""));
-					if (higherDepth(lowestBinJson, enchantedBookId) != null) {
-						eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(lowestBinJson, enchantedBookId, 0L)), false);
-						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
-						return eb;
-					}
-				} catch (NumberFormatException e) {
-					for (int j = 10; j > 0; j--) {
-						String enchantedBookId = i + ";" + j;
-						if (higherDepth(lowestBinJson, enchantedBookId) != null) {
-							eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(lowestBinJson, enchantedBookId, 0L)), false);
-						}
-					}
-
-					if (eb.getFields().size() != 0) {
-						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
-						return eb;
-					}
-				}
-			}
-		}
-
 		JsonElement petJson = getPetNumsJson();
 		for (String i : PET_NAMES) {
 			if (itemId.contains(i)) {

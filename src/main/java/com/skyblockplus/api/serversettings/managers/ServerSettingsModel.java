@@ -84,10 +84,6 @@ public class ServerSettingsModel {
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<String> botManagerRoles = new ArrayList<>();
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@Fetch(value = FetchMode.SUBSELECT)
-	private List<String> channelBlacklist = new ArrayList<>();
-
 	private String logChannel = "";
 
 	@Embedded
@@ -102,7 +98,7 @@ public class ServerSettingsModel {
 		return null;
 	}
 
-	public String getHypixelApiKeyInt() {
+	public String getHypixelApiKeyInternal() {
 		return hypixelApiKey;
 	}
 
@@ -122,7 +118,6 @@ public class ServerSettingsModel {
 		copy.setMayorChannel(mayorChannel);
 		copy.setMayorRole(mayorRole);
 		copy.setBotManagerRoles(botManagerRoles);
-		copy.setChannelBlacklist(channelBlacklist);
 		copy.setLogChannel(logChannel);
 		copy.setEventNotif(eventNotif);
 		return copy;

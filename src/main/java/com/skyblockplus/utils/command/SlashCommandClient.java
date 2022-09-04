@@ -73,11 +73,6 @@ public class SlashCommandClient extends ListenerAdapter {
 			return;
 		}
 
-		if (guildMap.get(event.getGuild().getId()).channelBlacklist.contains(event.getChannel().getId())) {
-			event.replyEmbeds(invalidEmbed("Commands cannot be used in this channel").build()).setEphemeral(true).queue();
-			return;
-		}
-
 		try {
 			event.deferReply().complete();
 		} catch (ErrorResponseException e) {

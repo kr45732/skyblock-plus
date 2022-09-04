@@ -102,9 +102,9 @@ public class NetworthExecute {
 		bazaarJson = getBazaarJson();
 		sbzPrices = getSbzPricesJson();
 
-		recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary.[0].pricePerUnit", 0.0);
-		hbpPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
-		fumingPrice = higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
+		recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.buy_summary.[0].pricePerUnit", 0.0);
+		hbpPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.buy_summary.[0].pricePerUnit", 0.0);
+		fumingPrice = higherDepth(bazaarJson, "FUMING_POTATO_BOOK.buy_summary.[0].pricePerUnit", 0.0);
 		return this;
 	}
 
@@ -831,8 +831,7 @@ public class NetworthExecute {
 
 		try {
 			essenceExtras =
-				item.getEssenceCount() *
-				higherDepth(bazaarJson, "ESSENCE_" + item.getEssenceType() + ".sell_summary.[0].pricePerUnit", 0.0);
+				item.getEssenceCount() * higherDepth(bazaarJson, "ESSENCE_" + item.getEssenceType() + ".buy_summary.[0].pricePerUnit", 0.0);
 		} catch (Exception ignored) {}
 
 		StringBuilder miscStr = verbose ? new StringBuilder("[") : null;
@@ -963,7 +962,7 @@ public class NetworthExecute {
 			try {
 				return (
 					Math.pow(2, enchantLevel - i) *
-					higherDepth(bazaarJson, enchantName + ";" + i + ".sell_summary.[0].pricePerUnit").getAsDouble()
+					higherDepth(bazaarJson, enchantName + ";" + i + ".buy_summary.[0].pricePerUnit").getAsDouble()
 				);
 			} catch (Exception ignored) {}
 		}
@@ -988,7 +987,7 @@ public class NetworthExecute {
 		double npcPrice = Math.max(0, getNpcSellPrice(itemId));
 
 		try {
-			double bazaarPrice = higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble();
+			double bazaarPrice = higherDepth(bazaarJson, itemId + ".buy_summary.[0].pricePerUnit").getAsDouble();
 			if (bazaarPrice >= npcPrice) {
 				if (source != null) {
 					source.append("bazaar");

@@ -100,9 +100,7 @@ public class Main {
 						}
 					}
 				)
-				.setCommandPreProcessBiFunction((event, command) ->
-					!event.isFromGuild() || !guildMap.get(event.getGuild().getId()).channelBlacklist.contains(event.getChannel().getId())
-				)
+				.setCommandPreProcessBiFunction((event, command) -> !event.isFromGuild())
 				.setActivity(Activity.playing("Loading..."))
 				.setManualUpsert(true)
 				.addCommands(springContext.getBeansOfType(Command.class).values().toArray(new Command[0]))

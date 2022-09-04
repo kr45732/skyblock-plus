@@ -106,13 +106,6 @@ public class SettingsExecute {
 					case "hypixel_key" -> deleteHypixelKey();
 					default -> errorEmbed("settings delete");
 				};
-		} else if (args.length == 4 && args[1].equals("channel_blacklist")) {
-			eb =
-				switch (args[2]) {
-					case "add" -> blacklistChannel(args[3]);
-					case "remove" -> unblacklistChannel(args[3]);
-					default -> errorEmbed("settings channel_blacklist");
-				};
 		} else if (args.length >= 2 && args[1].equals("blacklist")) {
 			args = content.split("\\s+", 5);
 			if (args.length == 2) {
@@ -189,10 +182,6 @@ public class SettingsExecute {
 				.map(r -> "<@&" + r.getAsString() + ">")
 				.collect(Collectors.joining(" "));
 			eb.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false);
-			String channelBlacklist = streamJsonArray(higherDepth(currentSettings, "channelBlacklist").getAsJsonArray())
-				.map(r -> "<#" + r.getAsString() + ">")
-				.collect(Collectors.joining(" "));
-			eb.addField("Channel Blacklist", channelBlacklist.isEmpty() ? "None" : channelBlacklist, false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
 			if (args.length == 2) {
 				eb = displayJacobSettings(higherDepth(currentSettings, "jacobSettings"));
@@ -2661,53 +2650,6 @@ public class SettingsExecute {
 			guildMap.get(guild.getId()).setLogChannel(channel);
 			return defaultSettingsEmbed("**Log channel set to:** " + channel.getAsMention());
 		}
-	}
-
-	public EmbedBuilder blacklistChannel(String channelMention) {
-		Object eb = checkTextChannel(channelMention);
-		if (eb instanceof EmbedBuilder e) {
-			return e;
-		}
-		TextChannel channel = (TextChannel) eb;
-
-		JsonArray channelBlacklist = collectJsonArray(
-			streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray())
-				.filter(c -> !c.getAsString().equals(channel.getId()))
-		);
-		channelBlacklist.add(channel.getId());
-
-		int responseCode = database.setChannelBlacklist(guild.getId(), channelBlacklist);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		guildMap
-			.get(guild.getId())
-			.setChannelBlacklist(streamJsonArray(channelBlacklist).map(JsonElement::getAsString).collect(Collectors.toList()));
-		return defaultSettingsEmbed("**Added channel to blacklist:** " + channel.getAsMention());
-	}
-
-	public EmbedBuilder unblacklistChannel(String channelMention) {
-		Object eb = checkTextChannel(channelMention);
-		if (eb instanceof EmbedBuilder e) {
-			return e;
-		}
-		TextChannel channel = (TextChannel) eb;
-
-		JsonArray channelBlacklist = collectJsonArray(
-			streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray())
-				.filter(c -> !c.getAsString().equals(channel.getId()))
-		);
-
-		int responseCode = database.setChannelBlacklist(guild.getId(), channelBlacklist);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		guildMap
-			.get(guild.getId())
-			.setChannelBlacklist(streamJsonArray(channelBlacklist).map(JsonElement::getAsString).collect(Collectors.toList()));
-		return defaultSettingsEmbed("**Removed channel from blacklist:** " + channel.getAsMention());
 	}
 
 	public EmbedBuilder setMayorPing(String roleMention) {
