@@ -18,7 +18,8 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
+import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;

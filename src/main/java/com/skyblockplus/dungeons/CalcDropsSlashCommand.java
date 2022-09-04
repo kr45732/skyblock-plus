@@ -22,7 +22,10 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.skyblockplus.utils.command.*;
+import com.skyblockplus.utils.command.CustomPaginator;
+import com.skyblockplus.utils.command.PaginatorExtras;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.Arrays;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

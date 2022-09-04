@@ -19,7 +19,8 @@
 package com.skyblockplus.utils.structs;
 
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.getClosestMatch;
+import static com.skyblockplus.utils.Utils.ignore;
 
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;

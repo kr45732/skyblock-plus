@@ -21,7 +21,10 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.command.*;
+import com.skyblockplus.utils.command.CustomPaginator;
+import com.skyblockplus.utils.command.PaginatorExtras;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.Comparator;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;

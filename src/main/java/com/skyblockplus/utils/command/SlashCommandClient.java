@@ -18,7 +18,6 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.Main;

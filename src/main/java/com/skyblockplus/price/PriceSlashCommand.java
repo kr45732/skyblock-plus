@@ -19,8 +19,10 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.ApiHandler.queryLowestBin;
+import static com.skyblockplus.utils.ApiHandler.queryLowestBinPet;
+import static com.skyblockplus.utils.Constants.PET_NAMES;
+import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -62,7 +64,7 @@ public class PriceSlashCommand extends SlashCommand {
 				new OptionData(OptionType.STRING, "auction_type", "Which type of auctions to show")
 					.addChoice("Bin", "bin")
 					.addChoice("Regular auctions", "auction")
-					.addChoice("Bin & regular auctions", "bin")
+					.addChoice("Bin & regular auctions", "both")
 			);
 	}
 

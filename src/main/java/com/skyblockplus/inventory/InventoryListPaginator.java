@@ -18,7 +18,8 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.client;
+import static com.skyblockplus.utils.Utils.ignore;
 
 import com.skyblockplus.utils.AbstractEventListener;
 import com.skyblockplus.utils.Player;

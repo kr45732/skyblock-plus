@@ -28,7 +28,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
@@ -37,7 +36,6 @@ import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.blacklist.BlacklistEntry;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -2029,7 +2027,7 @@ public class SettingsExecute {
 
 			return invalidEmbed("Invalid guild role name or guild ranks not enabled");
 		} else if (isOneLevelRole(roleName)) {
-			return invalidEmbed("These roles do not support levels. Use `/settings roles set <role_name> <@role>` instead");
+			return invalidEmbed("This role does not support multiple values. Use `/settings roles set <role_name> <@role>` instead");
 		} else if (roleName.equals("gamemode")) {
 			if (!roleValue.equals("ironman") && !roleValue.equals("stranded")) {
 				return invalidEmbed("Mode must be ironman or stranded");
@@ -2118,7 +2116,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder removeRoleLevel(String roleName, String value) {
 		if (isOneLevelRole(roleName)) {
-			return defaultEmbed("These roles do not support levels. Use `/settings roles set <role_name> <@role>` instead");
+			return defaultEmbed("This role does not multiple values. Use `/settings roles set <role_name> none` instead");
 		}
 
 		JsonObject currentRoleSettings;

@@ -22,7 +22,10 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.*;
+import com.skyblockplus.utils.command.PaginatorExtras;
+import com.skyblockplus.utils.command.SelectMenuPaginator;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.LinkedHashMap;
 import java.util.List;

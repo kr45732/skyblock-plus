@@ -18,7 +18,8 @@
 
 package com.skyblockplus.general.help;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.DISCORD_SERVER_INVITE_LINK;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommand;

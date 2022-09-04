@@ -21,7 +21,10 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.*;
+import com.skyblockplus.utils.command.PaginatorExtras;
+import com.skyblockplus.utils.command.SelectMenuPaginator;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import java.util.LinkedHashMap;
