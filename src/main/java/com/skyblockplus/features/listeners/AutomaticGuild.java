@@ -184,6 +184,17 @@ public class AutomaticGuild {
 					)
 					.findFirst()
 					.orElse(null);
+			try {
+				// Election closed
+				if (
+					Instant.now().getEpochSecond() >
+					Long.parseLong(
+						lastMayorElectionOpenMessage.getEmbeds().get(0).getDescription().split("Closes:\\*\\* <t:")[1].split(":R>")[0]
+					)
+				) {
+					lastMayorElectionOpenMessage = null;
+				}
+			} catch (Exception ignored) {}
 			lastMayorElectedMessage =
 				mayorChannel
 					.getIterableHistory()

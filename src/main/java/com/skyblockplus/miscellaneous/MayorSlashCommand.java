@@ -28,6 +28,7 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.time.Instant;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -63,7 +64,20 @@ public class MayorSlashCommand extends SlashCommand {
 		}
 		buttons.add(Button.primary("mayor_special_button", "Special Mayors"));
 
-		return new MessageEditBuilder().setEmbeds(automaticGuild.lastMayorElectedMessage.getEmbeds()).setActionRow(buttons);
+		EmbedBuilder eb = new EmbedBuilder();
+		eb.copyFrom(automaticGuild.lastMayorElectedMessage.getEmbeds().get(0));
+		try {
+			for (int i = eb.getFields().size() - 1; i >= 0; i--) {
+				MessageEmbed.Field field = eb.getFields().get(i);
+				if (
+					field.getName().equals("Next Election") &&
+					(Instant.now().getEpochSecond() > Long.parseLong(field.getValue().split("Opens <t:")[1].split(":R>")[0]))
+				) {
+					eb.getFields().set(i, new MessageEmbed.Field("Next Election", "Open", false));
+				}
+			}
+		} catch (Exception ignored) {}
+		return new MessageEditBuilder().setEmbeds(eb.build()).setActionRow(buttons);
 	}
 
 	public static EmbedBuilder getSpecialMayors() {
