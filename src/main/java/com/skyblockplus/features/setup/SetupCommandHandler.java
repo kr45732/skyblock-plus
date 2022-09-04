@@ -715,7 +715,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 
 	@Override
 	public boolean hasTimedOut() {
-		if (Duration.between(lastAction, Instant.now()).abs().toMinutes() > 2) {
+		if (Duration.between(lastAction, Instant.now()).abs().toSeconds() > 120) {
 			try {
 				if ((featureType == FeatureType.FETCHUR || featureType == FeatureType.MAYOR) && fetchurOrMayorChannelSet) {
 					buttonEvent.getMessage().editMessageComponents().queue(ignore, ignore);

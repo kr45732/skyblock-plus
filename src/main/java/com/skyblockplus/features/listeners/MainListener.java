@@ -20,7 +20,6 @@ package com.skyblockplus.features.listeners;
 
 import static com.skyblockplus.utils.Utils.*;
 
-import com.skyblockplus.inventory.InventoryListPaginator;
 import com.skyblockplus.utils.AbstractEventListener;
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.*;
@@ -214,27 +213,17 @@ public class MainListener extends ListenerAdapter {
 			return;
 		}
 
-		if (event.getGuild() == null) {
-			event.editButton(event.getButton().asDisabled()).queue();
-			event.getHook().editOriginal(client.getError() + " This button has been disabled").queue();
-			return;
-		}
-
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onButtonClick(event);
 		}
+
+		eventListeners.forEach(o -> o.onButtonInteraction(event));
 	}
 
 	@Override
 	public void onModalInteraction(@NotNull ModalInteractionEvent event) {
 		if (event.getUser().isBot() || event.getGuild() == null) {
 			return;
-		}
-
-		for (InventoryListPaginator paginator : InventoryListPaginator.paginators) {
-			if (paginator.onModalInteraction(event)) {
-				return;
-			}
 		}
 
 		if (guildMap.containsKey(event.getGuild().getId())) {

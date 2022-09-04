@@ -20,18 +20,19 @@ package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Utils.*;
 
+import com.skyblockplus.utils.AbstractEventListener;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.rendering.LoreRenderer;
 import com.skyblockplus.utils.structs.InvItem;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
@@ -40,7 +41,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
@@ -49,9 +49,8 @@ import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 
-public class InventoryListPaginator {
+public class InventoryListPaginator extends AbstractEventListener {
 
-	public static final List<InventoryListPaginator> paginators = new ArrayList<>();
 	private static final File loreRenderDir = new File("src/main/java/com/skyblockplus/json/lore_renders");
 	private final String key;
 	private final Map<Integer, InvItem> items;
@@ -60,7 +59,8 @@ public class InventoryListPaginator {
 	private final Player player;
 	private final Message message;
 	private final int maxPageNumber;
-	private Instant lastEdit;
+	private Instant lastEdit = Instant.now(); // For delaying 1.5s between changing pages
+	private Instant lastAction = Instant.now(); // For timeout
 	private int pageNumber;
 
 	public InventoryListPaginator(Player player, Map<Integer, InvItem> items, int slot, SlashCommandEvent event) {
@@ -70,7 +70,6 @@ public class InventoryListPaginator {
 		this.key = Instant.now().getEpochSecond() + "_" + player.getUuid() + "_";
 		this.player = player;
 		this.maxPageNumber = items.size() - 1;
-		this.lastEdit = Instant.now();
 		this.pageNumber = Math.min(Math.max(0, slot - 1), maxPageNumber);
 		this.message = event.getHook().retrieveOriginal().complete();
 
@@ -109,17 +108,14 @@ public class InventoryListPaginator {
 					.primary("inv_list_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 					.withDisabled(pageNumber == maxPageNumber)
 			)
-			.queue(ignored -> {
-				waitForEvent();
-				paginators.add(this);
-			});
+			.queue(ignore, ignore);
 	}
 
 	public String getRenderedLore() {
-		return renderedCache.computeIfAbsent(key + pageNumber, ignored -> getRenderedLore0());
+		return renderedCache.computeIfAbsent(key + pageNumber, ignored -> computeRenderedLore());
 	}
 
-	public String getRenderedLore0() {
+	public String computeRenderedLore() {
 		InvItem item = items.get(pageNumber);
 
 		List<String> loreWithName = new ArrayList<>();
@@ -136,45 +132,94 @@ public class InventoryListPaginator {
 		}
 	}
 
-	private boolean condition(ButtonInteractionEvent event) {
-		return (
+	@Override
+	public void onButtonInteraction(ButtonInteractionEvent event) {
+		if (
 			event.isFromGuild() &&
 			event.getUser().getId().equals(this.event.getUser().getId()) &&
 			event.getMessageId().equals(message.getId())
-		);
-	}
-
-	public void action(ButtonInteractionEvent event) {
-		if (event.getComponentId().equals("inv_list_paginator_search_button")) {
-			event
-				.replyModal(
-					Modal
-						.create("inv_list_search_modal_" + message.getId(), "Search")
-						.addActionRow(TextInput.create("item", "Item Name", TextInputStyle.SHORT).build())
-						.build()
-				)
-				.queue();
-			return;
-		}
-
-		if (Instant.now().minusMillis(1500).isBefore(lastEdit)) {
-			event
-				.reply(client.getError() + " Please wait between switching pages")
-				.setEphemeral(true)
-				.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
-		} else {
-			lastEdit = Instant.now();
-			if (event.getComponentId().equals("inv_list_paginator_left_button")) {
-				if ((pageNumber - 1) >= 0) {
-					pageNumber -= 1;
-				}
-			} else if (event.getComponentId().equals("inv_list_paginator_right_button")) {
-				if ((pageNumber + 1) <= maxPageNumber) {
-					pageNumber += 1;
-				}
+		) {
+			lastAction = Instant.now();
+			if (event.getComponentId().equals("inv_list_paginator_search_button")) {
+				event
+					.replyModal(
+						Modal
+							.create("inv_list_search_modal_" + message.getId(), "Search")
+							.addActionRow(TextInput.create("item", "Item Name", TextInputStyle.SHORT).build())
+							.build()
+					)
+					.queue();
+				return;
 			}
 
-			List<Button> curButtons = event.getMessage().getButtons();
+			if (Instant.now().minusMillis(1500).isBefore(lastEdit)) {
+				event.reply(client.getError() + " Please wait between switching pages").setEphemeral(true).queue(ignore, ignore);
+			} else {
+				lastEdit = Instant.now();
+				if (event.getComponentId().equals("inv_list_paginator_left_button")) {
+					if ((pageNumber - 1) >= 0) {
+						pageNumber -= 1;
+					}
+				} else if (event.getComponentId().equals("inv_list_paginator_right_button")) {
+					if ((pageNumber + 1) <= maxPageNumber) {
+						pageNumber += 1;
+					}
+				}
+
+				List<Button> curButtons = event.getMessage().getButtons();
+				MessageEditCallbackAction action;
+				EmbedBuilder eb = player
+					.defaultPlayerEmbed()
+					.setThumbnail(null)
+					.setFooter("By CrypticPlasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null);
+				InvItem item = items.get(pageNumber);
+				if (item == null) {
+					eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
+					action = event.editMessageEmbeds(eb.build());
+				} else {
+					eb
+						.setDescription(
+							"**Item:** " +
+							(item.getCount() > 1 ? (item.getName() + "x ") : "") +
+							item.getName() +
+							"\n**Slot:** " +
+							(pageNumber + 1) +
+							"\n**Item Creation:** " +
+							item.getCreationTimestamp()
+						)
+						.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
+						.setImage("attachment://lore.png");
+					action = event.editMessageEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
+				}
+				action
+					.setFiles()
+					.setActionRow(
+						curButtons.get(0).withDisabled(pageNumber == 0),
+						curButtons.get(1),
+						curButtons.get(2).withDisabled(pageNumber == (maxPageNumber))
+					)
+					.queue(ignore, ignore);
+			}
+		}
+	}
+
+	public void onModalInteraction(ModalInteractionEvent event) {
+		if (
+			event.getUser().getId().equals(this.event.getUser().getId()) &&
+			event.getModalId().equals("inv_list_search_modal_" + message.getId())
+		) {
+			lastAction = lastEdit = Instant.now();
+			String itemSearch = event.getValue("item").getAsString();
+			pageNumber =
+				FuzzySearch
+					.extractOne(
+						itemSearch,
+						items.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toList()),
+						i -> i.getValue().getName()
+					)
+					.getReferent()
+					.getKey();
+
 			MessageEditCallbackAction action;
 			EmbedBuilder eb = player
 				.defaultPlayerEmbed()
@@ -201,95 +246,32 @@ public class InventoryListPaginator {
 			}
 			action
 				.setFiles()
-				.setComponents(
-					ActionRow.of(
-						curButtons.get(0).withDisabled(pageNumber == 0),
-						curButtons.get(1).withDisabled(pageNumber == (maxPageNumber))
-					),
-					ActionRow.of(curButtons.get(2))
+				.setActionRow(
+					Button
+						.primary("inv_list_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))
+						.withDisabled(pageNumber == 0),
+					Button.primary("inv_list_paginator_search_button", "Search").withEmoji(Emoji.fromFormatted("\uD83D\uDD0E")),
+					Button
+						.primary("inv_list_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
+						.withDisabled(pageNumber == maxPageNumber)
 				)
-				.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
+				.queue(ignore, ignore);
 		}
 	}
 
-	private void waitForEvent() {
-		waiter.waitForEvent(
-			ButtonInteractionEvent.class,
-			this::condition,
-			this::action,
-			1,
-			TimeUnit.MINUTES,
-			() -> {
-				if (lastEdit.plusSeconds(27).isAfter(Instant.now())) {
-					waitForEvent();
-				} else {
-					paginators.remove(this);
-					message.editMessageComponents().queue(ignore, ignore);
-					for (File file : loreRenderDir.listFiles(file -> file.getName().startsWith(key))) {
-						file.delete();
-					}
+	@Override
+	public boolean hasTimedOut() {
+		if (Duration.between(lastAction, Instant.now()).abs().toSeconds() > 60) {
+			try {
+				message.editMessageComponents().queue(ignore, ignore);
+			} catch (Exception ignored) {}
+			try {
+				for (File file : loreRenderDir.listFiles(file -> file.getName().startsWith(key))) {
+					file.delete();
 				}
-			}
-		);
-	}
-
-	public boolean onModalInteraction(ModalInteractionEvent event) {
-		if (
-			!event.getUser().getId().equals(this.event.getUser().getId()) ||
-			!event.getModalId().equals("inv_list_search_modal_" + message.getId())
-		) {
-			return false;
+			} catch (Exception ignored) {}
+			return true;
 		}
-
-		lastEdit = Instant.now();
-		String itemSearch = event.getValue("item").getAsString();
-		pageNumber =
-			FuzzySearch
-				.extractOne(
-					itemSearch,
-					items.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toList()),
-					i -> i.getValue().getName()
-				)
-				.getReferent()
-				.getKey();
-
-		MessageEditCallbackAction action;
-		EmbedBuilder eb = player
-			.defaultPlayerEmbed()
-			.setThumbnail(null)
-			.setFooter("By CrypticPlasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null);
-		InvItem item = items.get(pageNumber);
-		if (item == null) {
-			eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
-			action = event.editMessageEmbeds(eb.build());
-		} else {
-			eb
-				.setDescription(
-					"**Item:** " +
-					(item.getCount() > 1 ? (item.getName() + "x ") : "") +
-					item.getName() +
-					"\n**Slot:** " +
-					(pageNumber + 1) +
-					"\n**Item Creation:** " +
-					item.getCreationTimestamp()
-				)
-				.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
-				.setImage("attachment://lore.png");
-			action = event.editMessageEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
-		}
-		action
-			.setFiles()
-			.setActionRow(
-				Button
-					.primary("inv_list_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))
-					.withDisabled(pageNumber == 0),
-				Button.primary("inv_list_paginator_search_button", "Search").withEmoji(Emoji.fromFormatted("\uD83D\uDD0E")),
-				Button
-					.primary("inv_list_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
-					.withDisabled(pageNumber == maxPageNumber)
-			)
-			.queue(ignored -> waitForEvent(), ignored -> waitForEvent());
-
-		return true;
+		return false;
 	}
 }

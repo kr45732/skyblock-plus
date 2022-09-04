@@ -197,8 +197,7 @@ public class ApplyGuild {
 			return waitingForInvite;
 		}
 
-		boolean currentApplyUser = onButtonClick_CurrentApplyUser(event);
-		if (currentApplyUser) {
+		if (onButtonClick_CurrentApplyUser(event)) {
 			return "IGNORE_INTERNAL";
 		}
 

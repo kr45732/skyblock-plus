@@ -71,7 +71,6 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
@@ -129,7 +128,7 @@ public class AutomaticGuild {
 	public AutomaticGuild(GenericGuildEvent event) {
 		guildId = event.getGuild().getId();
 
-		if (guildId.equals("796790757947867156") && isMainBot()) {
+		if (isMainBot() && guildId.equals("796790757947867156")) {
 			try {
 				long seconds = Duration
 					.between(
@@ -217,7 +216,7 @@ public class AutomaticGuild {
 			logChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "logChannel", null));
 		} catch (Exception ignored) {}
 		if (cacheDatabase.partyCaches.containsKey(guildId)) {
-			this.partyList.addAll(cacheDatabase.partyCaches.get(guildId));
+			partyList.addAll(cacheDatabase.partyCaches.get(guildId));
 		}
 	}
 
@@ -986,20 +985,10 @@ public class AutomaticGuild {
 	}
 
 	public void onButtonClick(ButtonInteractionEvent event) {
-		if (
-			event.getComponentId().startsWith("paginator_") ||
-			event.getComponentId().startsWith("reactive_") ||
-			event.getComponentId().startsWith("inv_paginator_") ||
-			event.getComponentId().startsWith("inv_list_paginator_") ||
-			event.getComponentId().startsWith("leaderboard_paginator_")
-		) {
-			return;
-		} else if (event.getComponentId().equals("mayor_graph_button")) {
+		if (event.getComponentId().equals("mayor_graph_button")) {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
-			return;
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
-			return;
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {
 			Message msg = guildMap.get("796790757947867156").lastMayorElectionOpenMessage;
 			event
@@ -1012,10 +1001,8 @@ public class AutomaticGuild {
 				)
 				.setEphemeral(true)
 				.queue();
-			return;
 		} else if (event.getComponentId().equals("mayor_jerry_button")) {
 			event.replyEmbeds(jerryEmbed).setEphemeral(true).queue();
-			return;
 		} else if (event.getComponentId().startsWith("bingo_")) {
 			StringBuilder card = new StringBuilder();
 			String[] split = event.getComponentId().split("bingo_")[1].split("");
@@ -1032,7 +1019,6 @@ public class AutomaticGuild {
 					);
 			}
 			event.reply(card.toString()).setEphemeral(true).queue();
-			return;
 		} else if (event.getComponentId().startsWith("track_auctions_")) {
 			String[] discordUuidSplit = event.getComponentId().split("track_auctions_")[1].split("_", 2)[1].split("_", 2);
 			if (event.getUser().getId().equals(discordUuidSplit[0])) {
@@ -1076,7 +1062,6 @@ public class AutomaticGuild {
 						}
 					});
 			}
-			return;
 		} else if (event.getComponentId().startsWith("event_message_")) {
 			event
 				.deferReply(true)
@@ -1095,18 +1080,15 @@ public class AutomaticGuild {
 						}
 					}
 				});
-			return;
 		} else if (event.getComponentId().startsWith("setup_command_")) {
 			if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
 				event
 					.reply(client.getError() + " You are missing the required permissions or roles to use this")
 					.setEphemeral(true)
 					.queue();
-				return;
+			} else {
+				new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
 			}
-
-			new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
-			return;
 		} else if (event.getComponentId().startsWith("party_finder_channel_close_")) {
 			if (event.getUser().getId().equals(event.getComponentId().split("party_finder_channel_close_")[1])) {
 				event
@@ -1115,20 +1097,21 @@ public class AutomaticGuild {
 			} else {
 				event.reply(client.getError() + " Only the party leader can archive the thread").setEphemeral(true).queue();
 			}
-			return;
-		} else {
-			if (event.getComponentId().startsWith("apply_user_") && !event.getComponentId().startsWith("apply_user_wait_")) {
-				event.deferReply().complete();
-			} else {
-				event.deferReply(true).complete();
-			}
+		} else if (
+			!event.getComponentId().startsWith("paginator_") &&
+			!event.getComponentId().startsWith("reactive_") &&
+			!event.getComponentId().startsWith("inv_paginator_") &&
+			!event.getComponentId().startsWith("inv_list_paginator_") &&
+			!event.getComponentId().startsWith("leaderboard_paginator_")
+		) {
+			event
+				.deferReply(!event.getComponentId().startsWith("apply_user_") || event.getComponentId().startsWith("apply_user_wait_"))
+				.complete();
 
 			for (ApplyGuild applyG : applyGuild) {
 				String buttonClickReply = applyG.onButtonClick(event);
 				if (buttonClickReply != null) {
-					if (buttonClickReply.equals("IGNORE_INTERNAL")) {
-						return;
-					} else if (buttonClickReply.startsWith("SBZ_SCAMMER_CHECK_")) {
+					if (buttonClickReply.startsWith("SBZ_SCAMMER_CHECK_")) {
 						event
 							.getHook()
 							.editOriginalEmbeds(
@@ -1142,17 +1125,13 @@ public class AutomaticGuild {
 									.build()
 							)
 							.queue();
-						return;
+					} else if (!buttonClickReply.equals("IGNORE_INTERNAL")) {
+						event.getHook().editOriginal(buttonClickReply).queue();
 					}
-
-					event.getHook().editOriginal(buttonClickReply).queue();
 					return;
 				}
 			}
 		}
-
-		event.editButton(event.getButton().asDisabled()).queue();
-		event.getHook().editOriginal(client.getError() + " This button has been disabled").queue();
 	}
 
 	public void onGuildLeave() {
