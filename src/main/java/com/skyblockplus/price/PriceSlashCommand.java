@@ -98,20 +98,18 @@ public class PriceSlashCommand extends SlashCommand {
 				if (lowestBinArr == null) {
 					return invalidEmbed("Error fetching auctions data");
 				}
-				query = queryFmt;
 				break;
 			}
 		}
 
 		String matchedQuery = null;
-		if (lowestBinArr == null) {
+		if (lowestBinArr == null || lowestBinArr.isEmpty()) {
 			String idStrict = nameToId(query, true);
 			if (idStrict != null) {
 				lowestBinArr = queryLowestBin(idStrict, false, auctionType);
 			} else {
-				String finalQuery = query;
 				List<String> queryItems = getQueryItems();
-				if (queryItems != null && queryItems.stream().noneMatch(q -> q.equalsIgnoreCase(finalQuery))) {
+				if (queryItems != null && queryItems.stream().noneMatch(q -> q.equalsIgnoreCase(query))) {
 					matchedQuery = getClosestMatch(query, queryItems);
 				}
 				lowestBinArr = queryLowestBin(matchedQuery != null ? matchedQuery : query, true, auctionType);
