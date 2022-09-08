@@ -206,7 +206,9 @@ public class CrimsonSlashCommand extends SlashCommand {
 				"wall_jump",
 				"Stamina",
 				"sword_swap",
-				"Discipline"
+				"Discipline",
+				"lock_head",
+				"Control"
 			);
 			int totalPoints = 0;
 			for (Map.Entry<String, String> dojoQuest : dojoQuests.entrySet()) {

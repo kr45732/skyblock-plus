@@ -41,6 +41,7 @@ import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.miscellaneous.MayorSlashCommand;
+import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -70,7 +71,11 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
+import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
@@ -978,6 +983,52 @@ public class AutomaticGuild {
 	}
 
 	public void onModalInteraction(ModalInteractionEvent event) {
+		if (event.getModalId().startsWith("nw_")) {
+			event.deferReply(true).queue();
+
+			// 0 = uuid, 1 = profile name, 2 = optional verbose json link
+			String[] split = event.getModalId().split("nw_")[1].split("_");
+			if (split.length < 4) {
+				NetworthExecute calc = new NetworthExecute().setVerbose(true).setOnlyTotal(true);
+				calc.getPlayerNetworth(split[0], split[1]);
+				split = new String[] { split[0], split[1], split[2], makeHastePost(formattedGson.toJson(calc.getVerboseJson())) };
+			}
+			split[2] = "" + Instant.now().toEpochMilli();
+
+			List<ActionRow> newRows = new ArrayList<>();
+			for (ActionRow actionRow : event.getMessage().getActionRows()) {
+				List<ItemComponent> newComponents = new ArrayList<>();
+				for (ItemComponent component : actionRow) {
+					if (component instanceof Button button && button.getId() != null && button.getId().startsWith("nw_")) {
+						component = button.withId("nw_" + String.join("_", split));
+					}
+					newComponents.add(component);
+				}
+				newRows.add(ActionRow.of(newComponents));
+			}
+			event.getMessage().editMessageComponents(newRows).queue();
+
+			networthBugWebhook.send(
+				defaultEmbed("Networth Bug Report")
+					.addField(
+						"Info",
+						"**UUID:** [" +
+						split[0] +
+						"](" +
+						skyblockStatsLink(split[0], split[1]) +
+						")\n**Profile name:** " +
+						split[1] +
+						"\n**Verbose Link:** " +
+						split[3],
+						false
+					)
+					.setDescription(event.getValues().get(0).getAsString())
+					.build()
+			);
+
+			event.getHook().editOriginal(client.getSuccess() + " Bug report sent").queue();
+		}
+
 		if (skyblockEventHandler != null) {
 			skyblockEventHandler.onModalInteraction(event);
 		}
@@ -1008,6 +1059,31 @@ public class AutomaticGuild {
 				.queue();
 		} else if (event.getComponentId().equals("mayor_jerry_button")) {
 			event.replyEmbeds(jerryEmbed).setEphemeral(true).queue();
+		} else if (event.getComponentId().startsWith("nw_")) {
+			long seconds = Duration
+				.between(Instant.now(), Instant.ofEpochMilli(Long.parseLong(event.getComponentId().split("nw_")[1].split("_")[2])))
+				.abs()
+				.toSeconds();
+			if (seconds < 30) {
+				event
+					.reply(client.getError() + " That is on cooldown for " + (30 - seconds) + " more second" + (seconds == 1 ? "" : "s"))
+					.setEphemeral(true)
+					.queue();
+			} else {
+				event
+					.replyModal(
+						Modal
+							.create(event.getComponentId(), "Networth Bugs Report")
+							.addActionRow(
+								TextInput
+									.create("value", "Items Calculated Incorrectly", TextInputStyle.PARAGRAPH)
+									.setPlaceholder("Include the item names, calculated prices, and the prices you think they should be")
+									.build()
+							)
+							.build()
+					)
+					.queue();
+			}
 		} else if (event.getComponentId().startsWith("bingo_")) {
 			StringBuilder card = new StringBuilder();
 			String[] split = event.getComponentId().split("bingo_")[1].split("");

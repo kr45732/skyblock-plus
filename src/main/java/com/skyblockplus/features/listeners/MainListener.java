@@ -56,7 +56,7 @@ public class MainListener extends ListenerAdapter {
 				} catch (Exception ignored) {}
 			},
 			0,
-			30,
+			15,
 			TimeUnit.SECONDS
 		);
 	}

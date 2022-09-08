@@ -122,7 +122,10 @@ public abstract class SlashCommand {
 	public void replyCooldown(SlashCommandEvent event, int remainingCooldown) {
 		event
 			.getHook()
-			.editOriginalEmbeds(invalidEmbed("That command is on cooldown for " + remainingCooldown + " more seconds").build())
+			.editOriginalEmbeds(
+				invalidEmbed("That command is on cooldown for " + remainingCooldown + " more second" + (remainingCooldown == 1 ? "" : "s"))
+					.build()
+			)
 			.queue();
 	}
 

@@ -30,6 +30,7 @@ import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.InvItem;
+import java.time.Instant;
 import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -440,14 +441,22 @@ public class NetworthExecute {
 			//				System.out.println(missing);
 			//			}
 
+			String verboseLink = null;
 			if (verbose) {
 				try {
-					extras.addButton(Button.link(makeHastePost(formattedGson.toJson(getVerboseJson())) + ".json", "Verbose JSON"));
+					verboseLink = makeHastePost(formattedGson.toJson(getVerboseJson()));
+					extras.addButton(Button.link(verboseLink + ".json", "Verbose JSON"));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-			extras.addButton(Button.link("https://forms.gle/RBmN2AFBLafGyx5E7", "Bug In Calculations?"));
+			// Init last updated to 0
+			extras.addButton(
+				Button.danger(
+					"nw_" + player.getUuid() + "_" + player.getProfileName() + "_0" + (verboseLink != null ? "_" + verboseLink : ""),
+					"Bug In Calculations?"
+				)
+			);
 			new SelectMenuPaginator(pages, "overview", extras, event);
 			return null;
 		}

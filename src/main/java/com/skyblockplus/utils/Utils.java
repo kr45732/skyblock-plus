@@ -159,6 +159,10 @@ public class Utils {
 		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
 	)
 		.buildJDA();
+	public static final JDAWebhookClient networthBugWebhook = new WebhookClientBuilder(
+		"https://discord.com/api/webhooks/1017573392498565140/F6MEL3VgM1Uvk3z-dM-N8bAPZj4n2L6_DCWOKWLejnxADe6GPVo8Npp5jLOI7AHFD-0k"
+	)
+		.buildJDA();
 	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[\\dA-FK-OR]");
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	/* Configuration File */
@@ -1095,7 +1099,9 @@ public class Utils {
 				int remainingLimit = Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue());
 				int timeTillReset = Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue());
 				if (checkRatelimit && remainingLimit < 10) {
-					return invalidEmbed("That command is on cooldown for " + timeTillReset + " more seconds");
+					return invalidEmbed(
+						"That command is on cooldown for " + timeTillReset + " more second" + (timeTillReset == 1 ? "" : "s")
+					);
 				}
 
 				try (InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())) {
