@@ -19,7 +19,6 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.ApiHandler.getNameHistory;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -133,14 +132,6 @@ public class HypixelSlashCommand extends SlashCommand {
 
 		eb.addField("Karma", formatNumber(player.getKarma()), true);
 		eb.addField("Achievement Points", formatNumber(player.getAchievementPoints()), true);
-
-		StringBuilder namesString = new StringBuilder();
-		for (String name : getNameHistory(player.getUuid())) {
-			namesString.append("• ").append(fixUsername(name)).append("\n");
-		}
-		if (namesString.length() > 0) {
-			eb.addField("Aliases", namesString.toString(), true);
-		}
 
 		String skyblockItems = "";
 		if (player.get("skyblock_free_cookie") != null) {

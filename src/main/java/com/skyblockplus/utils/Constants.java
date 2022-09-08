@@ -199,6 +199,7 @@ public class Constants {
 					}
 				}
 			}
+			ALL_TALISMANS.add("CHUMMING_TALISMAN");
 
 			/* NUMBER_TO_RARITY_MAP */
 			NUMBER_TO_RARITY_MAP =

@@ -19,7 +19,6 @@
 package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.getNameHistory;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -64,7 +63,6 @@ public class ApplyUser implements Serializable {
 	public String playerCatacombs;
 	public String playerWeight;
 	public String playerUsername;
-	public String nameHistory = "";
 	public String playerCoins;
 	public String ironmanSymbol = "";
 	public String playerProfileName;
@@ -124,7 +122,6 @@ public class ApplyUser implements Serializable {
 			Player player = new Player(playerUsername);
 			String[] profileNames = player.getAllProfileNames(Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all")));
 
-			getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + fixUsername(i));
 			if (profileNames.length == 1) {
 				applicationChannel
 					.sendMessage(
@@ -412,9 +409,6 @@ public class ApplyUser implements Serializable {
 							playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
 							true
 						);
-						if (!nameHistory.isEmpty()) {
-							applyPlayerStats.addField("Name history", nameHistory, true);
-						}
 						applyPlayerStats.setThumbnail("https://cravatar.eu/helmavatar/" + playerUsername + "/64.png");
 						String waitlistMsg = higherDepth(currentSettings, "applyWaitlistMessage", null);
 						List<Button> row = new ArrayList<>();

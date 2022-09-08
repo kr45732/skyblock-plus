@@ -223,32 +223,6 @@ public class ApiHandler {
 		return new UsernameUuidStruct();
 	}
 
-	public static List<String> getNameHistory(String uuid) {
-		try {
-			List<String> nameHistory = new ArrayList<>();
-
-			if (!useAlternativeApi) {
-				JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + uuid);
-				String username = higherDepth(usernameJson, "username").getAsString();
-				for (JsonElement name : higherDepth(usernameJson, "username_history").getAsJsonArray()) {
-					if (!higherDepth(name, "username").getAsString().equals(username)) {
-						nameHistory.add(higherDepth(name, "username").getAsString());
-					}
-				}
-			} else {
-				JsonElement usernameJson = higherDepth(getJson("https://playerdb.co/api/player/minecraft/" + uuid), "data.player");
-				String username = higherDepth(usernameJson, "username").getAsString();
-				for (JsonElement name : higherDepth(usernameJson, "meta.name_history").getAsJsonArray()) {
-					if (!higherDepth(name, "name").getAsString().equals(username)) {
-						nameHistory.add(higherDepth(name, "name").getAsString());
-					}
-				}
-			}
-			return nameHistory;
-		} catch (Exception ignored) {}
-		return new ArrayList<>();
-	}
-
 	public static CompletableFuture<String> asyncUuidToUsername(String uuid) {
 		CompletableFuture<String> future = new CompletableFuture<>();
 
