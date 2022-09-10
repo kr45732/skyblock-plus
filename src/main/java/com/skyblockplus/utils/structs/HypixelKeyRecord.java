@@ -49,6 +49,6 @@ public final class HypixelKeyRecord {
 	}
 
 	public long getTimeTillReset() {
-		return Math.max(0, Duration.between(Instant.now(), time.plusSeconds(timeTillReset.get())).getSeconds());
+		return Math.max(0, Duration.between(Instant.now(), time.plusSeconds(timeTillReset.get())).toSeconds());
 	}
 }

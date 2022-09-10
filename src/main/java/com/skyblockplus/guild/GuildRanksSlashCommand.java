@@ -33,6 +33,8 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.FileReader;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -123,7 +125,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 		} catch (Exception e) {
 			return invalidEmbed(
 				guildName +
-				"'s is not setup. Please join the [Skyblock Plus Discord](" +
+				"'s rank settings are not setup. Please join the [Skyblock Plus Discord](" +
 				DISCORD_SERVER_INVITE_LINK +
 				") and mention CrypticPlasma to setup this for your guild."
 			);
@@ -164,12 +166,12 @@ public class GuildRanksSlashCommand extends SlashCommand {
 				.orElse(null);
 			String curRank = higherDepth(gMemJson, "rank", null);
 
-			if (curRank == null || ignoredRanks.contains(curRank)) {
+			if (curRank == null || ignoredRanks.contains(curRank.toLowerCase())) {
 				playerList.remove(i);
 			} else {
 				playerList
 					.get(i)
-					.put("rank", curRank)
+					.put("rank", curRank.toLowerCase())
 					.put(
 						"gxp",
 						higherDepth(gMemJson, "expHistory")
@@ -178,6 +180,10 @@ public class GuildRanksSlashCommand extends SlashCommand {
 							.stream()
 							.mapToDouble(g -> g.getValue().getAsDouble())
 							.sum()
+					)
+					.put(
+						"duration",
+						Duration.between(Instant.now(), Instant.ofEpochMilli(higherDepth(gMemJson, "joined").getAsLong())).abs().toSeconds()
 					);
 				uniqueGuildName.add(gMemUsername);
 			}
@@ -300,7 +306,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 						continue;
 					}
 
-					String playerRank = currentPlayer.getString("rank").toLowerCase();
+					String playerRank = currentPlayer.getString("rank");
 					String playerUsername = currentPlayer.getString("username");
 
 					for (JsonElement rank : ranksArr) {
@@ -399,7 +405,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 						totalChange++;
 					}
 				} else {
-					if (!defaultRank.contains(gMember.getString("rank").toLowerCase())) {
+					if (!defaultRank.contains(gMember.getString("rank"))) {
 						pbItems.add(("- /g setrank " + fixUsername(gMember.getString("username")) + " " + defaultRank.get(0)));
 						totalChange++;
 					}

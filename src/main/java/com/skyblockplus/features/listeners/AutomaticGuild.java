@@ -74,6 +74,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -986,7 +987,7 @@ public class AutomaticGuild {
 		if (event.getModalId().startsWith("nw_")) {
 			event.deferReply(true).queue();
 
-			// 0 = uuid, 1 = profile name, 2 = optional verbose json link
+			// 0 = uuid, 1 = profile name, 2 = last action, 3 = optional verbose json link
 			String[] split = event.getModalId().split("nw_")[1].split("_");
 			if (split.length < 4) {
 				NetworthExecute calc = new NetworthExecute().setVerbose(true).setOnlyTotal(true);
@@ -1008,28 +1009,42 @@ public class AutomaticGuild {
 			}
 			event.getMessage().editMessageComponents(newRows).queue();
 
-			networthBugWebhook.send(
-				defaultEmbed("Networth Bug Report")
-					.addField(
-						"Info",
-						"**UUID:** [" +
-						split[0] +
-						"](" +
-						skyblockStatsLink(split[0], split[1]) +
-						")\n**Profile name:** " +
-						split[1] +
-						"\n**Verbose Link:** " +
-						split[3],
-						false
-					)
-					.setDescription(event.getValues().get(0).getAsString())
-					.build()
-			);
+			if (networthBugReportChannel == null) {
+				networthBugReportChannel = jda.getGuildById("796790757947867156").getTextChannelById("1017573342288564264");
+			}
+
+			String verboseLink = split[3];
+			networthBugReportChannel
+				.sendMessageEmbeds(
+					defaultEmbed("Networth Bug Report")
+						.addField(
+							"Information",
+							"**User:** " +
+							event.getUser().getAsMention() +
+							"\n**Username:** [" +
+							uuidToUsername(split[0]).username() +
+							"](" +
+							skyblockStatsLink(split[0], split[1]) +
+							")\n**Profile name:** " +
+							split[1],
+							false
+						)
+						.setDescription(event.getValues().get(0).getAsString())
+						.build()
+				)
+				.queue(m ->
+					m
+						.editMessageComponents(
+							ActionRow.of(
+								Button.link(verboseLink, "Verbose Link"),
+								Button.success("nw_resolved_" + event.getUser().getId() + "_" + m.getId(), "Resolved")
+							)
+						)
+						.queue()
+				);
 
 			event.getHook().editOriginal(client.getSuccess() + " Bug report sent").queue();
-		}
-
-		if (skyblockEventHandler != null) {
+		} else if (skyblockEventHandler != null) {
 			skyblockEventHandler.onModalInteraction(event);
 		}
 	}
@@ -1059,6 +1074,45 @@ public class AutomaticGuild {
 				.queue();
 		} else if (event.getComponentId().equals("mayor_jerry_button")) {
 			event.replyEmbeds(jerryEmbed).setEphemeral(true).queue();
+		} else if (event.getComponentId().startsWith("nw_resolved_")) {
+			if (event.getUser().getId().equals(client.getOwnerId())) {
+				event
+					.editComponents(
+						ActionRow.of(
+							event
+								.getMessage()
+								.getButtons()
+								.stream()
+								.filter(b -> b.getStyle() == ButtonStyle.LINK)
+								.collect(Collectors.toList())
+						)
+					)
+					.queue();
+				// 0 = user id, 1 = message id
+				String[] split = event.getComponentId().split("nw_resolved_")[1].split("_");
+				networthBugReportChannel
+					.retrieveMessageById(split[1])
+					.queue(m ->
+						jda
+							.retrieveUserById(split[0])
+							.queue(u ->
+								u
+									.openPrivateChannel()
+									.queue(c ->
+										c
+											.sendMessageEmbeds(
+												defaultEmbed(null).setDescription(m.getEmbeds().get(0).getDescription()).build()
+											)
+											.setContent(
+												client.getSuccess() +
+												" Your networth bug report has been resolved by " +
+												event.getUser().getAsMention()
+											)
+											.queue()
+									)
+							)
+					);
+			}
 		} else if (event.getComponentId().startsWith("nw_")) {
 			long seconds = Duration
 				.between(Instant.now(), Instant.ofEpochMilli(Long.parseLong(event.getComponentId().split("nw_")[1].split("_")[2])))

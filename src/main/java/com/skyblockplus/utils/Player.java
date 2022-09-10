@@ -929,7 +929,7 @@ public class Player {
 	private String username;
 	private String profileName;
 	private String failCause = "Unknown fail cause";
-	private final Map<Integer, Double> profileToNetworth = new HashMap<>();
+	public final Map<Integer, Double> profileToNetworth = new HashMap<>();
 
 	/* Constructors */
 	// Empty player, always invalid

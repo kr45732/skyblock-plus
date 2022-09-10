@@ -338,5 +338,35 @@
         }
       ]
     }
+  },
+  "62d6e74e8ea8c92961332738": {
+    "name": "BlackPast",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "administrateur",
+        "modérateur",
+        "guild master"
+      ],
+      "default_rank": {
+        "requirements" : [],
+        "names": ["nouveau"]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 1209600,
+                "type": "duration"
+              }
+            ]
+          ],
+          "names": [
+            "membres"
+          ]
+        }
+      ]
+    }
   }
 }

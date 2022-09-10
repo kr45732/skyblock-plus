@@ -154,13 +154,8 @@ public class Utils {
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
 	private static final Pattern bazaarEnchantPattern = Pattern.compile("ENCHANTMENT_(\\D*)_(\\d+)");
 	private static final Pattern neuTexturePattern = Pattern.compile("Properties:\\{textures:\\[0:\\{Value:\"(.*)\"}]}");
-
 	public static final JDAWebhookClient botStatusWebhook = new WebhookClientBuilder(
 		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
-	)
-		.buildJDA();
-	public static final JDAWebhookClient networthBugWebhook = new WebhookClientBuilder(
-		"https://discord.com/api/webhooks/1017573392498565140/F6MEL3VgM1Uvk3z-dM-N8bAPZj4n2L6_DCWOKWLejnxADe6GPVo8Npp5jLOI7AHFD-0k"
 	)
 		.buildJDA();
 	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[\\dA-FK-OR]");
@@ -208,6 +203,7 @@ public class Utils {
 	/* Miscellaneous */
 	private static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
+	public static TextChannel networthBugReportChannel;
 	private static Instant lowestBinJsonLastUpdated = Instant.now();
 	private static Instant averageAuctionJsonLastUpdated = Instant.now();
 	private static Instant bingoJsonLastUpdated = Instant.now();
@@ -806,15 +802,15 @@ public class Utils {
 
 	/* Embeds and paginators */
 	public static EmbedBuilder defaultEmbed(String title, String titleUrl) {
-		EmbedBuilder eb = new EmbedBuilder();
-		eb.setColor(botColor);
-		eb.setFooter("By CrypticPlasma • dsc.gg/sb+", null);
+		EmbedBuilder eb = new EmbedBuilder()
+			.setColor(botColor)
+			.setFooter("By CrypticPlasma • dsc.gg/sb+", null)
+			.setTimestamp(Instant.now());
 		if (titleUrl != null && titleUrl.length() <= MessageEmbed.URL_MAX_LENGTH && EmbedBuilder.URL_PATTERN.matcher(titleUrl).matches()) {
 			eb.setTitle(title, titleUrl);
 		} else {
 			eb.setTitle(title);
 		}
-		eb.setTimestamp(Instant.now());
 		return eb;
 	}
 

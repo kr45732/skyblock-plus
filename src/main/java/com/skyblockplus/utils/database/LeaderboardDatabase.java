@@ -200,30 +200,28 @@ public class LeaderboardDatabase {
 					statement.setLong(3 + offset, Instant.now().toEpochMilli());
 					for (int i = 0; i < typesSubList.size(); i++) {
 						String type = typesSubList.get(i);
-						if (type.equals("networth") && players.size() > 1) {
-							statement.setDouble(i + 4 + offset, 0);
-							continue;
-						}
 						statement.setDouble(
 							i + 4 + offset,
-							player.getHighestAmount(
-								type +
-								switch (type) {
-									case "catacombs",
-										"alchemy",
-										"combat",
-										"fishing",
-										"farming",
-										"foraging",
-										"carpentry",
-										"mining",
-										"taming",
-										"social",
-										"enchanting" -> "_xp";
-									default -> "";
-								},
-								gamemode
-							)
+							type.equals("networth") && players.size() > 1 && player.profileToNetworth.isEmpty()
+								? 0
+								: player.getHighestAmount(
+									type +
+									switch (type) {
+										case "catacombs",
+											"alchemy",
+											"combat",
+											"fishing",
+											"farming",
+											"foraging",
+											"carpentry",
+											"mining",
+											"taming",
+											"social",
+											"enchanting" -> "_xp";
+										default -> "";
+									},
+									gamemode
+								)
 						);
 					}
 				}
