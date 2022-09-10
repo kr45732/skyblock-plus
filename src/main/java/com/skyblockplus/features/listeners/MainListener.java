@@ -22,8 +22,12 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.AbstractEventListener;
 import com.skyblockplus.utils.AuctionFlipper;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -45,7 +49,7 @@ import org.jetbrains.annotations.NotNull;
 public class MainListener extends ListenerAdapter {
 
 	public static final Map<String, AutomaticGuild> guildMap = new ConcurrentHashMap<>();
-	public static final List<AbstractEventListener> eventListeners = new ArrayList<>();
+	public static final Queue<AbstractEventListener> eventListeners = new ConcurrentLinkedQueue<>();
 	private static String lastRepoCommitSha = null;
 
 	public static void initialize() {
