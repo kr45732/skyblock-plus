@@ -21,10 +21,9 @@ package com.skyblockplus.api.serversettings.automatedguild;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
+import javax.persistence.*;
+
+import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,8 +33,16 @@ import org.hibernate.annotations.FetchMode;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Embeddable
+@Entity
 public class AutomatedGuild {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	@ManyToOne
+	@JoinColumn(name = "id", insertable = false, updatable = false)
+	private ServerSettingsModel serverSettings;
 
 	private String guildName;
 	private String guildId;
