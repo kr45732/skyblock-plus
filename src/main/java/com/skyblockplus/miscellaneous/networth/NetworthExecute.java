@@ -789,7 +789,7 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			if (item.isRecombobulated() && (itemCost * 2 >= recombPrice)) {
+			if (item.isRecombobulated() && (ALL_TALISMANS.contains(item.getId()) || itemCost * 2 >= recombPrice)) {
 				recombobulatedExtra = recombPrice;
 			}
 		} catch (Exception ignored) {}
