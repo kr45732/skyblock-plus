@@ -72,7 +72,7 @@ public class ScammerSlashCommand extends SlashCommand {
 		}
 
 		JsonElement scammerJson = getScammerJson(usernameUuid.uuid());
-		EmbedBuilder eb = defaultEmbed(usernameUuid.usernameFixed(), "https://mine.ly/" + usernameUuid.uuid())
+		EmbedBuilder eb = defaultEmbed(usernameUuid.usernameFixed(), nameMcLink(usernameUuid.uuid()))
 			.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)");
 		if (scammerJson == null) {
 			return eb.setDescription(

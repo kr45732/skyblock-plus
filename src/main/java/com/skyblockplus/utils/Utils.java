@@ -1754,7 +1754,11 @@ public class Utils {
 	}
 
 	public static String nameMcHyperLink(String username, String uuid) {
-		return "[**" + username + "**](https://mine.ly/" + uuid + ")";
+		return "[**" + username + "**](" + nameMcLink(uuid) + ")";
+	}
+
+	public static String nameMcLink(String uuid) {
+		return "https://mine.ly/" + uuid;
 	}
 
 	public static boolean isMainBot() {
