@@ -218,9 +218,9 @@ public class ServerSettingsService {
 				}
 			}
 
-			System.out.println(automatedGuilds);
+			automatedGuilds.forEach(g -> g.setServerSettings(currentServerSettings));
+
 			currentServerSettings.setAutomatedGuilds(automatedGuilds);
-			System.out.println(currentServerSettings);
 			var saved = settingsRepository.save(currentServerSettings);
 			System.out.println(saved);
 			return new ResponseEntity<>(HttpStatus.OK);
