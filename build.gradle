@@ -76,7 +76,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.1'
 
     // NBT parser
-    implementation 'me.nullicorn:Nedit:2.1.1'
+    implementation 'me.nullicorn:Nedit:2.2.0'
 
     // Spring boot and postgresql
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.3'
