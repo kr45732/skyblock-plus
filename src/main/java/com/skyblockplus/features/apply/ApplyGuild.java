@@ -87,7 +87,11 @@ public class ApplyGuild {
 			ApplyUser applyUser = iterator.next();
 			if ((applyUser.applicationChannelId != null && applyUser.applicationChannelId.equals(event.getChannel().getId()))) {
 				if (applyUser.state == 2) {
-					event.getGuild().getTextChannelById(applyUser.staffChannelId).deleteMessageById(applyUser.reactMessageId).queue();
+					event
+						.getGuild()
+						.getTextChannelById(applyUser.staffChannelId)
+						.deleteMessageById(applyUser.reactMessageId)
+						.queue(ignore, ignore);
 				}
 				iterator.remove();
 			} else if (applyUser.staffChannelId != null && applyUser.staffChannelId.equals(event.getChannel().getId())) {
