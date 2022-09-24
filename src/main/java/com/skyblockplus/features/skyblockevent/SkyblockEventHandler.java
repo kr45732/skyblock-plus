@@ -205,7 +205,7 @@ public class SkyblockEventHandler {
 									.queue();
 								return;
 							}
-							event.deferEdit().queue();
+							event.deferEdit().complete();
 
 							String eventTypeFormatted = getEventTypeFormatted(eventSettings.getEventType());
 

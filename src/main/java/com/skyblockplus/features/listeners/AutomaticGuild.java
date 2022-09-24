@@ -40,6 +40,7 @@ import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
 import com.skyblockplus.features.verify.VerifyGuild;
+import com.skyblockplus.general.LinkSlashCommand;
 import com.skyblockplus.miscellaneous.MayorSlashCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.price.AuctionTracker;
@@ -82,6 +83,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -375,10 +377,7 @@ public class AutomaticGuild {
 		}
 
 		try {
-			if (
-				higherDepth(currentSettings, "enable") == null ||
-				(higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())
-			) {
+			if (!higherDepth(currentSettings, "enable", false)) {
 				return;
 			}
 
@@ -391,14 +390,19 @@ public class AutomaticGuild {
 						.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
 						.complete();
 					if (reactMessage != null) {
-						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
+						reactMessage
+							.editMessage(higherDepth(currentSettings, "messageText").getAsString())
+							.setActionRow(Button.primary("verify_button", "Verify"))
+							.queue();
 
 						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
 						return;
 					}
 				} catch (Exception ignored) {}
 
-				MessageCreateAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				MessageCreateAction action = reactChannel
+					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+					.setActionRow(Button.primary("verify_button", "Verify"));
 				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
 					action =
 						action.addFiles(
@@ -437,7 +441,10 @@ public class AutomaticGuild {
 						.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
 						.complete();
 					if (reactMessage != null) {
-						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
+						reactMessage
+							.editMessage(higherDepth(currentSettings, "messageText").getAsString())
+							.setActionRow(Button.primary("verify_button", "Verify"))
+							.queue();
 
 						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
 						return "Reloaded";
@@ -446,7 +453,9 @@ public class AutomaticGuild {
 
 				verifyGuild = new VerifyGuild(); // Prevent the old settings from deleting the new message
 
-				MessageCreateAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				MessageCreateAction action = reactChannel
+					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+					.setActionRow(Button.primary("verify_button", "Verify"));
 				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
 					action =
 						action.addFiles(
@@ -984,8 +993,16 @@ public class AutomaticGuild {
 	}
 
 	public void onModalInteraction(ModalInteractionEvent event) {
-		if (event.getModalId().startsWith("nw_")) {
-			event.deferReply(true).queue();
+		if (event.getModalId().equalsIgnoreCase("verify_modal")) {
+			event.deferReply(true).complete();
+			Object ebOrMb = LinkSlashCommand.linkAccount(event.getValues().get(0).getAsString(), event.getMember(), event.getGuild());
+			if (ebOrMb instanceof EmbedBuilder eb) {
+				event.getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
+			} else if (ebOrMb instanceof MessageEditBuilder mb) {
+				event.getHook().editOriginal(mb.build()).queue(ignore, ignore);
+			}
+		} else if (event.getModalId().startsWith("nw_")) {
+			event.deferReply(true).complete();
 
 			// 0 = uuid, 1 = profile name, 2 = last action, 3 = optional verbose json link
 			String[] split = event.getModalId().split("nw_")[1].split("_");
@@ -1056,7 +1073,9 @@ public class AutomaticGuild {
 	}
 
 	public void onButtonClick(ButtonInteractionEvent event) {
-		if (event.getComponentId().equals("mayor_graph_button")) {
+		if (event.getComponentId().equals("verify_button")) {
+			verifyGuild.onButtonClick(event);
+		} else if (event.getComponentId().equals("mayor_graph_button")) {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
