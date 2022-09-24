@@ -263,6 +263,7 @@ public class CalendarSlashCommand extends SlashCommand {
 		} else if (currentDay > 7) {
 			out = 14;
 		}
+		out--;
 		Instant cultStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS);
 		if (cultStart.isBefore(instantNow)) {
 			int curYearCult = getSkyblockYear() - 1;

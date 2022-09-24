@@ -417,6 +417,7 @@ public class EventHandler {
 		} else if (currentDay > 7) {
 			out = 14;
 		}
+		out--;
 		Instant fallenStar = Instant.ofEpochMilli(
 			CalendarSlashCommand.YEAR_0 +
 			(CalendarSlashCommand.getSkyblockYear() - 1) *
