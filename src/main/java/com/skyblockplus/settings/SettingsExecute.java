@@ -2276,7 +2276,7 @@ public class SettingsExecute {
 		}
 
 		try {
-			channel.getManager().setSlowmode(5).queue();
+			channel.getManager().putPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.MESSAGE_SEND)).queue();
 		} catch (Exception ignored) {}
 		return defaultSettingsEmbed("**Verify text channel set to:** " + channel.getAsMention());
 	}
