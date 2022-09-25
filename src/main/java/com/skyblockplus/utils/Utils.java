@@ -80,8 +80,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -1264,6 +1264,7 @@ public class Utils {
 								? item.getLong("tag.ExtraAttributes.winning_bid", -1L)
 								: -1
 						);
+						itemInfo.setMuseum(item.getInt("tag.ExtraAttributes.donated_museum", 0) == 1);
 
 						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
 							NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");

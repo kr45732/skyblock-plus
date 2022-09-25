@@ -1555,18 +1555,19 @@ public class Player {
 		return null;
 	}
 
-	public List<InvItem> getPetsMap() {
+	public Map<Integer, InvItem> getPetsMap() {
 		JsonArray petsArr;
 		try {
 			petsArr = getPets();
 		} catch (Exception e) {
-			return new ArrayList<>();
+			return new HashMap<>();
 		}
 
-		List<InvItem> petsNameFormatted = new ArrayList<>();
+		Map<Integer, InvItem> petsNameFormatted = new HashMap<>();
 
-		for (JsonElement pet : petsArr) {
+		for (int i = 0; i < petsArr.size(); i++) {
 			try {
+				JsonElement pet = petsArr.get(i);
 				String tier = higherDepth(pet, "tier").getAsString();
 				String type = higherDepth(pet, "type").getAsString();
 				InvItem invItemStruct = new InvItem();
@@ -1584,7 +1585,7 @@ public class Player {
 				if (higherDepth(pet, "heldItem", null) != null) {
 					invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
 				}
-				petsNameFormatted.add(invItemStruct);
+				petsNameFormatted.put(i, invItemStruct);
 			} catch (Exception ignored) {}
 		}
 

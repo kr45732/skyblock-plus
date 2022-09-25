@@ -23,7 +23,7 @@ import static com.skyblockplus.utils.Utils.invalidEmbed;
 import com.skyblockplus.Main;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.*;
-import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;

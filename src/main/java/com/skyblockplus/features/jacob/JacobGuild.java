@@ -27,7 +27,7 @@ import com.skyblockplus.features.listeners.AutomaticGuild;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class JacobGuild {
 

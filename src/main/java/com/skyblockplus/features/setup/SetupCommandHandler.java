@@ -585,7 +585,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 					event.getHook().editOriginalEmbeds(eb.build()).queue();
 				}
 				case GUILD_RANKS -> {
-					String[] guildRanks = event.getMessage().getContentRaw().split(",");
+					String[] guildRanks = event.getValues().get(0).getAsString().split(",");
 					EmbedBuilder eb = null;
 					if (guildRanks.length == 0) {
 						eb = invalidEmbed("You must specify at least one rank");
@@ -676,12 +676,13 @@ public class SetupCommandHandler extends AbstractEventListener {
 					switch (event.getModalId().split("setup_command_")[1]) {
 						case "channel" -> eb = getSettings().setJacobChannel(event.getValues().get(0).getAsString());
 						case "crops" -> {
+							String in = event.getValues().get(0).getAsString();
 							List<String> crops = new ArrayList<>();
 
-							if (event.getMessage().getContentRaw().equalsIgnoreCase("all")) {
+							if (in.equalsIgnoreCase("all")) {
 								crops.addAll(CROP_NAME_TO_EMOJI.keySet());
 							} else {
-								for (String crop : event.getMessage().getContentRaw().split(",")) {
+								for (String crop : in.split(",")) {
 									crops.add(capitalizeString(crop.trim()));
 								}
 							}

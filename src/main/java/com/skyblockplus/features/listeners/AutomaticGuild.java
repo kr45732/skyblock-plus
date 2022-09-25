@@ -61,6 +61,10 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -762,31 +766,27 @@ public class AutomaticGuild {
 					}
 
 					if (currentSetting.getGuildCounterEnable() != null && currentSetting.getGuildCounterEnable().equals("true")) {
-						VoiceChannel curVc = null;
 						try {
-							curVc = guild.getVoiceChannelById(currentSetting.getGuildCounterChannel());
-						} catch (Exception ignored) {}
+							VoiceChannel curVc = guild.getVoiceChannelById(currentSetting.getGuildCounterChannel());
 
-						if (curVc == null) {
+							if (curVc.getName().contains(guildMembers.size() + "/125")) {
+								continue;
+							}
+
+							curVc
+								.getManager()
+								.setName(
+									curVc.getName().split(":").length == 2
+										? curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125"
+										: response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125"
+								)
+								.queue();
+
+							counterUpdate++;
+						} catch (Exception e) {
 							currentSetting.setGuildCounterEnable("false");
 							database.setGuildSettings(guild.getId(), gson.toJsonTree(currentSetting));
-							continue;
 						}
-
-						if (curVc.getName().contains(guildMembers.size() + "/125")) {
-							continue;
-						}
-
-						curVc
-							.getManager()
-							.setName(
-								curVc.getName().split(":").length == 2
-									? curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125"
-									: response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125"
-							)
-							.queue();
-
-						counterUpdate++;
 					}
 				}
 			}
@@ -1007,8 +1007,8 @@ public class AutomaticGuild {
 			// 0 = uuid, 1 = profile name, 2 = last action, 3 = optional verbose json link
 			String[] split = event.getModalId().split("nw_")[1].split("_");
 			if (split.length < 4) {
-				NetworthExecute calc = new NetworthExecute().setVerbose(true).setOnlyTotal(true);
-				calc.getPlayerNetworth(split[0], split[1]);
+				NetworthExecute calc = new NetworthExecute().setVerbose(true);
+				calc.getPlayerNetworth(split[0], split[1], null);
 				split = new String[] { split[0], split[1], split[2], makeHastePost(formattedGson.toJson(calc.getVerboseJson())) };
 			}
 			split[2] = "" + Instant.now().toEpochMilli();

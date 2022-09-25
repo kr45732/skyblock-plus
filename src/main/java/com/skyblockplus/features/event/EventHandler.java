@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class EventHandler {
 
@@ -436,7 +436,7 @@ public class EventHandler {
 			ebs.put(
 				"fallen_star",
 				defaultEmbed("Cult Of Fallen Star")
-					.setDescription("Cult of fallen start arrives <t:" + fallenStar.getEpochSecond() + ":R>")
+					.setDescription("Cult of fallen star arrives <t:" + fallenStar.getEpochSecond() + ":R>")
 					.build()
 			);
 		} else if (nowEpoch > fallenStar.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < fallenStar.toEpochMilli()) {
@@ -444,7 +444,7 @@ public class EventHandler {
 			ebs.put(
 				"fallen_star",
 				defaultEmbed("Cult Of Fallen Star")
-					.setDescription("Cult of fallen start arrives <t:" + fallenStar.getEpochSecond() + ":R>")
+					.setDescription("Cult of fallen star arrives <t:" + fallenStar.getEpochSecond() + ":R>")
 					.build()
 			);
 		}

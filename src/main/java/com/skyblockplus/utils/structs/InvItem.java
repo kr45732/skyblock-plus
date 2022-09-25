@@ -51,6 +51,7 @@ public class InvItem {
 	private String essenceType;
 	private long darkAuctionPrice;
 	private NBTCompound nbtTag;
+	private boolean soulbound = false;
 
 	public void setEssence(int essenceCount, String essenceType) {
 		this.essenceCount = essenceCount;
@@ -103,7 +104,12 @@ public class InvItem {
 		if (lore != null) {
 			this.rarity = parseMcCodes(lore.get(lore.size() - 1)).trim().split("\\s+")[0];
 			rarity += rarity.startsWith("VERY") ? "_SPECIAL" : "";
+			soulbound = soulbound || lore.contains("§8§l* §8Co-op Soulbound §8§l*") || lore.contains("§8§l* §8Soulbound §8§l*");
 		}
+	}
+
+	public void setMuseum(boolean isMuseum) {
+		soulbound = soulbound || isMuseum;
 	}
 
 	public void setBackpackItems(Collection<InvItem> backpackItems) {
