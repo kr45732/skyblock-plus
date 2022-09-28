@@ -1121,22 +1121,14 @@ public class Player {
 
 	public boolean getLatestProfile(JsonArray profilesArray) {
 		try {
-			Instant lastProfileSave = Instant.EPOCH;
 			for (int i = 0; i < profilesArray.size(); i++) {
-				Instant lastSaveLoop;
-				try {
-					lastSaveLoop =
-						Instant.ofEpochMilli(higherDepth(profilesArray.get(i), "members." + this.uuid + ".last_save").getAsLong());
-				} catch (Exception e) {
-					continue;
-				}
-
-				if (lastSaveLoop.isAfter(lastProfileSave)) {
+				if (higherDepth(profilesArray.get(i), "selected", false)) {
 					this.profileIndex = i;
-					lastProfileSave = lastSaveLoop;
 					this.profileName = higherDepth(profilesArray.get(i), "cute_name").getAsString();
+					break;
 				}
 			}
+
 			return false;
 		} catch (Exception ignored) {}
 		return true;

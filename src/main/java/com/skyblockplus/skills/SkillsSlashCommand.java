@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
@@ -148,12 +149,12 @@ public class SkillsSlashCommand extends SlashCommand {
 			} else {
 				eb.addField("Perks", "None", false);
 			}
-			Map<String, Long> contests = higherDepth(jacobStats, "contests")
-				.getAsJsonObject()
-				.keySet()
-				.stream()
-				.map(s -> s.endsWith("INK_SACK:3") ? "INK_SACK:3" : s.substring(s.lastIndexOf(":") + 1))
-				.collect(Collectors.groupingBy(c -> c, Collectors.counting()));
+			Map<String, Long> contests =
+				(higherDepth(jacobStats, "contests") != null ? higherDepth(jacobStats, "contests") : new JsonObject()).getAsJsonObject()
+					.keySet()
+					.stream()
+					.map(s -> s.endsWith("INK_SACK:3") ? "INK_SACK:3" : s.substring(s.lastIndexOf(":") + 1))
+					.collect(Collectors.groupingBy(c -> c, Collectors.counting()));
 			StringBuilder ebStr = new StringBuilder();
 			for (Map.Entry<String, Long> entry : contests
 				.entrySet()

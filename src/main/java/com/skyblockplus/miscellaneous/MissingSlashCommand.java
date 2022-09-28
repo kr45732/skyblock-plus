@@ -83,8 +83,13 @@ public class MissingSlashCommand extends SlashCommand {
 				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 			}
 
-			Set<String> playerItems = player
-				.getTalismanBagMap()
+			Map<Integer, InvItem> talismanBag = player.getTalismanBagMap();
+
+			if (talismanBag == null) {
+				return invalidEmbed(player.getUsernameFixed() + " has not unlocked the talisman bag");
+			}
+
+			Set<String> playerItems = talismanBag
 				.values()
 				.stream()
 				.filter(Objects::nonNull)

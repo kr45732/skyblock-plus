@@ -293,11 +293,14 @@ public class ApplyGuild {
 					() ->
 						toCloseChannel
 							.sendMessageEmbeds(defaultEmbed("Closing Channel").build())
-							.queue(m -> m.getGuildChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS))
+							.queue(
+								m -> m.getGuildChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS, ignore),
+								ignore
+							)
 				);
 		} catch (Exception ignored) {}
 
-		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
+		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS, ignore);
 		return client.getSuccess() + " Player was invited";
 	}
 }
