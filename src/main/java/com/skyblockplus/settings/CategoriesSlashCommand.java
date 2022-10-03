@@ -25,6 +25,7 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.stereotype.Component;
@@ -51,7 +52,7 @@ public class CategoriesSlashCommand extends SlashCommand {
 
 	public static EmbedBuilder getCategories(Guild guild) {
 		StringBuilder ebString = new StringBuilder();
-		for (net.dv8tion.jda.api.entities.Category category : guild.getCategories()) {
+		for (Category category : guild.getCategories()) {
 			ebString.append("\n• ").append(category.getName()).append(" ⇢ `").append(category.getId()).append("`");
 		}
 

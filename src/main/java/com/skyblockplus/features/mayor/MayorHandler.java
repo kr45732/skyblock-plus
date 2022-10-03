@@ -27,15 +27,21 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.groovy.util.Maps;
+import org.apache.http.client.utils.URIBuilder;
 
 public class MayorHandler {
 
@@ -44,7 +50,7 @@ public class MayorHandler {
 	public static int currentMayorYear = 0;
 	public static ScheduledFuture<?> jerryFuture;
 	public static MessageEmbed jerryEmbed = invalidEmbed("Jerry is not currently mayor").build();
-	public static MessageEmbed votesEmbed = defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build();
+	public static File mayorGraphFile = null;
 	public static final Map<String, String> mayorNameToEmoji = Maps.of(
 		"DERPY",
 		"<:derpy:940083649129349150>",
@@ -268,7 +274,30 @@ public class MayorHandler {
 					.append(getEmoji("STAINED_GLASS_PANE:8", "l").repeat(20 - voteGlass))
 					.append("\n");
 			}
-			votesEmbed = defaultEmbed("Mayor Election Graph | Year " + year).setDescription(votesStr).build();
+
+			mayorGraphFile = new File("src/main/java/com/skyblockplus/json/lore_renders/mayor_graph.png");
+			ImageIO.write(
+				ImageIO.read(
+					new URIBuilder("https://quickchart.io/chart")
+						.addParameter("bkg", "#2f3136")
+						.addParameter(
+							"c",
+							"{ type: 'bar', data: { labels: [" +
+							streamJsonArray(curMayors)
+								.map(m -> "'" + higherDepth(m, "name").getAsString() + "'")
+								.collect(Collectors.joining(",")) +
+							"], datasets: [{ data: [" +
+							streamJsonArray(curMayors).map(m -> higherDepth(m, "votes").getAsString()).collect(Collectors.joining(",")) +
+							"], backgroundColor: getGradientFillHelper('vertical', [\"#023020\", \"#32CD32\"]), }] }, options: { title: { display: true, text: 'Mayor Election Graph | Year " +
+							year +
+							"' }, legend: { display: false, } } }"
+						)
+						.build()
+						.toURL()
+				),
+				"png",
+				mayorGraphFile
+			);
 
 			MessageEmbed embed = eb.build();
 			Button button = Button.primary("mayor_graph_button", "View Graph");

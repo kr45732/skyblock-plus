@@ -26,9 +26,13 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.general.LinkSlashCommand;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.Modal;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 
 public class VerifyGuild {
 
@@ -66,6 +70,25 @@ public class VerifyGuild {
 		}
 
 		event.getMessage().delete().queueAfter(7, TimeUnit.SECONDS, ignore, ignore);
+	}
+
+	public void onButtonClick(ButtonInteractionEvent event) {
+		if (!event.getChannel().getId().equals(messageChannel.getId())) {
+			return;
+		}
+
+		if (!event.getMessage().getId().equals(originalMessage.getId())) {
+			return;
+		}
+
+		event
+			.replyModal(
+				Modal
+					.create("verify_modal", "Verification")
+					.addActionRow(TextInput.create("value", "Your In-Game Name", TextInputStyle.SHORT).build())
+					.build()
+			)
+			.queue();
 	}
 
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {

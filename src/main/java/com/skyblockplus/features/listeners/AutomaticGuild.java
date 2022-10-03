@@ -20,7 +20,6 @@ package com.skyblockplus.features.listeners;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.jerryEmbed;
-import static com.skyblockplus.features.mayor.MayorHandler.votesEmbed;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -35,11 +34,13 @@ import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.event.EventGuild;
 import com.skyblockplus.features.jacob.JacobGuild;
+import com.skyblockplus.features.mayor.MayorHandler;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
 import com.skyblockplus.features.verify.VerifyGuild;
+import com.skyblockplus.general.LinkSlashCommand;
 import com.skyblockplus.miscellaneous.MayorSlashCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.price.AuctionTracker;
@@ -60,6 +61,10 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -82,6 +87,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -375,10 +381,7 @@ public class AutomaticGuild {
 		}
 
 		try {
-			if (
-				higherDepth(currentSettings, "enable") == null ||
-				(higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())
-			) {
+			if (!higherDepth(currentSettings, "enable", false)) {
 				return;
 			}
 
@@ -391,14 +394,19 @@ public class AutomaticGuild {
 						.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
 						.complete();
 					if (reactMessage != null) {
-						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
+						reactMessage
+							.editMessage(higherDepth(currentSettings, "messageText").getAsString())
+							.setActionRow(Button.primary("verify_button", "Verify"))
+							.queue();
 
 						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
 						return;
 					}
 				} catch (Exception ignored) {}
 
-				MessageCreateAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				MessageCreateAction action = reactChannel
+					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+					.setActionRow(Button.primary("verify_button", "Verify"));
 				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
 					action =
 						action.addFiles(
@@ -437,7 +445,10 @@ public class AutomaticGuild {
 						.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
 						.complete();
 					if (reactMessage != null) {
-						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
+						reactMessage
+							.editMessage(higherDepth(currentSettings, "messageText").getAsString())
+							.setActionRow(Button.primary("verify_button", "Verify"))
+							.queue();
 
 						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
 						return "Reloaded";
@@ -446,7 +457,9 @@ public class AutomaticGuild {
 
 				verifyGuild = new VerifyGuild(); // Prevent the old settings from deleting the new message
 
-				MessageCreateAction action = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString());
+				MessageCreateAction action = reactChannel
+					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+					.setActionRow(Button.primary("verify_button", "Verify"));
 				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
 					action =
 						action.addFiles(
@@ -753,31 +766,27 @@ public class AutomaticGuild {
 					}
 
 					if (currentSetting.getGuildCounterEnable() != null && currentSetting.getGuildCounterEnable().equals("true")) {
-						VoiceChannel curVc = null;
 						try {
-							curVc = guild.getVoiceChannelById(currentSetting.getGuildCounterChannel());
-						} catch (Exception ignored) {}
+							VoiceChannel curVc = guild.getVoiceChannelById(currentSetting.getGuildCounterChannel());
 
-						if (curVc == null) {
+							if (curVc.getName().contains(guildMembers.size() + "/125")) {
+								continue;
+							}
+
+							curVc
+								.getManager()
+								.setName(
+									curVc.getName().split(":").length == 2
+										? curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125"
+										: response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125"
+								)
+								.queue();
+
+							counterUpdate++;
+						} catch (Exception e) {
 							currentSetting.setGuildCounterEnable("false");
 							database.setGuildSettings(guild.getId(), gson.toJsonTree(currentSetting));
-							continue;
 						}
-
-						if (curVc.getName().contains(guildMembers.size() + "/125")) {
-							continue;
-						}
-
-						curVc
-							.getManager()
-							.setName(
-								curVc.getName().split(":").length == 2
-									? curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125"
-									: response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125"
-							)
-							.queue();
-
-						counterUpdate++;
 					}
 				}
 			}
@@ -984,14 +993,22 @@ public class AutomaticGuild {
 	}
 
 	public void onModalInteraction(ModalInteractionEvent event) {
-		if (event.getModalId().startsWith("nw_")) {
-			event.deferReply(true).queue();
+		if (event.getModalId().equalsIgnoreCase("verify_modal")) {
+			event.deferReply(true).complete();
+			Object ebOrMb = LinkSlashCommand.linkAccount(event.getValues().get(0).getAsString(), event.getMember(), event.getGuild());
+			if (ebOrMb instanceof EmbedBuilder eb) {
+				event.getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
+			} else if (ebOrMb instanceof MessageEditBuilder mb) {
+				event.getHook().editOriginal(mb.build()).queue(ignore, ignore);
+			}
+		} else if (event.getModalId().startsWith("nw_")) {
+			event.deferReply(true).complete();
 
 			// 0 = uuid, 1 = profile name, 2 = last action, 3 = optional verbose json link
 			String[] split = event.getModalId().split("nw_")[1].split("_");
 			if (split.length < 4) {
-				NetworthExecute calc = new NetworthExecute().setVerbose(true).setOnlyTotal(true);
-				calc.getPlayerNetworth(split[0], split[1]);
+				NetworthExecute calc = new NetworthExecute().setVerbose(true);
+				calc.getPlayerNetworth(split[0], split[1], null);
 				split = new String[] { split[0], split[1], split[2], makeHastePost(formattedGson.toJson(calc.getVerboseJson())) };
 			}
 			split[2] = "" + Instant.now().toEpochMilli();
@@ -1056,8 +1073,21 @@ public class AutomaticGuild {
 	}
 
 	public void onButtonClick(ButtonInteractionEvent event) {
-		if (event.getComponentId().equals("mayor_graph_button")) {
-			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
+		if (event.getComponentId().equals("verify_button")) {
+			verifyGuild.onButtonClick(event);
+		} else if (event.getComponentId().equals("mayor_graph_button")) {
+			if (MayorHandler.mayorGraphFile == null) {
+				event
+					.replyEmbeds(defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build())
+					.setEphemeral(true)
+					.queue();
+			} else {
+				event
+					.replyEmbeds(defaultEmbed(null).setImage("attachment://mayor_graph.png").build())
+					.setFiles(FileUpload.fromData(MayorHandler.mayorGraphFile))
+					.setEphemeral(true)
+					.queue();
+			}
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {

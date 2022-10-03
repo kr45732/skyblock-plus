@@ -75,10 +75,13 @@ public class SelectMenuPaginator {
 		page = event.getSelectedOptions().get(0).getValue();
 		event
 			.editMessageEmbeds(this.pages.get(page).build())
-			.queue(m -> {
-				message = event.getMessage();
-				waitForEvent();
-			});
+			.queue(
+				m -> {
+					message = event.getMessage();
+					waitForEvent();
+				},
+				ignore
+			);
 	}
 
 	public void waitForEvent() {

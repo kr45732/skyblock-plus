@@ -177,7 +177,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 					Modal.Builder modalBuilder = Modal.create("setup_command_" + selectedOption, "Setup");
 					switch (selectedOption) {
 						case "enable" -> {
-							event.deferReply(true).queue();
+							event.deferReply(true).complete();
 							EmbedBuilder eb = getSettings().setVerifyEnable(true);
 							if (!eb.build().getTitle().equals("Settings")) {
 								event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
@@ -269,7 +269,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 							)
 							.queue();
 						case GUILD_COUNTER -> {
-							event.deferReply(true).queue();
+							event.deferReply(true).complete();
 							EmbedBuilder eb = getSettings().setGuildCounterEnable(getGuildSettings(), true);
 							if (eb.build().getTitle().equals("Settings")) {
 								event
@@ -309,7 +309,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 					Modal.Builder modalBuilder = Modal.create("setup_command_" + selectedOption, "Setup");
 					switch (selectedOption) {
 						case "enable" -> {
-							event.deferReply(true).queue();
+							event.deferReply(true).complete();
 							EmbedBuilder eb = getSettings().setApplyEnable(getGuildSettings(), true);
 							if (eb.build().getTitle().equals("Settings")) {
 								String msg = onApplyReload(event.getGuild().getId());
@@ -451,7 +451,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 					Modal.Builder modalBuilder = Modal.create("setup_command_" + selectedOption, "Setup");
 					switch (selectedOption) {
 						case "enable" -> {
-							event.deferReply(true).queue();
+							event.deferReply(true).complete();
 							EmbedBuilder eb = getSettings().setJacobEnable(true);
 							if (eb.build().getTitle().equals("Settings")) {
 								event
@@ -486,7 +486,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 			event.getMessage().getId().equals(buttonEvent.getMessageId()) &&
 			event.getUser().getId().equals(buttonEvent.getUser().getId())
 		) {
-			(featureType == FeatureType.GUILD ? event.deferEdit() : event.deferReply(true)).queue();
+			(featureType == FeatureType.GUILD ? event.deferEdit() : event.deferReply(true)).complete();
 
 			lastAction = Instant.now();
 			switch (featureType) {
@@ -585,7 +585,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 					event.getHook().editOriginalEmbeds(eb.build()).queue();
 				}
 				case GUILD_RANKS -> {
-					String[] guildRanks = event.getMessage().getContentRaw().split(",");
+					String[] guildRanks = event.getValues().get(0).getAsString().split(",");
 					EmbedBuilder eb = null;
 					if (guildRanks.length == 0) {
 						eb = invalidEmbed("You must specify at least one rank");
@@ -676,12 +676,13 @@ public class SetupCommandHandler extends AbstractEventListener {
 					switch (event.getModalId().split("setup_command_")[1]) {
 						case "channel" -> eb = getSettings().setJacobChannel(event.getValues().get(0).getAsString());
 						case "crops" -> {
+							String in = event.getValues().get(0).getAsString();
 							List<String> crops = new ArrayList<>();
 
-							if (event.getMessage().getContentRaw().equalsIgnoreCase("all")) {
+							if (in.equalsIgnoreCase("all")) {
 								crops.addAll(CROP_NAME_TO_EMOJI.keySet());
 							} else {
-								for (String crop : event.getMessage().getContentRaw().split(",")) {
+								for (String crop : in.split(",")) {
 									crops.add(capitalizeString(crop.trim()));
 								}
 							}

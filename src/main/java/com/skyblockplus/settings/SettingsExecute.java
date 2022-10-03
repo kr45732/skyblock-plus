@@ -51,6 +51,10 @@ import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
@@ -829,7 +833,10 @@ public class SettingsExecute {
 		for (JsonElement blacklisted : currentBlacklist) {
 			paginateBuilder.addItems(
 				"• " +
-				nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) +
+				nameMcHyperLink(
+					fixUsername(higherDepth(blacklisted, "username").getAsString()),
+					higherDepth(blacklisted, "uuid").getAsString()
+				) +
 				" - " +
 				higherDepth(blacklisted, "reason").getAsString()
 			);
@@ -894,7 +901,7 @@ public class SettingsExecute {
 				"Reason: " +
 				higherDepth(referent, "reason").getAsString() +
 				"\nNameMC: " +
-				nameMcHyperLink(thisUser, higherDepth(referent, "uuid").getAsString()),
+				nameMcHyperLink(fixUsername(thisUser), higherDepth(referent, "uuid").getAsString()),
 				false
 			);
 		}
@@ -2269,7 +2276,7 @@ public class SettingsExecute {
 		}
 
 		try {
-			channel.getManager().setSlowmode(5).queue();
+			channel.getManager().putPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.MESSAGE_SEND)).queue();
 		} catch (Exception ignored) {}
 		return defaultSettingsEmbed("**Verify text channel set to:** " + channel.getAsMention());
 	}

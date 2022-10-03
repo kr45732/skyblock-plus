@@ -30,70 +30,53 @@ import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.InvItem;
-import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 
 public class NetworthExecute {
 
+	private static final List<String> locations = List.of(
+		"inventory",
+		"talisman",
+		"armor",
+		"wardrobe",
+		"pets",
+		"enderchest",
+		"equipment",
+		"personal_vault",
+		"storage"
+	);
 	//	private final Set<String> tempSet = new HashSet<>();
-	private final List<InvItem> invPets = new ArrayList<>();
-	private final List<InvItem> petsPets = new ArrayList<>();
-	private final List<InvItem> enderChestPets = new ArrayList<>();
-	private final List<InvItem> storagePets = new ArrayList<>();
-	private final List<InvItem> personalVaultPets = new ArrayList<>();
-	private final List<String> enderChestItems = new ArrayList<>();
-	private final List<String> petsItems = new ArrayList<>();
-	private final List<String> invItems = new ArrayList<>();
-	private final List<String> wardrobeItems = new ArrayList<>();
-	private final List<String> talismanItems = new ArrayList<>();
-	private final List<String> armorItems = new ArrayList<>();
-	private final List<String> storageItems = new ArrayList<>();
-	private final List<String> personalVaultItems = new ArrayList<>();
-	private final List<String> sacksItems = new ArrayList<>();
+	private final Map<String, List<InvItem>> pets = new HashMap<>();
+	private final Map<String, List<String>> items = new HashMap<>();
+	private final Map<String, Double> totals = new HashMap<>();
 	private StringBuilder calcItemsJsonStr = new StringBuilder("[");
 	private JsonElement lowestBinJson;
 	private JsonElement averageAuctionJson;
 	private JsonElement bazaarJson;
 	private JsonArray sbzPrices;
-	private double enderChestTotal = 0;
-	private double personalVaultTotal = 0;
-	private double petsTotal = 0;
-	private double invTotal = 0;
-	private double bankBalance = 0;
-	private double purseCoins = 0;
-	private double wardrobeTotal = 0;
-	private double talismanTotal = 0;
-	private double invArmor = 0;
-	private double storageTotal = 0;
-	private double sacksTotal = 0;
-	private boolean verbose = false;
 	private double recombPrice;
 	private double fumingPrice;
 	private double hbpPrice;
-	private boolean onlyTotal = false;
+	private boolean verbose = false;
 
 	public static double getTotalNetworth(String username, String profileName) {
-		NetworthExecute calc = new NetworthExecute().setOnlyTotal(true);
-		calc.getPlayerNetworth(username, profileName);
+		NetworthExecute calc = new NetworthExecute();
+		calc.getPlayerNetworth(username, profileName, null);
 		return calc.getTotalCalculatedNetworth();
 	}
 
 	public static double getTotalNetworth(Player player) {
-		NetworthExecute calc = new NetworthExecute().setOnlyTotal(true);
-		calc.getPlayerNetworth(player);
+		NetworthExecute calc = new NetworthExecute();
+		calc.getPlayerNetworth(player, null);
 		return calc.getTotalCalculatedNetworth();
 	}
 
 	public NetworthExecute setVerbose(boolean verbose) {
 		this.verbose = verbose;
-		return this;
-	}
-
-	public NetworthExecute setOnlyTotal(boolean onlyTotal) {
-		this.onlyTotal = onlyTotal;
 		return this;
 	}
 
@@ -109,16 +92,8 @@ public class NetworthExecute {
 		return this;
 	}
 
-	public void getPlayerNetworth(String username, String profileName) {
-		getPlayerNetworth(username, profileName, null);
-	}
-
 	public Object getPlayerNetworth(String username, String profileName, SlashCommandEvent event) {
 		return getPlayerNetworth(profileName == null ? new Player(username) : new Player(username, profileName), event);
-	}
-
-	public void getPlayerNetworth(Player player) {
-		getPlayerNetworth(player, null);
 	}
 
 	public Object getPlayerNetworth(Player player, SlashCommandEvent event) {
@@ -127,115 +102,40 @@ public class NetworthExecute {
 
 			initPrices();
 
-			bankBalance = player.getBankBalance();
-			purseCoins = player.getPurseCoins();
+			addTotal("bank", player.getBankBalance());
+			addTotal("purse", player.getPurseCoins());
 
 			Map<Integer, InvItem> playerInventory = player.getInventoryMap();
 			if (playerInventory == null) {
-				invTotal = -1;
+				addTotal("inventory", -1.0);
 				return defaultEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 			}
-			for (InvItem item : playerInventory.values()) {
-				double itemPrice = calculateItemPrice(item, "inventory");
-				invTotal += itemPrice;
-				if (!onlyTotal && item != null) {
-					invItems.add(addItemStr(item, itemPrice));
-				}
-			}
 
-			Map<Integer, InvItem> playerTalismans = player.getTalismanBagMap();
-			if (playerTalismans != null) {
-				for (InvItem item : playerTalismans.values()) {
-					if (item != null) {
-						double itemPrice = calculateItemPrice(item);
-						talismanTotal += itemPrice;
-						if (!onlyTotal) {
-							talismanItems.add(addItemStr(item, itemPrice));
-						}
-					}
-				}
-			}
+			for (String location : locations) {
+				Map<Integer, InvItem> curItems =
+					switch (location) {
+						case "inventory" -> playerInventory;
+						case "talisman" -> player.getTalismanBagMap();
+						case "armor" -> player.getArmorMap();
+						case "equipment" -> player.getEquipmentMap();
+						case "wardrobe" -> player.getWardrobeMap();
+						case "pets" -> player.getPetsMap();
+						case "enderchest" -> player.getEnderChestMap();
+						case "personal_vault" -> player.getPersonalVaultMap();
+						case "storage" -> player.getStorageMap();
+						default -> throw new IllegalStateException("Unexpected value: " + location);
+					};
 
-			Map<Integer, InvItem> invArmorMap = player.getArmorMap();
-			if (invArmorMap != null) {
-				for (InvItem item : invArmorMap.values()) {
-					if (item != null) {
-						double itemPrice = calculateItemPrice(item);
-						invArmor += itemPrice;
-						if (!onlyTotal) {
-							armorItems.add(addItemStr(item, itemPrice));
-						}
-					}
-				}
-			}
-
-			Map<Integer, InvItem> equipmentMap = player.getEquipmentMap();
-			if (equipmentMap != null) {
-				for (InvItem item : equipmentMap.values()) {
-					if (item != null) {
-						double itemPrice = calculateItemPrice(item);
-						invArmor += itemPrice;
-						if (!onlyTotal) {
-							armorItems.add(addItemStr(item, itemPrice));
-						}
-					}
-				}
-			}
-
-			Map<Integer, InvItem> wardrobeMap = player.getWardrobeMap();
-			if (wardrobeMap != null) {
-				for (InvItem item : wardrobeMap.values()) {
-					if (item != null) {
-						double itemPrice = calculateItemPrice(item);
-						wardrobeTotal += itemPrice;
-						if (!onlyTotal) {
-							wardrobeItems.add(addItemStr(item, itemPrice));
-						}
-					}
-				}
-			}
-
-			List<InvItem> petsMap = player.getPetsMap();
-			if (petsMap != null) {
-				for (InvItem item : petsMap) {
-					petsTotal += calculateItemPrice(item, "pets");
-				}
-			}
-
-			Map<Integer, InvItem> enderChest = player.getEnderChestMap();
-			if (enderChest != null) {
-				for (InvItem item : enderChest.values()) {
-					if (item != null) {
-						double itemPrice = calculateItemPrice(item, "enderchest");
-						enderChestTotal += itemPrice;
-						if (!onlyTotal) {
-							enderChestItems.add(addItemStr(item, itemPrice));
-						}
-					}
-				}
-			}
-
-			Map<Integer, InvItem> personalVault = player.getPersonalVaultMap();
-			if (personalVault != null) {
-				for (InvItem item : personalVault.values()) {
-					if (item != null) {
-						double itemPrice = calculateItemPrice(item, "personal_vault");
-						personalVaultTotal += itemPrice;
-						if (!onlyTotal) {
-							personalVaultItems.add(addItemStr(item, itemPrice));
-						}
-					}
-				}
-			}
-
-			Map<Integer, InvItem> storageMap = player.getStorageMap();
-			if (storageMap != null) {
-				for (InvItem item : storageMap.values()) {
-					if (item != null) {
-						double itemPrice = calculateItemPrice(item, "storage");
-						storageTotal += itemPrice;
-						if (!onlyTotal) {
-							storageItems.add(addItemStr(item, itemPrice));
+				if (curItems != null) {
+					for (InvItem item : curItems.values()) {
+						if (item != null) {
+							double itemPrice = calculateItemPrice(item, location);
+							if (itemPrice >= 0) { // -1 if pet
+								addTotal(location, itemPrice);
+								if (event != null) {
+									addItem(location, addItemStr(item, itemPrice));
+								}
+							}
 						}
 					}
 				}
@@ -246,10 +146,11 @@ public class NetworthExecute {
 				for (Map.Entry<String, Integer> sackEntry : sacksMap.entrySet()) {
 					if (sackEntry.getValue() > 0) {
 						double itemPrice = getLowestPrice(sackEntry.getKey(), true, true, null) * sackEntry.getValue();
-						sacksTotal += itemPrice;
-						if (!onlyTotal) {
+						addTotal("sacks", itemPrice);
+						if (event != null) {
 							String emoji = higherDepth(getEmojiMap(), sackEntry.getKey(), null);
-							sacksItems.add(
+							addItem(
+								"sacks",
 								(emoji == null ? "" : emoji + " ") +
 								(sackEntry.getValue() != 1 ? sackEntry.getValue() + "x " : "") +
 								idToName(sackEntry.getKey()) +
@@ -263,27 +164,23 @@ public class NetworthExecute {
 
 			calculatePetPrices();
 
-			if (onlyTotal) {
-				return invalidEmbed("Only total is enabled");
-			}
-
-			StringBuilder echestStr = getSectionString(enderChestItems);
-			StringBuilder sacksStr = getSectionString(sacksItems);
-			StringBuilder personalVaultStr = getSectionString(personalVaultItems);
-			StringBuilder storageStr = getSectionString(storageItems);
-			StringBuilder invStr = getSectionString(invItems);
-			StringBuilder armorStr = getSectionString(armorItems);
-			StringBuilder wardrobeStr = getSectionString(wardrobeItems);
-			StringBuilder petsStr = getSectionString(petsItems);
-			StringBuilder talismanStr = getSectionString(talismanItems);
-
 			if (event == null) {
-				return null;
+				return invalidEmbed("Was not triggered by command");
 			}
+
+			StringBuilder echestStr = getSectionString(getItems("enderchest"));
+			StringBuilder sacksStr = getSectionString(getItems("sacks"));
+			StringBuilder personalVaultStr = getSectionString(getItems("personal_vault"));
+			StringBuilder storageStr = getSectionString(getItems("storage"));
+			StringBuilder invStr = getSectionString(getItems("inventory"));
+			StringBuilder armorStr = getSectionString(getItems("armor"));
+			StringBuilder wardrobeStr = getSectionString(getItems("wardrobe"));
+			StringBuilder petsStr = getSectionString(getItems("pets"));
+			StringBuilder talismanStr = getSectionString(getItems("talisman"));
 
 			double totalNetworth = getTotalCalculatedNetworth();
 			//			int position = leaderboardDatabase.getNetworthPosition(player.getGamemode(), player.getUuid());
-			String ebDesc = "**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + formatNumber(totalNetworth) + ")";
+			String ebDesc = "**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + roundAndFormat(totalNetworth) + ")";
 			//			\n**" +
 			//				(
 			//					Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
@@ -291,32 +188,36 @@ public class NetworthExecute {
 			//						: ""
 			//				)+"Leaderboard Position:** " + (position != -1 ? formatNumber(position) : "Not on leaderboard");
 			eb.setDescription(ebDesc);
-			eb.addField("Purse", simplifyNumber(purseCoins), true);
-			eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);
-			eb.addField("Sacks", simplifyNumber(sacksTotal), true);
+			eb.addField("Purse", simplifyNumber(getTotal("purse")), true);
+			eb.addField("Bank", (getTotal("bank") == -1 ? "Private" : simplifyNumber(getTotal("bank"))), true);
+			eb.addField("Sacks", simplifyNumber(getTotal("sacks")), true);
 			if (!echestStr.isEmpty()) {
-				eb.addField("Ender Chest | " + simplifyNumber(enderChestTotal), echestStr.toString().split("\n\n")[0], false);
+				eb.addField("Ender Chest | " + simplifyNumber(getTotal("enderchest")), echestStr.toString().split("\n\n")[0], false);
 			}
 			if (!storageStr.isEmpty()) {
-				eb.addField("Storage | " + simplifyNumber(storageTotal), storageStr.toString().split("\n\n")[0], false);
+				eb.addField("Storage | " + simplifyNumber(getTotal("storage")), storageStr.toString().split("\n\n")[0], false);
 			}
 			if (!invStr.isEmpty()) {
-				eb.addField("Inventory | " + simplifyNumber(invTotal), invStr.toString().split("\n\n")[0], false);
+				eb.addField("Inventory | " + simplifyNumber(getTotal("inventory")), invStr.toString().split("\n\n")[0], false);
 			}
 			if (!armorStr.isEmpty()) {
-				eb.addField("Armor & Equipment | " + simplifyNumber(invArmor), armorStr.toString().split("\n\n")[0], false);
+				eb.addField("Armor & Equipment | " + simplifyNumber(getTotal("armor")), armorStr.toString().split("\n\n")[0], false);
 			}
 			if (!wardrobeStr.isEmpty()) {
-				eb.addField("Wardrobe | " + simplifyNumber(wardrobeTotal), wardrobeStr.toString().split("\n\n")[0], false);
+				eb.addField("Wardrobe | " + simplifyNumber(getTotal("wardrobe")), wardrobeStr.toString().split("\n\n")[0], false);
 			}
 			if (!petsStr.isEmpty()) {
-				eb.addField("Pets | " + simplifyNumber(petsTotal), petsStr.toString().split("\n\n")[0], false);
+				eb.addField("Pets | " + simplifyNumber(getTotal("pets")), petsStr.toString().split("\n\n")[0], false);
 			}
 			if (!talismanStr.isEmpty()) {
-				eb.addField("Accessories | " + simplifyNumber(talismanTotal), talismanStr.toString().split("\n\n")[0], false);
+				eb.addField("Accessories | " + simplifyNumber(getTotal("talisman")), talismanStr.toString().split("\n\n")[0], false);
 			}
 			if (!personalVaultStr.isEmpty()) {
-				eb.addField("Personal Vault | " + simplifyNumber(personalVaultTotal), personalVaultStr.toString().split("\n\n")[0], false);
+				eb.addField(
+					"Personal Vault | " + simplifyNumber(getTotal("personal_vault")),
+					personalVaultStr.toString().split("\n\n")[0],
+					false
+				);
 			}
 
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
@@ -331,7 +232,7 @@ public class NetworthExecute {
 						.setDescription(
 							ebDesc +
 							"\n**Ender Chest:** " +
-							simplifyNumber(enderChestTotal) +
+							simplifyNumber(getTotal("enderchest")) +
 							"\n\n" +
 							echestStr.toString().replace("\n\n", "\n")
 						)
@@ -343,7 +244,11 @@ public class NetworthExecute {
 					player
 						.defaultPlayerEmbed(" | Storage")
 						.setDescription(
-							ebDesc + "\n**Storage:** " + simplifyNumber(storageTotal) + "\n\n" + storageStr.toString().replace("\n\n", "\n")
+							ebDesc +
+							"\n**Storage:** " +
+							simplifyNumber(getTotal("storage")) +
+							"\n\n" +
+							storageStr.toString().replace("\n\n", "\n")
 						)
 				);
 			}
@@ -353,7 +258,11 @@ public class NetworthExecute {
 					player
 						.defaultPlayerEmbed(" | Inventory")
 						.setDescription(
-							ebDesc + "\n**Inventory:** " + simplifyNumber(invTotal) + "\n\n" + invStr.toString().replace("\n\n", "\n")
+							ebDesc +
+							"\n**Inventory:** " +
+							simplifyNumber(getTotal("inventory")) +
+							"\n\n" +
+							invStr.toString().replace("\n\n", "\n")
 						)
 				);
 			}
@@ -365,7 +274,7 @@ public class NetworthExecute {
 						.setDescription(
 							ebDesc +
 							"\n**Armor & Equipment:** " +
-							simplifyNumber(invArmor) +
+							simplifyNumber(getTotal("armor")) +
 							"\n\n" +
 							armorStr.toString().replace("\n\n", "\n")
 						)
@@ -379,7 +288,7 @@ public class NetworthExecute {
 						.setDescription(
 							ebDesc +
 							"\n**Wardrobe:** " +
-							simplifyNumber(wardrobeTotal) +
+							simplifyNumber(getTotal("wardrobe")) +
 							"\n\n" +
 							wardrobeStr.toString().replace("\n\n", "\n")
 						)
@@ -391,7 +300,7 @@ public class NetworthExecute {
 					player
 						.defaultPlayerEmbed(" | Pets")
 						.setDescription(
-							ebDesc + "\n**Pets:** " + simplifyNumber(petsTotal) + "\n\n" + petsStr.toString().replace("\n\n", "\n")
+							ebDesc + "\n**Pets:** " + simplifyNumber(getTotal("pets")) + "\n\n" + petsStr.toString().replace("\n\n", "\n")
 						)
 				);
 			}
@@ -403,7 +312,7 @@ public class NetworthExecute {
 						.setDescription(
 							ebDesc +
 							"\n**Accessories:** " +
-							simplifyNumber(talismanTotal) +
+							simplifyNumber(getTotal("talisman")) +
 							"\n\n" +
 							talismanStr.toString().replace("\n\n", "\n")
 						)
@@ -417,7 +326,7 @@ public class NetworthExecute {
 						.setDescription(
 							ebDesc +
 							"\n**Personal Vault:** " +
-							simplifyNumber(personalVaultTotal) +
+							simplifyNumber(getTotal("personal_vault")) +
 							"\n\n" +
 							personalVaultStr.toString().replace("\n\n", "\n")
 						)
@@ -429,7 +338,11 @@ public class NetworthExecute {
 					player
 						.defaultPlayerEmbed(" | Sacks")
 						.setDescription(
-							ebDesc + "\n**Sacks:** " + simplifyNumber(sacksTotal) + "\n\n" + sacksStr.toString().replace("\n\n", "\n")
+							ebDesc +
+							"\n**Sacks:** " +
+							simplifyNumber(getTotal("sacks")) +
+							"\n\n" +
+							sacksStr.toString().replace("\n\n", "\n")
 						)
 				);
 			}
@@ -485,31 +398,11 @@ public class NetworthExecute {
 	}
 
 	public double getTotalCalculatedNetworth() {
-		return invTotal == -1
-			? -1
-			: bankBalance +
-			purseCoins +
-			invTotal +
-			talismanTotal +
-			invArmor +
-			wardrobeTotal +
-			petsTotal +
-			enderChestTotal +
-			storageTotal +
-			sacksTotal +
-			personalVaultTotal;
+		return totals.getOrDefault("inventory", -1.0) == -1 ? -1 : totals.values().stream().mapToDouble(i -> i).sum();
 	}
 
 	public void calculatePetPrice(String location, String auctionName, double auctionPrice) {
-		List<InvItem> petsList =
-			switch (location) {
-				case "inventory" -> invPets;
-				case "pets" -> petsPets;
-				case "enderchest" -> enderChestPets;
-				case "storage" -> storagePets;
-				case "personal_vault" -> personalVaultPets;
-				default -> throw new IllegalStateException("Unexpected value: " + location);
-			};
+		List<InvItem> petsList = pets.getOrDefault(location, new ArrayList<>());
 
 		for (Iterator<InvItem> iterator = petsList.iterator(); iterator.hasNext();) {
 			InvItem item = iterator.next();
@@ -536,33 +429,15 @@ public class NetworthExecute {
 
 				String itemStr = addItemStr(item, auctionPrice + miscExtras);
 				double totalPrice = auctionPrice + miscExtras;
-				switch (location) {
-					case "inventory" -> {
-						invItems.add(itemStr);
-						invTotal += totalPrice;
-					}
-					case "pets" -> {
-						petsItems.add(itemStr);
-						petsTotal += totalPrice;
-					}
-					case "enderchest" -> {
-						enderChestItems.add(itemStr);
-						enderChestTotal += totalPrice;
-					}
-					case "storage" -> {
-						storageItems.add(itemStr);
-						storageTotal += totalPrice;
-					}
-					case "personal_vault" -> {
-						personalVaultItems.add(itemStr);
-						personalVaultTotal += totalPrice;
-					}
-				}
+				addItem(location, itemStr);
+				addTotal(location, totalPrice);
 
 				if (verbose) {
 					calcItemsJsonStr
 						.append("{\"name\":\"")
 						.append(item.getName())
+						.append("\",\"rarity\":\"")
+						.append(item.getRarity())
 						.append("\",\"total\":\"")
 						.append(simplifyNumber(auctionPrice + miscExtras))
 						.append("\",\"base_cost\":\"")
@@ -580,15 +455,7 @@ public class NetworthExecute {
 	}
 
 	public void calculateDefaultPetPrices(String location) {
-		List<InvItem> petsList =
-			switch (location) {
-				case "inventory" -> invPets;
-				case "pets" -> petsPets;
-				case "enderchest" -> enderChestPets;
-				case "storage" -> storagePets;
-				case "personal_vault" -> personalVaultPets;
-				default -> throw new IllegalStateException("Unexpected value: " + location);
-			};
+		List<InvItem> petsList = pets.getOrDefault(location, new ArrayList<>());
 
 		for (InvItem item : petsList) {
 			double auctionPrice = getMinBinAvg(
@@ -615,35 +482,15 @@ public class NetworthExecute {
 				}
 				miscStr.append("]");
 
-				String itemStr = addItemStr(item, auctionPrice + miscExtras);
-				double totalPrice = auctionPrice + miscExtras;
-				switch (location) {
-					case "inventory" -> {
-						invItems.add(itemStr);
-						invTotal += totalPrice;
-					}
-					case "pets" -> {
-						petsItems.add(itemStr);
-						petsTotal += totalPrice;
-					}
-					case "enderchest" -> {
-						enderChestItems.add(itemStr);
-						enderChestTotal += totalPrice;
-					}
-					case "storage" -> {
-						storageItems.add(itemStr);
-						storageTotal += totalPrice;
-					}
-					case "personal_vault" -> {
-						personalVaultItems.add(itemStr);
-						personalVaultTotal += totalPrice;
-					}
-				}
+				addItem(location, addItemStr(item, auctionPrice + miscExtras));
+				addTotal(location, auctionPrice + miscExtras);
 
 				if (verbose) {
 					calcItemsJsonStr
 						.append("{\"name\":\"")
 						.append(item.getName())
+						.append("\",\"rarity\":\"")
+						.append(item.getRarity())
 						.append("\",\"total\":\"")
 						.append(simplifyNumber(auctionPrice + miscExtras))
 						.append("\",\"base_cost\":\"")
@@ -659,49 +506,27 @@ public class NetworthExecute {
 	}
 
 	public void calculatePetPrices() {
-		StringBuilder queryStr = new StringBuilder();
-		for (InvItem item : invPets) {
-			queryStr.append(item.getPetApiName()).append(",");
-		}
-		for (InvItem item : petsPets) {
-			queryStr.append(item.getPetApiName()).append(",");
-		}
-		for (InvItem item : enderChestPets) {
-			queryStr.append(item.getPetApiName()).append(",");
-		}
-		for (InvItem item : storagePets) {
-			queryStr.append(item.getPetApiName()).append(",");
-		}
-		for (InvItem item : personalVaultPets) {
-			queryStr.append(item.getPetApiName()).append(",");
-		}
+		String queryStr = pets.values().stream().flatMap(Collection::stream).map(InvItem::getPetApiName).collect(Collectors.joining(","));
 
 		if (queryStr.isEmpty()) {
 			return;
 		}
-		if (queryStr.charAt(queryStr.length() - 1) == ',') {
-			queryStr.deleteCharAt(queryStr.length() - 1);
-		}
 
-		JsonArray ahQuery = getAuctionPetsByName(queryStr.toString());
+		JsonArray ahQuery = getAuctionPetsByName(queryStr);
 		if (ahQuery != null) {
 			for (JsonElement auction : ahQuery) {
 				String auctionName = higherDepth(auction, "name").getAsString();
 				double auctionPrice = higherDepth(auction, "price").getAsDouble();
 
-				calculatePetPrice("inventory", auctionName, auctionPrice);
-				calculatePetPrice("pets", auctionName, auctionPrice);
-				calculatePetPrice("enderchest", auctionName, auctionPrice);
-				calculatePetPrice("storage", auctionName, auctionPrice);
-				calculatePetPrice("personal_vault", auctionName, auctionPrice);
+				for (String location : locations) {
+					calculatePetPrice(location, auctionName, auctionPrice);
+				}
 			}
 		}
 
-		calculateDefaultPetPrices("inventory");
-		calculateDefaultPetPrices("pets");
-		calculateDefaultPetPrices("enderchest");
-		calculateDefaultPetPrices("storage");
-		calculateDefaultPetPrices("personal_vault");
+		for (String location : locations) {
+			calculateDefaultPetPrices(location);
+		}
 	}
 
 	public double getMinBinAvg(String id) {
@@ -763,15 +588,15 @@ public class NetworthExecute {
 		try {
 			if (item.getId().equals("PET") && location != null) {
 				if (!item.getName().startsWith("Mystery ") && !item.getName().equals("Unknown Pet")) {
-					switch (location) {
-						case "inventory" -> invPets.add(item);
-						case "pets" -> petsPets.add(item);
-						case "enderchest" -> enderChestPets.add(item);
-						case "storage" -> storagePets.add(item);
-						case "personal_vault" -> personalVaultPets.add(item);
-					}
+					pets.compute(
+						location,
+						(k, v) -> {
+							(v = (v == null ? new ArrayList<>() : v)).add(item);
+							return v;
+						}
+					);
 				}
-				return 0;
+				return -1;
 			} else {
 				if (item.getDarkAuctionPrice() != -1) {
 					itemCost = item.getDarkAuctionPrice();
@@ -789,7 +614,7 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			if (item.isRecombobulated() && (itemCost * 2 >= recombPrice)) {
+			if (item.isRecombobulated() && (ALL_TALISMANS.contains(item.getId()) || itemCost * 2 >= recombPrice)) {
 				recombobulatedExtra = recombPrice;
 			}
 		} catch (Exception ignored) {}
@@ -1120,5 +945,27 @@ public class NetworthExecute {
 
 	public void resetVerboseJson() {
 		calcItemsJsonStr = new StringBuilder("[");
+	}
+
+	public void addTotal(String location, double total) {
+		totals.compute(location.equals("equipment") ? "armor" : location, (k, v) -> (v == null ? 0 : v) + total);
+	}
+
+	public void addItem(String location, String item) {
+		items.compute(
+			location.equals("equipment") ? "armor" : location,
+			(k, v) -> {
+				(v = (v == null ? new ArrayList<>() : v)).add(item);
+				return v;
+			}
+		);
+	}
+
+	public double getTotal(String location) {
+		return totals.getOrDefault(location, 0.0);
+	}
+
+	public List<String> getItems(String location) {
+		return items.getOrDefault(location, new ArrayList<>());
 	}
 }

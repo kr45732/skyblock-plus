@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -87,7 +87,11 @@ public class ApplyGuild {
 			ApplyUser applyUser = iterator.next();
 			if ((applyUser.applicationChannelId != null && applyUser.applicationChannelId.equals(event.getChannel().getId()))) {
 				if (applyUser.state == 2) {
-					event.getGuild().getTextChannelById(applyUser.staffChannelId).deleteMessageById(applyUser.reactMessageId).queue();
+					event
+						.getGuild()
+						.getTextChannelById(applyUser.staffChannelId)
+						.deleteMessageById(applyUser.reactMessageId)
+						.queue(ignore, ignore);
 				}
 				iterator.remove();
 			} else if (applyUser.staffChannelId != null && applyUser.staffChannelId.equals(event.getChannel().getId())) {
@@ -289,11 +293,14 @@ public class ApplyGuild {
 					() ->
 						toCloseChannel
 							.sendMessageEmbeds(defaultEmbed("Closing Channel").build())
-							.queue(m -> m.getGuildChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS))
+							.queue(
+								m -> m.getGuildChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS, ignore),
+								ignore
+							)
 				);
 		} catch (Exception ignored) {}
 
-		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
+		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS, ignore);
 		return client.getSuccess() + " Player was invited";
 	}
 }

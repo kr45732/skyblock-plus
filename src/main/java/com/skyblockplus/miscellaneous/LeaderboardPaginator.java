@@ -230,7 +230,7 @@ public class LeaderboardPaginator extends AbstractEventListener {
 			event.getUser().getId().equals(this.event.getUser().getId()) &&
 			event.getModalId().equals("leaderboard_paginator_search_modal_" + message.getId())
 		) {
-			event.deferEdit().queue();
+			event.deferEdit().complete();
 
 			int rank = -1;
 			double amount = -1;

@@ -293,7 +293,7 @@ public class LinkSlashCommand extends SlashCommand {
 		guildMap
 			.get(member.getGuild().getId())
 			.logAction(
-				defaultEmbed(linkedAccount.username() + " Verified", "https://mine.ly/" + linkedAccount.uuid())
+				defaultEmbed(linkedAccount.username() + " Verified", nameMcLink(linkedAccount.uuid()))
 					.setDescription(
 						(
 							!updatedRoles.equals("false")

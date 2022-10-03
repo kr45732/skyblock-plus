@@ -34,7 +34,6 @@ import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.*;
-import java.time.Instant;
 import java.util.*;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
@@ -1121,22 +1120,14 @@ public class Player {
 
 	public boolean getLatestProfile(JsonArray profilesArray) {
 		try {
-			Instant lastProfileSave = Instant.EPOCH;
 			for (int i = 0; i < profilesArray.size(); i++) {
-				Instant lastSaveLoop;
-				try {
-					lastSaveLoop =
-						Instant.ofEpochMilli(higherDepth(profilesArray.get(i), "members." + this.uuid + ".last_save").getAsLong());
-				} catch (Exception e) {
-					continue;
-				}
-
-				if (lastSaveLoop.isAfter(lastProfileSave)) {
+				if (higherDepth(profilesArray.get(i), "selected", false)) {
 					this.profileIndex = i;
-					lastProfileSave = lastSaveLoop;
 					this.profileName = higherDepth(profilesArray.get(i), "cute_name").getAsString();
+					break;
 				}
 			}
+
 			return false;
 		} catch (Exception ignored) {}
 		return true;
@@ -1310,38 +1301,7 @@ public class Player {
 	}
 
 	public SkillsStruct skillInfoFromLevel(int targetLevel, String skill, WeightType weightType) {
-		JsonArray skillsTable =
-			switch (skill) {
-				case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(
-					getLevelingJson(),
-					skill
-				)
-					.getAsJsonArray();
-				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
-				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
-			};
-
-		int maxLevel = getSkillMaxLevel(skill, weightType);
-
-		long xpTotal = 0L;
-		int level = 1;
-		for (int i = 0; i < maxLevel; i++) {
-			xpTotal += skillsTable.get(i).getAsLong();
-
-			if (level >= targetLevel) {
-				xpTotal -= skillsTable.get(i).getAsLong();
-				break;
-			} else {
-				level = (i + 1);
-			}
-		}
-
-		long xpForNext = 0;
-		if (level < maxLevel) {
-			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
-		}
-
-		return new SkillsStruct(skill, targetLevel, maxLevel, xpTotal, 0, xpForNext, 0);
+		return levelingInfoFromLevel(targetLevel, skill, getSkillMaxLevel(skill, weightType));
 	}
 
 	public SkillsStruct getHOTM() {
@@ -1555,18 +1515,19 @@ public class Player {
 		return null;
 	}
 
-	public List<InvItem> getPetsMap() {
+	public Map<Integer, InvItem> getPetsMap() {
 		JsonArray petsArr;
 		try {
 			petsArr = getPets();
 		} catch (Exception e) {
-			return new ArrayList<>();
+			return new HashMap<>();
 		}
 
-		List<InvItem> petsNameFormatted = new ArrayList<>();
+		Map<Integer, InvItem> petsNameFormatted = new HashMap<>();
 
-		for (JsonElement pet : petsArr) {
+		for (int i = 0; i < petsArr.size(); i++) {
 			try {
+				JsonElement pet = petsArr.get(i);
 				String tier = higherDepth(pet, "tier").getAsString();
 				String type = higherDepth(pet, "type").getAsString();
 				InvItem invItemStruct = new InvItem();
@@ -1584,7 +1545,7 @@ public class Player {
 				if (higherDepth(pet, "heldItem", null) != null) {
 					invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
 				}
-				petsNameFormatted.add(invItemStruct);
+				petsNameFormatted.put(i, invItemStruct);
 			} catch (Exception ignored) {}
 		}
 

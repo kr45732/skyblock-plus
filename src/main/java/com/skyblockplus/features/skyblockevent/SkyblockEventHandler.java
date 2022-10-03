@@ -36,9 +36,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.Modal;
@@ -205,7 +205,7 @@ public class SkyblockEventHandler {
 									.queue();
 								return;
 							}
-							event.deferEdit().queue();
+							event.deferEdit().complete();
 
 							String eventTypeFormatted = getEventTypeFormatted(eventSettings.getEventType());
 

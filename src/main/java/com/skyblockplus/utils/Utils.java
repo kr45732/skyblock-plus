@@ -80,8 +80,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -1264,6 +1264,7 @@ public class Utils {
 								? item.getLong("tag.ExtraAttributes.winning_bid", -1L)
 								: -1
 						);
+						itemInfo.setMuseum(item.getInt("tag.ExtraAttributes.donated_museum", 0) == 1);
 
 						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
 							NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");
@@ -1754,7 +1755,11 @@ public class Utils {
 	}
 
 	public static String nameMcHyperLink(String username, String uuid) {
-		return "[**" + username + "**](https://mine.ly/" + uuid + ")";
+		return "[**" + username + "**](" + nameMcLink(uuid) + ")";
+	}
+
+	public static String nameMcLink(String uuid) {
+		return "https://mine.ly/" + uuid;
 	}
 
 	public static boolean isMainBot() {
@@ -1840,6 +1845,39 @@ public class Utils {
 		double progress = xpForNext > 0 ? Math.max(0, Math.min(((double) xpCurrent) / xpForNext, 1)) : 0;
 
 		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
+	}
+
+	public static SkillsStruct levelingInfoFromLevel(int targetLevel, String skill, int maxLevel) {
+		JsonArray skillsTable =
+			switch (skill) {
+				case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(
+					getLevelingJson(),
+					skill
+				)
+					.getAsJsonArray();
+				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+			};
+
+		long xpTotal = 0L;
+		int level = 1;
+		for (int i = 0; i < maxLevel; i++) {
+			xpTotal += skillsTable.get(i).getAsLong();
+
+			if (level >= targetLevel) {
+				xpTotal -= skillsTable.get(i).getAsLong();
+				break;
+			} else {
+				level = (i + 1);
+			}
+		}
+
+		long xpForNext = 0;
+		if (level < maxLevel) {
+			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
+		}
+
+		return new SkillsStruct(skill, targetLevel, maxLevel, xpTotal, 0, xpForNext, 0);
 	}
 
 	public static void updateItemMappings() {

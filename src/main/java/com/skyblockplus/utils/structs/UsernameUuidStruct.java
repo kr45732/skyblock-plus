@@ -48,7 +48,7 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 	}
 
 	public String nameMcHyperLink() {
-		return Utils.nameMcHyperLink(username, uuid);
+		return Utils.nameMcHyperLink(fixUsername(username), uuid);
 	}
 
 	public String usernameFixed() {

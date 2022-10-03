@@ -33,10 +33,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -63,6 +63,7 @@ public class ApplyUser implements Serializable {
 	public String playerCatacombs;
 	public String playerWeight;
 	public String playerUsername;
+	public String playerUuid = "";
 	public String playerCoins;
 	public String ironmanSymbol = "";
 	public String playerProfileName;
@@ -121,6 +122,7 @@ public class ApplyUser implements Serializable {
 
 			Player player = new Player(playerUsername);
 			String[] profileNames = player.getAllProfileNames(Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all")));
+			this.playerUuid = player.getUuid();
 
 			if (profileNames.length == 1) {
 				applicationChannel
@@ -537,7 +539,15 @@ public class ApplyUser implements Serializable {
 										"_" +
 										waitInviteChannel
 											.sendMessageEmbeds(
-												defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build()
+												defaultEmbed("Waiting for invite")
+													.setDescription(
+														"**Player:** " +
+														fixUsername(playerUsername) +
+														"\n**Discord:** <@" +
+														applyingUserId +
+														">"
+													)
+													.build()
 											)
 											.setActionRow(
 												Button.success(
@@ -550,7 +560,9 @@ public class ApplyUser implements Serializable {
 													"_" +
 													higherDepth(currentSettings, "guildMemberRole", "null"),
 													"Invited"
-												)
+												),
+												Button.link(nameMcLink(playerUuid), "NameMC"),
+												Button.link(skyblockStatsLink(playerUsername, playerProfileName), "SkyCrypt")
 											)
 											.complete()
 											.getId(),
@@ -618,7 +630,15 @@ public class ApplyUser implements Serializable {
 											"_" +
 											waitInviteChannel
 												.sendMessageEmbeds(
-													defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build()
+													defaultEmbed("Waiting for invite")
+														.setDescription(
+															"**Player:** " +
+															fixUsername(playerUsername) +
+															"\n**Discord:** <@" +
+															applyingUserId +
+															">"
+														)
+														.build()
 												)
 												.setActionRow(
 													Button.success(
@@ -631,7 +651,9 @@ public class ApplyUser implements Serializable {
 														"_" +
 														higherDepth(currentSettings, "guildMemberRole", "null"),
 														"Invited"
-													)
+													),
+													Button.link(nameMcLink(playerUuid), "NameMC"),
+													Button.link(skyblockStatsLink(playerUsername, playerProfileName), "SkyCrypt")
 												)
 												.complete()
 												.getId(),
