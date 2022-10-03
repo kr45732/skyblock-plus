@@ -49,7 +49,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.RoleModifyRecord;
 import java.io.File;
-import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;

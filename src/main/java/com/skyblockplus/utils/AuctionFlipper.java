@@ -22,7 +22,6 @@ import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.ApiHandler.useAlternativeAhApi;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.getItemThumbnail;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;

@@ -19,7 +19,6 @@
 package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.getItemThumbnail;
 
 import com.skyblockplus.utils.AbstractEventListener;
 import com.skyblockplus.utils.Player;

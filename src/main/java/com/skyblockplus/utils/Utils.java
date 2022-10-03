@@ -28,7 +28,6 @@ import static java.util.Collections.nCopies;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.google.gson.*;
-import com.google.gson.annotations.Expose;
 import com.google.gson.stream.JsonReader;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;

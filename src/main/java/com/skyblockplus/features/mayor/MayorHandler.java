@@ -28,8 +28,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import java.io.File;
-import java.net.URI;
-import java.net.URL;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Map;

@@ -20,7 +20,6 @@ package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.getItemThumbnail;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommandEvent;
