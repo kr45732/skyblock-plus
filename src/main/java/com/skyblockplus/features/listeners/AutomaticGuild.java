@@ -248,6 +248,9 @@ public class AutomaticGuild {
 		} catch (Exception e) {
 			return;
 		}
+		if (currentSettings == null) {
+			return;
+		}
 
 		for (AutomatedGuild currentSetting : currentSettings) {
 			try {
