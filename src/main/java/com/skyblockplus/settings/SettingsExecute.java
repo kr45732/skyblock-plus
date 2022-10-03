@@ -1752,7 +1752,7 @@ public class SettingsExecute {
 					"**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `/settings roles set pet_enthusiast @level 100 pet`\n"
 				);
 				case "guild_ranks" -> ebFieldString.append(
-					"**If a player is in the guild set in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be enabled, disabled, and linked here. To modify guild ranks use `/settings guild [name]`\n"
+					"**If a player is in the guild set in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be linked, enabled, or disabled here. To modify guild ranks use `/settings guild <name>`\n"
 				);
 				case "slayer_nine" -> ebFieldString.append(
 					"**The number of level nine slayers a player has**\nExample: `/settings roles add slayer_nine 3 @role`\n"
@@ -1992,9 +1992,6 @@ public class SettingsExecute {
 			JsonObject newRoleSettings = database.getRoleSettings(guild.getId(), "guild_ranks").getAsJsonObject();
 			JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
 
-			if (currentLevels.size() >= 2) {
-				return invalidEmbed("This role has reached the max limit of levels (2/2)");
-			}
 			JsonElement guildRoleSettings = database.getGuildSettings(guild.getId(), roleValue);
 			if (
 				guildRoleSettings != null &&
