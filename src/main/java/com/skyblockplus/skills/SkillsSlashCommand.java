@@ -149,27 +149,33 @@ public class SkillsSlashCommand extends SlashCommand {
 			} else {
 				eb.addField("Perks", "None", false);
 			}
-			Map<String, Long> contests =
-				(higherDepth(jacobStats, "contests") != null ? higherDepth(jacobStats, "contests") : new JsonObject()).getAsJsonObject()
+			if (higherDepth(jacobStats, "contests") != null) {
+				Map<String, Long> contests = higherDepth(jacobStats, "contests")
+					.getAsJsonObject()
 					.keySet()
 					.stream()
 					.map(s -> s.endsWith("INK_SACK:3") ? "INK_SACK:3" : s.substring(s.lastIndexOf(":") + 1))
 					.collect(Collectors.groupingBy(c -> c, Collectors.counting()));
-			StringBuilder ebStr = new StringBuilder();
-			for (Map.Entry<String, Long> entry : contests
-				.entrySet()
-				.stream()
-				.sorted(Comparator.comparingLong(e -> -e.getValue()))
-				.toList()) {
-				ebStr
-					.append("\n")
-					.append(getEmoji(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()))
-					.append(" ")
-					.append(idToName(entry.getKey()))
-					.append(": ")
-					.append(entry.getValue());
+				StringBuilder ebStr = new StringBuilder();
+				for (Map.Entry<String, Long> entry : contests
+					.entrySet()
+					.stream()
+					.sorted(Comparator.comparingLong(e -> -e.getValue()))
+					.toList()) {
+					ebStr
+						.append("\n")
+						.append(getEmoji(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()))
+						.append(" ")
+						.append(idToName(entry.getKey()))
+						.append(": ")
+						.append(entry.getValue());
+				}
+				eb.addField(
+					"Participated Contests | " + higherDepth(jacobStats, "contests").getAsJsonObject().size(),
+					ebStr.toString(),
+					false
+				);
 			}
-			eb.addField("Participated Contests | " + higherDepth(jacobStats, "contests").getAsJsonObject().size(), ebStr.toString(), false);
 
 			extras.addEmbedPage(eb);
 

@@ -349,9 +349,21 @@ public class GuildRanksSlashCommand extends SlashCommand {
 					for (JsonElement reqOr : defaultRanksArr) {
 						boolean meetsReqAnd = true;
 						for (JsonElement reqAnd : reqOr.getAsJsonArray()) {
-							double amount = gMember.getDouble(higherDepth(reqAnd, "type").getAsString());
+							String type = higherDepth(reqAnd, "type").getAsString();
+							double amount = gMember.getDouble(type);
 
-							if (amount < higherDepth(reqAnd, "amount").getAsDouble()) {
+							double reqAmount = higherDepth(reqAnd, "amount").getAsDouble();
+							if (higherDepth(reqAnd, "convert_from_level", false)) {
+								reqAmount =
+									levelingInfoFromLevel(
+										(int) reqAmount,
+										type,
+										type.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + type, 0)
+									)
+										.totalExp();
+							}
+
+							if (amount < reqAmount) {
 								meetsReqAnd = false;
 								break;
 							}
@@ -369,7 +381,6 @@ public class GuildRanksSlashCommand extends SlashCommand {
 					}
 				}
 
-				System.out.println(gMember);
 				int highestRankMet = -1;
 				JsonArray gRanks = higherDepth(lbSettings, "ranks").getAsJsonArray();
 				for (int i = 0; i < gRanks.size(); i++) {
@@ -380,14 +391,21 @@ public class GuildRanksSlashCommand extends SlashCommand {
 						boolean meetsReqAnd = true;
 
 						for (JsonElement reqAnd : reqOr.getAsJsonArray()) {
-							System.out.println(
-								gMember.getDouble(higherDepth(reqAnd, "type").getAsString()) +
-								" " +
-								higherDepth(reqAnd, "amount").getAsDouble()
-							);
-							if (
-								gMember.getDouble(higherDepth(reqAnd, "type").getAsString()) < higherDepth(reqAnd, "amount").getAsDouble()
-							) {
+							String type = higherDepth(reqAnd, "type").getAsString();
+							double amount = gMember.getDouble(type);
+
+							double reqAmount = higherDepth(reqAnd, "amount").getAsDouble();
+							if (higherDepth(reqAnd, "convert_from_level", false)) {
+								reqAmount =
+									levelingInfoFromLevel(
+										(int) reqAmount,
+										type,
+										type.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + type).getAsInt()
+									)
+										.totalExp();
+							}
+
+							if (amount < reqAmount) {
 								meetsReqAnd = false;
 								break;
 							}

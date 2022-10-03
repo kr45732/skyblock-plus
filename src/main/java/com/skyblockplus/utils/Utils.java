@@ -1847,6 +1847,39 @@ public class Utils {
 		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
 	}
 
+	public static SkillsStruct levelingInfoFromLevel(int targetLevel, String skill, int maxLevel) {
+		JsonArray skillsTable =
+			switch (skill) {
+				case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(
+					getLevelingJson(),
+					skill
+				)
+					.getAsJsonArray();
+				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+			};
+
+		long xpTotal = 0L;
+		int level = 1;
+		for (int i = 0; i < maxLevel; i++) {
+			xpTotal += skillsTable.get(i).getAsLong();
+
+			if (level >= targetLevel) {
+				xpTotal -= skillsTable.get(i).getAsLong();
+				break;
+			} else {
+				level = (i + 1);
+			}
+		}
+
+		long xpForNext = 0;
+		if (level < maxLevel) {
+			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
+		}
+
+		return new SkillsStruct(skill, targetLevel, maxLevel, xpTotal, 0, xpForNext, 0);
+	}
+
 	public static void updateItemMappings() {
 		try {
 			File neuDir = new File("src/main/java/com/skyblockplus/json/neu");
