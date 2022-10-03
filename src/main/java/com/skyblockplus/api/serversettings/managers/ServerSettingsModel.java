@@ -52,11 +52,8 @@ public class ServerSettingsModel {
 	@Embedded
 	private AutomatedVerify automatedVerify = new AutomatedVerify();
 
-	@Embedded
-	private AutomatedGuild automatedGuildOne = null;
-
-	@Embedded
-	private AutomatedGuild automatedGuildTwo = null;
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "serverSettings")
+	private List<AutomatedGuild> automatedGuilds = new ArrayList<>();
 
 	@Embedded
 	private Blacklist blacklist;
@@ -105,8 +102,7 @@ public class ServerSettingsModel {
 	public ServerSettingsModel copy(boolean nullHypixelApiKey) {
 		ServerSettingsModel copy = new ServerSettingsModel(serverName, serverId);
 		copy.setAutomatedVerify(automatedVerify);
-		copy.setAutomatedGuildOne(automatedGuildOne);
-		copy.setAutomatedGuildTwo(automatedGuildTwo);
+		copy.setAutomatedGuilds(automatedGuilds);
 		copy.setBlacklist(blacklist);
 		copy.setAutomatedRoles(automatedRoles);
 		copy.setSbEvent(sbEvent);

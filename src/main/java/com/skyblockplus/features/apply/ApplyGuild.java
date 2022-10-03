@@ -121,7 +121,7 @@ public class ApplyGuild {
 
 		LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());
 		if (linkedAccount == null) {
-			return client.getError() + " You are not linked to the bot. Please run `+link [IGN]` and try again.";
+			return client.getError() + " You are not linked to the bot. Please run `/link <player>` and try again.";
 		} else if (!linkedAccount.discord().equals(event.getUser().getId())) {
 			return (
 				client.getError() +

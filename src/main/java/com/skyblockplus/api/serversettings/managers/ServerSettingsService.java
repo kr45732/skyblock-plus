@@ -29,9 +29,7 @@ import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -195,30 +193,33 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			String guildSettingsName = newSettings.getGuildName();
-			if (guildSettingsName == null || guildSettingsName.length() == 0) {
+			if (guildSettingsName == null || guildSettingsName.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 
-			if (
-				currentServerSettings.getAutomatedGuildOne().getGuildName() != null &&
-				currentServerSettings.getAutomatedGuildOne().getGuildName().equalsIgnoreCase(guildSettingsName)
-			) {
-				currentServerSettings.setAutomatedGuildOne(newSettings);
-			} else if (
-				currentServerSettings.getAutomatedGuildTwo().getGuildName() != null &&
-				currentServerSettings.getAutomatedGuildTwo().getGuildName().equalsIgnoreCase(guildSettingsName)
-			) {
-				currentServerSettings.setAutomatedGuildTwo(newSettings);
-			} else {
-				if (currentServerSettings.getAutomatedGuildOne().getGuildName() == null) {
-					currentServerSettings.setAutomatedGuildOne(newSettings);
-				} else if (currentServerSettings.getAutomatedGuildTwo().getGuildName() == null) {
-					currentServerSettings.setAutomatedGuildTwo(newSettings);
+			List<AutomatedGuild> automatedGuilds = currentServerSettings.getAutomatedGuilds();
+			boolean found = false;
+
+			for (int i = 0; i < automatedGuilds.size(); i++) {
+				AutomatedGuild automatedGuild = automatedGuilds.get(i);
+
+				if (automatedGuild.getGuildName() != null && automatedGuild.getGuildName().equalsIgnoreCase(guildSettingsName)) {
+					automatedGuilds.set(i, newSettings);
+					found = true;
+					break;
+				}
+			}
+
+			if (!found) {
+				if (automatedGuilds.size() < 3) {
+					automatedGuilds.add(newSettings);
 				} else {
 					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 				}
 			}
 
+			automatedGuilds.forEach(g -> g.setServerSettings(currentServerSettings));
+			currentServerSettings.setAutomatedGuilds(automatedGuilds);
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
@@ -229,9 +230,7 @@ public class ServerSettingsService {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			return new ArrayList<>(
-				Arrays.asList(currentServerSettings.getAutomatedGuildOne(), currentServerSettings.getAutomatedGuildTwo())
-			);
+			return currentServerSettings.getAutomatedGuilds();
 		}
 		return null;
 	}
@@ -240,19 +239,18 @@ public class ServerSettingsService {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			AutomatedGuild guildOne = currentServerSettings.getAutomatedGuildOne();
-			AutomatedGuild guildTwo = currentServerSettings.getAutomatedGuildTwo();
+			List<AutomatedGuild> automatedGuilds = currentServerSettings.getAutomatedGuilds();
 
-			if (guildOne != null && guildOne.getGuildName() != null && guildOne.getGuildName().equalsIgnoreCase(name)) {
-				currentServerSettings.setAutomatedGuildOne(new AutomatedGuild());
-			} else if (guildTwo != null && guildTwo.getGuildName() != null && guildTwo.getGuildName().equalsIgnoreCase(name)) {
-				currentServerSettings.setAutomatedGuildTwo(new AutomatedGuild());
-			} else {
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			for (int i = automatedGuilds.size() - 1; i >= 0; i--) {
+				AutomatedGuild automatedGuild = automatedGuilds.get(i);
+
+				if (automatedGuild.getGuildName() != null && automatedGuild.getGuildName().equalsIgnoreCase(name)) {
+					automatedGuilds.remove(i);
+					currentServerSettings.setAutomatedGuilds(automatedGuilds);
+					settingsRepository.save(currentServerSettings);
+					return new ResponseEntity<>(HttpStatus.OK);
+				}
 			}
-
-			settingsRepository.save(currentServerSettings);
-			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
@@ -261,17 +259,12 @@ public class ServerSettingsService {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			if (
-				currentServerSettings.getAutomatedGuildOne().getGuildName() != null &&
-				currentServerSettings.getAutomatedGuildOne().getGuildName().equalsIgnoreCase(name)
-			) {
-				return currentServerSettings.getAutomatedGuildOne();
-			} else if (
-				currentServerSettings.getAutomatedGuildTwo().getGuildName() != null &&
-				currentServerSettings.getAutomatedGuildTwo().getGuildName().equalsIgnoreCase(name)
-			) {
-				return currentServerSettings.getAutomatedGuildTwo();
-			}
+			return currentServerSettings
+				.getAutomatedGuilds()
+				.stream()
+				.filter(g -> g.getGuildName() != null && g.getGuildName().equalsIgnoreCase(name))
+				.findFirst()
+				.orElse(null);
 		}
 		return null;
 	}

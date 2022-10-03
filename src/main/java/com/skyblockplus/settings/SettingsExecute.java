@@ -335,36 +335,23 @@ public class SettingsExecute {
 						default -> null;
 					};
 			} else if (args.length == 2) {
-				eb =
-					defaultSettingsEmbed()
-						.addField(
-							"Automatic Guild One",
-							(
-								higherDepth(currentSettings, "automatedGuildOne.guildName") != null
-									? "Name: " +
-									higherDepth(currentSettings, "automatedGuildOne.guildName").getAsString() +
-									"\nCommand: `/settings guild " +
-									higherDepth(currentSettings, "automatedGuildOne.guildName").getAsString() +
-									"`" +
-									""
-									: "Not setup"
-							),
-							false
-						)
-						.addField(
-							"Automatic Guild Two",
-							(
-								higherDepth(currentSettings, "automatedGuildTwo.guildName") != null
-									? "Name: " +
-									higherDepth(currentSettings, "automatedGuildTwo.guildName").getAsString() +
-									"\nCommand: `/settings guild " +
-									higherDepth(currentSettings, "automatedGuildTwo.guildName").getAsString() +
-									"`" +
-									""
-									: "Not setup"
-							),
+				eb = defaultSettingsEmbed();
+				JsonArray automatedGuilds = higherDepth(currentSettings, "automatedGuilds").getAsJsonArray();
+				if (automatedGuilds.isEmpty()) {
+					eb.setDescription("No guilds setup");
+				} else {
+					for (JsonElement automatedGuild : automatedGuilds) {
+						eb.addField(
+							"Automatic Guild",
+							"Name: " +
+							higherDepth(automatedGuild, "guildName").getAsString() +
+							"\nCommand: `/settings guild " +
+							higherDepth(automatedGuild, "guildName").getAsString() +
+							"`",
 							false
 						);
+					}
+				}
 			} else if (args.length == 3) {
 				return getGuildSettings(args[2]);
 			} else if (args.length == 5) {
