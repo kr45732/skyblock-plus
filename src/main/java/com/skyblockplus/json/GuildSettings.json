@@ -368,5 +368,130 @@
         }
       ]
     }
+  },
+  "5ea610b98ea8c9ab72c4dc39": {
+    "name": "Salty Slayers",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "staff",
+        "jrstaff",
+        "guild master"
+      ],
+      "default_rank": {
+        "requirements": [
+          [
+            {
+              "amount": 30,
+              "type": "skills"
+            },
+            {
+              "amount": 2000,
+              "type": "weight"
+            }
+          ],
+          [
+            {
+              "amount": 24,
+              "type": "catacombs"
+            },
+            {
+              "amount": 2000,
+              "type": "weight"
+            }
+          ],
+          [
+            {
+              "amount": 30,
+              "type": "skills"
+            },
+            {
+              "amount": 24,
+              "type": "catacombs"
+            }
+          ]
+        ],
+        "names": [
+          "midgame",
+          "member"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 40,
+                "type": "skills"
+              },
+              {
+                "amount": 7000,
+                "type": "weight"
+              }
+            ],
+            [
+              {
+                "amount": 34,
+                "type": "catacombs"
+              },
+              {
+                "amount": 7000,
+                "type": "weight"
+              }
+            ],
+            [
+              {
+                "amount": 40,
+                "type": "skills"
+              },
+              {
+                "amount": 34,
+                "type": "catacombs"
+              }
+            ]
+          ],
+          "names": [
+            "lategame"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 50,
+                "type": "skills"
+              },
+              {
+                "amount": 11000,
+                "type": "weight"
+              }
+            ],
+            [
+              {
+                "amount": 42,
+                "type": "catacombs"
+              },
+              {
+                "amount": 11000,
+                "type": "weight"
+              }
+            ],
+            [
+              {
+                "amount": 50,
+                "type": "skills"
+              },
+              {
+                "amount": 42,
+                "type": "catacombs"
+              }
+            ]
+          ],
+          "names": [
+            "endgame"
+          ]
+        }
+      ]
+    }
   }
 }

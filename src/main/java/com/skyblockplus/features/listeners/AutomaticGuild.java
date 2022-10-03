@@ -20,7 +20,6 @@ package com.skyblockplus.features.listeners;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.jerryEmbed;
-import static com.skyblockplus.features.mayor.MayorHandler.votesEmbed;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -35,6 +34,7 @@ import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.event.EventGuild;
 import com.skyblockplus.features.jacob.JacobGuild;
+import com.skyblockplus.features.mayor.MayorHandler;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
@@ -1076,7 +1076,18 @@ public class AutomaticGuild {
 		if (event.getComponentId().equals("verify_button")) {
 			verifyGuild.onButtonClick(event);
 		} else if (event.getComponentId().equals("mayor_graph_button")) {
-			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
+			if (MayorHandler.mayorGraphFile == null) {
+				event
+					.replyEmbeds(defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build())
+					.setEphemeral(true)
+					.queue();
+			} else {
+				event
+					.replyEmbeds(defaultEmbed(null).setImage("attachment://mayor_graph.png").build())
+					.setFiles(FileUpload.fromData(MayorHandler.mayorGraphFile))
+					.setEphemeral(true)
+					.queue();
+			}
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {

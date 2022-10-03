@@ -369,24 +369,32 @@ public class GuildRanksSlashCommand extends SlashCommand {
 					}
 				}
 
+				System.out.println(gMember);
 				int highestRankMet = -1;
 				JsonArray gRanks = higherDepth(lbSettings, "ranks").getAsJsonArray();
 				for (int i = 0; i < gRanks.size(); i++) {
-					JsonElement rank = gRanks.get(i);
-
+					JsonElement rank = gRanks.get(i); // e.g. [[a && b] || [c && d]]
 					boolean meetsReqOr = false;
+
 					for (JsonElement reqOr : higherDepth(rank, "requirements").getAsJsonArray()) {
 						boolean meetsReqAnd = true;
-						for (JsonElement reqAnd : reqOr.getAsJsonArray()) {
-							double amount = gMember.getDouble(higherDepth(reqAnd, "type").getAsString());
 
-							if (amount < higherDepth(reqAnd, "amount").getAsDouble()) {
+						for (JsonElement reqAnd : reqOr.getAsJsonArray()) {
+							System.out.println(
+								gMember.getDouble(higherDepth(reqAnd, "type").getAsString()) +
+								" " +
+								higherDepth(reqAnd, "amount").getAsDouble()
+							);
+							if (
+								gMember.getDouble(higherDepth(reqAnd, "type").getAsString()) < higherDepth(reqAnd, "amount").getAsDouble()
+							) {
 								meetsReqAnd = false;
 								break;
 							}
 						}
-						meetsReqOr = meetsReqAnd;
+
 						if (meetsReqAnd) {
+							meetsReqOr = true;
 							break;
 						}
 					}
@@ -400,7 +408,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 					List<String> rankNamesList = streamJsonArray(higherDepth(gRanks.get(highestRankMet), "names").getAsJsonArray())
 						.map(JsonElement::getAsString)
 						.toList();
-					if (!rankNamesList.contains(gMember.getString("username").toLowerCase())) {
+					if (!rankNamesList.contains(gMember.getString("rank").toLowerCase())) {
 						pbItems.add(("- /g setrank " + fixUsername(gMember.getString("username")) + " " + rankNamesList.get(0)));
 						totalChange++;
 					}

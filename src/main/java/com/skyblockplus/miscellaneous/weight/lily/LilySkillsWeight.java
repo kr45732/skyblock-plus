@@ -52,12 +52,15 @@ public class LilySkillsWeight extends SkillsWeight {
 		double skillAverage = 0;
 		for (String skill : SKILL_NAMES) {
 			try {
+				if (skill.equals("carpentry")) {
+					continue;
+				}
 				skillAverage += (skill.equals(skillName) ? skillsStruct : player.getSkill(skill, Player.WeightType.LILY)).currentLevel();
 			} catch (Exception e) {
 				return new WeightStruct();
 			}
 		}
-		skillAverage /= SKILL_NAMES.size();
+		skillAverage /= SKILL_NAMES.size() - 1;
 
 		double base =
 			(
@@ -68,6 +71,7 @@ public class LilySkillsWeight extends SkillsWeight {
 			(srwTable.get(srwTable.size() - 1).getAsDouble() * Math.pow(skillsStruct.currentLevel() / 60.0, Math.pow(2, 0.5)));
 		double overall = higherDepth(getWeightJson(), "lily.skills.overall").getAsDouble();
 		base *= overall;
+
 		double overflow = 0;
 		if (skillsStruct.totalExp() > SKILLS_LEVEL_60_XP) {
 			double factor = higherDepth(getWeightJson(), "lily.skills.factors." + skillName).getAsDouble();
