@@ -336,16 +336,21 @@ public class SettingsExecute {
 					};
 			} else if (args.length == 2) {
 				eb = defaultSettingsEmbed();
-				for (JsonElement automatedGuild : higherDepth(currentSettings, "automatedGuilds").getAsJsonArray()) {
-					eb.addField(
-						"Automatic Guild",
-						"Name: " +
-						higherDepth(automatedGuild, "guildName").getAsString() +
-						"\nCommand: `/settings guild " +
-						higherDepth(automatedGuild, "guildName").getAsString() +
-						"`",
-						false
-					);
+				JsonArray automatedGuilds = higherDepth(currentSettings, "automatedGuilds").getAsJsonArray();
+				if (automatedGuilds.isEmpty()) {
+					eb.setDescription("No guilds setup");
+				} else {
+					for (JsonElement automatedGuild : automatedGuilds) {
+						eb.addField(
+							"Automatic Guild",
+							"Name: " +
+							higherDepth(automatedGuild, "guildName").getAsString() +
+							"\nCommand: `/settings guild " +
+							higherDepth(automatedGuild, "guildName").getAsString() +
+							"`",
+							false
+						);
+					}
 				}
 			} else if (args.length == 3) {
 				return getGuildSettings(args[2]);
