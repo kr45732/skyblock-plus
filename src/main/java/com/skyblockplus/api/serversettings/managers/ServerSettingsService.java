@@ -197,7 +197,7 @@ public class ServerSettingsService {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 
-			List<AutomatedGuild> automatedGuilds =  currentServerSettings.getAutomatedGuilds();
+			List<AutomatedGuild> automatedGuilds = currentServerSettings.getAutomatedGuilds();
 			boolean found = false;
 
 			for (int i = 0; i < automatedGuilds.size(); i++) {
@@ -219,10 +219,8 @@ public class ServerSettingsService {
 			}
 
 			automatedGuilds.forEach(g -> g.setServerSettings(currentServerSettings));
-
 			currentServerSettings.setAutomatedGuilds(automatedGuilds);
-			var saved = settingsRepository.save(currentServerSettings);
-			System.out.println(saved);
+			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -233,9 +231,6 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			return currentServerSettings.getAutomatedGuilds();
-//			return new ArrayList<>(
-//				Arrays.asList(currentServerSettings.getAutomatedGuildOne(), currentServerSettings.getAutomatedGuildTwo())
-//			);
 		}
 		return null;
 	}
@@ -244,7 +239,7 @@ public class ServerSettingsService {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			List<AutomatedGuild> automatedGuilds =  currentServerSettings.getAutomatedGuilds();
+			List<AutomatedGuild> automatedGuilds = currentServerSettings.getAutomatedGuilds();
 
 			for (int i = automatedGuilds.size() - 1; i >= 0; i--) {
 				AutomatedGuild automatedGuild = automatedGuilds.get(i);
@@ -264,7 +259,12 @@ public class ServerSettingsService {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			return currentServerSettings.getAutomatedGuilds().stream().filter(g -> g.getGuildName() != null && g.getGuildId().equalsIgnoreCase(name)).findFirst().orElse(null);
+			return currentServerSettings
+				.getAutomatedGuilds()
+				.stream()
+				.filter(g -> g.getGuildName() != null && g.getGuildName().equalsIgnoreCase(name))
+				.findFirst()
+				.orElse(null);
 		}
 		return null;
 	}

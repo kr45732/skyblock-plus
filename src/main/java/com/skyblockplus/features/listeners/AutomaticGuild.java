@@ -26,6 +26,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
@@ -48,6 +49,7 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.RoleModifyRecord;
 import java.io.File;
+import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -242,10 +244,7 @@ public class AutomaticGuild {
 		List<AutomatedGuild> currentSettings;
 		try {
 			currentSettings =
-				List.of(
-					gson.fromJson(higherDepth(serverSettings, "automatedGuildOne"), AutomatedGuild.class),
-					gson.fromJson(higherDepth(serverSettings, "automatedGuildTwo"), AutomatedGuild.class)
-				);
+				gson.fromJson(higherDepth(serverSettings, "automatedGuilds"), new TypeToken<List<AutomatedGuild>>() {}.getType());
 		} catch (Exception e) {
 			return;
 		}

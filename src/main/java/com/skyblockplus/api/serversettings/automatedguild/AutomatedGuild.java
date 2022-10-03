@@ -19,12 +19,12 @@
 package com.skyblockplus.api.serversettings.automatedguild;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
+import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
-
-import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,8 +43,9 @@ public class AutomatedGuild {
 	private Long id;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "server_settings_id", insertable = false, updatable = false)
+	@JoinColumn(name = "server_settings_id")
 	@JsonIgnore
+	@Expose(serialize = false, deserialize = false)
 	@ToString.Exclude
 	private ServerSettingsModel serverSettings;
 

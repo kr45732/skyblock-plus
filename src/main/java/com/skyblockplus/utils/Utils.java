@@ -28,6 +28,7 @@ import static java.util.Collections.nCopies;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.google.gson.*;
+import com.google.gson.annotations.Expose;
 import com.google.gson.stream.JsonReader;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
@@ -145,8 +146,11 @@ public class Utils {
 		new LinkedBlockingQueue<>()
 	)
 		.setAllowCoreThreadTimeOut(true);
-	public static final Gson gson = new Gson();
-	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
+	public static final Gson gson = new GsonBuilder().addSerializationExclusionStrategy(new ExposeExclusionStrategy()).create();
+	public static final Gson formattedGson = new GsonBuilder()
+		.setPrettyPrinting()
+		.addSerializationExclusionStrategy(new ExposeExclusionStrategy())
+		.create();
 	public static final Consumer<Object> ignore = ignored -> {};
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
 	public static final AtomicInteger remainingLimit = new AtomicInteger(240);

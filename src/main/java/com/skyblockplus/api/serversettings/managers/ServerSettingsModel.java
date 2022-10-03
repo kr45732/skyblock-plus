@@ -102,8 +102,7 @@ public class ServerSettingsModel {
 	public ServerSettingsModel copy(boolean nullHypixelApiKey) {
 		ServerSettingsModel copy = new ServerSettingsModel(serverName, serverId);
 		copy.setAutomatedVerify(automatedVerify);
-//		copy.setAutomatedGuildOne(automatedGuildOne);
-//		copy.setAutomatedGuildTwo(automatedGuildTwo);
+		copy.setAutomatedGuilds(automatedGuilds);
 		copy.setBlacklist(blacklist);
 		copy.setAutomatedRoles(automatedRoles);
 		copy.setSbEvent(sbEvent);
