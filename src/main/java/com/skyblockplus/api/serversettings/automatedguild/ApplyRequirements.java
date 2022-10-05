@@ -33,4 +33,5 @@ public class ApplyRequirements {
 	private String skillsReq = "";
 	private String catacombsReq = "";
 	private String weightReq = "";
+	private String lilyWeightReq = "";
 }

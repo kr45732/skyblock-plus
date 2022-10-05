@@ -246,12 +246,14 @@ public class ApplyUser implements Serializable {
 				int skillsReq = higherDepth(req, "skillsReq", 0);
 				int cataReq = higherDepth(req, "catacombsReq", 0);
 				int weightReq = higherDepth(req, "weightReq", 0);
+				int lilyWeightReq = higherDepth(req, "lilyWeightReq", 0);
 
 				if (
 					player.getTotalSlayer() >= slayerReq &&
 					player.getSkillAverage() >= skillsReq &&
 					player.getCatacombs().getProgressLevel() >= cataReq &&
-					player.getWeight() >= weightReq
+					player.getWeight() >= weightReq &&
+					player.getLilyWeight() >= lilyWeightReq
 				) {
 					meetReqs = true;
 					break;
@@ -271,6 +273,11 @@ public class ApplyUser implements Serializable {
 					}
 					if (weightReq > 0) {
 						missingReqsStr.append(isFirst ? "• " : " | ").append("Weight - ").append(formatNumber(weightReq));
+						isFirst = false;
+					}
+					if (lilyWeightReq > 0) {
+						missingReqsStr.append(isFirst ? "• " : " | ").append("Lily weight - ").append(formatNumber(lilyWeightReq));
+						isFirst = false;
 					}
 
 					missingReqsStr.append("\n");

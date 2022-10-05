@@ -1470,6 +1470,7 @@ public class SettingsExecute {
 		int skillsReq = 0;
 		int cataReq = 0;
 		int weightReq = 0;
+		int lilyWeightReq = 0;
 
 		try {
 			slayerReq = Integer.parseInt(reqArgs.split("slayer:")[1].split("\\s+")[0]);
@@ -1487,7 +1488,16 @@ public class SettingsExecute {
 			weightReq = Integer.parseInt(reqArgs.split("weight:")[1].split("\\s+")[0]);
 		} catch (Exception ignored) {}
 
-		ApplyRequirements toAddReq = new ApplyRequirements("" + slayerReq, "" + skillsReq, "" + cataReq, "" + weightReq);
+		try {
+			lilyWeightReq = Integer.parseInt(reqArgs.split("lily_weight:")[1].split("\\s+")[0]);
+		} catch (Exception ignored) {}
+
+		ApplyRequirements toAddReq = new ApplyRequirements();
+		toAddReq.setSlayerReq("" + slayerReq);
+		toAddReq.setSkillsReq("" + skillsReq);
+		toAddReq.setCatacombsReq("" + cataReq);
+		toAddReq.setWeightReq("" + weightReq);
+		toAddReq.setLilyWeightReq("" + lilyWeightReq);
 		currentReqs.add(gson.toJsonTree(toAddReq));
 
 		guildSettings.add("applyReqs", currentReqs);
@@ -1497,14 +1507,12 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed(
-			"Added an apply requirement:\n• Slayer - " +
-			slayerReq +
-			"\n• Skills - " +
-			skillsReq +
-			"\n• Catacombs - " +
-			cataReq +
-			"\n• Weight - " +
-			weightReq
+			"Added an apply requirement:" +
+			(slayerReq > 0 ? "\n• Slayer - " + slayerReq : "") +
+			(skillsReq > 0 ? "\n• Skills - " + skillsReq : "") +
+			(cataReq > 0 ? "\n• Catacombs - " + cataReq : "") +
+			(weightReq > 0 ? "\n• Weight - " + weightReq : "") +
+			(lilyWeightReq > 0 ? "\n• Lily weight - " + lilyWeightReq : "")
 		);
 	}
 
@@ -1529,7 +1537,9 @@ public class SettingsExecute {
 				"\n• Catacombs - " +
 				higherDepth(req, "catacombsReq", 0) +
 				"\n• Weight - " +
-				higherDepth(req, "weightReq", 0)
+				higherDepth(req, "weightReq", 0) +
+				"\n• Lily Weight - " +
+				higherDepth(req, "lilyWeightReq", 0)
 			);
 		} catch (Exception e) {
 			return invalidEmbed("Invalid requirement number. Run `/settings guild <name>` to see the current apply requirements");
@@ -2732,6 +2742,7 @@ public class SettingsExecute {
 						String skillsReq = higherDepth(req, "skillsReq").getAsString();
 						String cataReq = higherDepth(req, "catacombsReq").getAsString();
 						String weightReq = higherDepth(req, "weightReq").getAsString();
+						String lilyWeightReq = higherDepth(req, "lilyWeightReq").getAsString();
 
 						reqsString
 							.append("`")
@@ -2744,7 +2755,9 @@ public class SettingsExecute {
 							.append(cataReq)
 							.append(" cata & ")
 							.append(weightReq)
-							.append(" weight\n");
+							.append(" weight")
+							.append(lilyWeightReq)
+							.append(" lily weight\n");
 					}
 					return reqsString.toString();
 				}
