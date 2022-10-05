@@ -62,6 +62,7 @@ public class ApplyUser implements Serializable {
 	public String playerSkills;
 	public String playerCatacombs;
 	public String playerWeight;
+	public String playerLilyWeight;
 	public String playerUsername;
 	public String playerUuid = "";
 	public String playerCoins;
@@ -258,29 +259,24 @@ public class ApplyUser implements Serializable {
 					meetReqs = true;
 					break;
 				} else {
-					boolean isFirst = true;
+					List<String> reqsFmt = new ArrayList<>();
 					if (slayerReq > 0) {
-						missingReqsStr.append("• " + "Slayer - ").append(formatNumber(slayerReq));
-						isFirst = false;
+						reqsFmt.add("Slayer - " + formatNumber(slayerReq));
 					}
 					if (skillsReq > 0) {
-						missingReqsStr.append(isFirst ? "• " : " | ").append("Skill Average - ").append(formatNumber(skillsReq));
-						isFirst = false;
+						reqsFmt.add("Skill Average - " + formatNumber(skillsReq));
 					}
 					if (cataReq > 0) {
-						missingReqsStr.append(isFirst ? "• " : " | ").append("Catacombs - ").append(formatNumber(cataReq));
-						isFirst = false;
+						reqsFmt.add("Catacombs - " + formatNumber(cataReq));
 					}
 					if (weightReq > 0) {
-						missingReqsStr.append(isFirst ? "• " : " | ").append("Weight - ").append(formatNumber(weightReq));
-						isFirst = false;
+						reqsFmt.add("Weight - " + formatNumber(weightReq));
 					}
 					if (lilyWeightReq > 0) {
-						missingReqsStr.append(isFirst ? "• " : " | ").append("Lily weight - ").append(formatNumber(lilyWeightReq));
-						isFirst = false;
+						reqsFmt.add("Lily weight - " + formatNumber(lilyWeightReq));
 					}
 
-					missingReqsStr.append("\n");
+					missingReqsStr.append("• ").append(String.join(" | ", reqsFmt)).append("\n");
 				}
 			}
 		}
@@ -292,11 +288,13 @@ public class ApplyUser implements Serializable {
 				"**Your statistics:**\n• Slayer - " +
 				formatNumber(player.getTotalSlayer()) +
 				" | Skill Average - " +
-				(player.getSkillAverage() == -1 ? "API disabled" : roundAndFormat(player.getSkillAverage())) +
+				(player.isSkillsApiEnabled() ? roundAndFormat(player.getSkillAverage()) : "API disabled") +
 				" | Catacombs - " +
 				roundAndFormat(player.getCatacombs().getProgressLevel()) +
 				" | Weight - " +
-				roundAndFormat(player.getWeight())
+				roundAndFormat(player.getWeight()) +
+				" | Lily Weight - " +
+				roundAndFormat(player.getLilyWeight())
 			);
 			reqEmbed.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr);
 			reqEmbed.appendDescription(
@@ -308,6 +306,7 @@ public class ApplyUser implements Serializable {
 			playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
 			playerCatacombs = roundAndFormat(player.getCatacombs().getProgressLevel());
 			playerWeight = roundAndFormat(player.getWeight());
+			playerLilyWeight = roundAndFormat(player.getLilyWeight());
 
 			reactMessage =
 				applicationChannel
@@ -342,6 +341,11 @@ public class ApplyUser implements Serializable {
 			} catch (Exception e) {
 				playerWeight = "API disabled";
 			}
+			try {
+				playerLilyWeight = roundAndFormat(player.getLilyWeight());
+			} catch (Exception e) {
+				playerLilyWeight = "API disabled";
+			}
 			playerUsername = player.getUsername();
 
 			ironmanSymbol = player.getSymbol(" ");
@@ -349,12 +353,14 @@ public class ApplyUser implements Serializable {
 			double bankCoins = player.getBankBalance();
 			playerCoins = (bankCoins != -1 ? simplifyNumber(bankCoins) : "API disabled") + " + " + simplifyNumber(player.getPurseCoins());
 
-			EmbedBuilder statsEmbed = player.defaultPlayerEmbed();
-			statsEmbed.addField("Weight", playerWeight, true);
-			statsEmbed.addField("Total slayer", playerSlayer, true);
-			statsEmbed.addField("Progress skill level", playerSkills, true);
-			statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
-			statsEmbed.addField("Bank & purse coins", playerCoins, true);
+			EmbedBuilder statsEmbed = player
+				.defaultPlayerEmbed()
+				.addField("Total Slayer", playerSlayer, true)
+				.addField("Skills", playerSkills, true)
+				.addField("Catacombs", playerCatacombs, true)
+				.addField("Weight", playerWeight, true)
+				.addField("Lily Weight", playerLilyWeight, true)
+				.addField("Bank & Purse", playerCoins, true);
 
 			List<Button> buttons = new ArrayList<>();
 			buttons.add(Button.success("apply_user_submit", "Submit"));
@@ -407,11 +413,12 @@ public class ApplyUser implements Serializable {
 						TextChannel staffChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyStaffChannel").getAsString());
 						staffChannelId = staffChannel.getId();
 						EmbedBuilder applyPlayerStats = defaultPlayerEmbed();
+						applyPlayerStats.addField("Total Slayer", playerSlayer, true);
+						applyPlayerStats.addField("Skills", playerSkills, true);
+						applyPlayerStats.addField("Catacombs", playerCatacombs, true);
 						applyPlayerStats.addField("Weight", playerWeight, true);
-						applyPlayerStats.addField("Total slayer", playerSlayer, true);
-						applyPlayerStats.addField("Progress skill level", playerSkills, true);
-						applyPlayerStats.addField("Catacombs level", playerCatacombs, true);
-						applyPlayerStats.addField("Bank & purse coins", playerCoins, true);
+						applyPlayerStats.addField("Lily Weight", playerLilyWeight, true);
+						applyPlayerStats.addField("Bank & Purse", playerCoins, true);
 						double playerNetworth = NetworthExecute.getTotalNetworth(playerUsername, playerProfileName);
 						applyPlayerStats.addField(
 							"Networth",

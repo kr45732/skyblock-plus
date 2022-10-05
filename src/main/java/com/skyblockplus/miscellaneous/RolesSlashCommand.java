@@ -302,7 +302,7 @@ public class RolesSlashCommand extends SlashCommand {
 								useHighest ? player.getHighestAmount(currentRoleName) : player.getAccessoryCount();
 							case "weight" -> {
 								if (
-									!useHighest && player.getSkillAverage() == -1 && !disabledAPI.toString().contains("Skills (for weight)")
+									!useHighest && !player.isSkillsApiEnabled() && !disabledAPI.toString().contains("Skills (for weight)")
 								) {
 									disabledAPI.append(roleChangeString("Skills (for weight) API disabled"));
 								}
