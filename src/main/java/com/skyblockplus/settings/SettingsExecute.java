@@ -28,7 +28,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
@@ -67,10 +66,6 @@ public class SettingsExecute {
 	private final User author;
 	private final JsonObject serverSettings;
 
-	public SettingsExecute(CommandEvent event) {
-		this(event.getGuild(), event.getChannel(), event.getAuthor());
-	}
-
 	public SettingsExecute(Guild guild, MessageReceivedEvent event) {
 		this(guild, event.getChannel(), event.getAuthor());
 	}
@@ -88,7 +83,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder getSettingsEmbed(String content, String[] args) {
 		EmbedBuilder eb = null;
-		JsonElement currentSettings = database.getServerSettings(guild.getId());
+
 		if (args.length >= 4 && args[1].equals("set")) {
 			eb =
 				switch (args[2]) {
@@ -153,42 +148,44 @@ public class SettingsExecute {
 					.addField("Guild Settings", "Use `/settings guild` to see the current settings", false)
 					.addField("Roles Settings", "Use `/settings roles` to see the current settings", false);
 		} else if (args.length == 2 && args[1].equals("general")) {
-			eb = defaultSettingsEmbed();
 			String hypixelKey = database.getServerHypixelApiKey(guild.getId());
-			eb.addField("Hypixel API Key", hypixelKey != null && !hypixelKey.isEmpty() ? "Hidden" : "Not set", false);
-			String fetchurChannel = higherDepth(currentSettings, "fetchurChannel", "none");
-			eb.addField(
-				"Fetchur Notifications Channel",
-				fetchurChannel.equals("none") || fetchurChannel.isEmpty() ? "None" : "<#" + fetchurChannel + ">",
-				false
-			);
-			String fetchurRole = higherDepth(currentSettings, "fetchurRole", "none");
-			eb.addField(
-				"Fetchur Ping Role",
-				fetchurRole.equals("none") || fetchurRole.isEmpty() ? "None" : "<@&" + fetchurRole + ">",
-				false
-			);
-			String mayorChannel = higherDepth(currentSettings, "mayorChannel", "none");
-			eb.addField(
-				"Mayor Notifications Channel",
-				mayorChannel.equals("none") || mayorChannel.isEmpty() ? "None" : "<#" + mayorChannel + ">",
-				false
-			);
-			String mayorRole = higherDepth(currentSettings, "mayorRole", "none");
-			eb.addField("Mayor Ping Role", mayorRole.equals("none") || mayorRole.isEmpty() ? "None" : "<@&" + mayorRole + ">", false);
-			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
-			eb.addField(
-				"Guest Role",
-				applyGuestRole.equals("none") || applyGuestRole.isEmpty() ? "None" : "<@&" + applyGuestRole + ">",
-				false
-			);
-			String botManagerRoles = streamJsonArray(higherDepth(currentSettings, "botManagerRoles").getAsJsonArray())
+			String fetchurChannel = higherDepth(serverSettings, "fetchurChannel", "none");
+			String fetchurRole = higherDepth(serverSettings, "fetchurRole", "none");
+			String mayorChannel = higherDepth(serverSettings, "mayorChannel", "none");
+			String mayorRole = higherDepth(serverSettings, "mayorRole", "none");
+			String applyGuestRole = higherDepth(serverSettings, "applyGuestRole", "none");
+			String botManagerRoles = streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray())
 				.map(r -> "<@&" + r.getAsString() + ">")
 				.collect(Collectors.joining(" "));
-			eb.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false);
+
+			eb =
+				defaultSettingsEmbed()
+					.addField("Hypixel API Key", hypixelKey != null && !hypixelKey.isEmpty() ? "Hidden" : "Not set", false)
+					.addField(
+						"Fetchur Notifications Channel",
+						fetchurChannel.equals("none") || fetchurChannel.isEmpty() ? "None" : "<#" + fetchurChannel + ">",
+						false
+					)
+					.addField(
+						"Fetchur Ping Role",
+						fetchurRole.equals("none") || fetchurRole.isEmpty() ? "None" : "<@&" + fetchurRole + ">",
+						false
+					)
+					.addField(
+						"Mayor Notifications Channel",
+						mayorChannel.equals("none") || mayorChannel.isEmpty() ? "None" : "<#" + mayorChannel + ">",
+						false
+					)
+					.addField("Mayor Ping Role", mayorRole.equals("none") || mayorRole.isEmpty() ? "None" : "<@&" + mayorRole + ">", false)
+					.addField(
+						"Guest Role",
+						applyGuestRole.equals("none") || applyGuestRole.isEmpty() ? "None" : "<@&" + applyGuestRole + ">",
+						false
+					)
+					.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
 			if (args.length == 2) {
-				eb = displayJacobSettings(higherDepth(currentSettings, "jacobSettings"));
+				eb = displayJacobSettings(higherDepth(serverSettings, "jacobSettings"));
 			} else if (args.length == 3) {
 				if (args[2].equals("enable")) {
 					eb = setJacobEnable(true);
@@ -210,7 +207,7 @@ public class SettingsExecute {
 			}
 		} else if (args.length >= 2 && args[1].equals("event")) {
 			if (args.length == 2) {
-				eb = displayEventSettings(higherDepth(currentSettings, "eventNotif"));
+				eb = displayEventSettings(higherDepth(serverSettings, "eventNotif"));
 			} else if (args.length == 3) {
 				if (args[2].equals("enable")) {
 					eb = setEventEnable(true);
@@ -232,7 +229,7 @@ public class SettingsExecute {
 			}
 		} else if (args.length >= 2 && args[1].equals("roles")) {
 			if (args.length == 2) {
-				return getRolesSettings(higherDepth(currentSettings, "automatedRoles"), 0);
+				return getRolesSettings(higherDepth(serverSettings, "automatedRoles"), 0);
 			} else if (args.length == 3) {
 				if (args[2].equals("enable")) {
 					eb = setRolesEnable(true);
@@ -275,7 +272,7 @@ public class SettingsExecute {
 		} else if (content.split("\\s+", 4).length >= 2 && content.split("\\s+", 4)[1].equals("verify")) {
 			args = content.split("\\s+", 4);
 			if (args.length == 2) {
-				eb = defaultSettingsEmbed(getCurrentVerifySettings(higherDepth(currentSettings, "automatedVerify")));
+				eb = defaultSettingsEmbed(getCurrentVerifySettings(higherDepth(serverSettings, "automatedVerify")));
 			} else if (args.length == 3) {
 				eb =
 					switch (args[2]) {
@@ -338,7 +335,7 @@ public class SettingsExecute {
 					};
 			} else if (args.length == 2) {
 				eb = defaultSettingsEmbed();
-				JsonArray automatedGuilds = higherDepth(currentSettings, "automatedGuilds").getAsJsonArray();
+				JsonArray automatedGuilds = higherDepth(serverSettings, "automatedGuilds").getAsJsonArray();
 				if (automatedGuilds.isEmpty()) {
 					eb.setDescription("No guilds setup");
 				} else {
@@ -1463,7 +1460,7 @@ public class SettingsExecute {
 		JsonArray currentReqs = guildSettings.getAsJsonArray("applyReqs");
 
 		if (currentReqs.size() >= 3) {
-			return invalidEmbed("You can only have up to 3 requirements");
+			return invalidEmbed("You can only have up to 3 sets of requirements");
 		}
 
 		int slayerReq = 0;
@@ -1472,25 +1469,27 @@ public class SettingsExecute {
 		int weightReq = 0;
 		int lilyWeightReq = 0;
 
-		try {
-			slayerReq = Integer.parseInt(reqArgs.split("slayer:")[1].split("\\s+")[0]);
-		} catch (Exception ignored) {}
+		for (String req : reqArgs.split("\\s+")) {
+			String[] reqSplit = req.split(":");
 
-		try {
-			skillsReq = Integer.parseInt(reqArgs.split("skills:")[1].split("\\s+")[0]);
-		} catch (Exception ignored) {}
+			int amount;
+			try {
+				amount = Integer.parseInt(reqSplit[1].trim());
+			} catch (Exception e) {
+				return invalidEmbed("Invalid requirement amount provided");
+			}
 
-		try {
-			cataReq = Integer.parseInt(reqArgs.split("catacombs:")[1].split("\\s+")[0]);
-		} catch (Exception ignored) {}
-
-		try {
-			weightReq = Integer.parseInt(reqArgs.split("weight:")[1].split("\\s+")[0]);
-		} catch (Exception ignored) {}
-
-		try {
-			lilyWeightReq = Integer.parseInt(reqArgs.split("lily_weight:")[1].split("\\s+")[0]);
-		} catch (Exception ignored) {}
+			switch (reqSplit[0].trim()) {
+				case "slayer" -> slayerReq = amount;
+				case "skills" -> skillsReq = amount;
+				case "catacombs" -> cataReq = amount;
+				case "weight" -> weightReq = amount;
+				case "lily_weight" -> lilyWeightReq = amount;
+				default -> {
+					return invalidEmbed("Invalid requirement type provided");
+				}
+			}
+		}
 
 		ApplyRequirements toAddReq = new ApplyRequirements();
 		toAddReq.setSlayerReq("" + slayerReq);
@@ -1529,20 +1528,22 @@ public class SettingsExecute {
 				return apiFailMessage(responseCode);
 			}
 
+			int slayerReq = higherDepth(req, "slayerReq", 0);
+			int skillsReq = higherDepth(req, "skillsReq", 0);
+			int catacombsReq = higherDepth(req, "catacombsReq", 0);
+			int weightReq = higherDepth(req, "weightReq", 0);
+			int lilyWeightReq = higherDepth(req, "lilyWeightReq", 0);
+
 			return defaultSettingsEmbed(
-				"Removed an apply requirement:\n• Slayer - " +
-				higherDepth(req, "slayerReq", 0) +
-				"\n• Skills - " +
-				higherDepth(req, "skillsReq", 0) +
-				"\n• Catacombs - " +
-				higherDepth(req, "catacombsReq", 0) +
-				"\n• Weight - " +
-				higherDepth(req, "weightReq", 0) +
-				"\n• Lily Weight - " +
-				higherDepth(req, "lilyWeightReq", 0)
+				"Removed an apply requirement:" +
+				(slayerReq > 0 ? "\n• Slayer - " + slayerReq : "") +
+				(skillsReq > 0 ? "\n• Skills - " + skillsReq : "") +
+				(catacombsReq > 0 ? "\n• Catacombs - " + catacombsReq : "") +
+				(weightReq > 0 ? "\n• Weight - " + weightReq : "") +
+				(lilyWeightReq > 0 ? "\n• Lily Weight - " + lilyWeightReq : "")
 			);
 		} catch (Exception e) {
-			return invalidEmbed("Invalid requirement number. Run `/settings guild <name>` to see the current apply requirements");
+			return invalidEmbed("Invalid requirement index. Run `/settings guild <name>` to see the current apply requirements");
 		}
 	}
 
@@ -2751,11 +2752,11 @@ public class SettingsExecute {
 							.append(slayerReq)
 							.append(" slayer & ")
 							.append(skillsReq)
-							.append(" skill avg & ")
+							.append(" skills & ")
 							.append(cataReq)
 							.append(" cata & ")
 							.append(weightReq)
-							.append(" weight")
+							.append(" weight & ")
 							.append(lilyWeightReq)
 							.append(" lily weight\n");
 					}
