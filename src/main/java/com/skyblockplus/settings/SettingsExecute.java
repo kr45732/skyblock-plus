@@ -110,7 +110,7 @@ public class SettingsExecute {
 			if (args.length == 2) {
 				return displayPlayerBlacklist();
 			} else if ((args.length >= 4) && args[2].equals("add")) {
-				eb = addPlayerBlacklist(args[3], args.length == 5 ? args[4] : "not provided");
+				eb = addToBlacklist(args[3], args.length == 5 ? args[4] : "not provided");
 			} else if (args.length == 4) {
 				eb =
 					switch (args[2]) {
@@ -118,8 +118,8 @@ public class SettingsExecute {
 						case "unshare" -> unshareBlacklist(args[3]);
 						case "use" -> useBlacklist(args[3]);
 						case "stop_using" -> stopUsingBlacklist(args[3]);
-						case "remove" -> removePlayerBlacklist(args[3]);
-						case "search" -> searchPlayerBlacklist(args[3]);
+						case "remove" -> removeFromBlacklist(args[3]);
+						case "search" -> searchBlacklist(args[3]);
 						default -> null;
 					};
 			}
@@ -185,7 +185,7 @@ public class SettingsExecute {
 					.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
 			if (args.length == 2) {
-				eb = displayJacobSettings(higherDepth(serverSettings, "jacobSettings"));
+				eb = displayJacobSettings();
 			} else if (args.length == 3) {
 				if (args[2].equals("enable")) {
 					eb = setJacobEnable(true);
@@ -207,7 +207,7 @@ public class SettingsExecute {
 			}
 		} else if (args.length >= 2 && args[1].equals("event")) {
 			if (args.length == 2) {
-				eb = displayEventSettings(higherDepth(serverSettings, "eventNotif"));
+				eb = displayEventSettings();
 			} else if (args.length == 3) {
 				if (args[2].equals("enable")) {
 					eb = setEventEnable(true);
@@ -229,14 +229,14 @@ public class SettingsExecute {
 			}
 		} else if (args.length >= 2 && args[1].equals("roles")) {
 			if (args.length == 2) {
-				return getRolesSettings(higherDepth(serverSettings, "automatedRoles"), 0);
+				return displayRolesSettings(higherDepth(serverSettings, "automatedRoles"), 0);
 			} else if (args.length == 3) {
 				if (args[2].equals("enable")) {
 					eb = setRolesEnable(true);
 				} else if (args[2].equals("disable")) {
 					eb = setRolesEnable(false);
 				} else {
-					return getRoleSettings(args[2]);
+					return displayRoleSettings(args[2]);
 				}
 			} else if (args.length == 4) {
 				switch (args[2]) {
@@ -272,7 +272,7 @@ public class SettingsExecute {
 		} else if (content.split("\\s+", 4).length >= 2 && content.split("\\s+", 4)[1].equals("verify")) {
 			args = content.split("\\s+", 4);
 			if (args.length == 2) {
-				eb = defaultSettingsEmbed(getCurrentVerifySettings(higherDepth(serverSettings, "automatedVerify")));
+				eb = defaultSettingsEmbed(displayVerifySettings());
 			} else if (args.length == 3) {
 				eb =
 					switch (args[2]) {
@@ -460,17 +460,14 @@ public class SettingsExecute {
 			}
 		}
 
-		if (eb == null) {
-			eb = errorEmbed("settings");
-		}
-
-		return eb;
+		return eb == null ? errorEmbed("settings") : eb;
 	}
 
 	/* Jacob Settings */
-	public EmbedBuilder displayJacobSettings(JsonElement jacobSettings) {
+	public EmbedBuilder displayJacobSettings() {
+		JsonElement jacobSettings = getJacobSettings();
 		String ebFieldString = "";
-		ebFieldString += "**" + displaySettings(jacobSettings, "enable") + "**";
+		ebFieldString += ("**" + displaySettings(jacobSettings, "enable") + "**");
 		ebFieldString += "\n• **Channel:** " + displaySettings(jacobSettings, "channel");
 		ebFieldString += "\n• **Crops:** " + displaySettings(jacobSettings, "crops");
 		return defaultEmbed("Jacob Settings").setDescription(ebFieldString);
@@ -483,7 +480,7 @@ public class SettingsExecute {
 		}
 
 		TextChannel channel = ((TextChannel) eb);
-		JsonObject jacobSettings = getJacobSetings();
+		JsonObject jacobSettings = getJacobSettings();
 		jacobSettings.addProperty("channel", channel.getId());
 
 		int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);
@@ -497,7 +494,7 @@ public class SettingsExecute {
 	public EmbedBuilder removeJacobCrop(String crop) {
 		crop = capitalizeString(crop.replace("_", " "));
 
-		JsonObject jacobSettings = getJacobSetings();
+		JsonObject jacobSettings = getJacobSettings();
 		JsonArray jacobRoles = higherDepth(jacobSettings, "crops").getAsJsonArray();
 
 		boolean removedCrop = false;
@@ -554,7 +551,7 @@ public class SettingsExecute {
 			return invalidEmbed("Invalid crop\n\nValid crops are: " + String.join(", ", CROP_NAME_TO_EMOJI.keySet()));
 		}
 
-		JsonObject jacobSettings = getJacobSetings();
+		JsonObject jacobSettings = getJacobSettings();
 		JsonArray crops = higherDepth(jacobSettings, "crops").getAsJsonArray();
 
 		for (JsonElement cropJson : crops) {
@@ -583,7 +580,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setJacobEnable(boolean enable) {
-		JsonObject jacobSettings = getJacobSetings();
+		JsonObject jacobSettings = getJacobSettings();
 		if (enable) {
 			try {
 				guild.getTextChannelById(higherDepth(jacobSettings, "channel").getAsString()).getId();
@@ -604,12 +601,13 @@ public class SettingsExecute {
 		return defaultSettingsEmbed((enable ? "Enabled" : "Disabled") + " jacob notifications");
 	}
 
-	public JsonObject getJacobSetings() {
+	public JsonObject getJacobSettings() {
 		return higherDepth(serverSettings, "jacobSettings").getAsJsonObject();
 	}
 
 	/* Event Settings */
-	public EmbedBuilder displayEventSettings(JsonElement eventSettings) {
+	public EmbedBuilder displayEventSettings() {
+		JsonElement eventSettings = getEventSettings();
 		String ebFieldString = "";
 		ebFieldString += "**" + displaySettings(eventSettings, "enable") + "**";
 		ebFieldString += "\n• **Channel:** " + displaySettings(eventSettings, "channel");
@@ -760,260 +758,6 @@ public class SettingsExecute {
 	}
 
 	/* Guild Settings */
-	public EmbedBuilder removePlayerBlacklist(String username) {
-		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if (!uuidStruct.isValid()) {
-			return invalidEmbed(uuidStruct.failCause());
-		}
-
-		JsonObject blacklistSettings = getBlacklistSettings();
-		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
-		for (int i = 0; i < currentBlacklist.size(); i++) {
-			if (
-				higherDepth(currentBlacklist.get(i), "uuid").getAsString().equals(uuidStruct.uuid()) ||
-				higherDepth(currentBlacklist.get(i), "username").getAsString().equals(uuidStruct.username())
-			) {
-				currentBlacklist.remove(i);
-				blacklistSettings.add("blacklist", currentBlacklist);
-				int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
-				if (responseCode != 200) {
-					return apiFailMessage(responseCode);
-				}
-
-				guildMap.get(guild.getId()).setBlacklist(currentBlacklist);
-				return defaultSettingsEmbed("Removed " + uuidStruct.nameMcHyperLink() + " from the blacklist");
-			}
-		}
-
-		return invalidEmbed(uuidStruct.nameMcHyperLink() + " is not blacklisted");
-	}
-
-	public EmbedBuilder displayPlayerBlacklist() {
-		JsonElement blacklistSettings = getBlacklistSettings();
-		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
-
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(30);
-		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Settings"));
-		String canUse = streamJsonArray(higherDepth(blacklistSettings, "canUse").getAsJsonArray())
-			.map(g -> jda.getGuildById(g.getAsString()))
-			.filter(Objects::nonNull)
-			.map(Guild::getName)
-			.collect(Collectors.joining(", "));
-		String isUsing = streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray())
-			.map(g -> jda.getGuildById(g.getAsString()))
-			.filter(Objects::nonNull)
-			.map(Guild::getName)
-			.collect(Collectors.joining(", "));
-
-		paginateBuilder.addItems(
-			"• Shared with: " + (canUse.isEmpty() ? "none" : canUse),
-			"• Using: " + (isUsing.isEmpty() ? "none" : isUsing),
-			"• Blacklist size (this server): " + currentBlacklist.size()
-		);
-		paginateBuilder.addItems(Collections.nCopies(27, "").toArray(new String[0]));
-
-		streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray())
-			.map(g -> higherDepth(database.getBlacklistSettings(g.getAsString()), "blacklist").getAsJsonArray())
-			.forEach(currentBlacklist::addAll);
-
-		for (JsonElement blacklisted : currentBlacklist) {
-			paginateBuilder.addItems(
-				"• " +
-				nameMcHyperLink(
-					fixUsername(higherDepth(blacklisted, "username").getAsString()),
-					higherDepth(blacklisted, "uuid").getAsString()
-				) +
-				" - " +
-				higherDepth(blacklisted, "reason").getAsString()
-			);
-		}
-
-		paginateBuilder.build().paginate(channel, 0);
-		return null;
-	}
-
-	public EmbedBuilder addPlayerBlacklist(String username, String reason) {
-		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if (!uuidStruct.isValid()) {
-			return invalidEmbed(uuidStruct.failCause());
-		}
-
-		JsonObject blacklistSettings = getBlacklistSettings();
-		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
-		JsonElement blacklistedUser = streamJsonArray(currentBlacklist)
-			.filter(blacklist ->
-				higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.uuid()) ||
-				higherDepth(blacklist, "username").getAsString().equals(uuidStruct.username())
-			)
-			.findFirst()
-			.orElse(null);
-		if (blacklistedUser != null) {
-			return invalidEmbed(
-				uuidStruct.nameMcHyperLink() +
-				" is already blacklisted with reason `" +
-				higherDepth(blacklistedUser, "reason").getAsString() +
-				"`"
-			);
-		}
-
-		currentBlacklist.add(gson.toJsonTree(new BlacklistEntry(uuidStruct.username(), uuidStruct.uuid(), reason)));
-		blacklistSettings.add("blacklist", currentBlacklist);
-		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		guildMap.get(guild.getId()).setBlacklist(currentBlacklist);
-		return defaultSettingsEmbed("Blacklisted " + uuidStruct.nameMcHyperLink() + " with reason `" + reason + "`");
-	}
-
-	public EmbedBuilder searchPlayerBlacklist(String username) {
-		List<JsonElement> blacklist = streamJsonArray(guildMap.get(guild.getId()).getBlacklist()).collect(Collectors.toList());
-		if (blacklist.isEmpty()) {
-			return invalidEmbed("Blacklist is empty");
-		}
-
-		EmbedBuilder eb = defaultSettingsEmbed();
-		for (BoundExtractedResult<JsonElement> match : FuzzySearch.extractTop(
-			username,
-			blacklist,
-			element -> higherDepth(element, "username").getAsString(),
-			5
-		)) {
-			JsonElement referent = match.getReferent();
-			String thisUser = higherDepth(referent, "username").getAsString();
-			eb.addField(
-				thisUser,
-				"Reason: " +
-				higherDepth(referent, "reason").getAsString() +
-				"\nNameMC: " +
-				nameMcHyperLink(fixUsername(thisUser), higherDepth(referent, "uuid").getAsString()),
-				false
-			);
-		}
-		return eb;
-	}
-
-	public EmbedBuilder useBlacklist(String serverId) {
-		JsonElement otherBlacklist = database.getBlacklistSettings(serverId);
-		if (otherBlacklist == null || otherBlacklist.isJsonNull()) {
-			return invalidEmbed("Invalid server");
-		}
-
-		JsonObject blacklistSettings = getBlacklistSettings();
-		JsonArray isUsing = higherDepth(blacklistSettings, "isUsing").getAsJsonArray();
-
-		if (isUsing.size() == 6) {
-			return invalidEmbed("You have reached the max number of shared blacklists (6/6)");
-		}
-
-		if (streamJsonArray(isUsing).anyMatch(g -> g.getAsString().equals(serverId))) {
-			return invalidEmbed("You are already using the provided servers blacklist");
-		}
-
-		if (streamJsonArray(higherDepth(otherBlacklist, "canUse").getAsJsonArray()).noneMatch(g -> g.getAsString().equals(guild.getId()))) {
-			return invalidEmbed("The provided server has not shared their blacklist with this server");
-		}
-
-		isUsing.add(serverId);
-		blacklistSettings.add("isUsing", isUsing);
-
-		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-		guildMap.get(guild.getId()).setIsUsing(isUsing);
-
-		return defaultSettingsEmbed("Using the blacklist of " + jda.getGuildById(serverId).getName());
-	}
-
-	public EmbedBuilder shareBlacklist(String serverId) {
-		Guild toShareGuild = null;
-		try {
-			toShareGuild = jda.getGuildById(serverId);
-		} catch (Exception ignored) {}
-		if (toShareGuild == null) {
-			return invalidEmbed("Invalid server id provided");
-		}
-
-		JsonObject blacklistSettings = getBlacklistSettings();
-		JsonArray canUse = higherDepth(blacklistSettings, "canUse").getAsJsonArray();
-
-		if (canUse.size() == 6) {
-			return invalidEmbed("You have reached the max number of shared blacklists (6/6)");
-		}
-
-		if (streamJsonArray(canUse).anyMatch(g -> g.getAsString().equals(serverId))) {
-			return invalidEmbed("You are already sharing the blacklist with the provided server");
-		}
-
-		canUse.add(serverId);
-		blacklistSettings.add("canUse", canUse);
-
-		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Shared blacklist with " + toShareGuild.getName());
-	}
-
-	public EmbedBuilder unshareBlacklist(String serverId) {
-		JsonObject blacklistSettings = getBlacklistSettings();
-		JsonArray canUse = higherDepth(blacklistSettings, "canUse").getAsJsonArray();
-
-		if (streamJsonArray(canUse).noneMatch(g -> g.getAsString().equals(serverId))) {
-			return invalidEmbed("You are not sharing the blacklist with the provided server");
-		}
-
-		canUse.remove(new JsonPrimitive(serverId));
-		blacklistSettings.add("canUse", canUse);
-
-		JsonObject otherBlacklist = database.getBlacklistSettings(serverId).getAsJsonObject();
-		JsonArray isUsing = higherDepth(otherBlacklist, "isUsing").getAsJsonArray();
-		isUsing.remove(new JsonPrimitive(guild.getId()));
-		otherBlacklist.add("isUsing", isUsing);
-		database.setBlacklistSettings(serverId, otherBlacklist);
-		guildMap.get(serverId).setIsUsing(isUsing);
-
-		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Stopped sharing blacklist with " + jda.getGuildById(serverId).getName());
-	}
-
-	public EmbedBuilder stopUsingBlacklist(String serverId) {
-		JsonElement otherBlacklist = database.getBlacklistSettings(serverId);
-		if (otherBlacklist == null || otherBlacklist.isJsonNull()) {
-			return invalidEmbed("Invalid server");
-		}
-
-		JsonObject blacklistSettings = getBlacklistSettings();
-		JsonArray isUsing = higherDepth(blacklistSettings, "isUsing").getAsJsonArray();
-
-		if (streamJsonArray(isUsing).noneMatch(g -> g.getAsString().equals(serverId))) {
-			return invalidEmbed("You are not using the provided servers blacklist");
-		}
-
-		for (int i = isUsing.size() - 1; i >= 0; i--) {
-			if (isUsing.get(i).getAsString().equals(serverId)) {
-				isUsing.remove(i);
-			}
-		}
-
-		blacklistSettings.add("isUsing", isUsing);
-
-		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-		guildMap.get(serverId).setIsUsing(isUsing);
-
-		return defaultSettingsEmbed("Stopped using the blacklist of " + jda.getGuildById(serverId).getName());
-	}
-
 	public EmbedBuilder createNewGuild(String guildName) {
 		HypixelResponse guildResponse = getGuildFromName(guildName);
 		if (!guildResponse.isValid()) {
@@ -1617,12 +1361,8 @@ public class SettingsExecute {
 		return null;
 	}
 
-	public JsonObject getBlacklistSettings() {
-		return higherDepth(serverSettings, "blacklist").getAsJsonObject();
-	}
-
 	/* Roles Settings */
-	public EmbedBuilder getRoleSettings(String roleName) {
+	public EmbedBuilder displayRoleSettings(String roleName) {
 		List<String> allRoles = List.of(
 			"sven",
 			"rev",
@@ -1669,17 +1409,17 @@ public class SettingsExecute {
 			.collect(Collectors.toMap(allRoles::get, i -> i + 2, (a, b) -> b));
 
 		if (rolePageMap.containsKey(roleName)) {
-			return getRolesSettings(database.getRolesSettings(guild.getId()), rolePageMap.get(roleName));
+			return displayRolesSettings(database.getRolesSettings(guild.getId()), rolePageMap.get(roleName));
 		} else {
 			try {
-				return getRolesSettings(database.getRolesSettings(guild.getId()), Integer.parseInt(roleName));
+				return displayRolesSettings(database.getRolesSettings(guild.getId()), Integer.parseInt(roleName));
 			} catch (Exception ignored) {}
 		}
 
 		return invalidEmbed("Invalid role name or index");
 	}
 
-	public EmbedBuilder getRolesSettings(JsonElement rolesSettings, int pageNum) {
+	public EmbedBuilder displayRolesSettings(JsonElement rolesSettings, int pageNum) {
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(1);
 
 		ArrayList<String> pageTitles = new ArrayList<>();
@@ -1879,14 +1619,6 @@ public class SettingsExecute {
 
 		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles)).build().paginate(channel, pageNum);
 		return null;
-	}
-
-	public boolean allowRolesEnable() {
-		JsonObject currentSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
-
-		currentSettings.remove("enable");
-		currentSettings.remove("useHighest");
-		return currentSettings.keySet().stream().anyMatch(role -> higherDepth(currentSettings, role + ".enable", false));
 	}
 
 	public EmbedBuilder setRolesEnable(boolean enable) {
@@ -2195,12 +1927,21 @@ public class SettingsExecute {
 		return defaultSettingsEmbed(roleName + " set to " + role.getAsMention());
 	}
 
+	public boolean allowRolesEnable() {
+		JsonObject currentSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
+
+		currentSettings.remove("enable");
+		currentSettings.remove("useHighest");
+		return currentSettings.keySet().stream().anyMatch(role -> higherDepth(currentSettings, role + ".enable", false));
+	}
+
 	public static boolean isOneLevelRole(String roleName) {
 		return roleName.equals("pet_enthusiast");
 	}
 
 	/* Verify Settings */
-	public String getCurrentVerifySettings(JsonElement verifySettings) {
+	public String displayVerifySettings() {
+		JsonElement verifySettings = higherDepth(serverSettings, "automatedVerify");
 		String ebFieldString = "";
 		ebFieldString += "**" + displaySettings(verifySettings, "enable") + "**";
 		ebFieldString += "\n• **Message Text:** " + displaySettings(verifySettings, "messageText");
@@ -2487,13 +2228,269 @@ public class SettingsExecute {
 	public int updateVerifySettings(String key, String newValue) {
 		JsonObject newVerifySettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 		newVerifySettings.addProperty(key, newValue);
-		if (key.equals("verifiedNickname") || key.equals("enableAutomaticSync")) {
-			guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(newVerifySettings);
-		}
+		guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(newVerifySettings);
 		return database.setVerifySettings(guild.getId(), newVerifySettings);
 	}
 
 	/* Miscellaneous */
+	public EmbedBuilder displayPlayerBlacklist() {
+		JsonElement blacklistSettings = getBlacklistSettings();
+		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
+
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(30);
+		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Settings"));
+		String canUse = streamJsonArray(higherDepth(blacklistSettings, "canUse").getAsJsonArray())
+			.map(g -> jda.getGuildById(g.getAsString()))
+			.filter(Objects::nonNull)
+			.map(Guild::getName)
+			.collect(Collectors.joining(", "));
+		String isUsing = streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray())
+			.map(g -> jda.getGuildById(g.getAsString()))
+			.filter(Objects::nonNull)
+			.map(Guild::getName)
+			.collect(Collectors.joining(", "));
+
+		paginateBuilder.addItems(
+			"• Shared with: " + (canUse.isEmpty() ? "none" : canUse),
+			"• Using: " + (isUsing.isEmpty() ? "none" : isUsing),
+			"• Blacklist size (this server): " + currentBlacklist.size()
+		);
+		paginateBuilder.addItems(Collections.nCopies(27, "").toArray(new String[0]));
+
+		streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray())
+			.map(g -> higherDepth(database.getBlacklistSettings(g.getAsString()), "blacklist").getAsJsonArray())
+			.forEach(currentBlacklist::addAll);
+
+		for (JsonElement blacklisted : currentBlacklist) {
+			paginateBuilder.addItems(
+				"• " +
+				nameMcHyperLink(
+					fixUsername(higherDepth(blacklisted, "username").getAsString()),
+					higherDepth(blacklisted, "uuid").getAsString()
+				) +
+				" - " +
+				higherDepth(blacklisted, "reason").getAsString()
+			);
+		}
+
+		paginateBuilder.build().paginate(channel, 0);
+		return null;
+	}
+
+	public EmbedBuilder removeFromBlacklist(String username) {
+		UsernameUuidStruct uuidStruct = usernameToUuid(username);
+		if (!uuidStruct.isValid()) {
+			return invalidEmbed(uuidStruct.failCause());
+		}
+
+		JsonObject blacklistSettings = getBlacklistSettings();
+		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
+		for (int i = 0; i < currentBlacklist.size(); i++) {
+			if (
+				higherDepth(currentBlacklist.get(i), "uuid").getAsString().equals(uuidStruct.uuid()) ||
+				higherDepth(currentBlacklist.get(i), "username").getAsString().equals(uuidStruct.username())
+			) {
+				currentBlacklist.remove(i);
+				blacklistSettings.add("blacklist", currentBlacklist);
+				int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
+				if (responseCode != 200) {
+					return apiFailMessage(responseCode);
+				}
+
+				guildMap.get(guild.getId()).setBlacklist(currentBlacklist);
+				return defaultSettingsEmbed("Removed " + uuidStruct.nameMcHyperLink() + " from the blacklist");
+			}
+		}
+
+		return invalidEmbed(uuidStruct.nameMcHyperLink() + " is not blacklisted");
+	}
+
+	public EmbedBuilder addToBlacklist(String username, String reason) {
+		UsernameUuidStruct uuidStruct = usernameToUuid(username);
+		if (!uuidStruct.isValid()) {
+			return invalidEmbed(uuidStruct.failCause());
+		}
+
+		JsonObject blacklistSettings = getBlacklistSettings();
+		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
+		JsonElement blacklistedUser = streamJsonArray(currentBlacklist)
+			.filter(blacklist ->
+				higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.uuid()) ||
+				higherDepth(blacklist, "username").getAsString().equals(uuidStruct.username())
+			)
+			.findFirst()
+			.orElse(null);
+		if (blacklistedUser != null) {
+			return invalidEmbed(
+				uuidStruct.nameMcHyperLink() +
+				" is already blacklisted with reason `" +
+				higherDepth(blacklistedUser, "reason").getAsString() +
+				"`"
+			);
+		}
+
+		currentBlacklist.add(gson.toJsonTree(new BlacklistEntry(uuidStruct.username(), uuidStruct.uuid(), reason)));
+		blacklistSettings.add("blacklist", currentBlacklist);
+		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setBlacklist(currentBlacklist);
+		return defaultSettingsEmbed("Blacklisted " + uuidStruct.nameMcHyperLink() + " with reason `" + reason + "`");
+	}
+
+	public EmbedBuilder searchBlacklist(String username) {
+		List<JsonElement> blacklist = streamJsonArray(guildMap.get(guild.getId()).getBlacklist()).collect(Collectors.toList());
+		if (blacklist.isEmpty()) {
+			return invalidEmbed("Blacklist is empty");
+		}
+
+		EmbedBuilder eb = defaultSettingsEmbed();
+		for (BoundExtractedResult<JsonElement> match : FuzzySearch.extractTop(
+			username,
+			blacklist,
+			element -> higherDepth(element, "username").getAsString(),
+			5
+		)) {
+			JsonElement referent = match.getReferent();
+			String thisUser = higherDepth(referent, "username").getAsString();
+			eb.addField(
+				thisUser,
+				"Reason: " +
+				higherDepth(referent, "reason").getAsString() +
+				"\nNameMC: " +
+				nameMcHyperLink(fixUsername(thisUser), higherDepth(referent, "uuid").getAsString()),
+				false
+			);
+		}
+		return eb;
+	}
+
+	public EmbedBuilder useBlacklist(String serverId) {
+		JsonElement otherBlacklist = database.getBlacklistSettings(serverId);
+		if (otherBlacklist == null || otherBlacklist.isJsonNull()) {
+			return invalidEmbed("Invalid server");
+		}
+
+		JsonObject blacklistSettings = getBlacklistSettings();
+		JsonArray isUsing = higherDepth(blacklistSettings, "isUsing").getAsJsonArray();
+
+		if (isUsing.size() == 6) {
+			return invalidEmbed("You have reached the max number of shared blacklists (6/6)");
+		}
+
+		if (streamJsonArray(isUsing).anyMatch(g -> g.getAsString().equals(serverId))) {
+			return invalidEmbed("You are already using the provided servers blacklist");
+		}
+
+		if (streamJsonArray(higherDepth(otherBlacklist, "canUse").getAsJsonArray()).noneMatch(g -> g.getAsString().equals(guild.getId()))) {
+			return invalidEmbed("The provided server has not shared their blacklist with this server");
+		}
+
+		isUsing.add(serverId);
+		blacklistSettings.add("isUsing", isUsing);
+
+		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+		guildMap.get(guild.getId()).setIsUsing(isUsing);
+
+		return defaultSettingsEmbed("Using the blacklist of " + jda.getGuildById(serverId).getName());
+	}
+
+	public EmbedBuilder shareBlacklist(String serverId) {
+		Guild toShareGuild = null;
+		try {
+			toShareGuild = jda.getGuildById(serverId);
+		} catch (Exception ignored) {}
+		if (toShareGuild == null) {
+			return invalidEmbed("Invalid server id provided");
+		}
+
+		JsonObject blacklistSettings = getBlacklistSettings();
+		JsonArray canUse = higherDepth(blacklistSettings, "canUse").getAsJsonArray();
+
+		if (canUse.size() == 6) {
+			return invalidEmbed("You have reached the max number of shared blacklists (6/6)");
+		}
+
+		if (streamJsonArray(canUse).anyMatch(g -> g.getAsString().equals(serverId))) {
+			return invalidEmbed("You are already sharing the blacklist with the provided server");
+		}
+
+		canUse.add(serverId);
+		blacklistSettings.add("canUse", canUse);
+
+		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Shared blacklist with " + toShareGuild.getName());
+	}
+
+	public EmbedBuilder unshareBlacklist(String serverId) {
+		JsonObject blacklistSettings = getBlacklistSettings();
+		JsonArray canUse = higherDepth(blacklistSettings, "canUse").getAsJsonArray();
+
+		if (streamJsonArray(canUse).noneMatch(g -> g.getAsString().equals(serverId))) {
+			return invalidEmbed("You are not sharing the blacklist with the provided server");
+		}
+
+		canUse.remove(new JsonPrimitive(serverId));
+		blacklistSettings.add("canUse", canUse);
+
+		JsonObject otherBlacklist = database.getBlacklistSettings(serverId).getAsJsonObject();
+		JsonArray isUsing = higherDepth(otherBlacklist, "isUsing").getAsJsonArray();
+		isUsing.remove(new JsonPrimitive(guild.getId()));
+		otherBlacklist.add("isUsing", isUsing);
+		database.setBlacklistSettings(serverId, otherBlacklist);
+		guildMap.get(serverId).setIsUsing(isUsing);
+
+		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Stopped sharing blacklist with " + jda.getGuildById(serverId).getName());
+	}
+
+	public EmbedBuilder stopUsingBlacklist(String serverId) {
+		JsonElement otherBlacklist = database.getBlacklistSettings(serverId);
+		if (otherBlacklist == null || otherBlacklist.isJsonNull()) {
+			return invalidEmbed("Invalid server");
+		}
+
+		JsonObject blacklistSettings = getBlacklistSettings();
+		JsonArray isUsing = higherDepth(blacklistSettings, "isUsing").getAsJsonArray();
+
+		if (streamJsonArray(isUsing).noneMatch(g -> g.getAsString().equals(serverId))) {
+			return invalidEmbed("You are not using the provided servers blacklist");
+		}
+
+		for (int i = isUsing.size() - 1; i >= 0; i--) {
+			if (isUsing.get(i).getAsString().equals(serverId)) {
+				isUsing.remove(i);
+			}
+		}
+
+		blacklistSettings.add("isUsing", isUsing);
+
+		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+		guildMap.get(serverId).setIsUsing(isUsing);
+
+		return defaultSettingsEmbed("Stopped using the blacklist of " + jda.getGuildById(serverId).getName());
+	}
+
+	public JsonObject getBlacklistSettings() {
+		return higherDepth(serverSettings, "blacklist").getAsJsonObject();
+	}
+
 	public EmbedBuilder setHypixelKey(String newKey) {
 		try {
 			newKey = higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey, newKey), "record.key").getAsString();
