@@ -607,7 +607,6 @@ public class SettingsExecute {
 		JsonElement eventSettings = getEventSettings();
 		String ebFieldString = "";
 		ebFieldString += "**" + displaySettings(eventSettings, "enable") + "**";
-		ebFieldString += "\n• **Channel:** " + displaySettings(eventSettings, "channel");
 		ebFieldString += "\n• **Events:** " + displaySettings(eventSettings, "events");
 		return defaultEmbed("Event Settings").setDescription(ebFieldString);
 	}
@@ -2755,7 +2754,7 @@ public class SettingsExecute {
 
 					return ebStr.toString();
 				}
-				case "crops", "events" -> {
+				case "crops" -> {
 					JsonArray roles = higherDepth(jsonSettings, settingName).getAsJsonArray();
 					List<String> ebStr = new ArrayList<>();
 					for (JsonElement role : roles) {
@@ -2763,6 +2762,29 @@ public class SettingsExecute {
 							"• " +
 							higherDepth(role, "value").getAsString() +
 							" - " +
+							"<@&" +
+							higherDepth(role, "roleId").getAsString() +
+							">"
+						);
+					}
+
+					if (ebStr.isEmpty()) {
+						return "None";
+					}
+
+					return "\n\u200B \u200B  " + String.join("\n\u200B \u200B  ", ebStr);
+				}
+				case "events" -> {
+					JsonArray roles = higherDepth(jsonSettings, settingName).getAsJsonArray();
+					List<String> ebStr = new ArrayList<>();
+					for (JsonElement role : roles) {
+						ebStr.add(
+							"• " +
+							higherDepth(role, "value").getAsString() +
+							" - " +
+							"<#" +
+							higherDepth(role, "channelId").getAsString() +
+							"> - " +
 							"<@&" +
 							higherDepth(role, "roleId").getAsString() +
 							">"
