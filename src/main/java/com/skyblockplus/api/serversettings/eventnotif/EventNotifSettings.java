@@ -36,7 +36,6 @@ import org.hibernate.annotations.FetchMode;
 public class EventNotifSettings {
 
 	private String enable = "false";
-	private String channel = "";
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
