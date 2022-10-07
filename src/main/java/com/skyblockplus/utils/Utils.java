@@ -167,8 +167,6 @@ public class Utils {
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
 	public static String DATABASE_URL = "";
-	public static String DATABASE_USERNAME = "";
-	public static String DATABASE_PASSWORD = "";
 	public static String API_USERNAME = "";
 	public static String API_PASSWORD = "";
 	public static String GITHUB_TOKEN = "";
@@ -176,7 +174,6 @@ public class Utils {
 	public static String AUCTION_API_KEY = "";
 	public static String PLANET_SCALE_URL = "";
 	public static String SBZ_SCAMMER_DB_KEY = "";
-	public static String LINKED_USER_URL = "";
 	public static String LEADERBOARD_DB_URL = "";
 	public static String HEROKU_API_KEY = "";
 	/* JSON */
@@ -1126,16 +1123,7 @@ public class Utils {
 			appProps.load(new FileInputStream("DevSettings.properties"));
 			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
 			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
-			String[] database_url_unformatted = ((String) appProps.get("DATABASE_URL")).split(":", 3);
-			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
-			DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
-			DATABASE_URL =
-				"jdbc:postgresql://" +
-				database_url_unformatted[2].split("@")[1] +
-				"?sslmode=require&user=" +
-				DATABASE_USERNAME +
-				"&password=" +
-				DATABASE_PASSWORD;
+			DATABASE_URL = ((String) appProps.get("DATABASE_URL"));
 			GITHUB_TOKEN = (String) appProps.get("GITHUB_TOKEN");
 			API_USERNAME = (String) appProps.get("API_USERNAME");
 			API_PASSWORD = (String) appProps.get("API_PASSWORD");
@@ -1143,22 +1131,12 @@ public class Utils {
 			AUCTION_API_KEY = (String) appProps.get("AUCTION_API_KEY");
 			PLANET_SCALE_URL = (String) appProps.get("PLANET_SCALE_URL");
 			SBZ_SCAMMER_DB_KEY = (String) appProps.get("SBZ_SCAMMER_DB_KEY");
-			LINKED_USER_URL = (String) appProps.get("LINKED_USER_URL");
 			HEROKU_API_KEY = (String) appProps.get("HEROKU_API_KEY");
 			LEADERBOARD_DB_URL = (String) appProps.get("LEADERBOARD_DB_URL");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
-			String[] database_url_unformatted = System.getenv("DATABASE_URL").split(":", 3);
-			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
-			DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
-			DATABASE_URL =
-				"jdbc:postgresql://" +
-				database_url_unformatted[2].split("@")[1] +
-				"?sslmode=require&user=" +
-				DATABASE_USERNAME +
-				"&password=" +
-				DATABASE_PASSWORD;
+			DATABASE_URL = System.getenv("DATABASE_URL");
 			GITHUB_TOKEN = System.getenv("GITHUB_TOKEN");
 			API_USERNAME = System.getenv("API_USERNAME");
 			API_PASSWORD = System.getenv("API_PASSWORD");
@@ -1166,7 +1144,6 @@ public class Utils {
 			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
 			PLANET_SCALE_URL = System.getenv("PLANET_SCALE_URL");
 			SBZ_SCAMMER_DB_KEY = System.getenv("SBZ_SCAMMER_DB_KEY");
-			LINKED_USER_URL = System.getenv("LINKED_USER_URL");
 			HEROKU_API_KEY = System.getenv("HEROKU_API_KEY");
 			LEADERBOARD_DB_URL = System.getenv("LEADERBOARD_DB_URL");
 		}

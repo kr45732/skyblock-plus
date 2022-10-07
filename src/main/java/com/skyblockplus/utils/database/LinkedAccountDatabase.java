@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.Utils.LINKED_USER_URL;
+import static com.skyblockplus.utils.Utils.DATABASE_URL;
 
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.zaxxer.hikari.HikariConfig;
@@ -36,7 +36,7 @@ public class LinkedAccountDatabase {
 
 	public LinkedAccountDatabase() {
 		HikariConfig config = new HikariConfig();
-		config.setJdbcUrl(LINKED_USER_URL);
+		config.setJdbcUrl(DATABASE_URL);
 		dataSource = new HikariDataSource(config);
 	}
 
