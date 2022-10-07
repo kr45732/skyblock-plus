@@ -33,6 +33,7 @@ import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.blacklist.BlacklistEntry;
+import com.skyblockplus.api.serversettings.eventnotif.EventObject;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -214,14 +215,10 @@ public class SettingsExecute {
 				} else if (args[2].equals("disable")) {
 					eb = setEventEnable(false);
 				}
+			} else if (args.length == 4) {
+				eb = removeEvent(args[3]);
 			} else {
-				eb =
-					switch (args[2]) {
-						case "add" -> addEvent(args[3], args.length == 5 ? args[4] : null);
-						case "remove" -> removeEvent(args[3]);
-						case "channel" -> setEventChannel(args[3]);
-						default -> null;
-					};
+				eb = addEvent(args[3], args[4], args.length >= 6 ? args[5] : null);
 			}
 
 			if (eb == null) {
@@ -615,26 +612,6 @@ public class SettingsExecute {
 		return defaultEmbed("Event Settings").setDescription(ebFieldString);
 	}
 
-	public EmbedBuilder setEventChannel(String channelMention) {
-		Object eb = checkTextChannel(channelMention);
-		if (eb instanceof EmbedBuilder e) {
-			return e;
-		}
-
-		TextChannel channel = ((TextChannel) eb);
-		JsonObject eventSettings = getEventSettings();
-		eventSettings.addProperty("channel", channel.getId());
-
-		int responseCode = database.setEventSettings(guild.getId(), eventSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		guildMap.get(guild.getId()).eventGuild.reloadSettingsJson(eventSettings);
-
-		return defaultSettingsEmbed("Set event notification channel to " + channel.getAsMention());
-	}
-
 	public EmbedBuilder removeEvent(String event) {
 		event = event.toLowerCase();
 
@@ -661,7 +638,13 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Removed event notification: " + event);
 	}
 
-	public EmbedBuilder addEvent(String event, String roleMention) {
+	public EmbedBuilder addEvent(String event, String channelMention, String roleMention) {
+		Object channelEb = checkTextChannel(channelMention);
+		if (channelEb instanceof EmbedBuilder e) {
+			return e;
+		}
+		TextChannel channel = ((TextChannel) channelEb);
+
 		Role role = null;
 		if (roleMention != null) {
 			Object eb = checkRole(roleMention);
@@ -687,7 +670,7 @@ public class SettingsExecute {
 		);
 		if (event.equals("all")) {
 			for (String validCrop : validEvents) {
-				EmbedBuilder eb = addEvent(validCrop, role != null ? role.getId() : null);
+				EmbedBuilder eb = addEvent(validCrop, channel.getId(), role != null ? role.getId() : null);
 				if (
 					!eb.build().getTitle().equalsIgnoreCase("Settings") &&
 					!eb.build().getDescription().equals("You have already added this event")
@@ -719,7 +702,7 @@ public class SettingsExecute {
 			return invalidEmbed("Missing permission `" + e.getPermission().getName() + "` to create a role for " + event);
 		}
 
-		events.add(gson.toJsonTree(new RoleObject(event, role.getId())));
+		events.add(gson.toJsonTree(new EventObject(event, role.getId(), channel != null ? channel.getId() : "")));
 		eventSettings.add("events", events);
 		int responseCode = database.setEventSettings(guild.getId(), eventSettings);
 

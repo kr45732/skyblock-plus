@@ -522,8 +522,7 @@ public class HelpSlashCommand extends SlashCommand {
 							.addSubcommands(
 								new HelpData("enable", "Enable event notifications."),
 								new HelpData("disable", "Disable event notifications."),
-								new HelpData("channel", "Set the channel where event notifications will be posted.", "channel <#channel>"),
-								new HelpData("add", "Add an event to be tracked and notified.", "add <event|all> [@role]"),
+								new HelpData("add", "Add an event to be tracked and notified.", "add <event|all> <#channel> [@role]"),
 								new HelpData("remove", "Remove an event from the tracking list.", "remove <event>")
 							),
 						new HelpData("verify", "Main command for verification settings.")
@@ -966,8 +965,7 @@ public class HelpSlashCommand extends SlashCommand {
 		paginateBuilder.addItems(
 			create("settings event", "View the current settings for event notifications") +
 			create("settings event <enable|disable>", "Enable or disable event notifications") +
-			create("settings event channel <#channel>", "Set the channel where event notifications will be sent") +
-			create("settings event add <event|all> [@role]", "Added an event to be notified for") +
+			create("settings event add <event|all> <#channel> [@role]", "Added an event to be notified for") +
 			create("settings event remove <event>", "Remove an event from the notification list")
 		);
 

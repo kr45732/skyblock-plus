@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,27 +18,18 @@
 
 package com.skyblockplus.api.serversettings.eventnotif;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class EventNotifSettings {
+public class EventObject {
 
-	private String enable = "false";
-	private String channel = "";
-
-	@ElementCollection(fetch = FetchType.EAGER)
-	@Fetch(value = FetchMode.SUBSELECT)
-	private List<EventObject> events = new ArrayList<>();
+	private String value = "";
+	private String roleId = "";
+	private String channelId = "";
 }

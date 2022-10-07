@@ -589,9 +589,7 @@ public class RolesSlashCommand extends SlashCommand {
 					);
 					JsonArray guildRanks = higherDepth(guildRoleSettings, "guildRanks").getAsJsonArray();
 					for (JsonElement guildRank : guildRanks) {
-						paginateBuilder.addItems(
-							event.getGuild().getRoleById(higherDepth(guildRank, "roleId").getAsString()).getAsMention()
-						);
+						paginateBuilder.addItems("<@&" + higherDepth(guildRank, "roleId").getAsString() + ">");
 					}
 				}
 			} else if (isOneLevelRole(currentRoleName)) {

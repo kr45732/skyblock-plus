@@ -22,9 +22,10 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
-import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
+import com.skyblockplus.api.serversettings.eventnotif.EventObject;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import java.util.*;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
@@ -32,8 +33,7 @@ public class EventGuild {
 
 	public final AutomaticGuild parent;
 	public boolean enable = false;
-	public List<RoleObject> wantedEvents;
-	public TextChannel channel;
+	public List<EventObject> wantedEvents;
 
 	public EventGuild(JsonElement eventSettings, AutomaticGuild parent) {
 		this.parent = parent;
@@ -43,25 +43,31 @@ public class EventGuild {
 	public void onEventNotif(Map<String, MessageEmbed> embeds) {
 		try {
 			if (enable) {
-				if (!channel.canTalk()) {
-					parent.logAction(
-						defaultEmbed("Event Notifications")
-							.setDescription("Missing permissions to view or send messages in " + channel.getAsMention())
-					);
-					return;
-				}
-
-				Set<String> roleMentions = new HashSet<>();
-				List<MessageEmbed> filteredEmbeds = new ArrayList<>();
-				for (RoleObject wantedEvent : wantedEvents) {
+				List<EventObject> filteredEvents = new ArrayList<>();
+				for (EventObject wantedEvent : wantedEvents) {
 					if (embeds.containsKey(wantedEvent.getValue())) {
-						filteredEmbeds.add(embeds.get(wantedEvent.getValue()));
-						roleMentions.add("<@&" + wantedEvent.getRoleId() + ">");
+						TextChannel channel = jda.getGuildById(parent.guildId).getTextChannelById(wantedEvent.getChannelId());
+						if (channel == null || !channel.canTalk()) {
+							parent.logAction(
+								defaultEmbed("Event Notifications")
+									.setDescription("Missing permissions to view or send messages in <#" + wantedEvent.getChannelId() + ">")
+							);
+						} else {
+							filteredEvents.add(wantedEvent);
+						}
 					}
 				}
 
-				if (!filteredEmbeds.isEmpty()) {
-					channel.sendMessage(String.join(" ", roleMentions)).setEmbeds(filteredEmbeds).queue();
+				for (Map.Entry<String, List<EventObject>> channels : filteredEvents
+					.stream()
+					.collect(Collectors.groupingBy(EventObject::getChannelId))
+					.entrySet()) {
+					jda
+						.getGuildById(parent.guildId)
+						.getTextChannelById(channels.getKey())
+						.sendMessage(channels.getValue().stream().map(e -> "<@&" + e.getRoleId() + ">").collect(Collectors.joining(" ")))
+						.setEmbeds(channels.getValue().stream().map(e -> embeds.get(e.getValue())).collect(Collectors.toList()))
+						.queue();
 				}
 			}
 		} catch (Exception e) {
@@ -73,10 +79,8 @@ public class EventGuild {
 		try {
 			enable = higherDepth(eventSettings, "enable", false);
 			if (enable) {
-				channel = jda.getGuildById(parent.guildId).getTextChannelById(higherDepth(eventSettings, "channel").getAsString());
-				channel.getId();
 				wantedEvents =
-					gson.fromJson(higherDepth(eventSettings, "events").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
+					gson.fromJson(higherDepth(eventSettings, "events").getAsJsonArray(), new TypeToken<List<EventObject>>() {}.getType());
 			}
 		} catch (Exception e) {
 			enable = false;
