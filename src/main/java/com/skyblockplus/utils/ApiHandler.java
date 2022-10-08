@@ -526,7 +526,7 @@ public class ApiHandler {
 	public static void updateLinkedAccounts() {
 		try {
 			database
-				.getLinkedAccounts()
+				.getAllLinkedAccounts()
 				.stream()
 				.filter(linkedAccountModel ->
 					Duration.between(Instant.ofEpochMilli(linkedAccountModel.lastUpdated()), Instant.now()).toDays() > 5

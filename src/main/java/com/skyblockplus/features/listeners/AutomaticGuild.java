@@ -529,7 +529,7 @@ public class AutomaticGuild {
 			int counterUpdate = 0;
 			if (roleOrRankEnabled[0] || verifyEnabled) {
 				discordToUuid.putAll(
-					database.getLinkedAccounts().stream().collect(Collectors.toMap(LinkedAccount::discord, Function.identity()))
+					database.getAllLinkedAccounts().stream().collect(Collectors.toMap(LinkedAccount::discord, Function.identity()))
 				);
 
 				CountDownLatch latch = new CountDownLatch(1);

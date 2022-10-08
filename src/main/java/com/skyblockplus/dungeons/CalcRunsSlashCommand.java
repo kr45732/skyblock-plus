@@ -193,7 +193,6 @@ public class CalcRunsSlashCommand extends SlashCommand {
 
 		if (xpNeeded > 0) {
 			double xpPerRun = (useRing ? 1.1 : 1.0) * baseXp * (completionsCap / 100.0 + 1);
-			xpPerRun *= 1.1;
 			runs = Math.max(0, completionsCap - completions) + (int) Math.ceil(xpNeeded / xpPerRun);
 		}
 

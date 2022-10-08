@@ -35,7 +35,7 @@ public class LinkedAccountController {
 
 	@GetMapping("/get/all")
 	public List<LinkedAccount> getAllServerSettings() {
-		return database.getLinkedAccounts();
+		return database.getAllLinkedAccounts();
 	}
 
 	@GetMapping("/get/by")

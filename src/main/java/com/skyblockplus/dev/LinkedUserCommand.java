@@ -60,7 +60,10 @@ public class LinkedUserCommand extends Command {
 					}
 				} else if (args.length == 2) {
 					if (args[1].equals("all")) {
-						event.getChannel().sendMessage(makeHastePost(formattedGson.toJson(database.getLinkedAccounts())) + ".json").queue();
+						event
+							.getChannel()
+							.sendMessage(makeHastePost(formattedGson.toJson(database.getAllLinkedAccounts())) + ".json")
+							.queue();
 						return;
 					}
 				}

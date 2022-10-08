@@ -148,7 +148,7 @@ public class NetworthExecute {
 						double itemPrice = getLowestPrice(sackEntry.getKey(), true, true, null) * sackEntry.getValue();
 						addTotal("sacks", itemPrice);
 						if (event != null) {
-							String emoji = higherDepth(getEmojiMap(), sackEntry.getKey(), null);
+							String emoji = getEmojiOr(sackEntry.getKey(), null);
 							addItem(
 								"sacks",
 								(emoji == null ? "" : emoji + " ") +
@@ -565,11 +565,7 @@ public class NetworthExecute {
 	}
 
 	public double calculateItemPrice(InvItem item, String location, StringBuilder out) {
-		if (item == null || item.getName().equalsIgnoreCase("null") || item.getId().equals("None")) {
-			return 0;
-		}
-
-		if (getPriceOverride(item.getId()) == 0) {
+		if (item == null || item.getName().equalsIgnoreCase("null") || item.getId().equals("None") || getPriceOverride(item.getId()) == 0) {
 			return 0;
 		}
 

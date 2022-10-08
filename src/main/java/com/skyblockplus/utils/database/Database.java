@@ -36,6 +36,12 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import com.zaxxer.hikari.HikariDataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,12 +52,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class Database {
 
 	public final ServerSettingsService settingsService;
-	public final LinkedAccountDatabase linkedAccountDatabase;
+	public final HikariDataSource dataSource;
 
 	@Autowired
-	public Database(ServerSettingsService settingsService) {
+	public Database(ServerSettingsService settingsService, HikariDataSource dataSource) {
 		this.settingsService = settingsService;
-		this.linkedAccountDatabase = new LinkedAccountDatabase();
+		this.dataSource = dataSource;
 	}
 
 	public int removeGuildSettings(String serverId, String name) {
@@ -211,43 +217,129 @@ public class Database {
 		return settingsService.setMayorRole(serverId, newSettings).getStatusCodeValue();
 	}
 
-	public boolean insertLinkedAccount(LinkedAccount linkedAccount) {
-		return linkedAccountDatabase.insertLinkedAccount(linkedAccount);
-	}
-
-	public LinkedAccount getByUsername(String username) {
-		return linkedAccountDatabase.getByUsername(username);
-	}
-
-	public LinkedAccount getByUuid(String uuid) {
-		return linkedAccountDatabase.getByUuid(uuid);
-	}
-
-	public LinkedAccount getByDiscord(String discord) {
-		return linkedAccountDatabase.getByDiscord(discord);
-	}
-
-	public List<LinkedAccount> getLinkedAccounts() {
-		return linkedAccountDatabase.getAllLinkedAccounts();
-	}
-
-	public boolean deleteByDiscord(String discord) {
-		return linkedAccountDatabase.deleteByDiscord(discord);
-	}
-
-	public boolean deleteByUuid(String uuid) {
-		return linkedAccountDatabase.deleteByUuid(uuid);
-	}
-
-	public boolean deleteByUsername(String username) {
-		return linkedAccountDatabase.deleteByUsername(username);
-	}
-
 	public int setBotManagerRoles(String serverId, JsonArray newSettings) {
 		return settingsService.setBotManagerRoles(serverId, gson.fromJson(newSettings, String[].class)).getStatusCodeValue();
 	}
 
 	public int setLogChannel(String serverId, String newSettings) {
 		return settingsService.setLogChannel(serverId, newSettings).getStatusCodeValue();
+	}
+
+	public Connection getConnection() throws SQLException {
+		return dataSource.getConnection();
+	}
+
+	public boolean insertLinkedAccount(LinkedAccount linkedAccount) {
+		try {
+			String discord = linkedAccount.discord();
+			long lastUpdated = linkedAccount.lastUpdated();
+			String username = linkedAccount.username();
+			String uuid = linkedAccount.uuid();
+
+			try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+					"DELETE FROM linked_account WHERE discord = ? OR username = ? or uuid = ?"
+				)
+			) {
+				statement.setString(1, discord);
+				statement.setString(2, username);
+				statement.setString(3, uuid);
+				statement.executeUpdate();
+			}
+
+			try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?, ?, ?)"
+				)
+			) {
+				statement.setLong(1, lastUpdated);
+				statement.setString(2, discord);
+				statement.setString(3, username);
+				statement.setString(4, uuid);
+				return statement.executeUpdate() == 1;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public LinkedAccount getByUsername(String username) {
+		return getBy("username", username);
+	}
+
+	public LinkedAccount getByUuid(String uuid) {
+		return getBy("uuid", uuid);
+	}
+
+	public LinkedAccount getByDiscord(String discord) {
+		return getBy("discord", discord);
+	}
+
+	public List<LinkedAccount> getAllLinkedAccounts() {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account")
+		) {
+			try (ResultSet response = statement.executeQuery()) {
+				List<LinkedAccount> linkedAccounts = new ArrayList<>();
+				while (response.next()) {
+					linkedAccounts.add(responseToRecord(response));
+				}
+				return linkedAccounts;
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public boolean deleteByDiscord(String discord) {
+		return deleteBy("discord", discord);
+	}
+
+	public boolean deleteByUuid(String uuid) {
+		return deleteBy("uuid", uuid);
+	}
+
+	public boolean deleteByUsername(String username) {
+		return deleteBy("username", username);
+	}
+
+	private LinkedAccount getBy(String type, String value) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account where " + type + " = ?")
+		) {
+			statement.setString(1, value);
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					return responseToRecord(response);
+				}
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	private boolean deleteBy(String type, String value) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM linked_account WHERE " + type + " = ?")
+		) {
+			statement.setString(1, value);
+			return statement.executeUpdate() == 1;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	private LinkedAccount responseToRecord(ResultSet response) throws SQLException {
+		return new LinkedAccount(
+			response.getLong("last_updated"),
+			response.getString("discord"),
+			response.getString("uuid"),
+			response.getString("username")
+		);
 	}
 }

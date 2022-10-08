@@ -564,7 +564,7 @@ public class LeaderboardDatabase {
 					log.info("Finished updating all users: " + userCount);
 					userCount = -1;
 				} else {
-					for (count = 0; count <= 90 && userCount < members.size() && System.currentTimeMillis() - start < 50000; userCount++) {
+					for (count = 0; count <= 90 && userCount < members.size() && System.currentTimeMillis() - start < 55000; userCount++) {
 						UsernameUuidStruct usernameUuidStruct = uuidToUsername(members.get(userCount).getAsString());
 						if (usernameUuidStruct.isValid()) {
 							count++;
@@ -575,9 +575,14 @@ public class LeaderboardDatabase {
 								false
 							);
 							if (profileResponse.isValid()) {
-								players.add(
-									new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), false)
+								Player player = new Player(
+									usernameUuidStruct.uuid(),
+									usernameUuidStruct.username(),
+									profileResponse.response(),
+									false
 								);
+								player.getHighestAmount("networth");
+								players.add(player);
 							}
 						}
 					}
@@ -606,7 +611,7 @@ public class LeaderboardDatabase {
 			}
 
 			for (String uuid : out) {
-				if (count == 90 || System.currentTimeMillis() - start >= 57000) {
+				if (count == 90 || System.currentTimeMillis() - start >= 55000) {
 					break;
 				}
 
@@ -620,9 +625,14 @@ public class LeaderboardDatabase {
 						false
 					);
 					if (profileResponse.isValid()) {
-						players.add(
-							new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), profileResponse.response(), false)
+						Player player = new Player(
+							usernameUuidStruct.uuid(),
+							usernameUuidStruct.username(),
+							profileResponse.response(),
+							false
 						);
+						player.getHighestAmount("networth");
+						players.add(player);
 					}
 				}
 			}

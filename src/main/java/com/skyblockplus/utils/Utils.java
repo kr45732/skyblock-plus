@@ -1297,7 +1297,7 @@ public class Utils {
 							item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5 ||
 							item.getInt("tag.ExtraAttributes.upgrade_level", 0) > 5
 						) {
-							if (higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items") == null) {
+							if (!higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".type").getAsString().equals("Crimson")) {
 								int masterStarCount =
 									Math.max(
 										item.getInt("tag.ExtraAttributes.dungeon_item_level", 0),
@@ -1339,8 +1339,7 @@ public class Utils {
 						}
 
 						if (item.containsKey("tag.ExtraAttributes.upgrade_level")) {
-							JsonElement itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items");
-							if (itemUpgrades != null) {
+							if (higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".type").getAsString().equals("Crimson")) {
 								int crimsonStar = item.getInt("tag.ExtraAttributes.upgrade_level", 0);
 
 								int crimsonEssence = 0;
@@ -1349,25 +1348,28 @@ public class Utils {
 								}
 								itemInfo.setEssence(crimsonEssence, "CRIMSON");
 
-								for (Map.Entry<String, JsonElement> entry : itemUpgrades.getAsJsonObject().entrySet()) {
-									if (Integer.parseInt(entry.getKey()) > crimsonStar) {
-										break;
-									}
-
-									for (JsonElement itemUpgrade : entry.getValue().getAsJsonArray()) {
-										String parsedUpgrade = itemUpgrade.getAsString();
-										String id;
-										int count = 1;
-										if (parsedUpgrade.contains(" §8x")) {
-											String[] idNameSplit = parsedUpgrade.split(" §8x");
-											id = nameToId(parseMcCodes(idNameSplit[0]), true);
-											count = Integer.parseInt(idNameSplit[1]);
-										} else {
-											id = nameToId(parsedUpgrade, true);
+								JsonElement itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items");
+								if (itemUpgrades != null) {
+									for (Map.Entry<String, JsonElement> entry : itemUpgrades.getAsJsonObject().entrySet()) {
+										if (Integer.parseInt(entry.getKey()) > crimsonStar) {
+											break;
 										}
 
-										if (id != null) {
-											itemInfo.addExtraValues(count, id);
+										for (JsonElement itemUpgrade : entry.getValue().getAsJsonArray()) {
+											String parsedUpgrade = itemUpgrade.getAsString();
+											String id;
+											int count = 1;
+											if (parsedUpgrade.contains(" §8x")) {
+												String[] idNameSplit = parsedUpgrade.split(" §8x");
+												id = nameToId(parseMcCodes(idNameSplit[0]), true);
+												count = Integer.parseInt(idNameSplit[1]);
+											} else {
+												id = nameToId(parsedUpgrade, true);
+											}
+
+											if (id != null) {
+												itemInfo.addExtraValues(count, id);
+											}
 										}
 									}
 								}
