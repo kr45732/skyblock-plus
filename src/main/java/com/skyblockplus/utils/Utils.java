@@ -318,6 +318,11 @@ public class Utils {
 					.getAsJsonObject()
 					.entrySet()) {
 					String id = entry.getKey();
+
+					if (!getInternalJsonMappings().has(id)) {
+						continue;
+					}
+
 					Matcher matcher = bazaarEnchantPattern.matcher(entry.getKey());
 					if (matcher.matches()) {
 						id = matcher.group(1) + ";" + matcher.group(2);

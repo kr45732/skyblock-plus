@@ -42,6 +42,10 @@ public class LilySkillsWeight extends SkillsWeight {
 
 	@Override
 	public WeightStruct getSkillsWeight(String skillName, SkillsStruct skillsStruct) {
+		if (!player.isSkillsApiEnabled() || skillsStruct == null) {
+			return new WeightStruct();
+		}
+
 		JsonArray srwTable;
 		try {
 			srwTable = higherDepth(getWeightJson(), "lily.skills.ratio_weight." + skillName).getAsJsonArray();
@@ -56,9 +60,7 @@ public class LilySkillsWeight extends SkillsWeight {
 					continue;
 				}
 				skillAverage += (skill.equals(skillName) ? skillsStruct : player.getSkill(skill, Player.WeightType.LILY)).currentLevel();
-			} catch (Exception e) {
-				return new WeightStruct();
-			}
+			} catch (Exception ignored) {}
 		}
 		skillAverage /= SKILL_NAMES.size() - 1;
 
