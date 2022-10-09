@@ -319,14 +319,15 @@ public class Utils {
 					.entrySet()) {
 					String id = entry.getKey();
 
-					if (!getInternalJsonMappings().has(id)) {
-						continue;
-					}
-
 					Matcher matcher = bazaarEnchantPattern.matcher(entry.getKey());
 					if (matcher.matches()) {
 						id = matcher.group(1) + ";" + matcher.group(2);
 					}
+
+					if (!getInternalJsonMappings().has(id)) {
+						continue;
+					}
+
 					tempBazaarJson.add(id, entry.getValue());
 				}
 				bazaarJson = tempBazaarJson;

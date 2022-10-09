@@ -793,16 +793,13 @@ public class NetworthExecute {
 			enchantLevel = 1;
 		}
 
-		for (int i = Math.max(1, ignoredLevels); i <= enchantLevel; i++) {
-			if (higherDepth(bazaarJson, enchantId + ";" + i) != null) {
-				try {
-					return (
-						Math.pow(2, enchantLevel - i) *
-						higherDepth(bazaarJson, enchantName + ";" + i + ".sell_summary.[0].pricePerUnit").getAsDouble()
-					);
-				} catch (Exception ignored) {}
-				break;
-			}
+		for (int i = enchantLevel; i >= Math.max(1, ignoredLevels); i--) {
+			try {
+				return (
+					Math.pow(2, enchantLevel - i) *
+					higherDepth(bazaarJson, enchantName + ";" + i + ".buy_summary.[0].pricePerUnit").getAsDouble()
+				);
+			} catch (Exception ignored) {}
 		}
 
 		//		tempSet.add(enchantId);
