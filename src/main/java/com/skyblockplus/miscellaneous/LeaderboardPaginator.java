@@ -68,7 +68,6 @@ public class LeaderboardPaginator extends AbstractEventListener {
 	) {
 		this.lbType = lbType;
 		this.gamemode = gamemode;
-		this.player = player != null ? player.getUsername() : null;
 		this.event = event;
 		this.message = event.getHook().retrieveOriginal().complete();
 
@@ -82,6 +81,7 @@ public class LeaderboardPaginator extends AbstractEventListener {
 			page = Math.max(1, page);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
 		} else if (player != null) {
+			this.player = player.getUsername();
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.getUuid()));
 		} else {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, 0, 201));
@@ -93,7 +93,7 @@ public class LeaderboardPaginator extends AbstractEventListener {
 			int curRank = entry.getKey();
 			double curAmount = entry.getValue().getDouble(lbType, 0.0);
 
-			if (player != null && entry.getValue().getString("username", "").equals(player.getUsername())) {
+			if (this.player != null && entry.getValue().getString("username", "").equals(this.player)) {
 				playerRank = curRank;
 				playerAmount = roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount);
 			}
@@ -104,7 +104,7 @@ public class LeaderboardPaginator extends AbstractEventListener {
 			}
 		}
 
-		if (player != null && playerAmount.equals("Not on leaderboard")) {
+		if (this.player != null && player != null && playerAmount.equals("Not on leaderboard")) {
 			if (lbType.equals("networth")) {
 				if (!player.isInventoryApiEnabled()) {
 					playerAmount = "Inventory API disabled";
@@ -126,7 +126,7 @@ public class LeaderboardPaginator extends AbstractEventListener {
 			pageFirstRank = ((idx - 1) / 20) * 20 + 1;
 		} else if (page != -1) {
 			pageFirstRank = (page - 1) * 20 + 1;
-		} else if (player != null) {
+		} else if (this.player != null) {
 			pageFirstRank = ((playerRank - 1) / 20) * 20 + 1;
 		}
 
