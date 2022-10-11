@@ -56,8 +56,6 @@ public class LinkSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(linkAccount(event.getOptionStr("player"), event.getMember(), event.getGuild()));
 	}
 

@@ -63,8 +63,6 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		String subcommandName = event.getSubcommandName();
 		if (
 			(

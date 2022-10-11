@@ -43,8 +43,6 @@ public class CalcDropsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.paginate(
 			getCalcDrops(event.getOptionInt("floor", 1), event.getOptionInt("luck", 1), event.getOptionStr("accessory", "A"), event)
 		);

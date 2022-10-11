@@ -39,8 +39,6 @@ public class BazaarSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(getBazaarItem(event.getOptionStr("item")));
 	}
 

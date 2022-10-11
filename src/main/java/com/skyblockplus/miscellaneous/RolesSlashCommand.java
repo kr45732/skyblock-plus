@@ -54,8 +54,6 @@ public class RolesSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		switch (event.getSubcommandName()) {
 			case "claim" -> event.embed(updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember()));
 			case "list" -> event.paginate(listRoles(event));

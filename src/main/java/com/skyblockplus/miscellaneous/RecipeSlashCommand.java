@@ -52,8 +52,6 @@ public class RecipeSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(getRecipe(event.getOptionStr("item")));
 	}
 

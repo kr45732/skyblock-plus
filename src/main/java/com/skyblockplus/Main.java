@@ -89,10 +89,11 @@ public class Main {
 		waiter = new EventWaiter(scheduler, true);
 		client =
 			new CommandClientBuilder()
+				.setPrefix(DEFAULT_PREFIX)
+				.setAlternativePrefix("@mention")
 				.setOwnerId("385939031596466176")
 				.setEmojis("<:yes:948359788889251940>", "⚠️", "<:no:948359781125607424>")
 				.useHelpBuilder(false)
-				.setPrefixFunction(event -> DEFAULT_PREFIX)
 				.setListener(
 					new CommandListener() {
 						@Override

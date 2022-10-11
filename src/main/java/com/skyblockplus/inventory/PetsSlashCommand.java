@@ -43,8 +43,6 @@ public class PetsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		if (event.invalidPlayerOption()) {
 			return;
 		}

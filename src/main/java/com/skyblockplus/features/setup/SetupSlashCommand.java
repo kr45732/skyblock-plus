@@ -40,8 +40,6 @@ public class SetupSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(getSetupEmbed());
 	}
 

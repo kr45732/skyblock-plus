@@ -34,8 +34,6 @@ public class VerifySlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(LinkSlashCommand.linkAccount(event.getOptionStr("player"), event.getMember(), event.getGuild()));
 	}
 

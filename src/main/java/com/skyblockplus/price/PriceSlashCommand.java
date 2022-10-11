@@ -48,8 +48,6 @@ public class PriceSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(
 			queryAuctions(event.getOptionStr("item"), AuctionType.valueOf(event.getOptionStr("auction_type", "bin").toUpperCase()))
 		);

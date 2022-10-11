@@ -58,11 +58,10 @@ public class AuctionsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		if (event.invalidPlayerOption()) {
 			return;
 		}
+
 		event.paginate(
 			getPlayerAuction(
 				event.player,

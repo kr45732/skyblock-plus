@@ -48,8 +48,6 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		String guild = event.getOptionStr("guild");
 		if (guild != null) {
 			event.embed(

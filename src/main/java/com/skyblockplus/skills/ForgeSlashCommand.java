@@ -43,8 +43,6 @@ public class ForgeSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		if (event.invalidPlayerOption()) {
 			return;
 		}

@@ -81,8 +81,6 @@ public class ReforgeSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(getReforgeStone(event.getOptionStr("item")));
 	}
 

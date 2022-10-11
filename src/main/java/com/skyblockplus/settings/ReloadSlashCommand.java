@@ -41,8 +41,6 @@ public class ReloadSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(getReloadEmbed(event.getGuild()));
 	}
 

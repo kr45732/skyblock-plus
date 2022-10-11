@@ -48,8 +48,6 @@ public class PartySlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		switch (event.getSubcommandName()) {
 			case "create" -> event.paginate(createParty(event), true);
 			case "list" -> event.embed(getPartyList(event.getGuild().getId()));

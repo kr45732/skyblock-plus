@@ -31,6 +31,7 @@ public abstract class SlashCommand {
 	protected final Permission[] botPermissions = defaultPerms(true);
 	protected String name = "null";
 	protected int cooldown = -1;
+	protected boolean logCommand = true;
 	protected Permission[] userPermissions = new Permission[0];
 
 	protected abstract void execute(SlashCommandEvent event);
@@ -96,6 +97,10 @@ public abstract class SlashCommand {
 					}
 				}
 			}
+		}
+
+		if (logCommand) {
+			event.logCommand();
 		}
 
 		executor.submit(() -> execute(event));

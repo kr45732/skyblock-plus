@@ -40,8 +40,6 @@ public class FetchurSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(getFetchurItem());
 	}
 

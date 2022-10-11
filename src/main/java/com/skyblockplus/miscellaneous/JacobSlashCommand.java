@@ -46,8 +46,6 @@ public class JacobSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.paginate(getJacobEmbed(event.getOptionStr("crop", "all"), event));
 	}
 

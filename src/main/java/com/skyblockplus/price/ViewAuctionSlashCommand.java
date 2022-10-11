@@ -45,8 +45,6 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(getAuctionByUuid(event.getOptionStr("uuid")));
 	}
 

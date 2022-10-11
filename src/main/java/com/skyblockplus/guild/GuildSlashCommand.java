@@ -52,8 +52,6 @@ public class GuildSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		switch (event.getSubcommandName()) {
 			case "information" -> {
 				String guild = event.getOptionStr("guild");

@@ -43,8 +43,6 @@ public class CalcDragsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.paginate(
 			getCalcDrags(event.getOptionInt("position", 1), event.getOptionDouble("ratio", 1), event.getOptionInt("eyes", 8), event)
 		);

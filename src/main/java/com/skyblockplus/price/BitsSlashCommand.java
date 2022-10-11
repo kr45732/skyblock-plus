@@ -41,8 +41,6 @@ public class BitsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.embed(getBitPrices(event.getOptionStr("item")));
 	}
 

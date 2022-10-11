@@ -41,8 +41,6 @@ public class LeaderboardSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.invalidPlayerOption(true);
 
 		event.paginate(

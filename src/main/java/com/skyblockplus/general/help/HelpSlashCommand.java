@@ -69,8 +69,6 @@ public class HelpSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		event.paginate(getHelp(event.getOptionStr("command"), event));
 	}
 

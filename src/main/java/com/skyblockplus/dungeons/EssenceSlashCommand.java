@@ -47,8 +47,6 @@ public class EssenceSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
 		switch (event.getSubcommandName()) {
 			case "upgrade" -> new EssenceHandler(nameToId(event.getOptionStr("item")), event);
 			case "information" -> event.embed(getEssenceInformation(event.getOptionStr("item")));

@@ -32,6 +32,7 @@ public class SettingsSlashCommand extends SlashCommand {
 	public SettingsSlashCommand() {
 		this.name = "settings";
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+		this.logCommand = false;
 	}
 
 	@Override
