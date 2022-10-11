@@ -32,10 +32,7 @@ import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -327,7 +324,10 @@ public class RolesSlashCommand extends SlashCommand {
 							continue;
 						}
 
-						JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+						JsonArray levelsArray = collectJsonArray(
+							streamJsonArray(higherDepth(currentRole, "levels").getAsJsonArray())
+								.sorted(Comparator.comparingLong(o -> higherDepth(o, "value").getAsLong()))
+						);
 						for (int i = levelsArray.size() - 1; i >= 0; i--) {
 							JsonElement currentLevel = levelsArray.get(i);
 							long currentLevelValue = higherDepth(currentLevel, "value").getAsLong();
