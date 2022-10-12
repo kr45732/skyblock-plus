@@ -1077,7 +1077,7 @@ public class AutomaticGuild {
 		if (event.getComponentId().equals("verify_button")) {
 			verifyGuild.onButtonClick(event);
 		} else if (event.getComponentId().equals("mayor_graph_button")) {
-			if (MayorHandler.mayorGraphFile == null) {
+			if (MayorHandler.mayorGraphFile == null || !MayorHandler.mayorGraphFile.exists()) {
 				event
 					.replyEmbeds(defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build())
 					.setEphemeral(true)
