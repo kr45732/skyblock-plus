@@ -215,9 +215,9 @@ public class SettingsExecute {
 				} else if (args[2].equals("disable")) {
 					eb = setEventEnable(false);
 				}
-			} else if (args.length == 4) {
+			} else if (args.length == 4 && args[2].equals("remove")) {
 				eb = removeEvent(args[3]);
-			} else {
+			} else if (args[2].equals("add")) {
 				eb = addEvent(args[3], args[4], args.length >= 6 ? args[5] : null);
 			}
 
@@ -717,10 +717,9 @@ public class SettingsExecute {
 		JsonObject eventSettings = getEventSettings();
 		if (enable) {
 			try {
-				guild.getTextChannelById(higherDepth(eventSettings, "channel").getAsString()).getId();
 				higherDepth(eventSettings, "events").getAsJsonArray().get(0);
 			} catch (Exception e) {
-				return invalidEmbed("A channel and at least one event must be set before enabling");
+				return invalidEmbed("At least one event must be set before enabling");
 			}
 		}
 
