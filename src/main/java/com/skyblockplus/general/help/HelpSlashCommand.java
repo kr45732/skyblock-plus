@@ -563,7 +563,7 @@ public class HelpSlashCommand extends SlashCommand {
 										),
 										new HelpData("disable", "Disable verification automatic sync")
 									),
-								new HelpData("dm_on_sync", "Enable or disable verify DM on join automatic sync")
+								new HelpData("dm_on_join", "Enable or disable verify DM on join automatic sync")
 									.addSubcommands(
 										new HelpData(
 											"enable",
@@ -632,7 +632,7 @@ public class HelpSlashCommand extends SlashCommand {
 										),
 										new HelpData("disable", "Disable automatic guild member counter.")
 									),
-								new HelpData("apply", "Automatic application system for this guild.")
+								new HelpData("apply", "Automatic application system for this guild.", "settings guild <name> apply", true)
 									.addSubcommands(
 										new HelpData("enable", "Enable automatic apply.", "settings guild <name> apply enable", true),
 										new HelpData("disable", "Enable automatic disable.", "settings guild <name> apply disable", true),
@@ -707,7 +707,7 @@ public class HelpSlashCommand extends SlashCommand {
 										new HelpData(
 											"gamemode",
 											"Whether applicants must use a certain gamemode profile in their application. Defaults to all. Options are: all, regular, ironman, stranded, or ironman_stranded.",
-											"settings guild <name> apply gamemode <true|false>",
+											"settings guild <name> apply gamemode <gamemode>",
 											true
 										),
 										new HelpData(
@@ -980,7 +980,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none") +
 			create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
 			create("settings verify sync <enable|disable>", "Enable or disable automatic verify role and nickname syncing") +
-			create("settings verify dm_on_sync <enable|disable>", "Enable or disable DMing the user on syncing") +
+			create("settings verify dm_on_join <enable|disable>", "Enable or disable DMing the user on syncing") +
 			create("settings verify roles_claim <enable|disable>", "Enable or disable automatic role syncing")
 		);
 
@@ -1020,7 +1020,7 @@ public class HelpSlashCommand extends SlashCommand {
 				"Message that will be sent if applicant is waitlisted. Can be set to none"
 			) +
 			create(
-				"settings guild <name> apply gamemode <true|false>",
+				"settings guild <name> apply gamemode <gamemode>",
 				"Whether applicants must use a certain gamemode profile in their application. Defaults to 'all'"
 			) +
 			create("settings guild <name> apply deny_message <message>", "Message that will be sent if applicant is denied") +

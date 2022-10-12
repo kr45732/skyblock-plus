@@ -303,7 +303,7 @@ public class SettingsExecute {
 							case "disable" -> setVerifyVideoEnable(false);
 							default -> null;
 						};
-					case "dm_on_sync" -> eb =
+					case "dm_on_join" -> eb =
 						switch (args[3]) {
 							case "enable" -> setVerifyDmOnSync(true);
 							case "disable" -> setVerifyDmOnSync(false);
@@ -311,8 +311,8 @@ public class SettingsExecute {
 						};
 					case "roles_claim" -> eb =
 						switch (args[3]) {
-							case "enable" -> setRolesClaimEnable(true);
-							case "disable" -> setRolesClaimEnable(false);
+							case "enable" -> setVerifyRolesClaimEnable(true);
+							case "disable" -> setVerifyRolesClaimEnable(false);
 							default -> null;
 						};
 				}
@@ -2186,7 +2186,7 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("DM on sync " + (enable ? "enabled" : "disabled"));
 	}
 
-	public EmbedBuilder setRolesClaimEnable(boolean enable) {
+	public EmbedBuilder setVerifyRolesClaimEnable(boolean enable) {
 		if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
 			return invalidEmbed("Automatic roles must be enabled");
 		}

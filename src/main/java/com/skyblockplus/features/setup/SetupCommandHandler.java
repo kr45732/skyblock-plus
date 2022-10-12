@@ -54,6 +54,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 		this.featureType = FeatureType.valueOf(feature.toUpperCase());
 
 		// TODO: add buttons to go back
+		// TODO: add sb event notif setup
 		switch (this.featureType) {
 			case VERIFY -> buttonEvent
 				.editMessage(
@@ -69,6 +70,11 @@ public class SetupCommandHandler extends AbstractEventListener {
 								.addOption("Verified Roles", "roles")
 								.addOption("Verification Channel", "channel")
 								.addOption("Nickname Template", "nickname")
+								.addOption("Toggle Help Video", "video")
+								.addOption("Remove Role", "remove_role")
+								.addOption("Toggle Sync Roles & Name", "sync")
+								.addOption("Toggle DM On Join Sync", "dm_on_join")
+								.addOption("Toggle Automatic Roles Claim", "roles_claim")
 								.build()
 						)
 						.build()
@@ -235,6 +241,86 @@ public class SetupCommandHandler extends AbstractEventListener {
 									.build()
 							)
 							.queue();
+						case "video" -> {
+							event.deferReply(true).complete();
+							event
+								.getHook()
+								.editOriginalEmbeds(
+									getSettings()
+										.setVerifyVideoEnable(
+											!higherDepth(
+												database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
+												"enableVerifyVideo",
+												true
+											)
+										)
+										.build()
+								)
+								.queue();
+						}
+						case "remove_role" -> event
+							.replyModal(
+								modalBuilder
+									.addActionRow(
+										TextInput
+											.create("value", "Remove Role", TextInputStyle.SHORT)
+											.setPlaceholder("Role removed when verified")
+											.build()
+									)
+									.build()
+							)
+							.queue();
+						case "sync" -> {
+							event.deferReply(true).complete();
+							event
+								.getHook()
+								.editOriginalEmbeds(
+									getSettings()
+										.setVerifySyncEnable(
+											!higherDepth(
+												database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
+												"enableAutomaticSync",
+												false
+											)
+										)
+										.build()
+								)
+								.queue();
+						}
+						case "dm_on_join" -> {
+							event.deferReply(true).complete();
+							event
+								.getHook()
+								.editOriginalEmbeds(
+									getSettings()
+										.setVerifyDmOnSync(
+											!higherDepth(
+												database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
+												"dmOnSync",
+												true
+											)
+										)
+										.build()
+								)
+								.queue();
+						}
+						case "roles_claim" -> {
+							event.deferReply(true).complete();
+							event
+								.getHook()
+								.editOriginalEmbeds(
+									getSettings()
+										.setVerifyDmOnSync(
+											!higherDepth(
+												database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
+												"enableRolesClaim",
+												false
+											)
+										)
+										.build()
+								)
+								.queue();
+						}
 					}
 				}
 				case GUILD -> {
@@ -263,6 +349,9 @@ public class SetupCommandHandler extends AbstractEventListener {
 											.addOption("Waitlisted Message", "waitlist_message")
 											.addOption("Waiting Channel", "waiting_channel")
 											.addOption("Requirements", "requirements")
+											.addOption("Toggle Scammer Check", "scammer_check")
+											.addOption("Required Gamemode", "gamemode")
+											.addOption("Toggle APIs Enabled Check", "check_api")
 											.build()
 									)
 									.build()
@@ -410,6 +499,42 @@ public class SetupCommandHandler extends AbstractEventListener {
 									.build()
 							)
 							.queue();
+						case "gamemode" -> event
+							.replyModal(
+								modalBuilder
+									.addActionRow(
+										TextInput
+											.create("value", "Required Gamemode", TextInputStyle.SHORT)
+											.setPlaceholder("Options: all, regular, ironman, stranded, ironman_stranded")
+											.build()
+									)
+									.build()
+							)
+							.queue();
+						case "scammer_check" -> {
+							event.deferReply(true).complete();
+							JsonObject guildSettings = getGuildSettings();
+							event
+								.getHook()
+								.editOriginalEmbeds(
+									getSettings()
+										.setApplyScammerCheck(guildSettings, !higherDepth(guildSettings, "applyScammerCheck", false))
+										.build()
+								)
+								.queue();
+						}
+						case "check_api" -> {
+							event.deferReply(true).complete();
+							JsonObject guildSettings = getGuildSettings();
+							event
+								.getHook()
+								.editOriginalEmbeds(
+									getSettings()
+										.setApplyCheckApiEnable(guildSettings, !higherDepth(guildSettings, "applyCheckApi", false))
+										.build()
+								)
+								.queue();
+						}
 					}
 				}
 				case FETCHUR -> {
@@ -513,6 +638,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 						}
 						case "channel" -> eb = getSettings().setVerifyMessageTextChannelId(event.getValues().get(0).getAsString());
 						case "nickname" -> eb = getSettings().setVerifyNickname(event.getValues().get(0).getAsString());
+						case "remove_role" -> eb = getSettings().setVerifyRemoveRole(event.getValues().get(0).getAsString());
 					}
 					if (!eb.build().getTitle().equals("Settings")) {
 						eb.appendDescription("\n\nPlease try again.");
@@ -578,6 +704,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 								}
 							}
 						}
+						case "gamemode" -> eb = getSettings().setApplyGamemode(getGuildSettings(), event.getValues().get(0).getAsString());
 					}
 					if (!eb.build().getTitle().equals("Settings")) {
 						eb.appendDescription("\n\nPlease try again.");
