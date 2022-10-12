@@ -217,7 +217,7 @@ public class SettingsExecute {
 				}
 			} else if (args.length == 4 && args[2].equals("remove")) {
 				eb = removeEvent(args[3]);
-			} else if (args[2].equals("add")) {
+			} else if (args.length >= 5 && args[2].equals("add")) {
 				eb = addEvent(args[3], args[4], args.length >= 6 ? args[5] : null);
 			}
 
