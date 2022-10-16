@@ -419,7 +419,7 @@ public class ApplyUser implements Serializable {
 						applyPlayerStats.addField("Weight", playerWeight, true);
 						applyPlayerStats.addField("Lily Weight", playerLilyWeight, true);
 						applyPlayerStats.addField("Bank & Purse", playerCoins, true);
-						double playerNetworth = NetworthExecute.getTotalNetworth(playerUsername, playerProfileName);
+						double playerNetworth = NetworthExecute.getNetworth(playerUsername, playerProfileName);
 						applyPlayerStats.addField(
 							"Networth",
 							playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),

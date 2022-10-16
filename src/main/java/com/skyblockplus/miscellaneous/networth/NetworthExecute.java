@@ -63,16 +63,16 @@ public class NetworthExecute {
 	private double hbpPrice;
 	private boolean verbose = false;
 
-	public static double getTotalNetworth(String username, String profileName) {
+	public static double getNetworth(String username, String profileName) {
 		NetworthExecute calc = new NetworthExecute();
 		calc.getPlayerNetworth(username, profileName, null);
-		return calc.getTotalCalculatedNetworth();
+		return calc.getNetworth();
 	}
 
-	public static double getTotalNetworth(Player player) {
+	public static double getNetworth(Player player) {
 		NetworthExecute calc = new NetworthExecute();
 		calc.getPlayerNetworth(player, null);
-		return calc.getTotalCalculatedNetworth();
+		return calc.getNetworth();
 	}
 
 	public NetworthExecute setVerbose(boolean verbose) {
@@ -97,283 +97,276 @@ public class NetworthExecute {
 	}
 
 	public Object getPlayerNetworth(Player player, SlashCommandEvent event) {
-		if (player.isValid()) {
-			EmbedBuilder eb = player.defaultPlayerEmbed();
+		if (!player.isValid()) {
+			return player.getFailEmbed();
+		}
 
-			initPrices();
+		Map<Integer, InvItem> playerInventory = player.getInventoryMap();
+		if (playerInventory == null) {
+			addTotal("inventory", -1.0);
+			return defaultEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+		}
 
-			addTotal("bank", player.getBankBalance());
-			addTotal("purse", player.getPurseCoins());
+		EmbedBuilder eb = player.defaultPlayerEmbed();
 
-			Map<Integer, InvItem> playerInventory = player.getInventoryMap();
-			if (playerInventory == null) {
-				addTotal("inventory", -1.0);
-				return defaultEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
-			}
+		initPrices();
 
-			for (String location : locations) {
-				Map<Integer, InvItem> curItems =
-					switch (location) {
-						case "inventory" -> playerInventory;
-						case "talisman" -> player.getTalismanBagMap();
-						case "armor" -> player.getArmorMap();
-						case "equipment" -> player.getEquipmentMap();
-						case "wardrobe" -> player.getWardrobeMap();
-						case "pets" -> player.getPetsMap();
-						case "enderchest" -> player.getEnderChestMap();
-						case "personal_vault" -> player.getPersonalVaultMap();
-						case "storage" -> player.getStorageMap();
-						default -> throw new IllegalStateException("Unexpected value: " + location);
-					};
+		addTotal("bank", player.getBankBalance());
+		addTotal("purse", player.getPurseCoins());
 
-				if (curItems != null) {
-					for (InvItem item : curItems.values()) {
-						if (item != null) {
-							double itemPrice = calculateItemPrice(item, location);
-							if (itemPrice >= 0) { // -1 if pet
-								addTotal(location, itemPrice);
-								if (event != null) {
-									addItem(location, addItemStr(item, itemPrice));
-								}
+		for (String location : locations) {
+			Map<Integer, InvItem> curItems =
+				switch (location) {
+					case "inventory" -> playerInventory;
+					case "talisman" -> player.getTalismanBagMap();
+					case "armor" -> player.getArmorMap();
+					case "equipment" -> player.getEquipmentMap();
+					case "wardrobe" -> player.getWardrobeMap();
+					case "pets" -> player.getPetsMap();
+					case "enderchest" -> player.getEnderChestMap();
+					case "personal_vault" -> player.getPersonalVaultMap();
+					case "storage" -> player.getStorageMap();
+					default -> throw new IllegalStateException("Unexpected value: " + location);
+				};
+
+			if (curItems != null) {
+				for (InvItem item : curItems.values()) {
+					if (item != null) {
+						double itemPrice = calculateItemPrice(item, location);
+						if (itemPrice >= 0) { // -1 if pet
+							addTotal(location, itemPrice);
+							if (event != null) {
+								addItem(location, addItemStr(item, itemPrice));
 							}
 						}
 					}
 				}
 			}
+		}
 
-			Map<String, Integer> sacksMap = player.getPlayerSacks();
-			if (sacksMap != null) {
-				for (Map.Entry<String, Integer> sackEntry : sacksMap.entrySet()) {
-					if (sackEntry.getValue() > 0) {
-						double itemPrice = getLowestPrice(sackEntry.getKey(), true, true, null) * sackEntry.getValue();
-						addTotal("sacks", itemPrice);
-						if (event != null) {
-							String emoji = getEmojiOr(sackEntry.getKey(), null);
-							addItem(
-								"sacks",
-								(emoji == null ? "" : emoji + " ") +
-								(sackEntry.getValue() != 1 ? sackEntry.getValue() + "x " : "") +
-								idToName(sackEntry.getKey()) +
-								"=:=" +
-								itemPrice
-							);
-						}
+		Map<String, Integer> sacksMap = player.getPlayerSacks();
+		if (sacksMap != null) {
+			for (Map.Entry<String, Integer> sackEntry : sacksMap.entrySet()) {
+				if (sackEntry.getValue() > 0) {
+					double itemPrice = getLowestPrice(sackEntry.getKey(), true, true, null) * sackEntry.getValue();
+					addTotal("sacks", itemPrice);
+					if (event != null) {
+						String emoji = getEmojiOr(sackEntry.getKey(), null);
+						addItem(
+							"sacks",
+							(emoji == null ? "" : emoji + " ") +
+							(sackEntry.getValue() != 1 ? sackEntry.getValue() + "x " : "") +
+							idToName(sackEntry.getKey()) +
+							"=:=" +
+							itemPrice
+						);
 					}
 				}
 			}
-
-			calculatePetPrices();
-
-			if (event == null) {
-				return invalidEmbed("Was not triggered by command");
-			}
-
-			StringBuilder echestStr = getSectionString(getItems("enderchest"));
-			StringBuilder sacksStr = getSectionString(getItems("sacks"));
-			StringBuilder personalVaultStr = getSectionString(getItems("personal_vault"));
-			StringBuilder storageStr = getSectionString(getItems("storage"));
-			StringBuilder invStr = getSectionString(getItems("inventory"));
-			StringBuilder armorStr = getSectionString(getItems("armor"));
-			StringBuilder wardrobeStr = getSectionString(getItems("wardrobe"));
-			StringBuilder petsStr = getSectionString(getItems("pets"));
-			StringBuilder talismanStr = getSectionString(getItems("talisman"));
-
-			double totalNetworth = getTotalCalculatedNetworth();
-			//			int position = leaderboardDatabase.getNetworthPosition(player.getGamemode(), player.getUuid());
-			String ebDesc = "**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + roundAndFormat(totalNetworth) + ")";
-			//			\n**" +
-			//				(
-			//					Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
-			//						? capitalizeString(player.getGamemode().toString()) + " "
-			//						: ""
-			//				)+"Leaderboard Position:** " + (position != -1 ? formatNumber(position) : "Not on leaderboard");
-			eb.setDescription(ebDesc);
-			eb.addField("Purse", simplifyNumber(getTotal("purse")), true);
-			eb.addField("Bank", (getTotal("bank") == -1 ? "Private" : simplifyNumber(getTotal("bank"))), true);
-			eb.addField("Sacks", simplifyNumber(getTotal("sacks")), true);
-			if (!echestStr.isEmpty()) {
-				eb.addField("Ender Chest | " + simplifyNumber(getTotal("enderchest")), echestStr.toString().split("\n\n")[0], false);
-			}
-			if (!storageStr.isEmpty()) {
-				eb.addField("Storage | " + simplifyNumber(getTotal("storage")), storageStr.toString().split("\n\n")[0], false);
-			}
-			if (!invStr.isEmpty()) {
-				eb.addField("Inventory | " + simplifyNumber(getTotal("inventory")), invStr.toString().split("\n\n")[0], false);
-			}
-			if (!armorStr.isEmpty()) {
-				eb.addField("Armor & Equipment | " + simplifyNumber(getTotal("armor")), armorStr.toString().split("\n\n")[0], false);
-			}
-			if (!wardrobeStr.isEmpty()) {
-				eb.addField("Wardrobe | " + simplifyNumber(getTotal("wardrobe")), wardrobeStr.toString().split("\n\n")[0], false);
-			}
-			if (!petsStr.isEmpty()) {
-				eb.addField("Pets | " + simplifyNumber(getTotal("pets")), petsStr.toString().split("\n\n")[0], false);
-			}
-			if (!talismanStr.isEmpty()) {
-				eb.addField("Accessories | " + simplifyNumber(getTotal("talisman")), talismanStr.toString().split("\n\n")[0], false);
-			}
-			if (!personalVaultStr.isEmpty()) {
-				eb.addField(
-					"Personal Vault | " + simplifyNumber(getTotal("personal_vault")),
-					personalVaultStr.toString().split("\n\n")[0],
-					false
-				);
-			}
-
-			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
-			Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
-			pages.put(SelectOption.of("Overview", "overview").withEmoji(getEmojiObj("SKYBLOCK_MENU")), eb);
-
-			if (!echestStr.isEmpty()) {
-				pages.put(
-					SelectOption.of("Ender Chest", "ender_chest").withEmoji(getEmojiObj("ENDER_CHEST")),
-					player
-						.defaultPlayerEmbed(" | Ender Chest")
-						.setDescription(
-							ebDesc +
-							"\n**Ender Chest:** " +
-							simplifyNumber(getTotal("enderchest")) +
-							"\n\n" +
-							echestStr.toString().replace("\n\n", "\n")
-						)
-				);
-			}
-			if (!storageStr.isEmpty()) {
-				pages.put(
-					SelectOption.of("Storage", "storage").withEmoji(getEmojiObj("SMALL_BACKPACK")),
-					player
-						.defaultPlayerEmbed(" | Storage")
-						.setDescription(
-							ebDesc +
-							"\n**Storage:** " +
-							simplifyNumber(getTotal("storage")) +
-							"\n\n" +
-							storageStr.toString().replace("\n\n", "\n")
-						)
-				);
-			}
-			if (!invStr.isEmpty()) {
-				pages.put(
-					SelectOption.of("Inventory", "inventory").withEmoji(getEmojiObj("CHEST")),
-					player
-						.defaultPlayerEmbed(" | Inventory")
-						.setDescription(
-							ebDesc +
-							"\n**Inventory:** " +
-							simplifyNumber(getTotal("inventory")) +
-							"\n\n" +
-							invStr.toString().replace("\n\n", "\n")
-						)
-				);
-			}
-			if (!armorStr.isEmpty()) {
-				pages.put(
-					SelectOption.of("Armor & Equipment", "armor_equipment").withEmoji(getEmojiObj("GOLD_CHESTPLATE")),
-					player
-						.defaultPlayerEmbed(" | Armor & Equipment")
-						.setDescription(
-							ebDesc +
-							"\n**Armor & Equipment:** " +
-							simplifyNumber(getTotal("armor")) +
-							"\n\n" +
-							armorStr.toString().replace("\n\n", "\n")
-						)
-				);
-			}
-			if (!wardrobeStr.isEmpty()) {
-				pages.put(
-					SelectOption.of("Wardrobe", "wardrobe").withEmoji(getEmojiObj("ARMOR_STAND")),
-					player
-						.defaultPlayerEmbed(" | Wardrobe")
-						.setDescription(
-							ebDesc +
-							"\n**Wardrobe:** " +
-							simplifyNumber(getTotal("wardrobe")) +
-							"\n\n" +
-							wardrobeStr.toString().replace("\n\n", "\n")
-						)
-				);
-			}
-			if (!petsStr.isEmpty()) {
-				pages.put(
-					SelectOption.of("Pets", "pets").withEmoji(getEmojiObj("ENDER_DRAGON;4")),
-					player
-						.defaultPlayerEmbed(" | Pets")
-						.setDescription(
-							ebDesc + "\n**Pets:** " + simplifyNumber(getTotal("pets")) + "\n\n" + petsStr.toString().replace("\n\n", "\n")
-						)
-				);
-			}
-			if (!talismanStr.isEmpty()) {
-				pages.put(
-					SelectOption.of("Accessories", "accessories").withEmoji(getEmojiObj("MASTER_SKULL_TIER_7")),
-					player
-						.defaultPlayerEmbed(" | Accessories")
-						.setDescription(
-							ebDesc +
-							"\n**Accessories:** " +
-							simplifyNumber(getTotal("talisman")) +
-							"\n\n" +
-							talismanStr.toString().replace("\n\n", "\n")
-						)
-				);
-			}
-			if (!personalVaultStr.isEmpty()) {
-				pages.put(
-					SelectOption.of("Personal Vault", "personal_vault").withEmoji(getEmojiObj("IRON_CHEST")),
-					player
-						.defaultPlayerEmbed(" | Personal Vault")
-						.setDescription(
-							ebDesc +
-							"\n**Personal Vault:** " +
-							simplifyNumber(getTotal("personal_vault")) +
-							"\n\n" +
-							personalVaultStr.toString().replace("\n\n", "\n")
-						)
-				);
-			}
-			if (!sacksStr.isEmpty()) {
-				pages.put(
-					SelectOption.of("Sacks", "sacks").withEmoji(getEmojiObj("RUNE_SACK")),
-					player
-						.defaultPlayerEmbed(" | Sacks")
-						.setDescription(
-							ebDesc +
-							"\n**Sacks:** " +
-							simplifyNumber(getTotal("sacks")) +
-							"\n\n" +
-							sacksStr.toString().replace("\n\n", "\n")
-						)
-				);
-			}
-
-			//			JsonArray missing = collectJsonArray(
-			//				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
-			//			);
-			//			if (!missing.isEmpty()) {
-			//				System.out.println(missing);
-			//			}
-
-			String verboseLink = null;
-			if (verbose) {
-				try {
-					verboseLink = makeHastePost(formattedGson.toJson(getVerboseJson()));
-					extras.addButton(Button.link(verboseLink + ".json", "Verbose JSON"));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			// Init last updated to 0
-			extras.addButton(
-				Button.danger(
-					"nw_" + player.getUuid() + "_" + player.getProfileName() + "_0" + (verboseLink != null ? "_" + verboseLink : ""),
-					"Bug In Calculations?"
-				)
-			);
-			new SelectMenuPaginator(pages, "overview", extras, event);
-			return null;
 		}
-		return player.getFailEmbed();
+
+		calculatePetPrices();
+
+		if (event == null) {
+			return invalidEmbed("Was not triggered by command");
+		}
+
+		StringBuilder echestStr = getSectionString(getItems("enderchest"));
+		StringBuilder sacksStr = getSectionString(getItems("sacks"));
+		StringBuilder personalVaultStr = getSectionString(getItems("personal_vault"));
+		StringBuilder storageStr = getSectionString(getItems("storage"));
+		StringBuilder invStr = getSectionString(getItems("inventory"));
+		StringBuilder armorStr = getSectionString(getItems("armor"));
+		StringBuilder wardrobeStr = getSectionString(getItems("wardrobe"));
+		StringBuilder petsStr = getSectionString(getItems("pets"));
+		StringBuilder talismanStr = getSectionString(getItems("talisman"));
+
+		double totalNetworth = getNetworth();
+		//			int position = leaderboardDatabase.getNetworthPosition(player.getGamemode(), player.getUuid());
+		String ebDesc = "**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + roundAndFormat(totalNetworth) + ")";
+		//			\n**" +
+		//				(
+		//					Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
+		//						? capitalizeString(player.getGamemode().toString()) + " "
+		//						: ""
+		//				)+"Leaderboard Position:** " + (position != -1 ? formatNumber(position) : "Not on leaderboard");
+		eb.setDescription(ebDesc);
+		eb.addField("Purse", simplifyNumber(getTotal("purse")), true);
+		eb.addField("Bank", (getTotal("bank") == -1 ? "Private" : simplifyNumber(getTotal("bank"))), true);
+		eb.addField("Sacks", simplifyNumber(getTotal("sacks")), true);
+		if (!echestStr.isEmpty()) {
+			eb.addField("Ender Chest | " + simplifyNumber(getTotal("enderchest")), echestStr.toString().split("\n\n")[0], false);
+		}
+		if (!storageStr.isEmpty()) {
+			eb.addField("Storage | " + simplifyNumber(getTotal("storage")), storageStr.toString().split("\n\n")[0], false);
+		}
+		if (!invStr.isEmpty()) {
+			eb.addField("Inventory | " + simplifyNumber(getTotal("inventory")), invStr.toString().split("\n\n")[0], false);
+		}
+		if (!armorStr.isEmpty()) {
+			eb.addField("Armor & Equipment | " + simplifyNumber(getTotal("armor")), armorStr.toString().split("\n\n")[0], false);
+		}
+		if (!wardrobeStr.isEmpty()) {
+			eb.addField("Wardrobe | " + simplifyNumber(getTotal("wardrobe")), wardrobeStr.toString().split("\n\n")[0], false);
+		}
+		if (!petsStr.isEmpty()) {
+			eb.addField("Pets | " + simplifyNumber(getTotal("pets")), petsStr.toString().split("\n\n")[0], false);
+		}
+		if (!talismanStr.isEmpty()) {
+			eb.addField("Accessories | " + simplifyNumber(getTotal("talisman")), talismanStr.toString().split("\n\n")[0], false);
+		}
+		if (!personalVaultStr.isEmpty()) {
+			eb.addField(
+				"Personal Vault | " + simplifyNumber(getTotal("personal_vault")),
+				personalVaultStr.toString().split("\n\n")[0],
+				false
+			);
+		}
+
+		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+		Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
+		pages.put(SelectOption.of("Overview", "overview").withEmoji(getEmojiObj("SKYBLOCK_MENU")), eb);
+
+		if (!echestStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Ender Chest", "ender_chest").withEmoji(getEmojiObj("ENDER_CHEST")),
+				player
+					.defaultPlayerEmbed(" | Ender Chest")
+					.setDescription(
+						ebDesc +
+						"\n**Ender Chest:** " +
+						simplifyNumber(getTotal("enderchest")) +
+						"\n\n" +
+						echestStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
+		if (!storageStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Storage", "storage").withEmoji(getEmojiObj("SMALL_BACKPACK")),
+				player
+					.defaultPlayerEmbed(" | Storage")
+					.setDescription(
+						ebDesc +
+						"\n**Storage:** " +
+						simplifyNumber(getTotal("storage")) +
+						"\n\n" +
+						storageStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
+		if (!invStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Inventory", "inventory").withEmoji(getEmojiObj("CHEST")),
+				player
+					.defaultPlayerEmbed(" | Inventory")
+					.setDescription(
+						ebDesc +
+						"\n**Inventory:** " +
+						simplifyNumber(getTotal("inventory")) +
+						"\n\n" +
+						invStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
+		if (!armorStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Armor & Equipment", "armor_equipment").withEmoji(getEmojiObj("GOLD_CHESTPLATE")),
+				player
+					.defaultPlayerEmbed(" | Armor & Equipment")
+					.setDescription(
+						ebDesc +
+						"\n**Armor & Equipment:** " +
+						simplifyNumber(getTotal("armor")) +
+						"\n\n" +
+						armorStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
+		if (!wardrobeStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Wardrobe", "wardrobe").withEmoji(getEmojiObj("ARMOR_STAND")),
+				player
+					.defaultPlayerEmbed(" | Wardrobe")
+					.setDescription(
+						ebDesc +
+						"\n**Wardrobe:** " +
+						simplifyNumber(getTotal("wardrobe")) +
+						"\n\n" +
+						wardrobeStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
+		if (!petsStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Pets", "pets").withEmoji(getEmojiObj("ENDER_DRAGON;4")),
+				player
+					.defaultPlayerEmbed(" | Pets")
+					.setDescription(
+						ebDesc + "\n**Pets:** " + simplifyNumber(getTotal("pets")) + "\n\n" + petsStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
+		if (!talismanStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Accessories", "accessories").withEmoji(getEmojiObj("MASTER_SKULL_TIER_7")),
+				player
+					.defaultPlayerEmbed(" | Accessories")
+					.setDescription(
+						ebDesc +
+						"\n**Accessories:** " +
+						simplifyNumber(getTotal("talisman")) +
+						"\n\n" +
+						talismanStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
+		if (!personalVaultStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Personal Vault", "personal_vault").withEmoji(getEmojiObj("IRON_CHEST")),
+				player
+					.defaultPlayerEmbed(" | Personal Vault")
+					.setDescription(
+						ebDesc +
+						"\n**Personal Vault:** " +
+						simplifyNumber(getTotal("personal_vault")) +
+						"\n\n" +
+						personalVaultStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
+		if (!sacksStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Sacks", "sacks").withEmoji(getEmojiObj("RUNE_SACK")),
+				player
+					.defaultPlayerEmbed(" | Sacks")
+					.setDescription(
+						ebDesc + "\n**Sacks:** " + simplifyNumber(getTotal("sacks")) + "\n\n" + sacksStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
+
+		//			JsonArray missing = collectJsonArray(
+		//				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
+		//			);
+		//			if (!missing.isEmpty()) {
+		//				System.out.println(missing);
+		//			}
+
+		String verboseLink = null;
+		if (verbose) {
+			verboseLink = makeHastePost(formattedGson.toJson(getVerboseJson()));
+			extras.addButton(Button.link(verboseLink + ".json", "Verbose JSON"));
+		}
+		// Init last updated to 0
+		extras.addButton(
+			Button.danger(
+				"nw_" + player.getUuid() + "_" + player.getProfileName() + "_0" + (verboseLink != null ? "_" + verboseLink : ""),
+				"Report Incorrect Calculations"
+			)
+		);
+		new SelectMenuPaginator(pages, "overview", extras, event);
+		return null;
 	}
 
 	public StringBuilder getSectionString(List<String> items) {
@@ -397,7 +390,7 @@ public class NetworthExecute {
 		return str;
 	}
 
-	public double getTotalCalculatedNetworth() {
+	public double getNetworth() {
 		return totals.getOrDefault("inventory", -1.0) == -1 ? -1 : totals.values().stream().mapToDouble(i -> i).sum();
 	}
 
@@ -499,7 +492,7 @@ public class NetworthExecute {
 						.append(
 							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
 						)
-						.append("\"fail_calc_lvl_cost\":true},");
+						.append("\"fail_find_lvl\":true},");
 				}
 			}
 		}
