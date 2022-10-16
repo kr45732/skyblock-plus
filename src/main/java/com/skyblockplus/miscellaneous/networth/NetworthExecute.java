@@ -810,6 +810,10 @@ public class NetworthExecute {
 			return priceOverride;
 		}
 
+		if (itemId.equals("SKYBLOCK_COIN")) {
+			return 1; // 1 * count
+		}
+
 		double npcPrice = Math.max(0, getNpcSellPrice(itemId));
 
 		try {
