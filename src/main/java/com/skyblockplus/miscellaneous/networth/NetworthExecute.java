@@ -107,8 +107,6 @@ public class NetworthExecute {
 			return defaultEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 		}
 
-		EmbedBuilder eb = player.defaultPlayerEmbed();
-
 		initPrices();
 
 		addTotal("bank", player.getBankBalance());
@@ -190,7 +188,7 @@ public class NetworthExecute {
 		//						? capitalizeString(player.getGamemode().toString()) + " "
 		//						: ""
 		//				)+"Leaderboard Position:** " + (position != -1 ? formatNumber(position) : "Not on leaderboard");
-		eb.setDescription(ebDesc);
+		EmbedBuilder eb = player.defaultPlayerEmbed().setDescription(ebDesc);
 		eb.addField("Purse", simplifyNumber(getTotal("purse")), true);
 		eb.addField("Bank", (getTotal("bank") == -1 ? "Private" : simplifyNumber(getTotal("bank"))), true);
 		eb.addField("Sacks", simplifyNumber(getTotal("sacks")), true);
@@ -890,7 +888,12 @@ public class NetworthExecute {
 	}
 
 	public double getMinionCost(String id, int tier, int depth) {
-		List<String> recipe = getRecipe(id + "_" + tier + ".recipe");
+		double priceOverride = getPriceOverride(id + "_" + tier);
+		if (priceOverride != -1) {
+			return priceOverride;
+		}
+
+		List<String> recipe = getRecipe(id + "_" + tier);
 		if (recipe == null) {
 			return 0;
 		}

@@ -150,16 +150,6 @@ public class Main {
 			}
 		}
 
-		MainListener.initialize();
-		ApiHandler.initialize();
-		AuctionTracker.initialize();
-		AuctionFlipper.initialize(true);
-		PublicEndpoints.initialize();
-		FetchurHandler.initialize();
-		MayorHandler.initialize();
-		JacobHandler.initialize();
-		EventHandler.initialize();
-
 		File loreRendersDir = new File("src/main/java/com/skyblockplus/json/lore_renders/");
 		if (!loreRendersDir.exists()) {
 			log.info((loreRendersDir.mkdirs() ? "Successfully created" : "Failed to create") + " lore render directory");
@@ -169,6 +159,16 @@ public class Main {
 				Arrays.stream(loreRendersDirFiles).forEach(File::delete);
 			}
 		}
+
+		MainListener.initialize();
+		ApiHandler.initialize();
+		AuctionTracker.initialize();
+		AuctionFlipper.initialize(true);
+		PublicEndpoints.initialize();
+		FetchurHandler.initialize();
+		MayorHandler.initialize();
+		JacobHandler.initialize();
+		EventHandler.initialize();
 
 		if (isMainBot()) {
 			scheduler.scheduleWithFixedDelay(
