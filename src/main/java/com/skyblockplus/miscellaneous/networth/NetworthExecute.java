@@ -57,7 +57,7 @@ public class NetworthExecute {
 	private JsonElement lowestBinJson;
 	private JsonElement averageAuctionJson;
 	private JsonElement bazaarJson;
-	private JsonArray sbzPrices;
+	//	private JsonObject extraPrices;
 	private double recombPrice;
 	private double fumingPrice;
 	private double hbpPrice;
@@ -84,7 +84,7 @@ public class NetworthExecute {
 		lowestBinJson = getLowestBinJson();
 		averageAuctionJson = getAverageAuctionJson();
 		bazaarJson = getBazaarJson();
-		sbzPrices = getSbzPricesJson();
+		//		extraPrices = getExtraPricesJson();
 
 		recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary.[0].pricePerUnit", 0.0);
 		hbpPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
@@ -870,22 +870,19 @@ public class NetworthExecute {
 			}
 		}
 
-		if (useRecipe && higherDepth(getInternalJsonMappings(), itemId + ".recipe") != null) {
-			double cost = 0;
-			for (String item : higherDepth(getInternalJsonMappings(), itemId + ".recipe")
-				.getAsJsonObject()
-				.entrySet()
-				.stream()
-				.map(e -> e.getValue().getAsString())
-				.filter(e -> !e.isEmpty())
-				.toList()) {
-				String[] idCountSplit = item.split(":");
-				cost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
+		if (useRecipe) {
+			List<String> recipe = getRecipe(itemId);
+			if (recipe != null) {
+				double cost = 0;
+				for (String item : recipe) {
+					String[] idCountSplit = item.split(":");
+					cost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
+				}
+				if (source != null) {
+					source.append("craft");
+				}
+				return cost;
 			}
-			if (source != null) {
-				source.append("craft");
-			}
-			return cost;
 		}
 
 		//		tempSet.add(itemId + " - " + iName);
@@ -900,25 +897,13 @@ public class NetworthExecute {
 	}
 
 	public double getMinionCost(String id, int tier, int depth) {
-		if (
-			(tier == 1 && (id.equals("FLOWER_GENERATOR") || id.equals("SNOW_GENERATOR"))) || (tier == 12 && !id.equals("FLOWER_GENERATOR"))
-		) {
-			String finalId = id.split("GENERATOR")[0].toLowerCase() + "minion_" + (tier == 1 ? "i" : "xii");
-			return streamJsonArray(sbzPrices)
-				.filter(i -> higherDepth(i, "name", "").equals(finalId))
-				.map(i -> higherDepth(i, "low", 0))
-				.findFirst()
-				.orElse(0);
+		List<String> recipe = getRecipe(id + "_" + tier + ".recipe");
+		if (recipe == null) {
+			return 0;
 		}
 
 		double cost = 0;
-		for (String material : higherDepth(getInternalJsonMappings(), id + "_" + tier + ".recipe")
-			.getAsJsonObject()
-			.entrySet()
-			.stream()
-			.map(e -> e.getValue().getAsString())
-			.filter(e -> !e.isEmpty())
-			.toList()) {
+		for (String material : recipe) {
 			String[] idCountSplit = material.split(":");
 			if (idCountSplit[0].contains("GENERATOR")) {
 				if (depth - 1 != 0) {

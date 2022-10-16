@@ -210,6 +210,6 @@ public class Constants {
 	}
 
 	public static JsonElement getConstant(String key) {
-		return CONSTANTS.get(key);
+		return higherDepth(CONSTANTS, key);
 	}
 }

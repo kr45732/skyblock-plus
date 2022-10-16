@@ -245,7 +245,6 @@ public class MayorHandler {
 					.getEpochSecond() +
 				":R>"
 			);
-			StringBuilder votesStr = new StringBuilder();
 			for (JsonElement curMayor : curMayors) {
 				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
@@ -259,18 +258,17 @@ public class MayorHandler {
 				int votes = higherDepth(curMayor, "votes").getAsInt();
 				String name = higherDepth(curMayor, "name").getAsString();
 				eb.addField(
-					mayorNameToEmoji.get(name.toUpperCase()) + " " + name,
-					"**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
+					mayorNameToEmoji.get(name.toUpperCase()) +
+					" " +
+					name +
+					" | " +
+					formatNumber(votes) +
+					" (" +
+					roundProgress(votes / totalVotes) +
+					")",
+					perksStr.toString(),
 					false
 				);
-
-				int voteGlass = (int) (20.0 * votes / totalVotes);
-				votesStr
-					.append(mayorNameToEmoji.get(name.toUpperCase()))
-					.append(" ")
-					.append(getEmoji("STAINED_GLASS_PANE:5", "g").repeat(voteGlass))
-					.append(getEmoji("STAINED_GLASS_PANE:8", "l").repeat(20 - voteGlass))
-					.append("\n");
 			}
 
 			mayorGraphFile = new File("src/main/java/com/skyblockplus/json/lore_renders/mayor_graph.png");

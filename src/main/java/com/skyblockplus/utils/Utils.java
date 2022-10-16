@@ -191,7 +191,7 @@ public class Utils {
 	private static JsonObject lowestBinJson;
 	private static JsonObject averageAuctionJson;
 	private static JsonObject bazaarJson;
-	private static JsonArray sbzPricesJson;
+	private static JsonObject extraPricesJson;
 	private static JsonObject emojiMap;
 	private static JsonArray skyblockItemsJson;
 	private static JsonObject internalJsonMappings;
@@ -208,7 +208,7 @@ public class Utils {
 	private static Instant averageAuctionJsonLastUpdated = Instant.now();
 	private static Instant bingoJsonLastUpdated = Instant.now();
 	private static Instant bazaarJsonLastUpdated = Instant.now();
-	private static Instant sbzPricesJsonLastUpdated = Instant.now();
+	private static Instant extraPricesJsonLastUpdated = Instant.now();
 	private static Instant userCountLastUpdated = Instant.now();
 	private static Set<String> vanillaItems;
 	private static int userCount = -1;
@@ -386,13 +386,13 @@ public class Utils {
 		return -1.0;
 	}
 
-	public static JsonArray getSbzPricesJson() {
-		if (sbzPricesJson == null || Duration.between(sbzPricesJsonLastUpdated, Instant.now()).toMinutes() >= 30) {
-			sbzPricesJson = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json").getAsJsonArray();
-			sbzPricesJsonLastUpdated = Instant.now();
+	public static JsonObject getExtraPricesJson() {
+		if (extraPricesJson == null || Duration.between(extraPricesJsonLastUpdated, Instant.now()).toMinutes() >= 15) {
+			extraPricesJson = getJson("https://raw.githubusercontent.com/SkyHelperBot/Prices/main/prices.json").getAsJsonObject();
+			extraPricesJsonLastUpdated = Instant.now();
 		}
 
-		return sbzPricesJson;
+		return extraPricesJson;
 	}
 
 	public static JsonObject getMiscJson() {
@@ -2023,5 +2023,19 @@ public class Utils {
 
 	public static String padStart(String string, int minLength, char padChar) {
 		return string.length() >= minLength ? string : (String.valueOf(padChar).repeat(minLength - string.length()) + string);
+	}
+
+	public static List<String> getRecipe(String itemId) {
+		JsonElement recipe = higherDepth(getInternalJsonMappings(), itemId + ".recipe");
+		if (recipe != null) {
+			return recipe.getAsJsonObject().entrySet().stream().map(e -> e.getValue().getAsString()).filter(e -> !e.isEmpty()).toList();
+		}
+
+		JsonElement additionalRecipe = getConstant("ADDITIONAL_RECIPES." + itemId);
+		if (additionalRecipe != null) {
+			return streamJsonArray(additionalRecipe).map(JsonElement::getAsString).collect(Collectors.toList());
+		}
+
+		return null;
 	}
 }
