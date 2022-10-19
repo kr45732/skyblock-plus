@@ -18,7 +18,6 @@
 
 package com.skyblockplus.skills;
 
-import static com.skyblockplus.utils.Constants.FORGE_TIMES;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -94,7 +93,7 @@ public class ForgeSlashCommand extends SlashCommand {
 					"\nEnd: <t:" +
 					Instant
 						.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong())
-						.plusMillis((long) (FORGE_TIMES.get(itemId) * bonus))
+						.plusSeconds((long) (higherDepth(getInternalJsonMappings(), itemId + ".forge").getAsLong() * bonus))
 						.getEpochSecond() +
 					":R>",
 					false

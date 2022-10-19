@@ -1946,7 +1946,8 @@ public class Utils {
 						itemId.endsWith("_MONSTER") ||
 						itemId.endsWith("_ANIMAL") ||
 						itemId.endsWith("_SC") ||
-						itemId.endsWith("_BOSS")
+						itemId.endsWith("_BOSS") ||
+						itemId.endsWith("_NPC")
 					) {
 						continue;
 					}
@@ -1983,7 +1984,25 @@ public class Utils {
 						}
 					} catch (Exception ignored) {}
 				}
-				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
+
+				if (higherDepth(itemJson, "infoType", "").equals("WIKI_URL")) {
+					for (JsonElement info : higherDepth(itemJson, "info").getAsJsonArray()) {
+						String wikiUrl = info.getAsString();
+						toAdd.addProperty("wiki", wikiUrl);
+						// Allows for falling back on unofficial wiki if official wiki link doesn't exist
+						if (wikiUrl.startsWith("https://wiki.hypixel.net")) {
+							break;
+						}
+					}
+				}
+
+				if (higherDepth(itemJson, "recipes") != null) {
+					for (JsonElement recipe : higherDepth(itemJson, "recipes").getAsJsonArray()) {
+						if (higherDepth(recipe, "type").equals("forge")) {
+							toAdd.add("forge", higherDepth(recipe, "duration"));
+						}
+					}
+				}
 
 				outputObj.add(itemId, toAdd);
 			} catch (Exception e) {

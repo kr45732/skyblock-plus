@@ -258,7 +258,8 @@ public class EmojiUpdater {
 										id.endsWith("_MONSTER") ||
 										id.endsWith("_ANIMAL") ||
 										id.endsWith("_SC") ||
-										id.endsWith("_BOSS")
+										id.endsWith("_BOSS") ||
+										id.endsWith("_NPC")
 									)
 								);
 							} catch (Exception e) {
