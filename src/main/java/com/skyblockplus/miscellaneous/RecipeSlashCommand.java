@@ -25,6 +25,7 @@ import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -65,7 +66,7 @@ public class RecipeSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
 				event.getFocusedOption().getValue(),
-				allRecipeIds.stream().map(Utils::idToName).collect(Collectors.toList())
+				allRecipeIds.stream().map(Utils::idToName).collect(Collectors.toCollection(ArrayList::new))
 			);
 		}
 	}

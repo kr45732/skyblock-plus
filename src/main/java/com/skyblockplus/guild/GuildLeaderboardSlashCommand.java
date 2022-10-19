@@ -20,7 +20,7 @@ package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedGuildTypesSubList;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 
 import com.google.gson.JsonElement;
@@ -103,7 +103,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		} else if (event.getFocusedOption().getName().equals("type")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), formattedGuildTypesSubList);
+			event.replyClosestMatch(event.getFocusedOption().getValue(), formattedTypesSubList);
 		}
 	}
 
@@ -125,7 +125,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 			}
 		}
 
-		lbType = getType(lbType, false);
+		lbType = getType(lbType);
 
 		UsernameUuidStruct usernameUuidStruct = null;
 		HypixelResponse guildResponse;

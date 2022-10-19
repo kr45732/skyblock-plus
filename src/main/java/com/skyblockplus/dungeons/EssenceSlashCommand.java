@@ -28,6 +28,7 @@ import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -80,7 +81,7 @@ public class EssenceSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
 				event.getFocusedOption().getValue(),
-				ESSENCE_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+				ESSENCE_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new))
 			);
 		} else if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();

@@ -25,6 +25,7 @@ import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -56,7 +57,7 @@ public class BitsSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
 				event.getFocusedOption().getValue(),
-				BITS_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+				BITS_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new))
 			);
 		}
 	}

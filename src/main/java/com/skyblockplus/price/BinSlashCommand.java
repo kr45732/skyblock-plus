@@ -60,7 +60,7 @@ public class BinSlashCommand extends SlashCommand {
 			if (getLowestBinJson() != null) {
 				event.replyClosestMatch(
 					event.getFocusedOption().getValue(),
-					getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+					getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new))
 				);
 			}
 		}

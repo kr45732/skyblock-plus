@@ -82,20 +82,12 @@ public class LeaderboardDatabase {
 	public static final List<String> typesSubList = new ArrayList<>();
 	public static final List<String> formattedTypesSubList = new ArrayList<>();
 
-	public static final List<String> guildTypes = new ArrayList<>();
-	public static final List<String> guildTypesSubList = new ArrayList<>();
-	public static final List<String> formattedGuildTypesSubList = new ArrayList<>();
-
 	static {
 		types.addAll(COLLECTION_NAME_TO_ID.keySet());
-		guildTypes.addAll(types);
 		types.addAll(STATS_LIST);
 
 		typesSubList.addAll(types.subList(2, types.size()));
 		formattedTypesSubList.addAll(typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).toList());
-
-		guildTypesSubList.addAll(guildTypes.subList(2, guildTypes.size()));
-		formattedGuildTypesSubList.addAll(guildTypesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).toList());
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
@@ -644,7 +636,7 @@ public class LeaderboardDatabase {
 		}
 	}
 
-	public static String getType(String lbType, boolean allLb) {
+	public static String getType(String lbType) {
 		lbType =
 			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
 				case "nw" -> "networth";
@@ -655,8 +647,8 @@ public class LeaderboardDatabase {
 				default -> lbType;
 			};
 
-		if (!(allLb ? typesSubList : guildTypesSubList).contains(lbType)) {
-			lbType = getClosestMatch(lbType, allLb ? typesSubList : guildTypesSubList);
+		if (!typesSubList.contains(lbType)) {
+			lbType = getClosestMatch(lbType, typesSubList);
 		}
 
 		return lbType;

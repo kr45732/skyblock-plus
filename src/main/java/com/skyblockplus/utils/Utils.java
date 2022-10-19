@@ -332,7 +332,7 @@ public class Utils {
 				}
 				bazaarJson = tempBazaarJson;
 				bazaarJsonLastUpdated = Instant.now();
-				bazaarItems = bazaarJson.keySet().stream().map(Utils::idToName).distinct().toList();
+				bazaarItems = bazaarJson.keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new));
 			} catch (Exception ignored) {}
 		}
 
@@ -360,7 +360,7 @@ public class Utils {
 					queryItems =
 						streamJsonArray(JsonParser.parseReader(in).getAsJsonArray())
 							.map(JsonElement::getAsString)
-							.collect(Collectors.toList());
+							.collect(Collectors.toCollection(ArrayList::new));
 				}
 			} catch (Exception ignored) {}
 		}

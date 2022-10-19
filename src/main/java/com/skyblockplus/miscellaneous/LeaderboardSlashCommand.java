@@ -91,7 +91,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		double amount,
 		SlashCommandEvent event
 	) {
-		lbType = getType(lbType, true);
+		lbType = getType(lbType);
 
 		Player player = null;
 		if (username != null) {
