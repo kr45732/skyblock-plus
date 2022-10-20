@@ -1998,8 +1998,9 @@ public class Utils {
 
 				if (higherDepth(itemJson, "recipes") != null) {
 					for (JsonElement recipe : higherDepth(itemJson, "recipes").getAsJsonArray()) {
-						if (higherDepth(recipe, "type").equals("forge")) {
+						if (higherDepth(recipe, "type").getAsString().equals("forge")) {
 							toAdd.add("forge", higherDepth(recipe, "duration"));
+							break;
 						}
 					}
 				}
@@ -2016,7 +2017,10 @@ public class Utils {
 	public static JsonElement getUpdatedPriceOverridesJson(JsonElement currentPriceOverrides) {
 		JsonObject outputObject = new JsonObject();
 
-		for (File child : new File("src/main/java/com/skyblockplus/json/neu/items").listFiles()) {
+		for (File child : Arrays
+			.stream(new File("src/main/java/com/skyblockplus/json/neu/items").listFiles())
+			.sorted(Comparator.comparing(File::getName))
+			.toList()) {
 			try {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
 				if (
