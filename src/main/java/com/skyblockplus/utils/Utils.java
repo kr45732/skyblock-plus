@@ -278,7 +278,7 @@ public class Utils {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			averageAuctionJson =
 				getJsonObject(
-					getQueryApiUrl("average_auction") +
+					getQueryApiUrl("average") +
 					"?key=" +
 					AUCTION_API_KEY +
 					"&time=" +
