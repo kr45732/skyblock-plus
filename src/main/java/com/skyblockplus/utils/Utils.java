@@ -283,7 +283,7 @@ public class Utils {
 					AUCTION_API_KEY +
 					"&time=" +
 					Instant.now().minus(3, ChronoUnit.DAYS).toEpochMilli() +
-					"&step=3600"
+					"&step=1800"
 				);
 
 			if (averageAuctionJson == null) {
