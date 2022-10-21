@@ -36,7 +36,6 @@ public class InvItem {
 	private List<String> lore;
 	private int count = 1;
 	private String modifier;
-	private String creationOrigin;
 	private String id;
 	private String creationTimestamp;
 	private List<String> enchantsFormatted = new ArrayList<>();

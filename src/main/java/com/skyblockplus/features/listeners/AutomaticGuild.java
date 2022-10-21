@@ -45,6 +45,7 @@ import com.skyblockplus.general.LinkSlashCommand;
 import com.skyblockplus.miscellaneous.MayorSlashCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.price.AuctionTracker;
+import com.skyblockplus.utils.HypixelPlayer;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.RoleModifyRecord;
@@ -586,6 +587,7 @@ public class AutomaticGuild {
 
 							Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
 							Player player = null;
+							HypixelPlayer hypixelPlayer = null;
 							while (matcher.find()) {
 								String category = matcher.group(1).toUpperCase();
 								String type = matcher.group(2).toUpperCase();
@@ -663,6 +665,21 @@ public class AutomaticGuild {
 													} +
 													extra
 												);
+										}
+									}
+								} else if (category.equals("HYPIXEL") && type.equals("RANK")) {
+									if (key != null) {
+										if (hypixelPlayer == null) {
+											numUpdated++; // Requires another request
+											HypixelResponse response = playerFromUuid(linkedAccount.uuid());
+											hypixelPlayer =
+												response.isValid()
+													? new HypixelPlayer(linkedAccount.uuid(), linkedAccount.username(), response.response())
+													: new HypixelPlayer();
+										}
+
+										if (hypixelPlayer.isValid()) {
+											nicknameTemplate = nicknameTemplate.replace(matcher.group(0), hypixelPlayer.getRank() + extra);
 										}
 									}
 								}

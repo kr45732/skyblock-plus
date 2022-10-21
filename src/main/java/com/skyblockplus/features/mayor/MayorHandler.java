@@ -271,29 +271,33 @@ public class MayorHandler {
 				);
 			}
 
-			mayorGraphFile = new File("src/main/java/com/skyblockplus/json/lore_renders/mayor_graph.png");
-			ImageIO.write(
-				ImageIO.read(
-					new URIBuilder("https://quickchart.io/chart")
-						.addParameter("bkg", "#2f3136")
-						.addParameter(
-							"c",
-							"{ type: 'bar', data: { labels: [" +
-							streamJsonArray(curMayors)
-								.map(m -> "'" + higherDepth(m, "name").getAsString() + "'")
-								.collect(Collectors.joining(",")) +
-							"], datasets: [{ data: [" +
-							streamJsonArray(curMayors).map(m -> higherDepth(m, "votes").getAsString()).collect(Collectors.joining(",")) +
-							"], backgroundColor: getGradientFillHelper('vertical', [\"#023020\", \"#32CD32\"]), }] }, options: { title: { display: true, text: 'Mayor Election Graph | Year " +
-							year +
-							"' }, legend: { display: false, } } }"
-						)
-						.build()
-						.toURL()
-				),
-				"png",
-				mayorGraphFile
-			);
+			try {
+				mayorGraphFile = new File("src/main/java/com/skyblockplus/json/lore_renders/mayor_graph.png");
+				ImageIO.write(
+					ImageIO.read(
+						new URIBuilder("https://quickchart.io/chart")
+							.addParameter("bkg", "#2f3136")
+							.addParameter(
+								"c",
+								"{ type: 'bar', data: { labels: [" +
+								streamJsonArray(curMayors)
+									.map(m -> "'" + higherDepth(m, "name").getAsString() + "'")
+									.collect(Collectors.joining(",")) +
+								"], datasets: [{ data: [" +
+								streamJsonArray(curMayors)
+									.map(m -> higherDepth(m, "votes").getAsString())
+									.collect(Collectors.joining(",")) +
+								"], backgroundColor: getGradientFillHelper('vertical', [\"#023020\", \"#32CD32\"]), }] }, options: { title: { display: true, text: 'Mayor Election Graph | Year " +
+								year +
+								"' }, legend: { display: false, } } }"
+							)
+							.build()
+							.toURL()
+					),
+					"png",
+					mayorGraphFile
+				);
+			} catch (Exception ignored) {}
 
 			MessageEmbed embed = eb.build();
 			Button button = Button.primary("mayor_graph_button", "View Graph");

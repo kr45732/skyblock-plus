@@ -28,6 +28,7 @@ import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.SkillsStruct;
+import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -78,11 +79,10 @@ public class HotmSlashCommand extends SlashCommand {
 
 			eb.addField(
 				"Statistics",
-				"• **HOTM level:** " +
+				"• **HOTM Level:** " +
 				skillInfo.currentLevel() +
-				" (**Progress:** " +
-				roundProgress(skillInfo.progressToNext()) +
-				")\n• **Tokens:** " +
+				(skillInfo.isMaxed() ? "" : " (**Progress:** " + roundProgress(skillInfo.progressToNext()) + ")") +
+				"\n• **Tokens:** " +
 				higherDepth(miningJson, "tokens", 0) +
 				" (**Spent:** " +
 				higherDepth(miningJson, "tokens_spent", 0) +
@@ -104,9 +104,11 @@ public class HotmSlashCommand extends SlashCommand {
 				if (!perk.getValue().getAsJsonPrimitive().isNumber()) {
 					continue;
 				}
-				if (HOTM_PERK_MAX_LEVEL.getOrDefault(perk.getKey(), 50) == 1) {
+
+				if (List.of("mining_speed_boost", "pickaxe_toss", "vein_seeker", "maniac_miner").contains(perk.getKey())) {
 					continue;
 				}
+
 				perksStr
 					.append("• **")
 					.append(capitalizeString(HOTM_PERK_ID_TO_NAME.getOrDefault(perk.getKey(), perk.getKey().replace("_", " "))))

@@ -19,13 +19,13 @@
 package com.skyblockplus.general;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.miscellaneous.RolesSlashCommand;
+import com.skyblockplus.utils.HypixelPlayer;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -143,6 +143,7 @@ public class LinkSlashCommand extends SlashCommand {
 		String updatedRoles = "false";
 
 		Player player = null;
+		HypixelPlayer hypixelPlayer = null;
 		String key = database.getServerHypixelApiKey(member.getGuild().getId());
 
 		try {
@@ -206,9 +207,9 @@ public class LinkSlashCommand extends SlashCommand {
 							if (player == null) {
 								HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
 								player =
-									!response.isValid()
-										? new Player()
-										: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
+									response.isValid()
+										? new Player(linkedAccount.uuid(), linkedAccount.username(), response.response())
+										: new Player();
 							}
 
 							if (player.isValid()) {
@@ -223,8 +224,23 @@ public class LinkSlashCommand extends SlashCommand {
 												? ""
 												: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
 											default -> roundAndFormat((int) player.getCatacombs().getProgressLevel());
-										}
+										} +
+										extra
 									);
+							}
+						}
+					} else if (category.equals("HYPIXEL") && type.equals("RANK")) {
+						if (key != null) {
+							if (hypixelPlayer == null) {
+								HypixelResponse response = playerFromUuid(linkedAccount.uuid());
+								hypixelPlayer =
+									response.isValid()
+										? new HypixelPlayer(linkedAccount.uuid(), linkedAccount.username(), response.response())
+										: new HypixelPlayer();
+							}
+
+							if (hypixelPlayer.isValid()) {
+								nicknameTemplate = nicknameTemplate.replace(matcher.group(0), hypixelPlayer.getRank() + extra);
 							}
 						}
 					}

@@ -227,13 +227,10 @@ public class Utils {
 	/* Getters */
 	public static JsonObject getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			if (currentMayor.equals("Derpy")) {
-				return lowestBinJson = getJsonObject(getQueryApiUrl("lowestbin") + "?key=" + AUCTION_API_KEY);
-			}
+			lowestBinJson = getJsonObject(getQueryApiUrl("lowestbin") + "?key=" + AUCTION_API_KEY);
 
-			lowestBinJson = getJsonObject("https://moulberry.codes/lowestbin.json");
 			if (lowestBinJson == null) {
-				lowestBinJson = getJsonObject(getQueryApiUrl("lowestbin") + "?key=" + AUCTION_API_KEY);
+				lowestBinJson = getJsonObject("https://moulberry.codes/lowestbin.json");
 			}
 			lowestBinJsonLastUpdated = Instant.now();
 		}
@@ -279,20 +276,17 @@ public class Utils {
 
 	public static JsonObject getAverageAuctionJson() {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			if (currentMayor.equals("Derpy")) {
-				return averageAuctionJson = getJsonObject(getQueryApiUrl("average_auction") + "?key=" + AUCTION_API_KEY + "&time=1");
-			}
+			averageAuctionJson =
+				getJsonObject(
+					getQueryApiUrl("average_auction") +
+					"?key=" +
+					AUCTION_API_KEY +
+					"&time=" +
+					Instant.now().minus(3, ChronoUnit.DAYS).toEpochMilli()
+				);
 
-			averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
 			if (averageAuctionJson == null) {
-				averageAuctionJson =
-					getJsonObject(
-						getQueryApiUrl("average_auction") +
-						"?key=" +
-						AUCTION_API_KEY +
-						"&time=" +
-						Instant.now().minus(3, ChronoUnit.DAYS).toEpochMilli()
-					);
+				averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
 			}
 			averageAuctionJsonLastUpdated = Instant.now();
 		}
@@ -1266,6 +1260,13 @@ public class Utils {
 								enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
 							}
 							itemInfo.setEnchantsFormatted(enchantsList);
+						}
+
+						if (item.containsTag("tag.ExtraAttributes.attributes", TagType.COMPOUND)) {
+							NBTCompound attributes = item.getCompound("tag.ExtraAttributes.attributes");
+							for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
+								itemInfo.addExtraValue("ATTRIBUTE_SHARD_" + attribute.getKey().toUpperCase());
+							}
 						}
 
 						if (item.containsKey("tag.ExtraAttributes.skin")) {

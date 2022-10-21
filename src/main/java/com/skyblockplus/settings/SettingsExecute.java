@@ -2031,14 +2031,17 @@ public class SettingsExecute {
 				}
 				nickname = nickname.replace(matcher.group(0), "");
 			} else if (
-				category.equals("PLAYER") &&
 				(
-					type.equals("SKILLS") ||
-					type.equals("CATACOMBS") ||
-					type.equals("SLAYER") ||
-					type.equals("WEIGHT") ||
-					type.equals("CLASS")
-				)
+					category.equals("PLAYER") &&
+					(
+						type.equals("SKILLS") ||
+						type.equals("CATACOMBS") ||
+						type.equals("SLAYER") ||
+						type.equals("WEIGHT") ||
+						type.equals("CLASS")
+					)
+				) ||
+				(category.equals("HYPIXEL") && type.equals("RANK"))
 			) {
 				EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
 				if (eb != null) {
