@@ -1064,7 +1064,7 @@ public class AutomaticGuild {
 							split[1],
 							false
 						)
-						.setDescription(event.getValues().get(0).getAsString())
+						.setDescription(event.getValue("items").getAsString() + "\n\n" + event.getValue("prices").getAsString())
 						.build()
 				)
 				.queue(m ->
@@ -1127,25 +1127,31 @@ public class AutomaticGuild {
 				String[] split = event.getComponentId().split("nw_resolved_")[1].split("_");
 				networthBugReportChannel
 					.retrieveMessageById(split[1])
-					.queue(m ->
-						jda
-							.retrieveUserById(split[0])
-							.queue(u ->
-								u
-									.openPrivateChannel()
-									.queue(c ->
-										c
-											.sendMessageEmbeds(
-												defaultEmbed(null).setDescription(m.getEmbeds().get(0).getDescription()).build()
-											)
-											.setContent(
-												client.getSuccess() +
-												" Your networth bug report has been resolved by " +
-												event.getUser().getAsMention()
-											)
-											.queue()
-									)
-							)
+					.queue(
+						m ->
+							jda
+								.retrieveUserById(split[0])
+								.queue(
+									u ->
+										u
+											.openPrivateChannel()
+											.queue(
+												c ->
+													c
+														.sendMessageEmbeds(
+															defaultEmbed(null).setDescription(m.getEmbeds().get(0).getDescription()).build()
+														)
+														.setContent(
+															client.getSuccess() +
+															" Your networth bug report has been resolved by " +
+															event.getUser().getAsMention()
+														)
+														.queue(ignore, ignore),
+												ignore
+											),
+									ignore
+								),
+						ignore
 					);
 			}
 		} else if (event.getComponentId().startsWith("nw_")) {
@@ -1162,12 +1168,20 @@ public class AutomaticGuild {
 				event
 					.replyModal(
 						Modal
-							.create(event.getComponentId(), "Networth Bugs Report")
-							.addActionRow(
-								TextInput
-									.create("value", "Items Calculated Incorrectly", TextInputStyle.PARAGRAPH)
-									.setPlaceholder("Include the item names, calculated prices, and the prices you think they should be")
-									.build()
+							.create(event.getComponentId(), "Networth Bug Report")
+							.addActionRows(
+								ActionRow.of(
+									TextInput
+										.create("items", "Items Calculated Incorrectly", TextInputStyle.PARAGRAPH)
+										.setPlaceholder("Description of the items calculated incorrectly")
+										.build()
+								),
+								ActionRow.of(
+									TextInput
+										.create("prices", "Expected Calculations", TextInputStyle.PARAGRAPH)
+										.setPlaceholder("What you expected the price to be and why")
+										.build()
+								)
 							)
 							.build()
 					)
