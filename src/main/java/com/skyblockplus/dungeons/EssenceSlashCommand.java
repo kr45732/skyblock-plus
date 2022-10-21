@@ -172,6 +172,10 @@ public class EssenceSlashCommand extends SlashCommand {
 				StringBuilder undeadShopUpgrades = new StringBuilder();
 				for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject().entrySet()) {
 					JsonElement curPerk = higherDepth(essenceTiers, perk.getKey());
+					if (curPerk == null) { // Non dungeon perks
+						continue;
+					}
+
 					JsonArray tiers = higherDepth(curPerk, "tiers").getAsJsonArray();
 					String out =
 						"\n" +

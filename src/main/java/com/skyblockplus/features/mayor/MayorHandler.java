@@ -48,7 +48,6 @@ public class MayorHandler {
 	public static int currentMayorYear = 0;
 	public static ScheduledFuture<?> jerryFuture;
 	public static MessageEmbed jerryEmbed = invalidEmbed("Jerry is not currently mayor").build();
-	public static File mayorGraphFile = null;
 	public static final Map<String, String> mayorNameToEmoji = Maps.of(
 		"DERPY",
 		"<:derpy:940083649129349150>",
@@ -271,6 +270,7 @@ public class MayorHandler {
 				);
 			}
 
+			File mayorGraphFile = null;
 			try {
 				mayorGraphFile = new File("src/main/java/com/skyblockplus/json/lore_renders/mayor_graph.png");
 				ImageIO.write(
@@ -299,12 +299,16 @@ public class MayorHandler {
 				);
 			} catch (Exception ignored) {}
 
-			MessageEmbed embed = eb.build();
-			Button button = Button.primary("mayor_graph_button", "View Graph");
+			MessageEmbed embed;
+			if (mayorGraphFile == null || !mayorGraphFile.exists()) {
+				embed = eb.build();
+			} else {
+				embed = eb.setImage("attachment://mayor_graph.png").build();
+			}
 
 			int updateCount = 0;
 			for (AutomaticGuild guild : guildMap.values()) {
-				if (guild.onMayorElection(embed, button, year)) { // Send or update message
+				if (guild.onMayorElection(embed, mayorGraphFile, year)) { // Send or update message
 					updateCount++;
 				}
 

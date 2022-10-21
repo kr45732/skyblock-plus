@@ -35,7 +35,6 @@ import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.event.EventGuild;
 import com.skyblockplus.features.jacob.JacobGuild;
-import com.skyblockplus.features.mayor.MayorHandler;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
@@ -86,6 +85,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -914,7 +914,7 @@ public class AutomaticGuild {
 		this.mayorPing = role;
 	}
 
-	public boolean onMayorElection(MessageEmbed embed, Button button, int year) {
+	public boolean onMayorElection(MessageEmbed embed, File mayorGraphFile, int year) {
 		try {
 			if (mayorChannel != null) {
 				if (!mayorChannel.canTalk()) {
@@ -933,10 +933,8 @@ public class AutomaticGuild {
 				}
 
 				if (lastMayorElectionOpenMessage != null) {
-					mayorChannel
-						.editMessageEmbedsById(lastMayorElectionOpenMessage.getId(), embed)
-						.setActionRow(button)
-						.queue(
+					MessageEditAction action = mayorChannel.editMessageEmbedsById(lastMayorElectionOpenMessage.getId(), embed);
+					(mayorGraphFile != null ? action.setFiles(FileUpload.fromData(mayorGraphFile)) : action).queue(
 							m -> lastMayorElectionOpenMessage = m,
 							e -> {
 								if (e instanceof ErrorResponseException ex && ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
@@ -945,7 +943,10 @@ public class AutomaticGuild {
 							}
 						);
 				} else {
-					mayorChannel.sendMessageEmbeds(embed).setActionRow(button).queue(m -> lastMayorElectionOpenMessage = m);
+					MessageCreateAction action = mayorChannel.sendMessageEmbeds(embed);
+					(mayorGraphFile != null ? action.setFiles(FileUpload.fromData(mayorGraphFile)) : action).queue(m ->
+							lastMayorElectionOpenMessage = m
+						);
 				}
 				return true;
 			}
@@ -959,7 +960,6 @@ public class AutomaticGuild {
 		try {
 			if (mayorChannel != null) {
 				if (lastMayorElectionOpenMessage != null) {
-					lastMayorElectionOpenMessage.editMessageComponents().queue(ignore, ignore);
 					lastMayorElectionOpenMessage = null;
 				}
 				if (lastMayorElectedMessage != null) {
@@ -1093,19 +1093,6 @@ public class AutomaticGuild {
 	public void onButtonClick(ButtonInteractionEvent event) {
 		if (event.getComponentId().equals("verify_button")) {
 			verifyGuild.onButtonClick(event);
-		} else if (event.getComponentId().equals("mayor_graph_button")) {
-			if (MayorHandler.mayorGraphFile == null || !MayorHandler.mayorGraphFile.exists()) {
-				event
-					.replyEmbeds(defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build())
-					.setEphemeral(true)
-					.queue();
-			} else {
-				event
-					.replyEmbeds(defaultEmbed(null).setImage("attachment://mayor_graph.png").build())
-					.setFiles(FileUpload.fromData(MayorHandler.mayorGraphFile))
-					.setEphemeral(true)
-					.queue();
-			}
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {

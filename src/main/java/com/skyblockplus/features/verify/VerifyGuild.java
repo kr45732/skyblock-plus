@@ -88,7 +88,7 @@ public class VerifyGuild {
 					.addActionRow(TextInput.create("value", "Your In-Game Name", TextInputStyle.SHORT).build())
 					.build()
 			)
-			.queue();
+			.queue(ignore, ignore);
 	}
 
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {

@@ -55,7 +55,8 @@ public class SkyblockProfilesParser {
 		"dungeon_journal",
 		"best_runs",
 		"dungeons_blah_blah",
-		"daily_runs"
+		"daily_runs",
+		"treasures"
 	);
 	private static final List<String> IGNORED_SB_PROFILE_LB = List.of("bestiary");
 
