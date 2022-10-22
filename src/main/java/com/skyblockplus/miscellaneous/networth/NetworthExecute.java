@@ -790,9 +790,7 @@ public class NetworthExecute {
 
 		try {
 			return higherDepth(extraPrices, "enchantment_" + enchantName.toLowerCase() + "_" + enchantLevel).getAsDouble();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Exception ignored) {}
 
 		for (int i = enchantLevel; i >= Math.max(1, ignoredLevels); i--) {
 			try {
