@@ -24,15 +24,16 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
-import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 
@@ -57,7 +58,7 @@ public class NetworthExecute {
 	private JsonElement lowestBinJson;
 	private JsonElement averageAuctionJson;
 	private JsonElement bazaarJson;
-	//	private JsonObject extraPrices;
+	private JsonObject extraPrices;
 	private double recombPrice;
 	private double fumingPrice;
 	private double hbpPrice;
@@ -84,7 +85,7 @@ public class NetworthExecute {
 		lowestBinJson = getLowestBinJson();
 		averageAuctionJson = getAverageAuctionJson();
 		bazaarJson = getBazaarJson();
-		//		extraPrices = getExtraPricesJson();
+		extraPrices = getExtraPricesJson();
 
 		recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary.[0].pricePerUnit", 0.0);
 		hbpPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
@@ -92,11 +93,11 @@ public class NetworthExecute {
 		return this;
 	}
 
-	public Object getPlayerNetworth(String username, String profileName, SlashCommandEvent event) {
+	public EmbedBuilder getPlayerNetworth(String username, String profileName, GenericInteractionCreateEvent event) {
 		return getPlayerNetworth(profileName == null ? new Player(username) : new Player(username, profileName), event);
 	}
 
-	public Object getPlayerNetworth(Player player, SlashCommandEvent event) {
+	public EmbedBuilder getPlayerNetworth(Player player, GenericInteractionCreateEvent event) {
 		if (!player.isValid()) {
 			return player.getFailEmbed();
 		}
@@ -401,7 +402,7 @@ public class NetworthExecute {
 				StringBuilder miscStr = new StringBuilder("[");
 				double miscExtras = 0;
 				try {
-					List<String> extraStats = item.getExtraStats();
+					Set<String> extraStats = item.getExtraStats().keySet();
 					for (String extraItem : extraStats) {
 						double miscPrice = getLowestPrice(extraItem);
 						miscExtras += miscPrice;
@@ -456,7 +457,7 @@ public class NetworthExecute {
 				StringBuilder miscStr = new StringBuilder("[");
 				double miscExtras = 0;
 				try {
-					List<String> extraStats = item.getExtraStats();
+					Set<String> extraStats = item.getExtraStats().keySet();
 					for (String extraItem : extraStats) {
 						double miscPrice = getLowestPrice(extraItem);
 						miscExtras += miscPrice;
@@ -658,15 +659,18 @@ public class NetworthExecute {
 
 		StringBuilder miscStr = verbose ? new StringBuilder("[") : null;
 		try {
-			List<String> extraStats = item.getExtraStats();
-			for (String extraItem : extraStats) {
-				double miscPrice = getLowestPrice(extraItem);
-				miscExtras += miscPrice;
+			for (Map.Entry<String, Integer> extraItem : item.getExtraStats().entrySet()) {
+				double miscPrice = getLowestPrice(extraItem.getKey());
+				miscExtras += miscPrice * extraItem.getValue();
 				if (verbose) {
 					miscStr
 						.append("{\"name\":\"")
-						.append(extraItem)
-						.append("\",\"price\":\"")
+						.append(extraItem.getKey())
+						.append("\",\"total\":\"")
+						.append(simplifyNumber(miscPrice * extraItem.getValue()))
+						.append("\",\"count\":")
+						.append(extraItem.getValue())
+						.append(",\"cost\":\"")
 						.append(simplifyNumber(miscPrice))
 						.append("\"},");
 				}
@@ -782,6 +786,12 @@ public class NetworthExecute {
 			enchantName.equalsIgnoreCase("hecatomb")
 		) {
 			enchantLevel = 1;
+		}
+
+		try {
+			return higherDepth(extraPrices, "enchantment_" + enchantName.toLowerCase() + "_" + enchantLevel).getAsDouble();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		for (int i = enchantLevel; i >= Math.max(1, ignoredLevels); i--) {

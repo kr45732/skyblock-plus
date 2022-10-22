@@ -22,12 +22,11 @@ import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.idToName;
 import static com.skyblockplus.utils.Utils.parseMcCodes;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.Data;
 import me.nullicorn.nedit.type.NBTCompound;
+import me.nullicorn.nedit.type.NBTList;
 
 @Data
 public class InvItem {
@@ -42,19 +41,34 @@ public class InvItem {
 	private int hbpCount = 0;
 	private int fumingCount = 0;
 	private boolean recombobulated = false;
-	private List<String> extraStats = new ArrayList<>();
+	private Map<String, Integer> extraStats = new HashMap<>();
 	private List<InvItem> backpackItems = new ArrayList<>();
 	private String rarity;
 	private int dungeonFloor = 0;
 	private int essenceCount;
 	private String essenceType;
-	private long darkAuctionPrice;
+	private long darkAuctionPrice = -1;
 	private NBTCompound nbtTag;
 	private boolean soulbound = false;
 
 	public void setEssence(int essenceCount, String essenceType) {
 		this.essenceCount = essenceCount;
 		this.essenceType = essenceType;
+	}
+
+	/**
+	 * Will only set it for midas sword or midas staff
+	 */
+	public void setDarkAuctionPrice(long darkAuctionPrice) {
+		if (id == null) {
+			return;
+		}
+
+		if (id.equals("MIDAS_SWORD")) {
+			this.darkAuctionPrice = Math.min(darkAuctionPrice, 50000000);
+		} else if (id.equals("MIDAS_STAFF")) {
+			this.darkAuctionPrice = Math.min(darkAuctionPrice, 100000000);
+		}
 	}
 
 	public String getName() {
@@ -89,21 +103,21 @@ public class InvItem {
 	}
 
 	public void addExtraValue(String itemId) {
-		extraStats.add(itemId);
+		addExtraValues(1, itemId);
 	}
 
 	public void addExtraValues(int count, String itemId) {
-		if (count > 0) {
-			extraStats.addAll(Collections.nCopies(count, itemId));
+		if (count > 0 && itemId != null) {
+			extraStats.compute(itemId, (k, v) -> (v == null ? 0 : v) + count);
 		}
 	}
 
-	public void setLore(List<String> lore) {
-		this.lore = lore;
+	public void setLore(NBTList lore) {
 		if (lore != null) {
-			this.rarity = parseMcCodes(lore.get(lore.size() - 1)).trim().split("\\s+")[0];
+			this.lore = lore.stream().map(line -> (String) line).collect(Collectors.toList());
+			rarity = parseMcCodes(this.lore.get(this.lore.size() - 1)).trim().split("\\s+")[0];
 			rarity += rarity.startsWith("VERY") ? "_SPECIAL" : "";
-			soulbound = soulbound || lore.contains("§8§l* §8Co-op Soulbound §8§l*") || lore.contains("§8§l* §8Soulbound §8§l*");
+			soulbound = soulbound || this.lore.contains("§8§l* §8Co-op Soulbound §8§l*") || this.lore.contains("§8§l* §8Soulbound §8§l*");
 		}
 	}
 
@@ -134,7 +148,7 @@ public class InvItem {
 
 	public String getPetItem() {
 		if (id.equals("PET")) {
-			for (String extraItem : getExtraStats()) {
+			for (String extraItem : getExtraStats().keySet()) {
 				if (PET_ITEM_NAMES.contains(extraItem)) {
 					return extraItem;
 				}
@@ -150,9 +164,9 @@ public class InvItem {
 		if (
 			id.equals("PET") &&
 			(
-				extraStats.contains("PET_ITEM_TIER_BOOST") ||
-				extraStats.contains("PET_ITEM_VAMPIRE_FANG") ||
-				extraStats.contains("PET_ITEM_TOY_JERRY")
+				extraStats.containsKey("PET_ITEM_TIER_BOOST") ||
+				extraStats.containsKey("PET_ITEM_VAMPIRE_FANG") ||
+				extraStats.containsKey("PET_ITEM_TOY_JERRY")
 			)
 		) {
 			return NUMBER_TO_RARITY_MAP.get("" + (Integer.parseInt(RARITY_TO_NUMBER_MAP.get(rarity).replace(";", "")) + 1));

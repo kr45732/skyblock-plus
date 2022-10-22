@@ -1231,7 +1231,7 @@ public class Utils {
 					if (!item.isEmpty()) {
 						InvItem itemInfo = new InvItem();
 						itemInfo.setName(item.getString("tag.display.Name", "None"));
-						itemInfo.setLore(item.getList("tag.display.Lore").stream().map(line -> (String) line).collect(Collectors.toList()));
+						itemInfo.setLore(item.getList("tag.display.Lore"));
 						itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
 						itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
 						itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));
@@ -1240,17 +1240,12 @@ public class Utils {
 						itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
 						itemInfo.setDungeonFloor(Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "-1")));
 						itemInfo.setNbtTag(item);
-						itemInfo.setDarkAuctionPrice(
-							(itemInfo.getId().equals("MIDAS_SWORD") || itemInfo.getId().equals("MIDAS_STAFF"))
-								? item.getLong("tag.ExtraAttributes.winning_bid", -1L)
-								: -1
-						);
+						itemInfo.setDarkAuctionPrice(item.getLong("tag.ExtraAttributes.winning_bid", -1L));
 						itemInfo.setMuseum(item.getInt("tag.ExtraAttributes.donated_museum", 0) == 1);
 
 						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
-							NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");
 							List<String> enchantsList = new ArrayList<>();
-							for (Map.Entry<String, Object> enchant : enchants.entrySet()) {
+							for (Map.Entry<String, Object> enchant : item.getCompound("tag.ExtraAttributes.enchantments").entrySet()) {
 								if (
 									enchant.getKey().equals("efficiency") &&
 									!itemInfo.getId().equals("STONK_PICKAXE") &&
@@ -1264,9 +1259,11 @@ public class Utils {
 						}
 
 						if (item.containsTag("tag.ExtraAttributes.attributes", TagType.COMPOUND)) {
-							NBTCompound attributes = item.getCompound("tag.ExtraAttributes.attributes");
-							for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
-								itemInfo.addExtraValue("ATTRIBUTE_SHARD_" + attribute.getKey().toUpperCase());
+							for (Map.Entry<String, Object> attribute : item.getCompound("tag.ExtraAttributes.attributes").entrySet()) {
+								itemInfo.addExtraValues(
+									(int) Math.pow(2, (Integer) attribute.getValue() - 1),
+									"ATTRIBUTE_SHARD_" + attribute.getKey().toUpperCase()
+								);
 							}
 						}
 
@@ -1285,27 +1282,28 @@ public class Utils {
 						}
 
 						if (item.containsTag("tag.ExtraAttributes.ability_scroll", TagType.LIST)) {
-							NBTList necronBladeScrolls = item.getList("tag.ExtraAttributes.ability_scroll");
-							for (Object scroll : necronBladeScrolls) {
+							for (Object scroll : item.getList("tag.ExtraAttributes.ability_scroll")) {
 								itemInfo.addExtraValue((String) scroll);
 							}
 						}
 
-						if (item.getInt("tag.ExtraAttributes.wood_singularity_count", 0) == 1) {
-							itemInfo.addExtraValue("WOOD_SINGULARITY");
-						}
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.wood_singularity_count", 0), "WOOD_SINGULARITY");
 
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.thunder_charge", 0) / 50000, "THUNDER_IN_A_BOTTLE");
 
-						if (item.getInt("tag.ExtraAttributes.art_of_war_count", 0) == 1) {
-							itemInfo.addExtraValue("THE_ART_OF_WAR");
-						}
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.art_of_war_count", 0), "THE_ART_OF_WAR");
 
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.artOfPeaceApplied", 0), "THE_ART_OF_PEACE");
+
+						// Master stars
 						if (
-							item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5 ||
-							item.getInt("tag.ExtraAttributes.upgrade_level", 0) > 5
+							(
+								item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5 ||
+								item.getInt("tag.ExtraAttributes.upgrade_level", 0) > 5
+							)
 						) {
-							if (!higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".type").getAsString().equals("Crimson")) {
+							String essenceType = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".type", null);
+							if (essenceType != null && !essenceType.equals("Crimson")) {
 								int masterStarCount =
 									Math.max(
 										item.getInt("tag.ExtraAttributes.dungeon_item_level", 0),
@@ -1327,57 +1325,56 @@ public class Utils {
 							}
 						}
 
-						if (item.containsKey("tag.ExtraAttributes.dungeon_item_level") || item.containsKey("dungeon_item")) {
+						// Regular or crimson essence
+						if (
+							item.containsKey("tag.ExtraAttributes.dungeon_item_level") ||
+							item.containsKey("tag.ExtraAttributes.upgrade_level")
+						) {
 							JsonElement essenceUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId());
-							if (essenceUpgrades != null) {
-								JsonObject essenceUpgradesObj = essenceUpgrades.getAsJsonObject();
+							if (higherDepth(essenceUpgrades, "type") != null) {
 								int totalEssence = 0;
-								int itemLevel = Math.min(item.getInt("tag.ExtraAttributes.dungeon_item_level", 0), 5);
+								int itemLevel = Math.max(
+									item.getInt("tag.ExtraAttributes.dungeon_item_level", 0),
+									item.getInt("tag.ExtraAttributes.upgrade_level", 0)
+								);
 								for (int j = 0; j <= itemLevel; j++) {
 									if (j == 0) {
-										if (essenceUpgradesObj.has("dungeonize")) {
-											totalEssence += essenceUpgradesObj.get("dungeonize").getAsInt();
-										}
+										totalEssence += higherDepth(essenceUpgrades, "dungeonize", 0);
 									} else {
-										totalEssence += essenceUpgradesObj.get("" + j).getAsInt();
+										totalEssence += higherDepth(essenceUpgrades, "" + j, 0);
 									}
 								}
-								itemInfo.setEssence(totalEssence, essenceUpgradesObj.get("type").getAsString().toUpperCase());
+								itemInfo.setEssence(totalEssence, higherDepth(essenceUpgrades, "type").getAsString().toUpperCase());
 							}
 						}
 
-						if (item.containsKey("tag.ExtraAttributes.upgrade_level")) {
-							if (higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".type").getAsString().equals("Crimson")) {
+						// Crimson item upgrades
+						if (
+							item.containsKey("tag.ExtraAttributes.upgrade_level") &&
+							higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".type", "").equals("Crimson")
+						) {
+							JsonElement itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items");
+							if (itemUpgrades != null) {
 								int crimsonStar = item.getInt("tag.ExtraAttributes.upgrade_level", 0);
+								for (Map.Entry<String, JsonElement> entry : itemUpgrades.getAsJsonObject().entrySet()) {
+									if (Integer.parseInt(entry.getKey()) > crimsonStar) {
+										break;
+									}
 
-								int crimsonEssence = 0;
-								for (int j = 1; j <= crimsonStar; j++) {
-									crimsonEssence += higherDepth(getEssenceCostsJson(), itemInfo.getId() + "." + j, 0);
-								}
-								itemInfo.setEssence(crimsonEssence, "CRIMSON");
-
-								JsonElement itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items");
-								if (itemUpgrades != null) {
-									for (Map.Entry<String, JsonElement> entry : itemUpgrades.getAsJsonObject().entrySet()) {
-										if (Integer.parseInt(entry.getKey()) > crimsonStar) {
-											break;
+									for (JsonElement itemUpgrade : entry.getValue().getAsJsonArray()) {
+										String itemUpgradeStr = itemUpgrade.getAsString();
+										String id;
+										int count = 1;
+										if (itemUpgradeStr.contains(" §8x")) {
+											String[] idNameSplit = itemUpgradeStr.split(" §8x");
+											id = nameToId(parseMcCodes(idNameSplit[0]), true);
+											count = Integer.parseInt(idNameSplit[1]);
+										} else {
+											id = nameToId(itemUpgradeStr, true);
 										}
 
-										for (JsonElement itemUpgrade : entry.getValue().getAsJsonArray()) {
-											String parsedUpgrade = itemUpgrade.getAsString();
-											String id;
-											int count = 1;
-											if (parsedUpgrade.contains(" §8x")) {
-												String[] idNameSplit = parsedUpgrade.split(" §8x");
-												id = nameToId(parseMcCodes(idNameSplit[0]), true);
-												count = Integer.parseInt(idNameSplit[1]);
-											} else {
-												id = nameToId(parsedUpgrade, true);
-											}
-
-											if (id != null) {
-												itemInfo.addExtraValues(count, id);
-											}
+										if (id != null) {
+											itemInfo.addExtraValues(count, id);
 										}
 									}
 								}
@@ -1413,18 +1410,53 @@ public class Utils {
 
 						if (item.containsTag("tag.ExtraAttributes.gems", TagType.COMPOUND)) {
 							NBTCompound gems = item.getCompound("tag.ExtraAttributes.gems");
+
+							// Slot unlock costs
+							JsonElement sbItemData = higherDepth(
+								streamJsonArray(getSkyblockItemsJson())
+									.filter(o -> higherDepth(o, "id").getAsString().equals(itemInfo.getId()))
+									.findAny()
+									.orElse(null),
+								"gemstone_slots"
+							);
+							if (sbItemData != null && gems.containsTag("unlocked_slots", TagType.LIST)) {
+								List<String> unlockedSlots = gems
+									.getList("unlocked_slots")
+									.stream()
+									.map(slot -> (String) slot)
+									.collect(Collectors.toCollection(ArrayList::new));
+								for (JsonElement gemstoneSlot : sbItemData.getAsJsonArray()) {
+									if (higherDepth(gemstoneSlot, "costs") != null) {
+										for (int unlockedSlotIdx = unlockedSlots.size() - 1; unlockedSlotIdx >= 0; unlockedSlotIdx--) {
+											if (
+												unlockedSlots
+													.get(unlockedSlotIdx)
+													.startsWith(higherDepth(gemstoneSlot, "slot_type").getAsString())
+											) {
+												for (JsonElement gemstoneSlotCost : higherDepth(gemstoneSlot, "costs").getAsJsonArray()) {
+													if (higherDepth(gemstoneSlotCost, "type").getAsString().equals("COINS")) {
+														itemInfo.addExtraValues(
+															higherDepth(gemstoneSlotCost, "coins").getAsInt(),
+															"SKYBLOCK_COIN"
+														);
+													} else {
+														itemInfo.addExtraValues(
+															higherDepth(gemstoneSlotCost, "amount").getAsInt(),
+															higherDepth(gemstoneSlotCost, "item_id").getAsString()
+														);
+													}
+												}
+												unlockedSlots.remove(unlockedSlotIdx);
+												break;
+											}
+										}
+									}
+								}
+							}
+
 							for (Map.Entry<String, Object> gem : gems.entrySet()) {
 								if (!gem.getKey().endsWith("_gem")) {
-									if (gem.getKey().equals("unlocked_slots") && gem.getValue() instanceof NBTList slotsList) {
-										if (
-											itemInfo.getId().equals("DIVAN_HELMET") ||
-											itemInfo.getId().equals("DIVAN_CHESTPLATE") ||
-											itemInfo.getId().equals("DIVAN_LEGGINGS") ||
-											itemInfo.getId().equals("DIVAN_BOOTS")
-										) {
-											itemInfo.addExtraValues(slotsList.size(), "GEMSTONE_CHAMBER");
-										}
-									} else if (gems.containsKey(gem.getKey() + "_gem")) { // "COMBAT_0": "PERFECT" & "COMBAT_0_gem": "JASPER"
+									if (gems.containsKey(gem.getKey() + "_gem")) { // "COMBAT_0": "PERFECT" & "COMBAT_0_gem": "JASPER"
 										itemInfo.addExtraValue(
 											(
 												gem.getValue() instanceof NBTCompound gemQualityNbt
@@ -1435,7 +1467,7 @@ public class Utils {
 											gems.get(gem.getKey() + "_gem") +
 											"_GEM"
 										);
-									} else { // "RUBY_0": "PERFECT"
+									} else if (!gem.getKey().equals("unlocked_slots")) { // "RUBY_0": "PERFECT"
 										itemInfo.addExtraValue(
 											(
 												gem.getValue() instanceof NBTCompound gemQualityNbt
@@ -1451,6 +1483,7 @@ public class Utils {
 							}
 						}
 
+						// Armor prestige costs
 						if (
 							itemInfo
 								.getId()
@@ -1467,12 +1500,15 @@ public class Utils {
 							}
 						}
 
+						// Gemstone slots for armors other than divan
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.gemstone_slots", 0), "GEMSTONE_CHAMBER");
 
-						try {
-							byte[] backpackContents = item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
-							NBTCompound parsedContentsBackpack = NBTReader.read(new ByteArrayInputStream(backpackContents));
-							itemInfo.setBackpackItems(getGenericInventoryMap(parsedContentsBackpack).values());
+						try (
+							ByteArrayInputStream backpackStream = new ByteArrayInputStream(
+								item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data")
+							)
+						) {
+							itemInfo.setBackpackItems(getGenericInventoryMap(NBTReader.read(backpackStream)).values());
 						} catch (Exception ignored) {}
 
 						itemsMap.put(i, itemInfo);

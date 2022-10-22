@@ -1048,7 +1048,7 @@ public class AutomaticGuild {
 				networthBugReportChannel = jda.getGuildById("796790757947867156").getTextChannelById("1017573342288564264");
 			}
 
-			String verboseLink = split[3];
+			String[] finalSplit = split;
 			networthBugReportChannel
 				.sendMessageEmbeds(
 					defaultEmbed("Networth Bug Report")
@@ -1071,7 +1071,8 @@ public class AutomaticGuild {
 					m
 						.editMessageComponents(
 							ActionRow.of(
-								Button.link(verboseLink, "Verbose Link"),
+								Button.link(finalSplit[3], "Verbose Link"),
+								Button.primary("nw_run_" + finalSplit[0] + "_" + finalSplit[1], "Run Networth"),
 								Button.success("nw_resolved_" + event.getUser().getId() + "_" + m.getId(), "Resolved")
 							)
 						)
@@ -1153,6 +1154,14 @@ public class AutomaticGuild {
 								),
 						ignore
 					);
+			}
+		} else if (event.getComponentId().startsWith("nw_run_")) {
+			event.deferReply(true).complete();
+			// 0 = uuid, 1 = profile name
+			String[] split = event.getComponentId().split("nw_run_")[1].split("_");
+			EmbedBuilder eb = new NetworthExecute().setVerbose(true).getPlayerNetworth(split[0], split[1], event);
+			if (eb != null) {
+				event.getHook().editOriginalEmbeds(eb.build()).queue();
 			}
 		} else if (event.getComponentId().startsWith("nw_")) {
 			long seconds = Duration

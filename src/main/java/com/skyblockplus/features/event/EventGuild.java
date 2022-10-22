@@ -65,7 +65,9 @@ public class EventGuild {
 					jda
 						.getGuildById(parent.guildId)
 						.getTextChannelById(channels.getKey())
-						.sendMessage(channels.getValue().stream().map(e -> "<@&" + e.getRoleId() + ">").collect(Collectors.joining(" ")))
+						.sendMessage(
+							channels.getValue().stream().map(e -> "<@&" + e.getRoleId() + ">").distinct().collect(Collectors.joining(" "))
+						)
 						.setEmbeds(channels.getValue().stream().map(e -> embeds.get(e.getValue())).collect(Collectors.toList()))
 						.queue();
 				}

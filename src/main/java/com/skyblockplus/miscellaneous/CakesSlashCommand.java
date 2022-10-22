@@ -94,7 +94,7 @@ public class CakesSlashCommand extends SlashCommand {
 							.append(getEmoji(cakeNameToId.get(cakeName)))
 							.append(" ")
 							.append(capitalizeString(cakeName.split("cake_")[1].replace("_", " ")))
-							.append(" Cake: expires <t:")
+							.append(": expires <t:")
 							.append(Instant.ofEpochMilli(higherDepth(cake, "expire_at").getAsLong()).getEpochSecond())
 							.append(":R>\n");
 						cakeNameToId.remove(cakeName);
@@ -109,7 +109,7 @@ public class CakesSlashCommand extends SlashCommand {
 					.append(getEmoji(missingCake.getValue()))
 					.append(" ")
 					.append(capitalizeString(missingCake.getKey().split("cake_")[1].replace("_", " ")))
-					.append(" Cake\n");
+					.append("\n");
 			}
 			eb.appendDescription("\n**Inactive Cakes**\n" + (missingCakesStr.length() > 0 ? missingCakesStr.toString() : "None"));
 

@@ -28,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
@@ -39,11 +41,16 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 public class SelectMenuPaginator {
 
 	private final Map<String, EmbedBuilder> pages;
-	private final SlashCommandEvent event;
+	private final GenericInteractionCreateEvent event;
 	private Message message;
 	private String page;
 
-	public SelectMenuPaginator(Map<SelectOption, EmbedBuilder> pages, String page, PaginatorExtras extras, SlashCommandEvent event) {
+	public SelectMenuPaginator(
+		Map<SelectOption, EmbedBuilder> pages,
+		String page,
+		PaginatorExtras extras,
+		GenericInteractionCreateEvent event
+	) {
 		this.pages = pages.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getValue(), Map.Entry::getValue));
 		this.page = page;
 		this.event = event;
@@ -53,8 +60,7 @@ public class SelectMenuPaginator {
 			actionRows.add(ActionRow.of(extras.getButtons()));
 		}
 		actionRows.add(ActionRow.of(SelectMenu.create("select_menu_paginator").addOptions(pages.keySet()).build()));
-		event
-			.getHook()
+		(event instanceof SlashCommandEvent ev ? ev : ((ButtonInteractionEvent) event)).getHook()
 			.editOriginalEmbeds(this.pages.get(page).build())
 			.setComponents(actionRows)
 			.queue(m -> {
