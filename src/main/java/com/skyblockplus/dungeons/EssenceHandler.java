@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class EssenceHandler {
 
@@ -58,7 +58,7 @@ public class EssenceHandler {
 			}
 		}
 
-		SelectMenu.Builder menuBuilder = SelectMenu.create("essence_upgrade_command");
+		StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("essence_upgrade_command");
 		if (higherDepth(itemJson, "dungeonize") != null) {
 			menuBuilder.addOption("Dungeonize", "-1");
 		}
@@ -78,7 +78,7 @@ public class EssenceHandler {
 			.queue();
 
 		waiter.waitForEvent(
-			SelectMenuInteractionEvent.class,
+			StringSelectInteractionEvent.class,
 			this::condition,
 			this::actionOne,
 			1,
@@ -87,7 +87,7 @@ public class EssenceHandler {
 		);
 	}
 
-	private boolean condition(SelectMenuInteractionEvent event) {
+	private boolean condition(StringSelectInteractionEvent event) {
 		return (
 			event.isFromGuild() &&
 			event.getMessageId().equals(reactMessage.getId()) &&
@@ -95,10 +95,10 @@ public class EssenceHandler {
 		);
 	}
 
-	private void actionOne(SelectMenuInteractionEvent event) {
+	private void actionOne(StringSelectInteractionEvent event) {
 		startingLevel = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
 
-		SelectMenu.Builder menuBuilder = SelectMenu.create("essence_upgrade_command");
+		StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("essence_upgrade_command");
 
 		for (int i = startingLevel + 1; i <= 10; i++) {
 			if (i == 0 || higherDepth(itemJson, "" + i) != null || higherDepth(itemJson, "items." + i) != null) {
@@ -117,7 +117,7 @@ public class EssenceHandler {
 			.queue();
 
 		waiter.waitForEvent(
-			SelectMenuInteractionEvent.class,
+			StringSelectInteractionEvent.class,
 			this::condition,
 			this::actionTwo,
 			1,
@@ -126,7 +126,7 @@ public class EssenceHandler {
 		);
 	}
 
-	private void actionTwo(SelectMenuInteractionEvent event) {
+	private void actionTwo(StringSelectInteractionEvent event) {
 		int endingLevel = Integer.parseInt(event.getSelectedOptions().get(0).getValue());
 
 		int totalEssence = 0;

@@ -30,13 +30,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class SelectMenuPaginator {
 
@@ -59,7 +59,7 @@ public class SelectMenuPaginator {
 		if (!extras.getButtons().isEmpty()) {
 			actionRows.add(ActionRow.of(extras.getButtons()));
 		}
-		actionRows.add(ActionRow.of(SelectMenu.create("select_menu_paginator").addOptions(pages.keySet()).build()));
+		actionRows.add(ActionRow.of(StringSelectMenu.create("select_menu_paginator").addOptions(pages.keySet()).build()));
 		(event instanceof SlashCommandEvent ev ? ev : ((ButtonInteractionEvent) event)).getHook()
 			.editOriginalEmbeds(this.pages.get(page).build())
 			.setComponents(actionRows)
@@ -69,7 +69,7 @@ public class SelectMenuPaginator {
 			});
 	}
 
-	public boolean condition(SelectMenuInteractionEvent event) {
+	public boolean condition(StringSelectInteractionEvent event) {
 		return (
 			event.isFromGuild() &&
 			event.getUser().getId().equals(this.event.getUser().getId()) &&
@@ -77,7 +77,7 @@ public class SelectMenuPaginator {
 		);
 	}
 
-	public void action(SelectMenuInteractionEvent event) {
+	public void action(StringSelectInteractionEvent event) {
 		page = event.getSelectedOptions().get(0).getValue();
 		event
 			.editMessageEmbeds(this.pages.get(page).build())
@@ -92,7 +92,7 @@ public class SelectMenuPaginator {
 
 	public void waitForEvent() {
 		waiter.waitForEvent(
-			SelectMenuInteractionEvent.class,
+			StringSelectInteractionEvent.class,
 			this::condition,
 			this::action,
 			1,

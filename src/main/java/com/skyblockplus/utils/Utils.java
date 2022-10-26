@@ -19,7 +19,6 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
 import static java.lang.String.join;
@@ -1970,25 +1969,31 @@ public class Utils {
 	}
 
 	public static JsonElement getUpdatedItemMappingsJson() {
-		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
 		JsonObject outputObj = new JsonObject();
+		Map<String, JsonElement> npcBuyCosts = new HashMap<>();
 
-		for (File child : Arrays.stream(dir.listFiles()).sorted(Comparator.comparing(File::getName)).toList()) {
+		for (File child : Arrays
+			.stream(new File("src/main/java/com/skyblockplus/json/neu/items").listFiles())
+			.sorted(Comparator.comparing(File::getName))
+			.toList()) {
 			try {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
 				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
 				String itemId = higherDepth(itemJson, "internalname").getAsString();
-				if (itemName.contains("(")) {
-					if (
-						itemId.endsWith("_MINIBOSS") ||
-						itemId.endsWith("_MONSTER") ||
-						itemId.endsWith("_ANIMAL") ||
-						itemId.endsWith("_SC") ||
-						itemId.endsWith("_BOSS") ||
-						itemId.endsWith("_NPC")
-					) {
-						continue;
+				if (
+					itemId.endsWith("_MINIBOSS") ||
+					itemId.endsWith("_MONSTER") ||
+					itemId.endsWith("_ANIMAL") ||
+					itemId.endsWith("_SC") ||
+					itemId.endsWith("_BOSS") ||
+					itemId.endsWith("_NPC")
+				) {
+					if (itemId.endsWith("_NPC") && higherDepth(itemJson, "recipes") != null) {
+						for (JsonElement recipe : higherDepth(itemJson, "recipes").getAsJsonArray()) {
+							npcBuyCosts.put(higherDepth(recipe, "result").getAsString(), higherDepth(recipe, "cost"));
+						}
 					}
+					continue;
 				}
 
 				if (itemName.startsWith("[Lvl")) {
@@ -2049,6 +2054,12 @@ public class Utils {
 			}
 		}
 
+		for (Map.Entry<String, JsonElement> entry : npcBuyCosts.entrySet()) {
+			if (outputObj.has(entry.getKey())) {
+				outputObj.getAsJsonObject(entry.getKey()).add("npc_buy_cost", entry.getValue());
+			}
+		}
+
 		return outputObj;
 	}
 
@@ -2059,8 +2070,8 @@ public class Utils {
 			.stream(new File("src/main/java/com/skyblockplus/json/neu/items").listFiles())
 			.sorted(Comparator.comparing(File::getName))
 			.toList()) {
-			try {
-				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
+			try (FileReader reader = new FileReader(child)) {
+				JsonElement itemJson = JsonParser.parseReader(reader);
 				if (
 					higherDepth(itemJson, "vanilla", false) ||
 					(
@@ -2092,9 +2103,9 @@ public class Utils {
 			return recipe.getAsJsonObject().entrySet().stream().map(e -> e.getValue().getAsString()).filter(e -> !e.isEmpty()).toList();
 		}
 
-		JsonElement additionalRecipe = getConstant("ADDITIONAL_RECIPES." + itemId);
-		if (additionalRecipe != null) {
-			return streamJsonArray(additionalRecipe).map(JsonElement::getAsString).collect(Collectors.toList());
+		JsonElement npcBuyCost = higherDepth(getInternalJsonMappings(), itemId + ".npc_buy_cost");
+		if (npcBuyCost != null) {
+			return streamJsonArray(npcBuyCost).map(JsonElement::getAsString).collect(Collectors.toList());
 		}
 
 		return null;

@@ -21,7 +21,7 @@ package com.skyblockplus.utils;
 import com.skyblockplus.features.listeners.MainListener;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 
 public abstract class AbstractEventListener {
 
@@ -35,7 +35,7 @@ public abstract class AbstractEventListener {
 		MainListener.eventListeners.remove(this);
 	}
 
-	public void onSelectMenuInteraction(SelectMenuInteractionEvent event) {}
+	public void onStringSelectInteraction(StringSelectInteractionEvent event) {}
 
 	public void onModalInteraction(ModalInteractionEvent event) {}
 

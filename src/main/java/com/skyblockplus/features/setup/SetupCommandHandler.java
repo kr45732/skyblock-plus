@@ -34,11 +34,11 @@ import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.Modal;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 public class SetupCommandHandler extends AbstractEventListener {
@@ -63,7 +63,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 							defaultEmbed("Setup").setDescription("Use the menu below to configure the verification settings").build()
 						)
 						.setActionRow(
-							SelectMenu
+							StringSelectMenu
 								.create("setup_command_" + featureType)
 								.addOption("Enable", "enable")
 								.addOption("Verification Message", "message")
@@ -128,7 +128,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 					new MessageEditBuilder()
 						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the fetchur settings").build())
 						.setActionRow(
-							SelectMenu
+							StringSelectMenu
 								.create("setup_command_" + featureType)
 								.addOption("Fetchur Channel", "channel")
 								.addOption("Fetchur Role", "role")
@@ -142,7 +142,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 					new MessageEditBuilder()
 						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the mayor settings").build())
 						.setActionRow(
-							SelectMenu
+							StringSelectMenu
 								.create("setup_command_" + featureType)
 								.addOption("Mayor Channel", "channel")
 								.addOption("Mayor Role", "role")
@@ -156,7 +156,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 					new MessageEditBuilder()
 						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the jacob settings").build())
 						.setActionRow(
-							SelectMenu
+							StringSelectMenu
 								.create("setup_command_" + featureType)
 								.addOption("Enable", "enable")
 								.addOption("Jacob Channel", "channel")
@@ -170,7 +170,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 	}
 
 	@Override
-	public void onSelectMenuInteraction(SelectMenuInteractionEvent event) {
+	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
 		if (
 			event.isFromGuild() &&
 			event.getMessageId().equals(buttonEvent.getMessageId()) &&
@@ -336,7 +336,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 											.build()
 									)
 									.setActionRow(
-										SelectMenu
+										StringSelectMenu
 											.create("setup_command_" + featureType)
 											.addOption("Enable", "enable")
 											.addOption("Application Message", "message")
@@ -659,7 +659,7 @@ public class SetupCommandHandler extends AbstractEventListener {
 								defaultEmbed("Setup").setDescription("Use the buttons below to setup the corresponding features").build()
 							)
 							.setActionRow(
-								SelectMenu
+								StringSelectMenu
 									.create("setup_command_" + featureType)
 									.addOption("Automated Apply", "guild_apply")
 									.addOption("Guild Member Role", "guild_role")

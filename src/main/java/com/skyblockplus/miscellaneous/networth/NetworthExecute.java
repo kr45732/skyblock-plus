@@ -147,7 +147,7 @@ public class NetworthExecute {
 		if (sacksMap != null) {
 			for (Map.Entry<String, Integer> sackEntry : sacksMap.entrySet()) {
 				if (sackEntry.getValue() > 0) {
-					double itemPrice = getLowestPrice(sackEntry.getKey(), true, true, null) * sackEntry.getValue();
+					double itemPrice = getLowestPrice(sackEntry.getKey(), true, null) * sackEntry.getValue();
 					addTotal("sacks", itemPrice);
 					if (event != null) {
 						String emoji = getEmojiOr(sackEntry.getKey(), null);
@@ -592,7 +592,7 @@ public class NetworthExecute {
 						source.append("dark auction price paid");
 					}
 				} else {
-					itemCost = getLowestPrice(item.getId().toUpperCase(), false, true, source);
+					itemCost = getLowestPrice(item.getId().toUpperCase(), false, source);
 				}
 			}
 		} catch (Exception ignored) {}
@@ -806,10 +806,10 @@ public class NetworthExecute {
 	}
 
 	public double getLowestPrice(String itemId) {
-		return getLowestPrice(itemId, false, true, null);
+		return getLowestPrice(itemId, false, null);
 	}
 
-	public double getLowestPrice(String itemId, boolean ignoreAh, boolean useRecipe, StringBuilder source) {
+	public double getLowestPrice(String itemId, boolean ignoreAh, StringBuilder source) {
 		double priceOverride = getPriceOverride(itemId);
 		if (priceOverride != -1) {
 			if (source != null) {
@@ -822,20 +822,30 @@ public class NetworthExecute {
 			return 1; // 1 * count
 		}
 
-		double npcPrice = Math.max(0, getNpcSellPrice(itemId));
+		if (itemId.contains("GENERATOR")) {
+			if (source != null) {
+				source.append("craft");
+			}
+			int index = itemId.lastIndexOf("_");
+			return getMinionCost(itemId.substring(0, index), Integer.parseInt(itemId.substring(index + 1)));
+		}
+
+		List<String> recipe = getRecipe(itemId);
+		double craftCost = 0;
+		if (recipe != null) {
+			for (String item : recipe) {
+				String[] idCountSplit = item.split(":");
+				craftCost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
+			}
+		}
 
 		try {
 			double bazaarPrice = higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble();
-			if (bazaarPrice >= npcPrice) {
+			if (recipe == null || bazaarPrice <= craftCost) {
 				if (source != null) {
 					source.append("bazaar");
 				}
 				return bazaarPrice;
-			} else {
-				if (source != null) {
-					source.append("npc");
-				}
-				return npcPrice;
 			}
 		} catch (Exception ignored) {}
 
@@ -848,12 +858,15 @@ public class NetworthExecute {
 			} catch (Exception ignored) {}
 
 			try {
-				JsonElement avgInfo = higherDepth(averageAuctionJson, itemId);
-				averageAuction = getMin(higherDepth(avgInfo, "clean_price", -1.0), higherDepth(avgInfo, "price", -1.0));
+				averageAuction =
+					getMin(
+						higherDepth(averageAuctionJson, itemId + ".clean_price", -1.0),
+						higherDepth(averageAuctionJson, itemId + ".price", -1.0)
+					);
 			} catch (Exception ignored) {}
 
 			double minBinAverage = getMin(lowestBin, averageAuction);
-			if (minBinAverage != -1) {
+			if (minBinAverage != -1 && (recipe == null || minBinAverage <= craftCost)) {
 				if (source != null) {
 					if (minBinAverage == lowestBin) {
 						source.append("lowest BIN");
@@ -863,36 +876,27 @@ public class NetworthExecute {
 				}
 				return minBinAverage;
 			}
-
-			if (itemId.contains("GENERATOR")) {
-				int index = itemId.lastIndexOf("_");
-				if (source != null) {
-					source.append("craft");
-				}
-				return getMinionCost(itemId.substring(0, index), Integer.parseInt(itemId.substring(index + 1)));
-			}
 		}
 
-		if (useRecipe) {
-			List<String> recipe = getRecipe(itemId);
-			if (recipe != null) {
-				double cost = 0;
-				for (String item : recipe) {
-					String[] idCountSplit = item.split(":");
-					cost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
-				}
-				if (source != null) {
+		if (recipe != null) {
+			if (source != null) {
+				if (higherDepth(getInternalJsonMappings(), itemId + ".recipe") != null) {
 					source.append("craft");
+				} else {
+					source.append("npc buy");
 				}
-				return cost;
 			}
+			return craftCost;
+		}
+
+		double npcPrice = getNpcSellPrice(itemId);
+		if (source != null && npcPrice != -1) {
+			source.append("npc sell");
+			return npcPrice;
 		}
 
 		//		tempSet.add(itemId + " - " + iName);
-		if (source != null && npcPrice > 0) {
-			source.append("npc");
-		}
-		return npcPrice;
+		return 0;
 	}
 
 	public double getMinionCost(String id, int tier) {
@@ -918,7 +922,7 @@ public class NetworthExecute {
 					cost += getMinionCost(idCountSplit[0].substring(0, idCountSplit[0].lastIndexOf("_")), tier - 1, depth - 1);
 				}
 			} else {
-				cost += getLowestPrice(idCountSplit[0].replace("-", ":"), false, false, null) * Integer.parseInt(idCountSplit[1]);
+				cost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
 			}
 		}
 		return cost;

@@ -40,13 +40,13 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.Modal;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 
@@ -69,7 +69,7 @@ public class SkyblockEventHandler {
 				.getHook()
 				.editOriginalEmbeds(eb.build())
 				.setActionRow(
-					SelectMenu
+					StringSelectMenu
 						.create("skyblock_event_" + selectMenuState)
 						.addOption("Slayer", "slayer")
 						.addOption("Skills", "skills")
@@ -81,7 +81,7 @@ public class SkyblockEventHandler {
 				.complete();
 	}
 
-	public void onSelectMenuInteraction(SelectMenuInteractionEvent event) {
+	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
 		if (
 			event.isFromGuild() &&
 			event.getMessageId().equals(message.getId()) &&
@@ -111,7 +111,7 @@ public class SkyblockEventHandler {
 									eb.setDescription("Use the menu below to choose the weight types that should be tracked").build()
 								)
 								.setActionRow(
-									SelectMenu
+									StringSelectMenu
 										.create("skyblock_event_" + selectMenuState)
 										.addOption("All", "all")
 										.addOption("Catacombs", "catacombs")
@@ -132,7 +132,7 @@ public class SkyblockEventHandler {
 									eb.setDescription("Use the menu below to choose the skill types that should be tracked").build()
 								)
 								.setActionRow(
-									SelectMenu
+									StringSelectMenu
 										.create("skyblock_event_" + selectMenuState)
 										.addOption("All", "all")
 										.addOptions(skillsOptions)
@@ -552,7 +552,7 @@ public class SkyblockEventHandler {
 		return new MessageEditBuilder()
 			.setEmbeds(eb.setDescription("Use the menu below to configure the event settings and start the event").build())
 			.setActionRow(
-				SelectMenu
+				StringSelectMenu
 					.create("skyblock_event_" + selectMenuState)
 					.addOption("Create Event", "create_event")
 					.addOption("Guild", "guild")
