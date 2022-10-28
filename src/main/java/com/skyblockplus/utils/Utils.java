@@ -1990,7 +1990,11 @@ public class Utils {
 				) {
 					if (itemId.endsWith("_NPC") && higherDepth(itemJson, "recipes") != null) {
 						for (JsonElement recipe : higherDepth(itemJson, "recipes").getAsJsonArray()) {
-							npcBuyCosts.put(higherDepth(recipe, "result").getAsString(), higherDepth(recipe, "cost"));
+							String[] result = higherDepth(recipe, "result").getAsString().split(":");
+							JsonObject buyCostObj = new JsonObject();
+							buyCostObj.add("cost", higherDepth(recipe, "cost"));
+							buyCostObj.addProperty("count", result.length == 2 ? Integer.parseInt(result[1]) : 1);
+							npcBuyCosts.put(result[0], buyCostObj);
 						}
 					}
 					continue;
@@ -2056,7 +2060,7 @@ public class Utils {
 
 		for (Map.Entry<String, JsonElement> entry : npcBuyCosts.entrySet()) {
 			if (outputObj.has(entry.getKey())) {
-				outputObj.getAsJsonObject(entry.getKey()).add("npc_buy_cost", entry.getValue());
+				outputObj.getAsJsonObject(entry.getKey()).add("npc_buy", entry.getValue());
 			}
 		}
 
@@ -2103,11 +2107,15 @@ public class Utils {
 			return recipe.getAsJsonObject().entrySet().stream().map(e -> e.getValue().getAsString()).filter(e -> !e.isEmpty()).toList();
 		}
 
-		JsonElement npcBuyCost = higherDepth(getInternalJsonMappings(), itemId + ".npc_buy_cost");
+		JsonElement npcBuyCost = higherDepth(getInternalJsonMappings(), itemId + ".npc_buy.cost");
 		if (npcBuyCost != null) {
 			return streamJsonArray(npcBuyCost).map(JsonElement::getAsString).collect(Collectors.toList());
 		}
 
 		return null;
+	}
+
+	public static int getRecipeCount(String itemId) {
+		return higherDepth(getInternalJsonMappings(), itemId + ".npc_buy.count", 1);
 	}
 }

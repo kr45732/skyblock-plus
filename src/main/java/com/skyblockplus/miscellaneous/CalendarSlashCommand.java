@@ -139,7 +139,7 @@ public class CalendarSlashCommand extends SlashCommand {
 			curYearWinter++;
 		}
 		int curYear = summerZooStart.isBefore(winterZooStart) ? curYearSummer : curYearWinter;
-		String[] pets = new String[] { "LION;4", "MONKEY;4", "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4" };
+		String[] pets = new String[] { "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4", "LION;4", "MONKEY;4" };
 		int index = 0;
 		if ((curYear - 1) % 3 == 0) {
 			index = 2;

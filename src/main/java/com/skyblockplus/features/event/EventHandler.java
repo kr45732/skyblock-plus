@@ -127,7 +127,7 @@ public class EventHandler {
 		}
 
 		index++;
-		String[] pets = new String[] { "LION;4", "MONKEY;4", "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4" };
+		String[] pets = new String[] { "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4", "LION;4", "MONKEY;4" };
 		int zooIndex = 0;
 		if ((CalendarSlashCommand.getSkyblockYear() - 2) % 3 == 0) {
 			zooIndex = 2;

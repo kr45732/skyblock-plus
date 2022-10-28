@@ -660,7 +660,7 @@ public class NetworthExecute {
 		StringBuilder miscStr = verbose ? new StringBuilder("[") : null;
 		try {
 			for (Map.Entry<String, Integer> extraItem : item.getExtraStats().entrySet()) {
-				double miscPrice = getLowestPrice(extraItem.getKey());
+				double miscPrice = getLowestPrice(extraItem.getKey()) * (extraItem.getKey().startsWith("ATTRIBUTE_SHARD_") ? 0.6 : 1);
 				miscExtras += miscPrice * extraItem.getValue();
 				if (verbose) {
 					miscStr
@@ -838,6 +838,7 @@ public class NetworthExecute {
 				craftCost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
 			}
 		}
+		craftCost /= getRecipeCount(itemId);
 
 		try {
 			double bazaarPrice = higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble();
