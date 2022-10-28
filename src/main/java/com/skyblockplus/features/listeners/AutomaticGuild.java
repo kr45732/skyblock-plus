@@ -1044,12 +1044,8 @@ public class AutomaticGuild {
 			}
 			event.getMessage().editMessageComponents(newRows).queue();
 
-			if (networthBugReportChannel == null) {
-				networthBugReportChannel = jda.getGuildById("796790757947867156").getTextChannelById("1017573342288564264");
-			}
-
 			String[] finalSplit = split;
-			networthBugReportChannel
+			getNetworthBugReportChannel()
 				.sendMessageEmbeds(
 					defaultEmbed("Networth Bug Report")
 						.addField(
@@ -1126,7 +1122,7 @@ public class AutomaticGuild {
 					.queue();
 				// 0 = user id, 1 = message id
 				String[] split = event.getComponentId().split("nw_resolved_")[1].split("_");
-				networthBugReportChannel
+				getNetworthBugReportChannel()
 					.retrieveMessageById(split[1])
 					.queue(
 						m ->
