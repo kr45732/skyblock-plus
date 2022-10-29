@@ -192,7 +192,7 @@ public class Utils {
 	private static JsonObject bazaarJson;
 	private static JsonObject extraPricesJson;
 	private static JsonObject emojiMap;
-	private static JsonArray skyblockItemsJson;
+	private static Map<String, JsonElement> skyblockItemsJson;
 	private static JsonObject internalJsonMappings;
 	private static JsonObject priceOverrideJson;
 	private static JsonObject bingoInfoJson;
@@ -281,7 +281,7 @@ public class Utils {
 					"?key=" +
 					AUCTION_API_KEY +
 					"&time=" +
-					Instant.now().minus(3, ChronoUnit.DAYS).toEpochMilli() +
+					Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli() +
 					"&step=60"
 				);
 
@@ -362,22 +362,14 @@ public class Utils {
 		return queryItems;
 	}
 
-	public static JsonArray getSkyblockItemsJson() {
+	public static Map<String, JsonElement> getSkyblockItemsJson() {
 		if (skyblockItemsJson == null) {
-			skyblockItemsJson = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items").getAsJsonArray();
+			skyblockItemsJson =
+				streamJsonArray(higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items"))
+					.collect(Collectors.toMap(o -> higherDepth(o, "id").getAsString(), Function.identity()));
 		}
 
 		return skyblockItemsJson;
-	}
-
-	public static double getNpcSellPrice(String id) {
-		for (JsonElement npcSellPrice : getSkyblockItemsJson()) {
-			if (higherDepth(npcSellPrice, "id").getAsString().equals(id)) {
-				return higherDepth(npcSellPrice, "npc_sell_price", -1.0);
-			}
-		}
-
-		return -1.0;
 	}
 
 	public static JsonObject getExtraPricesJson() {
@@ -1425,13 +1417,7 @@ public class Utils {
 							NBTCompound gems = item.getCompound("tag.ExtraAttributes.gems");
 
 							// Slot unlock costs
-							JsonElement sbItemData = higherDepth(
-								streamJsonArray(getSkyblockItemsJson())
-									.filter(o -> higherDepth(o, "id").getAsString().equals(itemInfo.getId()))
-									.findAny()
-									.orElse(null),
-								"gemstone_slots"
-							);
+							JsonElement sbItemData = higherDepth(getSkyblockItemsJson().get(itemInfo.getId()), "gemstone_slots");
 							if (sbItemData != null && gems.containsTag("unlocked_slots", TagType.LIST)) {
 								List<String> unlockedSlots = gems
 									.getList("unlocked_slots")
@@ -2138,5 +2124,13 @@ public class Utils {
 
 	public static int getRecipeCount(String itemId) {
 		return higherDepth(getInternalJsonMappings(), itemId + ".npc_buy.count", 1);
+	}
+
+	public static double getNpcSellPrice(String itemId) {
+		return higherDepth(getSkyblockItemsJson().get(itemId), "npc_sell_price", -1.0);
+	}
+
+	public static String getItemCategory(String itemId) {
+		return higherDepth(getSkyblockItemsJson().get(itemId), "category", "");
 	}
 }

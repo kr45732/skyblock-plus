@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
 import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -77,7 +76,7 @@ public class EmojiUpdater {
 				throw new FileNotFoundException("Unable to get glint images folder");
 			}
 
-			JsonArray sbItems = getSkyblockItemsJson();
+			Collection<JsonElement> sbItems = getSkyblockItemsJson().values();
 			Set<String> allSbItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
 				.getAsJsonObject()
 				.keySet();

@@ -76,7 +76,6 @@ public class Constants {
 			Type listInteger = new TypeToken<List<Integer>>() {}.getType();
 			Type listString = new TypeToken<List<String>>() {}.getType();
 			Type mapStringInteger = new TypeToken<Map<String, Integer>>() {}.getType();
-			Type mapStringLong = new TypeToken<Map<String, Long>>() {}.getType();
 
 			/* CATACOMBS_LEVEL_50_XP */
 			CATACOMBS_LEVEL_50_XP = higherDepth(CONSTANTS, "CATACOMBS_LEVEL_50_XP").getAsDouble();
@@ -177,10 +176,12 @@ public class Constants {
 
 			/* PET_ITEM_NAMES */
 			PET_ITEM_NAMES =
-				streamJsonArray(getSkyblockItemsJson())
-					.filter(e -> higherDepth(e, "category", "").equals("PET_ITEM"))
-					.map(e -> higherDepth(e, "id").getAsString())
-					.collect(Collectors.toList());
+				getSkyblockItemsJson()
+					.entrySet()
+					.stream()
+					.filter(e -> higherDepth(e.getValue(), "category", "").equals("PET_ITEM"))
+					.map(Map.Entry::getKey)
+					.toList();
 
 			/* ALL_TALISMANS */
 			ALL_TALISMANS = new HashSet<>();

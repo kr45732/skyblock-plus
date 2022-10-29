@@ -136,7 +136,7 @@ public class AuctionFlipper {
 							.addField("Price", formatNumber(startingBid), true)
 							.addField("Previous Lowest Bin", formatNumber(pastBinPrice), true)
 							.addField("Estimated Profit", roundAndFormat(profit), true)
-							.addField("Sales Per Day", formatNumber(sales), true)
+							.addField("Sales Per Hour", formatNumber(sales), true)
 							.addField("Command", "`/viewauction " + auctionUuid + "`", true)
 							.setThumbnail(getItemThumbnail(itemId))
 							.build()

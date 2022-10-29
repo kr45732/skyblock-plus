@@ -126,9 +126,11 @@ public class MissingSlashCommand extends SlashCommand {
 			missingInternalArr.removeAll(List.of("BURNING_KUUDRA_CORE", "FIERY_KUUDRA_CORE", "INFERNAL_KUUDRA_CORE")); // TODO: remove when obtainable
 			if (soulboundItems == null) {
 				soulboundItems =
-					streamJsonArray(getSkyblockItemsJson())
-						.filter(e -> higherDepth(e, "soulbound", null) != null)
-						.map(e -> higherDepth(e, "id").getAsString())
+					getSkyblockItemsJson()
+						.entrySet()
+						.stream()
+						.filter(e -> higherDepth(e.getValue(), "soulbound", null) != null)
+						.map(Map.Entry::getKey)
 						.toList();
 			}
 			List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");

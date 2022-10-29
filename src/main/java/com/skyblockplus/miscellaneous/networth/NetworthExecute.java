@@ -39,6 +39,7 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 
 public class NetworthExecute {
 
+	private static final List<String> allowedRecombCategories = List.of("ACCESSORY", "NECKLACE", "GLOVES", "BRACELET", "BELT", "CLOAK");
 	private static final List<String> locations = List.of(
 		"inventory",
 		"talisman",
@@ -602,7 +603,11 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			if (item.isRecombobulated() && (ALL_TALISMANS.contains(item.getId()) || itemCost * 10 >= recombPrice)) {
+			if (
+				item.isRecombobulated() &&
+				item.getDungeonFloor() == -1 &&
+				(!item.getEnchantsFormatted().isEmpty() || allowedRecombCategories.contains(getItemCategory(item.getId())))
+			) {
 				recombobulatedExtra = recombPrice;
 			}
 		} catch (Exception ignored) {}

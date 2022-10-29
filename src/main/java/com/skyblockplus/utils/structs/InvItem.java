@@ -44,7 +44,7 @@ public class InvItem {
 	private Map<String, Integer> extraStats = new HashMap<>();
 	private List<InvItem> backpackItems = new ArrayList<>();
 	private String rarity;
-	private int dungeonFloor = 0;
+	private int dungeonFloor = -1;
 	private int essenceCount;
 	private String essenceType;
 	private long darkAuctionPrice = -1;
