@@ -1125,8 +1125,8 @@ public class Utils {
 	}
 
 	public static void initialize() {
-		Properties appProps = new Properties();
 		try {
+			Properties appProps = new Properties();
 			appProps.load(new FileInputStream("DevSettings.properties"));
 			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
 			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
@@ -1248,6 +1248,13 @@ public class Utils {
 						itemInfo.setNbtTag(item);
 						itemInfo.setDarkAuctionPrice(item.getLong("tag.ExtraAttributes.winning_bid", -1L));
 						itemInfo.setMuseum(item.getInt("tag.ExtraAttributes.donated_museum", 0) == 1);
+
+						if (
+							(itemInfo.getId().equals("PARTY_HAT_CRAB") || itemInfo.getId().equals("PARTY_HAT_CRAB_ANIMATED")) &&
+							item.containsKey("tag.ExtraAttributes.party_hat_color")
+						) {
+							itemInfo.setId(itemInfo.getId() + "_" + item.getString("tag.ExtraAttributes.party_hat_color").toUpperCase());
+						}
 
 						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
 							List<String> enchantsList = new ArrayList<>();
@@ -1999,7 +2006,14 @@ public class Utils {
 						for (JsonElement recipe : higherDepth(itemJson, "recipes").getAsJsonArray()) {
 							String[] result = higherDepth(recipe, "result").getAsString().split(":");
 							JsonObject buyCostObj = new JsonObject();
-							buyCostObj.add("cost", higherDepth(recipe, "cost"));
+							JsonArray buyCostArr = higherDepth(recipe, "cost").getAsJsonArray();
+							for (int i = 0; i < buyCostArr.size(); i++) {
+								String buyCostArrItem = buyCostArr.get(i).getAsString();
+								if (!buyCostArrItem.matches(".+:\\d+")) {
+									buyCostArr.set(i, new JsonPrimitive(buyCostArrItem + ":1"));
+								}
+							}
+							buyCostObj.add("cost", buyCostArr);
 							buyCostObj.addProperty("count", result.length == 2 ? Integer.parseInt(result[1]) : 1);
 							npcBuyCosts.put(result[0], buyCostObj);
 						}

@@ -31,10 +31,15 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
@@ -180,7 +185,6 @@ public class SetupCommandHandler extends AbstractEventListener {
 			switch (featureType) {
 				case VERIFY -> {
 					String selectedOption = event.getSelectedOptions().get(0).getValue();
-					Modal.Builder modalBuilder = Modal.create("setup_command_" + selectedOption, "Setup");
 					switch (selectedOption) {
 						case "enable" -> {
 							event.deferReply(true).complete();
@@ -205,33 +209,42 @@ public class SetupCommandHandler extends AbstractEventListener {
 						}
 						case "message" -> event
 							.replyModal(
-								modalBuilder
+								Modal
+									.create("setup_command_" + selectedOption, "Setup")
 									.addActionRow(TextInput.create("value", "Verification Message", TextInputStyle.PARAGRAPH).build())
 									.build()
 							)
 							.queue();
 						case "roles" -> event
-							.replyModal(
-								modalBuilder
-									.addActionRow(
-										TextInput
-											.create("value", "Verified Roles", TextInputStyle.SHORT)
-											.setPlaceholder("Roles given when verifying seperated by commas")
-											.build()
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Roles given when verifying").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.ROLE
 									)
+									.setMaxValues(3)
 									.build()
 							)
+							.setEphemeral(true)
 							.queue();
 						case "channel" -> event
-							.replyModal(
-								modalBuilder
-									.addActionRow(TextInput.create("value", "Verification Channel", TextInputStyle.SHORT).build())
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Verification Channel").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.CHANNEL
+									)
+									.setChannelTypes(ChannelType.TEXT)
 									.build()
 							)
+							.setEphemeral(true)
 							.queue();
 						case "nickname" -> event
 							.replyModal(
-								modalBuilder
+								Modal
+									.create("setup_command_" + selectedOption, "Setup")
 									.addActionRow(
 										TextInput
 											.create("value", "Verified Nickname", TextInputStyle.SHORT)
@@ -259,16 +272,16 @@ public class SetupCommandHandler extends AbstractEventListener {
 								.queue();
 						}
 						case "remove_role" -> event
-							.replyModal(
-								modalBuilder
-									.addActionRow(
-										TextInput
-											.create("value", "Remove Role", TextInputStyle.SHORT)
-											.setPlaceholder("Role removed when verified")
-											.build()
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Role removed when verified").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.ROLE
 									)
 									.build()
 							)
+							.setEphemeral(true)
 							.queue();
 						case "sync" -> {
 							event.deferReply(true).complete();
@@ -384,12 +397,13 @@ public class SetupCommandHandler extends AbstractEventListener {
 							)
 							.queue();
 						case GUILD_ROLE -> event
-							.replyModal(
-								Modal
-									.create("setup_command_" + featureType, "Setup")
-									.addActionRow(TextInput.create("value", "Guild Member Role", TextInputStyle.SHORT).build())
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Guild Member Role").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create("setup_command_" + buttonEvent.getMessageId(), EntitySelectMenu.SelectTarget.ROLE)
 									.build()
 							)
+							.setEphemeral(true)
 							.queue();
 					}
 				}
@@ -434,30 +448,55 @@ public class SetupCommandHandler extends AbstractEventListener {
 							)
 							.queue();
 						case "channel" -> event
-							.replyModal(
-								modalBuilder
-									.addActionRow(TextInput.create("value", "Application Channel", TextInputStyle.SHORT).build())
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Application Channel").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.CHANNEL
+									)
+									.setChannelTypes(ChannelType.TEXT)
 									.build()
 							)
+							.setEphemeral(true)
 							.queue();
 						case "category" -> event
-							.replyModal(
-								modalBuilder
-									.addActionRow(TextInput.create("value", "New Application Category", TextInputStyle.SHORT).build())
+							.replyEmbeds(defaultEmbed("Setup").setDescription("New Application Category").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.CHANNEL
+									)
+									.setChannelTypes(ChannelType.CATEGORY)
 									.build()
 							)
+							.setEphemeral(true)
 							.queue();
 						case "staff_channel" -> event
-							.replyModal(
-								modalBuilder.addActionRow(TextInput.create("value", "Staff Channel", TextInputStyle.SHORT).build()).build()
-							)
-							.queue();
-						case "staff_role" -> event
-							.replyModal(
-								modalBuilder
-									.addActionRow(TextInput.create("value", "Staff Ping Role", TextInputStyle.SHORT).build())
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Staff Channel").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.CHANNEL
+									)
+									.setChannelTypes(ChannelType.TEXT)
 									.build()
 							)
+							.setEphemeral(true)
+							.queue();
+						case "staff_role" -> event
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Staff Ping Role").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.ROLE
+									)
+									.build()
+							)
+							.setEphemeral(true)
 							.queue();
 						case "accept_message" -> event
 							.replyModal(
@@ -481,11 +520,17 @@ public class SetupCommandHandler extends AbstractEventListener {
 							)
 							.queue();
 						case "waiting_channel" -> event
-							.replyModal(
-								modalBuilder
-									.addActionRow(TextInput.create("value", "Waiting Channel", TextInputStyle.PARAGRAPH).build())
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Waiting Channel").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.CHANNEL
+									)
+									.setChannelTypes(ChannelType.TEXT)
 									.build()
 							)
+							.setEphemeral(true)
 							.queue();
 						case "requirements" -> event
 							.replyModal(
@@ -539,41 +584,66 @@ public class SetupCommandHandler extends AbstractEventListener {
 				}
 				case FETCHUR -> {
 					String selectedOption = event.getSelectedOptions().get(0).getValue();
-					Modal.Builder modalBuilder = Modal.create("setup_command_" + selectedOption, "Setup");
 					switch (selectedOption) {
 						case "role" -> event
-							.replyModal(
-								modalBuilder.addActionRow(TextInput.create("value", "Fetchur Role", TextInputStyle.SHORT).build()).build()
-							)
-							.queue();
-						case "channel" -> event
-							.replyModal(
-								modalBuilder
-									.addActionRow(TextInput.create("value", "Fetchur Channel", TextInputStyle.SHORT).build())
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Fetchur Role").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.ROLE
+									)
 									.build()
 							)
+							.setEphemeral(true)
+							.queue();
+						case "channel" -> event
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Fetchur Channel").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.CHANNEL
+									)
+									.setChannelTypes(ChannelType.TEXT)
+									.build()
+							)
+							.setEphemeral(true)
 							.queue();
 					}
 				}
 				case MAYOR -> {
 					String selectedOption = event.getSelectedOptions().get(0).getValue();
-					Modal.Builder modalBuilder = Modal.create("setup_command_" + selectedOption, "Setup");
 					switch (selectedOption) {
 						case "role" -> event
-							.replyModal(
-								modalBuilder.addActionRow(TextInput.create("value", "Mayor Role", TextInputStyle.SHORT).build()).build()
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Mayor Role").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.ROLE
+									)
+									.build()
 							)
+							.setEphemeral(true)
 							.queue();
 						case "channel" -> event
-							.replyModal(
-								modalBuilder.addActionRow(TextInput.create("value", "Mayor Channel", TextInputStyle.SHORT).build()).build()
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Mayor Channel").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.CHANNEL
+									)
+									.setChannelTypes(ChannelType.TEXT)
+									.build()
 							)
+							.setEphemeral(true)
 							.queue();
 					}
 				}
 				case JACOB -> {
 					String selectedOption = event.getSelectedOptions().get(0).getValue();
-					Modal.Builder modalBuilder = Modal.create("setup_command_" + selectedOption, "Setup");
 					switch (selectedOption) {
 						case "enable" -> {
 							event.deferReply(true).complete();
@@ -590,13 +660,149 @@ public class SetupCommandHandler extends AbstractEventListener {
 							event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
 						}
 						case "crops" -> event
-							.replyModal(modalBuilder.addActionRow(TextInput.create("value", "Crops", TextInputStyle.SHORT).build()).build())
-							.queue();
-						case "channel" -> event
 							.replyModal(
-								modalBuilder.addActionRow(TextInput.create("value", "Mayor Channel", TextInputStyle.SHORT).build()).build()
+								Modal
+									.create("setup_command_" + selectedOption, "Setup")
+									.addActionRow(TextInput.create("value", "Crops", TextInputStyle.SHORT).build())
+									.build()
 							)
 							.queue();
+						case "channel" -> event
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Jacob Channel").build())
+							.setActionRow(
+								EntitySelectMenu
+									.create(
+										"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+										EntitySelectMenu.SelectTarget.CHANNEL
+									)
+									.setChannelTypes(ChannelType.TEXT)
+									.build()
+							)
+							.setEphemeral(true)
+							.queue();
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onEntitySelectInteraction(EntitySelectInteractionEvent event) {
+		if (
+			event.isFromGuild() &&
+			event.getUser().getId().equals(buttonEvent.getUser().getId()) &&
+			event.getComponentId().startsWith("setup_command_")
+		) {
+			String[] split = event.getComponentId().split("setup_command_")[1].split("_", 2);
+			if (split.length >= 1 && split[0].equals(buttonEvent.getMessageId())) {
+				lastAction = Instant.now();
+
+				event.deferReply(true).complete();
+				switch (featureType) {
+					case VERIFY -> {
+						EmbedBuilder eb = null;
+						switch (split[1]) {
+							case "roles" -> {
+								database.setVerifyRolesSettings(event.getGuild().getId(), new JsonArray());
+								for (Role verifyRole : event.getMentions().getRoles()) {
+									eb = getSettings().addVerifyRole(verifyRole.getId());
+									if (!eb.build().getTitle().equals("Settings")) {
+										break;
+									}
+								}
+								if (eb.build().getTitle().equals("Settings")) {
+									eb.setDescription(
+										"Set verified roles: " +
+										event.getMentions().getRoles().stream().map(Role::getAsMention).collect(Collectors.joining(" "))
+									);
+								}
+							}
+							case "channel" -> eb =
+								getSettings().setVerifyMessageTextChannelId(event.getMentions().getChannels().get(0).getId());
+							case "remove_role" -> eb = getSettings().setVerifyRemoveRole(event.getMentions().getRoles().get(0).getId());
+						}
+						if (!eb.build().getTitle().equals("Settings")) {
+							eb.appendDescription("\n\nPlease try again.");
+						}
+						event.getHook().editOriginalEmbeds(eb.build()).queue();
+					}
+					case GUILD_APPLY -> {
+						EmbedBuilder eb = null;
+						switch (split[1]) {
+							case "channel" -> eb =
+								getSettings().setApplyChannel(getGuildSettings(), event.getMentions().getChannels().get(0).getId());
+							case "staff_channel" -> eb =
+								getSettings().setApplyStaffChannel(getGuildSettings(), event.getMentions().getChannels().get(0).getId());
+							case "staff_role" -> eb =
+								getSettings().addApplyStaffRole(getGuildSettings(), event.getMentions().getRoles().get(0).getId());
+							case "waiting_channel" -> eb =
+								getSettings().setApplyWaitingChannel(getGuildSettings(), event.getMentions().getChannels().get(0).getId());
+							case "category" -> eb =
+								getSettings().setApplyCategory(getGuildSettings(), event.getMentions().getChannels().get(0).getId());
+						}
+						if (!eb.build().getTitle().equals("Settings")) {
+							eb.appendDescription("\n\nPlease try again.");
+						}
+						event.getHook().editOriginalEmbeds(eb.build()).queue();
+					}
+					case GUILD_ROLE -> {
+						EmbedBuilder eb = getSettings()
+							.setGuildMemberRole(getGuildSettings(), event.getMentions().getRoles().get(0).getId());
+						if (eb.build().getTitle().equals("Settings")) {
+							eb = getSettings().setGuildMemberRoleEnable(getGuildSettings(), true);
+							if (eb.build().getTitle().equals("Settings")) {
+								event
+									.getHook()
+									.editOriginalEmbeds(defaultEmbed("Success").setDescription("Enabled guild member role sync.").build())
+									.queue();
+								event.getMessage().editMessageComponents().queue();
+								completed();
+								return;
+							}
+						}
+						event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
+					}
+					case MAYOR -> {
+						EmbedBuilder eb = null;
+						switch (split[1]) {
+							case "channel" -> {
+								eb = getSettings().setMayorChannel(event.getMentions().getChannels().get(0).getId());
+								if (eb.build().getTitle().equals("Settings")) {
+									fetchurOrMayorChannelSet = true;
+								}
+							}
+							case "role" -> eb = getSettings().setMayorPing(event.getMentions().getRoles().get(0).getId());
+						}
+						if (!eb.build().getTitle().equals("Settings")) {
+							eb.appendDescription("\n\nPlease try again.");
+						}
+						event.getHook().editOriginalEmbeds(eb.build()).queue();
+					}
+					case FETCHUR -> {
+						EmbedBuilder eb = null;
+						switch (split[1]) {
+							case "channel" -> {
+								eb = getSettings().setFetchurChannel(event.getMentions().getChannels().get(0).getId());
+								if (eb.build().getTitle().equals("Settings")) {
+									fetchurOrMayorChannelSet = true;
+								}
+							}
+							case "role" -> eb = getSettings().setFetchurPing(event.getMentions().getRoles().get(0).getId());
+						}
+						if (!eb.build().getTitle().equals("Settings")) {
+							eb.appendDescription("\n\nPlease try again.");
+						}
+						event.getHook().editOriginalEmbeds(eb.build()).queue();
+					}
+					case JACOB -> {
+						EmbedBuilder eb = null;
+						switch (split[1]) {
+							case "channel" -> eb = getSettings().setJacobChannel(event.getMentions().getChannels().get(0).getId());
+						}
+						if (!eb.build().getTitle().equals("Settings")) {
+							eb.appendDescription("\n\nPlease try again.");
+						}
+						event.getHook().editOriginalEmbeds(eb.build()).queue();
 					}
 				}
 			}
@@ -611,34 +817,15 @@ public class SetupCommandHandler extends AbstractEventListener {
 			event.getMessage().getId().equals(buttonEvent.getMessageId()) &&
 			event.getUser().getId().equals(buttonEvent.getUser().getId())
 		) {
-			(featureType == FeatureType.GUILD ? event.deferEdit() : event.deferReply(true)).complete();
-
 			lastAction = Instant.now();
+
+			(featureType == FeatureType.GUILD ? event.deferEdit() : event.deferReply(true)).complete();
 			switch (featureType) {
 				case VERIFY -> {
 					EmbedBuilder eb = null;
 					switch (event.getModalId().split("setup_command_")[1]) {
 						case "message" -> eb = getSettings().setVerifyMessageText(event.getValues().get(0).getAsString());
-						case "roles" -> {
-							String[] verifyRoles = event.getValues().get(0).getAsString().split(",");
-							if (verifyRoles.length == 0 || verifyRoles.length > 3) {
-								eb =
-									invalidEmbed(
-										"You must add at least one verification role and at most three verification roles. (Example: `@role1, @role2`)"
-									);
-							} else {
-								database.setVerifyRolesSettings(event.getGuild().getId(), new JsonArray());
-								for (String verifyRole : verifyRoles) {
-									eb = getSettings().addVerifyRole(verifyRole.trim());
-									if (!eb.build().getTitle().equals("Settings")) {
-										break;
-									}
-								}
-							}
-						}
-						case "channel" -> eb = getSettings().setVerifyMessageTextChannelId(event.getValues().get(0).getAsString());
 						case "nickname" -> eb = getSettings().setVerifyNickname(event.getValues().get(0).getAsString());
-						case "remove_role" -> eb = getSettings().setVerifyRemoveRole(event.getValues().get(0).getAsString());
 					}
 					if (!eb.build().getTitle().equals("Settings")) {
 						eb.appendDescription("\n\nPlease try again.");
@@ -676,18 +863,10 @@ public class SetupCommandHandler extends AbstractEventListener {
 					EmbedBuilder eb = null;
 					switch (event.getModalId().split("setup_command_")[1]) {
 						case "message" -> eb = getSettings().setApplyMessage(getGuildSettings(), event.getValues().get(0).getAsString());
-						case "channel" -> eb = getSettings().setApplyChannel(getGuildSettings(), event.getValues().get(0).getAsString());
-						case "category" -> eb = getSettings().setApplyCategory(getGuildSettings(), event.getValues().get(0).getAsString());
-						case "staff_channel" -> eb =
-							getSettings().setApplyStaffChannel(getGuildSettings(), event.getValues().get(0).getAsString());
 						case "accept_message" -> eb =
 							getSettings().setApplyAcceptMessage(getGuildSettings(), event.getValues().get(0).getAsString());
 						case "deny_message" -> eb =
 							getSettings().setApplyDenyMessage(getGuildSettings(), event.getValues().get(0).getAsString());
-						case "staff_role" -> eb =
-							getSettings().addApplyStaffRole(getGuildSettings(), event.getValues().get(0).getAsString());
-						case "waiting_channel" -> eb =
-							getSettings().setApplyWaitingChannel(getGuildSettings(), event.getValues().get(0).getAsString());
 						case "waitlist_message" -> eb =
 							getSettings().setApplyWaitlistMessage(getGuildSettings(), event.getValues().get(0).getAsString());
 						case "requirements" -> {
@@ -750,58 +929,9 @@ public class SetupCommandHandler extends AbstractEventListener {
 					}
 					event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
 				}
-				case GUILD_ROLE -> {
-					EmbedBuilder eb = getSettings().setGuildMemberRole(getGuildSettings(), event.getValues().get(0).getAsString());
-					if (eb.build().getTitle().equals("Settings")) {
-						eb = getSettings().setGuildMemberRoleEnable(getGuildSettings(), true);
-						if (eb.build().getTitle().equals("Settings")) {
-							event
-								.getHook()
-								.editOriginalEmbeds(defaultEmbed("Success").setDescription("Enabled guild member role sync.").build())
-								.queue();
-							event.getMessage().editMessageComponents().queue();
-							completed();
-							return;
-						}
-					}
-					event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
-				}
-				case MAYOR -> {
-					EmbedBuilder eb = null;
-					switch (event.getModalId().split("setup_command_")[1]) {
-						case "channel" -> {
-							eb = getSettings().setMayorChannel(event.getValues().get(0).getAsString());
-							if (eb.build().getTitle().equals("Settings")) {
-								fetchurOrMayorChannelSet = true;
-							}
-						}
-						case "role" -> eb = getSettings().setMayorPing(event.getValues().get(0).getAsString());
-					}
-					if (!eb.build().getTitle().equals("Settings")) {
-						eb.appendDescription("\n\nPlease try again.");
-					}
-					event.getHook().editOriginalEmbeds(eb.build()).queue();
-				}
-				case FETCHUR -> {
-					EmbedBuilder eb = null;
-					switch (event.getModalId().split("setup_command_")[1]) {
-						case "channel" -> {
-							eb = getSettings().setFetchurChannel(event.getValues().get(0).getAsString());
-							if (eb.build().getTitle().equals("Settings")) {
-								fetchurOrMayorChannelSet = true;
-							}
-						}
-						case "role" -> eb = getSettings().setFetchurPing(event.getValues().get(0).getAsString());
-					}
-					if (!eb.build().getTitle().equals("Settings")) {
-						eb.appendDescription("\n\nPlease try again.");
-					}
-					event.getHook().editOriginalEmbeds(eb.build()).queue();
-				}
 				case JACOB -> {
 					EmbedBuilder eb = null;
 					switch (event.getModalId().split("setup_command_")[1]) {
-						case "channel" -> eb = getSettings().setJacobChannel(event.getValues().get(0).getAsString());
 						case "crops" -> {
 							String in = event.getValues().get(0).getAsString();
 							List<String> crops = new ArrayList<>();

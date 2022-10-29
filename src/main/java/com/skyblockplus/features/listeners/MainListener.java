@@ -40,6 +40,7 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -213,7 +214,7 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onButtonInteraction(ButtonInteractionEvent event) {
-		if (event.getUser().isBot()) {
+		if (event.getUser().isBot() || event.getGuild() == null) {
 			return;
 		}
 
@@ -253,6 +254,17 @@ public class MainListener extends ListenerAdapter {
 
 		for (AbstractEventListener listener : eventListeners) {
 			listener.onStringSelectInteraction(event);
+		}
+	}
+
+	@Override
+	public void onEntitySelectInteraction(@NotNull EntitySelectInteractionEvent event) {
+		if (event.getUser().isBot() || event.getGuild() == null) {
+			return;
+		}
+
+		for (AbstractEventListener listener : eventListeners) {
+			listener.onEntitySelectInteraction(event);
 		}
 	}
 
