@@ -384,34 +384,12 @@
         "requirements": [
           [
             {
-              "amount": 30,
-              "type": "skills"
-            },
-            {
-              "amount": 2000,
-              "type": "weight"
-            }
-          ],
-          [
-            {
-              "amount": 24,
-              "type": "catacombs",
-              "convert_from_level": true
-            },
-            {
-              "amount": 2000,
-              "type": "weight"
-            }
-          ],
-          [
-            {
-              "amount": 30,
-              "type": "skills"
+              "amount": 500000000,
+              "type": "networth"
             },
             {
               "amount": 24,
-              "type": "catacombs",
-              "convert_from_level": true
+              "type": "catacombs"
             }
           ]
         ],
@@ -425,34 +403,12 @@
           "requirements": [
             [
               {
-                "amount": 40,
-                "type": "skills"
+                "amount": 2500000000,
+                "type": "networth"
               },
               {
-                "amount": 7000,
-                "type": "weight"
-              }
-            ],
-            [
-              {
-                "amount": 34,
-                "type": "catacombs",
-                "convert_from_level": true
-              },
-              {
-                "amount": 7000,
-                "type": "weight"
-              }
-            ],
-            [
-              {
-                "amount": 40,
-                "type": "skills"
-              },
-              {
-                "amount": 34,
-                "type": "catacombs",
-                "convert_from_level": true
+                "amount": 35,
+                "type": "catacombs"
               }
             ]
           ],
@@ -464,34 +420,12 @@
           "requirements": [
             [
               {
-                "amount": 50,
-                "type": "skills"
+                "amount": 10000000000,
+                "type": "networth"
               },
               {
-                "amount": 11000,
-                "type": "weight"
-              }
-            ],
-            [
-              {
-                "amount": 42,
-                "type": "catacombs",
-                "convert_from_level": true
-              },
-              {
-                "amount": 11000,
-                "type": "weight"
-              }
-            ],
-            [
-              {
-                "amount": 50,
-                "type": "skills"
-              },
-              {
-                "amount": 42,
-                "type": "catacombs",
-                "convert_from_level": true
+                "amount": 45,
+                "type": "catacombs"
               }
             ]
           ],
