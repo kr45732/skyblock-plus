@@ -944,8 +944,9 @@ public class AutomaticGuild {
 						);
 				} else {
 					MessageCreateAction action = mayorChannel.sendMessageEmbeds(embed);
-					(mayorGraphFile != null ? action.setFiles(FileUpload.fromData(mayorGraphFile)) : action).queue(m ->
-							lastMayorElectionOpenMessage = m
+					(mayorGraphFile != null ? action.setFiles(FileUpload.fromData(mayorGraphFile)) : action).queue(
+							m -> lastMayorElectionOpenMessage = m,
+							ignore
 						);
 				}
 				return true;

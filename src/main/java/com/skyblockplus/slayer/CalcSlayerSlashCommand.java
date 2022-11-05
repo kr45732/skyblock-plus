@@ -22,10 +22,12 @@ import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
+import com.skyblockplus.miscellaneous.weight.weight.Weight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.WeightStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -52,7 +54,8 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 				event.getOptionStr("profile"),
 				event.getOptionStr("type"),
 				event.getOptionInt("level", -1),
-				event.getOptionInt("xp", -1)
+				event.getOptionInt("xp", -1),
+				Player.WeightType.of(event.getOptionStr("system", "senither"))
 			)
 		);
 	}
@@ -69,7 +72,10 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 					.addChoice("Voidgloom Seraph", "enderman")
 					.addChoice("Inferno Demonlord", "blaze"),
 				new OptionData(OptionType.INTEGER, "level", "Target slayer level").setRequiredRange(1, 9),
-				new OptionData(OptionType.INTEGER, "xp", "Target slayer xp").setMinValue(1)
+				new OptionData(OptionType.INTEGER, "xp", "Target slayer xp").setMinValue(1),
+				new OptionData(OptionType.STRING, "system", "Weight system that should be used")
+					.addChoice("Senither", "senither")
+					.addChoice("Lily", "lily")
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOption(OptionType.STRING, "profile", "Profile name");
@@ -82,7 +88,14 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static EmbedBuilder getCalcSlayer(String username, String profileName, String slayerType, int targetLevel, long targetXp) {
+	public static EmbedBuilder getCalcSlayer(
+		String username,
+		String profileName,
+		String slayerType,
+		int targetLevel,
+		long targetXp,
+		Player.WeightType weightType
+	) {
 		slayerType = slayerType.toLowerCase();
 		if (!SLAYER_NAMES.contains(slayerType)) {
 			return invalidEmbed("Invalid slayer type");
@@ -138,6 +151,11 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 					.append(")");
 			}
 
+			Weight weight = Weight.of(weightType, player).calculateWeight(slayerType);
+			Weight predictedWeight = Weight.of(weightType, player).calculateWeight(slayerType);
+			WeightStruct pre = weight.getSlayerWeight().getSlayerWeight(slayerType);
+			WeightStruct post = predictedWeight.getSlayerWeight().getSlayerWeight(slayerType, (int) targetXp);
+
 			return player
 				.defaultPlayerEmbed()
 				.setDescription(
@@ -146,9 +164,22 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 					"\n**Target XP:** " +
 					roundAndFormat(targetXp) +
 					"\n**XP Needed:** " +
-					formatNumber(xpNeeded) +
-					"\n**Bosses Needed:**" +
-					out
+					formatNumber(xpNeeded)
+				)
+				.addField("Bosses Needed", out.toString(), false)
+				.addField(
+					"Weight Change",
+					"Total: " +
+					weight.getTotalWeight().getFormatted(false) +
+					" ➜ " +
+					predictedWeight.getTotalWeight().getFormatted(false) +
+					"\n" +
+					capitalizeString(slayerType) +
+					": " +
+					pre.getFormatted(false) +
+					" ➜ " +
+					post.getFormatted(false),
+					false
 				);
 		}
 

@@ -185,7 +185,7 @@ public class Main {
 			scheduler.schedule(ApiHandler::updateBotStatistics, 90, TimeUnit.SECONDS);
 		}
 
-		log.info("Bot ready with " + jda.getShardsTotal() + " shards");
+		log.info("Bot ready with " + jda.getShardsTotal() + " shards and " + jda.getGuilds().size() + " guilds");
 	}
 
 	@PreDestroy

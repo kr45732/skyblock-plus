@@ -73,6 +73,10 @@ public class VerifyGuild {
 	}
 
 	public void onButtonClick(ButtonInteractionEvent event) {
+		if (!enable) {
+			return;
+		}
+
 		if (!event.getChannel().getId().equals(messageChannel.getId())) {
 			return;
 		}

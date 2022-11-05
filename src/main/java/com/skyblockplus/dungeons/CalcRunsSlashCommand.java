@@ -20,7 +20,7 @@ package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Utils.*;
 
-import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
+import com.skyblockplus.miscellaneous.weight.weight.Weight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -50,7 +50,14 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			getCalcRuns(event.player, event.getOptionStr("profile"), event.getOptionInt("level", 1), event.getOptionInt("floor", 0), event)
+			getCalcRuns(
+				event.player,
+				event.getOptionStr("profile"),
+				event.getOptionInt("level", 1),
+				event.getOptionInt("floor", 0),
+				Player.WeightType.of(event.getOptionStr("system", "senither")),
+				event
+			)
 		);
 	}
 
@@ -75,7 +82,10 @@ public class CalcRunsSlashCommand extends SlashCommand {
 					.addChoice("Master Floor 4", 11)
 					.addChoice("Master Floor 5", 12)
 					.addChoice("Master Floor 6", 13)
-					.addChoice("Master Floor 7", 14)
+					.addChoice("Master Floor 7", 14),
+				new OptionData(OptionType.STRING, "system", "Weight system that should be used")
+					.addChoice("Senither", "senither")
+					.addChoice("Lily", "lily")
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOption(OptionType.STRING, "profile", "Profile name");
@@ -88,7 +98,14 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static Object getCalcRuns(String username, String profileName, int targetLevel, int floor, SlashCommandEvent event) {
+	public static Object getCalcRuns(
+		String username,
+		String profileName,
+		int targetLevel,
+		int floor,
+		Player.WeightType weightType,
+		SlashCommandEvent event
+	) {
 		if (targetLevel <= 0 || targetLevel > 50) {
 			return invalidEmbed("Target level must be between 1 and 50");
 		}
@@ -98,8 +115,8 @@ public class CalcRunsSlashCommand extends SlashCommand {
 
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			EmbedBuilder regEmbed = getCalcRunsEmbed(player, targetLevel, floor, false);
-			EmbedBuilder ringEmbed = getCalcRunsEmbed(player, targetLevel, floor, true)
+			EmbedBuilder regEmbed = getCalcRunsEmbed(player, targetLevel, floor, false, weightType);
+			EmbedBuilder ringEmbed = getCalcRunsEmbed(player, targetLevel, floor, true, weightType)
 				.setDescription("**Note:** Calculating with catacombs expert ring");
 
 			event.paginate(
@@ -138,7 +155,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static EmbedBuilder getCalcRunsEmbed(Player player, int targetLevel, int floor, boolean useRing) {
+	public static EmbedBuilder getCalcRunsEmbed(Player player, int targetLevel, int floor, boolean useRing, Player.WeightType weightType) {
 		SkillsStruct current = player.getCatacombs();
 		SkillsStruct target = player.skillInfoFromLevel(targetLevel, "catacombs");
 		if (current.totalExp() >= target.totalExp()) {
@@ -194,8 +211,8 @@ public class CalcRunsSlashCommand extends SlashCommand {
 			runs = Math.max(0, completionsCap - completions) + (int) Math.ceil(xpNeeded / xpPerRun);
 		}
 
-		SenitherWeight weight = new SenitherWeight(player).calculateWeight("catacombs");
-		SenitherWeight predictedWeight = new SenitherWeight(player).calculateWeight("catacombs");
+		Weight weight = Weight.of(weightType, player).calculateWeight("catacombs");
+		Weight predictedWeight = Weight.of(weightType, player).calculateWeight("catacombs");
 		WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight();
 		WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight(target);
 
