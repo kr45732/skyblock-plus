@@ -20,15 +20,11 @@ package com.skyblockplus.features.listeners;
 
 import static com.skyblockplus.utils.Utils.*;
 
-import com.skyblockplus.utils.AbstractEventListener;
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -40,7 +36,6 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -50,21 +45,7 @@ import org.jetbrains.annotations.NotNull;
 public class MainListener extends ListenerAdapter {
 
 	public static final Map<String, AutomaticGuild> guildMap = new ConcurrentHashMap<>();
-	public static final Queue<AbstractEventListener> eventListeners = new ConcurrentLinkedQueue<>();
 	private static String lastRepoCommitSha = null;
-
-	public static void initialize() {
-		scheduler.scheduleAtFixedRate(
-			() -> {
-				try {
-					eventListeners.removeIf(AbstractEventListener::hasTimedOut);
-				} catch (Exception ignored) {}
-			},
-			0,
-			15,
-			TimeUnit.SECONDS
-		);
-	}
 
 	public static String onApplyReload(String guildId) {
 		String reloadStatus = "Error reloading";
@@ -221,10 +202,6 @@ public class MainListener extends ListenerAdapter {
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onButtonClick(event);
 		}
-
-		for (AbstractEventListener listener : eventListeners) {
-			listener.onButtonInteraction(event);
-		}
 	}
 
 	@Override
@@ -236,10 +213,6 @@ public class MainListener extends ListenerAdapter {
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onModalInteraction(event);
 		}
-
-		for (AbstractEventListener listener : eventListeners) {
-			listener.onModalInteraction(event);
-		}
 	}
 
 	@Override
@@ -250,21 +223,6 @@ public class MainListener extends ListenerAdapter {
 
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onStringSelectInteraction(event);
-		}
-
-		for (AbstractEventListener listener : eventListeners) {
-			listener.onStringSelectInteraction(event);
-		}
-	}
-
-	@Override
-	public void onEntitySelectInteraction(@NotNull EntitySelectInteractionEvent event) {
-		if (event.getUser().isBot() || event.getGuild() == null) {
-			return;
-		}
-
-		for (AbstractEventListener listener : eventListeners) {
-			listener.onEntitySelectInteraction(event);
 		}
 	}
 
