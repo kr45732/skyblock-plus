@@ -50,7 +50,21 @@ public class SelectMenuPaginator {
 		this.extras = extras;
 		this.event = event;
 
-		renderPage(event);
+		List<LayoutComponent> actionRows = new ArrayList<>();
+		if (!extras.getButtons().isEmpty()) {
+			actionRows.add(ActionRow.of(extras.getButtons()));
+		}
+		actionRows.add(ActionRow.of(StringSelectMenu.create("select_menu_paginator").addOptions(extras.getSelectPages().keySet()).build()));
+		(event instanceof SlashCommandEvent ev ? ev : ((ButtonInteractionEvent) event)).getHook()
+			.editOriginalEmbeds(getPage(page).build())
+			.setComponents(actionRows)
+			.queue(
+				m -> {
+					message = m;
+					waitForEvent();
+				},
+				ignore
+			);
 	}
 
 	public boolean condition(GenericComponentInteractionCreateEvent genericEvent) {
@@ -89,7 +103,21 @@ public class SelectMenuPaginator {
 			.orElse(ignored -> {})
 			.accept(null);
 
-		renderPage(event);
+		List<LayoutComponent> actionRows = new ArrayList<>();
+		if (!extras.getButtons().isEmpty()) {
+			actionRows.add(ActionRow.of(extras.getButtons()));
+		}
+		actionRows.add(ActionRow.of(StringSelectMenu.create("select_menu_paginator").addOptions(extras.getSelectPages().keySet()).build()));
+		event
+			.editMessageEmbeds(getPage(page).build())
+			.setComponents(actionRows)
+			.queue(
+				m -> {
+					message = event.getMessage();
+					waitForEvent();
+				},
+				ignore
+			);
 	}
 
 	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
@@ -112,24 +140,6 @@ public class SelectMenuPaginator {
 			.stream()
 			.collect(Collectors.toMap(e -> e.getKey().getValue(), Map.Entry::getValue))
 			.get(page);
-	}
-
-	public void renderPage(GenericInteractionCreateEvent event) {
-		List<LayoutComponent> actionRows = new ArrayList<>();
-		if (!extras.getButtons().isEmpty()) {
-			actionRows.add(ActionRow.of(extras.getButtons()));
-		}
-		actionRows.add(ActionRow.of(StringSelectMenu.create("select_menu_paginator").addOptions(extras.getSelectPages().keySet()).build()));
-		(event instanceof SlashCommandEvent ev ? ev : ((ButtonInteractionEvent) event)).getHook()
-			.editOriginalEmbeds(getPage(page).build())
-			.setComponents(actionRows)
-			.queue(
-				m -> {
-					message = m;
-					waitForEvent();
-				},
-				ignore
-			);
 	}
 
 	public void waitForEvent() {
