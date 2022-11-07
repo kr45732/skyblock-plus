@@ -54,7 +54,9 @@ public class NetworthExecute {
 	//	private final Set<String> tempSet = new HashSet<>();
 	private final Map<String, List<InvItem>> pets = new HashMap<>();
 	private final Map<String, List<String>> items = new HashMap<>();
+	private final Map<String, List<String>> soulboundIgnoredItems = new HashMap<>();
 	private final Map<String, Double> totals = new HashMap<>();
+	private final Map<String, Double> soulboundIgnoredTotals = new HashMap<>();
 	private StringBuilder calcItemsJsonStr = new StringBuilder("[");
 	private JsonElement lowestBinJson;
 	private JsonElement averageAuctionJson;
@@ -134,9 +136,10 @@ public class NetworthExecute {
 					if (item != null) {
 						double itemPrice = calculateItemPrice(item, location);
 						if (itemPrice >= 0) { // -1 if pet
-							addTotal(location, itemPrice);
+							// If event is null, no need to update the soulbound fields even if soulbound
+							addTotal(location, itemPrice, event != null && item.isSoulbound());
 							if (event != null) {
-								addItem(location, addItemStr(item, itemPrice));
+								addItem(location, addItemStr(item, itemPrice), item.isSoulbound());
 							}
 						}
 					}
@@ -171,17 +174,60 @@ public class NetworthExecute {
 			return invalidEmbed("Was not triggered by command");
 		}
 
-		StringBuilder echestStr = getSectionString(getItems("enderchest"));
-		StringBuilder sacksStr = getSectionString(getItems("sacks"));
-		StringBuilder personalVaultStr = getSectionString(getItems("personal_vault"));
-		StringBuilder storageStr = getSectionString(getItems("storage"));
-		StringBuilder invStr = getSectionString(getItems("inventory"));
-		StringBuilder armorStr = getSectionString(getItems("armor"));
-		StringBuilder wardrobeStr = getSectionString(getItems("wardrobe"));
-		StringBuilder petsStr = getSectionString(getItems("pets"));
-		StringBuilder talismanStr = getSectionString(getItems("talisman"));
+		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+		Map<SelectOption, EmbedBuilder> pages = getPages(player, false);
+		Map<SelectOption, EmbedBuilder> soulboundIgnoredPages = getPages(player, true);
 
-		double totalNetworth = getNetworth();
+		String verboseLink = null;
+		if (verbose) {
+			verboseLink = makeHastePost(formattedGson.toJson(getVerboseJson()));
+			extras.addButton(Button.link(verboseLink + ".json", "Verbose JSON"));
+		}
+		// Init last updated to 0
+		extras
+			.addButton(
+				Button.danger(
+					"nw_" + player.getUuid() + "_" + player.getProfileName() + "_0" + (verboseLink != null ? "_" + verboseLink : ""),
+					"Report Incorrect Calculations"
+				)
+			)
+			.setSelectPages(pages)
+			.addReactiveButtons(
+				new PaginatorExtras.ReactiveButton(
+					Button.primary("reactive_nw_ignore_soulbound", "Hide Soulbound"),
+					paginator ->
+						extras
+							.setSelectPages(soulboundIgnoredPages)
+							.toggleReactiveButton("reactive_nw_ignore_soulbound", false)
+							.toggleReactiveButton("reactive_nw_show_soulbound", true),
+					true
+				),
+				new PaginatorExtras.ReactiveButton(
+					Button.primary("reactive_nw_show_soulbound", "Show Soulbound"),
+					paginator ->
+						extras
+							.setSelectPages(pages)
+							.toggleReactiveButton("reactive_nw_ignore_soulbound", true)
+							.toggleReactiveButton("reactive_nw_show_soulbound", false),
+					false
+				)
+			);
+		new SelectMenuPaginator("overview", extras, event);
+		return null;
+	}
+
+	private Map<SelectOption, EmbedBuilder> getPages(Player player, boolean ignoreSoulbound) {
+		StringBuilder echestStr = getSectionString(getItems("enderchest", ignoreSoulbound));
+		StringBuilder sacksStr = getSectionString(getItems("sacks", ignoreSoulbound));
+		StringBuilder personalVaultStr = getSectionString(getItems("personal_vault", ignoreSoulbound));
+		StringBuilder storageStr = getSectionString(getItems("storage", ignoreSoulbound));
+		StringBuilder invStr = getSectionString(getItems("inventory", ignoreSoulbound));
+		StringBuilder armorStr = getSectionString(getItems("armor", ignoreSoulbound));
+		StringBuilder wardrobeStr = getSectionString(getItems("wardrobe", ignoreSoulbound));
+		StringBuilder petsStr = getSectionString(getItems("pets", ignoreSoulbound));
+		StringBuilder talismanStr = getSectionString(getItems("talisman", ignoreSoulbound));
+
+		double totalNetworth = getNetworth(ignoreSoulbound);
 		//			int position = leaderboardDatabase.getNetworthPosition(player.getGamemode(), player.getUuid());
 		String ebDesc = "**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + roundAndFormat(totalNetworth) + ")";
 		//			\n**" +
@@ -191,39 +237,58 @@ public class NetworthExecute {
 		//						: ""
 		//				)+"Leaderboard Position:** " + (position != -1 ? formatNumber(position) : "Not on leaderboard");
 		EmbedBuilder eb = player.defaultPlayerEmbed().setDescription(ebDesc);
-		eb.addField("Purse", simplifyNumber(getTotal("purse")), true);
-		eb.addField("Bank", (getTotal("bank") == -1 ? "Private" : simplifyNumber(getTotal("bank"))), true);
-		eb.addField("Sacks", simplifyNumber(getTotal("sacks")), true);
+		eb.addField("Purse", simplifyNumber(getTotal("purse", ignoreSoulbound)), true);
+		eb.addField(
+			"Bank",
+			(getTotal("bank", ignoreSoulbound) == -1 ? "Private" : simplifyNumber(getTotal("bank", ignoreSoulbound))),
+			true
+		);
+		eb.addField("Sacks", simplifyNumber(getTotal("sacks", ignoreSoulbound)), true);
 		if (!echestStr.isEmpty()) {
-			eb.addField("Ender Chest | " + simplifyNumber(getTotal("enderchest")), echestStr.toString().split("\n\n")[0], false);
+			eb.addField(
+				"Ender Chest | " + simplifyNumber(getTotal("enderchest", ignoreSoulbound)),
+				echestStr.toString().split("\n\n")[0],
+				false
+			);
 		}
 		if (!storageStr.isEmpty()) {
-			eb.addField("Storage | " + simplifyNumber(getTotal("storage")), storageStr.toString().split("\n\n")[0], false);
+			eb.addField("Storage | " + simplifyNumber(getTotal("storage", ignoreSoulbound)), storageStr.toString().split("\n\n")[0], false);
 		}
 		if (!invStr.isEmpty()) {
-			eb.addField("Inventory | " + simplifyNumber(getTotal("inventory")), invStr.toString().split("\n\n")[0], false);
+			eb.addField("Inventory | " + simplifyNumber(getTotal("inventory", ignoreSoulbound)), invStr.toString().split("\n\n")[0], false);
 		}
 		if (!armorStr.isEmpty()) {
-			eb.addField("Armor & Equipment | " + simplifyNumber(getTotal("armor")), armorStr.toString().split("\n\n")[0], false);
+			eb.addField(
+				"Armor & Equipment | " + simplifyNumber(getTotal("armor", ignoreSoulbound)),
+				armorStr.toString().split("\n\n")[0],
+				false
+			);
 		}
 		if (!wardrobeStr.isEmpty()) {
-			eb.addField("Wardrobe | " + simplifyNumber(getTotal("wardrobe")), wardrobeStr.toString().split("\n\n")[0], false);
+			eb.addField(
+				"Wardrobe | " + simplifyNumber(getTotal("wardrobe", ignoreSoulbound)),
+				wardrobeStr.toString().split("\n\n")[0],
+				false
+			);
 		}
 		if (!petsStr.isEmpty()) {
-			eb.addField("Pets | " + simplifyNumber(getTotal("pets")), petsStr.toString().split("\n\n")[0], false);
+			eb.addField("Pets | " + simplifyNumber(getTotal("pets", ignoreSoulbound)), petsStr.toString().split("\n\n")[0], false);
 		}
 		if (!talismanStr.isEmpty()) {
-			eb.addField("Accessories | " + simplifyNumber(getTotal("talisman")), talismanStr.toString().split("\n\n")[0], false);
+			eb.addField(
+				"Accessories | " + simplifyNumber(getTotal("talisman", ignoreSoulbound)),
+				talismanStr.toString().split("\n\n")[0],
+				false
+			);
 		}
 		if (!personalVaultStr.isEmpty()) {
 			eb.addField(
-				"Personal Vault | " + simplifyNumber(getTotal("personal_vault")),
+				"Personal Vault | " + simplifyNumber(getTotal("personal_vault", ignoreSoulbound)),
 				personalVaultStr.toString().split("\n\n")[0],
 				false
 			);
 		}
 
-		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 		Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 		pages.put(SelectOption.of("Overview", "overview").withEmoji(getEmojiObj("SKYBLOCK_MENU")), eb);
 
@@ -235,7 +300,7 @@ public class NetworthExecute {
 					.setDescription(
 						ebDesc +
 						"\n**Ender Chest:** " +
-						simplifyNumber(getTotal("enderchest")) +
+						simplifyNumber(getTotal("enderchest", ignoreSoulbound)) +
 						"\n\n" +
 						echestStr.toString().replace("\n\n", "\n")
 					)
@@ -249,7 +314,7 @@ public class NetworthExecute {
 					.setDescription(
 						ebDesc +
 						"\n**Storage:** " +
-						simplifyNumber(getTotal("storage")) +
+						simplifyNumber(getTotal("storage", ignoreSoulbound)) +
 						"\n\n" +
 						storageStr.toString().replace("\n\n", "\n")
 					)
@@ -263,7 +328,7 @@ public class NetworthExecute {
 					.setDescription(
 						ebDesc +
 						"\n**Inventory:** " +
-						simplifyNumber(getTotal("inventory")) +
+						simplifyNumber(getTotal("inventory", ignoreSoulbound)) +
 						"\n\n" +
 						invStr.toString().replace("\n\n", "\n")
 					)
@@ -277,7 +342,7 @@ public class NetworthExecute {
 					.setDescription(
 						ebDesc +
 						"\n**Armor & Equipment:** " +
-						simplifyNumber(getTotal("armor")) +
+						simplifyNumber(getTotal("armor", ignoreSoulbound)) +
 						"\n\n" +
 						armorStr.toString().replace("\n\n", "\n")
 					)
@@ -291,7 +356,7 @@ public class NetworthExecute {
 					.setDescription(
 						ebDesc +
 						"\n**Wardrobe:** " +
-						simplifyNumber(getTotal("wardrobe")) +
+						simplifyNumber(getTotal("wardrobe", ignoreSoulbound)) +
 						"\n\n" +
 						wardrobeStr.toString().replace("\n\n", "\n")
 					)
@@ -303,7 +368,11 @@ public class NetworthExecute {
 				player
 					.defaultPlayerEmbed(" | Pets")
 					.setDescription(
-						ebDesc + "\n**Pets:** " + simplifyNumber(getTotal("pets")) + "\n\n" + petsStr.toString().replace("\n\n", "\n")
+						ebDesc +
+						"\n**Pets:** " +
+						simplifyNumber(getTotal("pets", ignoreSoulbound)) +
+						"\n\n" +
+						petsStr.toString().replace("\n\n", "\n")
 					)
 			);
 		}
@@ -315,7 +384,7 @@ public class NetworthExecute {
 					.setDescription(
 						ebDesc +
 						"\n**Accessories:** " +
-						simplifyNumber(getTotal("talisman")) +
+						simplifyNumber(getTotal("talisman", ignoreSoulbound)) +
 						"\n\n" +
 						talismanStr.toString().replace("\n\n", "\n")
 					)
@@ -329,7 +398,7 @@ public class NetworthExecute {
 					.setDescription(
 						ebDesc +
 						"\n**Personal Vault:** " +
-						simplifyNumber(getTotal("personal_vault")) +
+						simplifyNumber(getTotal("personal_vault", ignoreSoulbound)) +
 						"\n\n" +
 						personalVaultStr.toString().replace("\n\n", "\n")
 					)
@@ -341,32 +410,16 @@ public class NetworthExecute {
 				player
 					.defaultPlayerEmbed(" | Sacks")
 					.setDescription(
-						ebDesc + "\n**Sacks:** " + simplifyNumber(getTotal("sacks")) + "\n\n" + sacksStr.toString().replace("\n\n", "\n")
+						ebDesc +
+						"\n**Sacks:** " +
+						simplifyNumber(getTotal("sacks", ignoreSoulbound)) +
+						"\n\n" +
+						sacksStr.toString().replace("\n\n", "\n")
 					)
 			);
 		}
 
-		//			JsonArray missing = collectJsonArray(
-		//				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
-		//			);
-		//			if (!missing.isEmpty()) {
-		//				System.out.println(missing);
-		//			}
-
-		String verboseLink = null;
-		if (verbose) {
-			verboseLink = makeHastePost(formattedGson.toJson(getVerboseJson()));
-			extras.addButton(Button.link(verboseLink + ".json", "Verbose JSON"));
-		}
-		// Init last updated to 0
-		extras.addButton(
-			Button.danger(
-				"nw_" + player.getUuid() + "_" + player.getProfileName() + "_0" + (verboseLink != null ? "_" + verboseLink : ""),
-				"Report Incorrect Calculations"
-			)
-		);
-		new SelectMenuPaginator(pages, "overview", extras, event);
-		return null;
+		return pages;
 	}
 
 	public StringBuilder getSectionString(List<String> items) {
@@ -391,7 +444,13 @@ public class NetworthExecute {
 	}
 
 	public double getNetworth() {
-		return totals.getOrDefault("inventory", -1.0) == -1 ? -1 : totals.values().stream().mapToDouble(i -> i).sum();
+		return getNetworth(false);
+	}
+
+	public double getNetworth(boolean ignoreSoulbound) {
+		return totals.getOrDefault("inventory", -1.0) == -1
+			? -1
+			: (ignoreSoulbound ? soulboundIgnoredTotals : totals).values().stream().mapToDouble(i -> i).sum();
 	}
 
 	public void calculatePetPrice(String location, String auctionName, double auctionPrice) {
@@ -952,10 +1011,21 @@ public class NetworthExecute {
 	}
 
 	public void addTotal(String location, double total) {
+		addTotal(location, total, false);
+	}
+
+	public void addTotal(String location, double total, boolean isSoulbound) {
 		totals.compute(location.equals("equipment") ? "armor" : location, (k, v) -> (v == null ? 0 : v) + total);
+		if (!isSoulbound) {
+			soulboundIgnoredTotals.compute(location.equals("equipment") ? "armor" : location, (k, v) -> (v == null ? 0 : v) + total);
+		}
 	}
 
 	public void addItem(String location, String item) {
+		addItem(location, item, false);
+	}
+
+	public void addItem(String location, String item, boolean isSoulbound) {
 		items.compute(
 			location.equals("equipment") ? "armor" : location,
 			(k, v) -> {
@@ -963,13 +1033,22 @@ public class NetworthExecute {
 				return v;
 			}
 		);
+		if (!isSoulbound) {
+			soulboundIgnoredItems.compute(
+				location.equals("equipment") ? "armor" : location,
+				(k, v) -> {
+					(v = (v == null ? new ArrayList<>() : v)).add(item);
+					return v;
+				}
+			);
+		}
 	}
 
-	public double getTotal(String location) {
-		return totals.getOrDefault(location, 0.0);
+	public double getTotal(String location, boolean ignoreSoulbound) {
+		return (ignoreSoulbound ? soulboundIgnoredTotals : totals).getOrDefault(location, 0.0);
 	}
 
-	public List<String> getItems(String location) {
-		return items.getOrDefault(location, new ArrayList<>());
+	public List<String> getItems(String location, boolean ignoreSoulbound) {
+		return (ignoreSoulbound ? soulboundIgnoredItems : items).getOrDefault(location, new ArrayList<>());
 	}
 }

@@ -18,10 +18,7 @@
 
 package com.skyblockplus.utils.command;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.Data;
@@ -29,6 +26,7 @@ import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 
 @Getter
 public class PaginatorExtras {
@@ -38,6 +36,7 @@ public class PaginatorExtras {
 	private final List<Field> embedFields = new ArrayList<>();
 	private final List<EmbedBuilder> embedPages = new ArrayList<>();
 	private final List<ReactiveButton> reactiveButtons = new ArrayList<>();
+	private final Map<SelectOption, EmbedBuilder> selectPages = new LinkedHashMap<>();
 	private final PaginatorType type;
 	private String everyPageText = null;
 	private String everyPageTitle = null;
@@ -125,6 +124,12 @@ public class PaginatorExtras {
 	public PaginatorExtras setEmbedPages(EmbedBuilder... embedBuilder) {
 		this.embedPages.clear();
 		Collections.addAll(this.embedPages, embedBuilder);
+		return this;
+	}
+
+	public PaginatorExtras setSelectPages(Map<SelectOption, EmbedBuilder> pages) {
+		this.selectPages.clear();
+		selectPages.putAll(pages);
 		return this;
 	}
 

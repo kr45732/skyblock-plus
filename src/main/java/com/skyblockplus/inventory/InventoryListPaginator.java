@@ -51,7 +51,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 
 public class InventoryListPaginator {
 
-	private static final File loreRenderDir = new File("src/main/java/com/skyblockplus/json/lore_renders");
+	private static final File loreRenderDir = new File("src/main/java/com/skyblockplus/json/renders");
 	private final String key;
 	private final Map<Integer, InvItem> items;
 	private final SlashCommandEvent event;

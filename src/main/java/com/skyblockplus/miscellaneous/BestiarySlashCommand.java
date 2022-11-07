@@ -268,7 +268,7 @@ public class BestiarySlashCommand extends SlashCommand {
 				pages.put(SelectOption.of(location.getKey(), location.getKey().toLowerCase().replace(" ", "_")), eb);
 			}
 
-			new SelectMenuPaginator(pages, "private_island", new PaginatorExtras(), event);
+			new SelectMenuPaginator("private_island", new PaginatorExtras().setSelectPages(pages), event);
 			return null;
 		}
 		return player.getFailEmbed();

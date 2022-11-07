@@ -30,57 +30,72 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class SelectMenuPaginator {
 
-	private final Map<String, EmbedBuilder> pages;
+	private final PaginatorExtras extras;
 	private final GenericInteractionCreateEvent event;
 	private Message message;
 	private String page;
 
-	public SelectMenuPaginator(
-		Map<SelectOption, EmbedBuilder> pages,
-		String page,
-		PaginatorExtras extras,
-		GenericInteractionCreateEvent event
-	) {
-		this.pages = pages.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getValue(), Map.Entry::getValue));
+	public SelectMenuPaginator(String page, PaginatorExtras extras, GenericInteractionCreateEvent event) {
 		this.page = page;
+		this.extras = extras;
 		this.event = event;
 
-		List<LayoutComponent> actionRows = new ArrayList<>();
-		if (!extras.getButtons().isEmpty()) {
-			actionRows.add(ActionRow.of(extras.getButtons()));
+		renderPage(event);
+	}
+
+	public boolean condition(GenericComponentInteractionCreateEvent genericEvent) {
+		if (genericEvent instanceof StringSelectInteractionEvent event) {
+			return (
+				event.isFromGuild() &&
+				event.getUser().getId().equals(this.event.getUser().getId()) &&
+				event.getMessageId().equals(message.getId())
+			);
+		} else if (genericEvent instanceof ButtonInteractionEvent event) {
+			return (
+				event.isFromGuild() &&
+				event.getUser().getId().equals(this.event.getUser().getId()) &&
+				event.getMessageId().equals(message.getId()) &&
+				extras.getReactiveButtons().stream().anyMatch(b -> b.isReacting() && event.getComponentId().equals(b.getId()))
+			);
 		}
-		actionRows.add(ActionRow.of(StringSelectMenu.create("select_menu_paginator").addOptions(pages.keySet()).build()));
-		(event instanceof SlashCommandEvent ev ? ev : ((ButtonInteractionEvent) event)).getHook()
-			.editOriginalEmbeds(this.pages.get(page).build())
-			.setComponents(actionRows)
-			.queue(m -> {
-				message = m;
-				waitForEvent();
-			});
+		return false;
 	}
 
-	public boolean condition(StringSelectInteractionEvent event) {
-		return (
-			event.isFromGuild() &&
-			event.getUser().getId().equals(this.event.getUser().getId()) &&
-			event.getMessageId().equals(message.getId())
-		);
+	public void action(GenericComponentInteractionCreateEvent genericEvent) {
+		if (genericEvent instanceof StringSelectInteractionEvent event) {
+			onStringSelectInteraction(event);
+		} else if (genericEvent instanceof ButtonInteractionEvent event) {
+			onButtonInteraction(event);
+		}
 	}
 
-	public void action(StringSelectInteractionEvent event) {
+	public void onButtonInteraction(ButtonInteractionEvent event) {
+		extras
+			.getReactiveButtons()
+			.stream()
+			.filter(b -> b.isReacting() && event.getComponentId().equals(b.getId()))
+			.map(PaginatorExtras.ReactiveButton::getAction)
+			.findFirst()
+			.orElse(ignored -> {})
+			.accept(null);
+
+		renderPage(event);
+	}
+
+	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
 		page = event.getSelectedOptions().get(0).getValue();
 		event
-			.editMessageEmbeds(this.pages.get(page).build())
+			.editMessageEmbeds(getPage(page).build())
 			.queue(
 				m -> {
 					message = event.getMessage();
@@ -90,9 +105,36 @@ public class SelectMenuPaginator {
 			);
 	}
 
+	private EmbedBuilder getPage(String page) {
+		return extras
+			.getSelectPages()
+			.entrySet()
+			.stream()
+			.collect(Collectors.toMap(e -> e.getKey().getValue(), Map.Entry::getValue))
+			.get(page);
+	}
+
+	public void renderPage(GenericInteractionCreateEvent event) {
+		List<LayoutComponent> actionRows = new ArrayList<>();
+		if (!extras.getButtons().isEmpty()) {
+			actionRows.add(ActionRow.of(extras.getButtons()));
+		}
+		actionRows.add(ActionRow.of(StringSelectMenu.create("select_menu_paginator").addOptions(extras.getSelectPages().keySet()).build()));
+		(event instanceof SlashCommandEvent ev ? ev : ((ButtonInteractionEvent) event)).getHook()
+			.editOriginalEmbeds(getPage(page).build())
+			.setComponents(actionRows)
+			.queue(
+				m -> {
+					message = m;
+					waitForEvent();
+				},
+				ignore
+			);
+	}
+
 	public void waitForEvent() {
 		waiter.waitForEvent(
-			StringSelectInteractionEvent.class,
+			GenericComponentInteractionCreateEvent.class,
 			this::condition,
 			this::action,
 			1,

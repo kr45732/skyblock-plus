@@ -268,7 +268,7 @@ public class MayorHandler {
 
 			File mayorGraphFile = null;
 			try {
-				mayorGraphFile = new File("src/main/java/com/skyblockplus/json/lore_renders/mayor_graph.png");
+				mayorGraphFile = new File("src/main/java/com/skyblockplus/json/renders/mayor_graph.png");
 				ImageIO.write(
 					ImageIO.read(
 						new URIBuilder("https://quickchart.io/chart")

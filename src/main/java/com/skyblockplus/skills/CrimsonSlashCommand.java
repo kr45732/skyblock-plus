@@ -245,7 +245,7 @@ public class CrimsonSlashCommand extends SlashCommand {
 			);
 			pages.put(SelectOption.of("Dojo", "dojo"), eb);
 
-			new SelectMenuPaginator(pages, "stats", new PaginatorExtras(), event);
+			new SelectMenuPaginator("stats", new PaginatorExtras().setSelectPages(pages), event);
 			return null;
 		}
 		return player.getFailEmbed();

@@ -150,7 +150,7 @@ public class Main {
 			}
 		}
 
-		File loreRendersDir = new File("src/main/java/com/skyblockplus/json/lore_renders/");
+		File loreRendersDir = new File("src/main/java/com/skyblockplus/json/renders/");
 		if (!loreRendersDir.exists()) {
 			log.info((loreRendersDir.mkdirs() ? "Successfully created" : "Failed to create") + " lore render directory");
 		} else {
