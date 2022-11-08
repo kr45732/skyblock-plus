@@ -389,7 +389,8 @@
             },
             {
               "amount": 24,
-              "type": "catacombs"
+              "type": "catacombs",
+              "convert_from_level": true
             }
           ]
         ],
@@ -408,7 +409,8 @@
               },
               {
                 "amount": 35,
-                "type": "catacombs"
+                "type": "catacombs",
+                "convert_from_level": true
               }
             ]
           ],
@@ -425,7 +427,8 @@
               },
               {
                 "amount": 45,
-                "type": "catacombs"
+                "type": "catacombs",
+                "convert_from_level": true
               }
             ]
           ],
