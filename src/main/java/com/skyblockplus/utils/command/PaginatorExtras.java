@@ -147,7 +147,7 @@ public class PaginatorExtras {
 
 	public PaginatorExtras toggleReactiveButton(String id, boolean visible) {
 		for (ReactiveButton reactiveButton : reactiveButtons) {
-			if (reactiveButton.getId() != null && reactiveButton.getId().equals(id)) {
+			if (reactiveButton.isReactive() && reactiveButton.getId().equals(id)) {
 				reactiveButton.setVisible(visible);
 			}
 		}
