@@ -562,7 +562,7 @@ public class LeaderboardDatabase {
 							count++;
 							HypixelResponse profileResponse = skyblockProfilesFromUuid(
 								usernameUuidStruct.uuid(),
-								count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+								count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "d317116a-beff-4ed1-bf0a-f246c6dd7ea9",
 								true,
 								false
 							);
@@ -612,7 +612,7 @@ public class LeaderboardDatabase {
 					count++;
 					HypixelResponse profileResponse = skyblockProfilesFromUuid(
 						usernameUuidStruct.uuid(),
-						count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+						count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "d317116a-beff-4ed1-bf0a-f246c6dd7ea9",
 						true,
 						false
 					);
