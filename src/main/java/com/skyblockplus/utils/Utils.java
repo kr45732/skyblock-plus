@@ -2000,7 +2000,9 @@ public class Utils {
 								}
 							}
 							buyCostObj.add("cost", buyCostArr);
-							buyCostObj.addProperty("count", result.length == 2 ? Integer.parseInt(result[1]) : 1);
+							if (result.length == 2) {
+								buyCostObj.addProperty("count", Integer.parseInt(result[1]));
+							}
 							npcBuyCosts.put(result[0], buyCostObj);
 						}
 					}
@@ -2076,6 +2078,7 @@ public class Utils {
 
 	public static JsonElement getUpdatedPriceOverridesJson(JsonElement currentPriceOverrides) {
 		JsonObject outputObject = new JsonObject();
+		JsonObject bazaarJson = getBazaarJson();
 
 		for (File child : Arrays
 			.stream(new File("src/main/java/com/skyblockplus/json/neu/items").listFiles())
@@ -2083,14 +2086,17 @@ public class Utils {
 			.toList()) {
 			try (FileReader reader = new FileReader(child)) {
 				JsonElement itemJson = JsonParser.parseReader(reader);
+				String id = higherDepth(itemJson, "internalname").getAsString().replace("-", ":");
 				if (
-					higherDepth(itemJson, "vanilla", false) ||
+					!bazaarJson.has(id) &&
 					(
-						higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture") &&
-						!higherDepth(itemJson, "internalname", "").startsWith("EPOCH_CAKE_")
+						higherDepth(itemJson, "vanilla", false) ||
+						(
+							higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture") &&
+							!higherDepth(itemJson, "internalname", "").startsWith("EPOCH_CAKE_")
+						)
 					)
 				) {
-					String id = higherDepth(itemJson, "internalname").getAsString().replace("-", ":");
 					outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
 				}
 			} catch (Exception e) {
@@ -2111,7 +2117,14 @@ public class Utils {
 	public static List<String> getRecipe(String itemId) {
 		JsonElement recipe = higherDepth(getInternalJsonMappings(), itemId + ".recipe");
 		if (recipe != null) {
-			return recipe.getAsJsonObject().entrySet().stream().map(e -> e.getValue().getAsString()).filter(e -> !e.isEmpty()).toList();
+			return recipe
+				.getAsJsonObject()
+				.entrySet()
+				.stream()
+				.filter(e -> !e.getKey().equals("count"))
+				.map(e -> e.getValue().getAsString())
+				.filter(e -> !e.isEmpty())
+				.toList();
 		}
 
 		JsonElement npcBuyCost = higherDepth(getInternalJsonMappings(), itemId + ".npc_buy.cost");
@@ -2123,7 +2136,11 @@ public class Utils {
 	}
 
 	public static int getRecipeCount(String itemId) {
-		return higherDepth(getInternalJsonMappings(), itemId + ".npc_buy.count", 1);
+		return higherDepth(
+			getInternalJsonMappings(),
+			itemId + ".recipe.count",
+			higherDepth(getInternalJsonMappings(), itemId + ".npc_buy.count", 1)
+		);
 	}
 
 	public static double getNpcSellPrice(String itemId) {

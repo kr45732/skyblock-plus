@@ -86,6 +86,9 @@ public class RecipeSlashCommand extends SlashCommand {
 
 		EmbedBuilder eb = defaultEmbed("Recipe of " + name);
 		for (Map.Entry<String, JsonElement> entry : higherDepth(infoJson, "recipe").getAsJsonObject().entrySet()) {
+			if (entry.getKey().equals("count")) {
+				continue;
+			}
 			String[] idCountSplit = entry.getValue().getAsString().split(":");
 			if (entry.getKey().equals("B1") || entry.getKey().equals("C1")) {
 				eb.appendDescription("\n");
