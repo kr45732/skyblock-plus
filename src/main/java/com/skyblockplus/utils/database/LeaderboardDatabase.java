@@ -162,6 +162,8 @@ public class LeaderboardDatabase {
 					);
 			multiParamsStr = multiParamsStr.substring(0, multiParamsStr.length() - 1);
 
+			boolean updateNetworth = players.size() == 1 || players.stream().noneMatch(p -> p.profileToNetworth.isEmpty());
+
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
@@ -175,7 +177,7 @@ public class LeaderboardDatabase {
 					typesSubList
 						.stream()
 						.map(t ->
-							t.equals("networth") && players.size() > 1
+							t.equals("networth") && !updateNetworth
 								? ("networth=" + gamemode.toCacheType() + ".networth")
 								: (t + "=EXCLUDED." + t)
 						)
@@ -194,7 +196,7 @@ public class LeaderboardDatabase {
 						String type = typesSubList.get(i);
 						statement.setDouble(
 							i + 4 + offset,
-							type.equals("networth") && players.size() > 1 && player.profileToNetworth.isEmpty()
+							type.equals("networth") && !updateNetworth
 								? 0
 								: player.getHighestAmount(
 									type +

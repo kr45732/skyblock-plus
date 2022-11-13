@@ -894,6 +894,14 @@ public class NetworthExecute {
 			return getMinionCost(itemId.substring(0, index), Integer.parseInt(itemId.substring(index + 1)));
 		}
 
+		try {
+			double bazaarPrice = higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble();
+			if (source != null) {
+				source.append("bazaar");
+			}
+			return bazaarPrice;
+		} catch (Exception ignored) {}
+
 		List<String> recipe = getRecipe(itemId);
 		double craftCost = 0;
 		if (recipe != null) {
@@ -903,16 +911,6 @@ public class NetworthExecute {
 			}
 		}
 		craftCost /= getRecipeCount(itemId);
-
-		try {
-			double bazaarPrice = higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble();
-			if (recipe == null || bazaarPrice <= craftCost) {
-				if (source != null) {
-					source.append("bazaar");
-				}
-				return bazaarPrice;
-			}
-		} catch (Exception ignored) {}
 
 		if (!ignoreAh) {
 			double lowestBin = -1;

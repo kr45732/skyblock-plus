@@ -72,7 +72,9 @@ public class MayorHandler {
 		"SCORPIUS",
 		"<:scorpius:940083649687203951>",
 		"MARINA",
-		"<:marina:940083649783664660>"
+		"<:marina:940083649783664660>",
+		"FINNEGAN",
+		"<:finnegan:1040460674247184474>"
 	);
 
 	public static void initialize() {

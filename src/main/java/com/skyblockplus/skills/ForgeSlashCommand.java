@@ -72,6 +72,7 @@ public class ForgeSlashCommand extends SlashCommand {
 			if (forgeItems == null) {
 				return defaultEmbed(player.getUsernameFixed() + " has no items in the forge");
 			}
+
 			int forgeTime = higherDepth(player.profileJson(), "mining_core.nodes.forge_time", 0);
 			double bonus;
 			if (forgeTime <= 1) {
@@ -83,6 +84,7 @@ public class ForgeSlashCommand extends SlashCommand {
 			} else {
 				bonus = 0.7;
 			}
+
 			for (JsonElement forgeItem : forgeItems.getAsJsonObject().entrySet().stream().map(Map.Entry::getValue).toList()) {
 				String itemId = higherDepth(forgeItem, "id").getAsString();
 				itemId = itemId.equals("PET") ? "AMMONITE;4" : itemId;
@@ -93,7 +95,16 @@ public class ForgeSlashCommand extends SlashCommand {
 					"\nEnd: <t:" +
 					Instant
 						.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong())
-						.plusSeconds((long) (higherDepth(getInternalJsonMappings(), itemId + ".forge").getAsLong() * bonus))
+						.plusSeconds(
+							(long) (
+								(
+									itemId.equals("AMMONITE;4")
+										? 1036800
+										: higherDepth(getInternalJsonMappings(), itemId + ".forge").getAsLong()
+								) *
+								bonus
+							)
+						)
 						.getEpochSecond() +
 					":R>",
 					false
