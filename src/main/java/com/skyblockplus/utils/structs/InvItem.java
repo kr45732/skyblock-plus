@@ -131,18 +131,15 @@ public class InvItem {
 	}
 
 	public String getPetApiName() {
+		return ((getName() + "_" + rarity).toUpperCase().replace(" ", "_") + (isTierBoosted() ? "_TB" : ""));
+	}
+
+	public boolean isTierBoosted() {
+		String petItem = getPetItem();
 		return (
-			(getName() + "_" + rarity).toUpperCase().replace(" ", "_") +
-			(
-				getPetItem() != null &&
-					(
-						getPetItem().equals("PET_ITEM_TIER_BOOST") ||
-						getPetItem().equals("PET_ITEM_VAMPIRE_FANG") ||
-						getPetItem().equals("PET_ITEM_TOY_JERRY")
-					)
-					? "_TB"
-					: ""
-			)
+			id.equals("PET") &&
+			petItem != null &&
+			(petItem.equals("PET_ITEM_TIER_BOOST") || petItem.equals("PET_ITEM_VAMPIRE_FANG") || petItem.equals("PET_ITEM_TOY_JERRY"))
 		);
 	}
 
@@ -161,14 +158,7 @@ public class InvItem {
 	 * Converts tier boosted pets to the post-boosted rarity
 	 */
 	public String getPetRarity() {
-		if (
-			id.equals("PET") &&
-			(
-				extraStats.containsKey("PET_ITEM_TIER_BOOST") ||
-				extraStats.containsKey("PET_ITEM_VAMPIRE_FANG") ||
-				extraStats.containsKey("PET_ITEM_TOY_JERRY")
-			)
-		) {
+		if (id.equals("PET") && isTierBoosted()) {
 			return NUMBER_TO_RARITY_MAP.get("" + (Integer.parseInt(RARITY_TO_NUMBER_MAP.get(rarity).replace(";", "")) + 1));
 		}
 		return rarity;

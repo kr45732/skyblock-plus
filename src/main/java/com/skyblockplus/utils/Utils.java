@@ -644,7 +644,7 @@ public class Utils {
 
 	public static String makeHastePost(Object body) {
 		try {
-			HttpPost httpPost = new HttpPost("https://hst.sh/documents");
+			HttpPost httpPost = new HttpPost("https://hste.vercel.app/api?key=cab35a7a9b1242beeaf0e6dfb69404d5");
 
 			StringEntity entity = new StringEntity(body.toString(), "UTF-8");
 			httpPost.setEntity(entity);
@@ -653,7 +653,7 @@ public class Utils {
 				CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
 				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
 			) {
-				return ("https://hst.sh/" + higherDepth(JsonParser.parseReader(in), "key").getAsString());
+				return ("https://hste.vercel.app/api/" + higherDepth(JsonParser.parseReader(in), "key").getAsString());
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -665,9 +665,9 @@ public class Utils {
 
 			StringEntity entity = new StringEntity(body.toString(), "UTF-8");
 			httpPost.setEntity(entity);
+			httpPost.setHeaders(headers);
 			httpPost.setHeader("Content-Type", "application/json");
 			httpPost.setHeader("Accept", "application/json");
-			httpPost.setHeaders(headers);
 
 			try (
 				CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
@@ -771,7 +771,7 @@ public class Utils {
 		}
 
 		if (commandInput.length() > 1024) {
-			eb.addField(user.getName() + " (" + user.getId() + ")", makeHastePost(commandInput) + ".json", false);
+			eb.addField(user.getName() + " (" + user.getId() + ")", makeHastePost(commandInput), false);
 		} else {
 			eb.addField(user.getName() + " (" + user.getId() + ")", "`" + commandInput + "`", false);
 		}

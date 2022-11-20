@@ -181,7 +181,7 @@ public class NetworthExecute {
 		String verboseLink = null;
 		if (verbose) {
 			verboseLink = makeHastePost(formattedGson.toJson(getVerboseJson()));
-			extras.addButton(Button.link(verboseLink + ".json", "Verbose JSON"));
+			extras.addButton(Button.link(verboseLink, "Verbose JSON"));
 		}
 		// Init last updated to 0
 		extras
@@ -464,6 +464,10 @@ public class NetworthExecute {
 				try {
 					Set<String> extraStats = item.getExtraStats().keySet();
 					for (String extraItem : extraStats) {
+						if (Objects.equals(extraItem, item.getPetItem()) && item.isTierBoosted()) {
+							continue;
+						}
+
 						double miscPrice = getLowestPrice(extraItem);
 						miscExtras += miscPrice;
 						miscStr
@@ -909,8 +913,8 @@ public class NetworthExecute {
 				String[] idCountSplit = item.split(":");
 				craftCost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
 			}
+			craftCost /= getRecipeCount(itemId);
 		}
-		craftCost /= getRecipeCount(itemId);
 
 		if (!ignoreAh) {
 			double lowestBin = -1;
@@ -929,7 +933,7 @@ public class NetworthExecute {
 			} catch (Exception ignored) {}
 
 			double minBinAverage = getMin(lowestBin, averageAuction);
-			if (minBinAverage != -1 && (recipe == null || minBinAverage <= craftCost)) {
+			if (minBinAverage != -1 && (craftCost <= 0 || minBinAverage <= craftCost)) {
 				if (source != null) {
 					if (minBinAverage == lowestBin) {
 						source.append("lowest BIN");
@@ -941,7 +945,7 @@ public class NetworthExecute {
 			}
 		}
 
-		if (recipe != null) {
+		if (craftCost > 0) {
 			if (source != null) {
 				if (higherDepth(getInternalJsonMappings(), itemId + ".recipe") != null) {
 					source.append("craft");

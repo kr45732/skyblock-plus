@@ -69,7 +69,7 @@ public class GetSettingsCommand extends Command {
 			return "Unable to fetch all server settings";
 		}
 
-		return makeHastePost(formattedGson.toJson(settings)) + ".json";
+		return makeHastePost(formattedGson.toJson(settings));
 	}
 
 	private String getServerSettings(String guildId) {
@@ -79,6 +79,6 @@ public class GetSettingsCommand extends Command {
 			return "No settings for provided guild id";
 		}
 
-		return makeHastePost(formattedGson.toJson(currentSettings)) + ".json";
+		return makeHastePost(formattedGson.toJson(currentSettings));
 	}
 }

@@ -133,9 +133,16 @@ public class ApiHandler {
 				)
 			);
 
-			//	JsonObject discordsJson = new JsonObject();
-			//	discordsJson.addProperty("server_count", serverCount);
-			//	postJson("https://discords.com/bots/api/bot/" + selfUserId, discordsJson, new BasicHeader("Authorization", "c46ba888473968c1e1c9ddc7e11c515abf1b85ece6df62a21fed3e9dcae4efd4b62d2dc9e2637c11b3eda05dd668630444c33e6add140da5ec50a95521f38004"));
+			JsonObject discordsJson = new JsonObject();
+			discordsJson.addProperty("server_count", serverCount);
+			postJson(
+				"https://discords.com/bots/api/bot/" + selfUserId,
+				discordsJson,
+				new BasicHeader(
+					"Authorization",
+					"e2574f9c2bbe92a80c387f4b4f9c43ef0b8d747189375eef19a98165ffc0e1341e7abd333b037eee5ca9e9e31ca906a945f6d30eb477fbf4acb7ca0e0938ff40"
+				)
+			);
 
 			JsonObject topGgJson = new JsonObject();
 			topGgJson.addProperty("server_count", serverCount);

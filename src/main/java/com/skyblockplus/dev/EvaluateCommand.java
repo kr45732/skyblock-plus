@@ -146,7 +146,7 @@ public class EvaluateCommand extends Command {
 					if (out == null) {
 						ebMessage.editMessage("Success (null output)").queue();
 					} else if (out.toString().length() >= 2000) {
-						ebMessage.editMessage(makeHastePost(out.toString()) + ".json").queue();
+						ebMessage.editMessage(makeHastePost(out.toString())).queue();
 					} else {
 						ebMessage.editMessage(out.toString()).queue();
 					}
