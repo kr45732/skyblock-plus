@@ -205,7 +205,7 @@ public class GuildKickerSlashCommand extends SlashCommand {
 		}
 
 		paginateBuilder
-			.getPaginatorExtras()
+			.getExtras()
 			.setEveryPageTitle("Guild Kick Helper")
 			.setEveryPageText("**Total missing requirements:** " + paginateBuilder.size());
 

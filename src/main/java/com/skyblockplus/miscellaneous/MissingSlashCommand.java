@@ -213,7 +213,7 @@ public class MissingSlashCommand extends SlashCommand {
 			double finalTotalCost = totalCost;
 			paginateBuilder
 				.addItems(out)
-				.getPaginatorExtras()
+				.getExtras()
 				.setEveryPageText(
 					"**Total Missing:** " +
 					missingInternalArr.size() +

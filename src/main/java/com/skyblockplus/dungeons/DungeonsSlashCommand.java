@@ -76,7 +76,7 @@ public class DungeonsSlashCommand extends SlashCommand {
 					.setColumns(3)
 					.setItemsPerPage(9);
 				PaginatorExtras extras = paginateBuilder
-					.getPaginatorExtras()
+					.getExtras()
 					.setEveryPageText(
 						"**Secrets:** " +
 						formatNumber(player.getDungeonSecrets()) +

@@ -23,15 +23,20 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
+import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.ArrayList;
+import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -68,8 +73,8 @@ public class PetsSlashCommand extends SlashCommand {
 	public static EmbedBuilder getPlayerPets(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
-
+			List<String> missingPets = new ArrayList<>(Constants.PET_NAMES);
+			List<String> petItems = new ArrayList<>();
 			JsonArray playerPets = player.getPets();
 			for (JsonElement pet : playerPets) {
 				String petItem = null;
@@ -78,9 +83,10 @@ public class PetsSlashCommand extends SlashCommand {
 				} catch (Exception ignored) {}
 
 				String petName = higherDepth(pet, "type").getAsString();
+				missingPets.remove(petName);
 				String rarity = higherDepth(pet, "tier").getAsString();
 
-				paginateBuilder.addItems(
+				petItems.add(
 					getEmoji(petName + RARITY_TO_NUMBER_MAP.get(rarity)) +
 					" " +
 					capitalizeString(rarity) +
@@ -92,6 +98,55 @@ public class PetsSlashCommand extends SlashCommand {
 					(petItem != null ? getEmoji(petItem) : "")
 				);
 			}
+
+			List<String> missingPetItems = new ArrayList<>();
+			for (String missingPet : missingPets) {
+				if (List.of("DROPLET_WISP", "FROST_WISP", "GLACIAL_WISP").contains(missingPet)) {
+					continue;
+				}
+
+				String emoji = null;
+				for (int i = 5; emoji == null && i >= 0; i--) {
+					emoji = getEmojiOr(missingPet + ";" + i, null);
+				}
+
+				missingPetItems.add(emoji + " " + capitalizeString(missingPet.toLowerCase().replace("_", " ")));
+			}
+
+			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
+			paginateBuilder.addItems(petItems);
+
+			if (!missingPetItems.isEmpty()) {
+				paginateBuilder
+					.getExtras()
+					.addReactiveButtons(
+						new PaginatorExtras.ReactiveButton(
+							Button.primary("reactive_pets_show_missing", "Show Missing"),
+							paginator -> {
+								paginator.setStrings(missingPetItems);
+								paginator
+									.getExtras()
+									.setEveryPageText("**Total Missing:** " + missingPetItems.size())
+									.toggleReactiveButton("reactive_pets_show_missing", false)
+									.toggleReactiveButton("reactive_pets_show_current", true);
+							},
+							true
+						),
+						new PaginatorExtras.ReactiveButton(
+							Button.primary("reactive_pets_show_current", "Show Current"),
+							paginator -> {
+								paginator.setStrings(petItems);
+								paginator
+									.getExtras()
+									.setEveryPageText(null)
+									.toggleReactiveButton("reactive_pets_show_missing", true)
+									.toggleReactiveButton("reactive_pets_show_current", false);
+							},
+							false
+						)
+					);
+			}
+
 			event.paginate(paginateBuilder);
 			return null;
 		}

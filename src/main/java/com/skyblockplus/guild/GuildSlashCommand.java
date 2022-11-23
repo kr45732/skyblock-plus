@@ -336,7 +336,7 @@ public class GuildSlashCommand extends SlashCommand {
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(3).setItemsPerPage(33);
 
 		paginateBuilder
-			.getPaginatorExtras()
+			.getExtras()
 			.setEveryPageText("**Size:** " + membersArr.size())
 			.setEveryPageTitle(higherDepth(guildJson, "name").getAsString() + " Members")
 			.setEveryPageFirstFieldTitle("Members:");

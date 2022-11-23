@@ -132,7 +132,7 @@ public class SacksSlashCommand extends SlashCommand {
 				});
 
 			paginateBuilder
-				.getPaginatorExtras()
+				.getExtras()
 				.setEveryPageText(
 					"**Total value:** " +
 					roundAndFormat(total[0] + total[1]) +

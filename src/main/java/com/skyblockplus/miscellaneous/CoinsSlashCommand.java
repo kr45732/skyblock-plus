@@ -153,7 +153,7 @@ public class CoinsSlashCommand extends SlashCommand {
 				}
 
 				paginateBuilder
-					.getPaginatorExtras()
+					.getExtras()
 					.setEveryPageText(
 						"**Last Transaction Time:** " +
 						"<t:" +
