@@ -187,7 +187,12 @@ public class NetworthExecute {
 		extras
 			.addButton(
 				Button.danger(
-					"nw_" + player.getUuid() + "_" + player.getProfileName() + "_0" + (verboseLink != null ? "_" + verboseLink : ""),
+					"nw_" +
+					player.getUuid() +
+					"_" +
+					player.getProfileName() +
+					"_0" +
+					(verboseLink != null ? "_" + verboseLink.split(getHasteUrl())[1] : ""),
 					"Report Incorrect Calculations"
 				)
 			)

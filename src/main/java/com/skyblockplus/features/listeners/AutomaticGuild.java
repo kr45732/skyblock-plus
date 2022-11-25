@@ -1013,7 +1013,11 @@ public class AutomaticGuild {
 
 	public void onModalInteraction(ModalInteractionEvent event) {
 		if (event.getModalId().equalsIgnoreCase("verify_modal")) {
-			event.deferReply(true).complete();
+			try {
+				event.deferReply(true).complete();
+			} catch (ErrorResponseException ignored) {
+				return;
+			}
 			Object ebOrMb = LinkSlashCommand.linkAccount(event.getValues().get(0).getAsString(), event.getMember(), event.getGuild());
 			if (ebOrMb instanceof EmbedBuilder eb) {
 				event.getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
@@ -1029,6 +1033,8 @@ public class AutomaticGuild {
 				NetworthExecute calc = new NetworthExecute().setVerbose(true);
 				calc.getPlayerNetworth(split[0], split[1], null);
 				split = new String[] { split[0], split[1], split[2], makeHastePost(formattedGson.toJson(calc.getVerboseJson())) };
+			} else {
+				split[3] = getHasteUrl() + split[3];
 			}
 			split[2] = "" + Instant.now().toEpochMilli();
 

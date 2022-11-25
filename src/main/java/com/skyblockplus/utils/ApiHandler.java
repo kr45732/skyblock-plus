@@ -61,7 +61,7 @@ public class ApiHandler {
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	public static boolean useAlternativeAhApi = false;
-	public static boolean useAlternativeApi = false;
+	public static int mojangApiNum = 0;
 	public static ScheduledFuture<?> updateCacheTask;
 
 	public static void initialize() {
@@ -98,7 +98,7 @@ public class ApiHandler {
 	public static void reloadSettingsJson() {
 		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json");
 		useAlternativeAhApi = higherDepth(settings, "useAlternativeAhApi", false);
-		useAlternativeApi = higherDepth(settings, "useAlternativeApi", false);
+		mojangApiNum = higherDepth(settings, "mojangApiNum", 0);
 	}
 
 	public static void updateBotStatistics() {
@@ -199,29 +199,58 @@ public class ApiHandler {
 
 	private static UsernameUuidStruct uuidUsername(String username) {
 		try {
-			if (!useAlternativeApi) {
-				JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
-				try {
-					UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-						higherDepth(usernameJson, "username").getAsString(),
-						higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
-					);
-					uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
-					return usernameUuidStruct;
-				} catch (Exception e) {
-					return new UsernameUuidStruct(higherDepth(usernameJson, "reason").getAsString());
+			switch (mojangApiNum) {
+				case 1 -> {
+					JsonElement usernameJson = getJson("https://playerdb.co/api/player/minecraft/" + username);
+					try {
+						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
+							higherDepth(usernameJson, "data.player.username").getAsString(),
+							higherDepth(usernameJson, "data.player.id").getAsString().replace("-", "")
+						);
+						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
+						return usernameUuidStruct;
+					} catch (Exception e) {
+						return new UsernameUuidStruct(higherDepth(usernameJson, "code").getAsString());
+					}
 				}
-			} else {
-				JsonElement usernameJson = getJson("https://playerdb.co/api/player/minecraft/" + username);
-				try {
-					UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-						higherDepth(usernameJson, "data.player.username").getAsString(),
-						higherDepth(usernameJson, "data.player.id").getAsString().replace("-", "")
-					);
-					uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
-					return usernameUuidStruct;
-				} catch (Exception e) {
-					return new UsernameUuidStruct(higherDepth(usernameJson, "code").getAsString());
+				case 2 -> {
+					JsonElement usernameJson = getJson("https://mc-heads.net/minecraft/profile/" + username);
+					try {
+						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
+							higherDepth(usernameJson, "name").getAsString(),
+							higherDepth(usernameJson, "id").getAsString().replace("-", "")
+						);
+						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
+						return usernameUuidStruct;
+					} catch (Exception e) {
+						return new UsernameUuidStruct(higherDepth(usernameJson, "errorMessage").getAsString());
+					}
+				}
+				case 3 -> {
+					JsonElement usernameJson = getJson("https://api.minetools.eu/uuid/" + username);
+					try {
+						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
+							higherDepth(usernameJson, "name").getAsString(),
+							higherDepth(usernameJson, "id").getAsString().replace("-", "")
+						);
+						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
+						return usernameUuidStruct;
+					} catch (Exception e) {
+						return new UsernameUuidStruct(higherDepth(usernameJson, "error").getAsString());
+					}
+				}
+				default -> {
+					JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
+					try {
+						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
+							higherDepth(usernameJson, "username").getAsString(),
+							higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
+						);
+						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
+						return usernameUuidStruct;
+					} catch (Exception e) {
+						return new UsernameUuidStruct(higherDepth(usernameJson, "reason").getAsString());
+					}
 				}
 			}
 		} catch (Exception ignored) {}
@@ -237,13 +266,28 @@ public class ApiHandler {
 		} else {
 			future =
 				asyncGetJson(
-					(useAlternativeApi ? "https://playerdb.co/api/player/minecraft/" : "https://api.ashcon.app/mojang/v2/user/") + uuid
+					(
+						switch (mojangApiNum) {
+							case 1 -> "https://playerdb.co/api/player/minecraft/";
+							case 2 -> "https://mc-heads.net/minecraft/profile/";
+							case 3 -> "https://api.minetools.eu/uuid/";
+							default -> "https://api.ashcon.app/mojang/v2/user/";
+						}
+					) +
+					uuid
 				)
 					.thenApplyAsync(
 						uuidToUsernameJson -> {
 							try {
 								String username = Utils
-									.higherDepth(uuidToUsernameJson, (useAlternativeApi ? "data.player." : "") + "username")
+									.higherDepth(
+										uuidToUsernameJson,
+										switch (mojangApiNum) {
+											case 1 -> "data.player.username";
+											case 2, 3 -> "name";
+											default -> "username";
+										}
+									)
 									.getAsString();
 								uuidToUsernameCache.put(uuid, username);
 								return username;

@@ -642,6 +642,10 @@ public class Utils {
 		return null;
 	}
 
+	public static String getHasteUrl() {
+		return "https://hste.vercel.app/api/";
+	}
+
 	public static String makeHastePost(Object body) {
 		try {
 			HttpPost httpPost = new HttpPost("https://hste.vercel.app/api?key=cab35a7a9b1242beeaf0e6dfb69404d5");
@@ -653,7 +657,7 @@ public class Utils {
 				CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
 				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
 			) {
-				return ("https://hste.vercel.app/api/" + higherDepth(JsonParser.parseReader(in), "key").getAsString());
+				return (getHasteUrl() + higherDepth(JsonParser.parseReader(in), "key").getAsString());
 			}
 		} catch (Exception ignored) {}
 		return null;
