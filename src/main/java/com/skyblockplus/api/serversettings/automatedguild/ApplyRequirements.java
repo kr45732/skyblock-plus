@@ -18,7 +18,7 @@
 
 package com.skyblockplus.api.serversettings.automatedguild;
 
-import jakarta.persistence.Embeddable;
+import javax.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
