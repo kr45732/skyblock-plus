@@ -123,52 +123,9 @@ public class MissingSlashCommand extends SlashCommand {
 				}
 			});
 
-			missingInternalArr.removeAll(List.of("BURNING_KUUDRA_CORE", "FIERY_KUUDRA_CORE", "INFERNAL_KUUDRA_CORE")); // TODO: remove when obtainable
-			if (soulboundItems == null) {
-				soulboundItems =
-					getSkyblockItemsJson()
-						.entrySet()
-						.stream()
-						.filter(e -> higherDepth(e.getValue(), "soulbound", null) != null)
-						.map(Map.Entry::getKey)
-						.toList();
-			}
-			List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");
-
 			NetworthExecute calc = new NetworthExecute().initPrices();
-			missingInternalArr.sort(
-				Comparator.comparingDouble(o1 ->
-					soulboundItems.contains(o1) || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
-						? Double.MAX_VALUE
-						: calc.getLowestPrice(o1)
-				)
-			);
 
-			JsonObject mappings = getInternalJsonMappings();
-			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
-			double totalCost = 0;
-			List<String> out = new ArrayList<>();
-			for (String curId : missingInternalArr) {
-				String costOut;
-				double cost = calc.getLowestPrice(curId);
-				totalCost += cost;
-				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
-				String name = idToName(curId);
-				if (soulboundItems.contains(curId)) {
-					costOut = (cost != 0 ? " ➜ " + roundAndFormat(cost) : "") + " (Soulbound)";
-				} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
-					costOut = " (Unobtainable)";
-				} else {
-					costOut = " ➜ " + roundAndFormat(cost);
-				}
-				out.add(
-					getEmoji(curId) +
-					" " +
-					(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
-					(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
-					costOut
-				);
-			}
+			Map.Entry<Double, List<String>> missing = getMissingInfo(missingInternalArr, player, calc);
 
 			for (int i = 0; i < missingInternalArr.size(); i++) {
 				String highestValue = higherDepth(talismanUpgrades, missingInternalArr.get(i) + ".[-1]", null);
@@ -176,63 +133,32 @@ public class MissingSlashCommand extends SlashCommand {
 					missingInternalArr.set(i, highestValue);
 				}
 			}
-			missingInternalArr.sort(
-				Comparator.comparingDouble(o1 ->
-					soulboundItems.contains(o1) || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
-						? Double.MAX_VALUE
-						: calc.getLowestPrice(o1)
-				)
-			);
 
-			long totalCostHighest = 0;
-			List<String> outHighest = new ArrayList<>();
-			for (String curId : missingInternalArr) {
-				double cost = calc.getLowestPrice(curId);
-				totalCostHighest += cost;
-				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
-				String name = idToName(curId);
+			Map.Entry<Double, List<String>> missingHighest = getMissingInfo(missingInternalArr, player, calc);
 
-				String costOut;
-				if (soulboundItems.contains(curId)) {
-					costOut = (cost != 0 ? " ➜ " + roundAndFormat(cost) : "") + " (Soulbound)";
-				} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
-					costOut = " (Unobtainable)";
-				} else {
-					costOut = " ➜ " + roundAndFormat(cost);
-				}
-				outHighest.add(
-					getEmoji(curId) +
-					" " +
-					(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
-					(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
-					costOut
-				);
-			}
-
-			long finalTotalCostHighest = totalCostHighest;
-			double finalTotalCost = totalCost;
+			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
 			paginateBuilder
-				.addItems(out)
+				.addItems(missing.getValue())
 				.getExtras()
 				.setEveryPageText(
 					"**Total Missing:** " +
 					missingInternalArr.size() +
 					"\n**Total Cost:** " +
-					simplifyNumber(totalCost) +
+					simplifyNumber(missing.getKey()) +
 					"\n**Note:** Talismans with a * have higher tiers\n"
 				)
 				.addReactiveButtons(
 					new PaginatorExtras.ReactiveButton(
 						Button.primary("reactive_missing_command_show_highest", "Show Highest Tier"),
 						paginator -> {
-							paginator.setStrings(outHighest);
+							paginator.setStrings(missingHighest.getValue());
 							paginator
 								.getExtras()
 								.setEveryPageText(
 									"**Total Missing:** " +
 									missingInternalArr.size() +
 									"\n**Total Cost:** " +
-									simplifyNumber(finalTotalCostHighest) +
+									simplifyNumber(missingHighest.getKey()) +
 									"\n**Note:** Showing highest tiers\n"
 								)
 								.toggleReactiveButton("reactive_missing_command_show_highest", false)
@@ -243,14 +169,14 @@ public class MissingSlashCommand extends SlashCommand {
 					new PaginatorExtras.ReactiveButton(
 						Button.primary("reactive_missing_command_show_next", "Show Next Tier"),
 						paginator -> {
-							paginator.setStrings(out);
+							paginator.setStrings(missing.getValue());
 							paginator
 								.getExtras()
 								.setEveryPageText(
 									"**Total Missing:** " +
 									missingInternalArr.size() +
 									"\n**Total Cost:** " +
-									simplifyNumber(finalTotalCost) +
+									simplifyNumber(missing.getKey()) +
 									"\n**Note:** Talismans with a * have higher tiers\n"
 								)
 								.toggleReactiveButton("reactive_missing_command_show_highest", true)
@@ -264,5 +190,87 @@ public class MissingSlashCommand extends SlashCommand {
 			return null;
 		}
 		return player.getFailEmbed();
+	}
+
+	public static Map.Entry<Double, List<String>> getMissingInfo(List<String> missingInternalArr, Player player, NetworthExecute calc) {
+		if (soulboundItems == null) {
+			soulboundItems =
+				getSkyblockItemsJson()
+					.entrySet()
+					.stream()
+					.filter(e -> higherDepth(e.getValue(), "soulbound", null) != null)
+					.map(Map.Entry::getKey)
+					.toList();
+		}
+
+		List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");
+
+		List<String> crabHatColors = List.of("RED", "AQUA", "LIME", "PINK", "BLACK", "GREEN", "ORANGE", "PURPLE", "YELLOW");
+		double crabHatCost = -1;
+		double animatedCrabHatCost = -1;
+		for (String crabHatColor : crabHatColors) {
+			double price = calc.getLowestPrice("PARTY_HAT_CRAB_" + crabHatColor);
+			if (price > 0 && (crabHatCost == -1 || price < crabHatCost)) {
+				crabHatCost = price;
+			}
+			double animatedPrice = calc.getLowestPrice("PARTY_HAT_CRAB_" + crabHatColor + "_ANIMATED");
+			if (animatedPrice > 0 && (animatedCrabHatCost == -1 || animatedPrice < animatedCrabHatCost)) {
+				animatedCrabHatCost = animatedPrice;
+			}
+		}
+		crabHatCost = Math.max(0, crabHatCost);
+		animatedCrabHatCost = Math.max(0, animatedCrabHatCost);
+
+		double finalCrabHatCost = crabHatCost;
+		double finalAnimatedCrabHatCost = animatedCrabHatCost;
+		missingInternalArr.sort(
+			Comparator.comparingDouble(o1 -> {
+				if (
+					soulboundItems.contains(o1) || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
+				) {
+					return Double.MAX_VALUE;
+				} else if (o1.equals("PARTY_HAT_CRAB")) {
+					return finalCrabHatCost;
+				} else if (o1.equals("PARTY_HAT_CRAB_ANIMATED")) {
+					return finalAnimatedCrabHatCost;
+				}
+				return calc.getLowestPrice(o1);
+			})
+		);
+
+		JsonObject mappings = getInternalJsonMappings();
+		double totalCost = 0;
+		List<String> out = new ArrayList<>();
+		for (String curId : missingInternalArr) {
+			double cost = calc.getLowestPrice(curId);
+			if (curId.equals("PARTY_HAT_CRAB")) {
+				cost = finalCrabHatCost;
+			} else if (curId.equals("PARTY_HAT_CRAB_ANIMATED")) {
+				cost = finalAnimatedCrabHatCost;
+			}
+			totalCost += cost;
+
+			String wikiLink = higherDepth(mappings, curId + ".wiki", null);
+			String name = idToName(curId);
+			String costOut;
+			if (soulboundItems.contains(curId)) {
+				costOut = (cost != 0 ? " ➜ " + roundAndFormat(cost) : "") + " (Soulbound)";
+			} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
+				costOut = " (Unobtainable)";
+			} else {
+				costOut = " ➜ " + roundAndFormat(cost);
+			}
+
+			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
+			out.add(
+				getEmoji(curId) +
+				" " +
+				(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
+				(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
+				costOut
+			);
+		}
+
+		return new AbstractMap.SimpleEntry<>(totalCost, out);
 	}
 }

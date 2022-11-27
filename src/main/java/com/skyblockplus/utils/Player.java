@@ -1034,6 +1034,9 @@ public class Player {
 	public Player(String uuid, String username, JsonElement profileArray, boolean updateLb) {
 		this.uuid = uuid;
 		this.username = username;
+		if (uuid == null || username == null) {
+			return;
+		}
 
 		try {
 			if (profileArray == null) {
@@ -1065,6 +1068,9 @@ public class Player {
 	public Player(String uuid, String username, String profileName, JsonElement profileArray, boolean updateLb) {
 		this.uuid = uuid;
 		this.username = username;
+		if (uuid == null || username == null) {
+			return;
+		}
 
 		try {
 			if (profileArray == null) {

@@ -181,6 +181,11 @@ public class ApiHandler {
 			.filter(entry -> entry.getValue().equalsIgnoreCase(username))
 			.findFirst()
 			.orElse(null);
+
+		if (cachedResponse == null && !isValidMinecraftUsername(username) && isValidMinecraftUuid(username)) {
+			return uuidToUsername(username);
+		}
+
 		if (cachedResponse != null) {
 			return new UsernameUuidStruct(cachedResponse.getValue(), cachedResponse.getKey());
 		}
