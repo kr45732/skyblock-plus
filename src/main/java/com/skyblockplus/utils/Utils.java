@@ -1736,7 +1736,6 @@ public class Utils {
 			for (Map.Entry<String, JsonElement> manualOverride : higherDepth(splitPriceOverrides, "manual").getAsJsonObject().entrySet()) {
 				priceOverrideJson.add(manualOverride.getKey(), manualOverride.getValue());
 			}
-			priceOverrideJson.remove("ENCHANTED_BOOK");
 		}
 
 		return priceOverrideJson.has(itemId) ? priceOverrideJson.get(itemId).getAsDouble() : -1;
