@@ -213,7 +213,7 @@ public class MissingSlashCommand extends SlashCommand {
 			if (price > 0 && (crabHatCost == -1 || price < crabHatCost)) {
 				crabHatCost = price;
 			}
-			double animatedPrice = calc.getLowestPrice("PARTY_HAT_CRAB_" + crabHatColor + "_ANIMATED");
+			double animatedPrice = calc.getLowestPrice("PARTY_HAT_CRAB_ANIMATED_" + crabHatColor);
 			if (animatedPrice > 0 && (animatedCrabHatCost == -1 || animatedPrice < animatedCrabHatCost)) {
 				animatedCrabHatCost = animatedPrice;
 			}
