@@ -60,7 +60,7 @@ public class ApiHandler {
 		"[\\da-f]{32}|[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}"
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-	public static String ahApiUrl;
+	public static String ahApiUrl = "";
 	public static int mojangApiNum = 0;
 	public static ScheduledFuture<?> updateCacheTask;
 

@@ -18,8 +18,6 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
-import static com.skyblockplus.utils.ApiHandler.ahApiUrl;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -31,7 +29,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Map;
@@ -41,7 +38,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.message.BasicHeader;
 
 public class AuctionFlipper {
 
