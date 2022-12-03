@@ -174,7 +174,6 @@ public class Utils {
 	public static String PLANET_SCALE_URL = "";
 	public static String SBZ_SCAMMER_DB_KEY = "";
 	public static String LEADERBOARD_DB_URL = "";
-	public static String HEROKU_API_KEY = "";
 	/* JSON */
 	private static JsonObject essenceCostsJson;
 	private static JsonObject levelingJson;
@@ -1134,7 +1133,6 @@ public class Utils {
 			AUCTION_API_KEY = (String) appProps.get("AUCTION_API_KEY");
 			PLANET_SCALE_URL = (String) appProps.get("PLANET_SCALE_URL");
 			SBZ_SCAMMER_DB_KEY = (String) appProps.get("SBZ_SCAMMER_DB_KEY");
-			HEROKU_API_KEY = (String) appProps.get("HEROKU_API_KEY");
 			LEADERBOARD_DB_URL = (String) appProps.get("LEADERBOARD_DB_URL");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
@@ -1147,7 +1145,6 @@ public class Utils {
 			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
 			PLANET_SCALE_URL = System.getenv("PLANET_SCALE_URL");
 			SBZ_SCAMMER_DB_KEY = System.getenv("SBZ_SCAMMER_DB_KEY");
-			HEROKU_API_KEY = System.getenv("HEROKU_API_KEY");
 			LEADERBOARD_DB_URL = System.getenv("LEADERBOARD_DB_URL");
 		}
 	}

@@ -60,7 +60,7 @@ public class ApiHandler {
 		"[\\da-f]{32}|[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}"
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-	public static boolean useAlternativeAhApi = false;
+	public static String ahApiUrl;
 	public static int mojangApiNum = 0;
 	public static ScheduledFuture<?> updateCacheTask;
 
@@ -97,7 +97,7 @@ public class ApiHandler {
 
 	public static void reloadSettingsJson() {
 		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json");
-		useAlternativeAhApi = higherDepth(settings, "useAlternativeAhApi", false);
+		ahApiUrl = higherDepth(settings, "ahApiUrl", "");
 		mojangApiNum = higherDepth(settings, "mojangApiNum", 0);
 	}
 
@@ -475,7 +475,8 @@ public class ApiHandler {
 	}
 
 	public static String getQueryApiUrl(String path) {
-		return (useAlternativeAhApi ? "https://query-api.up.railway.app/" : "https://query-api.herokuapp.com/") + path;
+		// ahApiUrl should end with a '/'
+		return ahApiUrl + path;
 	}
 
 	public static JsonArray getBidsFromPlayer(String uuid) {

@@ -19,8 +19,8 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
+import static com.skyblockplus.utils.ApiHandler.ahApiUrl;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
-import static com.skyblockplus.utils.ApiHandler.useAlternativeAhApi;
 import static com.skyblockplus.utils.Utils.*;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
@@ -59,10 +59,7 @@ public class AuctionFlipper {
 
 	public static boolean onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
-			if (
-				event.getChannel().getId().equals((useAlternativeAhApi ? "958904253299167262" : "958771784004567063")) &&
-				event.isWebhookMessage()
-			) {
+			if (event.getChannel().getId().equals("958771784004567063") && event.isWebhookMessage()) {
 				lastUpdated = Instant.now();
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
 				if (desc.contains(" query auctions into database in ")) {
@@ -79,26 +76,6 @@ public class AuctionFlipper {
 
 	public static void initialize(boolean enable) {
 		AuctionFlipper.enable = enable;
-		scheduler.scheduleWithFixedDelay(
-			() -> {
-				try {
-					if (
-						!useAlternativeAhApi &&
-						Duration.between(lastUpdated, Instant.now()).toMinutes() >= 3 &&
-						!currentMayor.equals("Derpy")
-					) {
-						deleteUrl(
-							"https://api.heroku.com/apps/query-api/dynos",
-							new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
-							new BasicHeader("Authorization", "Bearer " + HEROKU_API_KEY)
-						);
-					}
-				} catch (Exception ignored) {}
-			},
-			60,
-			30,
-			TimeUnit.SECONDS
-		);
 	}
 
 	public static void flip() {
