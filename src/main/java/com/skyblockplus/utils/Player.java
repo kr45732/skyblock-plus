@@ -2116,7 +2116,11 @@ public class Player {
 
 	public int getPetScore() {
 		JsonArray playerPets;
-		try{ playerPets = getPets();}catch (Exception e) {return 0;}
+		try {
+			playerPets = getPets();
+		} catch (Exception e) {
+			return 0;
+		}
 		Map<String, Integer> petsMap = new HashMap<>();
 		for (JsonElement pet : playerPets) {
 			String petName = higherDepth(pet, "type").getAsString();
