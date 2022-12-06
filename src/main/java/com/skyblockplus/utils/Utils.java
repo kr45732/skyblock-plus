@@ -1204,7 +1204,7 @@ public class Utils {
 			return List.of(toMatch);
 		}
 
-		return FuzzySearch.extractTop(toMatch, matchFrom, numMatches).stream().map(ExtractedResult::getString).collect(Collectors.toList());
+		return FuzzySearch.extractTop(toMatch, matchFrom, numMatches).stream().map(ExtractedResult::getString).collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	public static String skyblockStatsLink(String username, String profileName) {
