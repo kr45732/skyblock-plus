@@ -1201,7 +1201,7 @@ public class Utils {
 
 	public static List<String> getClosestMatch(String toMatch, List<String> matchFrom, int numMatches) {
 		if (matchFrom == null || matchFrom.isEmpty()) {
-			return List.of(toMatch);
+			return new ArrayList<>(List.of(toMatch));
 		}
 
 		return FuzzySearch
