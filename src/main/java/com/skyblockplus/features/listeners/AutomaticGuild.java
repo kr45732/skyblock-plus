@@ -517,10 +517,6 @@ public class AutomaticGuild {
 								: (curSettings.getGuildCounterEnable() != null && !curSettings.getGuildCounterEnable().equals("false"))
 						)
 						.collect(Collectors.toList());
-
-				if (filteredGuildSettings.isEmpty()) {
-					return;
-				}
 			}
 
 			JsonArray blacklist = guildMap.get(guildId).getBlacklist();
@@ -707,7 +703,7 @@ public class AutomaticGuild {
 			}
 
 			Set<String> memberCountList = new HashSet<>();
-			if (filteredGuildSettings != null) {
+			if (filteredGuildSettings != null && !filteredGuildSettings.isEmpty()) {
 				Set<String> inGuild = new HashSet<>();
 				for (AutomatedGuild currentSetting : filteredGuildSettings) {
 					HypixelResponse response = getGuildFromId(currentSetting.getGuildId());
