@@ -500,24 +500,20 @@ public class AutomaticGuild {
 			boolean verifyEnabled = higherDepth(verifySettings, "enableAutomaticSync", false);
 			List<AutomatedGuild> guildSettings = database.getAllGuildSettings(guild.getId());
 
-			if (guildSettings == null && !verifyEnabled) {
+			if (guildSettings.isEmpty() && !verifyEnabled) {
 				return;
 			}
 
 			final boolean[] roleOrRankEnabled = { false };
-			List<AutomatedGuild> filteredGuildSettings = null;
-			if (guildSettings != null) {
-				guildSettings.removeIf(g -> g == null || g.getGuildName() == null);
-				filteredGuildSettings =
-					guildSettings
-						.stream()
-						.filter(curSettings ->
-							curSettings.getGuildMemberRoleEnable().equals("true") || curSettings.getGuildRanksEnable().equals("true")
-								? (roleOrRankEnabled[0] = true)
-								: (curSettings.getGuildCounterEnable() != null && !curSettings.getGuildCounterEnable().equals("false"))
-						)
-						.collect(Collectors.toList());
-			}
+			guildSettings.removeIf(g -> g == null || g.getGuildName() == null);
+			List<AutomatedGuild> filteredGuildSettings = guildSettings
+				.stream()
+				.filter(curSettings ->
+					curSettings.getGuildMemberRoleEnable().equals("true") || curSettings.getGuildRanksEnable().equals("true")
+						? (roleOrRankEnabled[0] = true)
+						: (curSettings.getGuildCounterEnable() != null && !curSettings.getGuildCounterEnable().equals("false"))
+				)
+				.collect(Collectors.toList());
 
 			JsonArray blacklist = guildMap.get(guildId).getBlacklist();
 
@@ -592,7 +588,6 @@ public class AutomaticGuild {
 								if (
 									category.equals("GUILD") &&
 									(type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) &&
-									guildSettings != null &&
 									!guildSettings.isEmpty()
 								) {
 									if (guildResponses == null) {
@@ -703,7 +698,7 @@ public class AutomaticGuild {
 			}
 
 			Set<String> memberCountList = new HashSet<>();
-			if (filteredGuildSettings != null && !filteredGuildSettings.isEmpty()) {
+			if (!filteredGuildSettings.isEmpty()) {
 				Set<String> inGuild = new HashSet<>();
 				for (AutomatedGuild currentSetting : filteredGuildSettings) {
 					HypixelResponse response = getGuildFromId(currentSetting.getGuildId());
