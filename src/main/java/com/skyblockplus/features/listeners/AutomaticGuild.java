@@ -500,6 +500,10 @@ public class AutomaticGuild {
 			boolean verifyEnabled = higherDepth(verifySettings, "enableAutomaticSync", false);
 			List<AutomatedGuild> guildSettings = database.getAllGuildSettings(guild.getId());
 
+			if (guildSettings == null) { // Only happens if the SERVER settings don't exist
+				return;
+			}
+
 			if (guildSettings.isEmpty() && !verifyEnabled) {
 				return;
 			}
