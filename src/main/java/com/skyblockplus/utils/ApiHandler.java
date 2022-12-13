@@ -257,7 +257,11 @@ public class ApiHandler {
 						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 						return usernameUuidStruct;
 					} catch (Exception e) {
-						return new UsernameUuidStruct(allowMojangApi && higherDepth(usernameJson, "error", "").equals("Too Many Requests") ? "Mojang has rate limited this request." : higherDepth(usernameJson, "reason").getAsString());
+						return new UsernameUuidStruct(
+							allowMojangApi && higherDepth(usernameJson, "error", "").equals("Too Many Requests")
+								? "Mojang has rate limited this request."
+								: higherDepth(usernameJson, "reason").getAsString()
+						);
 					}
 				}
 			}
@@ -312,11 +316,18 @@ public class ApiHandler {
 	private static UsernameUuidStruct uuidUsernameMojang(String username) {
 		try {
 			// true ? uuid to username : second is username to uuid
-			JsonElement usernameJson = getJson((!isValidMinecraftUsername(username) && isValidMinecraftUuid(username) ? "https://sessionserver.mojang.com/session/minecraft/profile/" : "https://api.mojang.com/users/profiles/minecraft/") + username);
+			JsonElement usernameJson = getJson(
+				(
+					!isValidMinecraftUsername(username) && isValidMinecraftUuid(username)
+						? "https://sessionserver.mojang.com/session/minecraft/profile/"
+						: "https://api.mojang.com/users/profiles/minecraft/"
+				) +
+				username
+			);
 			try {
 				UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-						higherDepth(usernameJson, "name").getAsString(),
-						higherDepth(usernameJson, "id").getAsString()
+					higherDepth(usernameJson, "name").getAsString(),
+					higherDepth(usernameJson, "id").getAsString()
 				);
 				uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 				return usernameUuidStruct;
