@@ -120,7 +120,7 @@ public class CheckGuildApiSlashCommand extends SlashCommand {
 						guildMemberProfileJsonResponse -> {
 							Player player = new Player(
 								guildMemberUuid,
-								usernameToUuid(guildMemberUuid).username(),
+								uuidToUsername(guildMemberUuid).username(),
 								guildMemberProfileJsonResponse,
 								false
 							);

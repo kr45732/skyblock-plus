@@ -253,7 +253,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 						guildMemberProfileJsonResponse -> {
 							Player guildMemberPlayer = new Player(
 								guildMemberUuid,
-								usernameToUuid(guildMemberUuid).username(),
+								uuidToUsername(guildMemberUuid).username(),
 								guildMemberProfile,
 								guildMemberProfileJsonResponse,
 								false
@@ -262,53 +262,13 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 							if (guildMemberPlayer.isValid()) {
 								players.add(guildMemberPlayer);
 
-								switch (eventType) {
-									case "slayer" -> {
-										return new EventMember(
-											guildMemberPlayer.getUsername(),
-											guildMemberUuid,
-											"" +
-											(guildMemberPlayer.getTotalSlayer() - higherDepth(guildMember, "startingAmount").getAsDouble()),
-											higherDepth(guildMember, "profileName").getAsString()
-										);
-									}
-									case "catacombs" -> {
-										return new EventMember(
-											guildMemberPlayer.getUsername(),
-											guildMemberUuid,
-											"" +
-											(
-												guildMemberPlayer.getCatacombs().totalExp() -
-												higherDepth(guildMember, "startingAmount").getAsDouble()
-											),
-											higherDepth(guildMember, "profileName").getAsString()
-										);
-									}
-									case "weight" -> {
-										return new EventMember(
-											guildMemberPlayer.getUsername(),
-											guildMemberUuid,
-											"" + (guildMemberPlayer.getWeight() - higherDepth(guildMember, "startingAmount").getAsDouble()),
-											higherDepth(guildMember, "profileName").getAsString()
-										);
-									}
+								Double curChange = switch (eventType) {
+									case "slayer" -> guildMemberPlayer.getTotalSlayer() - higherDepth(guildMember, "startingAmount").getAsDouble();
+									case "catacombs" -> guildMemberPlayer.getCatacombs().totalExp() - higherDepth(guildMember, "startingAmount").getAsDouble();
+									case "weight" -> guildMemberPlayer.getWeight() - higherDepth(guildMember, "startingAmount").getAsDouble();
 									default -> {
 										if (eventType.startsWith("collection.")) {
-											return new EventMember(
-												guildMemberPlayer.getUsername(),
-												guildMemberUuid,
-												"" +
-												(
-													(
-														higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0]) != null
-															? higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0])
-																.getAsDouble()
-															: 0
-													) -
-													higherDepth(guildMember, "startingAmount").getAsDouble()
-												),
-												higherDepth(guildMember, "profileName").getAsString()
-											);
+											yield higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0], 0.0) - higherDepth(guildMember, "startingAmount").getAsDouble();
 										} else if (eventType.startsWith("skills.")) {
 											String skillType = eventType.split("skills.")[1];
 											double skillXp = skillType.equals("all")
@@ -316,27 +276,28 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 												: guildMemberPlayer.getSkillXp(skillType);
 
 											if (skillXp != -1) {
-												return new EventMember(
-													guildMemberPlayer.getUsername(),
-													guildMemberUuid,
-													"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
-													higherDepth(guildMember, "profileName").getAsString()
-												);
+												yield skillXp - higherDepth(guildMember, "startingAmount").getAsDouble();
 											}
 										} else if (eventType.startsWith("weight.")) {
 											String weightTypes = eventType.split("weight.")[1];
-											double skillXp = guildMemberPlayer.getWeight(weightTypes.split("-"));
+											double weightAmt = guildMemberPlayer.getWeight(weightTypes.split("-"));
 
-											if (skillXp != -1) {
-												return new EventMember(
-													guildMemberPlayer.getUsername(),
-													guildMemberUuid,
-													"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
-													higherDepth(guildMember, "profileName").getAsString()
-												);
+											if (weightAmt != -1) {
+												yield weightAmt - higherDepth(guildMember, "startingAmount").getAsDouble();
 											}
 										}
+
+										yield null;
 									}
+								};
+
+								if (curChange != null ) {
+									return new EventMember(
+											guildMemberPlayer.getUsername(),
+											guildMemberUuid,
+											"" + curChange,
+											higherDepth(guildMember, "profileName").getAsString()
+									);
 								}
 							}
 							return null;

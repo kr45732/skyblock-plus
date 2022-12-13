@@ -24,7 +24,7 @@ import com.skyblockplus.utils.Utils;
 
 public record UsernameUuidStruct(String username, String uuid, String failCause) {
 	public UsernameUuidStruct(String username, String uuid) {
-		this(username, uuid, null);
+		this(username, uuid.replace("-", ""), null);
 	}
 
 	public UsernameUuidStruct(String failCause) {
@@ -53,5 +53,9 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 
 	public String usernameFixed() {
 		return fixUsername(username());
+	}
+
+	public boolean isRateLimited() {
+		return !isValid() && failCause != null && failCause.equals("Mojang has rate limited this request.");
 	}
 }

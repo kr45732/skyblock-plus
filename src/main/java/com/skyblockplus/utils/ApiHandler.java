@@ -62,6 +62,7 @@ public class ApiHandler {
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	public static String ahApiUrl = "";
 	public static int mojangApiNum = 0;
+	public static boolean allowMojangApi = false;
 	public static ScheduledFuture<?> updateCacheTask;
 
 	public static void initialize() {
@@ -99,6 +100,7 @@ public class ApiHandler {
 		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json");
 		ahApiUrl = higherDepth(settings, "ahApiUrl", "");
 		mojangApiNum = higherDepth(settings, "mojangApiNum", 0);
+		allowMojangApi = higherDepth(settings, "allowMojangApi", false);
 	}
 
 	public static void updateBotStatistics() {
@@ -190,7 +192,8 @@ public class ApiHandler {
 			return new UsernameUuidStruct(cachedResponse.getValue(), cachedResponse.getKey());
 		}
 
-		return uuidUsername(username);
+		UsernameUuidStruct response = uuidUsername(username);
+		return allowMojangApi && response.isRateLimited() ? uuidUsernameMojang(username) : response;
 	}
 
 	public static UsernameUuidStruct uuidToUsername(String uuid) {
@@ -210,12 +213,12 @@ public class ApiHandler {
 					try {
 						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
 							higherDepth(usernameJson, "data.player.username").getAsString(),
-							higherDepth(usernameJson, "data.player.id").getAsString().replace("-", "")
+							higherDepth(usernameJson, "data.player.id").getAsString()
 						);
 						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 						return usernameUuidStruct;
 					} catch (Exception e) {
-						return new UsernameUuidStruct(higherDepth(usernameJson, "code").getAsString());
+						return new UsernameUuidStruct(higherDepth(usernameJson, "message").getAsString());
 					}
 				}
 				case 2 -> {
@@ -223,7 +226,7 @@ public class ApiHandler {
 					try {
 						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
 							higherDepth(usernameJson, "name").getAsString(),
-							higherDepth(usernameJson, "id").getAsString().replace("-", "")
+							higherDepth(usernameJson, "id").getAsString()
 						);
 						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 						return usernameUuidStruct;
@@ -236,7 +239,7 @@ public class ApiHandler {
 					try {
 						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
 							higherDepth(usernameJson, "name").getAsString(),
-							higherDepth(usernameJson, "id").getAsString().replace("-", "")
+							higherDepth(usernameJson, "id").getAsString()
 						);
 						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 						return usernameUuidStruct;
@@ -249,12 +252,12 @@ public class ApiHandler {
 					try {
 						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
 							higherDepth(usernameJson, "username").getAsString(),
-							higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
+							higherDepth(usernameJson, "uuid").getAsString()
 						);
 						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 						return usernameUuidStruct;
 					} catch (Exception e) {
-						return new UsernameUuidStruct(higherDepth(usernameJson, "reason").getAsString());
+						return new UsernameUuidStruct(allowMojangApi && higherDepth(usernameJson, "error", "").equals("Too Many Requests") ? "Mojang has rate limited this request." : higherDepth(usernameJson, "reason").getAsString());
 					}
 				}
 			}
@@ -304,6 +307,24 @@ public class ApiHandler {
 		}
 
 		return future;
+	}
+
+	private static UsernameUuidStruct uuidUsernameMojang(String username) {
+		try {
+			// true ? uuid to username : second is username to uuid
+			JsonElement usernameJson = getJson((!isValidMinecraftUsername(username) && isValidMinecraftUuid(username) ? "https://sessionserver.mojang.com/session/minecraft/profile/" : "https://api.mojang.com/users/profiles/minecraft/") + username);
+			try {
+				UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
+						higherDepth(usernameJson, "name").getAsString(),
+						higherDepth(usernameJson, "id").getAsString()
+				);
+				uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
+				return usernameUuidStruct;
+			} catch (Exception e) {
+				return new UsernameUuidStruct(higherDepth(usernameJson, "errorMessage").getAsString());
+			}
+		} catch (Exception ignored) {}
+		return new UsernameUuidStruct();
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid) {

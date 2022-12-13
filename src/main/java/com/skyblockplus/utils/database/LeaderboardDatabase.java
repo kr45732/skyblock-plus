@@ -443,7 +443,7 @@ public class LeaderboardDatabase {
 						asyncSkyblockProfilesFromUuid(uuid, hypixelKey)
 							.thenApplyAsync(
 								profilesJson -> {
-									Player player = new Player(uuid, usernameToUuid(uuid).username(), profilesJson, false);
+									Player player = new Player(uuid, uuidToUsername(uuid).username(), profilesJson, false);
 
 									if (player.isValid()) {
 										players.add(player);
