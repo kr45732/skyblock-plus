@@ -519,6 +519,10 @@ public class AutomaticGuild {
 				)
 				.collect(Collectors.toList());
 
+			if (filteredGuildSettings.isEmpty() && !verifyEnabled) {
+				return;
+			}
+
 			JsonArray blacklist = guildMap.get(guildId).getBlacklist();
 
 			List<Member> inGuildUsers = new ArrayList<>();
