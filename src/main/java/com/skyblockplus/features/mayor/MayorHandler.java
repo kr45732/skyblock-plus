@@ -47,6 +47,7 @@ public class MayorHandler {
 	public static String currentJerryMayor = "";
 	public static int currentMayorYear = 0;
 	public static ScheduledFuture<?> jerryFuture;
+	public static ScheduledFuture<?> mayorElectedFuture;
 	public static MessageEmbed jerryEmbed = invalidEmbed("Jerry is not currently mayor").build();
 	public static final Map<String, String> mayorNameToEmoji = Maps.of(
 		"DERPY",
@@ -85,19 +86,14 @@ public class MayorHandler {
 				currentMayorYear = higherDepth(mayorJson, "mayor.election.year", 0);
 			}
 
-			long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1);
-			long newYearToElectionClose = 105600000;
-
-			long currentTime = Instant.now().toEpochMilli();
-			long closeTime = newYearStartEpoch + newYearToElectionClose;
-
-			if (closeTime <= currentTime && currentTime <= closeTime + 420000) { // Ended at most 7 min ago
-				scheduler.schedule(MayorHandler::mayorElected, 5, TimeUnit.MINUTES);
-				scheduler.schedule(MayorHandler::initialize, 30, TimeUnit.MINUTES);
-			} else {
-				updateCurrentElection();
-				scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
+			long msTillElected = YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 105600000 - Instant.now().toEpochMilli() + 300000;
+			if (mayorElectedFuture == null && msTillElected > 0) {
+				mayorElectedFuture = scheduler.schedule(MayorHandler::mayorElected, msTillElected, TimeUnit.MINUTES);
 			}
+
+			updateCurrentElection();
+
+			scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
 
 			if (currentMayor.equals("Jerry") && jerryFuture == null) {
 				jerryFuture = scheduler.schedule(MayorHandler::updateMayorJerryRotations, 30, TimeUnit.SECONDS);
@@ -188,6 +184,8 @@ public class MayorHandler {
 					} catch (Exception ignored) {}
 				}
 			}
+
+			scheduler.schedule(() -> mayorElectedFuture = null, 30, TimeUnit.MINUTES);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -220,7 +218,7 @@ public class MayorHandler {
 	public static void updateCurrentElection() {
 		try {
 			JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "current");
-			if (higherDepth(cur, "candidates") == null) {
+			if (higherDepth(cur, "candidates") == null) { // Election not open
 				return;
 			}
 

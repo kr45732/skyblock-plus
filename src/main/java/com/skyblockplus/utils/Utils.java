@@ -19,6 +19,7 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
 import static java.lang.String.join;
@@ -279,9 +280,9 @@ public class Utils {
 					getQueryApiUrl("average") +
 					"?key=" +
 					AUCTION_API_KEY +
-					"&time=" +
+					(!currentMayor.equals("Derpy") ? "&time=" +
 					Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli() +
-					"&step=60"
+					"&step=60" : "")
 				);
 
 			if (averageAuctionJson == null) {

@@ -1031,9 +1031,7 @@ public class AutomaticGuild {
 			if (split.length < 4) {
 				NetworthExecute calc = new NetworthExecute().setVerbose(true);
 				calc.getPlayerNetworth(split[0], split[1], null);
-				split = new String[] { split[0], split[1], split[2], makeHastePost(formattedGson.toJson(calc.getVerboseJson())) };
-			} else {
-				split[3] = getHasteUrl() + split[3];
+				split = new String[] { split[0], split[1], split[2], makeHastePost(formattedGson.toJson(calc.getVerboseJson())).split(getHasteUrl())[1] };
 			}
 			split[2] = "" + Instant.now().toEpochMilli();
 
@@ -1073,7 +1071,7 @@ public class AutomaticGuild {
 					m
 						.editMessageComponents(
 							ActionRow.of(
-								Button.link(finalSplit[3], "Verbose Link"),
+								Button.link(getHasteUrl() + finalSplit[3], "Verbose Link"),
 								Button.primary("nw_run_" + finalSplit[0] + "_" + finalSplit[1], "Run Networth"),
 								Button.success("nw_resolved_" + event.getUser().getId() + "_" + m.getId(), "Resolved")
 							)
