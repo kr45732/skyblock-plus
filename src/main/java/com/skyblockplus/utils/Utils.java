@@ -228,7 +228,7 @@ public class Utils {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			lowestBinJson = getJsonObject(getQueryApiUrl("lowestbin") + "?key=" + AUCTION_API_KEY);
 
-			if (lowestBinJson == null) {
+			if (lowestBinJson == null || !higherDepth(lowestBinJson, "success", true)) {
 				lowestBinJson = getJsonObject("https://moulberry.codes/lowestbin.json");
 			}
 			lowestBinJsonLastUpdated = Instant.now();
