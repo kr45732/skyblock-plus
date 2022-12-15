@@ -280,9 +280,7 @@ public class Utils {
 					getQueryApiUrl("average") +
 					"?key=" +
 					AUCTION_API_KEY +
-					(!currentMayor.equals("Derpy") ? "&time=" +
-					Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli() +
-					"&step=60" : "")
+					(!currentMayor.equals("Derpy") ? "&time=" + Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli() + "&step=60" : "")
 				);
 
 			if (averageAuctionJson == null) {

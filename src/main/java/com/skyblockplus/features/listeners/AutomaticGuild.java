@@ -1031,7 +1031,13 @@ public class AutomaticGuild {
 			if (split.length < 4) {
 				NetworthExecute calc = new NetworthExecute().setVerbose(true);
 				calc.getPlayerNetworth(split[0], split[1], null);
-				split = new String[] { split[0], split[1], split[2], makeHastePost(formattedGson.toJson(calc.getVerboseJson())).split(getHasteUrl())[1] };
+				split =
+					new String[] {
+						split[0],
+						split[1],
+						split[2],
+						makeHastePost(formattedGson.toJson(calc.getVerboseJson())).split(getHasteUrl())[1],
+					};
 			}
 			split[2] = "" + Instant.now().toEpochMilli();
 
