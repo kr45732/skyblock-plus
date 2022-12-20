@@ -88,7 +88,7 @@ public class MayorHandler {
 
 			long msTillElected = YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 105600000 - Instant.now().toEpochMilli() + 300000;
 			if (mayorElectedFuture == null && msTillElected > 0) {
-				mayorElectedFuture = scheduler.schedule(MayorHandler::mayorElected, msTillElected, TimeUnit.MINUTES);
+				mayorElectedFuture = scheduler.schedule(MayorHandler::mayorElected, msTillElected, TimeUnit.MILLISECONDS);
 			}
 
 			updateCurrentElection();
