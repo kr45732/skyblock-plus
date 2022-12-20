@@ -357,7 +357,7 @@ public class SetupCommandHandler {
 							.getHook()
 							.editOriginalEmbeds(
 								getSettings()
-									.setVerifyDmOnSync(
+									.setVerifyRolesClaimEnable(
 										!higherDepth(
 											database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
 											"enableRolesClaim",
