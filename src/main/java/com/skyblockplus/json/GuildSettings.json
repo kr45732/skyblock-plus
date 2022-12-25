@@ -438,5 +438,56 @@
         }
       ]
     }
+  },
+  "6215ce3b8ea8c95a8a9d86b6": {
+    "name": "Skill n Chill",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "skilled",
+        "officer",
+        "guild master"
+      ],
+      "default_rank": {
+        "requirements" : [],
+        "names": ["newbie"]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 1209600,
+                "type": "duration"
+              },
+              {
+                "amount": 60000,
+                "type": "gxp"
+              }
+            ]
+          ],
+          "names": [
+            "novice"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 7890000,
+                "type": "duration"
+              },
+              {
+                "amount": 60000,
+                "type": "gxp"
+              }
+            ]
+          ],
+          "names": [
+            "rookie"
+          ]
+        }
+      ]
+    }
   }
 }
