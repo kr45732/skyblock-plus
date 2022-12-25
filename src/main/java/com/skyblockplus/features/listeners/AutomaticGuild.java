@@ -705,7 +705,6 @@ public class AutomaticGuild {
 				}
 			}
 
-			Set<String> memberCountList = new HashSet<>();
 			if (!filteredGuildSettings.isEmpty()) {
 				Set<String> inGuild = new HashSet<>();
 				for (AutomatedGuild currentSetting : filteredGuildSettings) {
@@ -778,7 +777,6 @@ public class AutomaticGuild {
 										.update(rolesToAdd, rolesToRemove)
 								);
 							}
-							memberCountList.add(linkedMember.getId());
 						}
 					}
 
@@ -819,16 +817,16 @@ public class AutomaticGuild {
 			logCommand(
 				guild,
 				"Update Guild | Time (" +
-				((System.currentTimeMillis() - startTime) / 1000) +
-				"s)" +
-				(!memberCountList.isEmpty() ? " | Users (" + memberCountList.size() + ")" : "") +
+				(System.currentTimeMillis() - startTime) +
+				"ms)" +
+				(!memberToRoleChanges.isEmpty() ? " | Users (" + memberToRoleChanges.size() + ")" : "") +
 				(counterUpdate > 0 ? " | Counters (" + counterUpdate + ")" : "")
 			);
 			logAction(
 				defaultEmbed("Automatic Guild Update")
 					.setDescription(
-						"• Checked " +
-						formatNumber(memberCountList.size()) +
+						"• Updated " +
+						formatNumber(memberToRoleChanges.size()) +
 						" linked members" +
 						(counterUpdate > 0 ? "\n• Updated " + counterUpdate + " counter" + (counterUpdate > 1 ? "s" : "") : "")
 					)
