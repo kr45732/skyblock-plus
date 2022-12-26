@@ -83,8 +83,7 @@ public class ApplyUser implements Serializable {
 
 			if (applyCategory.getChannels().size() == 50) {
 				failCause =
-					client.getError() +
-					" Unable to create a new application since the application category has reached 50/50 channels. Please report this to the server's staff.";
+					"Unable to create a new application since the application category has reached 50/50 channels. Please report this to the server's staff.";
 				return;
 			}
 
@@ -113,10 +112,10 @@ public class ApplyUser implements Serializable {
 
 				applicationChannel = applicationChannelAction.complete();
 			} catch (PermissionException e) {
-				failCause = client.getError() + " Missing permission: " + e.getPermission().getName();
+				failCause = "Missing permission: " + e.getPermission().getName();
 				return;
 			} catch (ErrorResponseException e) {
-				failCause = client.getError() + " Error when creating channel: " + e.getMeaning();
+				failCause = "Error when creating channel: " + e.getMeaning();
 				return;
 			}
 			this.applicationChannelId = applicationChannel.getId();
