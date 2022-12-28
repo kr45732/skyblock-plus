@@ -10,8 +10,7 @@
       ],
       "ignored_ranks": [
         "manager",
-        "officer",
-        "guild master"
+        "officer"
       ],
       "default_role": [
         "rookie",
@@ -77,8 +76,7 @@
       ],
       "ignored_ranks": [
         "co-master",
-        "officer",
-        "guild master"
+        "officer"
       ],
       "default_role": [
         "ironman"
@@ -105,8 +103,7 @@
       "lb_type": "amount",
       "ignored_ranks": [
         "officer",
-        "lobbyist",
-        "guild master"
+        "lobbyist"
       ],
       "default_rank": {
         "requirements" : [],
@@ -149,8 +146,7 @@
     "guild_leaderboard": {
       "lb_type": "amount",
       "ignored_ranks": [
-        "officer",
-        "guild master"
+        "officer"
       ],
       "default_rank": {
         "requirements": [],
@@ -206,8 +202,7 @@
     "guild_leaderboard": {
       "lb_type": "amount",
       "ignored_ranks": [
-        "team",
-        "guild master"
+        "team"
       ],
       "default_rank": {
         "requirements": [],
@@ -265,8 +260,7 @@
       "lb_type": "amount",
       "ignored_ranks": [
         "jakedoodoo",
-        "water",
-        "guild master"
+        "water"
       ],
       "default_rank": {
         "requirements": [],
@@ -296,8 +290,7 @@
     "guild_leaderboard": {
       "lb_type": "amount",
       "ignored_ranks": [
-        "staff",
-        "guild master"
+        "staff"
       ],
       "default_rank": {
         "requirements": [
@@ -347,8 +340,7 @@
       "lb_type": "amount",
       "ignored_ranks": [
         "administrateur",
-        "modérateur",
-        "guild master"
+        "modérateur"
       ],
       "default_rank": {
         "requirements" : [],
@@ -377,8 +369,7 @@
       "lb_type": "amount",
       "ignored_ranks": [
         "staff",
-        "jrstaff",
-        "guild master"
+        "jrstaff"
       ],
       "default_rank": {
         "requirements": [
@@ -445,46 +436,42 @@
       "lb_type": "amount",
       "ignored_ranks": [
         "skilled",
-        "officer",
-        "guild master"
+        "master"
       ],
       "default_rank": {
-        "requirements" : [],
-        "names": ["newbie"]
+        "requirements" : [
+          {
+            "amount": 60000,
+            "type": "gxp"
+          }
+        ],
+        "names": ["novice"]
       },
       "ranks": [
         {
           "requirements": [
             [
               {
-                "amount": 1209600,
-                "type": "duration"
-              },
-              {
-                "amount": 60000,
-                "type": "gxp"
-              }
-            ]
-          ],
-          "names": [
-            "novice"
-          ]
-        },
-        {
-          "requirements": [
-            [
-              {
-                "amount": 7890000,
-                "type": "duration"
-              },
-              {
-                "amount": 60000,
+                "amount": 100000,
                 "type": "gxp"
               }
             ]
           ],
           "names": [
             "rookie"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 200000,
+                "type": "gxp"
+              }
+            ]
+          ],
+          "names": [
+            "apprentice"
           ]
         }
       ]

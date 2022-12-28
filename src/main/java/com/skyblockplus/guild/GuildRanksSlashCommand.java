@@ -132,7 +132,8 @@ public class GuildRanksSlashCommand extends SlashCommand {
 		String lbType = higherDepth(lbSettings, "lb_type").getAsString();
 		List<String> ignoredRanks = streamJsonArray(higherDepth(lbSettings, "ignored_ranks"))
 			.map(e -> e.getAsString().toLowerCase())
-			.toList();
+			.collect(Collectors.toCollection(ArrayList::new));
+		ignoredRanks.add("guild master");
 		List<String> rankTypes = new ArrayList<>();
 		if (lbType.equals("position")) {
 			for (JsonElement i : higherDepth(lbSettings, "types").getAsJsonArray()) {
