@@ -440,10 +440,12 @@
       ],
       "default_rank": {
         "requirements" : [
-          {
+         [
+           {
             "amount": 60000,
             "type": "gxp"
           }
+         ]
         ],
         "names": ["novice"]
       },
