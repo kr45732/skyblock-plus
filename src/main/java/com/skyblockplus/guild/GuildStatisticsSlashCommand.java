@@ -117,8 +117,9 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		}
 
 		HypixelResponse guildResponse;
+		UsernameUuidStruct usernameUuidStruct = null;
 		if (username != null) {
-			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+			usernameUuidStruct = usernameToUuid(username);
 			if (!usernameUuidStruct.isValid()) {
 				return invalidEmbed(usernameUuidStruct.failCause());
 			}
@@ -148,15 +149,10 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		);
 		hypixelGuildQueue.remove(guildId);
 
-		List<DataObject> slayerLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("slayer"))).toList();
-		List<DataObject> skillsLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("skills"))).toList();
-		List<DataObject> cataLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("catacombs"))).toList();
-		List<DataObject> weightLb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("weight"))).toList();
-
-		double averageSlayer = slayerLb.stream().mapToDouble(m -> m.getDouble("slayer")).average().orElse(0);
-		double averageSkills = skillsLb.stream().mapToDouble(m -> m.getDouble("skills")).average().orElse(0);
-		double averageCata = cataLb.stream().mapToDouble(m -> m.getDouble("catacombs")).average().orElse(0);
-		double averageWeight = weightLb.stream().mapToDouble(m -> m.getDouble("weight")).average().orElse(0);
+		double averageSlayer = playerList.stream().mapToDouble(m -> m.getDouble("slayer")).average().orElse(0);
+		double averageSkills = playerList.stream().mapToDouble(m -> m.getDouble("skills")).average().orElse(0);
+		double averageCata = playerList.stream().mapToDouble(m -> m.getDouble("catacombs")).average().orElse(0);
+		double averageWeight = playerList.stream().mapToDouble(m -> m.getDouble("weight")).average().orElse(0);
 
 		EmbedBuilder eb = defaultEmbed(guildName)
 			.setDescription(
@@ -169,61 +165,52 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 				"\n**Average Weight:** " +
 				roundAndFormat(averageWeight)
 			);
-		StringBuilder slayerStr = new StringBuilder();
-		for (int i = 0; i < Math.min(5, slayerLb.size()); i++) {
-			DataObject cur = slayerLb.get(i);
-			slayerStr
-				.append("`")
-				.append(i + 1)
-				.append(")` ")
-				.append(fixUsername(cur.getString("username")))
-				.append(": ")
-				.append(roundAndFormat(cur.getDouble("slayer")))
-				.append("\n");
-		}
-		StringBuilder skillsStr = new StringBuilder();
-		for (int i = 0; i < Math.min(5, skillsLb.size()); i++) {
-			DataObject cur = skillsLb.get(i);
-			skillsStr
-				.append("`")
-				.append(i + 1)
-				.append(")` ")
-				.append(fixUsername(cur.getString("username")))
-				.append(": ")
-				.append(roundAndFormat(cur.getDouble("skills")))
-				.append("\n");
-		}
-		StringBuilder cataStr = new StringBuilder();
-		for (int i = 0; i < Math.min(5, cataLb.size()); i++) {
-			DataObject cur = cataLb.get(i);
-			cataStr
-				.append("`")
-				.append(i + 1)
-				.append(")` ")
-				.append(fixUsername(cur.getString("username")))
-				.append(": ")
-				.append(roundAndFormat(cur.getDouble("catacombs")))
-				.append("\n");
-		}
-		StringBuilder weightStr = new StringBuilder();
-		for (int i = 0; i < Math.min(5, weightLb.size()); i++) {
-			DataObject cur = weightLb.get(i);
-			weightStr
-				.append("`")
-				.append(i + 1)
-				.append(")` ")
-				.append(fixUsername(cur.getString("username")))
-				.append(": ")
-				.append(roundAndFormat(cur.getDouble("weight")))
-				.append("\n");
-		}
-		eb.addField("Top 5 Slayer", slayerStr.toString(), true);
-		eb.addField("Top 5 Skills", skillsStr.toString(), true);
+		String slayerStr = getLeaderboardTop(playerList, "slayer", usernameUuidStruct);
+		String skillsStr = getLeaderboardTop(playerList, "skills", usernameUuidStruct);
+		String cataStr = getLeaderboardTop(playerList, "catacombs", usernameUuidStruct);
+		String weightStr = getLeaderboardTop(playerList, "weight", usernameUuidStruct);
+
+		eb.addField("Top 5 Slayer", slayerStr, true);
+		eb.addField("Top 5 Skills", skillsStr, true);
 		eb.addBlankField(true);
-		eb.addField("Top 5 Catacombs", cataStr.toString(), true);
-		eb.addField("Top 5 Weight", weightStr.toString(), true);
+		eb.addField("Top 5 Catacombs", cataStr, true);
+		eb.addField("Top 5 Weight", weightStr, true);
 		eb.addBlankField(true);
 
 		return eb;
+	}
+
+	public static String  getLeaderboardTop(List<DataObject> playerList, String lbType, UsernameUuidStruct usernameUuidStruct) {
+		List<DataObject> lb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("slayer"))).toList();
+
+		int pos = -1;
+		if (usernameUuidStruct != null) {
+			for (int i = 0; i < lb.size(); i++) {
+				if (lb.get(i).getString("uuid").equals(usernameUuidStruct.uuid())) {
+					pos = i;
+				}
+			}
+		}
+
+		StringBuilder str = new StringBuilder();
+		for (int i = 0; i < Math.min(5, lb.size()); i++) {
+			DataObject cur = lb.get(i);
+			if (pos > 5 && i == 3) {
+				str.append("...\n");
+				cur = lb.get(pos);
+			}
+			str
+					.append("`")
+					.append(i + 1)
+					.append(")` ")
+					.append(fixUsername(cur.getString("username")))
+					.append(": ")
+					.append(roundAndFormat(cur.getDouble("slayer")))
+					.append("\n");
+			if (pos > 5 && i == 3) {
+				break;
+			}
+		}
+		return str.toString();
 	}
 }

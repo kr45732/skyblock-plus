@@ -1932,7 +1932,9 @@ public class SettingsExecute {
 		ebFieldString += "\n• **Verified Remove Role:** " + displaySettings(verifySettings, "verifiedRemoveRole");
 		ebFieldString += "\n• **Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
 		ebFieldString += "\n• **Automatic Sync:** " + displaySettings(verifySettings, "enableAutomaticSync");
-		ebFieldString += "\n• **DM On Automatic Sync:** " + displaySettings(verifySettings, "dmOnSync");
+		if (higherDepth(verifySettings, "enableAutomaticSync", false)) {
+			ebFieldString += "\n• **DM On Automatic Sync:** " + displaySettings(verifySettings, "dmOnSync");
+		}
 		ebFieldString += "\n• **Automatic Roles Claim:** " + displaySettings(verifySettings, "enableRolesClaim");
 		return ebFieldString;
 	}
