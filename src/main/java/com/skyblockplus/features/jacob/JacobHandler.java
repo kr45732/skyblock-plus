@@ -50,10 +50,6 @@ public class JacobHandler {
 		);
 	}
 
-	public static boolean needsUpdate() {
-		return jacobData == null || jacobData.getYear() != getSkyblockYear();
-	}
-
 	public static JacobData getJacobData() {
 		return jacobData;
 	}

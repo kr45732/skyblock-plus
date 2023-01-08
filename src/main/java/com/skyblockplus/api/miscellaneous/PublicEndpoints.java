@@ -72,17 +72,17 @@ public class PublicEndpoints {
 	@PostMapping(value = "/post/jacob", consumes = "application/json", produces = "application/json")
 	public ResponseEntity<?> postJacobData(@RequestBody JacobData jacobData, @RequestHeader String key) {
 		if (key.equals("2d7569ff0decff164a46e8d417e7b692")) {
-			if (JacobHandler.needsUpdate()) {
-				JacobHandler.setJacobData(jacobData);
-				cacheJacobData();
-				jda.getTextChannelById("937894945564545035").sendMessage(client.getSuccess() + " Received jacob data").queue();
-				return new ResponseEntity<>(DataObject.empty().put("success", true).toMap(), HttpStatus.OK);
-			} else {
+			if (jacobData.getContests().isEmpty()) {
 				return new ResponseEntity<>(
-					DataObject.empty().put("success", false).put("cause", "Already have data for this year").toMap(),
-					HttpStatus.OK
+					DataObject.empty().put("success", false).put("cause", "Contests list empty").toMap(),
+					HttpStatus.BAD_REQUEST
 				);
 			}
+
+			JacobHandler.setJacobData(jacobData);
+			cacheJacobData();
+			jda.getTextChannelById("937894945564545035").sendMessage(client.getSuccess() + " Received jacob data").queue();
+			return new ResponseEntity<>(DataObject.empty().put("success", true).toMap(), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(
 				DataObject.empty().put("success", false).put("cause", "Not authorized").toMap(),

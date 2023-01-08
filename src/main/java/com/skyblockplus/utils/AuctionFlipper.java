@@ -49,9 +49,10 @@ public class AuctionFlipper {
 		.setExecutorService(scheduler)
 		.setHttpClient(okHttpClient)
 		.buildJDA();
-	private static final Cache<String, Long> auctionUuidToMessage = Caffeine.newBuilder().expireAfterWrite(45, TimeUnit.MINUTES).build();
+	private static final Cache<String, String> auctionUuidToMessage = Caffeine.newBuilder().expireAfterWrite(45, TimeUnit.MINUTES).build();
 	private static boolean enable = false;
 	private static Instant lastUpdated = Instant.now();
+	public static JsonElement underBinJson;
 
 	public static boolean onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
@@ -75,7 +76,7 @@ public class AuctionFlipper {
 	}
 
 	public static void flip() {
-		JsonElement underBinJson = getUnderBinJson();
+		underBinJson = getUnderBinJson();
 		if (underBinJson != null) {
 			JsonElement avgAuctionJson = getAverageAuctionJson();
 
@@ -116,7 +117,7 @@ public class AuctionFlipper {
 					)
 					.whenComplete((m, e) -> {
 						if (m != null) {
-							auctionUuidToMessage.put(auctionUuid, m.getId());
+							auctionUuidToMessage.put(auctionUuid, "" + m.getId());
 						}
 					});
 			}
@@ -130,12 +131,12 @@ public class AuctionFlipper {
 		Instant jsonLastUpdated = Instant.ofEpochMilli(higherDepth(endedAuctionsJson, "lastUpdated").getAsLong());
 		if (lastUpdated == null || lastUpdated.isBefore(jsonLastUpdated)) {
 			lastUpdated = jsonLastUpdated;
-			Map<String, Long> toEdit = auctionUuidToMessage.getAllPresent(
+			Map<String, String> toEdit = auctionUuidToMessage.getAllPresent(
 				streamJsonArray(higherDepth(endedAuctionsJson, "auctions").getAsJsonArray())
 					.map(a -> higherDepth(a, "auction_id").getAsString())
 					.collect(Collectors.toSet())
 			);
-			for (long messageId : toEdit.values()) {
+			for (String messageId : toEdit.values()) {
 				flipperWebhook.edit(messageId, defaultEmbed("Auction Sold").build());
 			}
 			auctionUuidToMessage.invalidateAll(toEdit.keySet());

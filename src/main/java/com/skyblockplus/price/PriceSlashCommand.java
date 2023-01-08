@@ -75,7 +75,7 @@ public class PriceSlashCommand extends SlashCommand {
 
 	public static EmbedBuilder queryAuctions(String query, AuctionType auctionType) {
 		if (currentMayor.equals("Derpy")) {
-			return invalidEmbed("The price command does not work during Derpy");
+			return invalidEmbed("This command does not work during Derpy");
 		}
 
 		JsonArray lowestBinArr = null;
