@@ -228,7 +228,6 @@ public class NetworthExecute {
 		StringBuilder storageStr = getSectionString(getItems("storage", ignoreSoulbound));
 		StringBuilder invStr = getSectionString(getItems("inventory", ignoreSoulbound));
 		StringBuilder armorStr = getSectionString(getItems("armor", ignoreSoulbound));
-		StringBuilder wardrobeStr = getSectionString(getItems("wardrobe", ignoreSoulbound));
 		StringBuilder petsStr = getSectionString(getItems("pets", ignoreSoulbound));
 		StringBuilder talismanStr = getSectionString(getItems("talisman", ignoreSoulbound));
 
@@ -263,18 +262,7 @@ public class NetworthExecute {
 			eb.addField("Inventory | " + simplifyNumber(getTotal("inventory", ignoreSoulbound)), invStr.toString().split("\n\n")[0], false);
 		}
 		if (!armorStr.isEmpty()) {
-			eb.addField(
-				"Armor & Equipment | " + simplifyNumber(getTotal("armor", ignoreSoulbound)),
-				armorStr.toString().split("\n\n")[0],
-				false
-			);
-		}
-		if (!wardrobeStr.isEmpty()) {
-			eb.addField(
-				"Wardrobe | " + simplifyNumber(getTotal("wardrobe", ignoreSoulbound)),
-				wardrobeStr.toString().split("\n\n")[0],
-				false
-			);
+			eb.addField("Armor | " + simplifyNumber(getTotal("armor", ignoreSoulbound)), armorStr.toString().split("\n\n")[0], false);
 		}
 		if (!petsStr.isEmpty()) {
 			eb.addField("Pets | " + simplifyNumber(getTotal("pets", ignoreSoulbound)), petsStr.toString().split("\n\n")[0], false);
@@ -341,29 +329,15 @@ public class NetworthExecute {
 		}
 		if (!armorStr.isEmpty()) {
 			pages.put(
-				SelectOption.of("Armor & Equipment", "armor_equipment").withEmoji(getEmojiObj("GOLD_CHESTPLATE")),
+				SelectOption.of("Armor", "armor").withEmoji(getEmojiObj("GOLD_CHESTPLATE")),
 				player
-					.defaultPlayerEmbed(" | Armor & Equipment")
+					.defaultPlayerEmbed(" | Armor")
 					.setDescription(
 						ebDesc +
-						"\n**Armor & Equipment:** " +
+						"\n**Armor:** " +
 						simplifyNumber(getTotal("armor", ignoreSoulbound)) +
 						"\n\n" +
 						armorStr.toString().replace("\n\n", "\n")
-					)
-			);
-		}
-		if (!wardrobeStr.isEmpty()) {
-			pages.put(
-				SelectOption.of("Wardrobe", "wardrobe").withEmoji(getEmojiObj("ARMOR_STAND")),
-				player
-					.defaultPlayerEmbed(" | Wardrobe")
-					.setDescription(
-						ebDesc +
-						"\n**Wardrobe:** " +
-						simplifyNumber(getTotal("wardrobe", ignoreSoulbound)) +
-						"\n\n" +
-						wardrobeStr.toString().replace("\n\n", "\n")
 					)
 			);
 		}
@@ -1022,9 +996,10 @@ public class NetworthExecute {
 	}
 
 	public void addTotal(String location, double total, boolean isSoulbound) {
-		totals.compute(location.equals("equipment") ? "armor" : location, (k, v) -> (v == null ? 0 : v) + total);
+		location = location.equals("equipment") || location.equals("wardrobe") ? "armor" : location;
+		totals.compute(location, (k, v) -> (v == null ? 0 : v) + total);
 		if (!isSoulbound) {
-			soulboundIgnoredTotals.compute(location.equals("equipment") ? "armor" : location, (k, v) -> (v == null ? 0 : v) + total);
+			soulboundIgnoredTotals.compute(location, (k, v) -> (v == null ? 0 : v) + total);
 		}
 	}
 
@@ -1033,8 +1008,9 @@ public class NetworthExecute {
 	}
 
 	public void addItem(String location, String item, boolean isSoulbound) {
+		location = location.equals("equipment") || location.equals("wardrobe") ? "armor" : location;
 		items.compute(
-			location.equals("equipment") ? "armor" : location,
+			location,
 			(k, v) -> {
 				(v = (v == null ? new ArrayList<>() : v)).add(item);
 				return v;
@@ -1042,7 +1018,7 @@ public class NetworthExecute {
 		);
 		if (!isSoulbound) {
 			soulboundIgnoredItems.compute(
-				location.equals("equipment") ? "armor" : location,
+				location,
 				(k, v) -> {
 					(v = (v == null ? new ArrayList<>() : v)).add(item);
 					return v;
