@@ -180,7 +180,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		return eb;
 	}
 
-	public static String  getLeaderboardTop(List<DataObject> playerList, String lbType, UsernameUuidStruct usernameUuidStruct) {
+	public static String getLeaderboardTop(List<DataObject> playerList, String lbType, UsernameUuidStruct usernameUuidStruct) {
 		List<DataObject> lb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("slayer"))).toList();
 
 		int pos = -1;
@@ -200,13 +200,13 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 				cur = lb.get(pos);
 			}
 			str
-					.append("`")
-					.append(i + 1)
-					.append(")` ")
-					.append(fixUsername(cur.getString("username")))
-					.append(": ")
-					.append(roundAndFormat(cur.getDouble("slayer")))
-					.append("\n");
+				.append("`")
+				.append(i + 1)
+				.append(")` ")
+				.append(fixUsername(cur.getString("username")))
+				.append(": ")
+				.append(roundAndFormat(cur.getDouble("slayer")))
+				.append("\n");
 			if (pos > 5 && i == 3) {
 				break;
 			}
