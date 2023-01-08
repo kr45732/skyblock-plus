@@ -43,8 +43,6 @@ public class GetSettingsCommand extends Command {
 		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
-				logCommand();
-
 				if (args.length == 1) {
 					event.getChannel().sendMessage(getServerSettings(event.getGuild().getId())).queue();
 					return;

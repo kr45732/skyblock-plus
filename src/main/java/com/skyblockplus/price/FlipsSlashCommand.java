@@ -87,7 +87,7 @@ public class FlipsSlashCommand extends SlashCommand {
 				roundAndFormat(profit) +
 				"\n**Sales Per Hour:** " +
 				formatNumber(sales) +
-				"\n**Command:** /viewauction " +
+				"\n**Command:** `/viewauction " +
 				auctionUuid +
 				"`",
 				false

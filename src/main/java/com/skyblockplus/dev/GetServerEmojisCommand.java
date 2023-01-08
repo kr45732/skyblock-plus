@@ -43,8 +43,6 @@ public class GetServerEmojisCommand extends Command {
 		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
-				logCommand();
-
 				JsonObject toAdd = new JsonObject();
 				for (Emoji emote : event.getGuild().getEmojis()) {
 					toAdd.addProperty(emote.getName().toUpperCase(), emote.getFormatted());

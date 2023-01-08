@@ -194,11 +194,18 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 
 		StringBuilder str = new StringBuilder();
 		for (int i = 0; i < Math.min(5, lb.size()); i++) {
-			DataObject cur = lb.get(i);
 			if (pos > 5 && i == 3) {
-				str.append("...\n");
-				cur = lb.get(pos);
+				DataObject cur = lb.get(pos);
+				str
+					.append("...\n`")
+					.append(pos + 1)
+					.append(")` ")
+					.append(fixUsername(cur.getString("username")))
+					.append(": ")
+					.append(roundAndFormat(cur.getDouble("slayer")))
+					.append("\n");
 			}
+			DataObject cur = lb.get(i);
 			str
 				.append("`")
 				.append(i + 1)
@@ -207,9 +214,6 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 				.append(": ")
 				.append(roundAndFormat(cur.getDouble("slayer")))
 				.append("\n");
-			if (pos > 5 && i == 3) {
-				break;
-			}
 		}
 		return str.toString();
 	}

@@ -42,8 +42,6 @@ public class UpdateSlashCommands extends Command {
 		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
-				logCommand();
-
 				if (args.length == 1) {
 					jda
 						.getGuildById(event.getGuild().getId())

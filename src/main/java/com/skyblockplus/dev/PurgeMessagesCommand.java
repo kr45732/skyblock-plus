@@ -40,8 +40,6 @@ public class PurgeMessagesCommand extends Command {
 		new CommandExecute(this, event) {
 			@Override
 			protected void execute() {
-				logCommand();
-
 				if (args.length == 2) {
 					try {
 						int messageCount = Math.min(Integer.parseInt(args[1]) + 1, 100);

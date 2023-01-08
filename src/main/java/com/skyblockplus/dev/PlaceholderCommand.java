@@ -40,8 +40,6 @@ public class PlaceholderCommand extends Command {
 		new CommandExecute(this, event) {
 			@Override
 			protected void execute() {
-				logCommand();
-
 				String total = roundAndFormat(Runtime.getRuntime().totalMemory() / 1000000.0) + " MB";
 				String free = roundAndFormat(Runtime.getRuntime().freeMemory() / 1000000.0) + " MB";
 				String used = roundAndFormat((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB";

@@ -46,7 +46,6 @@ public class DevSettingsCommand extends Command {
 		new CommandExecute(this, event) {
 			@Override
 			protected void execute() {
-				logCommand();
 				setArgs(4);
 
 				if (args.length == 4) {
