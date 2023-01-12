@@ -157,6 +157,7 @@ public class Utils {
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
 	private static final Pattern bazaarEnchantPattern = Pattern.compile("ENCHANTMENT_(\\D*)_(\\d+)");
 	private static final Pattern neuTexturePattern = Pattern.compile("Properties:\\{textures:\\[0:\\{Value:\"(.*)\"}]}");
+	private static final Pattern uuidDashRegex = Pattern.compile("(.{8})(.{4})(.{4})(.{4})(.{12})");
 	public static final JDAWebhookClient botStatusWebhook = new WebhookClientBuilder(
 		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
 	)
@@ -748,14 +749,12 @@ public class Utils {
 		return null;
 	}
 
+	/**
+	 * @return scammer JSON only if marked as scammer else null
+	 */
 	public static JsonElement getScammerJson(String uuid) {
-		JsonElement scammerJson = getJson("https://api.robothanzo.dev/scammer/" + uuid + "?key=" + SBZ_SCAMMER_DB_KEY);
-		return higherDepth(scammerJson, "success", false) ? scammerJson : null;
-	}
-
-	public static String getScammerReason(String uuid) {
-		JsonElement scammerJson = getScammerJson(uuid);
-		return scammerJson != null ? higherDepth(getScammerJson(uuid), "result.reason", "No reason provided") : null;
+		JsonElement scammerJson = getJson("https://jerry.robothanzo.dev/v1/scammers/" + stringToUuid(uuid) + "?key=" + SBZ_SCAMMER_DB_KEY);
+		return higherDepth(scammerJson, "scammer", false) ? scammerJson : null;
 	}
 
 	/* Logging */
@@ -2152,5 +2151,10 @@ public class Utils {
 
 	public static String getItemCategory(String itemId) {
 		return higherDepth(getSkyblockItemsJson().get(itemId), "category", "");
+	}
+
+	public static UUID stringToUuid(String uuid) {
+		Matcher matcher = uuidDashRegex.matcher(uuid);
+		return UUID.fromString(matcher.matches() ? uuidDashRegex.matcher(uuid).replaceAll("$1-$2-$3-$4-$5") : uuid);
 	}
 }

@@ -145,7 +145,8 @@ public class ApplyGuild {
 		}
 
 		if (higherDepth(currentSettings, "applyScammerCheck", false)) {
-			String scammerReason = getScammerReason(linkedAccount.uuid());
+			JsonElement scammerJson = getScammerJson(linkedAccount.uuid());
+			String scammerReason = scammerJson != null ? higherDepth(scammerJson, "details.reason", "No reason provided") : null;
 			if (scammerReason != null) {
 				return "SBZ_SCAMMER_CHECK_" + scammerReason;
 			}

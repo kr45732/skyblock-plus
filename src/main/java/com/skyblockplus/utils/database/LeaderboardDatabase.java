@@ -40,7 +40,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
@@ -48,7 +47,6 @@ import org.slf4j.LoggerFactory;
 
 public class LeaderboardDatabase {
 
-	private static final Pattern uuidDashRegex = Pattern.compile("(.{8})(.{4})(.{4})(.{4})(.{12})");
 	private static final int MAX_INSERT_COUNT = 75;
 	public static final List<String> types = new ArrayList<>(
 		List.of(
@@ -654,10 +652,6 @@ public class LeaderboardDatabase {
 		}
 
 		return lbType;
-	}
-
-	public static UUID stringToUuid(String uuid) {
-		return UUID.fromString(uuidDashRegex.matcher(uuid).replaceAll("$1-$2-$3-$4-$5"));
 	}
 
 	public void close() {

@@ -19,8 +19,10 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -52,7 +54,7 @@ public class ScammerSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "Check if a player is marked as a scammer in SBZ's database")
+			.slash(name, "Check if a player is marked as a scammer in the SBZ database")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
 	}
 
@@ -74,31 +76,28 @@ public class ScammerSlashCommand extends SlashCommand {
 			.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)");
 		if (scammerJson == null) {
 			return eb.setDescription(
-				client.getSuccess() +
-				" This player is not marked as a scammer, however still exercise caution when trading with any player!"
+				client.getSuccess() + " This player is not marked as a scammer, however still be cautious when trading with any player"
 			);
 		}
 
 		eb.setDescription(client.getError() + " This player **IS** marked as a scammer");
-		eb.addField("Reason", higherDepth(scammerJson, "result.reason", "No reason provided"), false);
-		if (higherDepth(scammerJson, "is_alt", false)) {
+		eb.addField("Reason", higherDepth(scammerJson, "details.reason", "No reason provided"), false);
+		if (higherDepth(scammerJson, "alt", false)) {
 			eb.setDescription("This account **IS** marked as an alt");
 		}
-		if (higherDepth(scammerJson, "result.discord.[0]") != null) {
+		if (!higherDepth(scammerJson, "details.discordIds").getAsJsonArray().isEmpty()) {
+			JsonArray discordArr = higherDepth(scammerJson, "details.discordIds").getAsJsonArray();
 			eb.addField(
-				"Discord Account(s)",
-				streamJsonArray(higherDepth(scammerJson, "result.discord").getAsJsonArray())
-					.map(e -> "<@" + e.getAsString() + ">")
-					.collect(Collectors.joining(" ")),
+				"Discord Account" + (discordArr.size() > 1 ? "s" : ""),
+				streamJsonArray(discordArr).map(e -> "<@" + e.getAsString() + ">").collect(Collectors.joining(" ")),
 				false
 			);
 		}
-		if (higherDepth(scammerJson, "result.alts.[0]") != null) {
+		if (!higherDepth(scammerJson, "details.alts").getAsJsonArray().isEmpty()) {
+			JsonArray altsArr = higherDepth(scammerJson, "details.alts").getAsJsonArray();
 			eb.addField(
-				"Minecraft Alt(s)",
-				streamJsonArray(higherDepth(scammerJson, "result.alts").getAsJsonArray())
-					.map(JsonElement::getAsString)
-					.collect(Collectors.joining(" ")),
+				"Minecraft Alt" + (altsArr.size() > 1 ? "s" : ""),
+				streamJsonArray(altsArr).map(e -> uuidToUsername(e.getAsString()).username()).collect(Collectors.joining(", ")),
 				false
 			);
 		}
