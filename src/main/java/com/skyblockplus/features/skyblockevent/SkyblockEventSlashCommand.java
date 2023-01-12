@@ -207,12 +207,12 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			if (paginateBuilder.size() > 0) {
 				paginateBuilder.build().paginate(announcementChannel, 0);
 				database.setSkyblockEventSettings(guildId, new EventSettings());
-				return defaultEmbed("Success").setDescription("Ended skyblock event");
+				return defaultEmbed("Success").setDescription("Ended Skyblock event");
 			}
 		} catch (Exception ignored) {}
 		announcementChannel.sendMessageEmbeds(defaultEmbed("Prizes").setDescription("None").build()).complete();
 		database.setSkyblockEventSettings(guildId, new EventSettings());
-		return defaultEmbed("Success").setDescription("Ended skyblock event");
+		return defaultEmbed("Success").setDescription("Ended Skyblock event");
 	}
 
 	public static List<EventMember> getEventLeaderboardList(JsonElement runningSettings, String guildId) {

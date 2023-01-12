@@ -74,7 +74,9 @@ public class LeaderboardDatabase {
 			"blaze",
 			"lily_weight",
 			"coins",
-			"lily_slayer_weight"
+			"lily_slayer_weight",
+			"level",
+			"hotm"
 		)
 	);
 	public static final List<String> typesSubList = new ArrayList<>();

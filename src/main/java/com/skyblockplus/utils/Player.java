@@ -2029,6 +2029,10 @@ public class Player {
 		return "❓";
 	}
 
+	public double getLevel() {
+		return higherDepth(profileJson(), "leveling.experience", 0) / 100.0;
+	}
+
 	public double getLilyWeight() {
 		return new LilyWeight(this, true).getTotalWeight().getRaw();
 	}
@@ -2225,6 +2229,9 @@ public class Player {
 								getSkill(type.split("_xp")[0]) != null ? getSkill(type.split("_xp")[0]).totalExp() : -1
 							);
 						break;
+					case "hotm":
+						highestAmount = Math.max(highestAmount, getHOTM() != null ? getHOTM().totalExp() : -1);
+						break;
 					case "bank":
 						highestAmount = Math.max(highestAmount, getBankBalance());
 						break;
@@ -2276,6 +2283,9 @@ public class Player {
 						break;
 					case "lily_slayer_weight":
 						highestAmount = Math.max(highestAmount, new LilyWeight(this, true).getSlayerWeight().getWeightStruct().getRaw());
+						break;
+					case "level":
+						highestAmount = Math.max(highestAmount, getLevel());
 						break;
 					default:
 						if (COLLECTION_NAME_TO_ID.containsKey(type)) {

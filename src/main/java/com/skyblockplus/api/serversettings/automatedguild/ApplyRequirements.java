@@ -34,4 +34,5 @@ public class ApplyRequirements {
 	private String catacombsReq = "";
 	private String weightReq = "";
 	private String lilyWeightReq = "";
+	private String levelReq = "";
 }

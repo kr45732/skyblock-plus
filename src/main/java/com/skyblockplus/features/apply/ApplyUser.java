@@ -63,6 +63,7 @@ public class ApplyUser implements Serializable {
 	public String playerCatacombs;
 	public String playerWeight;
 	public String playerLilyWeight;
+	public String playerLevel;
 	public String playerUsername;
 	public String playerUuid = "";
 	public String playerCoins;
@@ -247,13 +248,15 @@ public class ApplyUser implements Serializable {
 				int cataReq = higherDepth(req, "catacombsReq", 0);
 				int weightReq = higherDepth(req, "weightReq", 0);
 				int lilyWeightReq = higherDepth(req, "lilyWeightReq", 0);
+				int levelReq = higherDepth(req, "levelReq", 0);
 
 				if (
 					player.getTotalSlayer() >= slayerReq &&
 					player.getSkillAverage() >= skillsReq &&
 					player.getCatacombs().getProgressLevel() >= cataReq &&
 					player.getWeight() >= weightReq &&
-					player.getLilyWeight() >= lilyWeightReq
+					player.getLilyWeight() >= lilyWeightReq &&
+					player.getLevel() >= levelReq
 				) {
 					meetReqs = true;
 					break;
@@ -274,6 +277,9 @@ public class ApplyUser implements Serializable {
 					if (lilyWeightReq > 0) {
 						reqsFmt.add("Lily weight - " + formatNumber(lilyWeightReq));
 					}
+					if (levelReq > 0) {
+						reqsFmt.add("Level - " + formatNumber(levelReq));
+					}
 
 					missingReqsStr.append("• ").append(String.join(" | ", reqsFmt)).append("\n");
 				}
@@ -293,7 +299,9 @@ public class ApplyUser implements Serializable {
 				" | Weight - " +
 				roundAndFormat(player.getWeight()) +
 				" | Lily Weight - " +
-				roundAndFormat(player.getLilyWeight())
+				roundAndFormat(player.getLilyWeight()) +
+				" | Level - " +
+				roundAndFormat(player.getLevel())
 			);
 			reqEmbed.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr);
 			reqEmbed.appendDescription(
@@ -306,6 +314,7 @@ public class ApplyUser implements Serializable {
 			playerCatacombs = roundAndFormat(player.getCatacombs().getProgressLevel());
 			playerWeight = roundAndFormat(player.getWeight());
 			playerLilyWeight = roundAndFormat(player.getLilyWeight());
+			playerLevel = roundAndFormat(player.getLevel());
 
 			reactMessage =
 				applicationChannel
@@ -340,11 +349,19 @@ public class ApplyUser implements Serializable {
 			} catch (Exception e) {
 				playerWeight = "API disabled";
 			}
+
 			try {
 				playerLilyWeight = roundAndFormat(player.getLilyWeight());
 			} catch (Exception e) {
 				playerLilyWeight = "API disabled";
 			}
+
+			try {
+				playerLevel = roundAndFormat(player.getLevel());
+			} catch (Exception e) {
+				playerLilyWeight = "API disabled";
+			}
+
 			playerUsername = player.getUsername();
 
 			ironmanSymbol = player.getSymbol(" ");
@@ -359,6 +376,7 @@ public class ApplyUser implements Serializable {
 				.addField("Catacombs", playerCatacombs, true)
 				.addField("Weight", playerWeight, true)
 				.addField("Lily Weight", playerLilyWeight, true)
+				.addField("Skyblock Level", playerLevel, true)
 				.addField("Bank & Purse", playerCoins, true);
 
 			List<Button> buttons = new ArrayList<>();
@@ -417,6 +435,7 @@ public class ApplyUser implements Serializable {
 						applyPlayerStats.addField("Catacombs", playerCatacombs, true);
 						applyPlayerStats.addField("Weight", playerWeight, true);
 						applyPlayerStats.addField("Lily Weight", playerLilyWeight, true);
+						applyPlayerStats.addField("Skyblock Level", playerLevel, true);
 						applyPlayerStats.addField("Bank & Purse", playerCoins, true);
 						double playerNetworth = NetworthExecute.getNetworth(playerUsername, playerProfileName);
 						applyPlayerStats.addField(

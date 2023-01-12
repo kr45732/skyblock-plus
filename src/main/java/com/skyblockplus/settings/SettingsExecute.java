@@ -1193,6 +1193,7 @@ public class SettingsExecute {
 		int cataReq = 0;
 		int weightReq = 0;
 		int lilyWeightReq = 0;
+		int levelReq = 0;
 
 		for (String req : reqArgs.split("\\s+")) {
 			String[] reqSplit = req.split(":");
@@ -1210,6 +1211,7 @@ public class SettingsExecute {
 				case "catacombs" -> cataReq = amount;
 				case "weight" -> weightReq = amount;
 				case "lily_weight" -> lilyWeightReq = amount;
+				case "level" -> levelReq = amount;
 				default -> {
 					return invalidEmbed("Invalid requirement type provided");
 				}
@@ -1222,6 +1224,7 @@ public class SettingsExecute {
 		toAddReq.setCatacombsReq("" + cataReq);
 		toAddReq.setWeightReq("" + weightReq);
 		toAddReq.setLilyWeightReq("" + lilyWeightReq);
+		toAddReq.setLevelReq("" + levelReq);
 		currentReqs.add(gson.toJsonTree(toAddReq));
 
 		guildSettings.add("applyReqs", currentReqs);
@@ -1236,7 +1239,8 @@ public class SettingsExecute {
 			(skillsReq > 0 ? "\n• Skills - " + skillsReq : "") +
 			(cataReq > 0 ? "\n• Catacombs - " + cataReq : "") +
 			(weightReq > 0 ? "\n• Weight - " + weightReq : "") +
-			(lilyWeightReq > 0 ? "\n• Lily weight - " + lilyWeightReq : "")
+			(lilyWeightReq > 0 ? "\n• Lily weight - " + lilyWeightReq : "") +
+			(levelReq > 0 ? "\n• Level - " + levelReq : "")
 		);
 	}
 
@@ -1258,6 +1262,7 @@ public class SettingsExecute {
 			int catacombsReq = higherDepth(req, "catacombsReq", 0);
 			int weightReq = higherDepth(req, "weightReq", 0);
 			int lilyWeightReq = higherDepth(req, "lilyWeightReq", 0);
+			int levelReq = higherDepth(req, "levelReq", 0);
 
 			return defaultSettingsEmbed(
 				"Removed an apply requirement:" +
@@ -1265,7 +1270,8 @@ public class SettingsExecute {
 				(skillsReq > 0 ? "\n• Skills - " + skillsReq : "") +
 				(catacombsReq > 0 ? "\n• Catacombs - " + catacombsReq : "") +
 				(weightReq > 0 ? "\n• Weight - " + weightReq : "") +
-				(lilyWeightReq > 0 ? "\n• Lily Weight - " + lilyWeightReq : "")
+				(lilyWeightReq > 0 ? "\n• Lily Weight - " + lilyWeightReq : "") +
+				(levelReq > 0 ? "\n• Level - " + levelReq : "")
 			);
 		} catch (Exception e) {
 			return invalidEmbed("Invalid requirement index. Run `/settings guild <name>` to see the current apply requirements");
@@ -2722,26 +2728,24 @@ public class SettingsExecute {
 					StringBuilder reqsString = new StringBuilder("\n");
 					for (int i = 0; i < reqs.size(); i++) {
 						JsonElement req = reqs.get(i);
-						String slayerReq = higherDepth(req, "slayerReq").getAsString();
-						String skillsReq = higherDepth(req, "skillsReq").getAsString();
-						String cataReq = higherDepth(req, "catacombsReq").getAsString();
-						String weightReq = higherDepth(req, "weightReq").getAsString();
-						String lilyWeightReq = higherDepth(req, "lilyWeightReq").getAsString();
+						int slayerReq = Integer.parseInt(higherDepth(req, "slayerReq").getAsString());
+						int skillsReq = Integer.parseInt(higherDepth(req, "skillsReq").getAsString());
+						int cataReq = Integer.parseInt(higherDepth(req, "catacombsReq").getAsString());
+						int weightReq = Integer.parseInt(higherDepth(req, "weightReq").getAsString());
+						int lilyWeightReq = Integer.parseInt(higherDepth(req, "lilyWeightReq").getAsString());
+						int levelReq = Integer.parseInt(higherDepth(req, "levelReq").getAsString());
 
 						reqsString
 							.append("`")
 							.append(i + 1)
-							.append(")` ")
-							.append(slayerReq)
-							.append(" slayer & ")
-							.append(skillsReq)
-							.append(" skills & ")
-							.append(cataReq)
-							.append(" cata & ")
-							.append(weightReq)
-							.append(" weight & ")
-							.append(lilyWeightReq)
-							.append(" lily weight\n");
+							.append(")`")
+							.append(slayerReq > 0 ? " " + slayerReq + " slayer" : "")
+							.append(skillsReq > 0 ? " " + skillsReq + " skills" : "")
+							.append(cataReq > 0 ? " " + cataReq + " cata" : "")
+							.append(weightReq > 0 ? " " + weightReq + " weight" : "")
+							.append(lilyWeightReq > 0 ? " " + lilyWeightReq + " lily weight" : "")
+							.append(levelReq > 0 ? " " + levelReq + " lvl" : "")
+							.append("\n");
 					}
 					return reqsString.toString();
 				}

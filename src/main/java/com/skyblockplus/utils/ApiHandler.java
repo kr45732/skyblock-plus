@@ -364,7 +364,7 @@ public class ApiHandler {
 			try {
 				if (higherDepth(profilesJson, "profiles").isJsonNull()) {
 					String username = uuidToUsernameCache.getIfPresent(uuid);
-					return new HypixelResponse((username != null ? username : "Player") + " has no SkyBlock profiles");
+					return new HypixelResponse((username != null ? username : "Player") + " has no Skyblock profiles");
 				}
 
 				JsonArray profileArray = higherDepth(profilesJson, "profiles").getAsJsonArray();

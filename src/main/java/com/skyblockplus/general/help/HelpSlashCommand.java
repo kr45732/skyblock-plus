@@ -211,7 +211,7 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("guild"),
 				new HelpData(
 					"guild-statistics",
-					"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight. Set key to true to force use the set Hypixel API key for more accurate results.",
+					"Get a guild's Skyblock statistics of slayer, skills, catacombs, and weight. Set key to true to force use the set Hypixel API key for more accurate results.",
 					"guild-statistics [player] [g:guild_name] [key]"
 				)
 					.addExamples("guild-stats u:CrypticPlasma")
@@ -831,7 +831,7 @@ public class HelpSlashCommand extends SlashCommand {
 			) +
 			create(
 				"guild-statistics [player] [guild] [gamemode] [key]",
-				"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight"
+				"Get a guild's Skyblock statistics of slayer, skills, catacombs, and weight"
 			) +
 			create("check-guild-api [player] [exclude]", "Get which Skyblock APIs players have enabled or disabled for a guild")
 		);
