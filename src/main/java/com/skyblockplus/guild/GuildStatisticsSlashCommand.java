@@ -204,6 +204,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 					.append(": ")
 					.append(roundAndFormat(cur.getDouble("slayer")))
 					.append("\n");
+				break;
 			}
 			DataObject cur = lb.get(i);
 			str

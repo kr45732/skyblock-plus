@@ -1580,7 +1580,7 @@ public class Utils {
 				}
 			}
 		}
-		log.info("Cached apply users in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+		log.info("Cached apply users in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 	}
 
 	public static void cacheParties() {
@@ -1602,7 +1602,7 @@ public class Utils {
 				log.error(automaticGuild.getKey(), e);
 			}
 		}
-		log.info("Cached parties in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+		log.info("Cached parties in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 	}
 
 	public static List<ApplyUser> getApplyGuildUsersCache(String guildId, String name) {
@@ -1644,9 +1644,9 @@ public class Utils {
 
 		long startTime = System.currentTimeMillis();
 		if (cacheDatabase.cacheCommandUsage(gson.toJson(getCommandUses()))) {
-			log.info("Cached command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+			log.info("Cached command uses in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 		} else {
-			log.error("Failed to cache command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+			log.error("Failed to cache command uses in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 		}
 	}
 
@@ -1659,12 +1659,12 @@ public class Utils {
 		if (cacheDatabase.cacheAhTracker(gson.toJson(AuctionTracker.commandAuthorToTrackingUser))) {
 			log.info(
 				"Cached auction tracker in " +
-				((System.currentTimeMillis() - startTime) / 1000) +
+				roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) +
 				"s | " +
 				AuctionTracker.commandAuthorToTrackingUser.size()
 			);
 		} else {
-			log.error("Failed to cache auction tracker in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+			log.error("Failed to cache auction tracker in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 		}
 	}
 
@@ -1675,9 +1675,9 @@ public class Utils {
 
 		long startTime = System.currentTimeMillis();
 		if (cacheDatabase.cacheJacobData(gson.toJson(JacobHandler.getJacobData()))) {
-			log.info("Cached jacob data in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+			log.info("Cached jacob data in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 		} else {
-			log.error("Failed to cache jacob data in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+			log.error("Failed to cache jacob data in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 		}
 	}
 

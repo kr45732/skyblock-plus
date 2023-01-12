@@ -817,8 +817,8 @@ public class AutomaticGuild {
 			logCommand(
 				guild,
 				"Update Guild | Time (" +
-				(System.currentTimeMillis() - startTime) +
-				"ms)" +
+				roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) +
+				"s)" +
 				(!memberToRoleChanges.isEmpty() ? " | Users (" + memberToRoleChanges.size() + ")" : "") +
 				(counterUpdate > 0 ? " | Counters (" + counterUpdate + ")" : "")
 			);
