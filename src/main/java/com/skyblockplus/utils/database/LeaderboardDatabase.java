@@ -471,21 +471,23 @@ public class LeaderboardDatabase {
 				);
 
 				for (String uuid : uuids) {
-					CompletableFuture.supplyAsync(
-						() -> {
-							Player player = new Player(uuid, false);
-							if (player.isValid()) {
-								players.add(player);
+					futuresList.add(
+						CompletableFuture.supplyAsync(
+							() -> {
+								Player player = new Player(uuid, false);
+								if (player.isValid()) {
+									players.add(player);
 
-								DataObject playerObj = DataObject.empty().put("username", player.getUsername()).put("uuid", uuid);
-								for (String lbType : lbTypes) {
-									playerObj.put(lbType, player.getHighestAmount(lbType, mode));
+									DataObject playerObj = DataObject.empty().put("username", player.getUsername()).put("uuid", uuid);
+									for (String lbType : lbTypes) {
+										playerObj.put(lbType, player.getHighestAmount(lbType, mode));
+									}
+									return playerObj;
 								}
-								return playerObj;
-							}
-							return null;
-						},
-						playerRequestExecutor
+								return null;
+							},
+							playerRequestExecutor
+						)
 					);
 				}
 			}
