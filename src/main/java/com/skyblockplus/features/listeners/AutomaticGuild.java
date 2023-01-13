@@ -686,6 +686,10 @@ public class AutomaticGuild {
 								nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
 							}
 
+							if ((player != null && !player.isValid()) || (hypixelPlayer != null && !hypixelPlayer.isValid())) {
+								continue;
+							}
+
 							if (
 								streamJsonArray(blacklist).noneMatch(u -> higherDepth(u, "uuid").getAsString().equals(linkedAccount.uuid()))
 							) {
