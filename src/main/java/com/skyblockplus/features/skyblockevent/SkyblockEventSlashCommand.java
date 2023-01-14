@@ -394,7 +394,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		}
 
 		if (currentGuild.eventCurrentlyUpdating) {
-			return invalidEmbed("The leaderboard is currently updating, please try again in a couple of seconds");
+			return invalidEmbed("The leaderboard is currently updating, please try again in a few seconds");
 		}
 
 		JsonElement runningSettings = database.getSkyblockEventSettings(guildId);

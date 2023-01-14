@@ -147,7 +147,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 
 		if (hypixelGuildQueue.contains(guildId)) {
-			return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
+			return invalidEmbed("This guild is currently updating, please try again in a few seconds");
 		}
 		hypixelGuildQueue.add(guildId);
 		List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(

@@ -137,11 +137,12 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 
 		if (hypixelGuildQueue.contains(guildId)) {
-			return invalidEmbed("This guild is currently updating, please try again in a couple of seconds");
+			return invalidEmbed("This guild is currently updating, please try again in a few seconds");
 		}
+
 		hypixelGuildQueue.add(guildId);
 		List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
-			List.of("slayer", "skills", "catacombs", "weight"),
+			List.of("networth", "level", "slayer", "skills", "catacombs", "weight"),
 			gamemode,
 			streamJsonArray(higherDepth(guildJson, "members")).map(u -> higherDepth(u, "uuid", "")).collect(Collectors.toList()),
 			hypixelKey,
@@ -149,13 +150,26 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		);
 		hypixelGuildQueue.remove(guildId);
 
+		String levelStr = getLeaderboardTop(playerList, "level", usernameUuidStruct);
+		String networthStr = getLeaderboardTop(playerList, "networth", usernameUuidStruct);
+		String slayerStr = getLeaderboardTop(playerList, "slayer", usernameUuidStruct);
+		String skillsStr = getLeaderboardTop(playerList, "skills", usernameUuidStruct);
+		String cataStr = getLeaderboardTop(playerList, "catacombs", usernameUuidStruct);
+		String weightStr = getLeaderboardTop(playerList, "weight", usernameUuidStruct);
+
+		double averageLevel = playerList.stream().mapToDouble(m -> m.getDouble("level")).average().orElse(0);
+		double averageNetworth = playerList.stream().mapToDouble(m -> m.getDouble("networth")).average().orElse(0);
 		double averageSlayer = playerList.stream().mapToDouble(m -> m.getDouble("slayer")).average().orElse(0);
 		double averageSkills = playerList.stream().mapToDouble(m -> m.getDouble("skills")).average().orElse(0);
 		double averageCata = playerList.stream().mapToDouble(m -> m.getDouble("catacombs")).average().orElse(0);
 		double averageWeight = playerList.stream().mapToDouble(m -> m.getDouble("weight")).average().orElse(0);
 
-		EmbedBuilder eb = defaultEmbed(guildName)
+		return defaultEmbed(guildName)
 			.setDescription(
+				"**Average Skyblock Level:** " +
+				roundAndFormat(averageLevel) +
+				"**Average Networth** " +
+				roundAndFormat(averageNetworth) +
 				"**Average Slayer XP:** " +
 				roundAndFormat(averageSlayer) +
 				"\n**Average Skills Level:** " +
@@ -164,24 +178,20 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 				roundAndFormat(averageCata) +
 				"\n**Average Weight:** " +
 				roundAndFormat(averageWeight)
-			);
-		String slayerStr = getLeaderboardTop(playerList, "slayer", usernameUuidStruct);
-		String skillsStr = getLeaderboardTop(playerList, "skills", usernameUuidStruct);
-		String cataStr = getLeaderboardTop(playerList, "catacombs", usernameUuidStruct);
-		String weightStr = getLeaderboardTop(playerList, "weight", usernameUuidStruct);
-
-		eb.addField("Top 5 Slayer", slayerStr, true);
-		eb.addField("Top 5 Skills", skillsStr, true);
-		eb.addBlankField(true);
-		eb.addField("Top 5 Catacombs", cataStr, true);
-		eb.addField("Top 5 Weight", weightStr, true);
-		eb.addBlankField(true);
-
-		return eb;
+			)
+			.addField("Top 5 Skyblock Level", levelStr, true)
+			.addField("Top 5 Networth", networthStr, true)
+			.addBlankField(true)
+			.addField("Top 5 Slayer", slayerStr, true)
+			.addField("Top 5 Skills", skillsStr, true)
+			.addBlankField(true)
+			.addField("Top 5 Catacombs", cataStr, true)
+			.addField("Top 5 Weight", weightStr, true)
+			.addBlankField(true);
 	}
 
 	public static String getLeaderboardTop(List<DataObject> playerList, String lbType, UsernameUuidStruct usernameUuidStruct) {
-		List<DataObject> lb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble("slayer"))).toList();
+		List<DataObject> lb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble(lbType))).toList();
 
 		int pos = -1;
 		if (usernameUuidStruct != null) {
@@ -202,7 +212,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 					.append(")` ")
 					.append(fixUsername(cur.getString("username")))
 					.append(": ")
-					.append(roundAndFormat(cur.getDouble("slayer")))
+					.append(roundAndFormat(cur.getDouble(lbType)))
 					.append("\n");
 				break;
 			}
@@ -213,7 +223,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 				.append(")` ")
 				.append(fixUsername(cur.getString("username")))
 				.append(": ")
-				.append(roundAndFormat(cur.getDouble("slayer")))
+				.append(roundAndFormat(cur.getDouble(lbType)))
 				.append("\n");
 		}
 		return str.toString();
