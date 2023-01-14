@@ -222,12 +222,10 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		JsonArray membersArr = higherDepth(runningSettings, "membersList").getAsJsonArray();
 		String eventType = higherDepth(runningSettings, "eventType").getAsString();
 
-		String key = null;
-		if (membersArr.size() > 40) {
-			key = database.getServerHypixelApiKey(guildId);
-			if (key == null || checkHypixelKey(key) != null) {
-				return null;
-			}
+		String key = database.getServerHypixelApiKey(guildId);
+		key = checkHypixelKey(key) == null ? key : null; // Set key to null if invalid
+		if (membersArr.size() > 40 && key == null) {
+			return null;
 		}
 		String hypixelKey = key;
 
