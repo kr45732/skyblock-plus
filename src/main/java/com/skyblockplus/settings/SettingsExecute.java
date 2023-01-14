@@ -2046,7 +2046,8 @@ public class SettingsExecute {
 						type.equals("CATACOMBS") ||
 						type.equals("SLAYER") ||
 						type.equals("WEIGHT") ||
-						type.equals("CLASS")
+						type.equals("CLASS") ||
+						type.equals("LEVEL")
 					)
 				) ||
 				(category.equals("HYPIXEL") && type.equals("RANK"))
@@ -2062,7 +2063,7 @@ public class SettingsExecute {
 		}
 
 		if (nickname.replace("[IGN]", "").length() > 15) {
-			return invalidEmbed("Nickname prefix and/or postfix must be less than or equal to 15 letters");
+			return invalidEmbed("Nickname prefix and/or postfix, excluding templates, must be less than or equal to 15 letters");
 		}
 
 		int responseCode = updateVerifySettings("verifiedNickname", origNick);

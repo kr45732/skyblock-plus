@@ -637,7 +637,8 @@ public class AutomaticGuild {
 										type.equals("CATACOMBS") ||
 										type.equals("SLAYER") ||
 										type.equals("WEIGHT") ||
-										type.equals("CLASS")
+										type.equals("CLASS") ||
+										type.equals("LEVEL")
 									)
 								) {
 									if (key != null) {
@@ -654,13 +655,14 @@ public class AutomaticGuild {
 												nicknameTemplate.replace(
 													matcher.group(0),
 													switch (type) {
-														case "SKILLS" -> roundAndFormat((int) player.getSkillAverage());
+														case "SKILLS" -> formatNumber((int) player.getSkillAverage());
 														case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
-														case "WEIGHT" -> roundAndFormat((int) player.getWeight());
+														case "WEIGHT" -> formatNumber((int) player.getWeight());
 														case "CLASS" -> player.getSelectedDungeonClass().equals("none")
 															? ""
 															: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
-														default -> roundAndFormat((int) player.getCatacombs().getProgressLevel());
+														case "LEVEL" -> formatNumber((int) player.getLevel());
+														default -> formatNumber((int) player.getCatacombs().getProgressLevel());
 													} +
 													extra
 												);

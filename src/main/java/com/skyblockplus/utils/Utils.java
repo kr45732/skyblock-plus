@@ -1251,6 +1251,10 @@ public class Utils {
 							itemInfo.setId(itemInfo.getId() + "_" + item.getString("tag.ExtraAttributes.party_hat_color").toUpperCase());
 						}
 
+						if (itemInfo.getId().equals("NEW_YEAR_CAKE") && item.containsKey("tag.ExtraAttributes.new_years_cake")) {
+							itemInfo.setId(itemInfo.getId() + "_" + item.get("tag.ExtraAttributes.new_years_cake"));
+						}
+
 						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
 							List<String> enchantsList = new ArrayList<>();
 							for (Map.Entry<String, Object> enchant : item.getCompound("tag.ExtraAttributes.enchantments").entrySet()) {
