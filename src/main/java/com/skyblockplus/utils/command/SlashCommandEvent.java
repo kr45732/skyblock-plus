@@ -97,13 +97,7 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 
 	public void paginate(Object ebOrMb, boolean deleteOriginal) {
 		if (ebOrMb != null) {
-			if (ebOrMb instanceof EmbedBuilder eb) {
-				getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
-			} else if (ebOrMb instanceof MessageEditBuilder mb) {
-				getHook().editOriginal(mb.build()).queue(ignore, ignore);
-			} else {
-				throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
-			}
+			embed(ebOrMb);
 		} else if (deleteOriginal) {
 			getHook().deleteOriginal().queue();
 		}

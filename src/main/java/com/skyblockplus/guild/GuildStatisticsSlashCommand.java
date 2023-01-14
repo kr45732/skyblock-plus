@@ -158,7 +158,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		String weightStr = getLeaderboardTop(playerList, "weight", usernameUuidStruct);
 
 		double averageLevel = playerList.stream().mapToDouble(m -> m.getDouble("level")).average().orElse(0);
-		double averageNetworth = playerList.stream().mapToDouble(m -> m.getDouble("networth")).average().orElse(0);
+		double averageNetworth = (long) playerList.stream().mapToDouble(m -> m.getDouble("networth")).average().orElse(0);
 		double averageSlayer = playerList.stream().mapToDouble(m -> m.getDouble("slayer")).average().orElse(0);
 		double averageSkills = playerList.stream().mapToDouble(m -> m.getDouble("skills")).average().orElse(0);
 		double averageCata = playerList.stream().mapToDouble(m -> m.getDouble("catacombs")).average().orElse(0);
@@ -168,9 +168,9 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 			.setDescription(
 				"**Average Skyblock Level:** " +
 				roundAndFormat(averageLevel) +
-				"**Average Networth** " +
+				"\n**Average Networth** " +
 				roundAndFormat(averageNetworth) +
-				"**Average Slayer XP:** " +
+				"\n**Average Slayer XP:** " +
 				roundAndFormat(averageSlayer) +
 				"\n**Average Skills Level:** " +
 				roundAndFormat(averageSkills) +

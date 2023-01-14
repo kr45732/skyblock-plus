@@ -48,7 +48,7 @@ public class InventoryEmojiPaginator {
 		this.maxPageNumber = inventoryPages.size() - 1;
 		this.lastEdit = Instant.now();
 
-		pagePart1 = event.getChannel().sendMessage(inventoryPages.get(0)[0]).complete();
+		pagePart1 = event.getHook().editOriginal(inventoryPages.get(0)[0]).setEmbeds().complete();
 		pagePart2 =
 			event
 				.getChannel()

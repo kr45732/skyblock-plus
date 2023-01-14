@@ -52,7 +52,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 			case "list" -> event.paginate(
 				getPlayerEnderChestList(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event)
 			);
-			case "emoji" -> event.paginate(getPlayerEnderChest(event.player, event.getOptionStr("profile"), event), true);
+			case "emoji" -> event.paginate(getPlayerEnderChest(event.player, event.getOptionStr("profile"), event));
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -84,10 +84,6 @@ public class EnderChestSlashCommand extends SlashCommand {
 		if (player.isValid()) {
 			List<String[]> enderChestPages = player.getEnderChest();
 			if (enderChestPages != null) {
-				if (player.invMissing.length() > 0) {
-					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
-				}
-
 				new InventoryEmojiPaginator(enderChestPages, "Ender Chest", player, event);
 				return null;
 			}

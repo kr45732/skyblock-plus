@@ -919,7 +919,6 @@ public class Player {
 		"mythos_burrows_dug_next_epic",
 		"mythos_burrows_dug_next_EPIC"
 	);
-	public String invMissing = "";
 	private JsonArray profilesArray;
 	private int profileIndex;
 	private JsonElement hypixelPlayerJson;
@@ -2023,9 +2022,6 @@ public class Player {
 			return getEmojiMap().get(itemName).getAsString();
 		} catch (Exception ignored) {}
 
-		if (!invMissing.contains(itemName)) {
-			invMissing += "\n• " + itemName;
-		}
 		return "❓";
 	}
 

@@ -52,8 +52,8 @@ public class PartyHandler {
 		this.menuId = menu.getId();
 		this.message =
 			slashCommandEvent
-				.getChannel()
-				.sendMessageEmbeds(
+				.getHook()
+				.editOriginalEmbeds(
 					defaultEmbed("Party Finder Creator").setDescription("Choose an option from the menu below to get started!").build()
 				)
 				.setActionRow(menu)

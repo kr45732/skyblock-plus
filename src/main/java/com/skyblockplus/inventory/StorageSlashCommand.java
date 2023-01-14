@@ -45,7 +45,7 @@ public class StorageSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(getPlayerStorage(event.player, event.getOptionStr("profile"), event), true);
+		event.paginate(getPlayerStorage(event.player, event.getOptionStr("profile"), event));
 	}
 
 	@Override
@@ -68,10 +68,6 @@ public class StorageSlashCommand extends SlashCommand {
 		if (player.isValid()) {
 			List<String[]> storagePages = player.getStorage();
 			if (storagePages != null) {
-				if (player.invMissing.length() > 0) {
-					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
-				}
-
 				new InventoryEmojiPaginator(storagePages, "Storage", player, event);
 				return null;
 			}

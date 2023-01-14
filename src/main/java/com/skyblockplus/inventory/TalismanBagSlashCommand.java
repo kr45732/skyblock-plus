@@ -106,7 +106,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 			case "list" -> event.paginate(
 				getPlayerTalismansList(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event)
 			);
-			case "emoji" -> event.paginate(getPlayerTalismansEmoji(event.player, event.getOptionStr("profile"), event), true);
+			case "emoji" -> event.paginate(getPlayerTalismansEmoji(event.player, event.getOptionStr("profile"), event));
 			case "tuning" -> event.paginate(getPlayerTuning(event.player, event.getOptionStr("profile"), event));
 			default -> event.embed(event.invalidCommandMessage());
 		}
@@ -154,10 +154,6 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		if (player.isValid()) {
 			List<String[]> talismanBag = player.getTalismanBag();
 			if (talismanBag != null) {
-				if (player.invMissing.length() > 0) {
-					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
-				}
-
 				new InventoryEmojiPaginator(talismanBag, "Talisman Bag", player, event);
 				return null;
 			}

@@ -52,7 +52,7 @@ public class InventorySlashCommand extends SlashCommand {
 			case "list" -> event.paginate(
 				getPlayerInventoryList(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event)
 			);
-			case "emoji" -> event.paginate(getPlayerInventory(event.player, event.getOptionStr("profile"), event), true);
+			case "emoji" -> event.paginate(getPlayerInventory(event.player, event.getOptionStr("profile"), event));
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -96,10 +96,7 @@ public class InventorySlashCommand extends SlashCommand {
 		if (player.isValid()) {
 			String[] playerInventory = player.getInventory();
 			if (playerInventory != null) {
-				if (player.invMissing.length() > 0) {
-					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
-				}
-				event.getChannel().sendMessage(playerInventory[0]).complete();
+				event.getHook().editOriginal(playerInventory[0]).setEmbeds().queue();
 				event
 					.getChannel()
 					.sendMessage(playerInventory[1])

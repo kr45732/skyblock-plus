@@ -51,7 +51,7 @@ public class ArmorSlashCommand extends SlashCommand {
 			case "list" -> event.paginate(
 				getPlayerEquippedArmor(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event)
 			);
-			case "emoji" -> event.paginate(getPlayerArmor(event.player, event.getOptionStr("profile"), event), true);
+			case "emoji" -> event.paginate(getPlayerArmor(event.player, event.getOptionStr("profile"), event));
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -120,8 +120,9 @@ public class ArmorSlashCommand extends SlashCommand {
 				}
 
 				event
-					.getChannel()
-					.sendMessage(out)
+					.getHook()
+					.editOriginal(out.toString())
+					.setEmbeds()
 					.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Armor & Equipment"))
 					.queue();
 				return null;

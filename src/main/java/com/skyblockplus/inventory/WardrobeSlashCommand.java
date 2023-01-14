@@ -51,7 +51,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "list" -> event.paginate(getPlayerWardrobeList(event.player, event.getOptionStr("profile"), event));
-			case "emoji" -> event.paginate(getPlayerWardrobe(event.player, event.getOptionStr("profile"), event), true);
+			case "emoji" -> event.paginate(getPlayerWardrobe(event.player, event.getOptionStr("profile"), event));
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}
@@ -112,10 +112,6 @@ public class WardrobeSlashCommand extends SlashCommand {
 		if (player.isValid()) {
 			List<String[]> wardrobe = player.getWardrobe();
 			if (wardrobe != null) {
-				if (player.invMissing.length() > 0) {
-					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
-				}
-
 				new InventoryEmojiPaginator(wardrobe, "Wardrobe", player, event);
 				return null;
 			}
