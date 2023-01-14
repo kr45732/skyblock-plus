@@ -572,11 +572,11 @@ public class Utils {
 
 					if (httpResponse.getStatusLine().getStatusCode() == 502) {
 						JsonObject obj = new JsonObject();
-						obj.addProperty("cause", "Hypixel API returned 502 bad gateway");
+						obj.addProperty("cause", "Hypixel API returned 502 bad gateway. The API may be down.");
 						return obj;
 					} else if (httpResponse.getStatusLine().getStatusCode() == 522) {
 						JsonObject obj = new JsonObject();
-						obj.addProperty("cause", "Hypixel API returned 522 connection timed out");
+						obj.addProperty("cause", "Hypixel API returned 522 connection timed out. The API may be down.");
 						return obj;
 					}
 				}
