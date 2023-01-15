@@ -63,7 +63,12 @@ public class EvaluateCommand extends Command {
 		};
 
 		// import [name]
-		String[] classImports = { "com.skyblockplus.utils.Player", "me.nullicorn.nedit.NBTReader" };
+		String[] classImports = {
+			"com.skyblockplus.utils.Player",
+			"me.nullicorn.nedit.NBTReader",
+			"com.skyblockplus.miscellaneous.networth.NetworthExecute",
+			"import com.skyblockplus.settings.SettingsExecute",
+		};
 
 		// import static [name]
 		String[] staticImports = {

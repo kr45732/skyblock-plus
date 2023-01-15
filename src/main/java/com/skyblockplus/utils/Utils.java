@@ -2120,6 +2120,9 @@ public class Utils {
 		return string.length() >= minLength ? string : (String.valueOf(padChar).repeat(minLength - string.length()) + string);
 	}
 
+	/**
+	 * Used only for NetworthExecute
+	 */
 	public static List<String> getRecipe(String itemId) {
 		JsonElement recipe = higherDepth(getInternalJsonMappings(), itemId + ".recipe");
 		if (recipe != null) {

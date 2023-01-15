@@ -890,6 +890,12 @@ public class NetworthExecute {
 		if (recipe != null) {
 			for (String item : recipe) {
 				String[] idCountSplit = item.split(":");
+
+				if (idCountSplit[0].equals("SKYBLOCK_NORTH_STAR")) { // Can't calculate value of a "currency"
+					craftCost = 0;
+					break;
+				}
+
 				craftCost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
 			}
 			craftCost /= getRecipeCount(itemId);
