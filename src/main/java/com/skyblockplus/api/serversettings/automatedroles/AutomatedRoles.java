@@ -151,4 +151,7 @@ public class AutomatedRoles {
 
 	@Embedded
 	private RoleModel barbarian_rep = new RoleModel();
+
+	@Embedded
+	private RoleModel level = new RoleModel();
 }

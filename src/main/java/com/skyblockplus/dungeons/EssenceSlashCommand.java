@@ -42,6 +42,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class EssenceSlashCommand extends SlashCommand {
 
+	public static List<String> ESSENCE_TYPES = List.of("ice", "gold", "dragon", "spider", "undead", "wither", "diamond", "crimson");
+
 	public EssenceSlashCommand() {
 		this.name = "essence";
 	}
@@ -154,7 +156,7 @@ public class EssenceSlashCommand extends SlashCommand {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
 			StringBuilder amountsStr = new StringBuilder();
-			for (String essence : List.of("ice", "gold", "dragon", "spider", "undead", "wither", "diamond", "crimson")) {
+			for (String essence : ESSENCE_TYPES) {
 				amountsStr
 					.append(ESSENCE_EMOJI_MAP.get(essence))
 					.append("** ")

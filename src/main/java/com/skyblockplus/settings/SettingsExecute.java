@@ -1388,7 +1388,8 @@ public class SettingsExecute {
 			"gamemode",
 			"maxed_collections",
 			"mage_rep",
-			"barbarian_rep"
+			"barbarian_rep",
+			"level"
 		);
 		Map<String, Integer> rolePageMap = IntStream
 			.range(0, allRoles.size())
@@ -1484,6 +1485,9 @@ public class SettingsExecute {
 				);
 				case "slot_collector" -> ebFieldString.append(
 					"**Number of minion slots excluding upgrades**\nExample: `/settings roles add slot_collector 24 @maxed minion slots`\n"
+				);
+				case "level" -> ebFieldString.append(
+					"**A player's Skyblock level**\nExample: `/settings roles add level 500 @maxed level`\n"
 				);
 				case "maxed_collections" -> ebFieldString.append(
 					"**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n"

@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous.networth;
 
+import static com.skyblockplus.dungeons.EssenceSlashCommand.ESSENCE_TYPES;
 import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
@@ -115,6 +116,13 @@ public class NetworthExecute {
 
 		addTotal("bank", player.getBankBalance());
 		addTotal("purse", player.getPurseCoins());
+
+		for (String essence : ESSENCE_TYPES) {
+			addTotal(
+				"essence",
+				getLowestPrice("ESSENCE_" + essence.toUpperCase()) * higherDepth(player.profileJson(), "essence_" + essence, 0)
+			);
+		}
 
 		for (String location : locations) {
 			Map<Integer, InvItem> curItems =
@@ -241,13 +249,15 @@ public class NetworthExecute {
 		//						: ""
 		//				)+"Leaderboard Position:** " + (position != -1 ? formatNumber(position) : "Not on leaderboard");
 		EmbedBuilder eb = player.defaultPlayerEmbed().setDescription(ebDesc);
-		eb.addField("Purse", simplifyNumber(getTotal("purse", ignoreSoulbound)), true);
 		eb.addField(
-			"Bank",
+			"Purse & Bank",
+			simplifyNumber(getTotal("purse", ignoreSoulbound)) +
+			" & " +
 			(getTotal("bank", ignoreSoulbound) == -1 ? "Private" : simplifyNumber(getTotal("bank", ignoreSoulbound))),
 			true
 		);
 		eb.addField("Sacks", simplifyNumber(getTotal("sacks", ignoreSoulbound)), true);
+		eb.addField("Essence", simplifyNumber(getTotal("essence", ignoreSoulbound)), true);
 		if (!echestStr.isEmpty()) {
 			eb.addField(
 				"Ender Chest | " + simplifyNumber(getTotal("enderchest", ignoreSoulbound)),

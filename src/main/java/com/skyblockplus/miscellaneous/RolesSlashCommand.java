@@ -243,6 +243,7 @@ public class RolesSlashCommand extends SlashCommand {
 					"pet_score",
 					"dungeon_secrets",
 					"slot_collector",
+					"level",
 					"enderman",
 					"weight",
 					"total_slayer",
@@ -270,6 +271,7 @@ public class RolesSlashCommand extends SlashCommand {
 								disabledAPI.append(roleChangeString("Skills API disabled"));
 							}
 						}
+						case "level" -> roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getLevel();
 						case "pet_score" -> roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getPetScore();
 						case "alchemy", "combat", "fishing", "farming", "foraging", "carpentry", "mining", "taming", "enchanting" -> {
 							if (useHighest) {
