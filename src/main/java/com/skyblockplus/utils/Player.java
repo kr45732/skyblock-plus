@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.inventory.TalismanBagSlashCommand.rarityToMagicPower;
 import static com.skyblockplus.miscellaneous.BestiarySlashCommand.bosses;
 import static com.skyblockplus.miscellaneous.BestiarySlashCommand.locations;
 import static com.skyblockplus.utils.ApiHandler.*;
@@ -35,6 +36,7 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -2029,6 +2031,54 @@ public class Player {
 		return higherDepth(profileJson(), "leveling.experience", 0) / 100.0;
 	}
 
+	public int getMagicPower() {
+		Map<Integer, InvItem> accessoryBagMap = getTalismanBagMap();
+		if (accessoryBagMap == null) {
+			return 0;
+		}
+
+		List<InvItem> accessoryBag = accessoryBagMap
+			.values()
+			.stream()
+			.filter(Objects::nonNull)
+			.sorted(Comparator.comparingInt(o -> Integer.parseInt(RARITY_TO_NUMBER_MAP.get(o.getRarity()).replace(";", ""))))
+			.collect(Collectors.toCollection(ArrayList::new));
+		// Don't reverse the rarity because we are iterating reverse order
+		Set<String> ignoredTalismans = new HashSet<>();
+		for (int i = accessoryBag.size() - 1; i >= 0; i--) {
+			String accessoryId = accessoryBag.get(i).getId();
+
+			if (ignoredTalismans.contains(accessoryId)) {
+				accessoryBag.remove(i);
+			}
+
+			ignoredTalismans.add(accessoryId);
+			JsonElement children = higherDepth(getParentsJson(), accessoryId);
+			if (children != null) {
+				for (JsonElement child : children.getAsJsonArray()) {
+					ignoredTalismans.add(child.getAsString());
+				}
+			}
+		}
+
+		int magicPower = 0;
+		for (Map.Entry<String, Integer> entry : rarityToMagicPower.entrySet()) {
+			long count = accessoryBag.stream().filter(i -> i.getRarity().equals(entry.getKey())).count();
+			long power = count * entry.getValue();
+			magicPower += power;
+		}
+
+		int hegemony = rarityToMagicPower.getOrDefault(
+			accessoryBag.stream().filter(a -> a.getId().equals("HEGEMONY_ARTIFACT")).map(InvItem::getRarity).findFirst().orElse(""),
+			0
+		);
+		if (hegemony != 0) {
+			magicPower += hegemony;
+		}
+
+		return magicPower;
+	}
+
 	public double getLilyWeight() {
 		return new LilyWeight(this, true).getTotalWeight().getRaw();
 	}
@@ -2086,13 +2136,11 @@ public class Player {
 
 	public int getNumberMinionSlots() {
 		try {
-			List<String> profileMembers = getJsonKeys(higherDepth(getOuterProfileJson(), "members"));
 			Set<String> uniqueCraftedMinions = new HashSet<>();
 
-			for (String member : profileMembers) {
+			for (Map.Entry<String, JsonElement> member : higherDepth(getOuterProfileJson(), "members").getAsJsonObject().entrySet()) {
 				try {
-					JsonArray craftedMinions = higherDepth(getOuterProfileJson(), "members." + member + ".crafted_generators")
-						.getAsJsonArray();
+					JsonArray craftedMinions = higherDepth(member.getValue(), "crafted_generators").getAsJsonArray();
 					for (JsonElement minion : craftedMinions) {
 						uniqueCraftedMinions.add(minion.getAsString());
 					}

@@ -67,7 +67,7 @@ public class EvaluateCommand extends Command {
 			"com.skyblockplus.utils.Player",
 			"me.nullicorn.nedit.NBTReader",
 			"com.skyblockplus.miscellaneous.networth.NetworthExecute",
-			"import com.skyblockplus.settings.SettingsExecute",
+			"com.skyblockplus.settings.SettingsExecute",
 		};
 
 		// import static [name]

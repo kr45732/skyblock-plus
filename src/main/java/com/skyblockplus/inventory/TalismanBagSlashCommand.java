@@ -73,7 +73,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		"attack_speed",
 		"⚔️"
 	);
-	private static final Map<String, Integer> rarityToMagicPower = Maps.of(
+	public static final Map<String, Integer> rarityToMagicPower = Maps.of(
 		"COMMON",
 		3,
 		"UNCOMMON",
@@ -212,7 +212,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 				magicPower += power;
 			}
 			int hegemony = rarityToMagicPower.getOrDefault(
-				accessoryBag.stream().filter(a -> a.getId().equals("HEGEMONY_ARTIFACT")).map(a -> a.getRarity()).findFirst().orElse(""),
+				accessoryBag.stream().filter(a -> a.getId().equals("HEGEMONY_ARTIFACT")).map(InvItem::getRarity).findFirst().orElse(""),
 				0
 			);
 			if (hegemony != 0) {
