@@ -892,13 +892,13 @@ public class NetworthExecute {
 			return getMinionCost(itemId.substring(0, index), Integer.parseInt(itemId.substring(index + 1)));
 		}
 
-		try {
-			double bazaarPrice = higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble();
+		if (higherDepth(bazaarJson, itemId) != null) {
+			double bazaarPrice = higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit", 0.0);
 			if (source != null) {
 				source.append("bazaar");
 			}
 			return bazaarPrice;
-		} catch (Exception ignored) {}
+		}
 
 		List<String> recipe = getRecipe(itemId);
 		double craftCost = 0;
