@@ -32,24 +32,25 @@ import me.nullicorn.nedit.type.NBTList;
 public class InvItem {
 
 	private String name;
-	private List<String> lore;
-	private int count = 1;
-	private String modifier;
 	private String id;
-	private String creationTimestamp;
-	private List<String> enchantsFormatted = new ArrayList<>();
+	private int count = 1;
 	private int hbpCount = 0;
 	private int fumingCount = 0;
 	private boolean recombobulated = false;
+	private String modifier;
+	private String rarity;
+	private String skin;
+	private List<String> lore;
+	private String creationTimestamp;
+	private List<String> enchantsFormatted = new ArrayList<>();
 	private Map<String, Integer> extraStats = new HashMap<>();
 	private List<InvItem> backpackItems = new ArrayList<>();
-	private String rarity;
-	private int dungeonFloor = -1;
 	private int essenceCount;
 	private String essenceType;
 	private long darkAuctionPrice = -1;
-	private NBTCompound nbtTag;
+	private int dungeonFloor = -1;
 	private boolean soulbound = false;
+	private NBTCompound nbtTag;
 
 	public void setEssence(int essenceCount, String essenceType) {
 		this.essenceCount = essenceCount;
@@ -162,5 +163,10 @@ public class InvItem {
 			return NUMBER_TO_RARITY_MAP.get("" + (Integer.parseInt(RARITY_TO_NUMBER_MAP.get(rarity).replace(";", "")) + 1));
 		}
 		return rarity;
+	}
+
+	public void setSkin(String skin) {
+		this.skin = skin;
+		addExtraValue(skin);
 	}
 }

@@ -1280,7 +1280,7 @@ public class Utils {
 						}
 
 						if (item.containsKey("tag.ExtraAttributes.skin")) {
-							itemInfo.addExtraValue(
+							itemInfo.setSkin(
 								(itemInfo.getId().equals("PET") ? "PET_SKIN_" : "") + item.getString("tag.ExtraAttributes.skin")
 							);
 						}

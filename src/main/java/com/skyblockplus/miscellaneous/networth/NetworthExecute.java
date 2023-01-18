@@ -582,7 +582,12 @@ public class NetworthExecute {
 	}
 
 	public String addItemStr(InvItem item, double itemPrice) {
-		String emoji = higherDepth(getEmojiMap(), item.getFormattedId(), null);
+		String emoji = getEmojiOr(item.getFormattedId(), null);
+
+		if (item.getSkin() != null && getEmojiOr(item.getSkin(), null) != null) {
+			emoji = getEmojiOr(item.getSkin(), null);
+		}
+
 		String formattedStr =
 			(emoji == null ? "" : emoji + " ") +
 			(item.getCount() != 1 ? item.getCount() + "x " : "") +
@@ -590,7 +595,7 @@ public class NetworthExecute {
 			item.getNameFormatted();
 
 		if (item.getPetItem() != null) {
-			String petItemEmoji = higherDepth(getEmojiMap(), item.getPetItem(), null);
+			String petItemEmoji = getEmojiOr(item.getPetItem(), null);
 			if (petItemEmoji != null) {
 				formattedStr += " " + petItemEmoji;
 			}
