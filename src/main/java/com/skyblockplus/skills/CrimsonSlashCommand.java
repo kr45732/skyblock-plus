@@ -41,6 +41,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class CrimsonSlashCommand extends SlashCommand {
 
+	public static Map<String, String> dojoQuests = Maps.of(
+		"snake",
+		"Swiftness",
+		"archer",
+		"Mastery",
+		"mob_kb",
+		"Force",
+		"fireball",
+		"Tenacity",
+		"wall_jump",
+		"Stamina",
+		"sword_swap",
+		"Discipline",
+		"lock_head",
+		"Control"
+	);
+
 	public CrimsonSlashCommand() {
 		this.name = "crimson";
 	}
@@ -192,49 +209,18 @@ public class CrimsonSlashCommand extends SlashCommand {
 			pages.put(SelectOption.of("Kuudra", "kuudra"), eb);
 
 			eb = player.defaultPlayerEmbed();
-			Map<String, String> dojoQuests = Maps.of(
-				"snake",
-				"Swiftness",
-				"archer",
-				"Mastery",
-				"mob_kb",
-				"Force",
-				"fireball",
-				"Tenacity",
-				"wall_jump",
-				"Stamina",
-				"sword_swap",
-				"Discipline",
-				"lock_head",
-				"Control"
-			);
-			int totalPoints = 0;
 			for (Map.Entry<String, String> dojoQuest : dojoQuests.entrySet()) {
-				int points = higherDepth(crimsonJson, "dojo.dojo_points_" + dojoQuest.getKey(), 0);
-				totalPoints += points;
 				eb.addField(
 					dojoQuest.getValue(),
 					"Points: " +
-					formatNumber(points) +
+					formatNumber(higherDepth(crimsonJson, "dojo.dojo_points_" + dojoQuest.getKey(), 0)) +
 					"\nTime: " +
 					toPrettyTime(higherDepth(crimsonJson, "dojo.dojo_time_" + dojoQuest.getKey(), 0)),
 					true
 				);
 			}
-			String belt;
-			if (totalPoints >= 7000) {
-				belt = "Black";
-			} else if (totalPoints >= 6000) {
-				belt = "Brown";
-			} else if (totalPoints >= 4000) {
-				belt = "Blue";
-			} else if (totalPoints >= 2000) {
-				belt = "Green";
-			} else if (totalPoints >= 1000) {
-				belt = "Yellow";
-			} else {
-				belt = "White";
-			}
+			String belt = player.getDojoBelt();
+			int totalPoints = player.getDojoPoints();
 			eb.setDescription(
 				"⭐ **Total Points:** " +
 				formatNumber(totalPoints) +

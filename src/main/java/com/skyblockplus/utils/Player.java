@@ -32,6 +32,7 @@ import com.google.gson.JsonParser;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
 import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
+import com.skyblockplus.skills.CrimsonSlashCommand;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.*;
@@ -2532,5 +2533,35 @@ public class Player {
 
 	public boolean isSkillsApiEnabled() {
 		return getSkill("combat") != null;
+	}
+
+	public int getDojoPoints() {
+		int totalPoints = 0;
+		for (Map.Entry<String, String> dojoQuest : CrimsonSlashCommand.dojoQuests.entrySet()) {
+			int points = higherDepth(profileJson(), "nether_island_player_data.dojo.dojo_points_" + dojoQuest.getKey(), 0);
+			totalPoints += points;
+		}
+		return totalPoints;
+	}
+
+	public String getDojoBelt() {
+		int totalPoints = getDojoPoints();
+		String belt;
+
+		if (totalPoints >= 7000) {
+			belt = "Black";
+		} else if (totalPoints >= 6000) {
+			belt = "Brown";
+		} else if (totalPoints >= 4000) {
+			belt = "Blue";
+		} else if (totalPoints >= 2000) {
+			belt = "Green";
+		} else if (totalPoints >= 1000) {
+			belt = "Yellow";
+		} else {
+			belt = "White";
+		}
+
+		return belt;
 	}
 }
