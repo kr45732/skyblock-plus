@@ -31,8 +31,6 @@ public class SkyblockProfilesParser {
 
 	private static final List<String> IGNORED_SB_PROFILE = List.of(
 		"community_upgrades",
-		"objectives",
-		"tutorial",
 		"quests",
 		"visited_zones",
 		"experimentation",

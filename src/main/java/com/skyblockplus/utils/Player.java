@@ -2032,6 +2032,19 @@ public class Player {
 		return higherDepth(profileJson(), "leveling.experience", 0) / 100.0;
 	}
 
+	public String getLevelColor() {
+		int level = (int) getLevel();
+		String color = "None";
+		for (Map.Entry<String, JsonElement> colorReq : higherDepth(getSbLevelsJson(), "sblevel_colours").getAsJsonObject().entrySet()) {
+			if (Integer.parseInt(colorReq.getKey()) > level) {
+				break;
+			}
+
+			color = colorReq.getValue().getAsString();
+		}
+		return capitalizeString(color.replace("_", " "));
+	}
+
 	public int getMagicPower() {
 		Map<Integer, InvItem> accessoryBagMap = getTalismanBagMap();
 		if (accessoryBagMap == null) {
@@ -2435,7 +2448,7 @@ public class Player {
 		);
 	}
 
-	public double getBestiaryLevel() {
+	public int getBestiaryTier() {
 		int total = 0;
 		for (Map.Entry<String, List<String>> location : locations.entrySet()) {
 			for (String mob : location.getValue()) {
@@ -2451,7 +2464,11 @@ public class Player {
 						.currentLevel();
 			}
 		}
-		return total / 10.0;
+		return total;
+	}
+
+	public double getBestiaryLevel() {
+		return getBestiaryTier() / 10.0;
 	}
 
 	public enum WeightType {

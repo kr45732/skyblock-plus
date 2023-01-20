@@ -78,7 +78,6 @@ public class LevelSlashCommand extends SlashCommand {
 		}
 
 		LevelRecord coreTasks = getCoreTasksEmbed(player);
-		LevelRecord eventTasks = getEventTasks(player);
 		LevelRecord dungeonTasks = getDungeonTasks(player);
 		LevelRecord essenceShopTasks = getEssenceShopTasks(player);
 		LevelRecord slayingTasks = getSlayingTasks(player);
@@ -90,11 +89,10 @@ public class LevelSlashCommand extends SlashCommand {
 		eb.setDescription(
 			"**Level:** " +
 			roundAndFormat(player.getLevel()) +
-			"\n**Level Color:** ?" +
+			"\n**Level Color:** " +
+			player.getLevelColor() +
 			"\n\nCore Tasks: " +
 			coreTasks.total() +
-			"\nEvent Tasks: " +
-			eventTasks.total() +
 			"\nDungeon Tasks: " +
 			dungeonTasks.total() +
 			"\nEssence Shop Tasks: " +
@@ -112,7 +110,6 @@ public class LevelSlashCommand extends SlashCommand {
 		Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 		pages.put(SelectOption.of("Overview", "overview"), eb);
 		pages.put(SelectOption.of("Core Tasks", "core_tasks"), coreTasks.eb());
-		pages.put(SelectOption.of("Event Tasks", "event_tasks"), eventTasks.eb());
 		pages.put(SelectOption.of("Dungeon Tasks", "dungeon_tasks"), dungeonTasks.eb());
 		pages.put(SelectOption.of("Essence Shop Tasks", "essence_shop_tasks"), essenceShopTasks.eb());
 		pages.put(SelectOption.of("Slaying Tasks", "slaying_tasks"), slayingTasks.eb());
@@ -147,9 +144,6 @@ public class LevelSlashCommand extends SlashCommand {
 			}
 		}
 		eb.appendDescription("\nSkill Level Up: " + formatNumber(skillsSbXp) + " / 7,500");
-
-		// Museum
-		eb.appendDescription("\nMuseum Progression: ? / 2,700");
 
 		// Fairy souls
 		int fairySoulSbXp = player.getFairySouls() / 5 * 10;
@@ -205,32 +199,10 @@ public class LevelSlashCommand extends SlashCommand {
 		}
 		eb.appendDescription("\nCraft Minions: " + formatNumber(minionsSbXp) + " / 2,801");
 
-		// Bank upgrades
-		eb.appendDescription("\nBank Upgrades: ? / 200");
-
 		// Core tasks total
 		String totalSbXp =
 			formatNumber(skillsSbXp + fairySoulSbXp + magicPowerSbXp + petScoreSbXp + collectionsSbXp + minionsSbXp) + " / 15,430";
 		eb.getDescriptionBuilder().insert(0, "Core Tasks: " + totalSbXp + "\n");
-
-		return new LevelRecord(eb, totalSbXp);
-	}
-
-	private static LevelRecord getEventTasks(Player player) {
-		EmbedBuilder eb = player.defaultPlayerEmbed(" | Event Tasks");
-
-		// Mining fiesta
-		eb.appendDescription("\nMining Fiesta: ? / 200");
-
-		// Fishing festival
-		eb.appendDescription("\nFishing Festival: ? / 100");
-
-		// Spooky festival
-		eb.appendDescription("\nSpooky Festival: ? / 225");
-
-		// Event tasks total
-		String totalSbXp = "? / 525";
-		eb.getDescriptionBuilder().insert(0, "Event Tasks: " + totalSbXp + "\n");
 
 		return new LevelRecord(eb, totalSbXp);
 	}
@@ -300,8 +272,45 @@ public class LevelSlashCommand extends SlashCommand {
 	private static LevelRecord getEssenceShopTasks(Player player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Essence Shop Tasks");
 
+		int essenceSbXp = 0;
+		JsonArray essenceSteps = higherDepth(getSbLevelsJson(), "essence_shop_task.essence_shop_xp").getAsJsonArray();
+		JsonObject essencePerks = higherDepth(player.profileJson(), "perks").getAsJsonObject();
+
+		for (Map.Entry<String, JsonElement> essenceShop : getEssenceShopsJson().entrySet()) {
+			StringBuilder ebStr = new StringBuilder();
+			int shopSbXp = 0;
+			for (Map.Entry<String, JsonElement> upgrade : essenceShop.getValue().getAsJsonObject().entrySet()) {
+				int upgradeTier = higherDepth(essencePerks, upgrade.getKey(), 0);
+
+				int upgradeSbXp = 0;
+				for (int i = 0; i < upgradeTier; i++) {
+					upgradeSbXp += essenceSteps.get(i).getAsInt();
+				}
+
+				shopSbXp += upgradeSbXp;
+
+				ebStr
+					.append("\n")
+					.append(capitalizeString(upgrade.getKey().replace("_", " ")))
+					.append(": ")
+					.append(formatNumber(upgradeSbXp));
+			}
+
+			essenceSbXp += shopSbXp;
+
+			eb.addField(
+				capitalizeString(essenceShop.getKey().replace("_", " ")) +
+				" | " +
+				formatNumber(shopSbXp) +
+				" / " +
+				higherDepth(getSbLevelsJson(), "essence_shop_task." + essenceShop.getKey().toLowerCase() + "_shop").getAsInt(),
+				ebStr.toString(),
+				false
+			);
+		}
+
 		// Essence shop tasks total
-		String totalSbXp = formatNumber(0) + " / 856";
+		String totalSbXp = formatNumber(essenceSbXp) + " / 856";
 		eb.getDescriptionBuilder().insert(0, "Essence Shop Tasks: " + totalSbXp + "\n");
 
 		return new LevelRecord(eb, totalSbXp);
@@ -310,11 +319,172 @@ public class LevelSlashCommand extends SlashCommand {
 	private static LevelRecord getSlayingTasks(Player player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Slaying Tasks");
 
+		// Slayer level up
+		int slayerLevelUpSbXp = 0;
+		JsonArray slayerLevelUpXp = higherDepth(getSbLevelsJson(), "slaying_task.slayer_level_up_xp").getAsJsonArray();
+		for (String slayer : SLAYER_NAMES) {
+			int slayerLevel = player.getSlayerLevel(slayer);
+			for (int i = 0; i < slayerLevel; i++) {
+				slayerLevelUpSbXp += slayerLevelUpXp.get(i).getAsInt();
+			}
+		}
+
+		// Boss collections
+		int bossCollectionsSbXp = 0;
+
+		HashMap<String, Integer> floorToCompletions = new HashMap<>();
+		for (String type : List.of("catacombs", "master_catacombs")) {
+			JsonElement dungeonCompletions = higherDepth(player.profileJson(), "dungeons.dungeon_types." + type + ".tier_completions");
+			if (dungeonCompletions != null) {
+				for (Map.Entry<String, JsonElement> floorCompletions : dungeonCompletions.getAsJsonObject().entrySet()) {
+					floorToCompletions.compute(
+						floorCompletions.getKey(),
+						(k, v) -> (v == null ? 0 : v) + floorCompletions.getValue().getAsInt()
+					);
+				}
+			}
+		}
+
+		int[] bossLow = { 25, 50, 100, 150, 250, 1000 };
+		int[] thorn = { 25, 50, 150, 250, 400, 1000 };
+		int[] bossHigh = { 50, 100, 150, 250, 500, 750, 1000 };
+
+		for (Map.Entry<String, Integer> levelCompletions : floorToCompletions.entrySet()) {
+			bossCollectionsSbXp +=
+				switch (levelCompletions.getKey()) {
+					case "1", "2", "3" -> loopThroughCollection(bossLow, levelCompletions.getValue());
+					case "4" -> loopThroughCollection(thorn, levelCompletions.getValue());
+					case "5", "6", "7" -> loopThroughCollection(bossHigh, levelCompletions.getValue());
+					default -> 0;
+				};
+		}
+
+		// Kuudra
+		int defeatKuudraSbXp = 0;
+
+		JsonArray defeatKuudraXp = higherDepth(getSbLevelsJson(), "slaying_task.defeat_kuudra_xp").getAsJsonArray();
+		JsonElement kuudraTiers = higherDepth(player.profileJson(), "nether_island_player_data.kuudra_completed_tiers");
+		if (kuudraTiers != null) {
+			int kuudraBossCollection = 0;
+
+			for (Map.Entry<String, JsonElement> stringJsonElementEntry : kuudraTiers.getAsJsonObject().entrySet()) {
+				String key = stringJsonElementEntry.getKey();
+				int value = stringJsonElementEntry.getValue().getAsInt();
+				if (key.equals("none")) {
+					defeatKuudraSbXp += defeatKuudraXp.get(0).getAsInt();
+					kuudraBossCollection += value;
+				}
+				if (key.equals("hot")) {
+					defeatKuudraSbXp += defeatKuudraXp.get(1).getAsInt();
+					kuudraBossCollection += 2 * value;
+				}
+				if (key.equals("burning")) {
+					defeatKuudraSbXp += defeatKuudraXp.get(2).getAsInt();
+					kuudraBossCollection += 3 * value;
+				}
+				if (key.equals("fiery")) {
+					defeatKuudraSbXp += defeatKuudraXp.get(3).getAsInt();
+					kuudraBossCollection += 4 * value;
+				}
+				if (key.equals("infernal")) {
+					defeatKuudraSbXp += defeatKuudraXp.get(4).getAsInt();
+					kuudraBossCollection += 5 * value;
+				}
+			}
+
+			if (kuudraBossCollection >= 10) {
+				bossCollectionsSbXp += 10;
+			}
+			if (kuudraBossCollection >= 100) {
+				bossCollectionsSbXp += 15;
+			}
+			if (kuudraBossCollection >= 500) {
+				bossCollectionsSbXp += 20;
+			}
+			if (kuudraBossCollection >= 2000) {
+				bossCollectionsSbXp += 25;
+			}
+			if (kuudraBossCollection >= 5000) {
+				bossCollectionsSbXp += 30;
+			}
+		}
+
+		// Bestiary Progress
+		int bestiarySbXp = player.getBestiaryTier() + (int) player.getBestiaryLevel() * 2;
+
+		// Mythological Kills
+		int mythologicalKillsSbXp = Math.min(higherDepth(player.profileJson(), "stats.mythos_kills", 0), 10000) / 100;
+
+		// Slay dragons
+		int dragonSlaySbXp = 0;
+		for (Map.Entry<String, JsonElement> entry : higherDepth(getSbLevelsJson(), "slaying_task.slay_dragons_xp")
+			.getAsJsonObject()
+			.entrySet()) {
+			if (higherDepth(player.profileJson(), "bestiary.kills_" + entry.getKey() + "_100", 0) > 0) {
+				dragonSlaySbXp += entry.getValue().getAsInt();
+			}
+		}
+
+		// Slayer kills
+		int defeatSlayerSbXp = 0;
+		JsonArray defeatSlayersXp = higherDepth(getSbLevelsJson(), "slaying_task.defeat_slayers_xp").getAsJsonArray();
+		for (String slayer : SLAYER_NAMES) {
+			for (int i = 1; i <= 5; i++) {
+				if (player.getSlayerBossKills(slayer, i) > 0) {
+					defeatSlayerSbXp += defeatSlayersXp.get(i - 1).getAsInt();
+				}
+			}
+		}
+
+		// Arachne
+		int defeatedArachneSbXp = 0;
+		// Tier 1
+		if (higherDepth(player.profileJson(), "bestiary.kills_arachne_300", 0) > 0) {
+			defeatedArachneSbXp += 20;
+		}
+		// Tier 2
+		if (higherDepth(player.profileJson(), "bestiary.kills_arachne_500", 0) > 0) {
+			defeatedArachneSbXp += 40;
+		}
+
+		eb.appendDescription("\nSlayer Level Up: " + formatNumber(slayerLevelUpSbXp) + " / 3,625");
+		eb.appendDescription("\nBoss Collections: " + formatNumber(bossCollectionsSbXp) + " / 1,015");
+		eb.appendDescription("\nBestiary Progress: " + formatNumber(bestiarySbXp));
+		eb.appendDescription("\nMythological Kills: " + formatNumber(mythologicalKillsSbXp) + " / 100");
+		eb.appendDescription("\nSlay Dragon: " + formatNumber(dragonSlaySbXp) + " / 200");
+		eb.appendDescription("\nDefeat Slayers: " + formatNumber(defeatSlayerSbXp) + " / 825");
+		eb.appendDescription("\nDefeat Kuudra: " + formatNumber(defeatKuudraSbXp) + " / 300");
+		eb.appendDescription("\nDefeat Arachne: " + formatNumber(defeatedArachneSbXp) + " / 60");
+
 		// Slaying tasks total
-		String totalSbXp = formatNumber(0) + " / 6,125";
+		String totalSbXp =
+			formatNumber(
+				slayerLevelUpSbXp +
+				bossCollectionsSbXp +
+				bestiarySbXp +
+				mythologicalKillsSbXp +
+				dragonSlaySbXp +
+				defeatSlayerSbXp +
+				defeatKuudraSbXp +
+				defeatedArachneSbXp
+			) +
+			" / 6,125";
 		eb.getDescriptionBuilder().insert(0, "Slaying Tasks: " + totalSbXp + "\n");
 
 		return new LevelRecord(eb, totalSbXp);
+	}
+
+	private static int loopThroughCollection(int[] array, int value) {
+		JsonArray dungeonCollectionXp = higherDepth(getSbLevelsJson(), "slaying_task.boss_collections_xp.dungeon_collection_xp")
+			.getAsJsonArray();
+		int gain = 0;
+		for (int i = 0; i < array.length; i++) {
+			if (value >= array[i]) {
+				int gained = dungeonCollectionXp.get(i).getAsInt();
+				gain += gained;
+			}
+		}
+		return gain;
 	}
 
 	private static LevelRecord getSkillRelatedTasks(Player player) {
@@ -336,7 +506,8 @@ public class LevelSlashCommand extends SlashCommand {
 						case 4 -> 75;
 						case 5 -> 90;
 						case 6 -> 110;
-						default -> 130; // 7
+						case 7 -> 130;
+						default -> 0;
 					};
 			}
 		}
@@ -345,28 +516,28 @@ public class LevelSlashCommand extends SlashCommand {
 		// Powder
 		int powderSbXp = 0;
 
-		final double mithrilCap = 12500000D;
-		final double gemstoneCap = 20000000;
-		final int capStartValue = 350000;
+		final int mithrilCap = 12500000;
+		final int gemstoneCap = 20000000;
+		final int normalCap = 350000;
 
 		long mithrilPower =
 			higherDepth(player.profileJson(), "mining_core.powder_mithril", 0L) +
 			higherDepth(player.profileJson(), "mining_core.powder_spent_mithril", 0L);
-		powderSbXp += Math.min(mithrilPower, 350000) / 2400;
-		if (mithrilPower > 350000) {
+		powderSbXp += Math.min(mithrilPower, normalCap) / 2400;
+		if (mithrilPower > normalCap) {
 			powderSbXp +=
 				3.75 *
-				(Math.sqrt(1 + 8 * (Math.sqrt((1758267 / mithrilCap) * (Math.min(mithrilPower, mithrilCap) - capStartValue + 9)))) - 3);
+				(Math.sqrt(1 + 8 * (Math.sqrt((1758267.0 / mithrilCap) * (Math.min(mithrilPower, mithrilCap) - normalCap + 9)))) - 3);
 		}
 
 		long gemstonePowder =
 			higherDepth(player.profileJson(), "mining_core.powder_gemstone", 0L) +
 			higherDepth(player.profileJson(), "mining_core.powder_spent_gemstone", 0L);
-		powderSbXp += Math.min(gemstonePowder, 350000) / 2500;
-		if (powderSbXp > 350000) {
+		powderSbXp += Math.min(gemstonePowder, normalCap) / 2500;
+		if (powderSbXp > normalCap) {
 			powderSbXp +=
 				4.25 *
-				(Math.sqrt(1 + 8 * (Math.sqrt((1758267 / gemstoneCap) * (Math.min(gemstonePowder, gemstoneCap) - capStartValue + 9)))) - 3);
+				(Math.sqrt(1 + 8 * (Math.sqrt((1758267.0 / gemstoneCap) * (Math.min(gemstonePowder, gemstoneCap) - normalCap + 9)))) - 3);
 		}
 		miningStr += "\nPowder: " + formatNumber(powderSbXp) + " / 1,080";
 
@@ -400,7 +571,8 @@ public class LevelSlashCommand extends SlashCommand {
 					case 4 -> 65;
 					case 5 -> 75;
 					case 6 -> 100;
-					default -> 125; // 7
+					case 7 -> 125;
+					default -> 9;
 				};
 		}
 		miningStr += "\nPeak Of The Mountain: " + formatNumber(peakOfTheMountainSbXp) + " / 475";
@@ -461,10 +633,10 @@ public class LevelSlashCommand extends SlashCommand {
 		int[] dolphinMilestoneRequired = { 250, 1000, 2500, 5000, 10000 };
 		for (int milestone : dolphinMilestoneRequired) {
 			if (dolphinMilestoneXp >= milestone) {
-				dolphinPetSbXp += dolphinMilestoneXp;
+				dolphinPetSbXp += 20;
 			}
 		}
-		fishingStr += "\nDolphin Milestones: " + formatNumber(dolphinMilestoneXp) + " / 1,080";
+		fishingStr += "\nDolphin Milestones: " + formatNumber(dolphinPetSbXp) + " / 1,080";
 
 		int fishingTotalSbXp = trophyFishingSbXp + dolphinPetSbXp;
 		eb.addField("Fishing | " + formatNumber(fishingTotalSbXp), fishingStr, false);
@@ -606,24 +778,15 @@ public class LevelSlashCommand extends SlashCommand {
 				switch (i) {
 					case 2 -> 25;
 					case 3 -> 35;
-					default -> 50; // 4
+					case 4 -> 50;
+					default -> 0;
 				};
 		}
 		eb.appendDescription("\nPersonal Bank Upgrades: " + formatNumber(personalBankSbXp) + " / 110");
 
 		// Miscellaneous tasks total
 		String totalSbXp =
-			formatNumber(
-				accessoryBagUpgradeSbXp +
-				reaperPepperSbXp +
-				unlockingPowersSbXp +
-				dojoSbXp +
-				harpSbXp +
-				abiphoneSbXp +
-				communityShopSbXp +
-				personalBankSbXp
-			) +
-			" / 1,351";
+			formatNumber(reaperPepperSbXp + dojoSbXp + harpSbXp + abiphoneSbXp + communityShopSbXp + personalBankSbXp) + " / 1,351";
 		eb.getDescriptionBuilder().insert(0, "Miscellaneous Tasks: " + totalSbXp + "\n");
 
 		return new LevelRecord(eb, totalSbXp);

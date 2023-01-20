@@ -200,6 +200,8 @@ public class Utils {
 	private static JsonObject dungeonLootJson;
 	private static JsonObject dragonLootJson;
 	private static JsonObject weightJson;
+	private static JsonObject sbLevelsJson;
+	private static JsonObject essenceShopsJson;
 	/* Miscellaneous */
 	private static TextChannel botLogChannel;
 	private static TextChannel networthBugReportChannel;
@@ -411,6 +413,24 @@ public class Utils {
 		}
 
 		return weightJson;
+	}
+
+	public static JsonObject getSbLevelsJson() {
+		if (sbLevelsJson == null) {
+			sbLevelsJson =
+				getJsonObject("https://raw.githubusercontent.com/jani270/NotEnoughUpdates-REPO/c2JsZXZlbHMK/constants/sblevels.json"); //"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/sblevels.json");
+		}
+
+		return sbLevelsJson;
+	}
+
+	public static JsonObject getEssenceShopsJson() {
+		if (essenceShopsJson == null) {
+			essenceShopsJson =
+				getJsonObject("https://raw.githubusercontent.com/jani270/NotEnoughUpdates-REPO/master/constants/essenceshops.json");
+		}
+
+		return essenceShopsJson;
 	}
 
 	public static JsonObject getTalismanJson() {
