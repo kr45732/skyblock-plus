@@ -429,9 +429,9 @@ public class LevelSlashCommand extends SlashCommand {
 		int defeatSlayerSbXp = 0;
 		JsonArray defeatSlayersXp = higherDepth(getSbLevelsJson(), "slaying_task.defeat_slayers_xp").getAsJsonArray();
 		for (String slayer : SLAYER_NAMES) {
-			for (int i = 1; i <= 5; i++) {
+			for (int i = 0; i <= 4; i++) {
 				if (player.getSlayerBossKills(slayer, i) > 0) {
-					defeatSlayerSbXp += defeatSlayersXp.get(i - 1).getAsInt();
+					defeatSlayerSbXp += defeatSlayersXp.get(i).getAsInt();
 				}
 			}
 		}
@@ -520,21 +520,21 @@ public class LevelSlashCommand extends SlashCommand {
 		final int gemstoneCap = 20000000;
 		final int normalCap = 350000;
 
-		long mithrilPower =
+		long mithrilPowder =
 			higherDepth(player.profileJson(), "mining_core.powder_mithril", 0L) +
 			higherDepth(player.profileJson(), "mining_core.powder_spent_mithril", 0L);
-		powderSbXp += Math.min(mithrilPower, normalCap) / 2400;
-		if (mithrilPower > normalCap) {
+		powderSbXp += Math.min(mithrilPowder, normalCap) / 2400;
+		if (mithrilPowder > normalCap) {
 			powderSbXp +=
 				3.75 *
-				(Math.sqrt(1 + 8 * (Math.sqrt((1758267.0 / mithrilCap) * (Math.min(mithrilPower, mithrilCap) - normalCap + 9)))) - 3);
+				(Math.sqrt(1 + 8 * (Math.sqrt((1758267.0 / mithrilCap) * (Math.min(mithrilPowder, mithrilCap) - normalCap + 9)))) - 3);
 		}
 
 		long gemstonePowder =
 			higherDepth(player.profileJson(), "mining_core.powder_gemstone", 0L) +
 			higherDepth(player.profileJson(), "mining_core.powder_spent_gemstone", 0L);
 		powderSbXp += Math.min(gemstonePowder, normalCap) / 2500;
-		if (powderSbXp > normalCap) {
+		if (gemstonePowder > normalCap) {
 			powderSbXp +=
 				4.25 *
 				(Math.sqrt(1 + 8 * (Math.sqrt((1758267.0 / gemstoneCap) * (Math.min(gemstonePowder, gemstoneCap) - normalCap + 9)))) - 3);
@@ -636,13 +636,13 @@ public class LevelSlashCommand extends SlashCommand {
 				dolphinPetSbXp += 20;
 			}
 		}
-		fishingStr += "\nDolphin Milestones: " + formatNumber(dolphinPetSbXp) + " / 1,080";
+		fishingStr += "\nDolphin Milestones: " + formatNumber(dolphinPetSbXp) + " / 100";
 
 		int fishingTotalSbXp = trophyFishingSbXp + dolphinPetSbXp;
 		eb.addField("Fishing | " + formatNumber(fishingTotalSbXp), fishingStr, false);
 
 		// Total xp
-		String totalSbXp = formatNumber(miningTotalSbXp + anitaShopUpgradeSbXp + fishingTotalSbXp) + " / 1,180";
+		String totalSbXp = formatNumber(miningTotalSbXp + anitaShopUpgradeSbXp + fishingTotalSbXp) + " / 4,085";
 		eb.getDescriptionBuilder().insert(0, "Skill Related Tasks: " + totalSbXp + "\n");
 
 		return new LevelRecord(eb, totalSbXp);
@@ -772,13 +772,14 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Personal bank upgrades
 		int personalBankSbXp = 0;
+		// Field is zero indexed
 		int personalBankUpgrade = higherDepth(player.profileJson(), "personal_bank_upgrade", 0);
-		for (int i = 2; i <= personalBankUpgrade; i++) {
+		for (int i = 1; i <= personalBankUpgrade; i++) {
 			personalBankSbXp +=
 				switch (i) {
-					case 2 -> 25;
-					case 3 -> 35;
-					case 4 -> 50;
+					case 1 -> 25;
+					case 2 -> 35;
+					case 3 -> 50;
 					default -> 0;
 				};
 		}

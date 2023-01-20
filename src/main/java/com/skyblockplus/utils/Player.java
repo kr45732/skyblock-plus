@@ -1323,24 +1323,30 @@ public class Player {
 	}
 
 	public int getTotalSlayer(String type, int overrideAmount) {
-		return (
-			(type.equals("sven") ? overrideAmount : getSlayer("sven")) +
-			(type.equals("rev") ? overrideAmount : getSlayer("rev")) +
-			(type.equals("tara") ? overrideAmount : getSlayer("tara")) +
-			(type.equals("enderman") ? overrideAmount : getSlayer("enderman")) +
-			(type.equals("blaze") ? overrideAmount : getSlayer("blaze"))
-		);
+		int totalSlayer = 0;
+		for (String slayerName : SLAYER_NAMES) {
+			if (slayerName.equals(type)) {
+				totalSlayer += overrideAmount;
+			} else {
+				totalSlayer += getSlayer(slayerName);
+			}
+		}
+		return totalSlayer;
 	}
 
 	public int getSlayerBossKills(String slayerName, int tier) {
-		return higherDepth(profileJson(), "slayer_bosses." + slayerName + ".boss_kills_tier_" + tier, 0);
+		return higherDepth(
+			profileJson(),
+			"slayer_bosses." + SLAYER_NAMES_MAP.getOrDefault(slayerName, slayerName) + ".boss_kills_tier_" + tier,
+			0
+		);
 	}
 
 	/**
 	 * @param slayerName sven, rev, tara, enderman
 	 */
 	public int getSlayer(String slayerName) {
-		return higherDepth(profileJson(), "slayer_bosses." + SLAYER_NAMES_MAP.get(slayerName) + ".xp", 0);
+		return higherDepth(profileJson(), "slayer_bosses." + SLAYER_NAMES_MAP.getOrDefault(slayerName, slayerName) + ".xp", 0);
 	}
 
 	public int getSlayerLevel(String slayerName) {
@@ -1348,7 +1354,8 @@ public class Player {
 	}
 
 	public int getSlayerLevel(String slayerName, int xp) {
-		JsonArray levelArray = higherDepth(getLevelingJson(), "slayer_xp." + SLAYER_NAMES_MAP.get(slayerName)).getAsJsonArray();
+		JsonArray levelArray = higherDepth(getLevelingJson(), "slayer_xp." + SLAYER_NAMES_MAP.getOrDefault(slayerName, slayerName))
+			.getAsJsonArray();
 		int level = 0;
 		for (int i = 0; i < levelArray.size(); i++) {
 			if (xp >= levelArray.get(i).getAsInt()) {
