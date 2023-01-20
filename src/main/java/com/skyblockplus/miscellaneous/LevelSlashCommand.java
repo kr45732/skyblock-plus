@@ -85,27 +85,43 @@ public class LevelSlashCommand extends SlashCommand {
 		LevelRecord miscellaneousTasks = getMiscellaneousTasks(player);
 		LevelRecord storyTasks = getStoryTasks(player);
 
-		EmbedBuilder eb = player.defaultPlayerEmbed();
-		eb.setDescription(
-			"**Level:** " +
-			roundAndFormat(player.getLevel()) +
-			"\n**Level Color:** " +
-			player.getLevelColor() +
-			"\n\nCore Tasks: " +
-			coreTasks.total() +
-			"\nDungeon Tasks: " +
-			dungeonTasks.total() +
-			"\nEssence Shop Tasks: " +
-			essenceShopTasks.total() +
-			"\nSlaying Tasks: " +
-			slayingTasks.total() +
-			"\nSkill Related Tasks: " +
-			skillRelatedTasks.total() +
-			"\nMiscellaneous Tasks: " +
-			miscellaneousTasks.total() +
-			"\nStory Tasks: " +
-			storyTasks.total()
-		);
+		double apiSbLevel = player.getLevel();
+		double calculatedSbLevel =
+			(
+				coreTasks.total() +
+				dungeonTasks.total() +
+				essenceShopTasks.total() +
+				slayingTasks.total() +
+				skillRelatedTasks.total() +
+				miscellaneousTasks.total() +
+				storyTasks.total()
+			) /
+			100.0;
+
+		EmbedBuilder eb = player
+			.defaultPlayerEmbed()
+			.setDescription(
+				"**" +
+				(apiSbLevel == 0 ? "Estimated " : "") +
+				"Level:** " +
+				roundAndFormat(apiSbLevel == 0 ? calculatedSbLevel : apiSbLevel) +
+				"\n**Level Color:** " +
+				player.getLevelColor() +
+				"\n\nCore Tasks: " +
+				coreTasks.getFormatted() +
+				"\nDungeon Tasks: " +
+				dungeonTasks.getFormatted() +
+				"\nEssence Shop Tasks: " +
+				essenceShopTasks.getFormatted() +
+				"\nSlaying Tasks: " +
+				slayingTasks.getFormatted() +
+				"\nSkill Related Tasks: " +
+				skillRelatedTasks.getFormatted() +
+				"\nMiscellaneous Tasks: " +
+				miscellaneousTasks.getFormatted() +
+				"\nStory Tasks: " +
+				storyTasks.getFormatted()
+			);
 
 		Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 		pages.put(SelectOption.of("Overview", "overview"), eb);
@@ -200,11 +216,14 @@ public class LevelSlashCommand extends SlashCommand {
 		eb.appendDescription("\nCraft Minions: " + formatNumber(minionsSbXp) + " / 2,801");
 
 		// Core tasks total
-		String totalSbXp =
-			formatNumber(skillsSbXp + fairySoulSbXp + magicPowerSbXp + petScoreSbXp + collectionsSbXp + minionsSbXp) + " / 15,430";
-		eb.getDescriptionBuilder().insert(0, "Core Tasks: " + totalSbXp + "\n");
+		LevelRecord levelRecord = new LevelRecord(
+			eb,
+			skillsSbXp + fairySoulSbXp + magicPowerSbXp + petScoreSbXp + collectionsSbXp + minionsSbXp,
+			15430
+		);
+		eb.getDescriptionBuilder().insert(0, "Core Tasks: " + levelRecord.getFormatted() + "\n");
 
-		return new LevelRecord(eb, totalSbXp);
+		return levelRecord;
 	}
 
 	private static LevelRecord getDungeonTasks(Player player) {
@@ -263,10 +282,10 @@ public class LevelSlashCommand extends SlashCommand {
 		eb.appendDescription("\nComplete The Catacombs Master Mode: " + formatNumber(masterFloorCompletionSbXp) + " / 350");
 
 		// Dungeon tasks total
-		String totalSbXp = formatNumber(catacombsSbXp + classSbXp + floorCompletionSbXp + masterFloorCompletionSbXp) + " / 2,760";
-		eb.getDescriptionBuilder().insert(0, "Dungeon Tasks: " + totalSbXp + "\n");
+		LevelRecord levelRecord = new LevelRecord(eb, catacombsSbXp + classSbXp + floorCompletionSbXp + masterFloorCompletionSbXp, 2760);
+		eb.getDescriptionBuilder().insert(0, "Dungeon Tasks: " + levelRecord.getFormatted() + "\n");
 
-		return new LevelRecord(eb, totalSbXp);
+		return levelRecord;
 	}
 
 	private static LevelRecord getEssenceShopTasks(Player player) {
@@ -310,10 +329,10 @@ public class LevelSlashCommand extends SlashCommand {
 		}
 
 		// Essence shop tasks total
-		String totalSbXp = formatNumber(essenceSbXp) + " / 856";
-		eb.getDescriptionBuilder().insert(0, "Essence Shop Tasks: " + totalSbXp + "\n");
+		LevelRecord levelRecord = new LevelRecord(eb, essenceSbXp, 856);
+		eb.getDescriptionBuilder().insert(0, "Essence Shop Tasks: " + levelRecord.getFormatted() + "\n");
 
-		return new LevelRecord(eb, totalSbXp);
+		return levelRecord;
 	}
 
 	private static LevelRecord getSlayingTasks(Player player) {
@@ -457,21 +476,21 @@ public class LevelSlashCommand extends SlashCommand {
 		eb.appendDescription("\nDefeat Arachne: " + formatNumber(defeatedArachneSbXp) + " / 60");
 
 		// Slaying tasks total
-		String totalSbXp =
-			formatNumber(
-				slayerLevelUpSbXp +
-				bossCollectionsSbXp +
-				bestiarySbXp +
-				mythologicalKillsSbXp +
-				dragonSlaySbXp +
-				defeatSlayerSbXp +
-				defeatKuudraSbXp +
-				defeatedArachneSbXp
-			) +
-			" / 6,125";
-		eb.getDescriptionBuilder().insert(0, "Slaying Tasks: " + totalSbXp + "\n");
+		LevelRecord levelRecord = new LevelRecord(
+			eb,
+			slayerLevelUpSbXp +
+			bossCollectionsSbXp +
+			bestiarySbXp +
+			mythologicalKillsSbXp +
+			dragonSlaySbXp +
+			defeatSlayerSbXp +
+			defeatKuudraSbXp +
+			defeatedArachneSbXp,
+			6125
+		);
+		eb.getDescriptionBuilder().insert(0, "Slaying Tasks: " + levelRecord.getFormatted() + "\n");
 
-		return new LevelRecord(eb, totalSbXp);
+		return levelRecord;
 	}
 
 	private static int loopThroughCollection(int[] array, int value) {
@@ -642,10 +661,10 @@ public class LevelSlashCommand extends SlashCommand {
 		eb.addField("Fishing | " + formatNumber(fishingTotalSbXp), fishingStr, false);
 
 		// Total xp
-		String totalSbXp = formatNumber(miningTotalSbXp + anitaShopUpgradeSbXp + fishingTotalSbXp) + " / 4,085";
-		eb.getDescriptionBuilder().insert(0, "Skill Related Tasks: " + totalSbXp + "\n");
+		LevelRecord levelRecord = new LevelRecord(eb, miningTotalSbXp + anitaShopUpgradeSbXp + fishingTotalSbXp, 4085);
+		eb.getDescriptionBuilder().insert(0, "Skill Related Tasks: " + levelRecord.getFormatted() + "\n");
 
-		return new LevelRecord(eb, totalSbXp);
+		return levelRecord;
 	}
 
 	private static LevelRecord getMiscellaneousTasks(Player player) {
@@ -786,11 +805,16 @@ public class LevelSlashCommand extends SlashCommand {
 		eb.appendDescription("\nPersonal Bank Upgrades: " + formatNumber(personalBankSbXp) + " / 110");
 
 		// Miscellaneous tasks total
-		String totalSbXp =
-			formatNumber(reaperPepperSbXp + dojoSbXp + harpSbXp + abiphoneSbXp + communityShopSbXp + personalBankSbXp) + " / 1,351";
-		eb.getDescriptionBuilder().insert(0, "Miscellaneous Tasks: " + totalSbXp + "\n");
+		int categoryTotalSbXp = reaperPepperSbXp + dojoSbXp + harpSbXp + abiphoneSbXp + communityShopSbXp + personalBankSbXp;
+		LevelRecord levelRecord = new LevelRecord(
+			eb,
+			categoryTotalSbXp + accessoryBagUpgradeSbXp + unlockingPowersSbXp,
+			categoryTotalSbXp,
+			1351
+		);
+		eb.getDescriptionBuilder().insert(0, "Miscellaneous Tasks: " + levelRecord.getFormatted() + "\n");
 
-		return new LevelRecord(eb, totalSbXp);
+		return levelRecord;
 	}
 
 	private static LevelRecord getStoryTasks(Player player) {
@@ -835,11 +859,19 @@ public class LevelSlashCommand extends SlashCommand {
 		eb.appendDescription("\nComplete Objectives: " + formatNumber(objectivesSbXp) + " / 105");
 
 		// Story tasks total
-		String totalSbXp = formatNumber(objectivesSbXp) + " / 105";
-		eb.getDescriptionBuilder().insert(0, "Story Tasks: " + totalSbXp + "\n");
+		LevelRecord levelRecord = new LevelRecord(eb, objectivesSbXp, 105);
+		eb.getDescriptionBuilder().insert(0, "Story Tasks: " + levelRecord.getFormatted() + "\n");
 
-		return new LevelRecord(eb, totalSbXp);
+		return levelRecord;
 	}
 
-	private record LevelRecord(EmbedBuilder eb, String total) {}
+	private record LevelRecord(EmbedBuilder eb, int total, int categoryTotal, int max) {
+		public LevelRecord(EmbedBuilder eb, int total, int max) {
+			this(eb, total, total, max);
+		}
+
+		public String getFormatted() {
+			return formatNumber(categoryTotal) + " / " + formatNumber(max);
+		}
+	}
 }

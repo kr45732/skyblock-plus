@@ -411,7 +411,7 @@ public class SetupCommandHandler {
 							event
 								.getHook()
 								.editOriginalEmbeds(defaultEmbed("Success").setDescription("Enabled guild member counter").build())
-								.queue();
+								.queue(ignore, ignore);
 							return true;
 						} else {
 							event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again").build()).queue();
@@ -468,7 +468,7 @@ public class SetupCommandHandler {
 								}
 								event.getHook().editOriginalEmbeds(defaultEmbed("Error").setDescription(msg).build()).queue();
 							}
-							event.getMessage().editMessageComponents().queue();
+							event.getMessage().editMessageComponents().queue(ignore, ignore);
 							return true;
 						} else {
 							event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
@@ -685,7 +685,7 @@ public class SetupCommandHandler {
 								.getHook()
 								.editOriginalEmbeds(defaultEmbed("Success").setDescription("Enabled jacob notifications.").build())
 								.queue();
-							event.getMessage().editMessageComponents().queue();
+							event.getMessage().editMessageComponents().queue(ignore, ignore);
 							return true;
 						}
 						event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
@@ -776,7 +776,7 @@ public class SetupCommandHandler {
 							.getHook()
 							.editOriginalEmbeds(defaultEmbed("Success").setDescription("Enabled guild member role sync.").build())
 							.queue();
-						event.getMessage().editMessageComponents().queue();
+						event.getMessage().editMessageComponents().queue(ignore, ignore);
 						return true;
 					}
 				}
@@ -932,7 +932,7 @@ public class SetupCommandHandler {
 							.getHook()
 							.editOriginalEmbeds(defaultEmbed("Success").setDescription("Enabled guild ranks sync.").build())
 							.queue();
-						event.getMessage().editMessageComponents().queue();
+						event.getMessage().editMessageComponents().queue(ignore, ignore);
 						return true;
 					}
 				}

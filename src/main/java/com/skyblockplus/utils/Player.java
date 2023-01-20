@@ -1554,7 +1554,7 @@ public class Player {
 				);
 				invItemStruct.setId("PET");
 				if (higherDepth(pet, "skin", null) != null) {
-					invItemStruct.addExtraValue("PET_SKIN_" + higherDepth(pet, "skin").getAsString());
+					invItemStruct.setSkin("PET_SKIN_" + higherDepth(pet, "skin").getAsString());
 				}
 				invItemStruct.setRarity(tier);
 				if (higherDepth(pet, "heldItem", null) != null) {
