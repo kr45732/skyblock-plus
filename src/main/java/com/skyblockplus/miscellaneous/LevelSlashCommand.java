@@ -345,18 +345,29 @@ public class LevelSlashCommand extends SlashCommand {
 		// Powder
 		int powderSbXp = 0;
 
-		long mithrilPower = higherDepth(player.profileJson(), "mining_core.powder_spent_mithril", 0L);
+		final double mithrilCap = 12500000D;
+		final double gemstoneCap = 20000000;
+		final int capStartValue = 350000;
+
+		long mithrilPower =
+			higherDepth(player.profileJson(), "mining_core.powder_mithril", 0L) +
+			higherDepth(player.profileJson(), "mining_core.powder_spent_mithril", 0L);
 		powderSbXp += Math.min(mithrilPower, 350000) / 2400;
-		powderSbXp +=
-			mithrilPower <= 350000 ? 0 : 3.75 * (Math.sqrt(1 + 8 * (Math.sqrt((1758267 / 12500000D) * (mithrilPower - 350000) + 9))) - 3);
+		if (mithrilPower > 350000) {
+			powderSbXp +=
+				3.75 *
+				(Math.sqrt(1 + 8 * (Math.sqrt((1758267 / mithrilCap) * (Math.min(mithrilPower, mithrilCap) - capStartValue + 9)))) - 3);
+		}
 
-		long gemstonePowder = higherDepth(player.profileJson(), "mining_core.powder_spent_gemstone", 0L);
+		long gemstonePowder =
+			higherDepth(player.profileJson(), "mining_core.powder_gemstone", 0L) +
+			higherDepth(player.profileJson(), "mining_core.powder_spent_gemstone", 0L);
 		powderSbXp += Math.min(gemstonePowder, 350000) / 2500;
-		powderSbXp +=
-			gemstonePowder <= 350000
-				? 0
-				: 4.25 * (Math.sqrt(1 + 8 * (Math.sqrt((1758267 / 20000000D) * (gemstonePowder - 350000) + 9))) - 3);
-
+		if (powderSbXp > 350000) {
+			powderSbXp +=
+				4.25 *
+				(Math.sqrt(1 + 8 * (Math.sqrt((1758267 / gemstoneCap) * (Math.min(gemstonePowder, gemstoneCap) - capStartValue + 9)))) - 3);
+		}
 		miningStr += "\nPowder: " + formatNumber(powderSbXp) + " / 1,080";
 
 		// Commissions
