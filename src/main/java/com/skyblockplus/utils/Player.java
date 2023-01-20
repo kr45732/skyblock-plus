@@ -2039,8 +2039,7 @@ public class Player {
 		return higherDepth(profileJson(), "leveling.experience", 0) / 100.0;
 	}
 
-	public String getLevelColor() {
-		int level = (int) getLevel();
+	public String getLevelColor(int level) {
 		String color = "None";
 		for (Map.Entry<String, JsonElement> colorReq : higherDepth(getSbLevelsJson(), "sblevel_colours").getAsJsonObject().entrySet()) {
 			if (Integer.parseInt(colorReq.getKey()) > level) {

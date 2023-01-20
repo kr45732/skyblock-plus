@@ -33,6 +33,7 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -98,15 +99,19 @@ public class LevelSlashCommand extends SlashCommand {
 			) /
 			100.0;
 
+		double displaySbLevel = apiSbLevel == 0 ? calculatedSbLevel : apiSbLevel;
+
 		EmbedBuilder eb = player
 			.defaultPlayerEmbed()
 			.setDescription(
 				"**" +
 				(apiSbLevel == 0 ? "Estimated " : "") +
 				"Level:** " +
-				roundAndFormat(apiSbLevel == 0 ? calculatedSbLevel : apiSbLevel) +
-				"\n**Level Color:** " +
-				player.getLevelColor() +
+				roundAndFormat(displaySbLevel) +
+				"\n**" +
+				(apiSbLevel == 0 ? "Estimated " : "") +
+				"Level Color:** " +
+				player.getLevelColor((int) displaySbLevel) +
 				"\n\nCore Tasks: " +
 				coreTasks.getFormatted() +
 				"\nDungeon Tasks: " +
@@ -125,13 +130,25 @@ public class LevelSlashCommand extends SlashCommand {
 
 		Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 		pages.put(SelectOption.of("Overview", "overview"), eb);
-		pages.put(SelectOption.of("Core Tasks", "core_tasks"), coreTasks.eb());
-		pages.put(SelectOption.of("Dungeon Tasks", "dungeon_tasks"), dungeonTasks.eb());
-		pages.put(SelectOption.of("Essence Shop Tasks", "essence_shop_tasks"), essenceShopTasks.eb());
-		pages.put(SelectOption.of("Slaying Tasks", "slaying_tasks"), slayingTasks.eb());
-		pages.put(SelectOption.of("Skill Related Tasks", "skill_related_tasks"), skillRelatedTasks.eb());
-		pages.put(SelectOption.of("Miscellaneous Tasks", "miscellaneous_tasks"), miscellaneousTasks.eb());
-		pages.put(SelectOption.of("Story Tasks", "story_tasks"), storyTasks.eb());
+		pages.put(SelectOption.of("Core Tasks", "core_tasks").withEmoji(getEmojiObj("NETHER_STAR")), coreTasks.eb());
+		pages.put(
+			SelectOption.of("Dungeon Tasks", "dungeon_tasks").withEmoji(Emoji.fromFormatted(DUNGEON_EMOJI_MAP.get("catacombs"))),
+			dungeonTasks.eb()
+		);
+		pages.put(
+			SelectOption.of("Essence Shop Tasks", "essence_shop_tasks").withEmoji(Emoji.fromFormatted(ESSENCE_EMOJI_MAP.get("wither"))),
+			essenceShopTasks.eb()
+		);
+		pages.put(SelectOption.of("Slaying Tasks", "slaying_tasks").withEmoji(getEmojiObj("GOLD_SWORD")), slayingTasks.eb());
+		pages.put(
+			SelectOption.of("Skill Related Tasks", "skill_related_tasks").withEmoji(getEmojiObj("DIAMOND_SWORD")),
+			skillRelatedTasks.eb()
+		);
+		pages.put(
+			SelectOption.of("Miscellaneous Tasks", "miscellaneous_tasks").withEmoji(getEmojiObj("EMPTY_MAP")),
+			miscellaneousTasks.eb()
+		);
+		pages.put(SelectOption.of("Story Tasks", "story_tasks").withEmoji(getEmojiObj("BOOK_AND_QUILL")), storyTasks.eb());
 
 		new SelectMenuPaginator("overview", new PaginatorExtras().setSelectPages(pages), event);
 
@@ -221,7 +238,7 @@ public class LevelSlashCommand extends SlashCommand {
 			skillsSbXp + fairySoulSbXp + magicPowerSbXp + petScoreSbXp + collectionsSbXp + minionsSbXp,
 			15430
 		);
-		eb.getDescriptionBuilder().insert(0, "Core Tasks: " + levelRecord.getFormatted() + "\n");
+		eb.getDescriptionBuilder().insert(0, "**Core Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -283,7 +300,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Dungeon tasks total
 		LevelRecord levelRecord = new LevelRecord(eb, catacombsSbXp + classSbXp + floorCompletionSbXp + masterFloorCompletionSbXp, 2760);
-		eb.getDescriptionBuilder().insert(0, "Dungeon Tasks: " + levelRecord.getFormatted() + "\n");
+		eb.getDescriptionBuilder().insert(0, "**Dungeon Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -318,8 +335,8 @@ public class LevelSlashCommand extends SlashCommand {
 			essenceSbXp += shopSbXp;
 
 			eb.addField(
-				capitalizeString(essenceShop.getKey().replace("_", " ")) +
-				" | " +
+				capitalizeString(essenceShop.getKey().split("_")[1]) +
+				" Essence | " +
 				formatNumber(shopSbXp) +
 				" / " +
 				higherDepth(getSbLevelsJson(), "essence_shop_task." + essenceShop.getKey().toLowerCase() + "_shop").getAsInt(),
@@ -330,7 +347,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Essence shop tasks total
 		LevelRecord levelRecord = new LevelRecord(eb, essenceSbXp, 856);
-		eb.getDescriptionBuilder().insert(0, "Essence Shop Tasks: " + levelRecord.getFormatted() + "\n");
+		eb.getDescriptionBuilder().insert(0, "**Essence Shop Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -488,7 +505,7 @@ public class LevelSlashCommand extends SlashCommand {
 			defeatedArachneSbXp,
 			6125
 		);
-		eb.getDescriptionBuilder().insert(0, "Slaying Tasks: " + levelRecord.getFormatted() + "\n");
+		eb.getDescriptionBuilder().insert(0, "**Slaying Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -662,7 +679,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Total xp
 		LevelRecord levelRecord = new LevelRecord(eb, miningTotalSbXp + anitaShopUpgradeSbXp + fishingTotalSbXp, 4085);
-		eb.getDescriptionBuilder().insert(0, "Skill Related Tasks: " + levelRecord.getFormatted() + "\n");
+		eb.getDescriptionBuilder().insert(0, "**Skill Related Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -812,7 +829,7 @@ public class LevelSlashCommand extends SlashCommand {
 			categoryTotalSbXp,
 			1351
 		);
-		eb.getDescriptionBuilder().insert(0, "Miscellaneous Tasks: " + levelRecord.getFormatted() + "\n");
+		eb.getDescriptionBuilder().insert(0, "**Miscellaneous Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -860,7 +877,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Story tasks total
 		LevelRecord levelRecord = new LevelRecord(eb, objectivesSbXp, 105);
-		eb.getDescriptionBuilder().insert(0, "Story Tasks: " + levelRecord.getFormatted() + "\n");
+		eb.getDescriptionBuilder().insert(0, "**Story Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
