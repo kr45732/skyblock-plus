@@ -1387,6 +1387,7 @@ public class SettingsExecute {
 			"networth",
 			"gamemode",
 			"maxed_collections",
+			"player_items",
 			"mage_rep",
 			"barbarian_rep",
 			"level"
