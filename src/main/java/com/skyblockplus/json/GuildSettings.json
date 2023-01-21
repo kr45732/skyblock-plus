@@ -447,8 +447,8 @@
           "requirements": [
             [
               {
-                "amount": 150000,
-                "type": "gxp"
+                "amount": 2500,
+                "type": "weight"
               }
             ]
           ],
@@ -460,8 +460,50 @@
           "requirements": [
             [
               {
-                "amount": 300000,
-                "type": "gxp"
+                "amount": 4500,
+                "type": "weight"
+              }
+            ]
+          ],
+          "names": [
+            "apprentice"
+          ]
+        }
+      ]
+    }
+  }, 
+  "63cae4db8ea8c999a1004b22": {
+    "name": "Skill N Chill 2",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "skilled",
+        "master"
+      ],
+      "default_rank": {
+        "requirements" : [],
+        "names": ["novice"]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 2500,
+                "type": "weight"
+              }
+            ]
+          ],
+          "names": [
+            "rookie"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 4500,
+                "type": "weight"
               }
             ]
           ],
