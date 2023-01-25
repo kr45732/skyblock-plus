@@ -2041,14 +2041,37 @@ public class Player {
 
 	public String getLevelColor(int level) {
 		String color = "None";
-		for (Map.Entry<String, JsonElement> colorReq : higherDepth(getSbLevelsJson(), "sblevel_colours").getAsJsonObject().entrySet()) {
-			if (Integer.parseInt(colorReq.getKey()) > level) {
+		for (Map.Entry<Integer, String> colorReq : Maps
+			.of(
+				1,
+				"Default",
+				40,
+				"Common",
+				80,
+				"Uncommon",
+				120,
+				"Rare",
+				160,
+				"Epic",
+				200,
+				"Legendary",
+				240,
+				"Mythic",
+				280,
+				"Device",
+				320,
+				"Special",
+				360,
+				"Very Special"
+			)
+			.entrySet()) {
+			if (level >= colorReq.getKey()) {
+				color = colorReq.getValue();
+			} else {
 				break;
 			}
-
-			color = colorReq.getValue().getAsString();
 		}
-		return capitalizeString(color.replace("_", " "));
+		return color;
 	}
 
 	public int getMagicPower() {

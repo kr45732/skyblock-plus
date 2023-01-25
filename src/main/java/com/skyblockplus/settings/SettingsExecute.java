@@ -297,6 +297,12 @@ public class SettingsExecute {
 							case "disable" -> setVerifySyncEnable(false);
 							default -> null;
 						};
+					case "roles_sync" -> eb =
+						switch (args[3]) {
+							case "enable" -> setVerifyRolesSyncEnable(true);
+							case "disable" -> setVerifyRolesSyncEnable(false);
+							default -> null;
+						};
 					case "video" -> eb =
 						switch (args[3]) {
 							case "enable" -> setVerifyVideoEnable(true);
@@ -1943,7 +1949,8 @@ public class SettingsExecute {
 		ebFieldString += "\n• **Verified Remove Role:** " + displaySettings(verifySettings, "verifiedRemoveRole");
 		ebFieldString += "\n• **Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
 		ebFieldString += "\n• **Automatic Sync:** " + displaySettings(verifySettings, "enableAutomaticSync");
-		if (higherDepth(verifySettings, "enableAutomaticSync", false)) {
+		ebFieldString += "\n• **Automatic Roles Sync:** " + displaySettings(verifySettings, "enableAutomaticRolesSync");
+		if (higherDepth(verifySettings, "enableAutomaticSync", false) || higherDepth(verifySettings, "enableAutomaticRolesSync", false)) {
 			ebFieldString += "\n• **DM On Automatic Sync:** " + displaySettings(verifySettings, "dmOnSync");
 		}
 		ebFieldString += "\n• **Automatic Roles Claim:** " + displaySettings(verifySettings, "enableRolesClaim");
@@ -1953,13 +1960,15 @@ public class SettingsExecute {
 	public EmbedBuilder setVerifyEnable(boolean enable) {
 		if (enable) {
 			JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
-			currentSettings.remove("previousMessageId");
-			currentSettings.remove("verifiedNickname");
-			currentSettings.remove("enableAutomaticSync");
-			currentSettings.remove("verifiedRemoveRole");
+
+			List<String> toCheck = List.of("messageText", "messageTextChannelId", "verifiedRoles");
 
 			try {
 				for (Entry<String, JsonElement> key : currentSettings.entrySet()) {
+					if (!toCheck.contains(key.getKey())) {
+						continue;
+					}
+
 					if (
 						(key.getValue().isJsonPrimitive() && key.getValue().getAsString().isEmpty()) ||
 						(key.getValue().isJsonArray() && key.getValue().getAsJsonArray().isEmpty())
@@ -2183,6 +2192,34 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Automatic sync " + (enable ? "enabled" : "disabled"));
+	}
+
+	public EmbedBuilder setVerifyRolesSyncEnable(boolean enable) {
+		if (enable) {
+			if (!author.getId().equals(client.getOwnerId())) {
+				return invalidEmbed("This can only be enabled by the developer");
+			}
+
+			JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
+
+			if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
+				return invalidEmbed("Automatic roles must be enabled");
+			}
+
+			EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
+			if (eb != null) {
+				return invalidEmbed(
+					"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to enable automatic roles sync"
+				);
+			}
+		}
+
+		int responseCode = updateVerifySettings("enableAutomaticRolesSync", "" + enable);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Automatic roles sync " + (enable ? "enabled" : "disabled"));
 	}
 
 	public EmbedBuilder setVerifyVideoEnable(boolean enable) {

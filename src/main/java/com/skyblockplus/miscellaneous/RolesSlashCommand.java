@@ -55,7 +55,7 @@ public class RolesSlashCommand extends SlashCommand {
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		switch (event.getSubcommandName()) {
-			case "claim" -> event.embed(updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember()));
+			case "claim" -> event.embed(updateRoles(event.getOptionStr("profile"), event.getMember()));
 			case "list" -> event.paginate(listRoles(event));
 			default -> event.invalidCommandMessage();
 		}
@@ -79,11 +79,15 @@ public class RolesSlashCommand extends SlashCommand {
 		}
 	}
 
+	public static Object updateRoles(Player player, Member member) {
+		return updateRoles(player, member, database.getRolesSettings(member.getGuild().getId()), false);
+	}
+
 	/**
+	 * @param skipRoles Whether to skip roles that require extra API requests (guild roles, guild ranks, dungeon secrets)
 	 * @return eb or [eb, toAdd, toRemove]
 	 */
-	public static Object updateRoles(Player player, Guild guild, Member member) {
-		JsonElement rolesJson = database.getRolesSettings(guild.getId());
+	public static Object updateRoles(Player player, Member member, JsonElement rolesJson, boolean skipRoles) {
 		if (rolesJson == null || rolesJson.isJsonNull()) {
 			return invalidEmbed("Unable to fetch roles settings");
 		}
@@ -92,6 +96,7 @@ public class RolesSlashCommand extends SlashCommand {
 			return invalidEmbed("Automatic roles not setup or enabled for this server");
 		}
 
+		Guild guild = member.getGuild();
 		List<String> allRoleNames = getJsonKeys(rolesJson);
 		allRoleNames.remove("enable");
 		Role botRole = guild.getSelfMember().getRoles().get(0);
@@ -109,9 +114,22 @@ public class RolesSlashCommand extends SlashCommand {
 		List<Role> toRemove = new ArrayList<>();
 		JsonElement guildJson = null;
 
+		//		List<String> skippedRoles = List.of("guild_member", "guild_ranks", "")
+
 		for (String currentRoleName : allRoleNames) {
 			JsonElement currentRole = higherDepth(rolesJson, currentRoleName);
 			if (!higherDepth(currentRole, "enable", false)) {
+				continue;
+			}
+
+			if (
+				skipRoles &&
+				(
+					currentRoleName.equals("guild_member") ||
+					currentRoleName.equals("guild_ranks") &&
+					currentRoleName.equals("dungeon_secrets")
+				)
+			) {
 				continue;
 			}
 
@@ -519,7 +537,7 @@ public class RolesSlashCommand extends SlashCommand {
 		return new Object[] { eb, toAdd, toRemove };
 	}
 
-	public static EmbedBuilder updateRoles(String profile, Guild guild, Member member) {
+	public static EmbedBuilder updateRoles(String profile, Member member) {
 		LinkedAccount linkedInfo = database.getByDiscord(member.getId());
 		if (linkedInfo == null) {
 			return defaultEmbed("You must be linked to run this command. Use `/link <player>` to link");
@@ -531,14 +549,14 @@ public class RolesSlashCommand extends SlashCommand {
 			return player.getFailEmbed();
 		}
 
-		Object out = updateRoles(player, guild, member);
+		Object out = updateRoles(player, member);
 		if (out instanceof EmbedBuilder eb1) {
 			return eb1;
 		}
 
 		Object[] outArr = ((Object[]) out);
 		try {
-			guild.modifyMemberRoles(member, (List<Role>) outArr[1], (List<Role>) outArr[2]).queue();
+			member.getGuild().modifyMemberRoles(member, (List<Role>) outArr[1], (List<Role>) outArr[2]).queue();
 		} catch (InsufficientPermissionException e) {
 			return invalidEmbed("Missing permission: " + e.getPermission().getName());
 		}

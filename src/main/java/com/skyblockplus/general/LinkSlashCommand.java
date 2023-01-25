@@ -278,7 +278,7 @@ public class LinkSlashCommand extends SlashCommand {
 						}
 
 						if (player.isValid()) {
-							Object[] out = (Object[]) RolesSlashCommand.updateRoles(player, member.getGuild(), member);
+							Object[] out = (Object[]) RolesSlashCommand.updateRoles(player, member);
 							toAdd.addAll((List<Role>) out[1]);
 							toRemove.addAll((List<Role>) out[2]);
 						}
