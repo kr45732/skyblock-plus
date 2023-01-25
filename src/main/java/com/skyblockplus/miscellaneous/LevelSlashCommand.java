@@ -112,19 +112,33 @@ public class LevelSlashCommand extends SlashCommand {
 				(apiSbLevel == 0 ? "Estimated " : "") +
 				"Level Color:** " +
 				player.getLevelColor((int) displaySbLevel) +
-				"\n\nCore Tasks: " +
+				"\n\n" +
+				getEmoji("NETHER_STAR") +
+				"Core Tasks: " +
 				coreTasks.getFormatted() +
-				"\nDungeon Tasks: " +
+				"\n" +
+				DUNGEON_EMOJI_MAP.get("catacombs") +
+				" Dungeon Tasks: " +
 				dungeonTasks.getFormatted() +
-				"\nEssence Shop Tasks: " +
+				"\n" +
+				ESSENCE_EMOJI_MAP.get("wither") +
+				" Essence Shop Tasks: " +
 				essenceShopTasks.getFormatted() +
-				"\nSlaying Tasks: " +
+				"\n" +
+				getEmoji("GOLD_SWORD") +
+				" Slaying Tasks: " +
 				slayingTasks.getFormatted() +
-				"\nSkill Related Tasks: " +
+				"\n" +
+				getEmoji("DIAMOND_SWORD") +
+				" Skill Related Tasks: " +
 				skillRelatedTasks.getFormatted() +
-				"\nMiscellaneous Tasks: " +
+				"\n" +
+				getEmoji("EMPTY_MAP") +
+				" Miscellaneous Tasks: " +
 				miscellaneousTasks.getFormatted() +
-				"\nStory Tasks: " +
+				"\n" +
+				getEmoji("BOOK_AND_QUILL") +
+				" Story Tasks: " +
 				storyTasks.getFormatted()
 			);
 
@@ -313,7 +327,6 @@ public class LevelSlashCommand extends SlashCommand {
 		JsonObject essencePerks = higherDepth(player.profileJson(), "perks").getAsJsonObject();
 
 		for (Map.Entry<String, JsonElement> essenceShop : getEssenceShopsJson().entrySet()) {
-			StringBuilder ebStr = new StringBuilder();
 			int shopSbXp = 0;
 			for (Map.Entry<String, JsonElement> upgrade : essenceShop.getValue().getAsJsonObject().entrySet()) {
 				int upgradeTier = higherDepth(essencePerks, upgrade.getKey(), 0);
@@ -324,24 +337,17 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 
 				shopSbXp += upgradeSbXp;
-
-				ebStr
-					.append("\n")
-					.append(capitalizeString(upgrade.getKey().replace("_", " ")))
-					.append(": ")
-					.append(formatNumber(upgradeSbXp));
 			}
 
 			essenceSbXp += shopSbXp;
 
-			eb.addField(
+			eb.appendDescription(
+				"\n" +
 				capitalizeString(essenceShop.getKey().split("_")[1]) +
-				" Essence | " +
+				" Essence Shop: " +
 				formatNumber(shopSbXp) +
 				" / " +
-				higherDepth(getSbLevelsJson(), "essence_shop_task." + essenceShop.getKey().toLowerCase() + "_shop").getAsInt(),
-				ebStr.toString(),
-				false
+				higherDepth(getSbLevelsJson(), "essence_shop_task." + essenceShop.getKey().toLowerCase() + "_shop").getAsInt()
 			);
 		}
 
@@ -888,7 +894,7 @@ public class LevelSlashCommand extends SlashCommand {
 		}
 
 		public String getFormatted() {
-			return formatNumber(categoryTotal) + " / " + formatNumber(max);
+			return formatNumber(categoryTotal) + " / " + formatNumber(max) + " (" + roundProgress((double) categoryTotal / max) + ")";
 		}
 	}
 }
