@@ -883,7 +883,7 @@ public class Utils {
 	}
 
 	public static String roundProgress(double number) {
-		DecimalFormat df = new DecimalFormat("#.###");
+		DecimalFormat df = new DecimalFormat("#.##");
 		df.setRoundingMode(RoundingMode.HALF_UP);
 		return df.format(number * 100) + "%";
 	}

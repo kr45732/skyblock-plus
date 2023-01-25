@@ -25,10 +25,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.Utils;
+import com.skyblockplus.utils.command.PaginatorExtras;
+import com.skyblockplus.utils.command.SelectMenuPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,12 +40,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EssenceSlashCommand extends SlashCommand {
 
-	public static List<String> ESSENCE_TYPES = List.of("ice", "gold", "dragon", "spider", "undead", "wither", "diamond", "crimson");
+	public static List<String> ESSENCE_TYPES = List.of("undead", "wither", "dragon", "spider", "ice", "crimson");
 
 	public EssenceSlashCommand() {
 		this.name = "essence";
@@ -57,7 +61,7 @@ public class EssenceSlashCommand extends SlashCommand {
 				if (event.invalidPlayerOption()) {
 					return;
 				}
-				event.embed(getPlayerEssence(event.player, event.getOptionStr("profile")));
+				event.paginate(getPlayerEssence(event.player, event.getOptionStr("profile"), event));
 			}
 			default -> event.embed(event.invalidCommandMessage());
 		}
@@ -150,10 +154,10 @@ public class EssenceSlashCommand extends SlashCommand {
 		return defaultEmbed("Invalid item name");
 	}
 
-	public static EmbedBuilder getPlayerEssence(String username, String profileName) {
+	public static EmbedBuilder getPlayerEssence(String username, String profileName, SlashCommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			EmbedBuilder eb = player.defaultPlayerEmbed();
+			Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 
 			StringBuilder amountsStr = new StringBuilder();
 			for (String essence : ESSENCE_TYPES) {
@@ -165,45 +169,39 @@ public class EssenceSlashCommand extends SlashCommand {
 					.append(formatNumber(higherDepth(player.profileJson(), "essence_" + essence, 0)))
 					.append("\n");
 			}
+			pages.put(SelectOption.of("Amounts", "amounts"), player.defaultPlayerEmbed().setDescription(amountsStr));
 
-			eb.addField("Amounts", amountsStr.toString(), false);
+			for (Map.Entry<String, JsonElement> essenceShop : getEssenceShopsJson().entrySet()) {
+				StringBuilder ebStr = new StringBuilder();
 
-			if (higherDepth(player.profileJson(), "perks") != null) {
-				JsonElement essenceTiers = getConstant("ESSENCE_SHOP_TIERS");
-				StringBuilder witherShopUpgrades = new StringBuilder();
-				StringBuilder undeadShopUpgrades = new StringBuilder();
-				for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject().entrySet()) {
-					JsonElement curPerk = higherDepth(essenceTiers, perk.getKey());
-					if (curPerk == null) { // Non dungeon perks
-						continue;
-					}
+				for (Map.Entry<String, JsonElement> essenceUpgrade : essenceShop.getValue().getAsJsonObject().entrySet()) {
+					int level = higherDepth(player.profileJson(), "perks." + essenceUpgrade.getKey(), 0);
+					JsonArray tiers = higherDepth(essenceUpgrade.getValue(), "costs").getAsJsonArray();
 
-					JsonArray tiers = higherDepth(curPerk, "tiers").getAsJsonArray();
-					String out =
-						"\n" +
-						ESSENCE_EMOJI_MAP.get(perk.getKey()) +
-						"** " +
-						capitalizeString(perk.getKey().replace("catacombs_", "").replace("_", " ")) +
-						":** " +
-						perk.getValue().getAsInt() +
-						"/" +
-						higherDepth(curPerk, "tiers").getAsJsonArray().size() +
-						(
-							perk.getValue().getAsInt() == tiers.size()
-								? ""
-								: (" (" + formatNumber(tiers.get(perk.getValue().getAsInt()).getAsInt()) + " for next)")
-						);
-					if (higherDepth(curPerk, "type").getAsString().equals("undead")) {
-						undeadShopUpgrades.append(out);
-					} else {
-						witherShopUpgrades.append(out);
+					ebStr
+						.append("\n")
+						.append(ESSENCE_EMOJI_MAP.getOrDefault(essenceUpgrade.getKey(), ""))
+						.append("** ")
+						.append(higherDepth(essenceUpgrade.getValue(), "name").getAsString())
+						.append(":** ")
+						.append(level)
+						.append("/")
+						.append(tiers.size());
+					if (level < tiers.size()) {
+						ebStr.append(" (").append(formatNumber(tiers.get(level).getAsInt())).append(" for next)");
 					}
 				}
-				eb.addField("Undead Essence Upgrades", undeadShopUpgrades.toString(), false);
-				eb.addField("Wither Essence Upgrades", witherShopUpgrades.toString(), false);
+
+				String essenceType = capitalizeString(essenceShop.getKey().split("_")[1]);
+				pages.put(
+					SelectOption.of(essenceType + " Essence Shop", essenceType),
+					player.defaultPlayerEmbed(" | " + essenceType + " Essence Shop").setDescription(ebStr.toString())
+				);
 			}
 
-			return eb;
+			new SelectMenuPaginator("amounts", new PaginatorExtras().setSelectPages(pages), event);
+
+			return null;
 		}
 		return player.getFailEmbed();
 	}

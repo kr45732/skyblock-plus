@@ -104,17 +104,17 @@ public class LevelSlashCommand extends SlashCommand {
 		EmbedBuilder eb = player
 			.defaultPlayerEmbed()
 			.setDescription(
-				"**" +
+				"<:levels:1067859971221499954> **" +
 				(apiSbLevel == 0 ? "Estimated " : "") +
 				"Level:** " +
 				roundAndFormat(displaySbLevel) +
 				"\n**" +
 				(apiSbLevel == 0 ? "Estimated " : "") +
-				"Level Color:** " +
+				"<:levels:1067859971221499954> Level Color:** " +
 				player.getLevelColor((int) displaySbLevel) +
 				"\n\n" +
 				getEmoji("NETHER_STAR") +
-				"Core Tasks: " +
+				" Core Tasks: " +
 				coreTasks.getFormatted() +
 				"\n" +
 				DUNGEON_EMOJI_MAP.get("catacombs") +
@@ -736,39 +736,13 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Harp
 		int harpSbXp = 0;
-		Map<String, Integer> harpSongToSbXp = Maps.of(
-			"song_hymn_joy_perfect_completions",
-			4,
-			"song_frere_jacques_perfect_completions",
-			4,
-			"song_amazing_grace_perfect_completions",
-			4,
-			"song_brahms_perfect_completions",
-			8,
-			"song_happy_birthday_perfect_completions",
-			8,
-			"song_greensleeves_perfect_completions",
-			8,
-			"song_jeopardy_perfect_completions",
-			16,
-			"song_minuet_perfect_completions",
-			16,
-			"song_joy_world_perfect_completions",
-			16,
-			"song_pure_imagination_perfect_completions",
-			28,
-			"song_vie_en_rose_perfect_completions",
-			28,
-			"song_fire_and_flames_perfect_completions",
-			48,
-			"song_pachelbel_perfect_completions",
-			48
-		);
+
+		JsonObject harpSongToSbXp = higherDepth(getSbLevelsJson(), "miscellaneous_task.harp_songs_names").getAsJsonObject();
 		JsonElement harpQuests = higherDepth(player.profileJson(), "harp_quest");
 		if (harpQuests != null) {
-			for (Map.Entry<String, Integer> harpSong : harpSongToSbXp.entrySet()) {
+			for (Map.Entry<String, JsonElement> harpSong : harpSongToSbXp.entrySet()) {
 				if (harpQuests.getAsJsonObject().has(harpSong.getKey())) {
-					harpSbXp += harpSong.getValue();
+					harpSbXp += harpSong.getValue().getAsInt();
 				}
 			}
 		}
@@ -784,16 +758,8 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Community shop
 		int communityShopSbXp = 0;
-		Map<String, Integer> communityShopUpgradesMax = Maps.of(
-			"island_size",
-			1,
-			"minion_slots",
-			5,
-			"guests_count",
-			1,
-			"coins_allowance",
-			5
-		);
+		JsonObject communityShopUpgradesMax = higherDepth(getSbLevelsJson(), "miscellaneous_task.community_shop_upgrades_max")
+			.getAsJsonObject();
 		JsonElement communityUpgrades = higherDepth(player.getOuterProfileJson(), "community_upgrades.upgrade_states");
 		if (communityUpgrades != null) {
 			for (JsonElement upgradeState : communityUpgrades.getAsJsonArray()) {
@@ -801,8 +767,8 @@ public class LevelSlashCommand extends SlashCommand {
 					JsonObject value = upgradeState.getAsJsonObject();
 					String upgrade = value.get("upgrade").getAsString();
 					int tier = value.get("tier").getAsInt();
-					if (communityShopUpgradesMax.containsKey(upgrade)) {
-						int max = communityShopUpgradesMax.get(upgrade);
+					if (communityShopUpgradesMax.has(upgrade)) {
+						int max = communityShopUpgradesMax.get(upgrade).getAsInt();
 						if (max >= tier) {
 							communityShopSbXp += 10;
 						}
@@ -845,34 +811,13 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Objectives/quests
 		int objectivesSbXp = 0;
-		String[] storyTaskNames = {
-			"explore_hub",
-			"talk_to_lumberjack",
-			"talk_to_fisherman_2",
-			"kill_danger_mobs",
-			"talk_to_guber_1",
-			"talk_to_farmer",
-			"talk_to_librarian",
-			"explore_village",
-			"complete_the_woods_race_4",
-			"increase_foraging_skill_5",
-			"public_island",
-			"talk_to_lazy_miner",
-			"increase_farming_skill_5",
-			"talk_to_farmhand_1",
-			"mine_coal",
-			"talk_to_gulliver_1",
-			"complete_the_chicken_race_4",
-			"complete_the_end_race_4",
-			"talk_to_gustave_1",
-			"talk_to_banker",
-			"help_elle",
-		};
+		JsonArray storyTaskNames = higherDepth(getSbLevelsJson(), "story_task.complete_objectives_names").getAsJsonArray();
 		JsonElement objectives = higherDepth(player.profileJson(), "objectives");
 		if (objectives != null) {
-			for (String storyTaskName : storyTaskNames) {
-				if (objectives.getAsJsonObject().has(storyTaskName)) {
-					JsonObject objective = objectives.getAsJsonObject().getAsJsonObject(storyTaskName);
+			for (JsonElement storyTaskName : storyTaskNames) {
+				String storyTaskNameStr = storyTaskName.getAsString();
+				if (objectives.getAsJsonObject().has(storyTaskNameStr)) {
+					JsonObject objective = objectives.getAsJsonObject().getAsJsonObject(storyTaskNameStr);
 					if (objective.has("status") && objective.get("status").getAsString().equals("COMPLETE")) {
 						objectivesSbXp += 5;
 					}

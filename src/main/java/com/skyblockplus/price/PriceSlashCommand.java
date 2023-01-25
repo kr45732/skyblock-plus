@@ -24,6 +24,7 @@ import static com.skyblockplus.utils.ApiHandler.queryLowestBinPet;
 import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -144,8 +145,12 @@ public class PriceSlashCommand extends SlashCommand {
 				Instant.ofEpochMilli(higherDepth(auction, "end_t").getAsLong()).getEpochSecond() +
 				":R>";
 
+			int count = higherDepth(auction, "count", 1);
 			eb.addField(
-				getEmoji(higherDepth(auction, "item_id").getAsString()) + " " + higherDepth(auction, "item_name").getAsString(),
+				getEmoji(higherDepth(auction, "item_id").getAsString()) +
+				" " +
+				(count > 1 ? count + "x " : "") +
+				higherDepth(auction, "item_name").getAsString(),
 				ahStr,
 				false
 			);
