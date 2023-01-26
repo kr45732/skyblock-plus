@@ -303,12 +303,6 @@ public class SettingsExecute {
 							case "disable" -> setVerifyRolesSyncEnable(false);
 							default -> null;
 						};
-					case "video" -> eb =
-						switch (args[3]) {
-							case "enable" -> setVerifyVideoEnable(true);
-							case "disable" -> setVerifyVideoEnable(false);
-							default -> null;
-						};
 					case "dm_on_join" -> eb =
 						switch (args[3]) {
 							case "enable" -> setVerifyDmOnSync(true);
@@ -1943,7 +1937,6 @@ public class SettingsExecute {
 		String ebFieldString = "";
 		ebFieldString += "**" + displaySettings(verifySettings, "enable") + "**";
 		ebFieldString += "\n• **Message Text:** " + displaySettings(verifySettings, "messageText");
-		ebFieldString += "\n• **Show Help Video** " + displaySettings(verifySettings, "enableVerifyVideo");
 		ebFieldString += "\n• **Channel:** " + displaySettings(verifySettings, "messageTextChannelId");
 		ebFieldString += "\n• **Verified Role(s):** " + displaySettings(verifySettings, "verifiedRoles");
 		ebFieldString += "\n• **Verified Remove Role:** " + displaySettings(verifySettings, "verifiedRemoveRole");
@@ -2220,15 +2213,6 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Automatic roles sync " + (enable ? "enabled" : "disabled"));
-	}
-
-	public EmbedBuilder setVerifyVideoEnable(boolean enable) {
-		int responseCode = updateVerifySettings("enableVerifyVideo", "" + enable);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Verify help video " + (enable ? "enabled" : "disabled"));
 	}
 
 	public EmbedBuilder setVerifyDmOnSync(boolean enable) {

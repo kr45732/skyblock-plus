@@ -73,7 +73,6 @@ public class SetupCommandHandler {
 								.addOption("Verified Roles", "roles")
 								.addOption("Verification Channel", "channel")
 								.addOption("Nickname Template", "nickname")
-								.addOption("Toggle Help Video", "video")
 								.addOption("Remove Role", "remove_role")
 								.addOption("Toggle Sync Roles & Name", "sync")
 								.addOption("Toggle DM On Join Sync", "dm_on_join")
@@ -288,23 +287,6 @@ public class SetupCommandHandler {
 								.build()
 						)
 						.queue();
-					case "video" -> {
-						event.deferReply(true).complete();
-						event
-							.getHook()
-							.editOriginalEmbeds(
-								getSettings()
-									.setVerifyVideoEnable(
-										!higherDepth(
-											database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
-											"enableVerifyVideo",
-											true
-										)
-									)
-									.build()
-							)
-							.queue();
-					}
 					case "remove_role" -> event
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Role removed when verified").build())
 						.setActionRow(

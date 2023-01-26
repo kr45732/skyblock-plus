@@ -409,13 +409,7 @@ public class AutomaticGuild {
 
 				MessageCreateAction action = reactChannel
 					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-					.setActionRow(Button.primary("verify_button", "Verify"));
-				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
-					action =
-						action.addFiles(
-							FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
-						);
-				}
+					.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"));
 				Message reactMessage = action.complete();
 
 				JsonObject newSettings = currentSettings.getAsJsonObject();
@@ -462,13 +456,7 @@ public class AutomaticGuild {
 
 				MessageCreateAction action = reactChannel
 					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-					.setActionRow(Button.primary("verify_button", "Verify"));
-				if (higherDepth(currentSettings, "enableVerifyVideo", true)) {
-					action =
-						action.addFiles(
-							FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
-						);
-				}
+					.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"));
 				Message reactMessage = action.complete();
 
 				JsonObject newSettings = currentSettings.getAsJsonObject();
@@ -556,6 +544,7 @@ public class AutomaticGuild {
 				}
 			}
 
+			Map<String, HypixelResponse> guildResponses = null;
 			Map<Member, RoleModifyRecord> memberToRoleChanges = new HashMap<>();
 			if (verifyEnabled || rolesEnabled) {
 				List<Role> verifyRolesAdd = new ArrayList<>();
@@ -574,31 +563,34 @@ public class AutomaticGuild {
 					} catch (Exception ignored) {}
 				}
 
-				List<HypixelResponse> guildResponses = null;
 				String key = database.getServerHypixelApiKey(guild.getId());
 				key = checkHypixelKey(key, false) == null ? key : null;
 				int numUpdated = 0;
-				int numUpdatedRoles = 0;
 
-				if (inGuildUsers.stream().filter(m -> !updatedMembers.contains(m.getId())).limit(120).count() < 120) {
+				int updateLimit = rolesEnabled && key != null ? 30 : 120;
+
+				if (inGuildUsers.stream().filter(m -> !updatedMembers.contains(m.getId())).limit(updateLimit).count() < updateLimit) {
 					inGuildUsers.sort(Comparator.comparing(m -> updatedMembers.contains(m.getId())));
 					updatedMembers.clear();
 				}
 
 				for (Member linkedMember : inGuildUsers) {
 					// updatedMembers.add returns true if ele not in set
-					if (numUpdated < 120 && updatedMembers.add(linkedMember.getId())) {
-						numUpdated++;
-
+					if (numUpdated < updateLimit && updatedMembers.add(linkedMember.getId())) {
 						if (!guild.getSelfMember().canInteract(linkedMember)) {
 							continue;
 						}
 
+						LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
+						if (blacklist.contains(linkedAccount.uuid())) {
+							continue;
+						}
+
+						numUpdated++;
+
 						List<Role> toAddRoles = new ArrayList<>(verifyRolesAdd);
 						List<Role> toRemoveRoles = new ArrayList<>(verifyRolesRemove);
-
 						Player player = null;
-						LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
 
 						if (verifyEnabled) {
 							String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
@@ -621,10 +613,13 @@ public class AutomaticGuild {
 											guildResponses =
 												guildSettings
 													.stream()
-													.map(g -> getGuildFromId(g.getGuildId()))
-													.collect(Collectors.toList());
+													.collect(
+														Collectors.toMap(AutomatedGuild::getGuildId, g -> getGuildFromId(g.getGuildId()))
+													);
 										}
+
 										HypixelResponse guildResponse = guildResponses
+											.values()
 											.stream()
 											.filter(g ->
 												streamJsonArray(g.get("members").getAsJsonArray())
@@ -633,7 +628,7 @@ public class AutomaticGuild {
 											.findFirst()
 											.orElse(null);
 
-										if (guildResponse != null) {
+										if (guildResponse != null && guildResponse.isValid()) {
 											nicknameTemplate =
 												nicknameTemplate.replace(
 													matcher.group(0),
@@ -651,8 +646,6 @@ public class AutomaticGuild {
 													} +
 													extra
 												);
-										} else {
-											nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
 										}
 									} else if (
 										category.equals("PLAYER") &&
@@ -721,31 +714,25 @@ public class AutomaticGuild {
 									continue;
 								}
 
-								if (!blacklist.contains(linkedAccount.uuid())) {
-									linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
-								}
+								linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
 							}
 						}
 
-						if (rolesEnabled && numUpdatedRoles < 25) {
-							if (key != null) {
-								numUpdatedRoles++;
+						if (rolesEnabled && key != null) {
+							if (player == null) {
+								HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
+								player =
+									!response.isValid()
+										? new Player()
+										: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
+							}
 
-								if (player == null) {
-									HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
-									player =
-										!response.isValid()
-											? new Player()
-											: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
-								}
-
-								if (player.isValid()) {
-									try {
-										Object[] out = (Object[]) RolesSlashCommand.updateRoles(player, linkedMember, rolesSettings, true);
-										toAddRoles.addAll((List<Role>) out[1]);
-										toRemoveRoles.addAll((List<Role>) out[2]);
-									} catch (Exception ignored) {}
-								}
+							if (player.isValid()) {
+								try {
+									Object[] out = (Object[]) RolesSlashCommand.updateRoles(player, linkedMember, rolesSettings, true);
+									toAddRoles.addAll((List<Role>) out[1]);
+									toRemoveRoles.addAll((List<Role>) out[2]);
+								} catch (Exception ignored) {}
 							}
 						}
 
@@ -764,7 +751,9 @@ public class AutomaticGuild {
 			if (!filteredGuildSettings.isEmpty()) {
 				Set<String> inGuild = new HashSet<>();
 				for (AutomatedGuild currentSetting : filteredGuildSettings) {
-					HypixelResponse response = getGuildFromId(currentSetting.getGuildId());
+					HypixelResponse response = guildResponses != null && guildResponses.containsKey(currentSetting.getGuildId())
+						? guildResponses.get(currentSetting.getGuildId())
+						: getGuildFromId(currentSetting.getGuildId());
 					if (!response.isValid()) {
 						continue;
 					}
@@ -1154,6 +1143,11 @@ public class AutomaticGuild {
 	public void onButtonClick(ButtonInteractionEvent event) {
 		if (event.getComponentId().equals("verify_button")) {
 			verifyGuild.onButtonClick(event);
+		} else if (event.getComponentId().equals("verify_video_button")) {
+			event
+				.replyFiles(FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4")))
+				.setEphemeral(true)
+				.queue();
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {
