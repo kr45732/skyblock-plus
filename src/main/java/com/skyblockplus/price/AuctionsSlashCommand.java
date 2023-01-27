@@ -19,7 +19,6 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
-import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -27,6 +26,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -38,6 +38,7 @@ import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -105,18 +106,19 @@ public class AuctionsSlashCommand extends SlashCommand {
 		boolean verbose,
 		SlashCommandEvent event
 	) {
-		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-		if (!usernameUuidStruct.isValid()) {
-			return invalidEmbed(usernameUuidStruct.failCause());
+		Player player = new Player(username);
+		if (!player.isValid()) {
+			return player.getFailEmbed();
 		}
 
-		HypixelResponse auctionsResponse = getAuctionFromPlayer(usernameUuidStruct.uuid());
+		HypixelResponse auctionsResponse = getAuctionFromPlayer(player.getUuid());
 		if (!auctionsResponse.isValid()) {
 			return invalidEmbed(auctionsResponse.failCause());
 		}
 
 		JsonArray auctionsArray = auctionsResponse.response().getAsJsonArray();
-		Stream<JsonElement> stream = streamJsonArray(auctionsArray);
+		List<String> validProfileIds = streamJsonArray(player.getProfileArray()).map(prof -> higherDepth(prof, "profile_id").getAsString()).toList();
+		Stream<JsonElement> stream = streamJsonArray(auctionsArray).filter(auc -> validProfileIds.contains(higherDepth(auc, "profile_id").getAsString()));
 		if (filterType == AuctionFilterType.SOLD || filterType == AuctionFilterType.UNSOLD) {
 			stream =
 				stream.filter(auction ->
@@ -201,26 +203,26 @@ public class AuctionsSlashCommand extends SlashCommand {
 
 			UsernameUuidStruct curTrack = AuctionTracker.commandAuthorToTrackingUser.getOrDefault(event.getUser().getId(), null);
 			Button button;
-			if (curTrack != null && curTrack.uuid().equals(usernameUuidStruct.uuid())) {
+			if (curTrack != null && curTrack.uuid().equals(player.getUuid())) {
 				button =
 					Button.primary(
-						"track_auctions_stop_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(),
+						"track_auctions_stop_" + event.getUser().getId() + "_" + player.getUuid(),
 						"Stop Tracking Auctions"
 					);
 			} else {
 				button =
-					Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(), "Track Auctions");
+					Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + player.getUuid(), "Track Auctions");
 			}
 			if (extras.getEmbedFields().size() == 0) {
 				return new MessageEditBuilder()
-					.setEmbeds(invalidEmbed("No auctions found for " + usernameUuidStruct.usernameFixed()).build())
+					.setEmbeds(invalidEmbed("No auctions found for " + player.getUsernameFixed()).build())
 					.setActionRow(button);
 			}
 
 			extras
-				.setEveryPageTitle(usernameUuidStruct.usernameFixed())
-				.setEveryPageTitleUrl(usernameUuidStruct.getAuctionUrl())
-				.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
+				.setEveryPageTitle(player.getUsernameFixed())
+				.setEveryPageTitleUrl(player.getAuctionUrl())
+				.setEveryPageThumbnail(player.getAvatarUrl())
 				.setEveryPageText(
 					(
 						totalSoldValue > 0
@@ -247,7 +249,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 			NetworthExecute calc = new NetworthExecute().initPrices().setVerbose(true);
 
 			for (JsonElement currentAuction : auctionsArray) {
-				EmbedBuilder eb = defaultEmbed(usernameUuidStruct.usernameFixed(), usernameUuidStruct.getAuctionUrl());
+				EmbedBuilder eb = defaultEmbed(player.getUsernameFixed(), player.getAuctionUrl());
 				if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
 					String auctionName;
 
@@ -324,7 +326,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 			}
 
 			if (extras.getEmbedPages().size() == 0) {
-				return invalidEmbed("No auctions found for " + usernameUuidStruct.usernameFixed());
+				return invalidEmbed("No auctions found for " + player.getUsernameFixed());
 			}
 
 			for (int i = 0; i < extras.getEmbedPages().size(); i++) {
@@ -335,8 +337,8 @@ public class AuctionsSlashCommand extends SlashCommand {
 						extras
 							.getEmbedPages()
 							.get(i)
-							.setTitle(usernameUuidStruct.usernameFixed(), usernameUuidStruct.getAuctionUrl())
-							.setThumbnail(usernameUuidStruct.getAvatarlUrl())
+							.setTitle(player.getUsernameFixed(), player.getAuctionUrl())
+							.setThumbnail(player.getAvatarUrl())
 							.setDescription(
 								(
 									totalSoldValue > 0

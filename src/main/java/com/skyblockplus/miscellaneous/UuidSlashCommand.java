@@ -62,6 +62,6 @@ public class UuidSlashCommand extends SlashCommand {
 
 		return defaultEmbed(usernameUuid.username(), "https://plancke.io/hypixel/player/stats/" + usernameUuid.username())
 			.setDescription("**Username:** " + usernameUuid.username() + "\n**Uuid:** " + usernameUuid.uuid())
-			.setThumbnail(usernameUuid.getAvatarlUrl());
+			.setThumbnail(usernameUuid.getAvatarUrl());
 	}
 }

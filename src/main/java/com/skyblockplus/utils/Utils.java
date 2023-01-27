@@ -1853,6 +1853,10 @@ public class Utils {
 		return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
 	}
 
+	public static String getAuctionUrl(String uuid) {
+		return "https://auctions.craftlink.xyz/players/" + uuid;
+	}
+
 	public static SkillsStruct levelingInfoFromExp(long skillExp, String skill, int maxLevel) {
 		JsonArray skillsTable =
 			switch (skill) {

@@ -39,12 +39,12 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 		return username != null && uuid != null;
 	}
 
-	public String getAvatarlUrl() {
+	public String getAvatarUrl() {
 		return Utils.getAvatarlUrl(uuid);
 	}
 
 	public String getAuctionUrl() {
-		return "https://auctions.craftlink.xyz/players/" + uuid;
+		return Utils.getAuctionUrl(uuid);
 	}
 
 	public String nameMcHyperLink() {

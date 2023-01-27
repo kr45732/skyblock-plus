@@ -153,7 +153,7 @@ public class BingoSlashCommand extends SlashCommand {
 		);
 		eb.appendDescription("\n\n**Self Goals:**" + regGoals);
 		eb.appendDescription("\n\n**Community Goals:**" + communityGoals);
-		eb.setThumbnail(usernameUuidStruct.getAvatarlUrl());
+		eb.setThumbnail(usernameUuidStruct.getAvatarUrl());
 		return new MessageEditBuilder().setEmbeds(eb.build()).setActionRow(Button.primary("bingo_" + cardStr, "Bingo Card"));
 	}
 }

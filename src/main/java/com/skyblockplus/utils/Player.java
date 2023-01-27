@@ -2500,6 +2500,14 @@ public class Player {
 		return getBestiaryTier() / 10.0;
 	}
 
+	public String getAuctionUrl() {
+		return  Utils.getAuctionUrl(uuid);
+	}
+
+	public String getAvatarUrl() {
+		return Utils.getAvatarlUrl(uuid);
+	}
+
 	public enum WeightType {
 		NONE,
 		SENITHER,
