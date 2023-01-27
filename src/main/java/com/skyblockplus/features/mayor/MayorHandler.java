@@ -195,7 +195,7 @@ public class MayorHandler {
 		try {
 			if (!currentMayor.equals("Jerry")) {
 				jerryFuture = null;
-				jerryEmbed = invalidEmbed("Jerry is not the current mayor").build();
+				jerryEmbed = invalidEmbed("Jerry is not currently mayor").build();
 				return;
 			}
 
