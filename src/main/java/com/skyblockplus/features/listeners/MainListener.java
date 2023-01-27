@@ -97,9 +97,9 @@ public class MainListener extends ListenerAdapter {
 					.setDescription(
 						"- Thank you for adding me to " +
 						event.getGuild().getName() +
-						"`\n- You can view my commands by running `/help`\n- Make sure to check out `/setup` or the forum post [**here**](" +
+						"\n- You can view my commands by running `/help`\n- Make sure to check out `/setup` or the forum post [**here**](" +
 						FORUM_POST_LINK +
-						") on how to setup the customizable features of this bot!"
+						") on how to setup customizable features such as automatic roles, verification, notifications, and much more!"
 					);
 				TextChannel channel = event
 					.getGuild()
