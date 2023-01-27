@@ -117,8 +117,11 @@ public class AuctionsSlashCommand extends SlashCommand {
 		}
 
 		JsonArray auctionsArray = auctionsResponse.response().getAsJsonArray();
-		List<String> validProfileIds = streamJsonArray(player.getProfileArray()).map(prof -> higherDepth(prof, "profile_id").getAsString()).toList();
-		Stream<JsonElement> stream = streamJsonArray(auctionsArray).filter(auc -> validProfileIds.contains(higherDepth(auc, "profile_id").getAsString()));
+		List<String> validProfileIds = streamJsonArray(player.getProfileArray())
+			.map(prof -> higherDepth(prof, "profile_id").getAsString())
+			.toList();
+		Stream<JsonElement> stream = streamJsonArray(auctionsArray)
+			.filter(auc -> validProfileIds.contains(higherDepth(auc, "profile_id").getAsString()));
 		if (filterType == AuctionFilterType.SOLD || filterType == AuctionFilterType.UNSOLD) {
 			stream =
 				stream.filter(auction ->
@@ -205,13 +208,9 @@ public class AuctionsSlashCommand extends SlashCommand {
 			Button button;
 			if (curTrack != null && curTrack.uuid().equals(player.getUuid())) {
 				button =
-					Button.primary(
-						"track_auctions_stop_" + event.getUser().getId() + "_" + player.getUuid(),
-						"Stop Tracking Auctions"
-					);
+					Button.primary("track_auctions_stop_" + event.getUser().getId() + "_" + player.getUuid(), "Stop Tracking Auctions");
 			} else {
-				button =
-					Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + player.getUuid(), "Track Auctions");
+				button = Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + player.getUuid(), "Track Auctions");
 			}
 			if (extras.getEmbedFields().size() == 0) {
 				return new MessageEditBuilder()

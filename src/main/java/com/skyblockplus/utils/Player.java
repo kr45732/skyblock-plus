@@ -2501,7 +2501,7 @@ public class Player {
 	}
 
 	public String getAuctionUrl() {
-		return  Utils.getAuctionUrl(uuid);
+		return Utils.getAuctionUrl(uuid);
 	}
 
 	public String getAvatarUrl() {
