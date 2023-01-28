@@ -493,7 +493,11 @@ public class EmojiUpdater {
 						.replace("travel_scroll_to_the_dwarven_forge", "travel_scroll_dwarven_forge")
 						.replace("dusty_travel_scroll_to_the_kuudra_skull", "travel_scroll_kuudra_skull")
 						.replace("pink_crab_hat_of_celebration_2022_edition", "pink_crab_hat_of_celebration_22")
-						.replace("travel_scroll_to_the_crystal_nucleus", "travel_scroll_crystal_nucleus");
+						.replace("travel_scroll_to_the_crystal_nucleus", "travel_scroll_crystal_nucleus")
+						.replace("travel_scroll_to_arachnes_sanctuary", "travel_scroll_arachne_sanctuary")
+						.replace("travel_scroll_to_the_smoldering_tomb", "travel_scroll_smoldering_tomb")
+						.replace("travel_scroll_to_the_trappers_den", "travel_scroll_trappers_den")
+						.replace("extreme_bingo_card_extreme_bingo_1", "extreme_bingo_card");
 					name =
 						switch (name = name.startsWith("_") ? name.substring(1) : name) {
 							case "x" -> "xx";
