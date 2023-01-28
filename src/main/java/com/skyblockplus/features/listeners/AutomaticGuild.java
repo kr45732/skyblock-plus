@@ -410,7 +410,6 @@ public class AutomaticGuild {
 
 				MessageCreateAction action = reactChannel
 					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-					.setAttachments()
 					.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"));
 				Message reactMessage = action.complete();
 
@@ -459,7 +458,6 @@ public class AutomaticGuild {
 
 				MessageCreateAction action = reactChannel
 					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-					.setAttachments()
 					.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"));
 				Message reactMessage = action.complete();
 
