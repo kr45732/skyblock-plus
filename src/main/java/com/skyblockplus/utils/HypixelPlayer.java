@@ -96,8 +96,7 @@ public class HypixelPlayer {
 	}
 
 	public EmbedBuilder getDefaultEmbed() {
-		return defaultEmbed(username, "https://plancke.io/hypixel/player/stats/" + uuid)
-			.setThumbnail("https://cravatar.eu/helmavatar/" + uuid + "/64.png");
+		return defaultEmbed(username, "https://plancke.io/hypixel/player/stats/" + uuid).setThumbnail(Utils.getAvatarlUrl(uuid));
 	}
 
 	/* Hypixel */

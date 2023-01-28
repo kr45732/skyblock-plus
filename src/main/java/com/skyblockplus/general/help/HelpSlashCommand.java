@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 public class HelpSlashCommand extends SlashCommand {
 
 	public static final List<HelpData> helpDataList = new ArrayList<>();
-	public static final List<String> helpNameList = new ArrayList<>();
+	private static final List<String> helpNameList = new ArrayList<>();
 	private static final String[] pageTitles = {
 		"Navigation",
 		"General",

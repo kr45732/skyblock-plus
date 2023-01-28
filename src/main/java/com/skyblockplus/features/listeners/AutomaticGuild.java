@@ -97,7 +97,7 @@ import org.slf4j.LoggerFactory;
 public class AutomaticGuild {
 
 	private static final Logger log = LoggerFactory.getLogger(AutomaticGuild.class);
-	public static final ScheduledFuture<?> logFuture = scheduler.scheduleWithFixedDelay(
+	private static final ScheduledFuture<?> logFuture = scheduler.scheduleWithFixedDelay(
 		() -> guildMap.values().forEach(g -> g.logAction(null, null)),
 		5,
 		5,

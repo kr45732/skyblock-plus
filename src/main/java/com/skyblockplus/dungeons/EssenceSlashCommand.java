@@ -32,7 +32,6 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -45,8 +44,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EssenceSlashCommand extends SlashCommand {
-
-	public static List<String> ESSENCE_TYPES = List.of("undead", "wither", "dragon", "spider", "ice", "crimson");
 
 	public EssenceSlashCommand() {
 		this.name = "essence";
@@ -160,7 +157,7 @@ public class EssenceSlashCommand extends SlashCommand {
 			Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 
 			StringBuilder amountsStr = new StringBuilder();
-			for (String essence : ESSENCE_TYPES) {
+			for (String essence : essenceTypes) {
 				amountsStr
 					.append(ESSENCE_EMOJI_MAP.get(essence))
 					.append("** ")

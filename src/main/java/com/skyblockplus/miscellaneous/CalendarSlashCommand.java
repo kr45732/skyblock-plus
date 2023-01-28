@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CalendarSlashCommand extends SlashCommand {
 
-	public static final String[] SEASONS = new String[] {
+	private static final String[] SEASONS = new String[] {
 		"Early Spring",
 		"Spring",
 		"Late Spring",
@@ -50,7 +50,7 @@ public class CalendarSlashCommand extends SlashCommand {
 		"Winter",
 		"Late Winter",
 	};
-	public static final long HOUR_MS = 50000;
+	private static final long HOUR_MS = 50000;
 	public static final long DAY_MS = 24 * HOUR_MS;
 	public static final long MONTH_MS = 31 * DAY_MS;
 	public static final long YEAR_MS = SEASONS.length * MONTH_MS;

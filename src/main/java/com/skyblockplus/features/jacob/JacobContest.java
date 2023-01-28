@@ -18,40 +18,14 @@
 
 package com.skyblockplus.features.jacob;
 
-import static com.skyblockplus.utils.Utils.getEmoji;
-
+import com.skyblockplus.utils.Constants;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import lombok.Data;
-import org.apache.groovy.util.Maps;
 
 @Data
 public class JacobContest {
-
-	public static final Map<String, String> CROP_NAME_TO_EMOJI = Maps.of(
-		"Wheat",
-		getEmoji("WHEAT"),
-		"Carrot",
-		getEmoji("CARROT_ITEM"),
-		"Potato",
-		getEmoji("POTATO_ITEM"),
-		"Pumpkin",
-		getEmoji("PUMPKIN"),
-		"Melon",
-		getEmoji("MELON"),
-		"Mushroom",
-		getEmoji("BROWN_MUSHROOM"),
-		"Cactus",
-		getEmoji("CACTUS"),
-		"Sugar Cane",
-		getEmoji("SUGAR_CANE"),
-		"Nether Wart",
-		getEmoji("NETHER_STALK"),
-		"Cocoa Beans",
-		getEmoji("INK_SACK:3")
-	);
 
 	private long time;
 	private List<String> crops;
@@ -75,7 +49,7 @@ public class JacobContest {
 	public String getCropsFormatted(boolean arrows) {
 		StringBuilder cropsFormatted = new StringBuilder();
 		for (String crop : crops) {
-			cropsFormatted.append(arrows ? "➜ " : "").append(CROP_NAME_TO_EMOJI.get(crop)).append(" ").append(crop).append("\n");
+			cropsFormatted.append(arrows ? "➜ " : "").append(Constants.cropNameToEmoji.get(crop)).append(" ").append(crop).append("\n");
 		}
 		return cropsFormatted.toString();
 	}

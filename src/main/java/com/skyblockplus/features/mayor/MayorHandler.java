@@ -27,10 +27,10 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
+import com.skyblockplus.utils.Constants;
 import java.io.File;
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -38,7 +38,6 @@ import javax.imageio.ImageIO;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.groovy.util.Maps;
 import org.apache.http.client.utils.URIBuilder;
 
 public class MayorHandler {
@@ -49,34 +48,6 @@ public class MayorHandler {
 	public static ScheduledFuture<?> jerryFuture;
 	public static ScheduledFuture<?> mayorElectedFuture;
 	public static MessageEmbed jerryEmbed = invalidEmbed("Jerry is not currently mayor").build();
-	public static final Map<String, String> mayorNameToEmoji = Maps.of(
-		"DERPY",
-		"<:derpy:940083649129349150>",
-		"FOXY",
-		"<:foxy:940083649301315614>",
-		"DANTE",
-		"<:dante:940083649188081715>",
-		"PAUL",
-		"<:paul:940083649607508009>",
-		"AATROX",
-		"<:aatrox:940083649041293312>",
-		"DIAZ",
-		"<:diaz:940083649322303489>",
-		"DIANA",
-		"<:diana:940083649590739004>",
-		"COLE",
-		"<:cole:940083649565581362>",
-		"BARRY",
-		"<:barry:940083649200652338>",
-		"JERRY",
-		"<:jerry:940083649318125578>",
-		"SCORPIUS",
-		"<:scorpius:940083649687203951>",
-		"MARINA",
-		"<:marina:940083649783664660>",
-		"FINNEGAN",
-		"<:finnegan:1040460674247184474>"
-	);
 
 	public static void initialize() {
 		try {
@@ -137,14 +108,14 @@ public class MayorHandler {
 					}
 
 					eb.addField(
-						mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
+						Constants.mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
 						"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
 						false
 					);
 				} else {
 					ebStr
 						.append("\n")
-						.append(mayorNameToEmoji.get(name.toUpperCase()))
+						.append(Constants.mayorNameToEmoji.get(name.toUpperCase()))
 						.append(" **")
 						.append(name)
 						.append(":** ")
@@ -253,7 +224,7 @@ public class MayorHandler {
 				int votes = higherDepth(curMayor, "votes").getAsInt();
 				String name = higherDepth(curMayor, "name").getAsString();
 				eb.addField(
-					mayorNameToEmoji.get(name.toUpperCase()) +
+					Constants.mayorNameToEmoji.get(name.toUpperCase()) +
 					" " +
 					name +
 					" | " +

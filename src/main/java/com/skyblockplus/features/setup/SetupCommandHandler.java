@@ -18,9 +18,9 @@
 
 package com.skyblockplus.features.setup;
 
-import static com.skyblockplus.features.jacob.JacobContest.CROP_NAME_TO_EMOJI;
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
+import static com.skyblockplus.utils.Constants.cropNameToEmoji;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -928,7 +928,7 @@ public class SetupCommandHandler {
 						List<String> crops = new ArrayList<>();
 
 						if (in.equalsIgnoreCase("all")) {
-							crops.addAll(CROP_NAME_TO_EMOJI.keySet());
+							crops.addAll(cropNameToEmoji.keySet());
 						} else {
 							for (String crop : in.split(",")) {
 								crops.add(capitalizeString(crop.trim()));

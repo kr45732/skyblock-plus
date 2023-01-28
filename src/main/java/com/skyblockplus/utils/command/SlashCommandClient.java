@@ -120,8 +120,8 @@ public class SlashCommandClient extends ListenerAdapter {
 		return userId.equals(ownerId);
 	}
 
-	public int getCommandUses(SlashCommand command) {
-		return commandUses.getOrDefault(command.getName(), 0);
+	public Map<String, Integer> getCommandUses() {
+		return commandUses;
 	}
 
 	public void setCommandUses(Map<String, Integer> commandUsage) {

@@ -27,6 +27,7 @@ import com.google.gson.JsonParser;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.Utils;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -443,7 +444,7 @@ public class ApplyUser implements Serializable {
 							playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
 							true
 						);
-						applyPlayerStats.setThumbnail("https://cravatar.eu/helmavatar/" + playerUsername + "/64.png");
+						applyPlayerStats.setThumbnail(Utils.getAvatarlUrl(playerUuid));
 						String waitlistMsg = higherDepth(currentSettings, "applyWaitlistMessage", null);
 						List<Button> row = new ArrayList<>();
 						row.add(Button.success("apply_user_accept", "Accept"));

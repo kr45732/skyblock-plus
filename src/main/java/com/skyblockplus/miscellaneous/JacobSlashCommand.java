@@ -18,7 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.features.jacob.JacobContest.CROP_NAME_TO_EMOJI;
+import static com.skyblockplus.utils.Constants.cropNameToEmoji;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.features.jacob.JacobContest;
@@ -55,13 +55,13 @@ public class JacobSlashCommand extends SlashCommand {
 			.slash(name, "Get a list of upcoming farming contests")
 			.addOptions(
 				new OptionData(OptionType.STRING, "crop", "Crop to filter by")
-					.addChoices(CROP_NAME_TO_EMOJI.keySet().stream().map(c -> new Command.Choice(c, c)).collect(Collectors.toList()))
+					.addChoices(cropNameToEmoji.keySet().stream().map(c -> new Command.Choice(c, c)).collect(Collectors.toList()))
 			);
 	}
 
 	public static EmbedBuilder getJacobEmbed(String crop, SlashCommandEvent event) {
 		crop = capitalizeString(crop);
-		if (!CROP_NAME_TO_EMOJI.containsKey(crop) && !crop.equals("All")) {
+		if (!cropNameToEmoji.containsKey(crop) && !crop.equals("All")) {
 			return invalidEmbed("Invalid crop");
 		}
 

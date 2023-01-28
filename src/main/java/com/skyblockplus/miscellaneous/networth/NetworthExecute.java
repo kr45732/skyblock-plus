@@ -18,7 +18,6 @@
 
 package com.skyblockplus.miscellaneous.networth;
 
-import static com.skyblockplus.dungeons.EssenceSlashCommand.ESSENCE_TYPES;
 import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
@@ -117,7 +116,7 @@ public class NetworthExecute {
 		addTotal("bank", player.getBankBalance());
 		addTotal("purse", player.getPurseCoins());
 
-		for (String essence : ESSENCE_TYPES) {
+		for (String essence : essenceTypes) {
 			addTotal(
 				"essence",
 				getLowestPrice("ESSENCE_" + essence.toUpperCase()) * higherDepth(player.profileJson(), "essence_" + essence, 0)

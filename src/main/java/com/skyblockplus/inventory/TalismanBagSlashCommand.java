@@ -24,6 +24,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -37,60 +38,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import org.apache.groovy.util.Maps;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TalismanBagSlashCommand extends SlashCommand {
-
-	private static final Map<String, Double> statToMultiplier = Maps.of(
-		"health",
-		5.0,
-		"walk_speed",
-		1.5,
-		"critical_chance",
-		0.2,
-		"attack_speed",
-		0.2,
-		"intelligence",
-		2.0
-	);
-	private static final Map<String, String> statToEmoji = Maps.of(
-		"health",
-		"❤️",
-		"defense",
-		getEmoji("IRON_CHESTPLATE"),
-		"strength",
-		getEmoji("BLAZE_POWDER"),
-		"walk_speed",
-		getEmoji("SUGAR"),
-		"critical_chance",
-		"☣️",
-		"critical_damage",
-		"☠️",
-		"intelligence",
-		getEmoji("ENCHANTED_BOOK"),
-		"attack_speed",
-		"⚔️"
-	);
-	public static final Map<String, Integer> rarityToMagicPower = Maps.of(
-		"COMMON",
-		3,
-		"UNCOMMON",
-		5,
-		"RARE",
-		8,
-		"EPIC",
-		12,
-		"LEGENDARY",
-		16,
-		"MYTHIC",
-		22,
-		"SPECIAL",
-		3,
-		"VERY_SPECIAL",
-		5
-	);
 
 	public TalismanBagSlashCommand() {
 		this.name = "talisman";
@@ -198,7 +149,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 
 			StringBuilder accessoryStr = new StringBuilder();
 			int magicPower = 0;
-			for (Map.Entry<String, Integer> entry : rarityToMagicPower.entrySet()) {
+			for (Map.Entry<String, Integer> entry : Constants.rarityToMagicPower.entrySet()) {
 				long count = accessoryBag.stream().filter(i -> i.getRarity().equals(entry.getKey())).count();
 				long power = count * entry.getValue();
 				accessoryStr
@@ -211,7 +162,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 					.append(" magic power)");
 				magicPower += power;
 			}
-			int hegemony = rarityToMagicPower.getOrDefault(
+			int hegemony = Constants.rarityToMagicPower.getOrDefault(
 				accessoryBag.stream().filter(a -> a.getId().equals("HEGEMONY_ARTIFACT")).map(InvItem::getRarity).findFirst().orElse(""),
 				0
 			);
@@ -247,7 +198,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 				for (Map.Entry<String, JsonElement> entry : higherDepth(POWER_TO_BASE_STATS, selectedPower).getAsJsonObject().entrySet()) {
 					powerStoneStr
 						.append("\n")
-						.append(statToEmoji.get(entry.getKey()))
+						.append(Constants.tuningStatToEmoji.get(entry.getKey()))
 						.append(" ")
 						.append(capitalizeString(entry.getKey().replace("_", " ")))
 						.append(": ")
@@ -271,14 +222,16 @@ public class TalismanBagSlashCommand extends SlashCommand {
 						tuningPointsSpent += amountSpent;
 						statStr
 							.append("\n")
-							.append(statToEmoji.get(stat.getKey()))
+							.append(Constants.tuningStatToEmoji.get(stat.getKey()))
 							.append(" ")
 							.append(capitalizeString(stat.getKey().replace("_", " ")))
 							.append(": ")
 							.append(amountSpent)
 							.append(
 								amountSpent > 0
-									? " (+" + roundAndFormat(amountSpent * statToMultiplier.getOrDefault(stat.getKey(), 1.0)) + ")"
+									? " (+" +
+									roundAndFormat(amountSpent * Constants.tuningStatToMultiplier.getOrDefault(stat.getKey(), 1.0)) +
+									")"
 									: ""
 							);
 					}

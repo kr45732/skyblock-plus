@@ -19,7 +19,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.features.mayor.MayorHandler.mayorNameToEmoji;
+import static com.skyblockplus.utils.Constants.mayorNameToEmoji;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;

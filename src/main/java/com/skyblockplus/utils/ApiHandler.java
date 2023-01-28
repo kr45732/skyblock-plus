@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 
 public class ApiHandler {
 
-	public static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
+	private static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
 	public static final CacheDatabase cacheDatabase = new CacheDatabase();
 	public static final LeaderboardDatabase leaderboardDatabase = new LeaderboardDatabase();
 	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);

@@ -39,7 +39,6 @@ import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandClient;
 import com.skyblockplus.utils.database.Database;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
@@ -107,13 +106,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class Utils {
 
 	/* Constants */
-	public static final Color botColor = new Color(223, 5, 5);
+	private static final Color botColor = new Color(223, 5, 5);
 	public static final int globalCooldown = 3;
 	public static final String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
 	public static final String BOT_INVITE_LINK =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395541081169&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
-	public static final HttpClient asyncHttpClient = HttpClient
+	private static final HttpClient asyncHttpClient = HttpClient
 		.newBuilder()
 		.executor(new ExceptionExecutor(20, 20, 45L, TimeUnit.SECONDS, new LinkedBlockingQueue<>()).setAllowCoreThreadTimeOut(true))
 		.build();
@@ -151,7 +150,7 @@ public class Utils {
 		.addSerializationExclusionStrategy(new ExposeExclusionStrategy())
 		.create();
 	public static final Consumer<Object> ignore = ignored -> {};
-	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
+	private static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
 	public static final AtomicInteger remainingLimit = new AtomicInteger(240);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
@@ -1822,12 +1821,8 @@ public class Utils {
 			.getCommands()
 			.stream()
 			.filter(command -> !command.isOwnerCommand())
-			.collect(Collectors.toMap(Command::getName, command -> client.getCommandUses(command), (a, b) -> b));
-		slashCommandClient
-			.getCommands()
-			.stream()
-			.collect(Collectors.toMap(SlashCommand::getName, command -> slashCommandClient.getCommandUses(command), (a, b) -> b))
-			.forEach((key, value) -> commandUses.compute(key, (k, v) -> (v != null ? v : 0) + value));
+			.collect(Collectors.toMap(Command::getName, command -> client.getCommandUses(command)));
+		slashCommandClient.getCommandUses().forEach((key, value) -> commandUses.compute(key, (k, v) -> (v != null ? v : 0) + value));
 		return commandUses;
 	}
 

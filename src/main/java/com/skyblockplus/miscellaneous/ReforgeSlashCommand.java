@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -35,46 +36,10 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import org.apache.groovy.util.Maps;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ReforgeSlashCommand extends SlashCommand {
-
-	public static final Map<String, String> statToEmoji = Maps.of(
-		"HEALTH",
-		"❤️",
-		"DEFENSE",
-		getEmoji("IRON_CHESTPLATE"),
-		"STRENGTH",
-		getEmoji("BLAZE_POWDER"),
-		"SPEED",
-		getEmoji("SUGAR"),
-		"CRIT_CHANCE",
-		"☣️",
-		"CRIT_DAMAGE",
-		"☠️",
-		"INTELLIGENCE",
-		getEmoji("ENCHANTED_BOOK"),
-		"MINING_SPEED",
-		"⛏️",
-		"BONUS_ATTACK_SPEED",
-		"⚔️",
-		"SEA_CREATURE_CHANCE",
-		"\uD83D\uDC20",
-		"MAGIC_FIND",
-		"\uD83C\uDF1F",
-		"PET_LUCK",
-		"♣️",
-		"TRUE_DEFENSE",
-		getEmoji("DIAMOND_CHESTPLATE"),
-		"FEROCITY",
-		"\uD83D\uDDE1️",
-		"MINING_FORTUNE",
-		"☘️",
-		"DAMAGE",
-		getEmoji("IRON_SWORD")
-	);
 
 	public ReforgeSlashCommand() {
 		this.name = "reforge";
@@ -145,7 +110,7 @@ public class ReforgeSlashCommand extends SlashCommand {
 					.entrySet()
 					.stream()
 					.map(e ->
-						statToEmoji.get(e.getKey().toUpperCase()) +
+						Constants.reforgeStatToEmoji.get(e.getKey().toUpperCase()) +
 						" " +
 						capitalizeString(e.getKey().replace("_", " ")) +
 						" ➜ " +

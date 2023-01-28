@@ -24,7 +24,6 @@ import static com.skyblockplus.utils.ApiHandler.queryLowestBinPet;
 import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -50,7 +49,7 @@ public class PriceSlashCommand extends SlashCommand {
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.embed(
-			queryAuctions(event.getOptionStr("item"), AuctionType.valueOf(event.getOptionStr("auction_type", "bin").toUpperCase()))
+			queryAuctions(event.getOptionStr("item"), AuctionType.valueOf(event.getOptionStr("auction_type", "both").toUpperCase()))
 		);
 	}
 
@@ -63,7 +62,7 @@ public class PriceSlashCommand extends SlashCommand {
 				new OptionData(OptionType.STRING, "auction_type", "Which type of auctions to show")
 					.addChoice("Bin", "bin")
 					.addChoice("Regular auctions", "auction")
-					.addChoice("Bin & regular auctions", "both")
+					.addChoice("All auctions", "both")
 			);
 	}
 
@@ -79,7 +78,7 @@ public class PriceSlashCommand extends SlashCommand {
 			return invalidEmbed("This command does not work during Derpy");
 		}
 
-		JsonArray lowestBinArr = null;
+		JsonArray auctionsArr = null;
 		for (String pet : PET_NAMES) {
 			if (query.replace(" ", "_").toUpperCase().contains(pet)) {
 				String queryFmt = query.toLowerCase();
@@ -93,8 +92,8 @@ public class PriceSlashCommand extends SlashCommand {
 					}
 				}
 
-				lowestBinArr = queryLowestBinPet(queryFmt, rarity, auctionType);
-				if (lowestBinArr == null) {
+				auctionsArr = queryLowestBinPet(queryFmt, rarity, auctionType);
+				if (auctionsArr == null) {
 					return invalidEmbed("Error fetching auctions data");
 				}
 				break;
@@ -102,24 +101,24 @@ public class PriceSlashCommand extends SlashCommand {
 		}
 
 		String matchedQuery = null;
-		if (lowestBinArr == null || lowestBinArr.isEmpty()) {
+		if (auctionsArr == null || auctionsArr.isEmpty()) {
 			String idStrict = nameToId(query, true);
 			if (idStrict != null) {
-				lowestBinArr = queryLowestBin(idStrict, false, auctionType);
+				auctionsArr = queryLowestBin(idStrict, false, auctionType);
 			} else {
 				List<String> queryItems = getQueryItems();
 				if (queryItems != null && queryItems.stream().noneMatch(q -> q.equalsIgnoreCase(query))) {
 					matchedQuery = getClosestMatch(query, queryItems);
 				}
-				lowestBinArr = queryLowestBin(matchedQuery != null ? matchedQuery : query, true, auctionType);
+				auctionsArr = queryLowestBin(matchedQuery != null ? matchedQuery : query, true, auctionType);
 			}
 
-			if (lowestBinArr == null) {
+			if (auctionsArr == null) {
 				return invalidEmbed("Error fetching auctions data");
 			}
 		}
 
-		if (lowestBinArr.size() == 0) {
+		if (auctionsArr.size() == 0) {
 			return invalidEmbed("No " + auctionType.getName() + " matching '" + query + "' found");
 		}
 
@@ -129,13 +128,12 @@ public class PriceSlashCommand extends SlashCommand {
 				"Searched for '" + matchedQuery + "' since no " + auctionType.getName() + " matching '" + query + "' were found"
 			);
 		}
-		for (JsonElement auction : lowestBinArr) {
+		for (JsonElement auction : auctionsArr) {
 			String ahStr =
 				"**Price:** " +
 				roundAndFormat(higherDepth(auction, "starting_bid").getAsDouble()) +
 				"\n**Rarity:** " +
 				higherDepth(auction, "tier").getAsString().toLowerCase() +
-				//	ahStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString()).username();
 				"\n**" +
 				(higherDepth(auction, "bin", false) ? "Bin" : "Auction") +
 				":** `/viewauction " +

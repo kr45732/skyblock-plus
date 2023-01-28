@@ -18,9 +18,9 @@
 
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.features.jacob.JacobContest.CROP_NAME_TO_EMOJI;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.cropNameToEmoji;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -532,7 +532,7 @@ public class SettingsExecute {
 		}
 
 		if (crop.equalsIgnoreCase("all")) {
-			for (String validCrop : CROP_NAME_TO_EMOJI.keySet()) {
+			for (String validCrop : cropNameToEmoji.keySet()) {
 				EmbedBuilder eb = addJacobCrop(validCrop, role != null ? role.getId() : null);
 				if (
 					!eb.build().getTitle().equalsIgnoreCase("Settings") &&
@@ -544,8 +544,8 @@ public class SettingsExecute {
 			return defaultSettingsEmbed("Added all jacob crops");
 		}
 
-		if (!CROP_NAME_TO_EMOJI.containsKey(crop)) {
-			return invalidEmbed("Invalid crop\n\nValid crops are: " + String.join(", ", CROP_NAME_TO_EMOJI.keySet()));
+		if (!cropNameToEmoji.containsKey(crop)) {
+			return invalidEmbed("Invalid crop\n\nValid crops are: " + String.join(", ", cropNameToEmoji.keySet()));
 		}
 
 		JsonObject jacobSettings = getJacobSettings();

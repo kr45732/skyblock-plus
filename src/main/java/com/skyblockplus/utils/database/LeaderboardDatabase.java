@@ -19,8 +19,8 @@
 package com.skyblockplus.utils.database;
 
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
-import static com.skyblockplus.utils.Player.STATS_LIST;
+import static com.skyblockplus.utils.Constants.collectionNameToId;
+import static com.skyblockplus.utils.Constants.skyblockStats;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 public class LeaderboardDatabase {
 
 	private static final int MAX_INSERT_COUNT = 75;
-	public static final List<String> types = new ArrayList<>(
+	private static final List<String> types = new ArrayList<>(
 		List.of(
 			"username",
 			"uuid",
@@ -79,12 +79,12 @@ public class LeaderboardDatabase {
 			"hotm"
 		)
 	);
-	public static final List<String> typesSubList = new ArrayList<>();
+	private static final List<String> typesSubList = new ArrayList<>();
 	public static final List<String> formattedTypesSubList = new ArrayList<>();
 
 	static {
-		types.addAll(COLLECTION_NAME_TO_ID.keySet());
-		types.addAll(STATS_LIST);
+		types.addAll(collectionNameToId.keySet());
+		types.addAll(skyblockStats);
 
 		typesSubList.addAll(types.subList(2, types.size()));
 		formattedTypesSubList.addAll(typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).toList());

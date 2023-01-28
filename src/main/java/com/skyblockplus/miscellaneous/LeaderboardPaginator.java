@@ -21,7 +21,7 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
-import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
+import static com.skyblockplus.utils.Constants.collectionNameToId;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
@@ -111,7 +111,7 @@ public class LeaderboardPaginator {
 				if (!player.isSkillsApiEnabled()) {
 					playerAmount = "Skills API Disabled";
 				}
-			} else if (COLLECTION_NAME_TO_ID.containsKey(lbType)) {
+			} else if (collectionNameToId.containsKey(lbType)) {
 				if (!player.isCollectionsApiEnabled()) {
 					playerAmount = "Collections API disabled";
 				}
