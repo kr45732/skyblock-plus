@@ -312,9 +312,19 @@ public class LevelSlashCommand extends SlashCommand {
 		LevelRecord levelRecord = new LevelRecord(eb, catacombsSbXp + classSbXp + floorCompletionSbXp + masterFloorCompletionSbXp, 2760);
 		eb.appendDescription("\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Catacombs Level Up: " + formatNumber(catacombsSbXp) + " / 1220");
 		eb.appendDescription("\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Class Level Up: " + formatNumber(classSbXp) + " / 1000");
-		eb.appendDescription("\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Complete The Catacombs: " + formatNumber(floorCompletionSbXp) + " / 190");
-		eb.appendDescription("\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Complete The Catacombs Master Mode: " + formatNumber(masterFloorCompletionSbXp) + " / 350");
-		eb.getDescriptionBuilder().insert(0, DUNGEON_EMOJI_MAP.get("catacombs") + " **Dungeon Tasks:** " + levelRecord.getFormatted() + "\n");
+		eb.appendDescription(
+			"\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Complete The Catacombs: " + formatNumber(floorCompletionSbXp) + " / 190"
+		);
+		eb.appendDescription(
+			"\n" +
+			DUNGEON_EMOJI_MAP.get("catacombs") +
+			" Complete The Catacombs Master Mode: " +
+			formatNumber(masterFloorCompletionSbXp) +
+			" / 350"
+		);
+		eb
+			.getDescriptionBuilder()
+			.insert(0, DUNGEON_EMOJI_MAP.get("catacombs") + " **Dungeon Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -343,7 +353,9 @@ public class LevelSlashCommand extends SlashCommand {
 
 			String essenceType = essenceShop.getKey().split("_")[1].toLowerCase();
 			eb.appendDescription(
-				"\n" + ESSENCE_EMOJI_MAP.get(essenceType) + " " +
+				"\n" +
+				ESSENCE_EMOJI_MAP.get(essenceType) +
+				" " +
 				capitalizeString(essenceType) +
 				" Essence Shop: " +
 				formatNumber(shopSbXp) +
@@ -354,7 +366,9 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Essence shop tasks total
 		LevelRecord levelRecord = new LevelRecord(eb, essenceSbXp, 856);
-		eb.getDescriptionBuilder().insert(0, ESSENCE_EMOJI_MAP.get("wither") + " **Essence Shop Tasks:** " + levelRecord.getFormatted() + "\n");
+		eb
+			.getDescriptionBuilder()
+			.insert(0, ESSENCE_EMOJI_MAP.get("wither") + " **Essence Shop Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -504,9 +518,13 @@ public class LevelSlashCommand extends SlashCommand {
 			6125
 		);
 		eb.appendDescription("\n" + getEmoji("EXP_BOTTLE") + " Slayer Level Up: " + formatNumber(slayerLevelUpSbXp) + " / 3,625");
-		eb.appendDescription("\n" + getEmoji("DIAMOND_THORN_HEAD") + " Boss Collections: " + formatNumber(bossCollectionsSbXp) + " / 1,015");
+		eb.appendDescription(
+			"\n" + getEmoji("DIAMOND_THORN_HEAD") + " Boss Collections: " + formatNumber(bossCollectionsSbXp) + " / 1,015"
+		);
 		eb.appendDescription("\n" + getEmoji("ZOMBIE_HAT") + " Bestiary Progress: " + formatNumber(bestiarySbXp));
-		eb.appendDescription("\n" + getEmoji("BEASTMASTER_CREST_LEGENDARY") + " Mythological Kills: " + formatNumber(mythologicalKillsSbXp) + " / 100");
+		eb.appendDescription(
+			"\n" + getEmoji("BEASTMASTER_CREST_LEGENDARY") + " Mythological Kills: " + formatNumber(mythologicalKillsSbXp) + " / 100"
+		);
 		eb.appendDescription("\n" + getEmoji("DRAGON_EGG") + " Slay Dragon: " + formatNumber(dragonSlaySbXp) + " / 200");
 		eb.appendDescription("\n" + getEmoji("AATROX_BATPHONE") + " Defeat Slayers: " + formatNumber(defeatSlayerSbXp) + " / 825");
 		eb.appendDescription("\n" + getEmoji("KUUDRA_TIER_KEY") + " Defeat Kuudra: " + formatNumber(defeatKuudraSbXp) + " / 300");
@@ -628,9 +646,9 @@ public class LevelSlashCommand extends SlashCommand {
 		int doubleDrops = higherDepth(player.profileJson(), "jacob2.perks.double_drops", 0);
 		int farmingLevelCap = player.getFarmingCapUpgrade();
 		int anitaShopUpgradeSbXp = (doubleDrops + farmingLevelCap) * 10;
-		
+
 		farmingStr += "\n" + getEmoji("STICK") + " Anita's Shop Upgrades: " + formatNumber(anitaShopUpgradeSbXp) + " / 250";
-		eb.addField(getEmoji("GOLD_HOE") +  " Farming | " + formatNumber(anitaShopUpgradeSbXp), farmingStr, false);
+		eb.addField(getEmoji("GOLD_HOE") + " Farming | " + formatNumber(anitaShopUpgradeSbXp), farmingStr, false);
 
 		// Fishing
 		String fishingStr = "";
@@ -682,7 +700,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Accessory bag upgrade count
 		int accessoryBagUpgradeSbXp = higherDepth(player.profileJson(), "accessory_bag_storage.bag_upgrades_purchased", 0) * 2;
-		
+
 		// Reaper peppers
 		int reaperPepperSbXp = higherDepth(player.profileJson(), "reaper_peppers_eaten", 0) * 10;
 
@@ -780,14 +798,20 @@ public class LevelSlashCommand extends SlashCommand {
 			categoryTotalSbXp,
 			1351
 		);
-		eb.appendDescription("\n" + getEmoji("HEGEMONY_ARTIFACT") + " Accessory Bag Upgrades: " + formatNumber(accessoryBagUpgradeSbXp) + " / 396");
+		eb.appendDescription(
+			"\n" + getEmoji("HEGEMONY_ARTIFACT") + " Accessory Bag Upgrades: " + formatNumber(accessoryBagUpgradeSbXp) + " / 396"
+		);
 		eb.appendDescription("\n" + getEmoji("REAPER_PEPPER") + " Reaper Peppers: " + formatNumber(reaperPepperSbXp) + " / 50");
 		eb.appendDescription("\n" + getEmoji("SCORCHED_BOOKS") + " Unlocking Powers: " + formatNumber(unlockingPowersSbXp) + " / 255");
 		eb.appendDescription("\n" + getEmoji("DOJO_BLACK_BELT") + " The Dojo: " + formatNumber(dojoSbXp) + " / 425");
 		eb.appendDescription("\n" + getEmoji("ENCHANTED_BOOK") + " Harp Songs: " + formatNumber(harpSbXp) + " / 236");
-		eb.appendDescription("\n" + getEmoji("ABIPHONE_XIV_ENORMOUS_PURPLE") + " Abiphone Contacts: " + formatNumber(abiphoneSbXp) + " / 410");
+		eb.appendDescription(
+			"\n" + getEmoji("ABIPHONE_XIV_ENORMOUS_PURPLE") + " Abiphone Contacts: " + formatNumber(abiphoneSbXp) + " / 410"
+		);
 		eb.appendDescription("\n" + getEmoji("EMERALD") + " Community Shop Upgrades: " + formatNumber(communityShopSbXp) + " / 120");
-		eb.appendDescription("\n" + getEmoji("PERSONAL_BANK_ITEM") + " Personal Bank Upgrades: " + formatNumber(personalBankSbXp) + " / 110");
+		eb.appendDescription(
+			"\n" + getEmoji("PERSONAL_BANK_ITEM") + " Personal Bank Upgrades: " + formatNumber(personalBankSbXp) + " / 110"
+		);
 		eb.getDescriptionBuilder().insert(0, getEmoji("EMPTY_MAP") + " **Miscellaneous Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
