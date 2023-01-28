@@ -559,7 +559,15 @@ public class HelpSlashCommand extends SlashCommand {
 									.addSubcommands(
 										new HelpData(
 											"enable",
-											"Enable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every 3 hours."
+											"Enable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every hour (capped at 120 members per sync)."
+										),
+										new HelpData("disable", "Disable verification automatic sync")
+									),
+								new HelpData("roles_sync", "Enable or disable verify automatic roles sync")
+									.addSubcommands(
+										new HelpData(
+											"enable",
+											"Enable verification automatic sync. This is will sync skyblock roles every hour (capped at 30 members per sync)."
 										),
 										new HelpData("disable", "Disable verification automatic sync")
 									),
@@ -571,7 +579,7 @@ public class HelpSlashCommand extends SlashCommand {
 										),
 										new HelpData("disable", "Disable verification automatic DM on join sync")
 									),
-								new HelpData("roles_claim", "Enable or disable automatic roles sync")
+								new HelpData("roles_claim", "Enable or disable automatic roles sync on join")
 									.addSubcommands(
 										new HelpData(
 											"enable",
@@ -980,6 +988,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none") +
 			create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
 			create("settings verify sync <enable|disable>", "Enable or disable automatic verify role and nickname syncing") +
+			create("settings verify roles_sync <enable|disable>", "Enable or disable automatic roles syncing") +
 			create("settings verify dm_on_join <enable|disable>", "Enable or disable DMing the user on syncing") +
 			create("settings verify roles_claim <enable|disable>", "Enable or disable automatic role syncing")
 		);

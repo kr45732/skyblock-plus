@@ -38,7 +38,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import org.apache.groovy.util.Maps;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -637,7 +636,7 @@ public class LevelSlashCommand extends SlashCommand {
 		miningStr += "\n" + getEmoji("ROYAL_PIGEON") + " Commission Milestones: " + formatNumber(commissionsSbXp) + " / 255";
 		miningStr += "\n" + getEmoji("REDSTONE_BLOCK") + " Peak Of The Mountain: " + formatNumber(peakOfTheMountainSbXp) + " / 475";
 		miningStr += "\n" + getEmoji("ROCK;4") + " Rock Milestones: " + formatNumber(rockPetSbXp) + " / 100";
-		eb.addField(getEmoji("STONE_PICKAXE") + " Mining | " + formatNumber(miningTotalSbXp) + " / 2,655", miningStr, false);
+		eb.addField("Mining | " + formatNumber(miningTotalSbXp) + " / 2,655", miningStr, false);
 
 		// Farming
 		String farmingStr = "";
@@ -648,7 +647,7 @@ public class LevelSlashCommand extends SlashCommand {
 		int anitaShopUpgradeSbXp = (doubleDrops + farmingLevelCap) * 10;
 
 		farmingStr += "\n" + getEmoji("STICK") + " Anita's Shop Upgrades: " + formatNumber(anitaShopUpgradeSbXp) + " / 250";
-		eb.addField(getEmoji("GOLD_HOE") + " Farming | " + formatNumber(anitaShopUpgradeSbXp), farmingStr, false);
+		eb.addField("Farming | " + formatNumber(anitaShopUpgradeSbXp), farmingStr, false);
 
 		// Fishing
 		String fishingStr = "";
@@ -686,7 +685,7 @@ public class LevelSlashCommand extends SlashCommand {
 		int fishingTotalSbXp = trophyFishingSbXp + dolphinPetSbXp;
 		fishingStr += "\n" + getEmoji("SLUGFISH_BRONZE") + " Trophy Fish: " + formatNumber(trophyFishingSbXp) + " / 1,080";
 		fishingStr += "\n" + getEmoji("DOLPHIN;4") + " Dolphin Milestones: " + formatNumber(dolphinPetSbXp) + " / 100";
-		eb.addField(getEmoji("FISHING_ROD") + " Fishing | " + formatNumber(fishingTotalSbXp), fishingStr, false);
+		eb.addField("Fishing | " + formatNumber(fishingTotalSbXp), fishingStr, false);
 
 		// Total xp
 		LevelRecord levelRecord = new LevelRecord(eb, miningTotalSbXp + anitaShopUpgradeSbXp + fishingTotalSbXp, 4085);
