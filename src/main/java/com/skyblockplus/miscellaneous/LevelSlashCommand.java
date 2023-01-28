@@ -190,19 +190,15 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 			}
 		}
-		eb.appendDescription("\nSkill Level Up: " + formatNumber(skillsSbXp) + " / 7,500");
 
 		// Fairy souls
 		int fairySoulSbXp = player.getFairySouls() / 5 * 10;
-		eb.appendDescription("\nFairy Souls: " + formatNumber(fairySoulSbXp) + " / 470");
 
 		// Accessories
 		int magicPowerSbXp = player.getMagicPower();
-		eb.appendDescription("\nAccessory Bag: " + formatNumber(magicPowerSbXp));
 
 		// Pets
 		int petScoreSbXp = player.getPetScore() * 3;
-		eb.appendDescription("\nPet Score: " + formatNumber(petScoreSbXp));
 
 		// Collections
 		Map<String, Long> collections = new HashMap<>();
@@ -228,7 +224,6 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 			}
 		}
-		eb.appendDescription("\nCollections: " + formatNumber(collectionsSbXp) + " / 2,452");
 
 		// Minions
 		Set<String> uniqueCraftedMinions = new HashSet<>();
@@ -244,7 +239,6 @@ public class LevelSlashCommand extends SlashCommand {
 			int idx = uniqueCraftedMinion.lastIndexOf("_");
 			minionsSbXp += higherDepth(getMiscJson(), "minionXp." + uniqueCraftedMinion.substring(idx + 1)).getAsInt();
 		}
-		eb.appendDescription("\nCraft Minions: " + formatNumber(minionsSbXp) + " / 2,801");
 
 		// Core tasks total
 		LevelRecord levelRecord = new LevelRecord(
@@ -252,7 +246,13 @@ public class LevelSlashCommand extends SlashCommand {
 			skillsSbXp + fairySoulSbXp + magicPowerSbXp + petScoreSbXp + collectionsSbXp + minionsSbXp,
 			15430
 		);
-		eb.getDescriptionBuilder().insert(0, "**Core Tasks:** " + levelRecord.getFormatted() + "\n");
+		eb.appendDescription("\n" + getEmoji("DIAMOND_SWORD") + " Skill Level Up: " + formatNumber(skillsSbXp) + " / 7,500");
+		eb.appendDescription("\n" + getEmoji("REVIVE_STONE") + " Fairy Souls: " + formatNumber(fairySoulSbXp) + " / 470");
+		eb.appendDescription("\n" + getEmoji("HEGEMONY_ARTIFACT") + " Accessory Bag: " + formatNumber(magicPowerSbXp));
+		eb.appendDescription("\n" + getEmoji("BONE") + " Pet Score: " + formatNumber(petScoreSbXp));
+		eb.appendDescription("\n" + getEmoji("PAINTING") + " Collections: " + formatNumber(collectionsSbXp) + " / 2,452");
+		eb.appendDescription("\n" + getEmoji("COBBLESTONE_GENERATOR_1") + " Craft Minions: " + formatNumber(minionsSbXp) + " / 2,801");
+		eb.getDescriptionBuilder().insert(0, getEmoji("NETHER_STAR") + " **Core Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -272,7 +272,6 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 			}
 		}
-		eb.appendDescription("\nCatacombs Level Up: " + formatNumber(catacombsSbXp) + " / 1220");
 
 		// Classes
 		int classSbXp = 0;
@@ -282,7 +281,6 @@ public class LevelSlashCommand extends SlashCommand {
 				classSbXp += Math.min(classInfo.currentLevel(), 50) * 4;
 			}
 		}
-		eb.appendDescription("\nClass Level Up: " + formatNumber(classSbXp) + " / 1000");
 
 		// Regular floor completions
 		int floorCompletionSbXp = 0;
@@ -298,7 +296,6 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 			}
 		}
-		eb.appendDescription("\nComplete The Catacombs: " + formatNumber(floorCompletionSbXp) + " / 190");
 
 		// Master flor completions
 		int masterFloorCompletionSbXp = 0;
@@ -310,11 +307,14 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 			}
 		}
-		eb.appendDescription("\nComplete The Catacombs Master Mode: " + formatNumber(masterFloorCompletionSbXp) + " / 350");
 
 		// Dungeon tasks total
 		LevelRecord levelRecord = new LevelRecord(eb, catacombsSbXp + classSbXp + floorCompletionSbXp + masterFloorCompletionSbXp, 2760);
-		eb.getDescriptionBuilder().insert(0, "**Dungeon Tasks:** " + levelRecord.getFormatted() + "\n");
+		eb.appendDescription("\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Catacombs Level Up: " + formatNumber(catacombsSbXp) + " / 1220");
+		eb.appendDescription("\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Class Level Up: " + formatNumber(classSbXp) + " / 1000");
+		eb.appendDescription("\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Complete The Catacombs: " + formatNumber(floorCompletionSbXp) + " / 190");
+		eb.appendDescription("\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Complete The Catacombs Master Mode: " + formatNumber(masterFloorCompletionSbXp) + " / 350");
+		eb.getDescriptionBuilder().insert(0, DUNGEON_EMOJI_MAP.get("catacombs") + " **Dungeon Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -341,9 +341,10 @@ public class LevelSlashCommand extends SlashCommand {
 
 			essenceSbXp += shopSbXp;
 
+			String essenceType = essenceShop.getKey().split("_")[1].toLowerCase();
 			eb.appendDescription(
-				"\n" +
-				capitalizeString(essenceShop.getKey().split("_")[1]) +
+				"\n" + ESSENCE_EMOJI_MAP.get(essenceType) + " " +
+				capitalizeString(essenceType) +
 				" Essence Shop: " +
 				formatNumber(shopSbXp) +
 				" / " +
@@ -353,7 +354,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Essence shop tasks total
 		LevelRecord levelRecord = new LevelRecord(eb, essenceSbXp, 856);
-		eb.getDescriptionBuilder().insert(0, "**Essence Shop Tasks:** " + levelRecord.getFormatted() + "\n");
+		eb.getDescriptionBuilder().insert(0, ESSENCE_EMOJI_MAP.get("wither") + " **Essence Shop Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -489,15 +490,6 @@ public class LevelSlashCommand extends SlashCommand {
 			defeatedArachneSbXp += 40;
 		}
 
-		eb.appendDescription("\nSlayer Level Up: " + formatNumber(slayerLevelUpSbXp) + " / 3,625");
-		eb.appendDescription("\nBoss Collections: " + formatNumber(bossCollectionsSbXp) + " / 1,015");
-		eb.appendDescription("\nBestiary Progress: " + formatNumber(bestiarySbXp));
-		eb.appendDescription("\nMythological Kills: " + formatNumber(mythologicalKillsSbXp) + " / 100");
-		eb.appendDescription("\nSlay Dragon: " + formatNumber(dragonSlaySbXp) + " / 200");
-		eb.appendDescription("\nDefeat Slayers: " + formatNumber(defeatSlayerSbXp) + " / 825");
-		eb.appendDescription("\nDefeat Kuudra: " + formatNumber(defeatKuudraSbXp) + " / 300");
-		eb.appendDescription("\nDefeat Arachne: " + formatNumber(defeatedArachneSbXp) + " / 60");
-
 		// Slaying tasks total
 		LevelRecord levelRecord = new LevelRecord(
 			eb,
@@ -511,22 +503,17 @@ public class LevelSlashCommand extends SlashCommand {
 			defeatedArachneSbXp,
 			6125
 		);
-		eb.getDescriptionBuilder().insert(0, "**Slaying Tasks:** " + levelRecord.getFormatted() + "\n");
+		eb.appendDescription("\n" + getEmoji("EXP_BOTTLE") + " Slayer Level Up: " + formatNumber(slayerLevelUpSbXp) + " / 3,625");
+		eb.appendDescription("\n" + getEmoji("DIAMOND_THORN_HEAD") + " Boss Collections: " + formatNumber(bossCollectionsSbXp) + " / 1,015");
+		eb.appendDescription("\n" + getEmoji("ZOMBIE_HAT") + " Bestiary Progress: " + formatNumber(bestiarySbXp));
+		eb.appendDescription("\n" + getEmoji("BEASTMASTER_CREST_LEGENDARY") + " Mythological Kills: " + formatNumber(mythologicalKillsSbXp) + " / 100");
+		eb.appendDescription("\n" + getEmoji("DRAGON_EGG") + " Slay Dragon: " + formatNumber(dragonSlaySbXp) + " / 200");
+		eb.appendDescription("\n" + getEmoji("AATROX_BATPHONE") + " Defeat Slayers: " + formatNumber(defeatSlayerSbXp) + " / 825");
+		eb.appendDescription("\n" + getEmoji("KUUDRA_TIER_KEY") + " Defeat Kuudra: " + formatNumber(defeatKuudraSbXp) + " / 300");
+		eb.appendDescription("\n" + getEmoji("ARACHNE_CRYSTAL") + " Defeat Arachne: " + formatNumber(defeatedArachneSbXp) + " / 60");
+		eb.getDescriptionBuilder().insert(0, getEmoji("GOLD_SWORD") + " **Slaying Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
-	}
-
-	private static int loopThroughCollection(int[] array, int value) {
-		JsonArray dungeonCollectionXp = higherDepth(getSbLevelsJson(), "slaying_task.boss_collections_xp.dungeon_collection_xp")
-			.getAsJsonArray();
-		int gain = 0;
-		for (int i = 0; i < array.length; i++) {
-			if (value >= array[i]) {
-				int gained = dungeonCollectionXp.get(i).getAsInt();
-				gain += gained;
-			}
-		}
-		return gain;
 	}
 
 	private static LevelRecord getSkillRelatedTasks(Player player) {
@@ -553,7 +540,6 @@ public class LevelSlashCommand extends SlashCommand {
 					};
 			}
 		}
-		miningStr += "\nHeart Of The Mountain: " + formatNumber(hotmSbXp) + " / 545";
 
 		// Powder
 		int powderSbXp = 0;
@@ -581,7 +567,6 @@ public class LevelSlashCommand extends SlashCommand {
 				4.25 *
 				(Math.sqrt(1 + 8 * (Math.sqrt((1758267.0 / gemstoneCap) * (Math.min(gemstonePowder, gemstoneCap) - normalCap + 9)))) - 3);
 		}
-		miningStr += "\nPowder: " + formatNumber(powderSbXp) + " / 1,080";
 
 		// Commissions
 		int commissionsSbXp = 0;
@@ -599,7 +584,6 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 			}
 		}
-		miningStr += "\nCommission Milestones: " + formatNumber(commissionsSbXp) + " / 255";
 
 		// Peak of the mountain
 		int peakOfTheMountainSbXp = 0;
@@ -617,7 +601,6 @@ public class LevelSlashCommand extends SlashCommand {
 					default -> 9;
 				};
 		}
-		miningStr += "\nPeak Of The Mountain: " + formatNumber(peakOfTheMountainSbXp) + " / 475";
 
 		// Rock pet milestones
 		int rockPetSbXp = 0;
@@ -629,10 +612,14 @@ public class LevelSlashCommand extends SlashCommand {
 				rockPetSbXp += 20;
 			}
 		}
-		miningStr += "\nRock Milestones: " + formatNumber(rockPetSbXp) + " / 100";
 
 		int miningTotalSbXp = hotmSbXp + powderSbXp + commissionsSbXp + peakOfTheMountainSbXp + rockPetSbXp;
-		eb.addField("Mining | " + formatNumber(miningTotalSbXp) + " / 2,655", miningStr, false);
+		miningStr += "\n" + getEmoji("DIVAN_DRILL") + " Heart Of The Mountain: " + formatNumber(hotmSbXp) + " / 545";
+		miningStr += "\n" + getEmoji("MITHRIL_ORE") + " Powder: " + formatNumber(powderSbXp) + " / 1,080";
+		miningStr += "\n" + getEmoji("ROYAL_PIGEON") + " Commission Milestones: " + formatNumber(commissionsSbXp) + " / 255";
+		miningStr += "\n" + getEmoji("REDSTONE_BLOCK") + " Peak Of The Mountain: " + formatNumber(peakOfTheMountainSbXp) + " / 475";
+		miningStr += "\n" + getEmoji("ROCK;4") + " Rock Milestones: " + formatNumber(rockPetSbXp) + " / 100";
+		eb.addField(getEmoji("STONE_PICKAXE") + " Mining | " + formatNumber(miningTotalSbXp) + " / 2,655", miningStr, false);
 
 		// Farming
 		String farmingStr = "";
@@ -641,9 +628,9 @@ public class LevelSlashCommand extends SlashCommand {
 		int doubleDrops = higherDepth(player.profileJson(), "jacob2.perks.double_drops", 0);
 		int farmingLevelCap = player.getFarmingCapUpgrade();
 		int anitaShopUpgradeSbXp = (doubleDrops + farmingLevelCap) * 10;
-		farmingStr += "\nAnita's Shop Upgrades: " + formatNumber(anitaShopUpgradeSbXp) + " / 250";
-
-		eb.addField("Farming | " + formatNumber(anitaShopUpgradeSbXp), farmingStr, false);
+		
+		farmingStr += "\n" + getEmoji("STICK") + " Anita's Shop Upgrades: " + formatNumber(anitaShopUpgradeSbXp) + " / 250";
+		eb.addField(getEmoji("GOLD_HOE") +  " Farming | " + formatNumber(anitaShopUpgradeSbXp), farmingStr, false);
 
 		// Fishing
 		String fishingStr = "";
@@ -667,7 +654,6 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 			}
 		}
-		fishingStr += "\nTrophy Fish: " + formatNumber(trophyFishingSbXp) + " / 1,080";
 
 		// Dolphin pet milestones
 		int dolphinPetSbXp = 0;
@@ -678,14 +664,15 @@ public class LevelSlashCommand extends SlashCommand {
 				dolphinPetSbXp += 20;
 			}
 		}
-		fishingStr += "\nDolphin Milestones: " + formatNumber(dolphinPetSbXp) + " / 100";
 
 		int fishingTotalSbXp = trophyFishingSbXp + dolphinPetSbXp;
-		eb.addField("Fishing | " + formatNumber(fishingTotalSbXp), fishingStr, false);
+		fishingStr += "\n" + getEmoji("SLUGFISH_BRONZE") + " Trophy Fish: " + formatNumber(trophyFishingSbXp) + " / 1,080";
+		fishingStr += "\n" + getEmoji("DOLPHIN;4") + " Dolphin Milestones: " + formatNumber(dolphinPetSbXp) + " / 100";
+		eb.addField(getEmoji("FISHING_ROD") + " Fishing | " + formatNumber(fishingTotalSbXp), fishingStr, false);
 
 		// Total xp
 		LevelRecord levelRecord = new LevelRecord(eb, miningTotalSbXp + anitaShopUpgradeSbXp + fishingTotalSbXp, 4085);
-		eb.getDescriptionBuilder().insert(0, "**Skill Related Tasks:** " + levelRecord.getFormatted() + "\n");
+		eb.getDescriptionBuilder().insert(0, getEmoji("DIAMOND_SWORD") + " **Skill Related Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -695,11 +682,9 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Accessory bag upgrade count
 		int accessoryBagUpgradeSbXp = higherDepth(player.profileJson(), "accessory_bag_storage.bag_upgrades_purchased", 0) * 2;
-		eb.appendDescription("\nAccessory Bag Upgrades: " + formatNumber(accessoryBagUpgradeSbXp) + " / 396");
-
+		
 		// Reaper peppers
 		int reaperPepperSbXp = higherDepth(player.profileJson(), "reaper_peppers_eaten", 0) * 10;
-		eb.appendDescription("\nReaper Peppers: " + formatNumber(reaperPepperSbXp) + " / 50");
 
 		// Unlocking accessory bag powers
 		int unlockingPowersSbXp = 0;
@@ -707,7 +692,6 @@ public class LevelSlashCommand extends SlashCommand {
 		if (unlockedPowers != null) {
 			unlockingPowersSbXp = unlockedPowers.getAsJsonArray().size() * 15;
 		}
-		eb.appendDescription("\nUnlocking Powers: " + formatNumber(unlockingPowersSbXp) + " / 255");
 
 		// Dojo
 		int dojoSbXp = 0;
@@ -732,7 +716,6 @@ public class LevelSlashCommand extends SlashCommand {
 			}
 			dojoSbXp += 20;
 		}
-		eb.appendDescription("\nThe Dojo: " + formatNumber(dojoSbXp) + " / 425");
 
 		// Harp
 		int harpSbXp = 0;
@@ -746,7 +729,6 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 			}
 		}
-		eb.appendDescription("\nHarp Songs: " + formatNumber(harpSbXp) + " / 236");
 
 		// Abiphone
 		int abiphoneSbXp = 0;
@@ -754,7 +736,6 @@ public class LevelSlashCommand extends SlashCommand {
 		if (abiphoneContacts != null) {
 			abiphoneSbXp = abiphoneContacts.getAsJsonArray().size() * 10;
 		}
-		eb.appendDescription("\nAbiphone Contacts: " + formatNumber(abiphoneSbXp) + " / 410");
 
 		// Community shop
 		int communityShopSbXp = 0;
@@ -776,7 +757,6 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 			}
 		}
-		eb.appendDescription("\nCommunity Shop Upgrades: " + formatNumber(communityShopSbXp) + " / 120");
 
 		// Personal bank upgrades
 		int personalBankSbXp = 0;
@@ -791,7 +771,6 @@ public class LevelSlashCommand extends SlashCommand {
 					default -> 0;
 				};
 		}
-		eb.appendDescription("\nPersonal Bank Upgrades: " + formatNumber(personalBankSbXp) + " / 110");
 
 		// Miscellaneous tasks total
 		int categoryTotalSbXp = reaperPepperSbXp + dojoSbXp + harpSbXp + abiphoneSbXp + communityShopSbXp + personalBankSbXp;
@@ -801,7 +780,15 @@ public class LevelSlashCommand extends SlashCommand {
 			categoryTotalSbXp,
 			1351
 		);
-		eb.getDescriptionBuilder().insert(0, "**Miscellaneous Tasks:** " + levelRecord.getFormatted() + "\n");
+		eb.appendDescription("\n" + getEmoji("HEGEMONY_ARTIFACT") + " Accessory Bag Upgrades: " + formatNumber(accessoryBagUpgradeSbXp) + " / 396");
+		eb.appendDescription("\n" + getEmoji("REAPER_PEPPER") + " Reaper Peppers: " + formatNumber(reaperPepperSbXp) + " / 50");
+		eb.appendDescription("\n" + getEmoji("SCORCHED_BOOKS") + " Unlocking Powers: " + formatNumber(unlockingPowersSbXp) + " / 255");
+		eb.appendDescription("\n" + getEmoji("DOJO_BLACK_BELT") + " The Dojo: " + formatNumber(dojoSbXp) + " / 425");
+		eb.appendDescription("\n" + getEmoji("ENCHANTED_BOOK") + " Harp Songs: " + formatNumber(harpSbXp) + " / 236");
+		eb.appendDescription("\n" + getEmoji("ABIPHONE_XIV_ENORMOUS_PURPLE") + " Abiphone Contacts: " + formatNumber(abiphoneSbXp) + " / 410");
+		eb.appendDescription("\n" + getEmoji("EMERALD") + " Community Shop Upgrades: " + formatNumber(communityShopSbXp) + " / 120");
+		eb.appendDescription("\n" + getEmoji("PERSONAL_BANK_ITEM") + " Personal Bank Upgrades: " + formatNumber(personalBankSbXp) + " / 110");
+		eb.getDescriptionBuilder().insert(0, getEmoji("EMPTY_MAP") + " **Miscellaneous Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -824,11 +811,11 @@ public class LevelSlashCommand extends SlashCommand {
 				}
 			}
 		}
-		eb.appendDescription("\nComplete Objectives: " + formatNumber(objectivesSbXp) + " / 105");
 
 		// Story tasks total
 		LevelRecord levelRecord = new LevelRecord(eb, objectivesSbXp, 105);
-		eb.getDescriptionBuilder().insert(0, "**Story Tasks:** " + levelRecord.getFormatted() + "\n");
+		eb.appendDescription("\n" + getEmoji("BOOK") + " Complete Objectives: " + formatNumber(objectivesSbXp) + " / 105");
+		eb.getDescriptionBuilder().insert(0, getEmoji("BOOK_AND_QUILL") " **Story Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -841,5 +828,18 @@ public class LevelSlashCommand extends SlashCommand {
 		public String getFormatted() {
 			return formatNumber(categoryTotal) + " / " + formatNumber(max) + " (" + roundProgress((double) categoryTotal / max) + ")";
 		}
+	}
+
+	private static int loopThroughCollection(int[] array, int value) {
+		JsonArray dungeonCollectionXp = higherDepth(getSbLevelsJson(), "slaying_task.boss_collections_xp.dungeon_collection_xp")
+			.getAsJsonArray();
+		int gain = 0;
+		for (int i = 0; i < array.length; i++) {
+			if (value >= array[i]) {
+				int gained = dungeonCollectionXp.get(i).getAsInt();
+				gain += gained;
+			}
+		}
+		return gain;
 	}
 }
