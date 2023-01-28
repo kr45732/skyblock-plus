@@ -399,7 +399,7 @@ public class AutomaticGuild {
 					if (reactMessage != null) {
 						reactMessage
 							.editMessage(higherDepth(currentSettings, "messageText").getAsString())
-							.setActionRow(Button.primary("verify_button", "Verify"))
+							.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"))
 							.queue();
 
 						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
@@ -444,7 +444,7 @@ public class AutomaticGuild {
 					if (reactMessage != null) {
 						reactMessage
 							.editMessage(higherDepth(currentSettings, "messageText").getAsString())
-							.setActionRow(Button.primary("verify_button", "Verify"))
+							.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"))
 							.queue();
 
 						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
@@ -1143,7 +1143,7 @@ public class AutomaticGuild {
 	public void onButtonClick(ButtonInteractionEvent event) {
 		if (event.getComponentId().equals("verify_button")) {
 			verifyGuild.onButtonClick(event);
-		} else if (event.getComponentId().equals("verify_video_button")) {
+		} else if (event.getComponentId().equals("verify_help_button")) {
 			event
 				.replyFiles(FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4")))
 				.setEphemeral(true)
