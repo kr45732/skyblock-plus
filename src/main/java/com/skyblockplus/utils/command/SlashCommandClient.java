@@ -50,6 +50,18 @@ public class SlashCommandClient extends ListenerAdapter {
 				);
 				throw new IllegalArgumentException("Command added has a name that has already been indexed: " + command.getName());
 			} else {
+				// Subcommands
+				for (Class<?> declaredClass : command.getClass().getDeclaredClasses()) {
+					if (declaredClass.getSuperclass() == Subcommand.class) {
+						try {
+							command.addSubcommand((Subcommand) declaredClass.getDeclaredConstructor().newInstance());
+						} catch (Exception e) {
+							Main.log.error("Error adding subcommand for " + command.getName(), e);
+							throw new RuntimeException(e);
+						}
+					}
+				}
+
 				slashCommands.add(command);
 			}
 		}
@@ -84,14 +96,7 @@ public class SlashCommandClient extends ListenerAdapter {
 		SlashCommandEvent slashCommandEvent = new SlashCommandEvent(event, this);
 		for (SlashCommand command : slashCommands) {
 			if (command.getName().equals(event.getName())) {
-				commandUses.put(command.getName(), commandUses.getOrDefault(command.getName(), 0) + 1);
-				int remainingCooldown = command.getRemainingCooldown(slashCommandEvent);
-				if (remainingCooldown > 0) {
-					command.replyCooldown(slashCommandEvent, remainingCooldown);
-				} else {
-					command.run(slashCommandEvent);
-				}
-
+				command.run(slashCommandEvent);
 				return;
 			}
 		}
@@ -109,7 +114,7 @@ public class SlashCommandClient extends ListenerAdapter {
 			.stream()
 			.filter(c -> c.getName().equals(event.getName()))
 			.findFirst()
-			.ifPresent(c -> c.onAutoComplete(new AutoCompleteEvent(event)));
+			.ifPresent(c -> c.onAutoCompleteInternal(new AutoCompleteEvent(event)));
 	}
 
 	public List<SlashCommand> getCommands() {

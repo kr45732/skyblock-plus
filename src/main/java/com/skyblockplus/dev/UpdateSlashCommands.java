@@ -82,6 +82,6 @@ public class UpdateSlashCommands extends Command {
 	}
 
 	private List<CommandData> generateSlashCommands() {
-		return slashCommandClient.getCommands().stream().map(c -> c.getCommandData().setGuildOnly(true)).collect(Collectors.toList());
+		return slashCommandClient.getCommands().stream().map(c -> c.getFullCommandData().setGuildOnly(true)).collect(Collectors.toList());
 	}
 }
