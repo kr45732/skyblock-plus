@@ -64,7 +64,7 @@ public class NetworthExecute {
 	private JsonObject extraPrices;
 	private double recombPrice;
 	private double fumingPrice;
-	private double hbpPrice;
+	private double hpbPrice;
 	private boolean verbose = false;
 
 	public static double getNetworth(String username, String profileName) {
@@ -91,7 +91,7 @@ public class NetworthExecute {
 		extraPrices = getExtraPricesJson();
 
 		recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary.[0].pricePerUnit", 0.0);
-		hbpPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
+		hpbPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
 		fumingPrice = higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
 		return this;
 	}
@@ -621,7 +621,7 @@ public class NetworthExecute {
 		double itemCost = 0;
 		double itemCount = 1;
 		double recombobulatedExtra = 0;
-		double hbpExtras = 0;
+		double hpbExtras = 0;
 		double enchantsExtras = 0;
 		double fumingExtras = 0;
 		double reforgeExtras = 0;
@@ -669,7 +669,7 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			hbpExtras = item.getHbpCount() * hbpPrice;
+			hpbExtras = item.getHpbCount() * hpbPrice;
 		} catch (Exception ignored) {}
 
 		try {
@@ -760,7 +760,17 @@ public class NetworthExecute {
 
 		double totalPrice =
 			itemCount *
-			(itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras + miscExtras + backpackExtras);
+			(
+				itemCost +
+				recombobulatedExtra +
+				hpbExtras +
+				enchantsExtras +
+				fumingExtras +
+				reforgeExtras +
+				miscExtras +
+				backpackExtras +
+				essenceExtras
+			);
 
 		if (verbose) {
 			out.append("{");
@@ -786,7 +796,7 @@ public class NetworthExecute {
 					"\"}"
 					: ""
 			);
-			out.append(hbpExtras > 0 ? ",\"hbp\":\"" + simplifyNumber(hbpExtras) + "\"" : "");
+			out.append(hpbExtras > 0 ? ",\"hpb\":\"" + simplifyNumber(hpbExtras) + "\"" : "");
 			out.append(
 				enchantsExtras > 0
 					? ",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"enchants\":" + enchStr + "}"
