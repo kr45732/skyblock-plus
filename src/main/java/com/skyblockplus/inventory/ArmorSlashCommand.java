@@ -42,9 +42,9 @@ public class ArmorSlashCommand extends SlashCommand {
 		this.name = "armor";
 	}
 
-	public static class ListSubCommand extends Subcommand {
+	public static class ListSubcommand extends Subcommand {
 
-		public ListSubCommand() {
+		public ListSubcommand() {
 			this.name = "list";
 		}
 

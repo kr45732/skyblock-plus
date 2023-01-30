@@ -849,11 +849,7 @@ public class Utils {
 			.setItemsPerPage(1)
 			.setFinalAction(m -> {
 				if (!m.getActionRows().isEmpty()) {
-					List<Button> buttons = m
-						.getButtons()
-						.stream()
-						.filter(b -> b.getStyle() == ButtonStyle.LINK)
-						.collect(Collectors.toList());
+					List<Button> buttons = m.getButtons().stream().filter(b -> b.getStyle() == ButtonStyle.LINK).toList();
 					if (buttons.isEmpty()) {
 						m.editMessageComponents().queue(ignore, ignore);
 					} else {
@@ -1577,7 +1573,7 @@ public class Utils {
 								return false;
 							}
 						})
-						.collect(Collectors.toList());
+						.toList();
 					database.setApplyCacheSettings(automaticGuild.getKey(), name, gson.toJson(applyUserList));
 
 					if (applyUserList.size() > 0) {
@@ -1645,7 +1641,7 @@ public class Utils {
 						return false;
 					}
 				})
-				.collect(Collectors.toList());
+				.toList();
 
 			if (applyUsersCacheList.size() > 0) {
 				log.info(
@@ -2157,7 +2153,7 @@ public class Utils {
 
 		JsonElement npcBuyCost = higherDepth(getInternalJsonMappings(), itemId + ".npc_buy.cost");
 		if (npcBuyCost != null) {
-			return streamJsonArray(npcBuyCost).map(JsonElement::getAsString).collect(Collectors.toList());
+			return streamJsonArray(npcBuyCost).map(JsonElement::getAsString).toList();
 		}
 
 		return null;
@@ -2182,5 +2178,21 @@ public class Utils {
 	public static UUID stringToUuid(String uuid) {
 		Matcher matcher = uuidDashRegex.matcher(uuid);
 		return UUID.fromString(matcher.matches() ? uuidDashRegex.matcher(uuid).replaceAll("$1-$2-$3-$4-$5") : uuid);
+	}
+
+	public static int guildExpToLevel(int guildExp) {
+		int guildLevel = 0;
+
+		for (int i = 0;; i++) {
+			int expNeeded = i >= GUILD_EXP_TO_LEVEL.size()
+				? GUILD_EXP_TO_LEVEL.get(GUILD_EXP_TO_LEVEL.size() - 1)
+				: GUILD_EXP_TO_LEVEL.get(i);
+			guildExp -= expNeeded;
+			if (guildExp < 0) {
+				return guildLevel;
+			} else {
+				guildLevel++;
+			}
+		}
 	}
 }

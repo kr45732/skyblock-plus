@@ -1170,14 +1170,7 @@ public class AutomaticGuild {
 			if (event.getUser().getId().equals(client.getOwnerId())) {
 				event
 					.editComponents(
-						ActionRow.of(
-							event
-								.getMessage()
-								.getButtons()
-								.stream()
-								.filter(b -> b.getStyle() == ButtonStyle.LINK)
-								.collect(Collectors.toList())
-						)
+						ActionRow.of(event.getMessage().getButtons().stream().filter(b -> b.getStyle() == ButtonStyle.LINK).toList())
 					)
 					.queue();
 				// 0 = user id, 1 = message id
@@ -1454,7 +1447,7 @@ public class AutomaticGuild {
 	}
 
 	public void setIsUsing(JsonArray arr) {
-		isUsing = streamJsonArray(arr).map(JsonElement::getAsString).collect(Collectors.toList());
+		isUsing = streamJsonArray(arr).map(JsonElement::getAsString).toList();
 	}
 
 	public JsonArray getBlacklist() {

@@ -105,7 +105,7 @@ public class SkyblockEventHandler {
 								.of(SLAYER_NAMES, SKILL_NAMES, DUNGEON_CLASS_NAMES)
 								.flatMap(Collection::stream)
 								.map(name -> SelectOption.of(capitalizeString(name), name))
-								.collect(Collectors.toList());
+								.toList();
 							event
 								.editMessageEmbeds(
 									eb.setDescription("Use the menu below to choose the weight types that should be tracked").build()
@@ -126,7 +126,7 @@ public class SkyblockEventHandler {
 							List<SelectOption> skillsOptions = SKILL_NAMES
 								.stream()
 								.map(name -> SelectOption.of(capitalizeString(name), name))
-								.collect(Collectors.toList());
+								.toList();
 							event
 								.editMessageEmbeds(
 									eb.setDescription("Use the menu below to choose the skill types that should be tracked").build()

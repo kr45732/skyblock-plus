@@ -27,7 +27,6 @@ import com.skyblockplus.general.help.HelpSlashCommand;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.apache.groovy.util.Maps;
 import org.springframework.http.HttpStatus;
@@ -42,10 +41,7 @@ public class PublicEndpoints {
 
 	public static void initialize() {
 		apiCommandList =
-			HelpSlashCommand.helpDataList
-				.stream()
-				.map(helpData -> DataObject.fromJson(gson.toJson(helpData)).toMap())
-				.collect(Collectors.toList());
+			HelpSlashCommand.helpDataList.stream().map(helpData -> DataObject.fromJson(gson.toJson(helpData)).toMap()).toList();
 	}
 
 	@GetMapping("/get/commands")

@@ -110,11 +110,12 @@ public class SlashCommandClient extends ListenerAdapter {
 			return;
 		}
 
-		slashCommands
-			.stream()
-			.filter(c -> c.getName().equals(event.getName()))
-			.findFirst()
-			.ifPresent(c -> c.onAutoCompleteInternal(new AutoCompleteEvent(event)));
+		for (SlashCommand slashCommand : slashCommands) {
+			if (slashCommand.getName().equals(event.getName())) {
+				slashCommand.onAutoCompleteInternal(new AutoCompleteEvent(event));
+				break;
+			}
+		}
 	}
 
 	public List<SlashCommand> getCommands() {

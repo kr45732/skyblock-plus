@@ -37,6 +37,7 @@ public abstract class AbstractSlashCommand {
 
 	protected void run(SlashCommandEvent event) {
 		slashCommandClient.getCommandUses().compute(getFullName(), (k, v) -> (v != null ? v : 0) + 1);
+
 		int remainingCooldown = getRemainingCooldown(event);
 		if (remainingCooldown > 0) {
 			replyCooldown(event, remainingCooldown);
@@ -113,7 +114,7 @@ public abstract class AbstractSlashCommand {
 
 	private int getRemainingCooldown(SlashCommandEvent event) {
 		if (!event.isOwner()) {
-			String key = name + "|" + String.format("U:%d", event.getUser().getIdLong());
+			String key = getFullName() + "|" + String.format("U:%d", event.getUser().getIdLong());
 			int remaining = client.getRemainingCooldown(key);
 			if (remaining > 0) {
 				return remaining;

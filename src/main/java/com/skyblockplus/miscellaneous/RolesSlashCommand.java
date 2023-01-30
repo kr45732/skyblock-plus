@@ -33,15 +33,14 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.util.*;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +49,7 @@ public class RolesSlashCommand extends SlashCommand {
 
 	public RolesSlashCommand() {
 		this.name = "roles";
+		this.cooldown = globalCooldown + 2;
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class RolesSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands
 			.slash(name, "Main roles command")
 			.addSubcommands(
@@ -424,9 +424,7 @@ public class RolesSlashCommand extends SlashCommand {
 				}
 				case "player_items" -> {
 					JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-					List<String> items = streamJsonArray(levelsArray)
-						.map(item -> higherDepth(item, "value").getAsString())
-						.collect(Collectors.toList());
+					List<String> items = streamJsonArray(levelsArray).map(item -> higherDepth(item, "value").getAsString()).toList();
 					Set<String> itemsPlayerHas = player.getItemsPlayerHas(items);
 
 					if (itemsPlayerHas == null) {

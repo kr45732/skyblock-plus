@@ -27,8 +27,8 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,7 +44,7 @@ public class FetchurSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands.slash(name, "Get the item that fetchur wants today");
 	}
 

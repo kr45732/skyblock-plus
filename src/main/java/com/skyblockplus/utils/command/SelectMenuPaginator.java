@@ -151,11 +151,7 @@ public class SelectMenuPaginator {
 			TimeUnit.MINUTES,
 			() -> {
 				if (!message.getActionRows().isEmpty()) {
-					List<Button> buttons = message
-						.getButtons()
-						.stream()
-						.filter(b -> b.getStyle() == ButtonStyle.LINK)
-						.collect(Collectors.toList());
+					List<Button> buttons = message.getButtons().stream().filter(b -> b.getStyle() == ButtonStyle.LINK).toList();
 					if (buttons.isEmpty()) {
 						message.editMessageComponents().queue(ignore, ignore);
 					} else {

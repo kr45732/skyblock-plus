@@ -34,7 +34,6 @@ import java.net.URLConnection;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
@@ -268,7 +267,7 @@ public class EmojiUpdater {
 						})
 				)
 				.map(f -> f.getName().split(".json")[0])
-				.collect(Collectors.toList());
+				.toList();
 
 			FileUtils.deleteDirectory(neuDir);
 
