@@ -34,7 +34,7 @@ public class InvItem {
 	private String name;
 	private String id;
 	private int count = 1;
-	private int hbpCount = 0;
+	private int hpbCount = 0;
 	private int fumingCount = 0;
 	private boolean recombobulated = false;
 	private String modifier;
@@ -94,12 +94,12 @@ public class InvItem {
 		return id.equals("ENCHANTED_BOOK") && !enchantsFormatted.isEmpty() ? idToName(enchantsFormatted.get(0)) : getName();
 	}
 
-	public void setHbpCount(int hbpCount) {
-		if (hbpCount > 10) {
-			this.fumingCount = hbpCount - 10;
-			this.hbpCount = 10;
+	public void setHpbCount(int hpbCount) {
+		if (hpbCount > 10) {
+			this.fumingCount = hpbCount - 10;
+			this.hpbCount = 10;
 		} else {
-			this.hbpCount = hbpCount;
+			this.hpbCount = hpbCount;
 		}
 	}
 

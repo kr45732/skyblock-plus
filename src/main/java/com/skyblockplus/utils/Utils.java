@@ -1255,7 +1255,7 @@ public class Utils {
 						itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
 						itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
 						itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));
-						itemInfo.setHbpCount(item.getInt("tag.ExtraAttributes.hot_potato_count", 0));
+						itemInfo.setHpbCount(item.getInt("tag.ExtraAttributes.hot_potato_count", 0));
 						itemInfo.setRecombobulated(item.getInt("tag.ExtraAttributes.rarity_upgrades", 0) == 1);
 						itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
 						itemInfo.setDungeonFloor(Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "-1")));
@@ -1279,10 +1279,10 @@ public class Utils {
 							for (Map.Entry<String, Object> enchant : item.getCompound("tag.ExtraAttributes.enchantments").entrySet()) {
 								if (
 									enchant.getKey().equals("efficiency") &&
-									!itemInfo.getId().equals("STONK_PICKAXE") &&
+									!itemInfo.getId().equals("PROMISING_SPADE") &&
 									(int) enchant.getValue() > 5
 								) {
-									itemInfo.addExtraValues((int) enchant.getValue() - 5, "SIL_EX");
+									itemInfo.addExtraValues((int) enchant.getValue() - (itemInfo.getId().equals("STONK_PICKAXE") ? 6: 5), "SIL_EX");
 								}
 								enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
 							}
