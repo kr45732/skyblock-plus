@@ -1282,7 +1282,10 @@ public class Utils {
 									!itemInfo.getId().equals("PROMISING_SPADE") &&
 									(int) enchant.getValue() > 5
 								) {
-									itemInfo.addExtraValues((int) enchant.getValue() - (itemInfo.getId().equals("STONK_PICKAXE") ? 6: 5), "SIL_EX");
+									itemInfo.addExtraValues(
+										(int) enchant.getValue() - (itemInfo.getId().equals("STONK_PICKAXE") ? 6 : 5),
+										"SIL_EX"
+									);
 								}
 								enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
 							}
