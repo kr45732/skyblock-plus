@@ -420,8 +420,10 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("join", "Join the current event."),
 						new HelpData("leave", "Leave the current event."),
 						new HelpData("leaderboard", "Get the leaderboard for current event."),
-						new HelpData("end", "Force end the event."),
-						new HelpData("cancel", "Cancel the event. No prizes or winners will be announced.")
+						new HelpData(
+							"end",
+							"Force end the event. If silent is true, the event will be canceled and no prizes or winners will be announced."
+						)
 					)
 					.setCategory("event"),
 				// Settings
@@ -923,8 +925,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("event add <player> [profile]", "Force add a player to the event") +
 			create("event leave", "Leave the current event") +
 			create("event leaderboard", "Get the leaderboard for current event") +
-			create("event end", "Force end the event") +
-			create("event cancel", "Cancel the event. No announcement will be made")
+			create("event end", "Force end or cancel the event")
 		);
 
 		paginateBuilder.addItems(

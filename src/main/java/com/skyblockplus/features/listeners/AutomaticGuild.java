@@ -890,15 +890,11 @@ public class AutomaticGuild {
 
 	public void updateSkyblockEvent() {
 		try {
-			if (skyblockEventHandler != null && skyblockEventHandler.hasTimedOut()) {
-				skyblockEventHandler = null;
-			}
-
-			if (database.getSkyblockEventActive(guildId)) {
-				JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
+			JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
+			if (!higherDepth(currentSettings, "eventType", "").isEmpty()) {
 				Instant endingTime = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 				if (Instant.now().isAfter(endingTime)) {
-					SkyblockEventSlashCommand.endSkyblockEvent(guildId);
+					SkyblockEventSlashCommand.EndSubcommand.endSkyblockEvent(jda.getGuildById(guildId), false);
 				}
 			}
 		} catch (Exception ignored) {}
@@ -1312,11 +1308,18 @@ public class AutomaticGuild {
 						event
 							.getHook()
 							.editOriginalEmbeds(
-								SkyblockEventSlashCommand.joinSkyblockEvent(null, null, event.getMember(), event.getGuild().getId()).build()
+								SkyblockEventSlashCommand.JoinSubcommand
+									.joinSkyblockEvent(null, null, event.getMember(), event.getGuild().getId())
+									.build()
 							)
 							.queue();
 					} else {
-						EmbedBuilder eb = SkyblockEventSlashCommand.getEventLeaderboard(event.getGuild(), event.getUser(), null, event);
+						EmbedBuilder eb = SkyblockEventSlashCommand.LeaderboardSubcommand.getEventLeaderboard(
+							event.getGuild(),
+							event.getUser(),
+							null,
+							event
+						);
 						if (eb != null) {
 							event.getHook().editOriginalEmbeds(eb.build()).queue();
 						}

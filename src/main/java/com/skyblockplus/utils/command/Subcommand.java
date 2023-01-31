@@ -24,10 +24,13 @@ public abstract class Subcommand extends AbstractSlashCommand {
 
 	protected SlashCommand superCommand;
 
-	protected String getFullName() {
-		return superCommand.getFullName() + " " + name;
-	}
+	@Override
+	protected abstract void execute(SlashCommandEvent event);
 
 	@Override
 	protected abstract SubcommandData getCommandData();
+
+	protected String getFullName() {
+		return superCommand.getFullName() + " " + name;
+	}
 }

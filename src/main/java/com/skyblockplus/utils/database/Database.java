@@ -72,12 +72,12 @@ public class Database {
 		return gson.toJsonTree(settingsService.getServerSettingsById(serverId).getBody());
 	}
 
-	public void newServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
-		settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
+	public int newServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
+		return settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
 	}
 
-	public void setServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
-		settingsService.setServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
+	public int setServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
+		return settingsService.setServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
 	}
 
 	public int deleteServerSettings(String serverId) {
@@ -134,10 +134,6 @@ public class Database {
 
 	public int addMemberToSkyblockEvent(String serverId, EventMember newEventMember) {
 		return settingsService.addMemberToSkyblockEvent(serverId, newEventMember).getStatusCodeValue();
-	}
-
-	public boolean getSkyblockEventActive(String serverId) {
-		return settingsService.getSkyblockEventActive(serverId);
 	}
 
 	public JsonElement getSkyblockEventSettings(String serverId) {
