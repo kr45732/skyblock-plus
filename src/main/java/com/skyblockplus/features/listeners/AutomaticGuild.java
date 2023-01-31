@@ -106,23 +106,24 @@ public class AutomaticGuild {
 
 	/* Apply */
 	public final List<ApplyGuild> applyGuild = new ArrayList<>();
-	public Role applyGuestRole = null;
+	private Role applyGuestRole = null;
 	/* Verify */
 	public VerifyGuild verifyGuild;
-	public final Set<String> updatedMembers = new HashSet<>();
+	private final Set<String> updatedMembers = new HashSet<>();
 	/* Skyblock event */
 	public SkyblockEventHandler skyblockEventHandler = null;
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
 	public boolean eventCurrentlyUpdating = false;
+	private ScheduledFuture<?> sbEventFuture;
 	/* Event */
 	public final EventGuild eventGuild;
 	/* Fetchur */
-	public TextChannel fetchurChannel = null;
-	public Role fetchurPing = null;
+	private TextChannel fetchurChannel = null;
+	private Role fetchurPing = null;
 	/* Mayor */
-	public TextChannel mayorChannel = null;
-	public Role mayorPing = null;
+	private TextChannel mayorChannel = null;
+	private Role mayorPing = null;
 	public Message lastMayorElectionOpenMessage = null;
 	public Message lastMayorElectedMessage = null;
 	/* Party */
@@ -130,13 +131,13 @@ public class AutomaticGuild {
 	/* Jacob */
 	public final JacobGuild jacobGuild;
 	/* Miscellaneous */
-	public final List<String> botManagerRoles = new ArrayList<>();
+	private final List<String> botManagerRoles = new ArrayList<>();
 	public final String guildId;
-	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
-	public TextChannel logChannel = null;
-	public final List<MessageEmbed> logQueue = new ArrayList<>();
-	public JsonArray blacklist = new JsonArray();
-	public List<String> isUsing = new ArrayList<>();
+	private final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
+	private TextChannel logChannel = null;
+	private final List<MessageEmbed> logQueue = new ArrayList<>();
+	private JsonArray blacklist = new JsonArray();
+	private List<String> isUsing = new ArrayList<>();
 
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
@@ -166,7 +167,9 @@ public class AutomaticGuild {
 		JsonElement serverSettings = allServerSettings.get(guildId);
 		applyConstructor(event, serverSettings);
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
-		schedulerConstructor();
+		int eventDelay = (int) (Math.random() * 60 + 5);
+		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 60, TimeUnit.MINUTES));
+		scheduleSbEventFuture(higherDepth(serverSettings, "sbEvent"));
 		jacobGuild = new JacobGuild(higherDepth(serverSettings, "jacobSettings"), this);
 		eventGuild = new EventGuild(higherDepth(serverSettings, "eventNotif"), this);
 		try {
@@ -1393,10 +1396,31 @@ public class AutomaticGuild {
 	}
 
 	/* Miscellaneous */
-	public void schedulerConstructor() {
-		int eventDelay = (int) (Math.random() * 60 + 5);
-		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 60, TimeUnit.MINUTES));
-		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateSkyblockEvent, eventDelay, 15, TimeUnit.MINUTES));
+	public void scheduleSbEventFuture(JsonElement sbEventSettings) {
+		if (!higherDepth(sbEventSettings, "eventType", "").isEmpty()) {
+			if (sbEventFuture != null) {
+				sbEventFuture.cancel(true);
+			}
+
+			long secondsTillEnd = Math.max(
+				0,
+				Duration.between(Instant.now(), Instant.ofEpochSecond(higherDepth(sbEventSettings, "timeEndingSeconds", 0L))).toSeconds()
+			);
+			sbEventFuture =
+				scheduler.schedule(
+					() -> SkyblockEventSlashCommand.EndSubcommand.endSkyblockEvent(jda.getGuildById(guildId), false),
+					secondsTillEnd,
+					TimeUnit.SECONDS
+				);
+			scheduledFutures.add(sbEventFuture);
+		}
+	}
+
+	public void cancelSbEventFuture() {
+		if (sbEventFuture != null) {
+			scheduledFutures.remove(sbEventFuture);
+			sbEventFuture.cancel(true);
+		}
 	}
 
 	public void setLogChannel(TextChannel channel) {

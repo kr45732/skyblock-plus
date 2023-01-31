@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -636,11 +637,13 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				if (paginateBuilder.size() > 0) {
 					paginateBuilder.build().paginate(announcementChannel, 0);
 					database.setSkyblockEventSettings(guildId, new EventSettings());
+					guildMap.get(guildId).cancelSbEventFuture();
 					return defaultEmbed("Success").setDescription("Ended Skyblock event");
 				}
 			} catch (Exception ignored) {}
 			announcementChannel.sendMessageEmbeds(defaultEmbed("Prizes").setDescription("None").build()).complete();
 			database.setSkyblockEventSettings(guildId, new EventSettings());
+			guildMap.get(guildId).cancelSbEventFuture();
 			return defaultEmbed("Success").setDescription("Ended Skyblock event");
 		}
 	}

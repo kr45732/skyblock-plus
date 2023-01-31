@@ -247,6 +247,9 @@ public class SkyblockEventHandler {
 								)
 								.setComponents()
 								.queue();
+							guildMap
+								.get(event.getGuild().getId())
+								.scheduleSbEventFuture(database.getSkyblockEventSettings(event.getGuild().getId()));
 						} else {
 							announcementMessage.delete().queue(ignore, ignore);
 							event
@@ -527,8 +530,7 @@ public class SkyblockEventHandler {
 				event.getUser().getId().equals(slashCommandEvent.getUser().getId())
 			);
 		} else if (genericEvent instanceof ModalInteractionEvent event) {
-			return //					modalState != null &&
-			(
+			return ( //					modalState != null &&
 				event.isFromGuild() &&
 				event.getMessage() != null &&
 				event.getMessage().getId().equals(message.getId()) &&
