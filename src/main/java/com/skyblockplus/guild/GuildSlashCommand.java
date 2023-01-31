@@ -96,11 +96,19 @@ public class GuildSlashCommand extends SlashCommand {
 				hypixelResponse = getGuildFromPlayer(usernameUuid.uuid());
 			}
 
+			if (!hypixelResponse.isValid()) {
+				return invalidEmbed(hypixelResponse.failCause());
+			}
+
 			String guildInfo = "";
 			guildName = hypixelResponse.get("name").getAsString();
 
 			guildInfo +=
-				"• " + guildName + " was created on <t:" + Instant.ofEpochMilli(hypixelResponse.get("created").getAsLong()) + ":D>\n";
+				"• " +
+				guildName +
+				" was created on <t:" +
+				Instant.ofEpochMilli(hypixelResponse.get("created").getAsLong()).getEpochSecond() +
+				":D>\n";
 
 			JsonArray guildMembers = hypixelResponse.get("members").getAsJsonArray();
 			for (JsonElement currentMember : guildMembers) {
@@ -458,7 +466,9 @@ public class GuildSlashCommand extends SlashCommand {
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
 				lbType,
 				gamemode,
-				streamJsonArray(higherDepth(guildJson, "members")).map(u -> higherDepth(u, "uuid", "")).toList(),
+				streamJsonArray(higherDepth(guildJson, "members"))
+					.map(u -> higherDepth(u, "uuid", ""))
+					.collect(Collectors.toCollection(ArrayList::new)),
 				hypixelKey,
 				event
 			);
@@ -617,7 +627,9 @@ public class GuildSlashCommand extends SlashCommand {
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
 				List.of("slayer", "skills", "catacombs", "weight"),
 				gamemode,
-				streamJsonArray(higherDepth(guildJson, "members")).map(u -> higherDepth(u, "uuid", "")).toList(),
+				streamJsonArray(higherDepth(guildJson, "members"))
+					.map(u -> higherDepth(u, "uuid", ""))
+					.collect(Collectors.toCollection(ArrayList::new)),
 				hypixelKey,
 				event
 			);
@@ -778,7 +790,7 @@ public class GuildSlashCommand extends SlashCommand {
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
 				List.of("slayer", "skills", "catacombs", "weight", "networth"),
 				gamemode,
-				streamJsonArray(guildMembers).map(u -> higherDepth(u, "uuid", "")).toList(),
+				streamJsonArray(guildMembers).map(u -> higherDepth(u, "uuid", "")).collect(Collectors.toCollection(ArrayList::new)),
 				hypixelKey,
 				event
 			);
@@ -1187,7 +1199,9 @@ public class GuildSlashCommand extends SlashCommand {
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
 				List.of("networth", "level", "slayer", "skills", "catacombs", "weight"),
 				gamemode,
-				streamJsonArray(higherDepth(guildJson, "members")).map(u -> higherDepth(u, "uuid", "")).toList(),
+				streamJsonArray(higherDepth(guildJson, "members"))
+					.map(u -> higherDepth(u, "uuid", ""))
+					.collect(Collectors.toCollection(ArrayList::new)),
 				hypixelKey,
 				event
 			);

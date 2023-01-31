@@ -113,7 +113,7 @@ public class EmojiUpdater {
 						if (imgFiles.length == 0) {
 							imgFile = new File(skyCryptFiles.getPath() + "/" + id + ".png");
 							ImageIO.write(ImageIO.read(new URL(url)), "png", imgFile);
-							TimeUnit.MILLISECONDS.sleep(200);
+							TimeUnit.MILLISECONDS.sleep(150);
 						} else {
 							imgFile = imgFiles[0];
 						}
@@ -160,7 +160,7 @@ public class EmojiUpdater {
 						if (imgFiles.length == 0) {
 							imgFile = new File(skyCryptFiles.getPath() + "/" + sbItem + ".png");
 							ImageIO.write(ImageIO.read(new URL(getPetUrl(sbItem))), "png", imgFile);
-							TimeUnit.MILLISECONDS.sleep(250);
+							TimeUnit.MILLISECONDS.sleep(150);
 						} else {
 							imgFile = imgFiles[0];
 						}
@@ -183,7 +183,7 @@ public class EmojiUpdater {
 					if (imgFiles.length == 0) {
 						imgFile = new File(skyCryptFiles.getPath() + "/" + sbItem + ".png");
 						ImageIO.write(ImageIO.read(new URL("https://sky.shiiyu.moe/item/" + sbItem)), "png", imgFile);
-						TimeUnit.MILLISECONDS.sleep(200);
+						TimeUnit.MILLISECONDS.sleep(150);
 					} else {
 						imgFile = imgFiles[0];
 					}
@@ -509,7 +509,7 @@ public class EmojiUpdater {
 					if (curGuild.getEmojis().stream().filter(e -> enchanted == e.isAnimated()).count() >= curGuild.getMaxEmojis()) {
 						guildCount++;
 						curGuild = guildList.get(guildCount);
-						TimeUnit.SECONDS.sleep(3);
+						TimeUnit.SECONDS.sleep(2);
 						System.out.println("Switched to " + curGuild.getName());
 					}
 

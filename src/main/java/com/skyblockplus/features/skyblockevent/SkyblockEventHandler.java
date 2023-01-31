@@ -181,6 +181,7 @@ public class SkyblockEventHandler {
 										.build()
 								)
 								.queue();
+							waitForEvent();
 							return;
 						}
 						if (eventSettings.getTimeEndingSeconds() == null || eventSettings.getTimeEndingSeconds().isEmpty()) {
@@ -189,6 +190,7 @@ public class SkyblockEventHandler {
 									eb.setDescription("The duration must be set before creating the event. Please try again.").build()
 								)
 								.queue();
+							waitForEvent();
 							return;
 						}
 						if (!eventSettings.isMinMaxValid()) {
@@ -197,6 +199,7 @@ public class SkyblockEventHandler {
 									eb.setDescription("The maximum value cannot be less than the minimum value. Please try again.").build()
 								)
 								.queue();
+							waitForEvent();
 							return;
 						}
 						event.deferEdit().complete();
@@ -219,13 +222,13 @@ public class SkyblockEventHandler {
 							.addField("Prizes", ebString.isEmpty() ? "None" : ebString.toString(), false)
 							.addField(
 								"Join the event",
-								"Click the join button below or run `/event join` to join! You must be linked to the bot" +
+								"Click the join button below or run `/event join` to join" +
 								(eventSettings.getEventGuildId().isEmpty() ? "." : " and in the guild."),
 								false
 							)
 							.addField(
 								"Leaderboard",
-								"Click the leaderboard button below or run `/event leaderboard`. to view the leaderboard.",
+								"Click the leaderboard button below or run `/event leaderboard` to view the leaderboard",
 								false
 							);
 
@@ -367,6 +370,7 @@ public class SkyblockEventHandler {
 						selectMenuState = SelectMenuState.CONFIG_GENERIC;
 						eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 						event.editMessage(getGenericConfigMessage()).queue();
+						waitForEvent();
 						return;
 					}
 					collections.add(collectionName);

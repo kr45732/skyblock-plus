@@ -153,7 +153,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				}
 
 				eb.addField("Prizes", ebString.toString(), false);
-				eb.addField("Members joined", "" + higherDepth(currentSettings, "membersList").getAsJsonArray().size(), false);
+				eb.addField("Members Joined", "" + higherDepth(currentSettings, "membersList").getAsJsonArray().size(), false);
 
 				return eb;
 			} else {
@@ -425,7 +425,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			String guildId = guild.getId();
 
 			JsonElement runningSettings = database.getSkyblockEventSettings(guildId);
-			if (!higherDepth(runningSettings, "eventType", "").isEmpty()) {
+			if (higherDepth(runningSettings, "eventType", "").isEmpty()) {
 				return defaultEmbed("No event running");
 			}
 

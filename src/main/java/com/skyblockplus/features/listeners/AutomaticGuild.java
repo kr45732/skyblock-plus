@@ -1130,14 +1130,6 @@ public class AutomaticGuild {
 				);
 
 			event.getHook().editOriginal(client.getSuccess() + " Bug report sent").queue();
-		} else if (skyblockEventHandler != null) {
-			skyblockEventHandler.onModalInteraction(event);
-		}
-	}
-
-	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-		if (skyblockEventHandler != null) {
-			skyblockEventHandler.onStringSelectInteraction(event);
 		}
 	}
 

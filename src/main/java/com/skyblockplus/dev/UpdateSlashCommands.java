@@ -24,7 +24,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.util.List;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -80,7 +80,7 @@ public class UpdateSlashCommands extends Command {
 			.queue();
 	}
 
-	private List<CommandData> generateSlashCommands() {
+	private List<SlashCommandData> generateSlashCommands() {
 		return slashCommandClient.getCommands().stream().map(c -> c.getFullCommandData().setGuildOnly(true)).toList();
 	}
 }
