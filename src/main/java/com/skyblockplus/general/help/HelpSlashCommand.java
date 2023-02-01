@@ -310,8 +310,8 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("list", "List all enabled claimable roles for this server.")
 					)
 					.setCategory("miscellaneous"),
-				new HelpData("coins", "Get a player's bank and purse coins.", "bank [player] [profile]")
-					.addSecondData("Get a player's bank transaction history.", "bank history [player] [profile]")
+				new HelpData("coins", "Get a player's bank and purse coins.", "coins player [player] [profile]")
+					.addSecondData("Get a player's bank transaction history.", "coins history [player] [profile]")
 					.addExamples(
 						"coins CrypticPlasma",
 						"coins CrypticPlasma Zucchini",
@@ -536,7 +536,7 @@ public class HelpSlashCommand extends SlashCommand {
 									.addSubcommands(
 										new HelpData(
 											"add",
-											"Add a role that user will receive upon being verified. The role cannot be @everyone or a managed role. You can add a max of 3 roles.",
+											"Add a role that user will receive upon being verified. The role cannot be @everyone or a managed role. You can add a max of 5 roles.",
 											"add <@role>"
 										),
 										new HelpData("remove", "Remove a verify role.", "remove <@role>")
@@ -878,7 +878,7 @@ public class HelpSlashCommand extends SlashCommand {
 		paginateBuilder.addItems(
 			create("roles claim [profile]", "Claim your automatic Skyblock roles based on your statistics") +
 			create("roles list", "List all roles that can be claimed through the bot") +
-			create("coins total [player] [profile]", "Get a player's bank and purse coins") +
+			create("coins player [player] [profile]", "Get a player's bank and purse coins") +
 			create("coins history [player] [profile]", "Get a player's bank transaction history") +
 			create("networth [player] [profile] [verbose]", "Calculate a player's networth") +
 			create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +

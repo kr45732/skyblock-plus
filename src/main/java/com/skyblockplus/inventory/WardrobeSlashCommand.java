@@ -24,6 +24,7 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.utils.command.Subcommand;
 import com.skyblockplus.utils.structs.ArmorStruct;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.List;
@@ -42,31 +43,98 @@ public class WardrobeSlashCommand extends SlashCommand {
 		this.name = "wardrobe";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
+	public static class ListSubcommand extends Subcommand {
+
+		public ListSubcommand() {
+			this.name = "list";
 		}
 
-		switch (event.getSubcommandName()) {
-			case "list" -> event.paginate(getPlayerWardrobeList(event.player, event.getOptionStr("profile"), event));
-			case "emoji" -> event.paginate(getPlayerWardrobe(event.player, event.getOptionStr("profile"), event));
-			default -> event.embed(event.invalidCommandMessage());
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			if (event.invalidPlayerOption()) {
+				return;
+			}
+
+			event.paginate(getPlayerWardrobeList(event.player, event.getOptionStr("profile"), event));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("list", "Get a list of a player's wardrobe with lore")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "profile", "Profile name");
+		}
+
+		public static EmbedBuilder getPlayerWardrobeList(String username, String profileName, SlashCommandEvent event) {
+			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			if (player.isValid()) {
+				Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
+				if (armorStructMap != null) {
+					CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(4);
+
+					for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
+						paginateBuilder.addItems(
+							"**__Slot " +
+							(currentArmour.getKey() + 1) +
+							"__**\n" +
+							currentArmour.getValue().getHelmet() +
+							"\n" +
+							currentArmour.getValue().getChestplate() +
+							"\n" +
+							currentArmour.getValue().getLeggings() +
+							"\n" +
+							currentArmour.getValue().getBoots() +
+							"\n"
+						);
+					}
+					event.paginate(paginateBuilder);
+					return null;
+				}
+				return invalidEmbed("API disabled");
+			}
+			return player.getFailEmbed();
+		}
+	}
+
+	public static class EmojiSubcommand extends Subcommand {
+
+		public EmojiSubcommand() {
+			this.name = "emoji";
+		}
+
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			if (event.invalidPlayerOption()) {
+				return;
+			}
+
+			event.paginate(getPlayerWardrobe(event.player, event.getOptionStr("profile"), event));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("emoji", "Get a player's wardrobe represented in emojis")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "profile", "Profile name");
+		}
+
+		public static EmbedBuilder getPlayerWardrobe(String username, String profileName, SlashCommandEvent event) {
+			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			if (player.isValid()) {
+				List<String[]> wardrobe = player.getWardrobe();
+				if (wardrobe != null) {
+					new InventoryEmojiPaginator(wardrobe, "Wardrobe", player, event);
+					return null;
+				}
+				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+			}
+			return player.getFailEmbed();
 		}
 	}
 
 	@Override
 	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Main wardrobe bag command")
-			.addSubcommands(
-				new SubcommandData("list", "Get a list of a player's wardrobe with lore")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-					.addOption(OptionType.STRING, "profile", "Profile name"),
-				new SubcommandData("emoji", "Get a player's wardrobe represented in emojis")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-					.addOption(OptionType.STRING, "profile", "Profile name")
-			);
+		return Commands.slash(name, "Main wardrobe bag command");
 	}
 
 	@Override
@@ -74,48 +142,5 @@ public class WardrobeSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
-	}
-
-	public static EmbedBuilder getPlayerWardrobeList(String username, String profileName, SlashCommandEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
-			if (armorStructMap != null) {
-				CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(4);
-
-				for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
-					paginateBuilder.addItems(
-						"**__Slot " +
-						(currentArmour.getKey() + 1) +
-						"__**\n" +
-						currentArmour.getValue().getHelmet() +
-						"\n" +
-						currentArmour.getValue().getChestplate() +
-						"\n" +
-						currentArmour.getValue().getLeggings() +
-						"\n" +
-						currentArmour.getValue().getBoots() +
-						"\n"
-					);
-				}
-				event.paginate(paginateBuilder);
-				return null;
-			}
-			return invalidEmbed("API disabled");
-		}
-		return player.getFailEmbed();
-	}
-
-	public static EmbedBuilder getPlayerWardrobe(String username, String profileName, SlashCommandEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			List<String[]> wardrobe = player.getWardrobe();
-			if (wardrobe != null) {
-				new InventoryEmojiPaginator(wardrobe, "Wardrobe", player, event);
-				return null;
-			}
-			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
-		}
-		return player.getFailEmbed();
 	}
 }

@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.Utils.invalidEmbed;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.utils.command.Subcommand;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.Map;
@@ -41,34 +42,86 @@ public class InventorySlashCommand extends SlashCommand {
 		this.name = "inventory";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
+	public static class ListSubcommand extends Subcommand {
+
+		public ListSubcommand() {
+			this.name = "list";
 		}
 
-		switch (event.getSubcommandName()) {
-			case "list" -> event.paginate(
-				getPlayerInventoryList(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event)
-			);
-			case "emoji" -> event.paginate(getPlayerInventory(event.player, event.getOptionStr("profile"), event));
-			default -> event.embed(event.invalidCommandMessage());
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			if (event.invalidPlayerOption()) {
+				return;
+			}
+
+			event.paginate(getPlayerInventoryList(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("list", "Get a list of the player's inventory with lore")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "profile", "Profile name")
+				.addOption(OptionType.INTEGER, "slot", "Slot number");
+		}
+
+		public static EmbedBuilder getPlayerInventoryList(String username, String profileName, int slotNum, SlashCommandEvent event) {
+			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			if (player.isValid()) {
+				Map<Integer, InvItem> inventoryMap = player.getInventoryMap(true);
+				if (inventoryMap != null) {
+					new InventoryListPaginator(player, inventoryMap, slotNum, event);
+					return null;
+				}
+			}
+			return player.getFailEmbed();
+		}
+	}
+
+	public static class EmojiSubcommand extends Subcommand {
+
+		public EmojiSubcommand() {
+			this.name = "emoji";
+		}
+
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			if (event.invalidPlayerOption()) {
+				return;
+			}
+
+			event.paginate(getPlayerInventory(event.player, event.getOptionStr("profile"), event));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("emoji", "Get a player's inventory represented in emojis")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "profile", "Profile name");
+		}
+
+		public static EmbedBuilder getPlayerInventory(String username, String profileName, SlashCommandEvent event) {
+			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			if (player.isValid()) {
+				String[] playerInventory = player.getInventory();
+				if (playerInventory != null) {
+					event.getHook().editOriginal(playerInventory[0]).setEmbeds().queue();
+					event
+						.getChannel()
+						.sendMessage(playerInventory[1])
+						.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Inventory"))
+						.queue();
+					return null;
+				}
+				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+			}
+			return player.getFailEmbed();
 		}
 	}
 
 	@Override
 	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Main inventory command")
-			.addSubcommands(
-				new SubcommandData("list", "Get a list of the player's inventory with lore")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-					.addOption(OptionType.STRING, "profile", "Profile name")
-					.addOption(OptionType.INTEGER, "slot", "Slot number"),
-				new SubcommandData("emoji", "Get a player's inventory represented in emojis")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-					.addOption(OptionType.STRING, "profile", "Profile name")
-			);
+		return Commands.slash(name, "Main inventory command");
 	}
 
 	@Override
@@ -76,35 +129,5 @@ public class InventorySlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
-	}
-
-	public static EmbedBuilder getPlayerInventoryList(String username, String profileName, int slotNum, SlashCommandEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			Map<Integer, InvItem> inventoryMap = player.getInventoryMap(true);
-			if (inventoryMap != null) {
-				new InventoryListPaginator(player, inventoryMap, slotNum, event);
-				return null;
-			}
-		}
-		return player.getFailEmbed();
-	}
-
-	public static EmbedBuilder getPlayerInventory(String username, String profileName, SlashCommandEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			String[] playerInventory = player.getInventory();
-			if (playerInventory != null) {
-				event.getHook().editOriginal(playerInventory[0]).setEmbeds().queue();
-				event
-					.getChannel()
-					.sendMessage(playerInventory[1])
-					.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Inventory"))
-					.queue();
-				return null;
-			}
-			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
-		}
-		return player.getFailEmbed();
 	}
 }

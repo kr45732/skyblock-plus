@@ -2117,8 +2117,8 @@ public class SettingsExecute {
 
 		JsonElement verifySettings = database.getVerifySettings(guild.getId());
 		JsonArray currentVerifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
-		if (currentVerifyRoles.size() >= 3) {
-			return defaultEmbed("You have reached the max number of verify roles (3/3)");
+		if (currentVerifyRoles.size() >= 5) {
+			return defaultEmbed("You have reached the max number of verify roles (5/5)");
 		}
 
 		for (int i = currentVerifyRoles.size() - 1; i >= 0; i--) {
