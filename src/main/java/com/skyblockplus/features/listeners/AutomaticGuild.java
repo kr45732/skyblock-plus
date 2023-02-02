@@ -72,7 +72,6 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
@@ -732,7 +731,12 @@ public class AutomaticGuild {
 
 							if (player.isValid()) {
 								try {
-									Object[] out = (Object[]) RolesSlashCommand.updateRoles(player, linkedMember, rolesSettings, true);
+									Object[] out = (Object[]) RolesSlashCommand.ClaimSubcommand.updateRoles(
+										player,
+										linkedMember,
+										rolesSettings,
+										true
+									);
 									toAddRoles.addAll((List<Role>) out[1]);
 									toRemoveRoles.addAll((List<Role>) out[2]);
 								} catch (Exception ignored) {}
