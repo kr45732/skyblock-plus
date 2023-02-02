@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -259,7 +260,7 @@ public class LinkSlashCommand extends SlashCommand {
 		try {
 			List<Role> toAdd = streamJsonArray(higherDepth(verifySettings, "verifiedRoles"))
 				.map(e -> member.getGuild().getRoleById(e.getAsString()))
-				.toList();
+				.collect(Collectors.toCollection(ArrayList::new));
 			List<Role> toRemove = new ArrayList<>();
 			try {
 				toRemove.add(member.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
