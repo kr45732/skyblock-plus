@@ -55,7 +55,7 @@ public class CakesSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a player's active and inactive cake buffs")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOptions(Constants.profilesCommandOption);
 	}
 
 	@Override

@@ -65,7 +65,7 @@ public class CoinsSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("player", "Get a player's bank and purse coins")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "profile", "Profile name");
+				.addOptions(Constants.profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerBalance(String username, String profileName) {
@@ -132,7 +132,7 @@ public class CoinsSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("history", "Get a player's bank transaction history")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "profile", "Profile name");
+				.addOptions(Constants.profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerBankHistory(String username, String profileName, SlashCommandEvent event) {

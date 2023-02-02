@@ -62,7 +62,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("list", "Get a list of a player's wardrobe with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "profile", "Profile name");
+				.addOptions(Constants.profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerWardrobeList(String username, String profileName, SlashCommandEvent event) {
@@ -115,7 +115,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("emoji", "Get a player's wardrobe represented in emojis")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "profile", "Profile name");
+				.addOptions(Constants.profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerWardrobe(String username, String profileName, SlashCommandEvent event) {

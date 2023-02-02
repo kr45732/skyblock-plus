@@ -27,6 +27,9 @@ import com.skyblockplus.Main;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.groovy.util.Maps;
 
 public class Constants {
@@ -1169,6 +1172,53 @@ public class Constants {
 		"mythos_burrows_dug_next_epic",
 		"mythos_burrows_dug_next_EPIC"
 	);
+	public static final Map<String, String> profileNameToEmoji = Maps.of(
+		"apple",
+		"\uD83C\uDF4E",
+		"banana",
+		"\uD83C\uDF4C",
+		"blueberry",
+		"\uD83E\uDED0",
+		"coconut",
+		"\uD83E\uDD65",
+		"cucumber",
+		"\uD83E\uDD52",
+		"grapes",
+		"\uD83C\uDF47",
+		"kiwi",
+		"\uD83E\uDD5D",
+		"lemon",
+		"\uD83C\uDF4B",
+		"lime",
+		"<:lime:828632854174498837>",
+		"mango",
+		"\uD83E\uDD6D",
+		"orange",
+		"<:orange:828634110360289331>",
+		"papaya",
+		"<:papaya:828633125370200085>",
+		"peach",
+		"\uD83C\uDF51",
+		"pear",
+		"\uD83C\uDF50",
+		"pineapple",
+		"\uD83C\uDF4D",
+		"pomegranate",
+		"<:pomegranate:828632397032456232>",
+		"raspberry",
+		"<:raspberry:828632035127853064>",
+		"strawberry",
+		"\uD83C\uDF53",
+		"tomato",
+		"\uD83C\uDF45",
+		"watermelon",
+		"\uD83C\uDF49",
+		"zucchini",
+		"<:zucchini:828636746358194206>"
+	);
+	public static final OptionData profilesCommandOption = new OptionData(OptionType.STRING, "profile", "Profile name")
+		.addChoices(profileNameToEmoji.keySet().stream().map(i -> new Command.Choice(capitalizeString(i), i)).toList());
+	/* Constants JSON file */
 	public static JsonObject CONSTANTS;
 
 	/* Constants JSON */

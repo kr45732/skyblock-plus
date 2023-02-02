@@ -51,7 +51,7 @@ public class CheckApiSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get which Skyblock APIs a player has enabled or disabled")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOptions(Constants.profilesCommandOption);
 	}
 
 	@Override

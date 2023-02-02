@@ -175,7 +175,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("join", "Join the current event").addOption(OptionType.STRING, "profile", "Profile name");
+			return new SubcommandData("join", "Join the current event").addOptions(Constants.profilesCommandOption);
 		}
 
 		public static EmbedBuilder joinSkyblockEvent(String username, String profile, Member member, String guildId) {
@@ -359,7 +359,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("add", "Force add a player to the current event")
 				.addOption(OptionType.STRING, "player", "Player username or mention", true, true)
-				.addOption(OptionType.STRING, "profile", "Profile name");
+				.addOptions(Constants.profilesCommandOption);
 		}
 	}
 

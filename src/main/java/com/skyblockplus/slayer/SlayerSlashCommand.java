@@ -53,7 +53,7 @@ public class SlayerSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get the slayer data of a player")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOptions(Constants.profilesCommandOption);
 	}
 
 	@Override

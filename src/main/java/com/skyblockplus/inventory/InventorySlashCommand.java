@@ -61,7 +61,7 @@ public class InventorySlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("list", "Get a list of the player's inventory with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "profile", "Profile name")
+				.addOptions(Constants.profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");
 		}
 
@@ -97,7 +97,7 @@ public class InventorySlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("emoji", "Get a player's inventory represented in emojis")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "profile", "Profile name");
+				.addOptions(Constants.profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerInventory(String username, String profileName, SlashCommandEvent event) {

@@ -21,6 +21,7 @@ package com.skyblockplus.skills;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
@@ -76,7 +77,7 @@ public class CrimsonSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a player's crimson isle statistics")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOptions(Constants.profilesCommandOption);
 	}
 
 	@Override

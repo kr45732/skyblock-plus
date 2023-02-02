@@ -55,7 +55,7 @@ public class CollectionsSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a player's collection amounts and levels")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOptions(Constants.profilesCommandOption);
 	}
 
 	@Override

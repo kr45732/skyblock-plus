@@ -58,7 +58,7 @@ public class SkyblockSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get an overview of a player's Skyblock statistics")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOptions(Constants.profilesCommandOption);
 	}
 
 	@Override

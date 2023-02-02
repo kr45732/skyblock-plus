@@ -67,7 +67,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("list", "Get a list of the player's talisman bag with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "profile", "Profile name")
+				.addOptions(Constants.profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");
 		}
 
@@ -103,7 +103,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("emoji", "Get a player's talisman bag represented in emojis")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "profile", "Profile name");
+				.addOptions(Constants.profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerTalismansEmoji(String username, String profileName, SlashCommandEvent event) {
@@ -139,7 +139,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("tuning", "Get a player's power stone stats and tuning stats")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "profile", "Profile name");
+				.addOptions(Constants.profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerTuning(String username, String profileName, SlashCommandEvent event) {
