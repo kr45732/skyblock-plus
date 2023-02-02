@@ -34,7 +34,6 @@ import org.hibernate.annotations.FetchMode;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity

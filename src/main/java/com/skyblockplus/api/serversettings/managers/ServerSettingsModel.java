@@ -38,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
