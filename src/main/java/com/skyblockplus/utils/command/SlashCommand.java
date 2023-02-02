@@ -18,123 +18,62 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
-
-import com.jagrosh.jdautilities.command.Command;
+import com.skyblockplus.Main;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import java.util.ArrayList;
+import java.util.List;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
-public abstract class SlashCommand {
+public abstract class SlashCommand extends AbstractSlashCommand {
 
-	protected final Permission[] botPermissions = defaultPerms(true);
-	protected String name = "null";
-	protected int cooldown = -1;
-	protected boolean logCommand = true;
-	protected Permission[] userPermissions = new Permission[0];
-
-	protected abstract void execute(SlashCommandEvent event);
+	protected List<Subcommand> subcommands = new ArrayList<>();
 
 	protected void run(SlashCommandEvent event) {
-		if (cooldown == -1) {
-			Command command = client.getCommands().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
-			cooldown = command != null ? command.getCooldown() : globalCooldown;
-		}
-
-		for (Permission p : botPermissions) {
-			if (p.isChannel()) {
-				if (!event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), p)) {
-					if (p == Permission.MESSAGE_SEND) {
-						event
-							.getUser()
-							.openPrivateChannel()
-							.queue(dm ->
-								dm
-									.sendMessageEmbeds(
-										invalidEmbed(
-											"I need the " + p.getName() + " permission in " + event.getGuildChannel().getAsMention() + "!"
-										)
-											.build()
-									)
-									.queue(ignore, ignore)
-							);
-					} else {
-						event.embed(invalidEmbed("I need the " + p.getName() + " permission in this channel!"));
-					}
-					return;
-				}
+		if (!subcommands.isEmpty() && event.getSubcommandName() != null) {
+			Subcommand subcommand = getSubcommand(event.getSubcommandName());
+			if (subcommand != null) {
+				subcommand.run(event);
 			} else {
-				if (!event.getGuild().getSelfMember().hasPermission(p)) {
-					event.embed(invalidEmbed("I need the " + p.getName() + " permission in this server!"));
-					return;
-				}
+				event.embed(event.invalidCommandMessage());
 			}
+			return;
 		}
 
-		if (!event.isOwner()) {
-			for (Permission p : userPermissions) {
-				if (event.getMember() == null) {
-					continue;
-				}
-
-				if (p.isChannel()) {
-					if (!event.getMember().hasPermission(event.getGuildChannel(), p)) {
-						event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
-						return;
-					}
-				} else {
-					if (p == Permission.ADMINISTRATOR) {
-						if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
-							event.embed(invalidEmbed("You are missing the required permissions or roles to use this command"));
-							return;
-						}
-					} else {
-						if (!event.getMember().hasPermission(p)) {
-							event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
-							return;
-						}
-					}
-				}
-			}
-		}
-
-		if (logCommand) {
-			event.logCommand();
-		}
-
-		executor.submit(() -> execute(event));
+		super.run(event);
 	}
 
-	public String getName() {
+	@Override
+	protected String getFullName() {
 		return name;
 	}
 
-	public int getRemainingCooldown(SlashCommandEvent event) {
-		if (!event.isOwner()) {
-			String key = name + "|" + String.format("U:%d", event.getUser().getIdLong());
-			int remaining = client.getRemainingCooldown(key);
-			if (remaining > 0) {
-				return remaining;
-			}
+	protected abstract SlashCommandData getCommandData();
 
-			client.applyCooldown(key, cooldown);
+	protected void addSubcommand(Subcommand subcommand) {
+		if (subcommands.stream().anyMatch(cmd -> cmd.getName().equalsIgnoreCase(subcommand.getName()))) {
+			throw new IllegalArgumentException("Tried to add a subcommand name that has already been indexed: " + subcommand.getName());
 		}
 
-		return 0;
+		subcommand.superCommand = this;
+		subcommands.add(subcommand);
 	}
 
-	public void replyCooldown(SlashCommandEvent event, int remainingCooldown) {
-		event
-			.getHook()
-			.editOriginalEmbeds(
-				invalidEmbed("That command is on cooldown for " + remainingCooldown + " more second" + (remainingCooldown == 1 ? "" : "s"))
-					.build()
-			)
-			.queue();
+	private Subcommand getSubcommand(String subcommandName) {
+		return subcommands.stream().filter(s -> s.name.equals(subcommandName)).findAny().orElse(null);
 	}
 
-	public abstract CommandData getCommandData();
+	protected void onAutoCompleteInternal(AutoCompleteEvent event) {
+		if (!subcommands.isEmpty() && event.getSubcommandName() != null) {
+			Subcommand subcommand = getSubcommand(event.getSubcommandName());
+			if (subcommand != null) {
+				subcommand.onAutoComplete(event);
+			}
+		}
 
-	public void onAutoComplete(AutoCompleteEvent event) {}
+		onAutoComplete(event);
+	}
+
+	public SlashCommandData getFullCommandData() {
+		return getCommandData().addSubcommands(subcommands.stream().map(Subcommand::getCommandData).toList());
+	}
 }

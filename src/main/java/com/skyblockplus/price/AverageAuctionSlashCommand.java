@@ -33,8 +33,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -50,7 +50,7 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands
 			.slash(name, "Get the average auction price of an item")
 			.addOption(OptionType.STRING, "item", "Item name", true, true);

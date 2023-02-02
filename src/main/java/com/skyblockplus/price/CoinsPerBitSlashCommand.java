@@ -28,8 +28,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,7 +45,7 @@ public class CoinsPerBitSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands.slash(name, "Get the coins to bits ratio for items in the bits shop");
 	}
 

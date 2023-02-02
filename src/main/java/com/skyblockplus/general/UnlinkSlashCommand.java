@@ -26,11 +26,10 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -46,7 +45,7 @@ public class UnlinkSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands.slash(name, "Unlink your account from this bot");
 	}
 
@@ -64,7 +63,7 @@ public class UnlinkSlashCommand extends SlashCommand {
 				.modifyMemberRoles(
 					event.getMember(),
 					toAdd,
-					streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
+					streamJsonArray(higherDepth(verifySettings, "verifiedRoles"))
 						.map(r -> {
 							try {
 								return event.getGuild().getRoleById(r.getAsString());
@@ -73,7 +72,7 @@ public class UnlinkSlashCommand extends SlashCommand {
 							}
 						})
 						.filter(Objects::nonNull)
-						.collect(Collectors.toList())
+						.toList()
 				)
 				.queue();
 		}

@@ -216,17 +216,6 @@ public class MainListener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
-		if (event.getUser().isBot() || event.getGuild() == null) {
-			return;
-		}
-
-		if (guildMap.containsKey(event.getGuild().getId())) {
-			guildMap.get(event.getGuild().getId()).onStringSelectInteraction(event);
-		}
-	}
-
-	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onGuildMemberJoin(event);

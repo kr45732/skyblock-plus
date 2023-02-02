@@ -34,7 +34,6 @@ import java.net.URLConnection;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
@@ -114,7 +113,7 @@ public class EmojiUpdater {
 						if (imgFiles.length == 0) {
 							imgFile = new File(skyCryptFiles.getPath() + "/" + id + ".png");
 							ImageIO.write(ImageIO.read(new URL(url)), "png", imgFile);
-							TimeUnit.MILLISECONDS.sleep(200);
+							TimeUnit.MILLISECONDS.sleep(150);
 						} else {
 							imgFile = imgFiles[0];
 						}
@@ -161,7 +160,7 @@ public class EmojiUpdater {
 						if (imgFiles.length == 0) {
 							imgFile = new File(skyCryptFiles.getPath() + "/" + sbItem + ".png");
 							ImageIO.write(ImageIO.read(new URL(getPetUrl(sbItem))), "png", imgFile);
-							TimeUnit.MILLISECONDS.sleep(250);
+							TimeUnit.MILLISECONDS.sleep(150);
 						} else {
 							imgFile = imgFiles[0];
 						}
@@ -184,7 +183,7 @@ public class EmojiUpdater {
 					if (imgFiles.length == 0) {
 						imgFile = new File(skyCryptFiles.getPath() + "/" + sbItem + ".png");
 						ImageIO.write(ImageIO.read(new URL("https://sky.shiiyu.moe/item/" + sbItem)), "png", imgFile);
-						TimeUnit.MILLISECONDS.sleep(200);
+						TimeUnit.MILLISECONDS.sleep(150);
 					} else {
 						imgFile = imgFiles[0];
 					}
@@ -268,7 +267,7 @@ public class EmojiUpdater {
 						})
 				)
 				.map(f -> f.getName().split(".json")[0])
-				.collect(Collectors.toList());
+				.toList();
 
 			FileUtils.deleteDirectory(neuDir);
 
@@ -510,7 +509,7 @@ public class EmojiUpdater {
 					if (curGuild.getEmojis().stream().filter(e -> enchanted == e.isAnimated()).count() >= curGuild.getMaxEmojis()) {
 						guildCount++;
 						curGuild = guildList.get(guildCount);
-						TimeUnit.SECONDS.sleep(3);
+						TimeUnit.SECONDS.sleep(2);
 						System.out.println("Switched to " + curGuild.getName());
 					}
 
@@ -577,7 +576,7 @@ public class EmojiUpdater {
 			.sorted(Comparator.comparing(File::getName))
 			.toList();
 		List<String> enchantList = url.length == 1
-			? streamJsonArray(getJson(url[0]).getAsJsonArray()).map(JsonElement::getAsString).toList()
+			? streamJsonArray(getJson(url[0])).map(JsonElement::getAsString).toList()
 			: getEnchantedItems();
 		File outputFileDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 		if (!outputFileDir.exists()) {

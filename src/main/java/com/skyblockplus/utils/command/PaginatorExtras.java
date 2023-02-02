@@ -20,7 +20,6 @@ package com.skyblockplus.utils.command;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -142,7 +141,7 @@ public class PaginatorExtras {
 	}
 
 	public List<Button> getButtons() {
-		return reactiveButtons.stream().filter(ReactiveButton::isVisible).map(ReactiveButton::getButton).collect(Collectors.toList());
+		return reactiveButtons.stream().filter(ReactiveButton::isVisible).map(ReactiveButton::getButton).toList();
 	}
 
 	public PaginatorExtras toggleReactiveButton(String id, boolean visible) {

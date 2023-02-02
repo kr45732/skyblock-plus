@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.idToName;
 import static com.skyblockplus.utils.Utils.parseMcCodes;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.Data;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -115,7 +114,7 @@ public class InvItem {
 
 	public void setLore(NBTList lore) {
 		if (lore != null) {
-			this.lore = lore.stream().map(line -> (String) line).collect(Collectors.toList());
+			this.lore = lore.stream().map(line -> (String) line).toList();
 			rarity = parseMcCodes(this.lore.get(this.lore.size() - 1)).trim().split("\\s+")[0];
 			rarity += rarity.startsWith("VERY") ? "_SPECIAL" : "";
 			soulbound = soulbound || this.lore.contains("§8§l* §8Co-op Soulbound §8§l*") || this.lore.contains("§8§l* §8Soulbound §8§l*");

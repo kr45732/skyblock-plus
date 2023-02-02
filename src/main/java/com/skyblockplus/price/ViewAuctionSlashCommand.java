@@ -32,8 +32,8 @@ import java.time.Instant;
 import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -49,7 +49,7 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands
 			.slash(name, "Get information about an auction by it's UUID")
 			.addOption(OptionType.STRING, "uuid", "Auction UUID", true);

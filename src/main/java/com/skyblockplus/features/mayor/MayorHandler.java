@@ -81,7 +81,7 @@ public class MayorHandler {
 		try {
 			JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor");
 			JsonArray mayors = collectJsonArray(
-				streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray())
+				streamJsonArray(higherDepth(cur, "election.candidates"))
 					.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
 			);
 
@@ -194,8 +194,7 @@ public class MayorHandler {
 			}
 
 			JsonArray curMayors = collectJsonArray(
-				streamJsonArray(higherDepth(cur, "candidates").getAsJsonArray())
-					.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
+				streamJsonArray(higherDepth(cur, "candidates")).sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
 			);
 			double totalVotes = streamJsonArray(curMayors).mapToInt(m -> higherDepth(m, "votes").getAsInt()).sum();
 			int year = higherDepth(cur, "year").getAsInt();

@@ -72,7 +72,6 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
@@ -106,23 +105,24 @@ public class AutomaticGuild {
 
 	/* Apply */
 	public final List<ApplyGuild> applyGuild = new ArrayList<>();
-	public Role applyGuestRole = null;
+	private Role applyGuestRole = null;
 	/* Verify */
 	public VerifyGuild verifyGuild;
-	public final Set<String> updatedMembers = new HashSet<>();
+	private final Set<String> updatedMembers = new HashSet<>();
 	/* Skyblock event */
 	public SkyblockEventHandler skyblockEventHandler = null;
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
 	public boolean eventCurrentlyUpdating = false;
+	private ScheduledFuture<?> sbEventFuture;
 	/* Event */
 	public final EventGuild eventGuild;
 	/* Fetchur */
-	public TextChannel fetchurChannel = null;
-	public Role fetchurPing = null;
+	private TextChannel fetchurChannel = null;
+	private Role fetchurPing = null;
 	/* Mayor */
-	public TextChannel mayorChannel = null;
-	public Role mayorPing = null;
+	private TextChannel mayorChannel = null;
+	private Role mayorPing = null;
 	public Message lastMayorElectionOpenMessage = null;
 	public Message lastMayorElectedMessage = null;
 	/* Party */
@@ -130,13 +130,13 @@ public class AutomaticGuild {
 	/* Jacob */
 	public final JacobGuild jacobGuild;
 	/* Miscellaneous */
-	public final List<String> botManagerRoles = new ArrayList<>();
+	private final List<String> botManagerRoles = new ArrayList<>();
 	public final String guildId;
-	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
-	public TextChannel logChannel = null;
-	public final List<MessageEmbed> logQueue = new ArrayList<>();
-	public JsonArray blacklist = new JsonArray();
-	public List<String> isUsing = new ArrayList<>();
+	private final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
+	private TextChannel logChannel = null;
+	private final List<MessageEmbed> logQueue = new ArrayList<>();
+	private JsonArray blacklist = new JsonArray();
+	private List<String> isUsing = new ArrayList<>();
 
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
@@ -166,7 +166,9 @@ public class AutomaticGuild {
 		JsonElement serverSettings = allServerSettings.get(guildId);
 		applyConstructor(event, serverSettings);
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
-		schedulerConstructor();
+		int eventDelay = (int) (Math.random() * 60 + 5);
+		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 60, TimeUnit.MINUTES));
+		scheduleSbEventFuture(higherDepth(serverSettings, "sbEvent"));
 		jacobGuild = new JacobGuild(higherDepth(serverSettings, "jacobSettings"), this);
 		eventGuild = new EventGuild(higherDepth(serverSettings, "eventNotif"), this);
 		try {
@@ -228,9 +230,7 @@ public class AutomaticGuild {
 			mayorPing = event.getGuild().getRoleById(higherDepth(serverSettings, "mayorRole", null));
 		} catch (Exception ignored) {}
 		try {
-			botManagerRoles.addAll(
-				streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray()).map(JsonElement::getAsString).toList()
-			);
+			botManagerRoles.addAll(streamJsonArray(higherDepth(serverSettings, "botManagerRoles")).map(JsonElement::getAsString).toList());
 		} catch (Exception ignored) {}
 		try {
 			logChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "logChannel", null));
@@ -553,7 +553,7 @@ public class AutomaticGuild {
 				List<Role> verifyRolesRemove = new ArrayList<>();
 				if (verifyEnabled) {
 					verifyRolesAdd.addAll(
-						streamJsonArray(higherDepth(serverSettings, "automatedVerify.verifiedRoles").getAsJsonArray())
+						streamJsonArray(higherDepth(serverSettings, "automatedVerify.verifiedRoles"))
 							.map(e -> guild.getRoleById(e.getAsString()))
 							.filter(Objects::nonNull)
 							.toList()
@@ -624,7 +624,7 @@ public class AutomaticGuild {
 											.values()
 											.stream()
 											.filter(g ->
-												streamJsonArray(g.get("members").getAsJsonArray())
+												streamJsonArray(g.get("members"))
 													.anyMatch(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
 											)
 											.findFirst()
@@ -637,7 +637,7 @@ public class AutomaticGuild {
 													switch (type) {
 														case "NAME" -> guildResponse.get("name").getAsString();
 														case "RANK" -> higherDepth(
-															streamJsonArray(guildResponse.get("members").getAsJsonArray())
+															streamJsonArray(guildResponse.get("members"))
 																.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid()))
 																.findFirst()
 																.orElse(null),
@@ -731,7 +731,12 @@ public class AutomaticGuild {
 
 							if (player.isValid()) {
 								try {
-									Object[] out = (Object[]) RolesSlashCommand.updateRoles(player, linkedMember, rolesSettings, true);
+									Object[] out = (Object[]) RolesSlashCommand.ClaimSubcommand.updateRoles(
+										player,
+										linkedMember,
+										rolesSettings,
+										true
+									);
 									toAddRoles.addAll((List<Role>) out[1]);
 									toRemoveRoles.addAll((List<Role>) out[2]);
 								} catch (Exception ignored) {}
@@ -890,15 +895,11 @@ public class AutomaticGuild {
 
 	public void updateSkyblockEvent() {
 		try {
-			if (skyblockEventHandler != null && skyblockEventHandler.hasTimedOut()) {
-				skyblockEventHandler = null;
-			}
-
-			if (database.getSkyblockEventActive(guildId)) {
-				JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
+			JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
+			if (!higherDepth(currentSettings, "eventType", "").isEmpty()) {
 				Instant endingTime = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 				if (Instant.now().isAfter(endingTime)) {
-					SkyblockEventSlashCommand.endSkyblockEvent(guildId);
+					SkyblockEventSlashCommand.EndSubcommand.endSkyblockEvent(jda.getGuildById(guildId), false);
 				}
 			}
 		} catch (Exception ignored) {}
@@ -1131,14 +1132,6 @@ public class AutomaticGuild {
 				);
 
 			event.getHook().editOriginal(client.getSuccess() + " Bug report sent").queue();
-		} else if (skyblockEventHandler != null) {
-			skyblockEventHandler.onModalInteraction(event);
-		}
-	}
-
-	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-		if (skyblockEventHandler != null) {
-			skyblockEventHandler.onStringSelectInteraction(event);
 		}
 	}
 
@@ -1170,14 +1163,7 @@ public class AutomaticGuild {
 			if (event.getUser().getId().equals(client.getOwnerId())) {
 				event
 					.editComponents(
-						ActionRow.of(
-							event
-								.getMessage()
-								.getButtons()
-								.stream()
-								.filter(b -> b.getStyle() == ButtonStyle.LINK)
-								.collect(Collectors.toList())
-						)
+						ActionRow.of(event.getMessage().getButtons().stream().filter(b -> b.getStyle() == ButtonStyle.LINK).toList())
 					)
 					.queue();
 				// 0 = user id, 1 = message id
@@ -1319,11 +1305,18 @@ public class AutomaticGuild {
 						event
 							.getHook()
 							.editOriginalEmbeds(
-								SkyblockEventSlashCommand.joinSkyblockEvent(null, null, event.getMember(), event.getGuild().getId()).build()
+								SkyblockEventSlashCommand.JoinSubcommand
+									.joinSkyblockEvent(null, null, event.getMember(), event.getGuild().getId())
+									.build()
 							)
 							.queue();
 					} else {
-						EmbedBuilder eb = SkyblockEventSlashCommand.getEventLeaderboard(event.getGuild(), event.getUser(), null, event);
+						EmbedBuilder eb = SkyblockEventSlashCommand.LeaderboardSubcommand.getEventLeaderboard(
+							event.getGuild(),
+							event.getUser(),
+							null,
+							event
+						);
 						if (eb != null) {
 							event.getHook().editOriginalEmbeds(eb.build()).queue();
 						}
@@ -1397,10 +1390,31 @@ public class AutomaticGuild {
 	}
 
 	/* Miscellaneous */
-	public void schedulerConstructor() {
-		int eventDelay = (int) (Math.random() * 60 + 5);
-		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 60, TimeUnit.MINUTES));
-		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateSkyblockEvent, eventDelay, 15, TimeUnit.MINUTES));
+	public void scheduleSbEventFuture(JsonElement sbEventSettings) {
+		if (!higherDepth(sbEventSettings, "eventType", "").isEmpty()) {
+			if (sbEventFuture != null) {
+				sbEventFuture.cancel(true);
+			}
+
+			long secondsTillEnd = Math.max(
+				0,
+				Duration.between(Instant.now(), Instant.ofEpochSecond(higherDepth(sbEventSettings, "timeEndingSeconds", 0L))).toSeconds()
+			);
+			sbEventFuture =
+				scheduler.schedule(
+					() -> SkyblockEventSlashCommand.EndSubcommand.endSkyblockEvent(jda.getGuildById(guildId), false),
+					secondsTillEnd,
+					TimeUnit.SECONDS
+				);
+			scheduledFutures.add(sbEventFuture);
+		}
+	}
+
+	public void cancelSbEventFuture() {
+		if (sbEventFuture != null) {
+			scheduledFutures.remove(sbEventFuture);
+			sbEventFuture.cancel(true);
+		}
 	}
 
 	public void setLogChannel(TextChannel channel) {
@@ -1454,7 +1468,7 @@ public class AutomaticGuild {
 	}
 
 	public void setIsUsing(JsonArray arr) {
-		isUsing = streamJsonArray(arr).map(JsonElement::getAsString).collect(Collectors.toList());
+		isUsing = streamJsonArray(arr).map(JsonElement::getAsString).toList();
 	}
 
 	public JsonArray getBlacklist() {

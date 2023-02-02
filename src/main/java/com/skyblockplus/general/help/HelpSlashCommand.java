@@ -30,8 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -73,7 +73,7 @@ public class HelpSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands
 			.slash(name, "Show the help page for this bot")
 			.addOption(OptionType.STRING, "command", "Name of command or page number", false, true);
@@ -310,8 +310,8 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("list", "List all enabled claimable roles for this server.")
 					)
 					.setCategory("miscellaneous"),
-				new HelpData("coins", "Get a player's bank and purse coins.", "bank [player] [profile]")
-					.addSecondData("Get a player's bank transaction history.", "bank history [player] [profile]")
+				new HelpData("coins", "Get a player's bank and purse coins.", "coins player [player] [profile]")
+					.addSecondData("Get a player's bank transaction history.", "coins history [player] [profile]")
 					.addExamples(
 						"coins CrypticPlasma",
 						"coins CrypticPlasma Zucchini",
@@ -420,8 +420,10 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("join", "Join the current event."),
 						new HelpData("leave", "Leave the current event."),
 						new HelpData("leaderboard", "Get the leaderboard for current event."),
-						new HelpData("end", "Force end the event."),
-						new HelpData("cancel", "Cancel the event. No prizes or winners will be announced.")
+						new HelpData(
+							"end",
+							"Force end the event. If silent is true, the event will be canceled and no prizes or winners will be announced."
+						)
 					)
 					.setCategory("event"),
 				// Settings
@@ -534,7 +536,7 @@ public class HelpSlashCommand extends SlashCommand {
 									.addSubcommands(
 										new HelpData(
 											"add",
-											"Add a role that user will receive upon being verified. The role cannot be @everyone or a managed role. You can add a max of 3 roles.",
+											"Add a role that user will receive upon being verified. The role cannot be @everyone or a managed role. You can add a max of 5 roles.",
 											"add <@role>"
 										),
 										new HelpData("remove", "Remove a verify role.", "remove <@role>")
@@ -876,7 +878,7 @@ public class HelpSlashCommand extends SlashCommand {
 		paginateBuilder.addItems(
 			create("roles claim [profile]", "Claim your automatic Skyblock roles based on your statistics") +
 			create("roles list", "List all roles that can be claimed through the bot") +
-			create("coins total [player] [profile]", "Get a player's bank and purse coins") +
+			create("coins player [player] [profile]", "Get a player's bank and purse coins") +
 			create("coins history [player] [profile]", "Get a player's bank transaction history") +
 			create("networth [player] [profile] [verbose]", "Calculate a player's networth") +
 			create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +
@@ -923,8 +925,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("event add <player> [profile]", "Force add a player to the event") +
 			create("event leave", "Leave the current event") +
 			create("event leaderboard", "Get the leaderboard for current event") +
-			create("event end", "Force end the event") +
-			create("event cancel", "Cancel the event. No announcement will be made")
+			create("event end", "Force end or cancel the event")
 		);
 
 		paginateBuilder.addItems(

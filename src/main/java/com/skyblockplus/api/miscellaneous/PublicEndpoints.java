@@ -25,6 +25,8 @@ import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.general.help.HelpSlashCommand;
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,10 +44,7 @@ public class PublicEndpoints {
 
 	public static void initialize() {
 		apiCommandList =
-			HelpSlashCommand.helpDataList
-				.stream()
-				.map(helpData -> DataObject.fromJson(gson.toJson(helpData)).toMap())
-				.collect(Collectors.toList());
+			HelpSlashCommand.helpDataList.stream().map(helpData -> DataObject.fromJson(gson.toJson(helpData)).toMap()).toList();
 	}
 
 	@GetMapping("/get/commands")
@@ -63,7 +62,14 @@ public class PublicEndpoints {
 				.put("guild_count", jda.getGuildCache().size())
 				.put("user_count", getUserCount())
 				.put("total_command_uses", commandUses.values().stream().mapToInt(Integer::intValue).sum())
-				.put("command_uses", commandUses)
+				.put(
+					"command_uses",
+					commandUses
+						.entrySet()
+						.stream()
+						.sorted(Comparator.comparingInt(e -> -e.getValue()))
+						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new))
+				)
 				.toMap(),
 			HttpStatus.OK
 		);

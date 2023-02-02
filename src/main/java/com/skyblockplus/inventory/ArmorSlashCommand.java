@@ -18,18 +18,20 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.utils.command.Subcommand;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
@@ -41,34 +43,110 @@ public class ArmorSlashCommand extends SlashCommand {
 		this.name = "armor";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
+	public static class ListSubcommand extends Subcommand {
+
+		public ListSubcommand() {
+			this.name = "list";
 		}
 
-		switch (event.getSubcommandName()) {
-			case "list" -> event.paginate(
-				getPlayerEquippedArmor(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event)
-			);
-			case "emoji" -> event.paginate(getPlayerArmor(event.player, event.getOptionStr("profile"), event));
-			default -> event.embed(event.invalidCommandMessage());
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			if (event.invalidPlayerOption()) {
+				return;
+			}
+
+			event.paginate(getPlayerEquippedArmor(event.player, event.getOptionStr("profile"), event.getOptionInt("slot", 0), event));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("list", "Get a list of the player's equipped armor and equipment with lore")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOptions(profilesCommandOption)
+				.addOption(OptionType.INTEGER, "slot", "Slot number");
+		}
+
+		public static EmbedBuilder getPlayerEquippedArmor(String username, String profileName, int slot, SlashCommandEvent event) {
+			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			if (player.isValid()) {
+				Map<Integer, InvItem> inventoryMap = player.getArmorMap();
+				if (inventoryMap != null) {
+					Map<Integer, InvItem> equipmentMap = player.getEquipmentMap();
+					if (equipmentMap != null) {
+						for (Map.Entry<Integer, InvItem> entry : equipmentMap.entrySet()) {
+							inventoryMap.put(entry.getKey() + 4, entry.getValue());
+						}
+					}
+					new InventoryListPaginator(player, inventoryMap, slot, event);
+					return null;
+				}
+			}
+			return player.getFailEmbed();
+		}
+	}
+
+	public static class EmojiSubcommand extends Subcommand {
+
+		public EmojiSubcommand() {
+			this.name = "emoji";
+		}
+
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			if (event.invalidPlayerOption()) {
+				return;
+			}
+
+			event.paginate(getPlayerArmor(event.player, event.getOptionStr("profile"), event));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("emoji", "Get a player's equipped armor and equipment represented in emojis")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOptions(profilesCommandOption);
+		}
+
+		public static EmbedBuilder getPlayerArmor(String username, String profileName, SlashCommandEvent event) {
+			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			if (player.isValid()) {
+				Map<Integer, InvItem> playerArmor = player.getArmorMap();
+				Map<Integer, InvItem> playerEquipment = player.getEquipmentMap();
+				if (playerArmor != null || playerEquipment != null) {
+					StringBuilder out = new StringBuilder();
+					for (int i = 0; i < 8; i++) {
+						if (i % 2 == 0) {
+							try {
+								out.append(getEmojiOr(playerEquipment.get(i / 2).getId(), "❓"));
+							} catch (Exception e) {
+								out.append(getEmoji("EMPTY"));
+							}
+						} else {
+							try {
+								out.append(getEmojiOr(playerArmor.get((i - 1) / 2).getId(), "❓")).append("\n");
+							} catch (Exception e) {
+								out.append(getEmoji("EMPTY")).append("\n");
+							}
+						}
+					}
+
+					event
+						.getHook()
+						.editOriginal(out.toString())
+						.setEmbeds()
+						.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Armor & Equipment"))
+						.queue();
+					return null;
+				}
+				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+			}
+			return player.getFailEmbed();
 		}
 	}
 
 	@Override
-	public CommandData getCommandData() {
-		return Commands
-			.slash(name, "Main armor command")
-			.addSubcommands(
-				new SubcommandData("list", "Get a list of the player's equipped armor and equipment with lore")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-					.addOption(OptionType.STRING, "profile", "Profile name")
-					.addOption(OptionType.INTEGER, "slot", "Slot number"),
-				new SubcommandData("emoji", "Get a player's equipped armor and equipment represented in emojis")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-					.addOption(OptionType.STRING, "profile", "Profile name")
-			);
+	protected SlashCommandData getCommandData() {
+		return Commands.slash(name, "Main armor command");
 	}
 
 	@Override
@@ -76,59 +154,5 @@ public class ArmorSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
-	}
-
-	public static EmbedBuilder getPlayerEquippedArmor(String username, String profileName, int slot, SlashCommandEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			Map<Integer, InvItem> inventoryMap = player.getArmorMap();
-			if (inventoryMap != null) {
-				Map<Integer, InvItem> equipmentMap = player.getEquipmentMap();
-				if (equipmentMap != null) {
-					for (Map.Entry<Integer, InvItem> entry : equipmentMap.entrySet()) {
-						inventoryMap.put(entry.getKey() + 4, entry.getValue());
-					}
-				}
-				new InventoryListPaginator(player, inventoryMap, slot, event);
-				return null;
-			}
-		}
-		return player.getFailEmbed();
-	}
-
-	public static EmbedBuilder getPlayerArmor(String username, String profileName, SlashCommandEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			Map<Integer, InvItem> playerArmor = player.getArmorMap();
-			Map<Integer, InvItem> playerEquipment = player.getEquipmentMap();
-			if (playerArmor != null || playerEquipment != null) {
-				StringBuilder out = new StringBuilder();
-				for (int i = 0; i < 8; i++) {
-					if (i % 2 == 0) {
-						try {
-							out.append(getEmojiOr(playerEquipment.get(i / 2).getId(), "❓"));
-						} catch (Exception e) {
-							out.append(getEmoji("EMPTY"));
-						}
-					} else {
-						try {
-							out.append(getEmojiOr(playerArmor.get((i - 1) / 2).getId(), "❓")).append("\n");
-						} catch (Exception e) {
-							out.append(getEmoji("EMPTY")).append("\n");
-						}
-					}
-				}
-
-				event
-					.getHook()
-					.editOriginal(out.toString())
-					.setEmbeds()
-					.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Armor & Equipment"))
-					.queue();
-				return null;
-			}
-			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
-		}
-		return player.getFailEmbed();
 	}
 }

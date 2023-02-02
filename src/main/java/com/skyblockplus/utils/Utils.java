@@ -352,7 +352,7 @@ public class Utils {
 					InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
 				) {
 					queryItems =
-						streamJsonArray(JsonParser.parseReader(in).getAsJsonArray())
+						streamJsonArray(JsonParser.parseReader(in))
 							.map(JsonElement::getAsString)
 							.collect(Collectors.toCollection(ArrayList::new));
 				}
@@ -638,10 +638,6 @@ public class Utils {
 	}
 
 	public static String getSkyCryptData(String dataUrl) {
-		if (!dataUrl.contains("raw.githubusercontent.com")) {
-			return null;
-		}
-
 		try {
 			HttpGet httpGet = new HttpGet(dataUrl);
 			httpGet.setHeader("Authorization", "token " + GITHUB_TOKEN);
@@ -849,11 +845,7 @@ public class Utils {
 			.setItemsPerPage(1)
 			.setFinalAction(m -> {
 				if (!m.getActionRows().isEmpty()) {
-					List<Button> buttons = m
-						.getButtons()
-						.stream()
-						.filter(b -> b.getStyle() == ButtonStyle.LINK)
-						.collect(Collectors.toList());
+					List<Button> buttons = m.getButtons().stream().filter(b -> b.getStyle() == ButtonStyle.LINK).toList();
 					if (buttons.isEmpty()) {
 						m.editMessageComponents().queue(ignore, ignore);
 					} else {
@@ -1064,30 +1056,7 @@ public class Utils {
 	}
 
 	public static String profileNameToEmoji(String profileName) {
-		return switch (profileName) {
-			case "apple" -> "\uD83C\uDF4E";
-			case "banana" -> "\uD83C\uDF4C";
-			case "blueberry" -> "\uD83E\uDED0";
-			case "coconut" -> "\uD83E\uDD65";
-			case "cucumber" -> "\uD83E\uDD52";
-			case "grapes" -> "\uD83C\uDF47";
-			case "kiwi" -> "\uD83E\uDD5D";
-			case "lemon" -> "\uD83C\uDF4B";
-			case "lime" -> "<:lime:828632854174498837>";
-			case "mango" -> "\uD83E\uDD6D";
-			case "orange" -> "<:orange:828634110360289331>";
-			case "papaya" -> "<:papaya:828633125370200085>";
-			case "peach" -> "\uD83C\uDF51";
-			case "pear" -> "\uD83C\uDF50";
-			case "pineapple" -> "\uD83C\uDF4D";
-			case "pomegranate" -> "<:pomegranate:828632397032456232>";
-			case "raspberry" -> "<:raspberry:828632035127853064>";
-			case "strawberry" -> "\uD83C\uDF53";
-			case "tomato" -> "\uD83C\uDF45";
-			case "watermelon" -> "\uD83C\uDF49";
-			case "zucchini" -> "<:zucchini:828636746358194206>";
-			default -> null;
-		};
+		return profileNameToEmoji.getOrDefault(profileName, null);
 	}
 
 	public static EmbedBuilder checkHypixelKey(String hypixelKey) {
@@ -1282,7 +1251,10 @@ public class Utils {
 									!itemInfo.getId().equals("PROMISING_SPADE") &&
 									(int) enchant.getValue() > 5
 								) {
-									itemInfo.addExtraValues((int) enchant.getValue() - (itemInfo.getId().equals("STONK_PICKAXE") ? 6: 5), "SIL_EX");
+									itemInfo.addExtraValues(
+										(int) enchant.getValue() - (itemInfo.getId().equals("STONK_PICKAXE") ? 6 : 5),
+										"SIL_EX"
+									);
 								}
 								enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
 							}
@@ -1577,7 +1549,7 @@ public class Utils {
 								return false;
 							}
 						})
-						.collect(Collectors.toList());
+						.toList();
 					database.setApplyCacheSettings(automaticGuild.getKey(), name, gson.toJson(applyUserList));
 
 					if (applyUserList.size() > 0) {
@@ -1645,7 +1617,7 @@ public class Utils {
 						return false;
 					}
 				})
-				.collect(Collectors.toList());
+				.toList();
 
 			if (applyUsersCacheList.size() > 0) {
 				log.info(
@@ -1786,16 +1758,12 @@ public class Utils {
 			: new Permission[] { Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS };
 	}
 
-	public static Stream<JsonElement> streamJsonArray(JsonArray array) {
+	public static Stream<JsonElement> streamJsonArray(JsonElement array) {
 		List<JsonElement> list = new ArrayList<>();
-		for (JsonElement element : array) {
+		for (JsonElement element : array.getAsJsonArray()) {
 			list.add(element);
 		}
 		return list.stream();
-	}
-
-	public static Stream<JsonElement> streamJsonArray(JsonElement array) {
-		return streamJsonArray(array.getAsJsonArray());
 	}
 
 	public static JsonArray collectJsonArray(Stream<JsonElement> list) {
@@ -2157,7 +2125,7 @@ public class Utils {
 
 		JsonElement npcBuyCost = higherDepth(getInternalJsonMappings(), itemId + ".npc_buy.cost");
 		if (npcBuyCost != null) {
-			return streamJsonArray(npcBuyCost).map(JsonElement::getAsString).collect(Collectors.toList());
+			return streamJsonArray(npcBuyCost).map(JsonElement::getAsString).toList();
 		}
 
 		return null;
@@ -2182,5 +2150,21 @@ public class Utils {
 	public static UUID stringToUuid(String uuid) {
 		Matcher matcher = uuidDashRegex.matcher(uuid);
 		return UUID.fromString(matcher.matches() ? uuidDashRegex.matcher(uuid).replaceAll("$1-$2-$3-$4-$5") : uuid);
+	}
+
+	public static int guildExpToLevel(int guildExp) {
+		int guildLevel = 0;
+
+		for (int i = 0;; i++) {
+			int expNeeded = i >= GUILD_EXP_TO_LEVEL.size()
+				? GUILD_EXP_TO_LEVEL.get(GUILD_EXP_TO_LEVEL.size() - 1)
+				: GUILD_EXP_TO_LEVEL.get(i);
+			guildExp -= expNeeded;
+			if (guildExp < 0) {
+				return guildLevel;
+			} else {
+				guildLevel++;
+			}
+		}
 	}
 }

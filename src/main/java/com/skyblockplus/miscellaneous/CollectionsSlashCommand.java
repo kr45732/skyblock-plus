@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -30,8 +31,8 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -51,11 +52,11 @@ public class CollectionsSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands
 			.slash(name, "Get a player's collection amounts and levels")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

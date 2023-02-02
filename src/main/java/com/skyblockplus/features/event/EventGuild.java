@@ -70,7 +70,7 @@ public class EventGuild {
 						.sendMessage(
 							channels.getValue().stream().map(e -> "<@&" + e.getRoleId() + ">").distinct().collect(Collectors.joining(" "))
 						)
-						.setEmbeds(channels.getValue().stream().map(e -> embeds.get(e.getValue())).collect(Collectors.toList()))
+						.setEmbeds(channels.getValue().stream().map(e -> embeds.get(e.getValue())).toList())
 						.queue();
 				}
 			}

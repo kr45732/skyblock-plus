@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021-2022 kr45732
+ * Copyright (c) 2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,28 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.general;
+package com.skyblockplus.utils.command;
 
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import org.springframework.stereotype.Component;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-@Component
-public class InviteSlashCommand extends SlashCommand {
+public abstract class Subcommand extends AbstractSlashCommand {
 
-	public InviteSlashCommand() {
-		this.name = "invite";
-	}
+	protected SlashCommand superCommand;
 
 	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(InformationSlashCommand.getInformation());
-	}
+	protected abstract void execute(SlashCommandEvent event);
 
 	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Invite this bot to your server");
+	protected abstract SubcommandData getCommandData();
+
+	protected String getFullName() {
+		return superCommand.getFullName() + " " + name;
 	}
 }

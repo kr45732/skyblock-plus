@@ -760,7 +760,17 @@ public class NetworthExecute {
 
 		double totalPrice =
 			itemCount *
-			(itemCost + recombobulatedExtra + hpbExtras + enchantsExtras + fumingExtras + reforgeExtras + miscExtras + backpackExtras + essenceExtras);
+			(
+				itemCost +
+				recombobulatedExtra +
+				hpbExtras +
+				enchantsExtras +
+				fumingExtras +
+				reforgeExtras +
+				miscExtras +
+				backpackExtras +
+				essenceExtras
+			);
 
 		if (verbose) {
 			out.append("{");

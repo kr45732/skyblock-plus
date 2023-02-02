@@ -452,7 +452,7 @@ public class ApplyUser implements Serializable {
 							row.add(Button.primary("apply_user_waitlist", "Waitlist"));
 						}
 						row.add(Button.danger("apply_user_deny", "Deny"));
-						String staffPingMentions = streamJsonArray(higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray())
+						String staffPingMentions = streamJsonArray(higherDepth(currentSettings, "applyStaffRoles"))
 							.map(r -> "<@&" + r.getAsString() + ">")
 							.collect(Collectors.joining(" "));
 						Message reactMessage = staffPingMentions.isEmpty()

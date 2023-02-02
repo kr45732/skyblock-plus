@@ -325,31 +325,13 @@ public class ServerSettingsService {
 	}
 
 	// Event
-	public boolean getSkyblockEventActive(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			try {
-				if (currentServerSettings.getSbEvent().getEventType().length() > 0) {
-					return true;
-				}
-			} catch (Exception ignored) {}
-		}
-		return false;
-	}
-
 	public boolean eventHasMemberByUuid(String serverId, String minecraftUuid) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			if (getSkyblockEventActive(serverId)) {
-				EventSettings eventSettings = currentServerSettings.getSbEvent();
-				List<EventMember> eventMembers = eventSettings.getMembersList();
-				for (EventMember eventMember : eventMembers) {
-					if (eventMember.getUuid().equals(minecraftUuid)) {
-						return true;
-					}
-				}
+			EventSettings eventSettings = currentServerSettings.getSbEvent();
+			if (!eventSettings.getEventType().isEmpty()) {
+				return eventSettings.getMembersList().stream().anyMatch(eventMember -> eventMember.getUuid().equals(minecraftUuid));
 			}
 		}
 		return false;
@@ -379,8 +361,8 @@ public class ServerSettingsService {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			if (getSkyblockEventActive(serverId)) {
-				EventSettings eventSettings = currentServerSettings.getSbEvent();
+			EventSettings eventSettings = currentServerSettings.getSbEvent();
+			if (!eventSettings.getEventType().isEmpty()) {
 				List<EventMember> eventMembers = eventSettings.getMembersList();
 				eventMembers.add(newEventMember);
 				eventSettings.setMembersList(eventMembers);
@@ -395,8 +377,8 @@ public class ServerSettingsService {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			if (getSkyblockEventActive(serverId)) {
-				EventSettings eventSettings = currentServerSettings.getSbEvent();
+			EventSettings eventSettings = currentServerSettings.getSbEvent();
+			if (!eventSettings.getEventType().isEmpty()) {
 				List<EventMember> eventMembers = eventSettings.getMembersList();
 				eventMembers.removeIf(eventMember -> eventMember.getUuid().equals(minecraftUuid));
 				eventSettings.setMembersList(eventMembers);

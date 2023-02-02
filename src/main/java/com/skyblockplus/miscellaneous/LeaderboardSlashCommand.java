@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.globalCooldown;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 
@@ -27,9 +28,9 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,6 +38,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 
 	public LeaderboardSlashCommand() {
 		this.name = "leaderboard";
+		this.cooldown = globalCooldown + 1;
 	}
 
 	@Override
@@ -57,7 +59,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands
 			.slash(name, "Get the global leaderboard. Player's on leaderboard are only added or updated when commands are run")
 			.addOptions(new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true))

@@ -21,14 +21,15 @@ package com.skyblockplus.settings;
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,6 +38,7 @@ public class ReloadSlashCommand extends SlashCommand {
 	public ReloadSlashCommand() {
 		this.name = "reload";
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+		this.cooldown = globalCooldown + 2;
 	}
 
 	@Override
@@ -45,7 +47,7 @@ public class ReloadSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands.slash(name, "Reload the guild application and verification settings");
 	}
 

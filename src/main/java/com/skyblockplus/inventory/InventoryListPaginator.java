@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -205,11 +204,7 @@ public class InventoryListPaginator {
 		String itemSearch = event.getValue("item").getAsString();
 		pageNumber =
 			FuzzySearch
-				.extractOne(
-					itemSearch,
-					items.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toList()),
-					i -> i.getValue().getName()
-				)
+				.extractOne(itemSearch, items.entrySet().stream().filter(e -> e.getValue() != null).toList(), i -> i.getValue().getName())
 				.getReferent()
 				.getKey();
 

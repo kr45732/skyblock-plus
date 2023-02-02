@@ -43,9 +43,9 @@ import java.util.stream.Stream;
 import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
@@ -55,6 +55,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 
 	public AuctionsSlashCommand() {
 		this.name = "auctions";
+		this.cooldown = globalCooldown + 1;
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands
 			.slash(name, "Get player's active (not claimed) auctions on all profiles")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)

@@ -28,13 +28,12 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -50,12 +49,12 @@ public class JacobSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getCommandData() {
 		return Commands
 			.slash(name, "Get a list of upcoming farming contests")
 			.addOptions(
 				new OptionData(OptionType.STRING, "crop", "Crop to filter by")
-					.addChoices(cropNameToEmoji.keySet().stream().map(c -> new Command.Choice(c, c)).collect(Collectors.toList()))
+					.addChoices(cropNameToEmoji.keySet().stream().map(c -> new Command.Choice(c, c)).toList())
 			);
 	}
 
