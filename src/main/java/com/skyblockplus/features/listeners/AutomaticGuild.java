@@ -166,8 +166,7 @@ public class AutomaticGuild {
 		JsonElement serverSettings = allServerSettings.get(guildId);
 		applyConstructor(event, serverSettings);
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
-		int eventDelay = (int) (Math.random() * 60 + 5);
-		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 60, TimeUnit.MINUTES));
+		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, (int) (Math.random() * 60 + 5), 60, TimeUnit.MINUTES));
 		scheduleSbEventFuture(higherDepth(serverSettings, "sbEvent"));
 		jacobGuild = new JacobGuild(higherDepth(serverSettings, "jacobSettings"), this);
 		eventGuild = new EventGuild(higherDepth(serverSettings, "eventNotif"), this);
@@ -1408,7 +1407,7 @@ public class AutomaticGuild {
 			}
 
 			long secondsTillEnd = Math.max(
-				120,
+				60,
 				Duration.between(Instant.now(), Instant.ofEpochSecond(higherDepth(sbEventSettings, "timeEndingSeconds", 0L))).toSeconds()
 			);
 			sbEventFuture =

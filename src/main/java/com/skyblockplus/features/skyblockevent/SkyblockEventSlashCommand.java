@@ -604,13 +604,15 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				);
 			}
 
-			if (paginateBuilder.size() > 0) {
-				paginateBuilder.build().paginate(announcementChannel, 0);
-			} else {
-				announcementChannel
-					.sendMessageEmbeds(defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build())
-					.complete();
-			}
+			try {
+				if (paginateBuilder.size() > 0) {
+					paginateBuilder.build().paginate(announcementChannel, 0);
+				} else {
+					announcementChannel
+						.sendMessageEmbeds(defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build())
+						.complete();
+				}
+			} catch (Exception ignored) {}
 
 			try {
 				paginateBuilder =
@@ -629,19 +631,18 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 							")` " +
 							higherDepth(runningEventSettings, "prizeMap." + prizeListKeys.get(i)).getAsString() +
 							" - " +
-							fixUsername(guildMemberPlayersList.get(i).getUsername())
+							(i < guildMemberPlayersList.size() ? fixUsername(guildMemberPlayersList.get(i).getUsername()) : " None")
 						);
 					} catch (Exception ignored) {}
 				}
 
 				if (paginateBuilder.size() > 0) {
 					paginateBuilder.build().paginate(announcementChannel, 0);
-					database.setSkyblockEventSettings(guildId, new EventSettings());
-					guildMap.get(guildId).cancelSbEventFuture();
-					return defaultEmbed("Success").setDescription("Ended Skyblock event");
+				} else {
+					announcementChannel.sendMessageEmbeds(defaultEmbed("Prizes").setDescription("None").build()).complete();
 				}
 			} catch (Exception ignored) {}
-			announcementChannel.sendMessageEmbeds(defaultEmbed("Prizes").setDescription("None").build()).complete();
+
 			database.setSkyblockEventSettings(guildId, new EventSettings());
 			guildMap.get(guildId).cancelSbEventFuture();
 			return defaultEmbed("Success").setDescription("Ended Skyblock event");
