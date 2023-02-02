@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils.command;
 
+import com.skyblockplus.Main;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,10 @@ public abstract class SlashCommand extends AbstractSlashCommand {
 	protected abstract SlashCommandData getCommandData();
 
 	protected void addSubcommand(Subcommand subcommand) {
+		if (subcommands.stream().anyMatch(cmd -> cmd.getName().equalsIgnoreCase(subcommand.getName()))) {
+			throw new IllegalArgumentException("Tried to add a subcommand name that has already been indexed: " + subcommand.getName());
+		}
+
 		subcommand.superCommand = this;
 		subcommands.add(subcommand);
 	}

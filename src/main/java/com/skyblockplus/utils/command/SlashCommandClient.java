@@ -46,9 +46,9 @@ public class SlashCommandClient extends ListenerAdapter {
 			if (slashCommands.stream().anyMatch(cmd -> cmd.getName().equalsIgnoreCase(command.getName()))) {
 				Main.log.error(
 					"",
-					new IllegalArgumentException("Command added has a name that has already been indexed: " + command.getName())
+					new IllegalArgumentException("Tried to add a command name that has already been indexed: " + command.getName())
 				);
-				throw new IllegalArgumentException("Command added has a name that has already been indexed: " + command.getName());
+				throw new IllegalArgumentException("Tried to add a command name that has already been indexed: " + command.getName());
 			} else {
 				// Subcommands
 				for (Class<?> declaredClass : command.getClass().getDeclaredClasses()) {
