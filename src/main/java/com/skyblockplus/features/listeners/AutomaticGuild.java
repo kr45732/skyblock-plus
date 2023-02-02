@@ -1397,7 +1397,7 @@ public class AutomaticGuild {
 			}
 
 			long secondsTillEnd = Math.max(
-				0,
+				120,
 				Duration.between(Instant.now(), Instant.ofEpochSecond(higherDepth(sbEventSettings, "timeEndingSeconds", 0L))).toSeconds()
 			);
 			sbEventFuture =

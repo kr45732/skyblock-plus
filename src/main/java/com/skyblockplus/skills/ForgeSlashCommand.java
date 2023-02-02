@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;

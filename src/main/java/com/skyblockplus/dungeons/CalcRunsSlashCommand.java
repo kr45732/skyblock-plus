@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.miscellaneous.weight.weight.Weight;
-import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;

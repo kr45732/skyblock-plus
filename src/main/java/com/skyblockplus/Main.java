@@ -51,7 +51,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
-import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -74,7 +73,7 @@ public class Main {
 
 	public static final Logger log = LoggerFactory.getLogger(Main.class);
 
-	public static void main(String[] args) throws LoginException, IllegalArgumentException {
+	public static void main(String[] args) throws IllegalArgumentException {
 		globalExceptionHandler = new GlobalExceptionHandler();
 		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
 		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));

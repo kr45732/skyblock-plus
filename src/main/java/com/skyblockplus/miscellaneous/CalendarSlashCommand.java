@@ -247,7 +247,6 @@ public class CalendarSlashCommand extends SlashCommand {
 		}
 
 		if (currentMayor.equalsIgnoreCase("cole")) {
-			int curYearMayor = currentMayorYear;
 			// TODO: mining fiesta https://wiki.hypixel.net/Mining_Fiesta
 		}
 
@@ -261,8 +260,7 @@ public class CalendarSlashCommand extends SlashCommand {
 		} else if (currentDay > 7) {
 			out = 14;
 		}
-		out--;
-		Instant cultStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS);
+		Instant cultStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonth * MONTH_MS + (out - 1) * DAY_MS);
 		if (cultStart.isBefore(instantNow)) {
 			int curYearCult = getSkyblockYear() - 1;
 			if (out == 28) {
@@ -276,7 +274,7 @@ public class CalendarSlashCommand extends SlashCommand {
 			} else {
 				out += 7;
 			}
-			cultStart = Instant.ofEpochMilli(YEAR_0 + (curYearCult) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS);
+			cultStart = Instant.ofEpochMilli(YEAR_0 + (curYearCult) * YEAR_MS + currentMonth * MONTH_MS + (out - 1) * DAY_MS);
 		}
 
 		int currentMonthBank = (int) Math.floorDiv(currentOffset, MONTH_MS);

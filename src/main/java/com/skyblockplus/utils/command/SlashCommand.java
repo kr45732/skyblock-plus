@@ -18,7 +18,6 @@
 
 package com.skyblockplus.utils.command;
 
-import com.skyblockplus.Main;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 public abstract class SlashCommand extends AbstractSlashCommand {
 
-	protected List<Subcommand> subcommands = new ArrayList<>();
+	protected final List<Subcommand> subcommands = new ArrayList<>();
 
 	protected void run(SlashCommandEvent event) {
 		if (!subcommands.isEmpty() && event.getSubcommandName() != null) {

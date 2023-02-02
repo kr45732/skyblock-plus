@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
@@ -43,7 +42,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CrimsonSlashCommand extends SlashCommand {
 
-	public static Map<String, String> dojoQuests = Maps.of(
+	public static final Map<String, String> dojoQuests = Maps.of(
 		"snake",
 		"Swiftness",
 		"archer",

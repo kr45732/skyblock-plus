@@ -30,8 +30,6 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenuInteraction;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectInteraction;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class PartyHandler {
@@ -61,7 +59,7 @@ public class PartyHandler {
 		scheduleWaiter();
 	}
 
-	private boolean condition(SelectMenuInteraction event) {
+	private boolean condition(StringSelectInteractionEvent event) {
 		return (
 			event.isFromGuild() &&
 			event.getUser().getId().equals(slashCommandEvent.getUser().getId()) &&
@@ -70,7 +68,7 @@ public class PartyHandler {
 		);
 	}
 
-	private void action(StringSelectInteraction event) {
+	private void action(StringSelectInteractionEvent event) {
 		event.deferEdit().complete();
 
 		switch (menuId) {

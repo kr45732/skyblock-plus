@@ -101,33 +101,19 @@ public abstract class CommandExecute extends CommandEvent {
 	}
 
 	protected void paginate(Object ebOrMb) {
-		paginate(ebOrMb, false);
-	}
-
-	protected void paginate(Object ebOrMb, boolean deleteOriginal) {
-		if (ebOrMb == null) {
-			if (deleteOriginal) {
-				ebMessage.delete().queue(ignore, ignore);
+		if (ebOrMb != null) {
+			if (ebOrMb instanceof EmbedBuilder eb) {
+				ebMessage.editMessageEmbeds(eb.build()).queue(ignore, ignore);
+			} else if (ebOrMb instanceof MessageEditBuilder mb) {
+				ebMessage.editMessage(mb.build()).queue(ignore, ignore);
+			} else {
+				throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
 			}
-		} else if (ebOrMb instanceof EmbedBuilder eb) {
-			ebMessage.editMessageEmbeds(eb.build()).queue(ignore, ignore);
-		} else if (ebOrMb instanceof MessageEditBuilder mb) {
-			ebMessage.editMessage(mb.build()).queue(ignore, ignore);
-		} else {
-			throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
 		}
 	}
 
 	protected void paginate(EmbedBuilder embedBuilder) {
-		paginate(embedBuilder, false);
-	}
-
-	protected void paginate(EmbedBuilder embedBuilder, boolean deleteOriginal) {
-		if (embedBuilder == null) {
-			if (deleteOriginal) {
-				ebMessage.delete().queue(ignore, ignore);
-			}
-		} else {
+		if (embedBuilder != null) {
 			ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignore, ignore);
 		}
 	}

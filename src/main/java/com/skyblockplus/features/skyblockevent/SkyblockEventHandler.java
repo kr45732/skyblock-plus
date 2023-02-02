@@ -60,7 +60,6 @@ public class SkyblockEventHandler {
 	private GuildMessageChannel announcementChannel;
 	private String guildName;
 	private SelectMenuState selectMenuState = SelectMenuState.TYPE_GENERIC;
-	private ModalState modalState = null; // Allows to fallback on the select menu state if the modal is exited or canceled
 
 	public SkyblockEventHandler(SlashCommandEvent slashCommandEvent) {
 		this.slashCommandEvent = slashCommandEvent;
@@ -139,11 +138,10 @@ public class SkyblockEventHandler {
 							.queue();
 					}
 					case "collections" -> {
-						modalState = ModalState.TYPE_COLLECTIONS;
 						event
 							.replyModal(
 								Modal
-									.create("skyblock_event_" + modalState, "Skyblock Event")
+									.create("skyblock_event_type_collections", "Skyblock Event")
 									.addActionRow(TextInput.create("value", "Collection Type", TextInputStyle.SHORT).build())
 									.build()
 							)
@@ -265,22 +263,20 @@ public class SkyblockEventHandler {
 						return;
 					}
 					case "guild" -> {
-						modalState = ModalState.CONFIG_GUILD;
 						event
 							.replyModal(
 								Modal
-									.create("skyblock_event_" + modalState, "Skyblock Event")
+									.create("skyblock_event_config_guild", "Skyblock Event")
 									.addActionRow(TextInput.create("value", "Guild Name", TextInputStyle.SHORT).build())
 									.build()
 							)
 							.queue();
 					}
 					case "duration" -> {
-						modalState = ModalState.CONFIG_DURATION;
 						event
 							.replyModal(
 								Modal
-									.create("skyblock_event_" + modalState, "Skyblock Event")
+									.create("skyblock_event_config_duration", "Skyblock Event")
 									.addActionRow(
 										TextInput
 											.create("value", "Duration", TextInputStyle.SHORT)
@@ -291,23 +287,19 @@ public class SkyblockEventHandler {
 							)
 							.queue();
 					}
-					case "channel" -> {
-						modalState = ModalState.CONFIG_CHANNEL;
-						event
-							.replyModal(
-								Modal
-									.create("skyblock_event_" + modalState, "Skyblock Event")
-									.addActionRow(TextInput.create("value", "Channel", TextInputStyle.SHORT).build())
-									.build()
-							)
-							.queue();
-					}
+					case "channel" -> event
+						.replyModal(
+							Modal
+								.create("skyblock_event_config_channel", "Skyblock Event")
+								.addActionRow(TextInput.create("value", "Channel", TextInputStyle.SHORT).build())
+								.build()
+						)
+						.queue();
 					case "prizes" -> {
-						modalState = ModalState.CONFIG_PRIZES;
 						event
 							.replyModal(
 								Modal
-									.create("skyblock_event_" + modalState, "Skyblock Event")
+									.create("skyblock_event_config_prizes", "Skyblock Event")
 									.addActionRow(
 										TextInput
 											.create("value", "Prizes", TextInputStyle.PARAGRAPH)
@@ -318,39 +310,32 @@ public class SkyblockEventHandler {
 							)
 							.queue();
 					}
-					case "minimum_amount" -> {
-						modalState = ModalState.CONFIG_MINIMUM_AMOUNT;
-						event
-							.replyModal(
-								Modal
-									.create("skyblock_event_" + modalState, "Skyblock Event")
-									.addActionRow(TextInput.create("value", "Minimum Amount", TextInputStyle.SHORT).build())
-									.build()
-							)
-							.queue();
-					}
+					case "minimum_amount" -> event
+						.replyModal(
+							Modal
+								.create("skyblock_event_config_minimum_amount", "Skyblock Event")
+								.addActionRow(TextInput.create("value", "Minimum Amount", TextInputStyle.SHORT).build())
+								.build()
+						)
+						.queue();
 					case "maximum_amount" -> {
-						modalState = ModalState.CONFIG_MAXIMUM_AMOUNT;
 						event
 							.replyModal(
 								Modal
-									.create("skyblock_event_" + modalState, "Skyblock Event")
+									.create("skyblock_event_config_maximum_amount", "Skyblock Event")
 									.addActionRow(TextInput.create("value", "Maximum Amount", TextInputStyle.SHORT).build())
 									.build()
 							)
 							.queue();
 					}
-					case "whitelist_role" -> {
-						modalState = ModalState.CONFIG_WHITELIST_ROLE;
-						event
-							.replyModal(
-								Modal
-									.create("skyblock_event_" + modalState, "Skyblock Event")
-									.addActionRow(TextInput.create("value", "Whitelist Role", TextInputStyle.SHORT).build())
-									.build()
-							)
-							.queue();
-					}
+					case "whitelist_role" -> event
+						.replyModal(
+							Modal
+								.create("skyblock_event_config_whitelist_role", "Skyblock Event")
+								.addActionRow(TextInput.create("value", "Whitelist Role", TextInputStyle.SHORT).build())
+								.build()
+						)
+						.queue();
 				}
 			}
 		}
@@ -359,8 +344,8 @@ public class SkyblockEventHandler {
 	}
 
 	public void onModalInteraction(ModalInteractionEvent event) {
-		switch (ModalState.valueOf(event.getModalId().split("skyblock_event_")[1].toUpperCase())) {
-			case TYPE_COLLECTIONS -> {
+		switch (event.getModalId().split("skyblock_event_")[1]) {
+			case "type_collections" -> {
 				String selectedName = event.getValues().get(0).getAsString();
 				List<String> collections = new ArrayList<>();
 				for (Map.Entry<String, JsonElement> collection : getCollectionsJson().entrySet()) {
@@ -390,7 +375,7 @@ public class SkyblockEventHandler {
 					)
 					.queue();
 			}
-			case CONFIG_GUILD -> {
+			case "config_guild" -> {
 				HypixelResponse response = getGuildFromName(event.getValues().get(0).getAsString().trim());
 				if (!response.isValid()) {
 					event.editMessageEmbeds(eb.setDescription(response.failCause() + ". Please try again.").build()).queue();
@@ -401,7 +386,7 @@ public class SkyblockEventHandler {
 					event.editMessage(getGenericConfigMessage()).queue();
 				}
 			}
-			case CONFIG_CHANNEL -> {
+			case "config_channel" -> {
 				String textChannel = event.getValues().get(0).getAsString();
 				try {
 					announcementChannel = (GuildMessageChannel) event.getGuild().getGuildChannelById(textChannel.replaceAll("[<#>]", ""));
@@ -417,7 +402,7 @@ public class SkyblockEventHandler {
 					event.editMessage(getGenericConfigMessage()).queue();
 				}
 			}
-			case CONFIG_DURATION -> {
+			case "config_duration" -> {
 				String textDuration = event.getValues().get(0).getAsString();
 				try {
 					int eventDuration = Integer.parseInt(textDuration);
@@ -434,7 +419,7 @@ public class SkyblockEventHandler {
 					event.editMessageEmbeds(eb.setDescription("`" + textDuration + "` is invalid. Please try again.").build()).queue();
 				}
 			}
-			case CONFIG_MINIMUM_AMOUNT -> {
+			case "config_minimum_amount" -> {
 				String textMinAmt = event.getValues().get(0).getAsString();
 				try {
 					int minAmount = Integer.parseInt(textMinAmt);
@@ -449,7 +434,7 @@ public class SkyblockEventHandler {
 					event.editMessageEmbeds(eb.setDescription("`" + textMinAmt + "` is invalid. Please try again.").build()).queue();
 				}
 			}
-			case CONFIG_MAXIMUM_AMOUNT -> {
+			case "config_maxmimum_amount" -> {
 				String textMaxAmt = event.getValues().get(0).getAsString();
 				try {
 					int maxAmount = Integer.parseInt(textMaxAmt);
@@ -466,7 +451,7 @@ public class SkyblockEventHandler {
 					event.editMessageEmbeds(eb.setDescription("`" + textMaxAmt + "` is invalid. Please try again.").build()).queue();
 				}
 			}
-			case CONFIG_WHITELIST_ROLE -> {
+			case "config_whitelist_role" -> {
 				String textRole = event.getValues().get(0).getAsString();
 				Role role = null;
 				try {
@@ -494,7 +479,7 @@ public class SkyblockEventHandler {
 					event.editMessage(getGenericConfigMessage()).queue();
 				}
 			}
-			case CONFIG_PRIZES -> {
+			case "config_prizes" -> {
 				String textPrizes = event.getValues().get(0).getAsString();
 				String[] prizeList = textPrizes.split("\n");
 				Map<Integer, String> prizeListMap = new TreeMap<>();
@@ -604,16 +589,5 @@ public class SkyblockEventHandler {
 		TYPE_WEIGHT,
 		TYPE_SKILLS,
 		CONFIG_GENERIC,
-	}
-
-	private enum ModalState {
-		TYPE_COLLECTIONS,
-		CONFIG_GUILD,
-		CONFIG_CHANNEL,
-		CONFIG_PRIZES,
-		CONFIG_MINIMUM_AMOUNT,
-		CONFIG_MAXIMUM_AMOUNT,
-		CONFIG_WHITELIST_ROLE,
-		CONFIG_DURATION,
 	}
 }
