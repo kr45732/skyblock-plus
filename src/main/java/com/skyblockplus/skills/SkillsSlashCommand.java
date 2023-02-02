@@ -29,6 +29,7 @@ import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.SkillsStruct;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;

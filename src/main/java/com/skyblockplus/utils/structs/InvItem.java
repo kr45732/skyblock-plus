@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.Utils.idToName;
 import static com.skyblockplus.utils.Utils.parseMcCodes;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.Data;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
