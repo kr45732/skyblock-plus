@@ -576,7 +576,7 @@ public class EmojiUpdater {
 			.sorted(Comparator.comparing(File::getName))
 			.toList();
 		List<String> enchantList = url.length == 1
-			? streamJsonArray(getJson(url[0]).getAsJsonArray()).map(JsonElement::getAsString).toList()
+			? streamJsonArray(getJson(url[0])).map(JsonElement::getAsString).toList()
 			: getEnchantedItems();
 		File outputFileDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 		if (!outputFileDir.exists()) {

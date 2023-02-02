@@ -231,9 +231,7 @@ public class AutomaticGuild {
 			mayorPing = event.getGuild().getRoleById(higherDepth(serverSettings, "mayorRole", null));
 		} catch (Exception ignored) {}
 		try {
-			botManagerRoles.addAll(
-				streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray()).map(JsonElement::getAsString).toList()
-			);
+			botManagerRoles.addAll(streamJsonArray(higherDepth(serverSettings, "botManagerRoles")).map(JsonElement::getAsString).toList());
 		} catch (Exception ignored) {}
 		try {
 			logChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "logChannel", null));
@@ -556,7 +554,7 @@ public class AutomaticGuild {
 				List<Role> verifyRolesRemove = new ArrayList<>();
 				if (verifyEnabled) {
 					verifyRolesAdd.addAll(
-						streamJsonArray(higherDepth(serverSettings, "automatedVerify.verifiedRoles").getAsJsonArray())
+						streamJsonArray(higherDepth(serverSettings, "automatedVerify.verifiedRoles"))
 							.map(e -> guild.getRoleById(e.getAsString()))
 							.filter(Objects::nonNull)
 							.toList()
@@ -627,7 +625,7 @@ public class AutomaticGuild {
 											.values()
 											.stream()
 											.filter(g ->
-												streamJsonArray(g.get("members").getAsJsonArray())
+												streamJsonArray(g.get("members"))
 													.anyMatch(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
 											)
 											.findFirst()
@@ -640,7 +638,7 @@ public class AutomaticGuild {
 													switch (type) {
 														case "NAME" -> guildResponse.get("name").getAsString();
 														case "RANK" -> higherDepth(
-															streamJsonArray(guildResponse.get("members").getAsJsonArray())
+															streamJsonArray(guildResponse.get("members"))
 																.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid()))
 																.findFirst()
 																.orElse(null),

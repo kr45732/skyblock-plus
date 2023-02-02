@@ -336,7 +336,7 @@ public class RolesSlashCommand extends SlashCommand {
 					}
 
 					JsonArray levelsArray = collectJsonArray(
-						streamJsonArray(higherDepth(currentRole, "levels").getAsJsonArray())
+						streamJsonArray(higherDepth(currentRole, "levels"))
 							.sorted(Comparator.comparingLong(o -> higherDepth(o, "value").getAsLong()))
 					);
 					for (int i = levelsArray.size() - 1; i >= 0; i--) {

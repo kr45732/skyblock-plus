@@ -352,7 +352,7 @@ public class Utils {
 					InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
 				) {
 					queryItems =
-						streamJsonArray(JsonParser.parseReader(in).getAsJsonArray())
+						streamJsonArray(JsonParser.parseReader(in))
 							.map(JsonElement::getAsString)
 							.collect(Collectors.toCollection(ArrayList::new));
 				}
@@ -638,10 +638,6 @@ public class Utils {
 	}
 
 	public static String getSkyCryptData(String dataUrl) {
-		if (!dataUrl.contains("raw.githubusercontent.com")) {
-			return null;
-		}
-
 		try {
 			HttpGet httpGet = new HttpGet(dataUrl);
 			httpGet.setHeader("Authorization", "token " + GITHUB_TOKEN);
@@ -1785,16 +1781,12 @@ public class Utils {
 			: new Permission[] { Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS };
 	}
 
-	public static Stream<JsonElement> streamJsonArray(JsonArray array) {
+	public static Stream<JsonElement> streamJsonArray(JsonElement array) {
 		List<JsonElement> list = new ArrayList<>();
-		for (JsonElement element : array) {
+		for (JsonElement element : array.getAsJsonArray()) {
 			list.add(element);
 		}
 		return list.stream();
-	}
-
-	public static Stream<JsonElement> streamJsonArray(JsonElement array) {
-		return streamJsonArray(array.getAsJsonArray());
 	}
 
 	public static JsonArray collectJsonArray(Stream<JsonElement> list) {

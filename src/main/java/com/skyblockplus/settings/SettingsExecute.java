@@ -155,7 +155,7 @@ public class SettingsExecute {
 			String mayorChannel = higherDepth(serverSettings, "mayorChannel", "none");
 			String mayorRole = higherDepth(serverSettings, "mayorRole", "none");
 			String applyGuestRole = higherDepth(serverSettings, "applyGuestRole", "none");
-			String botManagerRoles = streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray())
+			String botManagerRoles = streamJsonArray(higherDepth(serverSettings, "botManagerRoles"))
 				.map(r -> "<@&" + r.getAsString() + ">")
 				.collect(Collectors.joining(" "));
 
@@ -2116,6 +2116,11 @@ public class SettingsExecute {
 		Role role = ((Role) eb);
 
 		JsonElement verifySettings = database.getVerifySettings(guild.getId());
+
+		if (higherDepth(verifySettings, "verifiedRemoveRole", "").equals(role.getId())) {
+			return invalidEmbed("This is already set as the verify remove role");
+		}
+
 		JsonArray currentVerifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
 		if (currentVerifyRoles.size() >= 5) {
 			return defaultEmbed("You have reached the max number of verify roles (5/5)");
@@ -2146,7 +2151,7 @@ public class SettingsExecute {
 				return apiFailMessage(responseCode);
 			}
 			guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(verifySettings);
-			return defaultSettingsEmbed("Verify remove role removed");
+			return defaultSettingsEmbed("Unset verify remove role");
 		}
 
 		Object eb = checkRole(roleMention);
@@ -2156,6 +2161,10 @@ public class SettingsExecute {
 		Role role = ((Role) eb);
 
 		JsonObject verifySettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
+		if (streamJsonArray(higherDepth(verifySettings, "verifiedRoles")).anyMatch(r -> r.getAsString().equals(role.getId()))) {
+			return invalidEmbed("This is already added as a verified role");
+		}
+
 		verifySettings.addProperty("verifiedRemoveRole", role.getId());
 		int responseCode = database.setVerifySettings(guild.getId(), verifySettings);
 
@@ -2170,9 +2179,11 @@ public class SettingsExecute {
 	public EmbedBuilder setVerifySyncEnable(boolean enable) {
 		JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 
-		String nickname = higherDepth(currentSettings, "verifiedNickname").getAsString();
-		if (!nickname.contains("[IGN]") && higherDepth(currentSettings, "verifiedRoles").getAsJsonArray().isEmpty()) {
-			return invalidEmbed("You must have at least on verify role or a nickname template set.");
+		if (enable) {
+			String nickname = higherDepth(currentSettings, "verifiedNickname").getAsString();
+			if (!nickname.contains("[IGN]") && higherDepth(currentSettings, "verifiedRoles").getAsJsonArray().isEmpty()) {
+				return invalidEmbed("You must have at least on verify role or a nickname template set.");
+			}
 		}
 
 		int responseCode = updateVerifySettings("enableAutomaticSync", "" + enable);
@@ -2188,8 +2199,6 @@ public class SettingsExecute {
 			if (!author.getId().equals(client.getOwnerId())) {
 				return invalidEmbed("This can only be enabled by the developer");
 			}
-
-			JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 
 			if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
 				return invalidEmbed("Automatic roles must be enabled");
@@ -2221,15 +2230,17 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setVerifyRolesClaimEnable(boolean enable) {
-		if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
-			return invalidEmbed("Automatic roles must be enabled");
-		}
+		if (enable) {
+			if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
+				return invalidEmbed("Automatic roles must be enabled");
+			}
 
-		EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
-		if (eb != null) {
-			return invalidEmbed(
-				"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to enable automatic roles claim"
-			);
+			EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
+			if (eb != null) {
+				return invalidEmbed(
+					"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to enable automatic roles claim"
+				);
+			}
 		}
 
 		int responseCode = updateVerifySettings("enableRolesClaim", "" + enable);
@@ -2254,12 +2265,12 @@ public class SettingsExecute {
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(30);
 		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Settings"));
-		String canUse = streamJsonArray(higherDepth(blacklistSettings, "canUse").getAsJsonArray())
+		String canUse = streamJsonArray(higherDepth(blacklistSettings, "canUse"))
 			.map(g -> jda.getGuildById(g.getAsString()))
 			.filter(Objects::nonNull)
 			.map(Guild::getName)
 			.collect(Collectors.joining(", "));
-		String isUsing = streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray())
+		String isUsing = streamJsonArray(higherDepth(blacklistSettings, "isUsing"))
 			.map(g -> jda.getGuildById(g.getAsString()))
 			.filter(Objects::nonNull)
 			.map(Guild::getName)
@@ -2272,7 +2283,7 @@ public class SettingsExecute {
 		);
 		paginateBuilder.addItems(Collections.nCopies(27, "").toArray(new String[0]));
 
-		streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray())
+		streamJsonArray(higherDepth(blacklistSettings, "isUsing"))
 			.map(g -> higherDepth(database.getBlacklistSettings(g.getAsString()), "blacklist").getAsJsonArray())
 			.forEach(currentBlacklist::addAll);
 
@@ -2399,7 +2410,7 @@ public class SettingsExecute {
 			return invalidEmbed("You are already using the provided servers blacklist");
 		}
 
-		if (streamJsonArray(higherDepth(otherBlacklist, "canUse").getAsJsonArray()).noneMatch(g -> g.getAsString().equals(guild.getId()))) {
+		if (streamJsonArray(higherDepth(otherBlacklist, "canUse")).noneMatch(g -> g.getAsString().equals(guild.getId()))) {
 			return invalidEmbed("The provided server has not shared their blacklist with this server");
 		}
 

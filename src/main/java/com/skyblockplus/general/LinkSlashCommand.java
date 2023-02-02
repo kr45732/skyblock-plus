@@ -180,7 +180,7 @@ public class LinkSlashCommand extends SlashCommand {
 									switch (type) {
 										case "NAME" -> playerGuild.get("name").getAsString();
 										case "RANK" -> higherDepth(
-											streamJsonArray(playerGuild.get("members").getAsJsonArray())
+											streamJsonArray(playerGuild.get("members"))
 												.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid()))
 												.findFirst()
 												.orElse(null),
@@ -257,7 +257,7 @@ public class LinkSlashCommand extends SlashCommand {
 		}
 
 		try {
-			List<Role> toAdd = streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
+			List<Role> toAdd = streamJsonArray(higherDepth(verifySettings, "verifiedRoles"))
 				.map(e -> member.getGuild().getRoleById(e.getAsString()))
 				.toList();
 			List<Role> toRemove = new ArrayList<>();

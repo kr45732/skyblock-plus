@@ -121,7 +121,7 @@ public class SkillsSlashCommand extends SlashCommand {
 			if (higherDepth(jacobStats, "unique_golds2") != null && !higherDepth(jacobStats, "unique_golds2").getAsJsonArray().isEmpty()) {
 				eb.addField(
 					"Unique Golds | " + higherDepth(jacobStats, "unique_golds2").getAsJsonArray().size(),
-					streamJsonArray(higherDepth(jacobStats, "unique_golds2").getAsJsonArray())
+					streamJsonArray(higherDepth(jacobStats, "unique_golds2"))
 						.map(i ->
 							getEmoji(i.getAsString().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : i.getAsString()) +
 							" " +

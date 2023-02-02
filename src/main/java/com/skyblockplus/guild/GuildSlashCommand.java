@@ -199,7 +199,7 @@ public class GuildSlashCommand extends SlashCommand {
 			JsonArray membersArr = higherDepth(guildJson, "members").getAsJsonArray();
 			Map<CompletableFuture<String>, Integer> futures = new HashMap<>();
 			Map<String, Integer> guildMembers = new HashMap<>();
-			Map<String, Integer> ranksMap = streamJsonArray(higherDepth(guildJson, "ranks").getAsJsonArray())
+			Map<String, Integer> ranksMap = streamJsonArray(higherDepth(guildJson, "ranks"))
 				.collect(Collectors.toMap(m -> higherDepth(m, "name").getAsString(), m -> higherDepth(m, "priority", 0)));
 			for (JsonElement member : membersArr) {
 				String rank = higherDepth(member, "rank").getAsString();
@@ -1067,7 +1067,7 @@ public class GuildSlashCommand extends SlashCommand {
 					}
 
 					if (highestRankMet != -1) {
-						List<String> rankNamesList = streamJsonArray(higherDepth(gRanks.get(highestRankMet), "names").getAsJsonArray())
+						List<String> rankNamesList = streamJsonArray(higherDepth(gRanks.get(highestRankMet), "names"))
 							.map(JsonElement::getAsString)
 							.toList();
 						if (!rankNamesList.contains(gMember.getString("rank").toLowerCase())) {

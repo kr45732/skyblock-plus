@@ -63,7 +63,7 @@ public class UnlinkSlashCommand extends SlashCommand {
 				.modifyMemberRoles(
 					event.getMember(),
 					toAdd,
-					streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
+					streamJsonArray(higherDepth(verifySettings, "verifiedRoles"))
 						.map(r -> {
 							try {
 								return event.getGuild().getRoleById(r.getAsString());

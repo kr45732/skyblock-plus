@@ -85,7 +85,6 @@ public class BingoSlashCommand extends SlashCommand {
 						getJson("https://api.hypixel.net/skyblock/bingo?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuidStruct.uuid()),
 						"events"
 					)
-						.getAsJsonArray()
 				)
 					.filter(e -> higherDepth(e, "key", -1) == higherDepth(bingoInfo, "id", -1))
 					.findFirst()

@@ -93,22 +93,30 @@ public class AuctionFlipper {
 					continue;
 				}
 
-				int sales = higherDepth(avgAuctionJson, itemId + ".sales", -1);
+				int sales = higherDepth(avgAuctionJson, itemId + ".sales", 0);
 				if (sales < 5) {
 					continue;
 				}
 
-				long pastBinPrice = higherDepth(auction, "past_bin_price").getAsLong();
-				double profit = higherDepth(auction, "profit").getAsLong();
+				double pastBinPrice = Math.min(
+					higherDepth(auction, "past_bin_price").getAsLong(),
+					calculateWithTaxes(higherDepth(avgAuctionJson, itemId + ".price").getAsDouble())
+				);
 				long startingBid = higherDepth(auction, "starting_bid").getAsLong();
+				double profit = pastBinPrice - startingBid;
+
+				if (profit < 1000000) {
+					continue;
+				}
+
 				String itemName = higherDepth(auction, "name").getAsString();
 				String auctionUuid = higherDepth(auction, "uuid").getAsString();
 
 				flipperWebhook
 					.send(
 						defaultEmbed(itemName)
-							.addField("Price", formatNumber(startingBid), true)
-							.addField("Previous Lowest Bin", formatNumber(pastBinPrice), true)
+							.addField("Price", roundAndFormat(startingBid), true)
+							.addField("Previous Lowest Bin", roundAndFormat(pastBinPrice), true)
 							.addField("Estimated Profit", roundAndFormat(profit), true)
 							.addField("Sales Per Hour", formatNumber(sales), true)
 							.addField("Command", "`/viewauction " + auctionUuid + "`", true)
@@ -132,7 +140,7 @@ public class AuctionFlipper {
 		if (lastUpdated == null || lastUpdated.isBefore(jsonLastUpdated)) {
 			lastUpdated = jsonLastUpdated;
 			Map<String, String> toEdit = auctionUuidToMessage.getAllPresent(
-				streamJsonArray(higherDepth(endedAuctionsJson, "auctions").getAsJsonArray())
+				streamJsonArray(higherDepth(endedAuctionsJson, "auctions"))
 					.map(a -> higherDepth(a, "auction_id").getAsString())
 					.collect(Collectors.toSet())
 			);
@@ -159,5 +167,9 @@ public class AuctionFlipper {
 			}
 		} catch (Exception ignored) {}
 		return null;
+	}
+
+	private static double calculateWithTaxes(double price) {
+		return price * (price >= 1000000 ? 0.98 : 0.99);
 	}
 }
