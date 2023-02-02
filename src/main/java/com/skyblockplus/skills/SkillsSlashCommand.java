@@ -59,7 +59,7 @@ public class SkillsSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get the skills data of a player")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

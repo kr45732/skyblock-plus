@@ -78,7 +78,7 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 					.addChoice("Lily", "lily")
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

@@ -18,6 +18,7 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.utils.Player;
@@ -52,7 +53,7 @@ public class StorageSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a player's storage represented in emojis")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

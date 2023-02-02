@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -55,7 +56,7 @@ public class CakesSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a player's active and inactive cake buffs")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

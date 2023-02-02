@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.client;
 
 import com.skyblockplus.utils.Player;
@@ -51,7 +52,7 @@ public class CheckApiSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get which Skyblock APIs a player has enabled or disabled")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

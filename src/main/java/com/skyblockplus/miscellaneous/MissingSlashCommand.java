@@ -19,6 +19,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.ALL_TALISMANS;
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -64,7 +65,7 @@ public class MissingSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a player's missing talismans")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

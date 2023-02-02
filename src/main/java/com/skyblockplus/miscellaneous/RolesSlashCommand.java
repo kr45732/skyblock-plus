@@ -20,6 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.settings.SettingsExecute.isOneLevelRole;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -67,7 +68,7 @@ public class RolesSlashCommand extends SlashCommand {
 			.slash(name, "Main roles command")
 			.addSubcommands(
 				new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
-					.addOptions(Constants.profilesCommandOption),
+					.addOptions(profilesCommandOption),
 				new SubcommandData("list", "List all roles that can be claimed through the bot")
 			);
 	}

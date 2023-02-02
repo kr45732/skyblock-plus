@@ -18,8 +18,7 @@
 
 package com.skyblockplus.skills;
 
-import static com.skyblockplus.utils.Constants.HOTM_PERK_ID_TO_NAME;
-import static com.skyblockplus.utils.Constants.HOTM_PERK_MAX_LEVEL;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -57,7 +56,7 @@ public class HotmSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a player's heart of the mountain statistics")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

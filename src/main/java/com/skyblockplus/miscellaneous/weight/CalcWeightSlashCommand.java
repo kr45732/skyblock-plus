@@ -18,8 +18,7 @@
 
 package com.skyblockplus.miscellaneous.weight;
 
-import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
-import static com.skyblockplus.utils.Constants.SLAYER_NAMES;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.miscellaneous.weight.weight.Weight;
@@ -86,7 +85,7 @@ public class CalcWeightSlashCommand extends SlashCommand {
 					.addChoice("Lily", "lily")
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

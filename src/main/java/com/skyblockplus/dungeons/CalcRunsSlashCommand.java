@@ -18,6 +18,7 @@
 
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.miscellaneous.weight.weight.Weight;
@@ -89,7 +90,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 					.addChoice("Lily", "lily")
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

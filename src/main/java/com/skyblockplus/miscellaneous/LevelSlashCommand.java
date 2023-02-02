@@ -61,7 +61,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a player's Skyblock level")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

@@ -20,6 +20,7 @@ package com.skyblockplus.features.skyblockevent;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -175,7 +176,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("join", "Join the current event").addOptions(Constants.profilesCommandOption);
+			return new SubcommandData("join", "Join the current event").addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder joinSkyblockEvent(String username, String profile, Member member, String guildId) {
@@ -359,7 +360,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("add", "Force add a player to the current event")
 				.addOption(OptionType.STRING, "player", "Player username or mention", true, true)
-				.addOptions(Constants.profilesCommandOption);
+				.addOptions(profilesCommandOption);
 		}
 	}
 

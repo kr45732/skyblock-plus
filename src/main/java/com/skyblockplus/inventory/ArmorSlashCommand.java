@@ -18,6 +18,7 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
@@ -61,7 +62,7 @@ public class ArmorSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("list", "Get a list of the player's equipped armor and equipment with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(Constants.profilesCommandOption)
+				.addOptions(profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");
 		}
 
@@ -103,7 +104,7 @@ public class ArmorSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("emoji", "Get a player's equipped armor and equipment represented in emojis")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(Constants.profilesCommandOption);
+				.addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerArmor(String username, String profileName, SlashCommandEvent event) {

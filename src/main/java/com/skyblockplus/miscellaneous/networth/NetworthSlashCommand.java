@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous.networth;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.skyblockplus.utils.command.SlashCommand;
@@ -54,7 +55,7 @@ public class NetworthSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Calculate a player's networth")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption)
+			.addOptions(profilesCommandOption)
 			.addOption(OptionType.BOOLEAN, "verbose", "Links a detailed JSON with a breakdown of value of each item");
 	}
 

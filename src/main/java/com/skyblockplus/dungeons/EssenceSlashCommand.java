@@ -160,7 +160,7 @@ public class EssenceSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("player", "Get the amount of each essence a player has")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(Constants.profilesCommandOption);
+				.addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerEssence(String username, String profileName, SlashCommandEvent event) {

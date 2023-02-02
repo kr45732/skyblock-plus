@@ -18,6 +18,7 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.utils.Player;
@@ -62,7 +63,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("list", "Get a list of a player's wardrobe with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(Constants.profilesCommandOption);
+				.addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerWardrobeList(String username, String profileName, SlashCommandEvent event) {
@@ -115,7 +116,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("emoji", "Get a player's wardrobe represented in emojis")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(Constants.profilesCommandOption);
+				.addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerWardrobe(String username, String profileName, SlashCommandEvent event) {

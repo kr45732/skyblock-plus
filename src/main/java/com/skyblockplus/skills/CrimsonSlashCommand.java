@@ -18,6 +18,7 @@
 
 package com.skyblockplus.skills;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -77,7 +78,7 @@ public class CrimsonSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a player's crimson isle statistics")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override

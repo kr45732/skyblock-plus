@@ -18,8 +18,7 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.Constants.POWER_TO_BASE_STATS;
-import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -67,7 +66,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("list", "Get a list of the player's talisman bag with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(Constants.profilesCommandOption)
+				.addOptions(profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");
 		}
 
@@ -103,7 +102,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("emoji", "Get a player's talisman bag represented in emojis")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(Constants.profilesCommandOption);
+				.addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerTalismansEmoji(String username, String profileName, SlashCommandEvent event) {
@@ -139,7 +138,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("tuning", "Get a player's power stone stats and tuning stats")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(Constants.profilesCommandOption);
+				.addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerTuning(String username, String profileName, SlashCommandEvent event) {

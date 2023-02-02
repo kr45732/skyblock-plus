@@ -18,6 +18,7 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.utils.Player;
@@ -61,7 +62,7 @@ public class InventorySlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("list", "Get a list of the player's inventory with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(Constants.profilesCommandOption)
+				.addOptions(profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");
 		}
 
@@ -97,7 +98,7 @@ public class InventorySlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData("emoji", "Get a player's inventory represented in emojis")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(Constants.profilesCommandOption);
+				.addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerInventory(String username, String profileName, SlashCommandEvent event) {

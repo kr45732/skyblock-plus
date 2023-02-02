@@ -56,7 +56,7 @@ public class WeightSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a player's weight")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(Constants.profilesCommandOption);
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override
