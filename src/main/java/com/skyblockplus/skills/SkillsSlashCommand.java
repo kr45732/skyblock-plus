@@ -158,7 +158,7 @@ public class SkillsSlashCommand extends SlashCommand {
 					.entrySet()
 					.stream()
 					.sorted(Comparator.comparingLong(e -> -e.getValue()))
-					.toList()) {
+					.collect(Collectors.toCollection(ArrayList::new))) {
 					ebStr
 						.append("\n")
 						.append(getEmoji(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()))

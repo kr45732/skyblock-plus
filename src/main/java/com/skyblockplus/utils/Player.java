@@ -841,7 +841,7 @@ public class Player {
 				.stream()
 				.sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey())))
 				.map(Map.Entry::getValue)
-				.toList()) {
+				.collect(Collectors.toCollection(ArrayList::new))) {
 				NBTCompound decodedInventoryContents = NBTReader.readBase64(higherDepth(page, "data").getAsString());
 
 				NBTList invFrames = decodedInventoryContents.getList("i");

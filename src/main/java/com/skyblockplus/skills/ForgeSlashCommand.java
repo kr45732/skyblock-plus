@@ -86,7 +86,12 @@ public class ForgeSlashCommand extends SlashCommand {
 				bonus = 0.7;
 			}
 
-			for (JsonElement forgeItem : forgeItems.getAsJsonObject().entrySet().stream().map(Map.Entry::getValue).toList()) {
+			for (JsonElement forgeItem : forgeItems
+				.getAsJsonObject()
+				.entrySet()
+				.stream()
+				.map(Map.Entry::getValue)
+				.collect(Collectors.toCollection(ArrayList::new))) {
 				String itemId = higherDepth(forgeItem, "id").getAsString();
 				itemId = itemId.equals("PET") ? "AMMONITE;4" : itemId;
 				eb.addField(

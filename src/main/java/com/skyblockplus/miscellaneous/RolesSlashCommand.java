@@ -451,7 +451,9 @@ public class RolesSlashCommand extends SlashCommand {
 					}
 					case "player_items" -> {
 						JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-						List<String> items = streamJsonArray(levelsArray).map(item -> higherDepth(item, "value").getAsString()).toList();
+						List<String> items = streamJsonArray(levelsArray)
+							.map(item -> higherDepth(item, "value").getAsString())
+							.collect(Collectors.toCollection(ArrayList::new));
 						Set<String> itemsPlayerHas = player.getItemsPlayerHas(items);
 
 						if (itemsPlayerHas == null) {

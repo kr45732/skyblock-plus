@@ -204,7 +204,11 @@ public class InventoryListPaginator {
 		String itemSearch = event.getValue("item").getAsString();
 		pageNumber =
 			FuzzySearch
-				.extractOne(itemSearch, items.entrySet().stream().filter(e -> e.getValue() != null).toList(), i -> i.getValue().getName())
+				.extractOne(
+					itemSearch,
+					items.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toCollection(ArrayList::new)),
+					i -> i.getValue().getName()
+				)
 				.getReferent()
 				.getKey();
 

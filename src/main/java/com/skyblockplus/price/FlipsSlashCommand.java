@@ -63,7 +63,7 @@ public class FlipsSlashCommand extends SlashCommand {
 			.map(Map.Entry::getValue)
 			.sorted(Comparator.comparingLong(c -> -higherDepth(c, "profit", 0L)))
 			.limit(5)
-			.toList()) {
+			.collect(Collectors.toCollection(ArrayList::new))) {
 			String itemId = higherDepth(auction, "id").getAsString();
 			if (isVanillaItem(itemId) || itemId.equals("BEDROCK")) {
 				continue;

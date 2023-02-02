@@ -87,7 +87,9 @@ public class LeaderboardDatabase {
 		types.addAll(skyblockStats);
 
 		typesSubList.addAll(types.subList(2, types.size()));
-		formattedTypesSubList.addAll(typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).toList());
+		formattedTypesSubList.addAll(
+			typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toCollection(ArrayList::new))
+		);
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);

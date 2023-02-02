@@ -34,6 +34,7 @@ import java.net.URLConnection;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
@@ -146,7 +147,7 @@ public class EmojiUpdater {
 				Arrays
 					.stream(new File("src/main/java/com/skyblockplus/json/glint_images").listFiles())
 					.sorted(Comparator.comparing(File::getName))
-					.toList()
+					.collect(Collectors.toCollection(ArrayList::new))
 			);
 			if (!out.has("ENCHANTED_BOOK")) {
 				out.addProperty("ENCHANTED_BOOK", enchantedBook.getPath());
@@ -267,7 +268,7 @@ public class EmojiUpdater {
 						})
 				)
 				.map(f -> f.getName().split(".json")[0])
-				.toList();
+				.collect(Collectors.toCollection(ArrayList::new));
 
 			FileUtils.deleteDirectory(neuDir);
 
@@ -464,7 +465,7 @@ public class EmojiUpdater {
 				})
 				.filter(g -> g.getEmojis().stream().filter(e -> enchanted == e.isAnimated()).count() < g.getMaxEmojis())
 				.sorted(Comparator.comparingInt(g -> Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1])))
-				.toList();
+				.collect(Collectors.toCollection(ArrayList::new));
 
 			int guildCount = 0;
 			for (Map.Entry<String, JsonElement> entry : (enchanted ? enchItems : regItems).entrySet()) {
@@ -574,9 +575,9 @@ public class EmojiUpdater {
 		List<File> glintFiles = Arrays
 			.stream(new File("src/main/java/com/skyblockplus/json/glint_images").listFiles())
 			.sorted(Comparator.comparing(File::getName))
-			.toList();
+			.collect(Collectors.toCollection(ArrayList::new));
 		List<String> enchantList = url.length == 1
-			? streamJsonArray(getJson(url[0])).map(JsonElement::getAsString).toList()
+			? streamJsonArray(getJson(url[0])).map(JsonElement::getAsString).collect(Collectors.toCollection(ArrayList::new))
 			: getEnchantedItems();
 		File outputFileDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 		if (!outputFileDir.exists()) {

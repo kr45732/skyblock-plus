@@ -114,7 +114,7 @@ public class InvItem {
 
 	public void setLore(NBTList lore) {
 		if (lore != null) {
-			this.lore = lore.stream().map(line -> (String) line).toList();
+			this.lore = lore.stream().map(line -> (String) line).collect(Collectors.toCollection(ArrayList::new));
 			rarity = parseMcCodes(this.lore.get(this.lore.size() - 1)).trim().split("\\s+")[0];
 			rarity += rarity.startsWith("VERY") ? "_SPECIAL" : "";
 			soulbound = soulbound || this.lore.contains("§8§l* §8Co-op Soulbound §8§l*") || this.lore.contains("§8§l* §8Soulbound §8§l*");

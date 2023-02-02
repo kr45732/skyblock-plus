@@ -73,6 +73,7 @@ public abstract class SlashCommand extends AbstractSlashCommand {
 	}
 
 	public SlashCommandData getFullCommandData() {
-		return getCommandData().addSubcommands(subcommands.stream().map(Subcommand::getCommandData).toList());
+		return getCommandData()
+			.addSubcommands(subcommands.stream().map(Subcommand::getCommandData).collect(Collectors.toCollection(ArrayList::new)));
 	}
 }

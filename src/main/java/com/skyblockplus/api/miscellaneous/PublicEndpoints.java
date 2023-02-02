@@ -44,7 +44,10 @@ public class PublicEndpoints {
 
 	public static void initialize() {
 		apiCommandList =
-			HelpSlashCommand.helpDataList.stream().map(helpData -> DataObject.fromJson(gson.toJson(helpData)).toMap()).toList();
+			HelpSlashCommand.helpDataList
+				.stream()
+				.map(helpData -> DataObject.fromJson(gson.toJson(helpData)).toMap())
+				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	@GetMapping("/get/commands")

@@ -230,7 +230,11 @@ public class AutomaticGuild {
 			mayorPing = event.getGuild().getRoleById(higherDepth(serverSettings, "mayorRole", null));
 		} catch (Exception ignored) {}
 		try {
-			botManagerRoles.addAll(streamJsonArray(higherDepth(serverSettings, "botManagerRoles")).map(JsonElement::getAsString).toList());
+			botManagerRoles.addAll(
+				streamJsonArray(higherDepth(serverSettings, "botManagerRoles"))
+					.map(JsonElement::getAsString)
+					.collect(Collectors.toCollection(ArrayList::new))
+			);
 		} catch (Exception ignored) {}
 		try {
 			logChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "logChannel", null));
@@ -520,7 +524,7 @@ public class AutomaticGuild {
 
 			List<String> blacklist = streamJsonArray(guildMap.get(guildId).getBlacklist())
 				.map(u -> higherDepth(u, "uuid").getAsString())
-				.toList();
+				.collect(Collectors.toCollection(ArrayList::new));
 
 			List<Member> inGuildUsers = new ArrayList<>();
 			Map<String, LinkedAccount> discordToUuid = new HashMap<>();
@@ -556,7 +560,7 @@ public class AutomaticGuild {
 						streamJsonArray(higherDepth(serverSettings, "automatedVerify.verifiedRoles"))
 							.map(e -> guild.getRoleById(e.getAsString()))
 							.filter(Objects::nonNull)
-							.toList()
+							.collect(Collectors.toCollection(ArrayList::new))
 					);
 					try {
 						verifyRolesRemove.add(
@@ -1163,7 +1167,14 @@ public class AutomaticGuild {
 			if (event.getUser().getId().equals(client.getOwnerId())) {
 				event
 					.editComponents(
-						ActionRow.of(event.getMessage().getButtons().stream().filter(b -> b.getStyle() == ButtonStyle.LINK).toList())
+						ActionRow.of(
+							event
+								.getMessage()
+								.getButtons()
+								.stream()
+								.filter(b -> b.getStyle() == ButtonStyle.LINK)
+								.collect(Collectors.toCollection(ArrayList::new))
+						)
 					)
 					.queue();
 				// 0 = user id, 1 = message id
@@ -1432,7 +1443,7 @@ public class AutomaticGuild {
 
 	public boolean isAdmin(Member member) {
 		if (!member.hasPermission(Permission.ADMINISTRATOR)) {
-			List<String> playerRoles = member.getRoles().stream().map(ISnowflake::getId).toList();
+			List<String> playerRoles = member.getRoles().stream().map(ISnowflake::getId).collect(Collectors.toCollection(ArrayList::new));
 			return botManagerRoles.stream().anyMatch(playerRoles::contains);
 		}
 		return true;
@@ -1468,7 +1479,7 @@ public class AutomaticGuild {
 	}
 
 	public void setIsUsing(JsonArray arr) {
-		isUsing = streamJsonArray(arr).map(JsonElement::getAsString).toList();
+		isUsing = streamJsonArray(arr).map(JsonElement::getAsString).collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	public JsonArray getBlacklist() {

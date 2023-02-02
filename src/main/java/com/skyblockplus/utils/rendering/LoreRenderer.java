@@ -65,7 +65,7 @@ public class LoreRenderer {
 				parts.set(0, "r" + parts.get(0));
 				return parts;
 			})
-			.toList();
+			.collect(Collectors.toCollection(ArrayList::new));
 
 		int width = formattedLines
 			.stream()

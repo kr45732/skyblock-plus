@@ -129,7 +129,7 @@ public class GuildSlashCommand extends SlashCommand {
 			if (preferredGames != null) {
 				List<String> preferedGames = streamJsonArray(preferredGames)
 					.map(e -> capitalizeString(e.getAsString().replace("_", " ")))
-					.toList();
+					.collect(Collectors.toCollection(ArrayList::new));
 				if (!preferedGames.isEmpty()) {
 					guildInfo +=
 						"• " +
@@ -228,7 +228,7 @@ public class GuildSlashCommand extends SlashCommand {
 				.stream()
 				.sorted(Comparator.comparingInt(m -> -m.getValue()))
 				.map(Map.Entry::getKey)
-				.toList()) {
+				.collect(Collectors.toCollection(ArrayList::new))) {
 				if (member != null) {
 					paginateBuilder.addItems("• [" + fixUsername(member) + "](" + skyblockStatsLink(member, null) + ")  ");
 				}
@@ -984,7 +984,9 @@ public class GuildSlashCommand extends SlashCommand {
 				List<String> pbItems = new ArrayList<>();
 				int totalChange = 0;
 				JsonObject defaultRankObj = higherDepth(lbSettings, "default_rank").getAsJsonObject();
-				List<String> defaultRank = streamJsonArray(higherDepth(defaultRankObj, "names")).map(JsonElement::getAsString).toList();
+				List<String> defaultRank = streamJsonArray(higherDepth(defaultRankObj, "names"))
+					.map(JsonElement::getAsString)
+					.collect(Collectors.toCollection(ArrayList::new));
 				JsonArray defaultRanksArr = higherDepth(defaultRankObj, "requirements").getAsJsonArray();
 
 				for (DataObject gMember : playerList) {
@@ -1069,7 +1071,7 @@ public class GuildSlashCommand extends SlashCommand {
 					if (highestRankMet != -1) {
 						List<String> rankNamesList = streamJsonArray(higherDepth(gRanks.get(highestRankMet), "names"))
 							.map(JsonElement::getAsString)
-							.toList();
+							.collect(Collectors.toCollection(ArrayList::new));
 						if (!rankNamesList.contains(gMember.getString("rank").toLowerCase())) {
 							pbItems.add(("- /g setrank " + fixUsername(gMember.getString("username")) + " " + rankNamesList.get(0)));
 							totalChange++;
@@ -1089,7 +1091,7 @@ public class GuildSlashCommand extends SlashCommand {
 				CustomPaginator.Builder paginateBuilder = event
 					.getPaginator()
 					.setItemsPerPage(20)
-					.addItems(pbItems.stream().sorted().toList());
+					.addItems(pbItems.stream().sorted().collect(Collectors.toCollection(ArrayList::new)));
 				paginateBuilder
 					.getExtras()
 					.setEveryPageTitle("Rank changes for " + guildName)
@@ -1248,7 +1250,10 @@ public class GuildSlashCommand extends SlashCommand {
 		}
 
 		private static String getLeaderboardTop(List<DataObject> playerList, String lbType, UsernameUuidStruct usernameUuidStruct) {
-			List<DataObject> lb = playerList.stream().sorted(Comparator.comparingDouble(m -> -m.getDouble(lbType))).toList();
+			List<DataObject> lb = playerList
+				.stream()
+				.sorted(Comparator.comparingDouble(m -> -m.getDouble(lbType)))
+				.collect(Collectors.toCollection(ArrayList::new));
 
 			int pos = -1;
 			if (usernameUuidStruct != null) {

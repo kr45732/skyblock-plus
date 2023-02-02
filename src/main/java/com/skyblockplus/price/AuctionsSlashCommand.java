@@ -120,7 +120,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 		JsonArray auctionsArray = auctionsResponse.response().getAsJsonArray();
 		List<String> validProfileIds = streamJsonArray(player.getProfileArray())
 			.map(prof -> higherDepth(prof, "profile_id").getAsString())
-			.toList();
+			.collect(Collectors.toCollection(ArrayList::new));
 		Stream<JsonElement> stream = streamJsonArray(auctionsArray)
 			.filter(auc -> validProfileIds.contains(higherDepth(auc, "profile_id").getAsString()));
 		if (filterType == AuctionFilterType.SOLD || filterType == AuctionFilterType.UNSOLD) {

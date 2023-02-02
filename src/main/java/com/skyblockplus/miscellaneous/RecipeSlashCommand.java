@@ -48,7 +48,7 @@ public class RecipeSlashCommand extends SlashCommand {
 				.stream()
 				.filter(e -> higherDepth(e.getValue(), "recipe") != null)
 				.map(Map.Entry::getKey)
-				.toList();
+				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	@Override

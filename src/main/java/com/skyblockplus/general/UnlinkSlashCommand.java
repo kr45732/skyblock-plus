@@ -72,7 +72,7 @@ public class UnlinkSlashCommand extends SlashCommand {
 							}
 						})
 						.filter(Objects::nonNull)
-						.toList()
+						.collect(Collectors.toCollection(ArrayList::new))
 				)
 				.queue();
 		}

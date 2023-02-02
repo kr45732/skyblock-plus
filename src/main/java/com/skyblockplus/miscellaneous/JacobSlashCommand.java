@@ -54,7 +54,13 @@ public class JacobSlashCommand extends SlashCommand {
 			.slash(name, "Get a list of upcoming farming contests")
 			.addOptions(
 				new OptionData(OptionType.STRING, "crop", "Crop to filter by")
-					.addChoices(cropNameToEmoji.keySet().stream().map(c -> new Command.Choice(c, c)).toList())
+					.addChoices(
+						cropNameToEmoji
+							.keySet()
+							.stream()
+							.map(c -> new Command.Choice(c, c))
+							.collect(Collectors.toCollection(ArrayList::new))
+					)
 			);
 	}
 
@@ -76,7 +82,11 @@ public class JacobSlashCommand extends SlashCommand {
 		String finalCrop = crop;
 		for (JacobContest contest : crop.equals("All")
 			? data.getContests()
-			: data.getContests().stream().filter(c -> c.getCrops().stream().anyMatch(thisCrop -> thisCrop.equals(finalCrop))).toList()) {
+			: data
+				.getContests()
+				.stream()
+				.filter(c -> c.getCrops().stream().anyMatch(thisCrop -> thisCrop.equals(finalCrop)))
+				.collect(Collectors.toCollection(ArrayList::new))) {
 			extras.addEmbedField(
 				"Contest",
 				"**In:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(false),

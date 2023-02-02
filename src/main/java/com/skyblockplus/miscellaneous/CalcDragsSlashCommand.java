@@ -101,7 +101,7 @@ public class CalcDragsSlashCommand extends SlashCommand {
 				.entrySet()
 				.stream()
 				.sorted(Comparator.comparingInt(e -> -higherDepth(e.getValue(), "quality", 0)))
-				.toList()) {
+				.collect(Collectors.toCollection(ArrayList::new))) {
 				eb.addField(
 					getEmoji(nameToId(entry.getKey())) +
 					" " +

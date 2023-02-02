@@ -1771,7 +1771,11 @@ public class SettingsExecute {
 					FuzzySearch
 						.extractTop(
 							roleValue,
-							getInternalJsonMappings().entrySet().stream().map(e -> higherDepth(e.getValue(), "name", "")).toList(),
+							getInternalJsonMappings()
+								.entrySet()
+								.stream()
+								.map(e -> higherDepth(e.getValue(), "name", ""))
+								.collect(Collectors.toCollection(ArrayList::new)),
 							5
 						)
 						.stream()
@@ -2367,7 +2371,8 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder searchBlacklist(String username) {
-		List<JsonElement> blacklist = streamJsonArray(guildMap.get(guild.getId()).getBlacklist()).toList();
+		List<JsonElement> blacklist = streamJsonArray(guildMap.get(guild.getId()).getBlacklist())
+			.collect(Collectors.toCollection(ArrayList::new));
 		if (blacklist.isEmpty()) {
 			return invalidEmbed("Blacklist is empty");
 		}

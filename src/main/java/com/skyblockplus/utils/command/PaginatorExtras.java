@@ -141,7 +141,11 @@ public class PaginatorExtras {
 	}
 
 	public List<Button> getButtons() {
-		return reactiveButtons.stream().filter(ReactiveButton::isVisible).map(ReactiveButton::getButton).toList();
+		return reactiveButtons
+			.stream()
+			.filter(ReactiveButton::isVisible)
+			.map(ReactiveButton::getButton)
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	public PaginatorExtras toggleReactiveButton(String id, boolean visible) {

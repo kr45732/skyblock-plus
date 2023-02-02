@@ -1217,7 +1217,13 @@ public class Constants {
 		"<:zucchini:828636746358194206>"
 	);
 	public static final OptionData profilesCommandOption = new OptionData(OptionType.STRING, "profile", "Profile name")
-		.addChoices(profileNameToEmoji.keySet().stream().map(i -> new Command.Choice(capitalizeString(i), i)).toList());
+		.addChoices(
+			profileNameToEmoji
+				.keySet()
+				.stream()
+				.map(i -> new Command.Choice(capitalizeString(i), i))
+				.collect(Collectors.toCollection(ArrayList::new))
+		);
 	/* Constants JSON file */
 	public static JsonObject CONSTANTS;
 
@@ -1370,7 +1376,7 @@ public class Constants {
 					.stream()
 					.filter(e -> higherDepth(e.getValue(), "category", "").equals("PET_ITEM"))
 					.map(Map.Entry::getKey)
-					.toList();
+					.collect(Collectors.toCollection(ArrayList::new));
 
 			/* ALL_TALISMANS */
 			ALL_TALISMANS = new HashSet<>();

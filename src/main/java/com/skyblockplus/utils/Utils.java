@@ -845,7 +845,11 @@ public class Utils {
 			.setItemsPerPage(1)
 			.setFinalAction(m -> {
 				if (!m.getActionRows().isEmpty()) {
-					List<Button> buttons = m.getButtons().stream().filter(b -> b.getStyle() == ButtonStyle.LINK).toList();
+					List<Button> buttons = m
+						.getButtons()
+						.stream()
+						.filter(b -> b.getStyle() == ButtonStyle.LINK)
+						.collect(Collectors.toCollection(ArrayList::new));
 					if (buttons.isEmpty()) {
 						m.editMessageComponents().queue(ignore, ignore);
 					} else {
@@ -1549,7 +1553,7 @@ public class Utils {
 								return false;
 							}
 						})
-						.toList();
+						.collect(Collectors.toCollection(ArrayList::new));
 					database.setApplyCacheSettings(automaticGuild.getKey(), name, gson.toJson(applyUserList));
 
 					if (applyUserList.size() > 0) {
@@ -1617,7 +1621,7 @@ public class Utils {
 						return false;
 					}
 				})
-				.toList();
+				.collect(Collectors.toCollection(ArrayList::new));
 
 			if (applyUsersCacheList.size() > 0) {
 				log.info(
@@ -1968,7 +1972,7 @@ public class Utils {
 		for (File child : Arrays
 			.stream(new File("src/main/java/com/skyblockplus/json/neu/items").listFiles())
 			.sorted(Comparator.comparing(File::getName))
-			.toList()) {
+			.collect(Collectors.toCollection(ArrayList::new))) {
 			try {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
 				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
@@ -2076,7 +2080,7 @@ public class Utils {
 		for (File child : Arrays
 			.stream(new File("src/main/java/com/skyblockplus/json/neu/items").listFiles())
 			.sorted(Comparator.comparing(File::getName))
-			.toList()) {
+			.collect(Collectors.toCollection(ArrayList::new))) {
 			try (FileReader reader = new FileReader(child)) {
 				JsonElement itemJson = JsonParser.parseReader(reader);
 				String id = higherDepth(itemJson, "internalname").getAsString().replace("-", ":");
@@ -2120,12 +2124,12 @@ public class Utils {
 				.filter(e -> !e.getKey().equals("count"))
 				.map(e -> e.getValue().getAsString())
 				.filter(e -> !e.isEmpty())
-				.toList();
+				.collect(Collectors.toCollection(ArrayList::new));
 		}
 
 		JsonElement npcBuyCost = higherDepth(getInternalJsonMappings(), itemId + ".npc_buy.cost");
 		if (npcBuyCost != null) {
-			return streamJsonArray(npcBuyCost).map(JsonElement::getAsString).toList();
+			return streamJsonArray(npcBuyCost).map(JsonElement::getAsString).collect(Collectors.toCollection(ArrayList::new));
 		}
 
 		return null;
