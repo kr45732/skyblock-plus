@@ -100,286 +100,210 @@ public class HelpSlashCommand extends SlashCommand {
 		helpDataList.addAll(
 			Arrays.asList(
 				// General
-				new HelpData("help", "Show the help menu with all the commands.", "help")
-					.addSecondData("Show the help menu for a certain command.", "help <command>")
-					.addExamples("help", "help guild experience")
+				new HelpData("help", "Show the help menu with all commands or a specific command.", "help [command]")
+					.addExamples("help", "help settings guild create")
 					.setCategory("general"),
-				new HelpData("information", "Get information about this bot.").setCategory("general"),
+				new HelpData("information", "Get information about the bot.").setCategory("general"),
 				new HelpData("invite", "Get the invite link and support server link for the bot.").setCategory("general"),
 				new HelpData("link", "Link your Hypixel account to the bot.", "link <player>")
 					.addExamples("link CrypticPlasma")
 					.setCategory("general"),
 				new HelpData("unlink", "Unlink your account from the bot.").setCategory("general"),
+				new HelpData("vote", "Get links to upvote the bot.").setCategory("general"),
 				// Slayer
-				new HelpData("slayer", "Get the slayer data of a player.", "slayer [player] [profile]")
-					.addPlayerExamples()
-					.setCategory("slayer"),
+				new HelpData("slayer", "Get a player's slayer data.", "slayer [player] [profile]").setCategory("slayer"),
 				new HelpData(
 					"calcslayer",
-					"Calculate the number of slayer bosses needed to reach a certain level or xp amount. The type can be sven, rev, tara, or enderman.",
-					"calcslayer <type> [player] [profile] [level:level] [xp:xp]"
+					"Calculate the number of slayer bosses needed to reach a certain level or xp amount.",
+					"calcslayer <type> [player] [profile] [level] [xp] [system]"
 				)
-					.addExamples("calcslayer rev CrypticPlasma level:8", "calcslayer enderman CrypticPlasma xp:100000")
 					.setCategory("slayer"),
 				// Skills
-				new HelpData("skills", "Get the skills data of a player.", "skills [player] [profile]")
-					.addPlayerExamples()
-					.setCategory("skills"),
-				new HelpData("hotm", "Get a player's heart of the mountain statistics.", "hotm [player] [profile]")
-					.addPlayerExamples()
-					.setCategory("skills"),
-				new HelpData("forge", "Get a player's forge items and ending times", "forge [player] [profile]")
-					.addPlayerExamples()
-					.setCategory("skills"),
-				new HelpData("crimson", "Get a player's crimson isle stats", "crimson [player] [profile]")
-					.addPlayerExamples()
-					.setCategory("skills"),
+				new HelpData("skills", "Get a player's skill data.", "skills [player] [profile]").setCategory("skills"),
+				new HelpData("hotm", "Get a player's heart of the mountain statistics.", "hotm [player] [profile]").setCategory("skills"),
+				new HelpData("forge", "Get a player's forge items and ending times.", "forge [player] [profile]").setCategory("skills"),
+				new HelpData("crimson", "Get a player's crimson isle statistics.", "crimson [player] [profile]").setCategory("skills"),
 				// Dungeons
-				new HelpData("dungeons", "Get the dungeons data of a player.", "dungeons [player] [profile]")
-					.addPlayerExamples()
-					.setCategory("dungeons"),
+				new HelpData("dungeons", "Get a player's dungeon data.", "dungeons [player] [profile]").setCategory("dungeons"),
 				new HelpData("essence", "Main essence command.")
-					.setCategory("dungeons")
 					.addSubcommands(
-						new HelpData("upgrade", "Interactive message to find the essence amount to upgrade an item.", "upgrade <item>")
+						new HelpData(
+							"upgrade",
+							"Interactive message to calculate the amount of essence and items to upgrade an item.",
+							"upgrade <item>"
+						)
 							.addExamples("upgrade Hyperion"),
-						new HelpData("information", "Get the amount of essence to upgrade an item for each level.", "information <item>")
+						new HelpData(
+							"information",
+							"Get the amount of essence and items to upgrade an item for each level.",
+							"information <item>"
+						)
 							.addExamples("information Hyperion"),
-						new HelpData("player", "Get a player's essence amounts and their essence shop upgrades.", "[player] [profile]")
-							.addPlayerExamples()
-					),
+						new HelpData("player", "Get a player's essence amounts and essence shop upgrades.", "player [player] [profile]")
+					)
+					.setCategory("dungeons"),
 				new HelpData(
 					"calcruns",
-					"Calculate the number of runs needed to reach a certain catacombs level. The floor can be from F1 to F7 or M1 to M6.",
-					"calcruns [player] [profile] <level:level> <floor:floor>"
+					"Calculate the number of runs needed to reach a certain catacombs level.",
+					"calcruns <level> <floor> [player] [profile] [system]"
 				)
 					.setCategory("dungeons"),
 				new HelpData(
 					"calcdrops",
-					"Calculate the drop rate and cost of all chests for a floor",
-					"calcdrops <floor> [luck:1|2|3|4|5] [accessory:none|talisman|ring|artifact]"
+					"Calculate the drop rate and cost of all chests for a dungeons floor",
+					"calcdrops <floor> [luck] [accessory]"
 				)
 					.setCategory("dungeons"),
 				// Guild
 				new HelpData("guild", "Main guild command")
-					.addSecondData("Find what guild a player is in.", "guild <player>")
 					.addSubcommands(
-						new HelpData("information", "Get information and statistics about a player's guild.", "information [player]")
-							.addSecondData("Get information and statistics about a guild.", "information <g:guild_name>")
-							.addExamples("information CrypticPlasma", "information g:Skyblock_Forceful"),
-						new HelpData("members", "Get a list of all members in a player's guild.", "members [player]")
-							.addSecondData("Get a list of all members in a guild.", "members <g:guild_name>")
-							.addExamples("members CrypticPlasma", "members g:Skyblock_Forceful"),
+						new HelpData("information", "Get information and statistics about a guild.", "information [player] [guild]"),
+						new HelpData("members", "List all members in a guild.", "members [player] [guild]"),
 						new HelpData(
 							"experience",
-							"Get the experience leaderboard for a player's guild. Days can range from 1 to 7, default number of days is 7.",
-							"experience [player] [days:days]"
+							"Get the experience leaderboard for a guild. Defaults to seven days.",
+							"experience [player] [guild] [days]"
+						),
+						new HelpData(
+							"leaderboard",
+							"Get a leaderboard for a guild. Set key to true to force use this server's Hypixel API key for more accurate results.",
+							"leaderboard <type> [player] [guild] [gamemode] [key]"
+						),
+						new HelpData(
+							"kicker",
+							"Get all player's who don't meet the provided requirements. Requirements are in the format `[type:value ...] ...`.  The requirement type can be skills, slayer, catacombs, or weight. The requirement value must be an integer. You can have up to 3 sets of requirements. Set key to true to force use this server's Hypixel API key for more accurate results.",
+							"kicker <requirements> [player] [gamemode] [key]"
+						),
+						new HelpData(
+							"statistics",
+							"Get a guild's average and top 5 leaderboards of slayer, skills, catacombs, weight, networth, and level. Set key to true to force use this server's Hypixel API key for more accurate results.",
+							"statistics [player] [guild] [gamemode] [key]"
+						),
+						new HelpData(
+							"ranks",
+							"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" +
+							DISCORD_SERVER_INVITE_LINK +
+							") to set this up for your guild. Set key to true to force use this server's Hypixel API key for more accurate results.",
+							"ranks <player> [gamemode] [key]"
+						),
+						new HelpData(
+							"api",
+							"Get which Skyblock APIs players have enabled or disabled for a guild. Requires this server's Hypixel API key to be set.",
+							"api [player] [exclude]"
 						)
-							.addSecondData(
-								"Get the experience leaderboard for a guild. Days can range from 1 to 7, default number of days is 7.",
-								"experience <g:guild_name> [days:days]"
-							)
-							.addExamples("experience CrypticPlasma", "experience g:Skyblock Forceful days:4")
 					)
-					.setCategory("guild"),
-				new HelpData(
-					"guild-leaderboard",
-					"Get a leaderboard for a player's guild. All types can be seen through autocomplete. The mode can be all, ironman, or stranded.  Set key to true to force use the set Hypixel API key for more accurate results.",
-					"guild-leaderboard <type> [player] [mode:all|ironman|stranded] [key]"
-				)
-					.addSecondData(
-						"Get a leaderboard for a guild.",
-						"guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded] [key]"
-					)
-					.addExamples("guild-leaderboard weight CrypticPlasma", "guild-leaderboard sven CrypticPlasma mode:ironman")
-					.setCategory("guild"),
-				new HelpData(
-					"guild-kicker",
-					"Get all player's who don't meet the provided requirements. The requirement type can be skills, slayer, catacombs, or weight. The requirement value must be an integer. You can have up to 3 sets of requirements.  Set key to true to force use the set Hypixel API key for more accurate results.",
-					"guild-kicker <u:player> <[type:value ...]> ... [key]"
-				)
-					.addExamples("guild-kicker u:CrypticPlasma [weight:4000 skills:40] [weight:4500]")
-					.setCategory("guild"),
-				new HelpData(
-					"guild-ranks",
-					"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" +
-					DISCORD_SERVER_INVITE_LINK +
-					") to set this up for your guild. Set key to true to force use the set Hypixel API key for more accurate results.",
-					"guild-ranks <player> [mode:all|ironman|stranded] [key]"
-				)
-					.addExamples("guild-ranks CrypticPlasma")
-					.setCategory("guild"),
-				new HelpData(
-					"guild-statistics",
-					"Get a guild's Skyblock statistics of slayer, skills, catacombs, and weight. Set key to true to force use the set Hypixel API key for more accurate results.",
-					"guild-statistics [player] [g:guild_name] [key]"
-				)
-					.addExamples("guild-stats u:CrypticPlasma")
-					.setCategory("guild"),
-				new HelpData(
-					"check-guild-api",
-					"Get which Skyblock APIs players have enabled or disabled for a guild. Requires a Hypixel API key to be set.",
-					"check-guild-api [player]"
-				)
-					.addExamples("check-guild-api CrypticPlasma")
 					.setCategory("guild"),
 				// Auctions
 				new HelpData(
 					"auctions",
-					"Get (and/or track) a player's unclaimed auctions on all profiles. Can be sorted ascending or descending. Can be filtered by sold or unsold. Add verbose flag to show estimated price of each auction.",
-					"auctions [player] [sort:low|high] [filter:unsold|sold] [verbose]"
+					"Get and/or track a player's unclaimed auctions on all profiles. Set verbose to true to show an estimated price breakdown for each auction.",
+					"auctions [player] [filter] [sort] [verbose]"
 				)
-					.addExamples("auctions CrypticPlasma", "auctions CrypticPlasma filter:sold verbose:true")
 					.setCategory("price"),
 				new HelpData("viewauction", "Get information about an auction by it's UUID.", "viewauction <uuid>")
-					.addExamples("auctions uuid 77df55d9c0084473b113265ef48fb396")
+					.addExamples("viewauction 77df55d9c0084473b113265ef48fb396")
 					.setCategory("price"),
 				new HelpData("bin", "Get the lowest bin of an item.", "bin <item>")
-					.addExamples("bin Necron Chestplate")
+					.addExamples("bin Wither Chestplate")
 					.setCategory("price"),
 				new HelpData("bazaar", "Get the bazaar prices of an item.", "bazaar <item>")
 					.addExamples("bazaar Booster Cookie")
 					.setCategory("price"),
-				new HelpData("average", "Get the average auction price of an item.", "average <item>")
+				new HelpData("average", "Get the average auction and bin price of an item.", "average <item>")
 					.addExamples("average Necron's Handle")
 					.setCategory("price"),
-				new HelpData("bids", "Get a player's auction house bids", "bids [player].")
-					.addExamples("bids CrypticPlasma")
-					.setCategory("price"),
+				new HelpData("bids", "Get a player's auction house bids", "bids [player]").setCategory("price"),
 				new HelpData(
 					"price",
-					"Query the auction house for the lowest price of an item. Allows for more specific queries than bin or average command. Can be filtered by bin only, auction only, or both.",
-					"price <item> [type:bin|auction|both]"
+					"Query the auction house for the lowest price of an item. Allows for more specific queries than bin or average command. Defaults to searching auctions and bins.",
+					"price <item> [type]"
 				)
-					.addExamples("price Necron's Chestplate ✪✪✪✪✪", "price Withered Hyperion ✪✪✪ type:both")
+					.addExamples("price Necron's Chestplate ✪✪✪✪✪")
 					.setCategory("price"),
 				new HelpData("bits", "Get the bits cost of an item from the bits shop.", "bits <item>")
 					.addExamples("bits God Potion")
 					.setCategory("price"),
 				new HelpData("coinsperbit", "Get the coins to bits ratio for items in the bits shop.", "coinsperbit <item>")
 					.setCategory("price"),
+				new HelpData("flips", "Get current auction flips (**experimental**).", "flips <item>").setCategory("price"),
 				// Inventory
-				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory [player] [profile]")
-					.addSecondData("Get a player's inventory with lore.", "inventory [player] [profile] <slot:number>")
-					.addExamples(
-						"inventory CrypticPlasma",
-						"inventory CrypticPlasma Zucchini",
-						"inventory CrypticPlasma slot:1",
-						"inventory CrypticPlasma Zucchini slot:1"
-					)
+				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory emoji [player] [profile]")
+					.addSecondData("Get a player's inventory with lore.", "inventory list [player] [profile] [slot]")
 					.setCategory("inventory"),
-				new HelpData("armor", "Get a player's equipped armor with lore.", "armor [player] [profile]")
-					.addPlayerExamples()
+				new HelpData("armor", "Get a player's armor and equipment represented in emojis.", "armor emoji [player] [profile]")
+					.addSecondData("Get a player's armor and equipment with lore.", "armor list [player] [profile] [slot]")
 					.setCategory("inventory"),
-				new HelpData("enderchest", "Get a player's ender chest represented in emojis.", "enderchest [player] [profile]")
-					.addPlayerExamples()
+				new HelpData("enderchest", "Get a player's enderchest represented in emojis.", "enderchest emoji [player] [profile]")
+					.addSecondData("Get a player's enderchest with lore.", "enderchest list [player] [profile] [slot]")
 					.setCategory("inventory"),
 				new HelpData("storage", "Get a player's storage represented in emojis.", "storage [player] [profile]")
-					.addPlayerExamples()
 					.setCategory("inventory"),
-				new HelpData("talisman", "Get a player's talisman bag represented in emojis.", "talisman [player] [profile]")
-					.addSecondData("Get a player's talisman bag with lore.", "talisman [player] [profile] <slot:number>")
-					.addExamples(
-						"talisman CrypticPlasma",
-						"talisman CrypticPlasma Zucchini",
-						"talisman CrypticPlasma slot:1",
-						"talisman CrypticPlasma Zucchini slot:1"
-					)
-					.setCategory("inventory"),
+				new HelpData("talisman", "Main talisman command.")
+					.addSubcommands(
+						new HelpData("emoji", "Get a player's talisman bag represented in emojis.", "emoji [player] [profile]"),
+						new HelpData("list", "Get a player's talisman bag with lore.", "list [player] [profile] [slot]"),
+						new HelpData("tuning", "Get a player's power stone stats and tuning stats", "list [player] [profile]")
+					),
 				new HelpData(
 					"sacks",
 					"Get a player's sacks' content bag represented in a list. Sorted by descending price.",
-					"sacks [player] [profile]"
+					"sacks [player] [profile] [npc]"
 				)
-					.addPlayerExamples()
 					.setCategory("inventory"),
-				new HelpData("wardrobe", "Get a player's wardrobe armors represented in emojis.", "wardrobe [player] [profile]")
+				new HelpData("wardrobe", "Get a player's wardrobe armors represented in emojis.", "wardrobe emoji [player] [profile]")
 					.addSecondData("Get a player's wardrobe armors represented in a list.", "wardrobe list [player] [profile]")
-					.addExamples(
-						"wardrobe CrypticPlasma",
-						"wardrobe CrypticPlasma Zucchini",
-						"wardrobe list CrypticPlasma",
-						"wardrobe list CrypticPlasma Zucchini"
-					),
-				new HelpData("pets", "Get a player's pets.", "pets [player] [profile]").addPlayerExamples().setCategory("inventory"),
+					.setCategory("inventory"),
+				new HelpData("pets", "Get a player's pets and missing pets.", "pets [player] [profile]").setCategory("inventory"),
 				// Misc
 				new HelpData("roles", "Main roles command.")
 					.addSubcommands(
-						new HelpData("claim", "Claim your automatic Skyblock roles. You must be linked to the bot.", "claim <profile>")
-							.addExamples("claim", "claim Zucchini"),
-						new HelpData("list", "List all enabled claimable roles for this server.")
+						new HelpData("claim", "Claim your automatic Skyblock roles. You must be linked to the bot.", "claim [profile]"),
+						new HelpData("list", "List all claimable roles for this server.")
 					)
 					.setCategory("miscellaneous"),
 				new HelpData("coins", "Get a player's bank and purse coins.", "coins player [player] [profile]")
 					.addSecondData("Get a player's bank transaction history.", "coins history [player] [profile]")
-					.addExamples(
-						"coins CrypticPlasma",
-						"coins CrypticPlasma Zucchini",
-						"coins history CrypticPlasma",
-						"coins history CrypticPlasma Zucchini"
-					)
 					.setCategory("miscellaneous"),
-				new HelpData("networth", "Calculate a player's networth.", "networth [player] [profile]")
-					.addSecondData(
-						"Calculate a player's networth with a detailed JSON of each item cost.",
-						"networth [player] [profile] --verbose"
-					)
-					.addExamples(
-						"networth CrypticPlasma",
-						"networth CrypticPlasma Zucchini",
-						"networth CrypticPlasma --verbose",
-						"networth CrypticPlasma Zucchini --verbose"
-					)
+				new HelpData(
+					"networth",
+					"Calculate a player's networth. Set verbose to true to get a detailed breakdown of the calculations.",
+					"networth [player] [profile] [verbose]"
+				)
 					.setCategory("miscellaneous"),
 				new HelpData(
 					"weight",
-					"Get a player's slayer, skills, dungeons, and total weight. Shows both senither and lily weight.",
+					"Get a player's slayer, skills, dungeons, and total weight. Shows both Senither and Lily weight.",
 					"weight [player] [profile]"
 				)
-					.addPlayerExamples()
 					.setCategory("miscellaneous"),
 				new HelpData(
 					"calcweight",
-					"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount.",
-					"weight calculate [player] [profile] <type:type> <amount:amount>"
+					"Calculate predicted weight change for a reaching a skills, slayers, or dungeons level/amount.",
+					"calcweight <type> <amount> [player] [profile] [system]"
 				)
-					.addExamples("weight calculate CrypticPlasma type:catacombs amount:43")
 					.setCategory("miscellaneous"),
-				new HelpData("hypixel", "Get Hypixel information about a player.", "hypixel [player]")
-					.addExamples("hypixel CrypticPlasma")
+				new HelpData("hypixel", "Get Hypixel information about a player.", "hypixel [player]").setCategory("miscellaneous"),
+				new HelpData("missing", "Get a player's missing talismans and cheapest ones to buy.", "missing [player] [profile]")
 					.setCategory("miscellaneous"),
-				new HelpData("missing", "Get a player's missing talismans.", "missing [player] [profile]")
-					.addPlayerExamples()
+				new HelpData("check-api", "Get a player's enabled and disabled Skyblock APIs", "check-api [player] [profile]")
 					.setCategory("miscellaneous"),
-				new HelpData("check-api", "Get a player's enabled and/or disabled Skyblock APIs", "check-api [player] [profile]")
-					.addPlayerExamples()
-					.setCategory("miscellaneous"),
-				new HelpData("profiles", "Get information about all of a player's profiles.", "missing [player] [profile]")
-					.addPlayerExamples()
+				new HelpData("profiles", "Get information about all of a player's profiles.", "profiles [player]")
 					.setCategory("miscellaneous"),
 				new HelpData("cakes", "Get a player's active and inactive cake buffs.", "cakes [player] [profile]")
-					.addPlayerExamples()
 					.setCategory("miscellaneous"),
-				new HelpData("bestiary", "Get bestiary stats.", "bestiary [player] [profile]")
-					.addPlayerExamples()
-					.setCategory("miscellaneous"),
-				new HelpData("harp", "Get a player's harp statistics.", "harp [player] [profile]")
-					.addPlayerExamples()
-					.setCategory("miscellaneous"),
+				new HelpData("bestiary", "Get a player's bestiary statistics.", "bestiary [player] [profile]").setCategory("miscellaneous"),
+				new HelpData("harp", "Get a player's harp statistics.", "harp [player] [profile]").setCategory("miscellaneous"),
 				new HelpData("uuid", "Convert username to UUID or UUID to username.", "uuid [username|uuid]")
 					.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88")
 					.setCategory("miscellaneous"),
-				new HelpData("fetchur", "Get the item that fetchur wants today.").setCategory("miscellaneous"),
-				new HelpData("jacob", "Get the upcoming contests and their crops.").setCategory("miscellaneous"),
+				new HelpData("fetchur", "Get today's fetchur item.").setCategory("miscellaneous"),
+				new HelpData("level", "Get a player's skyblock level.", "level [player] [profile]").setCategory("miscellaneous"),
+				new HelpData("collections", "Get a player's collections.", "collections [player] [profile]").setCategory("miscellaneous"),
+				new HelpData("jacob [crop]", "Get the upcoming contests and their crops.").setCategory("miscellaneous"),
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
-				new HelpData(
-					"leaderboard",
-					"Get a global leaderboard. All types can be seen through autocomplete. The mode can be all, ironman, or stranded.",
-					"leaderboard <type> [u:player] [mode:all|ironman|stranded] [page:page] [rank:rank] [amount:amount]"
-				)
+				new HelpData("leaderboard", "Get a global leaderboard.", "leaderboard <type> [player] [mode] [page] [rank] [amount]")
 					.setCategory("miscellaneous"),
 				new HelpData("skyblock", "Get an overview of a player's Skyblock statistics", "skyblock [player] [profile]")
-					.addPlayerExamples()
 					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
 					.setCategory("miscellaneous"),
@@ -387,15 +311,14 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("calendar", "Get the current Skyblock datetime and running or upcoming events").setCategory("miscellaneous"),
 				new HelpData(
 					"scammer",
-					"Check if a player is marked as a scammer in the SkyblockZ database with the reason, discord(s), and Minecraft alt(s)",
+					"Check if a player is marked as a scammer in the SkyblockZ database with the reason, Discords, and Minecraft alts",
 					"scammer [player]"
 				)
-					.addExamples("scammer CrypticPlasma")
 					.setCategory("miscellaneous"),
 				new HelpData(
 					"calcdrags",
-					"Calculate your loot quality and loot from dragons in the end. The ratio is your damage divided by first place damage.",
-					"calcdrags [position:position] [eyes:eyes] [ratio:ratio]"
+					"Calculate your loot quality and predicted loot from dragons in the end. The ratio is your damage divided by first place damage.",
+					"calcdrags [position] [eyes] [ratio]"
 				)
 					.setCategory("miscellaneous"),
 				new HelpData("reforge", "Get the reforge stone stats for each rarity.", "reforge <stone>").setCategory("miscellaneous"),
@@ -404,7 +327,7 @@ public class HelpSlashCommand extends SlashCommand {
 					.addSubcommands(
 						new HelpData("create", "Interactive message to create a new party."),
 						new HelpData("current", "Get information about your current party."),
-						new HelpData("join", "Join a player's party where username is the party leader's IGN.", "join <username>")
+						new HelpData("join", "Join a player's party by the party leader's IGN.", "join <username>")
 							.addExamples("join CrypticPlasma"),
 						new HelpData("leave", "Leave your current party."),
 						new HelpData("list", "List all active parties"),
@@ -422,16 +345,17 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("leaderboard", "Get the leaderboard for current event."),
 						new HelpData(
 							"end",
-							"Force end the event. If silent is true, the event will be canceled and no prizes or winners will be announced."
+							"Force end the event. If silent is true, the event will be canceled and no prizes or winners will be announced.",
+							"end [silent]"
 						)
 					)
 					.setCategory("event"),
 				// Settings
 				new HelpData("settings", "Main settings command.")
 					.setCategory("settings")
-					.addSecondData("View the current settings for the Discord server.", "settings")
+					.addSecondData("View the current settings for this server.", "settings")
 					.addSubcommands(
-						new HelpData("delete", "Delete certain settings or all settings from the database.")
+						new HelpData("delete", "Delete certain settings from the database.")
 							.addSubcommands(
 								new HelpData("all", "Delete the current server settings."),
 								new HelpData("hypixel_key", "Delete the set Hypixel API of this server.")
@@ -467,6 +391,11 @@ public class HelpSlashCommand extends SlashCommand {
 									"guest_role",
 									"Set the role that will be given to linked users that are not in any of the setup automatic guilds. Requires at least one automatic guild to be setup.",
 									"guest_role <@role>"
+								),
+								new HelpData(
+									"log_channel",
+									"Set the channel where automatic actions will be logged to.",
+									"log_channel <#channel>"
 								)
 							),
 						new HelpData("bot_manager", "Manage bot manager roles.")
@@ -510,11 +439,7 @@ public class HelpSlashCommand extends SlashCommand {
 									"Set the channel where farming event notifications will be posted.",
 									"channel <#channel>"
 								),
-								new HelpData(
-									"add",
-									"Add a crop to be tracked and notified. The role will automatically be created.",
-									"add <crop|all>"
-								),
+								new HelpData("add", "Add a crop to be tracked and notified.", "add <crop|all> [role]"),
 								new HelpData("remove", "Remove a crop from the tracking list.", "remove <crop>")
 							),
 						new HelpData("event", "Main command for event notification settings.")
@@ -619,8 +544,8 @@ public class HelpSlashCommand extends SlashCommand {
 							.addSecondData("List all setup automatic guilds.", "guild")
 							.addSubcommands(
 								new HelpData("create", "Create a new automatic guild for a guild.", "create <name>")
-									.addExamples("create myGuild"),
-								new HelpData("remove", "Remove an automatic guild.", "remove <name>").addExamples("remove myGuild"),
+									.addExamples("create my_guild"),
+								new HelpData("remove", "Remove an automatic guild.", "remove <name>").addExamples("remove my_guild"),
 								new HelpData("member_role", "Automatic guild member role.", "settings guild <name> member_role", true)
 									.addSubcommands(
 										new HelpData("enable", "Enable automatic guild role."),
@@ -755,11 +680,11 @@ public class HelpSlashCommand extends SlashCommand {
 									)
 							)
 					),
-				new HelpData("setup", "A short walk-through on how to setup the bot.").setCategory("settings"),
-				new HelpData("categories", "Get the id's of all categories in the Discord server.").setCategory("settings"),
+				new HelpData("setup", "A guide on how to setup the bot.").setCategory("settings"),
+				new HelpData("categories", "Get the ids of all categories in this server.").setCategory("settings"),
 				new HelpData(
 					"reload",
-					"Reload the automatic guild application(s) and automatic verification settings. This for changes to take effect for both of these features."
+					"Reload the automatic guild application(s) and automatic verification settings. This is required for most changes to take effect for both of these features."
 				)
 					.setCategory("settings")
 			)
@@ -796,13 +721,14 @@ public class HelpSlashCommand extends SlashCommand {
 			create("information", "Show information and statistics about the bot") +
 			create("invite", "Get the invite link and Discord link for the bot") +
 			create("link <player>", "Link your Hypixel account to the bot") +
-			create("unlink", "Unlink your account from the bot")
+			create("unlink", "Unlink your account from the bot") +
+			create("vote", "Upvote the bot")
 		);
 
 		paginateBuilder.addItems(
 			create("slayer [player] [profile]", "Get the slayer data of a player") +
 			create(
-				"calcslayer <type> [player] [profile] [level] [xp]",
+				"calcslayer <type> [player] [profile] [level] [xp] [system]",
 				"Calculate the number of bosses needed to reach a level or xp amount"
 			)
 		);
@@ -818,9 +744,9 @@ public class HelpSlashCommand extends SlashCommand {
 			create("dungeons [player] [profile]", "Get the dungeons data of a player") +
 			create("essence upgrade <item>", "Interactive message to find the essence amount to upgrade an item") +
 			create("essence information <item>", "Get the amount of essence to upgrade an item for each level") +
-			create("essence [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
+			create("essence player [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
 			create(
-				"calcruns <level> <floor> [player] [profile]",
+				"calcruns <level> <floor> [player] [profile] [system]",
 				"Calculate the number of runs needed to reach a certain catacombs level"
 			) +
 			create("calcdrops <floor> [luck] [accessory]", "Calculate the drop rate and cost of all chests for a floor")
@@ -830,20 +756,17 @@ public class HelpSlashCommand extends SlashCommand {
 			create("guild information [player] [guild]", "Get information and statistics about a guild") +
 			create("guild members [player] [guild]", "Get a list of all members in a guild") +
 			create("guild experience [player] [guild]", "Get the experience leaderboard for a guild") +
-			create("guild-leaderboard <type> [player] [guild] [mode] [key]", "Get a leaderboard for a player's guild") +
+			create("guild leaderboard <type> [player] [guild] [mode] [key]", "Get a leaderboard for a player's guild") +
+			create("guild kicker <requirements> [player] [gamemode] [key]", "Get all player's who don't meet the provided requirements") +
 			create(
-				"guild-kicker <requirements> [player] [gamemode] [key]",
-				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer"
-			) +
-			create(
-				"guild-ranks [player] [gamemode] [key]",
+				"guild ranks [player] [gamemode] [key]",
 				"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild"
 			) +
 			create(
-				"guild-statistics [player] [guild] [gamemode] [key]",
-				"Get a guild's Skyblock statistics of slayer, skills, catacombs, and weight"
+				"guild statistics [player] [guild] [gamemode] [key]",
+				"Get a guild's Skyblock statistics of slayer, skills, catacombs, weight, level, and networth"
 			) +
-			create("check-guild-api [player] [exclude]", "Get which Skyblock APIs players have enabled or disabled for a guild")
+			create("guild api [player] [exclude]", "Get which Skyblock APIs players have enabled or disabled for a guild")
 		);
 
 		paginateBuilder.addItems(
@@ -855,7 +778,8 @@ public class HelpSlashCommand extends SlashCommand {
 			create("bids [player]", "Get a player's auction house bids") +
 			create("price <item> [auction_type]", "Query the auction house for the lowest bin of an item") +
 			create("bits <item>", "Get the bits cost of an item from the bits shop") +
-			create("coinsperbit <item>", "Get the coins to bits ratio for items in the bits shop")
+			create("coinsperbit <item>", "Get the coins to bits ratio for items in the bits shop") +
+			create("flips", "Get current auction flips")
 		);
 
 		paginateBuilder.addItems(
@@ -865,7 +789,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("armor list [player] [profile]", "Get a player's equipped armor & equipment with lore") +
 			create("enderchest emoji [player] [profile]", "Get a player's ender chest represented in emojis") +
 			create("enderchest list [player] [profile] [slot]", "Get a player's enderchest lore") +
-			create("storage [player] <profile]", "Get a player's storage represented in emojis") +
+			create("storage [player] [profile]", "Get a player's storage represented in emojis") +
 			create("talisman emoji [player] [profile]", "Get a player's talisman bag represented in emojis") +
 			create("talisman list [player] [profile] [slot]", "Get a player's talisman bag with lore") +
 			create("talisman tuning [player] [profile]", "Get a player's power stone stats and tuning stats") +
@@ -878,6 +802,7 @@ public class HelpSlashCommand extends SlashCommand {
 		paginateBuilder.addItems(
 			create("roles claim [profile]", "Claim your automatic Skyblock roles based on your statistics") +
 			create("roles list", "List all roles that can be claimed through the bot") +
+			create("level [player] [profile]", "Get a player's Skyblock level") +
 			create("coins player [player] [profile]", "Get a player's bank and purse coins") +
 			create("coins history [player] [profile]", "Get a player's bank transaction history") +
 			create("networth [player] [profile] [verbose]", "Calculate a player's networth") +
@@ -925,7 +850,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("event add <player> [profile]", "Force add a player to the event") +
 			create("event leave", "Leave the current event") +
 			create("event leaderboard", "Get the leaderboard for current event") +
-			create("event end", "Force end or cancel the event")
+			create("event end [silent]", "Force end or cancel the event")
 		);
 
 		paginateBuilder.addItems(
