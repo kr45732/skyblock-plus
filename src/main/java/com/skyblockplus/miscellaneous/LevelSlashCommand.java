@@ -85,7 +85,7 @@ public class LevelSlashCommand extends SlashCommand {
 		LevelRecord miscellaneousTasks = getMiscellaneousTasks(player);
 		LevelRecord storyTasks = getStoryTasks(player);
 
-		double apiSbLevel = player.getLevel();
+		double apiSbLevel = player.getExactLevel();
 		double calculatedSbLevel =
 			(
 				coreTasks.total() +
@@ -168,7 +168,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return null;
 	}
 
-	private static LevelRecord getCoreTasksEmbed(Player player) {
+	public static LevelRecord getCoreTasksEmbed(Player player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Core Tasks");
 
 		// Skills
@@ -256,7 +256,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	private static LevelRecord getDungeonTasks(Player player) {
+	public static LevelRecord getDungeonTasks(Player player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Dungeon Tasks");
 
 		// Catacombs
@@ -328,7 +328,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	private static LevelRecord getEssenceShopTasks(Player player) {
+	public static LevelRecord getEssenceShopTasks(Player player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Essence Shop Tasks");
 
 		int essenceSbXp = 0;
@@ -372,7 +372,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	private static LevelRecord getSlayingTasks(Player player) {
+	public static LevelRecord getSlayingTasks(Player player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Slaying Tasks");
 
 		// Slayer level up
@@ -533,7 +533,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	private static LevelRecord getSkillRelatedTasks(Player player) {
+	public static LevelRecord getSkillRelatedTasks(Player player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Skill Related Tasks");
 
 		// Mining
@@ -694,7 +694,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	private static LevelRecord getMiscellaneousTasks(Player player) {
+	public static LevelRecord getMiscellaneousTasks(Player player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Miscellaneous Tasks");
 
 		// Accessory bag upgrade count
@@ -816,7 +816,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	private static LevelRecord getStoryTasks(Player player) {
+	public static LevelRecord getStoryTasks(Player player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Story Tasks");
 
 		// Objectives/quests
@@ -843,7 +843,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	private record LevelRecord(EmbedBuilder eb, int total, int categoryTotal, int max) {
+	public record LevelRecord(EmbedBuilder eb, int total, int categoryTotal, int max) {
 		public LevelRecord(EmbedBuilder eb, int total, int max) {
 			this(eb, total, total, max);
 		}
@@ -859,8 +859,7 @@ public class LevelSlashCommand extends SlashCommand {
 		int gain = 0;
 		for (int i = 0; i < array.length; i++) {
 			if (value >= array[i]) {
-				int gained = dungeonCollectionXp.get(i).getAsInt();
-				gain += gained;
+				gain += dungeonCollectionXp.get(i).getAsInt();
 			}
 		}
 		return gain;

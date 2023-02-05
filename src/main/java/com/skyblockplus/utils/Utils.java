@@ -417,7 +417,7 @@ public class Utils {
 	public static JsonObject getSbLevelsJson() {
 		if (sbLevelsJson == null) {
 			sbLevelsJson =
-				getJsonObject("https://raw.githubusercontent.com/jani270/NotEnoughUpdates-REPO/c2JsZXZlbHMK/constants/sblevels.json"); //"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/sblevels.json");
+				getJsonObject("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/raw/prerelease/constants/sblevels.json"); //"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/sblevels.json");
 		}
 
 		return sbLevelsJson;

@@ -26,6 +26,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.skyblockplus.miscellaneous.LevelSlashCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
 import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
@@ -1153,8 +1154,27 @@ public class Player {
 		return "❓";
 	}
 
-	public double getLevel() {
+	public double getExactLevel() {
 		return higherDepth(profileJson(), "leveling.experience", 0) / 100.0;
+	}
+
+	public double getLevel() {
+		if (higherDepth(profileJson(), "leveling.experience") != null) {
+			return getLevel();
+		}
+
+		return (
+			(
+				LevelSlashCommand.getCoreTasksEmbed(this).total() +
+				LevelSlashCommand.getDungeonTasks(this).total() +
+				LevelSlashCommand.getEssenceShopTasks(this).total() +
+				LevelSlashCommand.getSlayingTasks(this).total() +
+				LevelSlashCommand.getSkillRelatedTasks(this).total() +
+				LevelSlashCommand.getMiscellaneousTasks(this).total() +
+				LevelSlashCommand.getStoryTasks(this).total()
+			) /
+			100.0
+		);
 	}
 
 	public String getLevelColor(int level) {
