@@ -28,10 +28,12 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import org.apache.groovy.util.Maps;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,26 +41,44 @@ public class HelpSlashCommand extends SlashCommand {
 
 	public static final List<HelpData> helpDataList = new ArrayList<>();
 	private static final List<String> helpNameList = new ArrayList<>();
-	private static final String[] pageTitles = {
+	private static final Map<String, String> pageTitleToCategory = Maps.of(
 		"Navigation",
+		"",
 		"General",
+		"?category=General",
 		"Slayer",
+		"?category=Slayer",
 		"Skills",
+		"?category=Skills",
 		"Dungeons",
+		"?category=Dungeons",
 		"Guild",
-		"Price Commands",
+		"?category=Guild",
+		"Price",
+		"?category=Price",
 		"Inventory",
-		"Miscellaneous Commands",
+		"?category=Inventory",
+		"Miscellaneous",
+		"?category=Miscellaneous",
 		"Party",
+		"?category=Party",
 		"Skyblock Event",
+		"?category=Event",
 		"Settings",
+		"?category=Settings",
 		"Jacob Events",
+		"?category=Settings",
 		"Event Notifications",
+		"?category=Settings",
 		"Verify Settings",
+		"?category=Settings",
 		"Guild | Roles & Ranks Settings",
+		"?category=Settings",
 		"Guild | Apply Settings",
+		"?category=Settings",
 		"Roles Settings",
-	};
+		"?category=Settings"
+	);
 
 	public HelpSlashCommand() {
 		this.name = "help";
@@ -355,6 +375,7 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("settings")
 					.addSecondData("View the current settings for this server.", "settings")
 					.addSubcommands(
+						new HelpData("general", "View general settings for this server."),
 						new HelpData("delete", "Delete certain settings from the database.")
 							.addSubcommands(
 								new HelpData("all", "Delete the current server settings."),
@@ -710,7 +731,13 @@ public class HelpSlashCommand extends SlashCommand {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = event.getPaginator().updateExtras(extra -> extra.setTitles(pageTitles));
+		CustomPaginator.Builder paginateBuilder = event
+			.getPaginator()
+			.updateExtras(extra ->
+				extra
+					.setTitles(pageTitleToCategory.keySet().stream().toList())
+					.setTitleUrls(pageTitleToCategory.values().stream().map(u -> "https://skyblock-plus.vercel.app/commands" + u).toList())
+			);
 
 		paginateBuilder.addItems(
 			"Use the arrow buttons to navigate through the pages" + generatePageMap() + "\n\n<> = required [] = optional"
@@ -995,8 +1022,18 @@ public class HelpSlashCommand extends SlashCommand {
 
 	private static String generatePageMap() {
 		StringBuilder generatedStr = new StringBuilder();
-		for (int i = 1; i < pageTitles.length; i++) {
-			generatedStr.append("\n• **Page ").append(i + 1).append(":** ").append(pageTitles[i]);
+		int i = 1;
+		for (Map.Entry<String, String> entry : pageTitleToCategory.entrySet()) {
+			generatedStr
+				.append("\n• **Page ")
+				.append(i + 1)
+				.append(":** ")
+				.append("[")
+				.append(entry.getKey())
+				.append("](https://skyblock-plus.vercel.app/commands")
+				.append(entry.getValue())
+				.append(")");
+			i++;
 		}
 		return generatedStr.toString();
 	}

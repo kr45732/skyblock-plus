@@ -76,13 +76,13 @@ public class HelpData {
 			return defaultEmbed("Invalid Command");
 		}
 
-		EmbedBuilder eb = defaultEmbed(getCategory() + " | " + getName());
+		EmbedBuilder eb = defaultEmbed(getCategory() + " | " + getName(), "https://skyblock-plus.vercel.app/commands?command=" + getName());
 		eb.addField("Description", getDescription(), false);
 		eb.addField("Usage", getUsageFormatted(), false);
-		if (examples.size() > 0) {
+		if (!examples.isEmpty()) {
 			eb.addField(examples.size() == 1 ? "Example" : "Examples", getExamples(), false);
 		}
-		if (subcommands.size() > 0) {
+		if (!subcommands.isEmpty()) {
 			eb.addField(subcommands.size() == 1 ? "Subcommand" : "Subcommands", getSubcommandsFormatted(), false);
 		}
 
