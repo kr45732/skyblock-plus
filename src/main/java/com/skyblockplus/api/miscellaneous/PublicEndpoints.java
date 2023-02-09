@@ -21,6 +21,7 @@ package com.skyblockplus.api.miscellaneous;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.features.jacob.JacobData;
@@ -207,13 +208,18 @@ public class PublicEndpoints {
 			body.add("metadata", metadata);
 
 			return CompletableFuture.supplyAsync(
-				() ->
-					putJson(
-						"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
-						body,
-						new BasicHeader("Authorization", "Bearer " + tokenData.accessToken())
-					) !=
-					null,
+				() -> {
+					try {
+						return putJson(
+								"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
+								body,
+								new BasicHeader("Authorization", "Bearer " + tokenData.accessToken())
+						) != null;
+					} catch (Exception e) {
+						e.printStackTrace();
+						return false;
+					}
+				},
 				executor
 			);
 		} catch (Exception e) {
