@@ -78,6 +78,7 @@ public class LevelSlashCommand extends SlashCommand {
 		}
 
 		LevelRecord coreTasks = getCoreTasksEmbed(player);
+		LevelRecord eventTasks = getEventTasksEmbed(player);
 		LevelRecord dungeonTasks = getDungeonTasks(player);
 		LevelRecord essenceShopTasks = getEssenceShopTasks(player);
 		LevelRecord slayingTasks = getSlayingTasks(player);
@@ -89,6 +90,7 @@ public class LevelSlashCommand extends SlashCommand {
 		double calculatedSbLevel =
 			(
 				coreTasks.total() +
+				eventTasks.total() +
 				dungeonTasks.total() +
 				essenceShopTasks.total() +
 				slayingTasks.total() +
@@ -115,6 +117,10 @@ public class LevelSlashCommand extends SlashCommand {
 				getEmoji("NETHER_STAR") +
 				" Core Tasks: " +
 				coreTasks.getFormatted() +
+				"\n" +
+				getEmoji("WATCH") +
+				" Event Tasks: " +
+				eventTasks.getFormatted() +
 				"\n" +
 				DUNGEON_EMOJI_MAP.get("catacombs") +
 				" Dungeon Tasks: " +
@@ -144,6 +150,7 @@ public class LevelSlashCommand extends SlashCommand {
 		Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 		pages.put(SelectOption.of("Overview", "overview"), eb);
 		pages.put(SelectOption.of("Core Tasks", "core_tasks").withEmoji(getEmojiObj("NETHER_STAR")), coreTasks.eb());
+		pages.put(SelectOption.of("Event Tasks", "event_tasks").withEmoji(getEmojiObj("WATCH")), eventTasks.eb());
 		pages.put(
 			SelectOption.of("Dungeon Tasks", "dungeon_tasks").withEmoji(Emoji.fromFormatted(DUNGEON_EMOJI_MAP.get("catacombs"))),
 			dungeonTasks.eb()
@@ -194,10 +201,10 @@ public class LevelSlashCommand extends SlashCommand {
 		int fairySoulSbXp = player.getFairySouls() / 5 * 10;
 
 		// Accessories
-		int magicPowerSbXp = player.getMagicPower();
+		int magicPowerSbXp = higherDepth(player.profileJson(), "accessory_bag_storage.highest_magical_power", player.getMagicPower());
 
 		// Pets
-		int petScoreSbXp = player.getPetScore() * 3;
+		int petScoreSbXp = higherDepth(player.profileJson(), "leveling.highest_pet_score", player.getPetScore()) * 3;
 
 		// Collections
 		Map<String, Long> collections = new HashMap<>();
@@ -239,6 +246,23 @@ public class LevelSlashCommand extends SlashCommand {
 			minionsSbXp += higherDepth(getMiscJson(), "minionXp." + uniqueCraftedMinion.substring(idx + 1)).getAsInt();
 		}
 
+		// Bank upgrades
+		int bankUpgradesSbXp = 0;
+		for (JsonElement task : higherDepth(player.profileJson(), "leveling.completed_tasks").getAsJsonArray()) {
+			if (task.getAsString().startsWith("BANK_UPGRADE_")) {
+				bankUpgradesSbXp +=
+					switch (task.getAsString().split("BANK_UPGRADE_")[1]) {
+						case "GOLD" -> 10;
+						case "DELUXE" -> 15;
+						case "SUPER_DELUXE" -> 20;
+						case "PREMIER" -> 30;
+						case "LUXURIOUS" -> 40;
+						case "PALATIAL" -> 50;
+						default -> 0;
+					};
+			}
+		}
+
 		// Core tasks total
 		LevelRecord levelRecord = new LevelRecord(
 			eb,
@@ -251,7 +275,44 @@ public class LevelSlashCommand extends SlashCommand {
 		eb.appendDescription("\n" + getEmoji("BONE") + " Pet Score: " + formatNumber(petScoreSbXp));
 		eb.appendDescription("\n" + getEmoji("PAINTING") + " Collections: " + formatNumber(collectionsSbXp) + " / 2,452");
 		eb.appendDescription("\n" + getEmoji("COBBLESTONE_GENERATOR_1") + " Craft Minions: " + formatNumber(minionsSbXp) + " / 2,801");
+		eb.appendDescription("\n" + getEmoji("PERSONAL_BANK_ITEM") + " Bank Upgrades: " + formatNumber(bankUpgradesSbXp) + " / 200");
 		eb.getDescriptionBuilder().insert(0, getEmoji("NETHER_STAR") + " **Core Tasks:** " + levelRecord.getFormatted() + "\n");
+
+		return levelRecord;
+	}
+
+	public static LevelRecord getEventTasksEmbed(Player player) {
+		EmbedBuilder eb = player.defaultPlayerEmbed(" | Event Tasks");
+
+		// Mining fiesta
+		int miningFiestaSbXp = higherDepth(player.profileJson(), "leveling.mining_fiesta_ores_mined", 0) / 1000;
+
+		// Fishing festival
+		int fishingFestivalSbXp = higherDepth(player.profileJson(), "leveling.fishing_festival_sharks_killed", 0) / 50;
+
+		// Spooky festival
+		int spookyFestivalSbXp = 0;
+		for (JsonElement task : higherDepth(player.profileJson(), "leveling.completed_tasks").getAsJsonArray()) {
+			if (task.getAsString().startsWith("SPOOKY_FESTIVAL_")) {
+				spookyFestivalSbXp +=
+					switch (task.getAsString().split("SPOOKY_FESTIVAL_")[1]) {
+						case "WOOD" -> 10;
+						case "STONE" -> 20;
+						case "IRON" -> 30;
+						case "GOLD" -> 40;
+						case "DIAMOND" -> 50;
+						case "EMERALD" -> 75;
+						default -> 0;
+					};
+			}
+		}
+
+		// Core tasks total
+		LevelRecord levelRecord = new LevelRecord(eb, miningFiestaSbXp + fishingFestivalSbXp + spookyFestivalSbXp, 525);
+		eb.appendDescription("\n" + getEmoji("IRON_PICKAXE") + " Mining Fiesta: " + formatNumber(miningFiestaSbXp) + " / 200");
+		eb.appendDescription("\n" + getEmoji("FISHING_ROD") + " Fishing Festival: " + formatNumber(fishingFestivalSbXp) + " / 100");
+		eb.appendDescription("\n" + getEmoji("JACK_O_LANTERN") + " Spooky Festival: " + formatNumber(spookyFestivalSbXp) + " / 225");
+		eb.getDescriptionBuilder().insert(0, getEmoji("WATCH") + " **Event Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
 	}
@@ -504,18 +565,15 @@ public class LevelSlashCommand extends SlashCommand {
 		}
 
 		// Slaying tasks total
-		LevelRecord levelRecord = new LevelRecord(
-			eb,
+		int categorySbXp =
 			slayerLevelUpSbXp +
 			bossCollectionsSbXp +
-			bestiarySbXp +
 			mythologicalKillsSbXp +
 			dragonSlaySbXp +
 			defeatSlayerSbXp +
 			defeatKuudraSbXp +
-			defeatedArachneSbXp,
-			6125
-		);
+			defeatedArachneSbXp;
+		LevelRecord levelRecord = new LevelRecord(eb, categorySbXp + bestiarySbXp, categorySbXp, 6125);
 		eb.appendDescription("\n" + getEmoji("EXP_BOTTLE") + " Slayer Level Up: " + formatNumber(slayerLevelUpSbXp) + " / 3,625");
 		eb.appendDescription(
 			"\n" + getEmoji("DIAMOND_THORN_HEAD") + " Boss Collections: " + formatNumber(bossCollectionsSbXp) + " / 1,015"
@@ -602,6 +660,9 @@ public class LevelSlashCommand extends SlashCommand {
 			}
 		}
 
+		// Crystal nucleus runs
+		int crystalNucleusRuns = higherDepth(player.profileJson(), "leveling.completions.NUCLEUS_RUNS", 0) * 4;
+
 		// Peak of the mountain
 		int peakOfTheMountainSbXp = 0;
 		int potmLevel = higherDepth(player.profileJson(), "mining_core.nodes.special_0", 0);
@@ -634,6 +695,7 @@ public class LevelSlashCommand extends SlashCommand {
 		miningStr += "\n" + getEmoji("DIVAN_DRILL") + " Heart Of The Mountain: " + formatNumber(hotmSbXp) + " / 545";
 		miningStr += "\n" + getEmoji("MITHRIL_ORE") + " Powder: " + formatNumber(powderSbXp) + " / 1,080";
 		miningStr += "\n" + getEmoji("ROYAL_PIGEON") + " Commission Milestones: " + formatNumber(commissionsSbXp) + " / 255";
+		miningStr += "\n" + getEmoji("NETHER_STAR") + " Crystal Nucleus Runs: " + formatNumber(crystalNucleusRuns) + " / 200";
 		miningStr += "\n" + getEmoji("REDSTONE_BLOCK") + " Peak Of The Mountain: " + formatNumber(peakOfTheMountainSbXp) + " / 475";
 		miningStr += "\n" + getEmoji("ROCK;4") + " Rock Milestones: " + formatNumber(rockPetSbXp) + " / 100";
 		eb.addField("Mining | " + formatNumber(miningTotalSbXp) + " / 2,655", miningStr, false);
