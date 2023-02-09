@@ -63,7 +63,6 @@ public class ApiHandler {
 	public static String ahApiUrl = "";
 	public static int mojangApiNum = 0;
 	public static boolean allowMojangApi = false;
-	public static ScheduledFuture<?> updateCacheTask;
 
 	public static void initialize() {
 		try {
@@ -74,25 +73,21 @@ public class ApiHandler {
 			cacheDatabase.initializeJacobData();
 			cacheDatabase.initializeAhTracker();
 			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
-			updateCacheTask =
-				scheduler.scheduleWithFixedDelay(
-					() -> {
-						try {
-							cacheApplyGuildUsers();
-							cacheParties();
-							cacheCommandUses();
-							cacheAhTracker();
-						} catch (Exception e) {
-							log.error("Exception when interval caching", e);
-						}
-					},
-					60,
-					60,
-					TimeUnit.MINUTES
-				);
+			scheduler.scheduleWithFixedDelay(ApiHandler::updateCaches, 60, 60, TimeUnit.MINUTES);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			log.error("Exception when initializing the ApiHandler", e);
+		}
+	}
+
+	public static void updateCaches() {
+		try {
+			cacheApplyGuildUsers();
+			cacheParties();
+			cacheCommandUses();
+			cacheAhTracker();
+		} catch (Exception e) {
+			log.error("Exception when interval caching", e);
 		}
 	}
 

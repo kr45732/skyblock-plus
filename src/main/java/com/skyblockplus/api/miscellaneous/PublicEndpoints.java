@@ -21,17 +21,28 @@ package com.skyblockplus.api.miscellaneous;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonObject;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.general.help.HelpSlashCommand;
+import com.skyblockplus.utils.oauth.TokenData;
+import java.net.URI;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.apache.groovy.util.Maps;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicHeader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping(value = "/api/public")
@@ -113,6 +124,101 @@ public class PublicEndpoints {
 			return new ResponseEntity<>(Maps.of("last_updated", lastUpdated == null ? -1 : lastUpdated.toEpochMilli()), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/discord/verify")
+	public ResponseEntity<?> getDiscordVerify(HttpServletResponse res, HttpServletRequest req) {
+		try {
+			String redirectUri = ServletUriComponentsBuilder
+				.fromRequest(req)
+				.replacePath("/api/public/discord/oauth")
+				.build()
+				.toUriString();
+			String state = oAuthClient.generateState(redirectUri);
+
+			URI url = new URIBuilder("https://discord.com/api/oauth2/authorize")
+				.addParameter("client_id", selfUserId)
+				.addParameter("redirect_uri", redirectUri)
+				.addParameter("response_type", "code")
+				.addParameter("state", state)
+				.addParameter("scope", "role_connections.write identify")
+				.addParameter("prompt", "consent")
+				.build();
+
+			Cookie stateCookie = new Cookie("clientState", state);
+			stateCookie.setMaxAge(1000 * 60 * 5);
+			res.addCookie(stateCookie);
+
+			return ResponseEntity.status(HttpStatus.FOUND).location(url).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/discord/oauth")
+	public ResponseEntity<?> getDiscordOauth(
+		HttpServletResponse res,
+		HttpServletRequest req,
+		@RequestParam(value = "code") String code,
+		@RequestParam(value = "state") String state,
+		@CookieValue(value = "clientState") String clientState
+	) {
+		try {
+			if (!Objects.equals(clientState, state)) {
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			}
+
+			String redirectUri = oAuthClient.consumeState(state);
+			if (redirectUri == null) {
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			}
+
+			TokenData tokenData = oAuthClient.postToken(code, redirectUri);
+			String userId = oAuthClient.getDiscord(tokenData);
+
+			if (updateLinkedRolesMetadata(userId, database.getByDiscord(userId)).get()) {
+				res.sendRedirect("/success.html");
+				return new ResponseEntity<>(HttpStatus.FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	public static CompletableFuture<Boolean> updateLinkedRolesMetadata(String discord, LinkedAccount linkedAccount) {
+		try {
+			TokenData tokenData = oAuthClient.getToken(discord);
+			if (tokenData == null) {
+				return CompletableFuture.completedFuture(false);
+			}
+
+			JsonObject body = new JsonObject();
+			JsonObject metadata = new JsonObject();
+			if (linkedAccount != null) {
+				body.addProperty("platform_username", linkedAccount.username());
+				metadata.addProperty("verified", 1);
+			} else {
+				metadata.addProperty("verified", 0);
+			}
+			body.addProperty("platform_name", "Skyblock Plus");
+			body.add("metadata", metadata);
+
+			return CompletableFuture.supplyAsync(
+				() ->
+					putJson(
+						"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
+						body,
+						new BasicHeader("Authorization", "Bearer " + tokenData.accessToken())
+					) !=
+					null,
+				executor
+			);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return CompletableFuture.completedFuture(false);
 		}
 	}
 }

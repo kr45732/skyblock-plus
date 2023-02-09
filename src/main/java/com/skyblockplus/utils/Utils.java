@@ -44,6 +44,7 @@ import com.skyblockplus.utils.database.Database;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
 import com.skyblockplus.utils.exceptionhandler.ExceptionScheduler;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
+import com.skyblockplus.utils.oauth.OAuthClient;
 import com.skyblockplus.utils.structs.*;
 import java.awt.*;
 import java.io.*;
@@ -88,10 +89,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import okhttp3.OkHttpClient;
 import org.apache.http.Header;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -160,6 +158,8 @@ public class Utils {
 	public static final JDAWebhookClient botStatusWebhook = new WebhookClientBuilder(
 		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
 	)
+		.setExecutorService(scheduler)
+		.setHttpClient(okHttpClient)
 		.buildJDA();
 	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[\\dA-FK-OR]");
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
@@ -175,6 +175,7 @@ public class Utils {
 	public static String PLANET_SCALE_URL = "";
 	public static String SBZ_SCAMMER_DB_KEY = "";
 	public static String LEADERBOARD_DB_URL = "";
+	public static String CLIENT_SECRET = "";
 	/* JSON */
 	private static JsonObject essenceCostsJson;
 	private static JsonObject levelingJson;
@@ -221,6 +222,7 @@ public class Utils {
 	public static GlobalExceptionHandler globalExceptionHandler;
 	public static CommandClient client;
 	public static SlashCommandClient slashCommandClient;
+	public static OAuthClient oAuthClient;
 	public static JsonObject allServerSettings;
 	public static ConfigurableApplicationContext springContext;
 	public static String selfUserId;
@@ -697,6 +699,26 @@ public class Utils {
 		return null;
 	}
 
+	public static JsonElement putJson(String url, JsonElement body, Header... headers) {
+		try {
+			HttpPut httpPut = new HttpPut(url);
+
+			StringEntity entity = new StringEntity(body.toString(), "UTF-8");
+			httpPut.setEntity(entity);
+			httpPut.setHeaders(headers);
+			httpPut.setHeader("Content-Type", "application/json");
+			httpPut.setHeader("Accept", "application/json");
+
+			try (
+				CloseableHttpResponse httpResponse = httpClient.execute(httpPut);
+				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
+			) {
+				return JsonParser.parseReader(in);
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
 	public static JsonElement deleteUrl(String url, Header... headers) {
 		try {
 			HttpDelete httpDelete = new HttpDelete(url);
@@ -1124,6 +1146,7 @@ public class Utils {
 			PLANET_SCALE_URL = (String) appProps.get("PLANET_SCALE_URL");
 			SBZ_SCAMMER_DB_KEY = (String) appProps.get("SBZ_SCAMMER_DB_KEY");
 			LEADERBOARD_DB_URL = (String) appProps.get("LEADERBOARD_DB_URL");
+			CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -1136,6 +1159,7 @@ public class Utils {
 			PLANET_SCALE_URL = System.getenv("PLANET_SCALE_URL");
 			SBZ_SCAMMER_DB_KEY = System.getenv("SBZ_SCAMMER_DB_KEY");
 			LEADERBOARD_DB_URL = System.getenv("LEADERBOARD_DB_URL");
+			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
 		}
 	}
 
@@ -1538,6 +1562,7 @@ public class Utils {
 			return;
 		}
 
+		log.info("Caching Apply Users");
 		long startTime = System.currentTimeMillis();
 		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
 			List<ApplyGuild> applySettings = automaticGuild.getValue().applyGuild;
@@ -1587,6 +1612,7 @@ public class Utils {
 			return;
 		}
 
+		log.info("Caching Parties");
 		long startTime = System.currentTimeMillis();
 		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
 			try {
@@ -1641,6 +1667,7 @@ public class Utils {
 			return;
 		}
 
+		log.info("Caching Command Uses");
 		long startTime = System.currentTimeMillis();
 		if (cacheDatabase.cacheCommandUsage(gson.toJson(getCommandUses()))) {
 			log.info("Cached command uses in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
@@ -1654,6 +1681,7 @@ public class Utils {
 			return;
 		}
 
+		log.info("Caching Auction Tracker");
 		long startTime = System.currentTimeMillis();
 		if (cacheDatabase.cacheAhTracker(gson.toJson(AuctionTracker.commandAuthorToTrackingUser))) {
 			log.info(
@@ -1682,6 +1710,7 @@ public class Utils {
 
 	public static void closeHttpClient() {
 		try {
+			log.info("Closing Http Client");
 			httpClient.close();
 			log.info("Successfully Closed Http Client");
 		} catch (Exception e) {

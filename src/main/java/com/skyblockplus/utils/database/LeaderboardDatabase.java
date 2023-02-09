@@ -101,7 +101,6 @@ public class LeaderboardDatabase {
 		Player.Gamemode.STRANDED
 	);
 	public int userCount = -1;
-	public ScheduledFuture<?> updateTask;
 
 	public LeaderboardDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -110,7 +109,7 @@ public class LeaderboardDatabase {
 		dataSource = new HikariDataSource(config);
 
 		if (isMainBot()) {
-			updateTask = scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
+			scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
 	}
 
@@ -661,6 +660,8 @@ public class LeaderboardDatabase {
 	}
 
 	public void close() {
+		log.info("Closing leaderboard database");
 		dataSource.close();
+		log.info("Successfully closed leaderboard database");
 	}
 }

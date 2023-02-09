@@ -24,6 +24,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.api.miscellaneous.PublicEndpoints;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
@@ -232,6 +233,8 @@ public class Database {
 			String username = linkedAccount.username();
 			String uuid = linkedAccount.uuid();
 
+			PublicEndpoints.updateLinkedRolesMetadata(discord, linkedAccount);
+
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
@@ -291,6 +294,7 @@ public class Database {
 	}
 
 	public boolean deleteByDiscord(String discord) {
+		PublicEndpoints.updateLinkedRolesMetadata(discord, null);
 		return deleteBy("discord", discord);
 	}
 
