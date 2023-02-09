@@ -68,7 +68,7 @@ public class Main {
 
 	public static final Logger log = LoggerFactory.getLogger(Main.class);
 
-	public static void main1(String[] args) throws IllegalArgumentException {
+	public static void main(String[] args) throws IllegalArgumentException {
 		globalExceptionHandler = new GlobalExceptionHandler();
 		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
 		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
