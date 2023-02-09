@@ -1160,7 +1160,7 @@ public class Player {
 
 	public double getLevel() {
 		if (higherDepth(profileJson(), "leveling.experience") != null) {
-			return getLevel();
+			return getExactLevel();
 		}
 
 		return (
