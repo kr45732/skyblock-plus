@@ -210,11 +210,14 @@ public class PublicEndpoints {
 			return CompletableFuture.supplyAsync(
 				() -> {
 					try {
-						return putJson(
+						return (
+							putJson(
 								"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
 								body,
 								new BasicHeader("Authorization", "Bearer " + tokenData.accessToken())
-						) != null;
+							) !=
+							null
+						);
 					} catch (Exception e) {
 						e.printStackTrace();
 						return false;
