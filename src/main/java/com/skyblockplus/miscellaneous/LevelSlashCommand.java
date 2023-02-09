@@ -691,7 +691,7 @@ public class LevelSlashCommand extends SlashCommand {
 			}
 		}
 
-		int miningTotalSbXp = hotmSbXp + powderSbXp + commissionsSbXp + peakOfTheMountainSbXp + rockPetSbXp;
+		int miningTotalSbXp = hotmSbXp + powderSbXp + commissionsSbXp + crystalNucleusRuns + peakOfTheMountainSbXp + rockPetSbXp;
 		miningStr += "\n" + getEmoji("DIVAN_DRILL") + " Heart Of The Mountain: " + formatNumber(hotmSbXp) + " / 545";
 		miningStr += "\n" + getEmoji("MITHRIL_ORE") + " Powder: " + formatNumber(powderSbXp) + " / 1,080";
 		miningStr += "\n" + getEmoji("ROYAL_PIGEON") + " Commission Milestones: " + formatNumber(commissionsSbXp) + " / 255";
