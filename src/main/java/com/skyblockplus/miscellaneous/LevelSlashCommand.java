@@ -86,6 +86,7 @@ public class LevelSlashCommand extends SlashCommand {
 		LevelRecord miscellaneousTasks = getMiscellaneousTasks(player);
 		LevelRecord storyTasks = getStoryTasks(player);
 
+		boolean isEstimated = higherDepth(player.profileJson(), "leveling.experience") == null;
 		double apiSbLevel = player.getExactLevel();
 		double calculatedSbLevel =
 			(
@@ -106,12 +107,12 @@ public class LevelSlashCommand extends SlashCommand {
 			.defaultPlayerEmbed()
 			.setDescription(
 				"<:levels:1067859971221499954> **" +
-				(apiSbLevel == 0 ? "Estimated " : "") +
+				(isEstimated ? "Estimated " : "") +
 				"Level:** " +
 				roundAndFormat(displaySbLevel) +
-				"\n**" +
-				(apiSbLevel == 0 ? "Estimated " : "") +
-				"<:levels:1067859971221499954> Level Color:** " +
+				"\n<:levels:1067859971221499954> **" +
+				(isEstimated ? "Estimated " : "") +
+				"Level Color:** " +
 				player.getLevelColor((int) displaySbLevel) +
 				"\n\n" +
 				getEmoji("NETHER_STAR") +
@@ -248,27 +249,27 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Bank upgrades
 		int bankUpgradesSbXp = 0;
-		for (JsonElement task : higherDepth(player.profileJson(), "leveling.completed_tasks").getAsJsonArray()) {
-			if (task.getAsString().startsWith("BANK_UPGRADE_")) {
-				bankUpgradesSbXp +=
-					switch (task.getAsString().split("BANK_UPGRADE_")[1]) {
-						case "GOLD" -> 10;
-						case "DELUXE" -> 15;
-						case "SUPER_DELUXE" -> 20;
-						case "PREMIER" -> 30;
-						case "LUXURIOUS" -> 40;
-						case "PALATIAL" -> 50;
-						default -> 0;
-					};
+		JsonElement completedTasks = higherDepth(player.profileJson(), "leveling.completed_tasks");
+		if (completedTasks != null) {
+			for (JsonElement task : completedTasks.getAsJsonArray()) {
+				if (task.getAsString().startsWith("BANK_UPGRADE_")) {
+					bankUpgradesSbXp +=
+						switch (task.getAsString().split("BANK_UPGRADE_")[1]) {
+							case "GOLD" -> 10;
+							case "DELUXE" -> 15;
+							case "SUPER_DELUXE" -> 20;
+							case "PREMIER" -> 30;
+							case "LUXURIOUS" -> 40;
+							case "PALATIAL" -> 50;
+							default -> 0;
+						};
+				}
 			}
 		}
 
 		// Core tasks total
-		LevelRecord levelRecord = new LevelRecord(
-			eb,
-			skillsSbXp + fairySoulSbXp + magicPowerSbXp + petScoreSbXp + collectionsSbXp + minionsSbXp,
-			15430
-		);
+		int categoryTotal = skillsSbXp + fairySoulSbXp + collectionsSbXp + minionsSbXp;
+		LevelRecord levelRecord = new LevelRecord(eb, categoryTotal + magicPowerSbXp + petScoreSbXp, categoryTotal, 15430);
 		eb.appendDescription("\n" + getEmoji("DIAMOND_SWORD") + " Skill Level Up: " + formatNumber(skillsSbXp) + " / 7,500");
 		eb.appendDescription("\n" + getEmoji("REVIVE_STONE") + " Fairy Souls: " + formatNumber(fairySoulSbXp) + " / 470");
 		eb.appendDescription("\n" + getEmoji("HEGEMONY_ARTIFACT") + " Accessory Bag: " + formatNumber(magicPowerSbXp));
@@ -285,25 +286,28 @@ public class LevelSlashCommand extends SlashCommand {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Event Tasks");
 
 		// Mining fiesta
-		int miningFiestaSbXp = higherDepth(player.profileJson(), "leveling.mining_fiesta_ores_mined", 0) / 1000;
+		int miningFiestaSbXp = higherDepth(player.profileJson(), "leveling.mining_fiesta_ores_mined", 0) / 5000;
 
 		// Fishing festival
 		int fishingFestivalSbXp = higherDepth(player.profileJson(), "leveling.fishing_festival_sharks_killed", 0) / 50;
 
 		// Spooky festival
 		int spookyFestivalSbXp = 0;
-		for (JsonElement task : higherDepth(player.profileJson(), "leveling.completed_tasks").getAsJsonArray()) {
-			if (task.getAsString().startsWith("SPOOKY_FESTIVAL_")) {
-				spookyFestivalSbXp +=
-					switch (task.getAsString().split("SPOOKY_FESTIVAL_")[1]) {
-						case "WOOD" -> 10;
-						case "STONE" -> 20;
-						case "IRON" -> 30;
-						case "GOLD" -> 40;
-						case "DIAMOND" -> 50;
-						case "EMERALD" -> 75;
-						default -> 0;
-					};
+		JsonElement completedTasks = higherDepth(player.profileJson(), "leveling.completed_tasks");
+		if (completedTasks != null) {
+			for (JsonElement task : completedTasks.getAsJsonArray()) {
+				if (task.getAsString().startsWith("SPOOKY_FESTIVAL_")) {
+					spookyFestivalSbXp +=
+						switch (task.getAsString().split("SPOOKY_FESTIVAL_")[1]) {
+							case "WOOD" -> 10;
+							case "STONE" -> 20;
+							case "IRON" -> 30;
+							case "GOLD" -> 40;
+							case "DIAMOND" -> 50;
+							case "EMERALD" -> 75;
+							default -> 0;
+						};
+				}
 			}
 		}
 
