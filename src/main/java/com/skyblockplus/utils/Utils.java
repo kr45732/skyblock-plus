@@ -426,7 +426,7 @@ public class Utils {
 	public static JsonObject getEssenceShopsJson() {
 		if (essenceShopsJson == null) {
 			essenceShopsJson =
-				getJsonObject("https://raw.githubusercontent.com/jani270/NotEnoughUpdates-REPO/master/constants/essenceshops.json");
+				getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/essenceshops.json");
 		}
 
 		return essenceShopsJson;
