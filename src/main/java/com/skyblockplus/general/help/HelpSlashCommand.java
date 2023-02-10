@@ -263,7 +263,8 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("emoji", "Get a player's talisman bag represented in emojis.", "emoji [player] [profile]"),
 						new HelpData("list", "Get a player's talisman bag with lore.", "list [player] [profile] [slot]"),
 						new HelpData("tuning", "Get a player's power stone stats and tuning stats", "list [player] [profile]")
-					),
+					)
+					.setCategory("inventory"),
 				new HelpData(
 					"sacks",
 					"Get a player's sacks' content bag represented in a list. Sorted by descending price.",
@@ -1022,18 +1023,20 @@ public class HelpSlashCommand extends SlashCommand {
 
 	private static String generatePageMap() {
 		StringBuilder generatedStr = new StringBuilder();
-		int i = 1;
+		int i = 2;
 		for (Map.Entry<String, String> entry : pageTitleToCategory.entrySet()) {
-			generatedStr
-				.append("\n• **Page ")
-				.append(i + 1)
-				.append(":** ")
-				.append("[")
-				.append(entry.getKey())
-				.append("](https://skyblock-plus.vercel.app/commands")
-				.append(entry.getValue())
-				.append(")");
-			i++;
+			if (!entry.getKey().equals("Navigation")) {
+				generatedStr
+					.append("\n• **Page ")
+					.append(i)
+					.append(":** ")
+					.append("[")
+					.append(entry.getKey())
+					.append("](https://skyblock-plus.vercel.app/commands")
+					.append(entry.getValue())
+					.append(")");
+				i++;
+			}
 		}
 		return generatedStr.toString();
 	}

@@ -1245,7 +1245,7 @@ public class Player {
 
 		int magicPower = 0;
 		for (Map.Entry<String, Integer> entry : rarityToMagicPower.entrySet()) {
-			long count = accessoryBag.stream().filter(i -> i.getRarity().equals(entry.getKey())).count();
+			long count = accessoryBag.stream().filter(i -> Objects.equals(i.getRarity(), entry.getKey())).count();
 			long power = count * entry.getValue();
 			magicPower += power;
 		}

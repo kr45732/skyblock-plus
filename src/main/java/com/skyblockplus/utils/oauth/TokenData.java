@@ -35,8 +35,8 @@ public final class TokenData {
 	private String accessToken;
 	private String refreshToken;
 	private String tokenType;
-	private Instant expiresAt;
-	private Instant lastMetadataUpdate;
+	private long expiresAt;
+	private long lastMetadataUpdate = -1;
 	private JsonObject body;
 
 	public TokenData(JsonElement json) {
@@ -55,31 +55,27 @@ public final class TokenData {
 		return tokenType;
 	}
 
-	public Instant expiresAt() {
-		return expiresAt;
-	}
-
 	public void refreshData(JsonElement json) {
 		this.accessToken = higherDepth(json, "access_token").getAsString();
 		this.refreshToken = higherDepth(json, "refresh_token").getAsString();
 		this.tokenType = higherDepth(json, "token_type").getAsString();
-		this.expiresAt = Instant.now().plusSeconds(higherDepth(json, "expires_in").getAsLong());
+		this.expiresAt = Instant.now().plusSeconds(higherDepth(json, "expires_in").getAsLong()).toEpochMilli();
 	}
 
 	public boolean isExpired() {
-		return expiresAt().isBefore(Instant.now());
+		return Instant.ofEpochMilli(expiresAt).isBefore(Instant.now());
 	}
 
 	public boolean shouldUpdateMetadata() {
-		return lastMetadataUpdate == null || Duration.between(lastMetadataUpdate, Instant.now()).toMinutes() >= 5;
+		return lastMetadataUpdate == -1 || Duration.between(Instant.ofEpochMilli(lastMetadataUpdate), Instant.now()).toMinutes() >= 5;
 	}
 
 	public long getMetadata(String key, long defaultValue) {
 		return higherDepth(body, "metadata." + key, defaultValue);
 	}
 
-	public boolean updateMetaData(JsonObject body) {
-		this.lastMetadataUpdate = Instant.now();
+	public boolean updateMetadata(JsonObject body) {
+		this.lastMetadataUpdate = Instant.now().toEpochMilli();
 		this.body = body;
 		JsonElement data = putJson(
 			"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
@@ -136,7 +132,7 @@ public final class TokenData {
 				return CompletableFuture.completedFuture(true);
 			}
 
-			return CompletableFuture.supplyAsync(() -> tokenData.updateMetaData(body), executor);
+			return CompletableFuture.supplyAsync(() -> tokenData.updateMetadata(body), executor);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return CompletableFuture.completedFuture(false);

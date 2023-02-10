@@ -126,4 +126,8 @@ public class OAuthClient {
 			.addParameter("prompt", "consent")
 			.build();
 	}
+
+	public Map<String, TokenData> getTokensMap() {
+		return discordToToken;
+	}
 }

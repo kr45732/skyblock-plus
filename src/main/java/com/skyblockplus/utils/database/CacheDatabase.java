@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils.database;
 
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -26,8 +27,10 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
+import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.price.AuctionTracker;
+import com.skyblockplus.utils.oauth.TokenData;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -152,45 +155,101 @@ public class CacheDatabase {
 		} catch (Exception ignored) {}
 	}
 
-	public boolean cachePartyData(String guildId, String json) {
-		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
-			statement.executeUpdate(
-				"INSERT INTO party VALUES ('" +
-				guildId +
-				"', '" +
-				json +
-				"') ON DUPLICATE KEY UPDATE guild_id = VALUES(guild_id), data = VALUES(data)"
-			);
-			return true;
-		} catch (Exception e) {
-			return false;
+	public void cachePartyData() {
+		if (!isMainBot()) {
+			return;
 		}
+
+		log.info("Caching Parties");
+		long startTime = System.currentTimeMillis();
+		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
+			try {
+				List<Party> partyList = automaticGuild.getValue().partyList;
+				if (!partyList.isEmpty()) {
+					String partySettingsJson = gson.toJson(partyList);
+					try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+						statement.executeUpdate(
+							"INSERT INTO party VALUES ('" +
+							automaticGuild.getValue().guildId +
+							"', '" +
+							partySettingsJson +
+							"') ON DUPLICATE KEY UPDATE guild_id = VALUES(guild_id), data = VALUES(data)"
+						);
+						log.info("Successfully cached PartyList | " + automaticGuild.getKey() + " | " + partyList.size());
+					}
+				}
+			} catch (Exception e) {
+				log.error(automaticGuild.getKey(), e);
+			}
+		}
+
+		log.info("Cached parties in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 	}
 
-	public boolean cacheCommandUsage(String json) {
+	public void cacheCommandUsesData() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		log.info("Caching Command Uses");
+		long startTime = System.currentTimeMillis();
+		String json = gson.toJson(getCommandUses());
 		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
 			statement.executeUpdate("INSERT INTO commands VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
-			return true;
+			log.info("Cached command uses in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 		} catch (Exception e) {
-			return false;
+			log.error("Failed to cache command uses in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 		}
 	}
 
-	public boolean cacheAhTracker(String json) {
+	public void cacheAhTrackerData() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		log.info("Caching Auction Tracker");
+		long startTime = System.currentTimeMillis();
+		String json = gson.toJson(AuctionTracker.commandAuthorToTrackingUser);
 		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
 			statement.executeUpdate("INSERT INTO ah_track VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
-			return true;
+			log.info(
+				"Cached auction tracker in " +
+				roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) +
+				"s | " +
+				AuctionTracker.commandAuthorToTrackingUser.size()
+			);
 		} catch (Exception e) {
-			return false;
+			log.error("Failed to cache auction tracker in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 		}
 	}
 
-	public boolean cacheJacobData(String json) {
+	public void cacheJacobData() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		long startTime = System.currentTimeMillis();
+		String json = gson.toJson(JacobHandler.getJacobData());
 		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
 			statement.executeUpdate("INSERT INTO jacob VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
-			return true;
+			log.info("Cached jacob data in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 		} catch (Exception e) {
-			return false;
+			log.error("Failed to cache jacob data in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
+		}
+	}
+
+	public void cacheTokensData() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		long startTime = System.currentTimeMillis();
+		String json = gson.toJson(oAuthClient.getTokensMap());
+		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+			statement.executeUpdate("INSERT INTO tokens VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
+			log.info("Cached token data in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
+		} catch (Exception e) {
+			log.error("Failed to cache token data in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 		}
 	}
 
@@ -249,6 +308,24 @@ public class CacheDatabase {
 				response.next();
 				JacobHandler.setJacobData(gson.fromJson(response.getString("data"), JacobData.class));
 				log.info("Retrieved jacob data");
+			}
+		} catch (Exception e) {
+			log.error("", e);
+		}
+	}
+
+	public void initializeTokens() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM tokens")) {
+			try (ResultSet response = statement.executeQuery()) {
+				response.next();
+				oAuthClient
+					.getTokensMap()
+					.putAll(gson.fromJson(response.getString("data"), new TypeToken<Map<String, TokenData>>() {}.getType()));
+				log.info("Retrieved tokens data");
 			}
 		} catch (Exception e) {
 			log.error("", e);

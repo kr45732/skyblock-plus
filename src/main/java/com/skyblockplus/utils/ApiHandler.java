@@ -71,6 +71,7 @@ public class ApiHandler {
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 0, 3, TimeUnit.HOURS);
 			cacheDatabase.initializeCommandUses();
 			cacheDatabase.initializeJacobData();
+			cacheDatabase.initializeTokens();
 			cacheDatabase.initializeAhTracker();
 			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCaches, 60, 60, TimeUnit.MINUTES);
@@ -83,9 +84,10 @@ public class ApiHandler {
 	public static void updateCaches() {
 		try {
 			cacheApplyGuildUsers();
-			cacheParties();
-			cacheCommandUses();
-			cacheAhTracker();
+			cacheDatabase.cachePartyData();
+			cacheDatabase.cacheCommandUsesData();
+			cacheDatabase.cacheAhTrackerData();
+			cacheDatabase.cacheTokensData();
 		} catch (Exception e) {
 			log.error("Exception when interval caching", e);
 		}

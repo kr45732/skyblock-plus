@@ -34,10 +34,7 @@ import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
-import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.listeners.AutomaticGuild;
-import com.skyblockplus.features.party.Party;
-import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommandClient;
 import com.skyblockplus.utils.database.Database;
@@ -1607,29 +1604,6 @@ public class Utils {
 		log.info("Cached apply users in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
 	}
 
-	public static void cacheParties() {
-		if (!isMainBot()) {
-			return;
-		}
-
-		log.info("Caching Parties");
-		long startTime = System.currentTimeMillis();
-		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
-			try {
-				List<Party> partyList = automaticGuild.getValue().partyList;
-				if (partyList.size() > 0) {
-					String partySettingsJson = gson.toJson(partyList);
-					if (cacheDatabase.cachePartyData(automaticGuild.getValue().guildId, partySettingsJson)) {
-						log.info("Successfully cached PartyList | " + automaticGuild.getKey() + " | " + partyList.size());
-					}
-				}
-			} catch (Exception e) {
-				log.error(automaticGuild.getKey(), e);
-			}
-		}
-		log.info("Cached parties in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
-	}
-
 	public static List<ApplyUser> getApplyGuildUsersCache(String guildId, String name) {
 		if (!isMainBot()) {
 			return new ArrayList<>();
@@ -1660,52 +1634,6 @@ public class Utils {
 		}
 
 		return new ArrayList<>();
-	}
-
-	public static void cacheCommandUses() {
-		if (!isMainBot()) {
-			return;
-		}
-
-		log.info("Caching Command Uses");
-		long startTime = System.currentTimeMillis();
-		if (cacheDatabase.cacheCommandUsage(gson.toJson(getCommandUses()))) {
-			log.info("Cached command uses in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
-		} else {
-			log.error("Failed to cache command uses in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
-		}
-	}
-
-	public static void cacheAhTracker() {
-		if (!isMainBot()) {
-			return;
-		}
-
-		log.info("Caching Auction Tracker");
-		long startTime = System.currentTimeMillis();
-		if (cacheDatabase.cacheAhTracker(gson.toJson(AuctionTracker.commandAuthorToTrackingUser))) {
-			log.info(
-				"Cached auction tracker in " +
-				roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) +
-				"s | " +
-				AuctionTracker.commandAuthorToTrackingUser.size()
-			);
-		} else {
-			log.error("Failed to cache auction tracker in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
-		}
-	}
-
-	public static void cacheJacobData() {
-		if (!isMainBot()) {
-			return;
-		}
-
-		long startTime = System.currentTimeMillis();
-		if (cacheDatabase.cacheJacobData(gson.toJson(JacobHandler.getJacobData()))) {
-			log.info("Cached jacob data in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
-		} else {
-			log.error("Failed to cache jacob data in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
-		}
 	}
 
 	public static void closeHttpClient() {

@@ -19,6 +19,7 @@
 package com.skyblockplus.api.miscellaneous;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.features.jacob.JacobData;
@@ -91,7 +92,7 @@ public class PublicEndpoints {
 			}
 
 			JacobHandler.setJacobData(jacobData);
-			cacheJacobData();
+			cacheDatabase.cacheJacobData();
 			jda.getTextChannelById("937894945564545035").sendMessage(client.getSuccess() + " Received jacob data").queue();
 			return new ResponseEntity<>(DataObject.empty().put("success", true).toMap(), HttpStatus.OK);
 		} else {
