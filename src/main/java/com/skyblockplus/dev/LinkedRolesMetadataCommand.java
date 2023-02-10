@@ -48,7 +48,7 @@ public class LinkedRolesMetadataCommand extends Command {
 				JsonObject role = new JsonObject();
 				role.addProperty("key", "verified");
 				role.addProperty("name", "Verified");
-				role.addProperty("description", "Verified");
+				role.addProperty("description", "Hypixel account linked to the bot");
 				role.addProperty("type", 7);
 				body.add(role);
 
@@ -72,7 +72,7 @@ public class LinkedRolesMetadataCommand extends Command {
 		JsonObject role = new JsonObject();
 		role.addProperty("key", key);
 		role.addProperty("name", name);
-		role.addProperty("description", "Keep this set to 1");
+		role.addProperty("description", name + " (set this to 1)");
 		role.addProperty("type", 2);
 		return role;
 	}

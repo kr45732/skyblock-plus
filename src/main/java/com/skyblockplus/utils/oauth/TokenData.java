@@ -37,7 +37,7 @@ public final class TokenData {
 	private String tokenType;
 	private Instant expiresAt;
 	private Instant lastMetadataUpdate;
-	private JsonObject metaData;
+	private JsonObject body;
 
 	public TokenData(JsonElement json) {
 		refreshData(json);
@@ -70,12 +70,17 @@ public final class TokenData {
 		return expiresAt().isBefore(Instant.now());
 	}
 
-	public boolean canUpdateMetadata() {
+	public boolean shouldUpdateMetadata() {
 		return lastMetadataUpdate == null || Duration.between(lastMetadataUpdate, Instant.now()).toMinutes() >= 5;
 	}
 
+	public long getMetadata(String key, long defaultValue) {
+		return higherDepth(body, "metadata." + key, defaultValue);
+	}
+
 	public boolean updateMetaData(JsonObject body) {
-		lastMetadataUpdate = Instant.now();
+		this.lastMetadataUpdate = Instant.now();
+		this.body = body;
 		JsonElement data = putJson(
 			"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
 			body,
@@ -96,7 +101,7 @@ public final class TokenData {
 				return CompletableFuture.completedFuture(false);
 			}
 
-			if (runCheck && !tokenData.canUpdateMetadata()) {
+			if (runCheck && !tokenData.shouldUpdateMetadata()) {
 				return CompletableFuture.completedFuture(false);
 			}
 
@@ -105,27 +110,20 @@ public final class TokenData {
 			if (linkedAccount != null) {
 				String platformUsername = linkedAccount.username();
 
-				metadata.addProperty("verified", 1);
 				if (player != null) {
 					platformUsername += " | " + player.getProfileName();
-					metadata.addProperty("level", (long) Math.max(0, player.getLevel()));
-					metadata.addProperty("networth", (long) Math.max(0, player.getNetworth()));
-					metadata.addProperty("weight", (long) Math.max(0, player.getWeight()));
-					metadata.addProperty("lily_weight", (long) Math.max(0, player.getLilyWeight()));
-
-					tokenData.setMetaData(metadata);
-				} else if (tokenData.metaData != null) {
-					metadata.add("level", tokenData.metaData.get("level"));
-					metadata.add("networth", tokenData.metaData.get("networth"));
-					metadata.add("weight", tokenData.metaData.get("weight"));
-					metadata.add("lily_weight", tokenData.metaData.get("lily_weight"));
+					metadata.addProperty("level", (long) Math.max(1, player.getLevel()));
+					metadata.addProperty("networth", (long) Math.max(1, player.getNetworth()));
+					metadata.addProperty("weight", (long) Math.max(1, player.getWeight()));
+					metadata.addProperty("lily_weight", (long) Math.max(1, player.getLilyWeight()));
 				} else {
-					metadata.addProperty("level", 1);
-					metadata.addProperty("networth", 1);
-					metadata.addProperty("weight", 1);
-					metadata.addProperty("lily_weight", 1);
+					metadata.addProperty("level", tokenData.getMetadata("level", 1));
+					metadata.addProperty("networth", tokenData.getMetadata("networth", 1));
+					metadata.addProperty("weight", tokenData.getMetadata("weight", 1));
+					metadata.addProperty("lily_weight", tokenData.getMetadata("lily_weight", 1));
 				}
 
+				metadata.addProperty("verified", 1);
 				body.addProperty("platform_name", "Skyblock Plus");
 				body.addProperty("platform_username", platformUsername);
 			} else {
@@ -133,14 +131,15 @@ public final class TokenData {
 			}
 			body.add("metadata", metadata);
 
+			// Don't update if same as the old metadata
+			if (tokenData.body != null && tokenData.body.equals(body)) {
+				return CompletableFuture.completedFuture(true);
+			}
+
 			return CompletableFuture.supplyAsync(() -> tokenData.updateMetaData(body), executor);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return CompletableFuture.completedFuture(false);
 		}
-	}
-
-	public void setMetaData(JsonObject metaData) {
-		this.metaData = metaData;
 	}
 }
