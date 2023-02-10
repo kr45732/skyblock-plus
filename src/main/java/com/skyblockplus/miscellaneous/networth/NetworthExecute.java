@@ -181,6 +181,8 @@ public class NetworthExecute {
 			return invalidEmbed("Was not triggered by command");
 		}
 
+		player.profileToNetworth.put(player.getProfileIndex(), getNetworth());
+
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 		Map<SelectOption, EmbedBuilder> pages = getPages(player, false);
 		Map<SelectOption, EmbedBuilder> soulboundIgnoredPages = getPages(player, true);

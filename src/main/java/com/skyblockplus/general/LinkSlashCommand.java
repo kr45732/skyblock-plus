@@ -29,6 +29,7 @@ import com.skyblockplus.utils.HypixelPlayer;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.utils.oauth.TokenData;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Instant;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -97,32 +99,36 @@ public class LinkSlashCommand extends SlashCommand {
 		LinkedAccount toAdd = new LinkedAccount(Instant.now().toEpochMilli(), member.getId(), playerInfo.uuid(), playerInfo.username());
 
 		if (database.insertLinkedAccount(toAdd)) {
+			EmbedBuilder eb;
 			JsonElement blacklisted = streamJsonArray(guildMap.get(guild.getId()).getBlacklist())
 				.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(toAdd.uuid()))
 				.findFirst()
 				.orElse(null);
 			if (blacklisted != null) {
-				return invalidEmbed("You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`");
+				eb = invalidEmbed("You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`");
+			} else {
+				JsonElement verifySettings = database.getVerifySettings(guild.getId());
+				if (verifySettings != null) {
+					String[] result = updateLinkedUser(verifySettings, toAdd, member);
+					String out =
+						(
+							!result[1].equals("false")
+								? result[1].equals("true") ? "\n• Successfully synced your roles" : "\n• Error syncing your roles"
+								: ""
+						) +
+						(
+							!result[0].equals("false")
+								? result[0].equals("true") ? "\n• Successfully synced your nickname" : "\n• Error syncing your nickname"
+								: ""
+						);
+					eb = defaultEmbed("Success").setDescription("You have been linked to `" + playerInfo.username() + "`\n" + out);
+				} else {
+					eb = defaultEmbed("Success").setDescription("You have been linked to `" + playerInfo.username() + "`");
+				}
 			}
 
-			JsonElement verifySettings = database.getVerifySettings(guild.getId());
-			if (verifySettings != null) {
-				String[] result = updateLinkedUser(verifySettings, toAdd, member);
-				String out =
-					(
-						!result[1].equals("false")
-							? result[1].equals("true") ? "\n• Successfully synced your roles" : "\n• Error syncing your roles"
-							: ""
-					) +
-					(
-						!result[0].equals("false")
-							? result[0].equals("true") ? "\n• Successfully synced your nickname" : "\n• Error syncing your nickname"
-							: ""
-					);
-				return defaultEmbed("Success").setDescription("You have been linked to `" + playerInfo.username() + "`\n" + out);
-			}
-
-			return defaultEmbed("Success").setDescription("You have been linked to `" + playerInfo.username() + "`");
+			TokenData.updateLinkedRolesMetadata(toAdd.discord(), toAdd, null, true);
+			return eb;
 		} else {
 			return invalidEmbed("Error when inserting into database");
 		}

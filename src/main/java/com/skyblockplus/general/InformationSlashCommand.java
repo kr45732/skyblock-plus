@@ -61,11 +61,11 @@ public class InformationSlashCommand extends SlashCommand {
 						formatNumber(jda.getGuildCache().size()) +
 						"\n**Users:** " +
 						formatNumber(getUserCount()) +
-						"\n**Avg Ping:** " +
+						"\n**Ping:** " +
 						formatNumber(
 							(long) jda.getShardCache().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
 						) +
-						"ms\n**Avg Websocket:** " +
+						"ms\n**Websocket:** " +
 						formatNumber((long) jda.getAverageGatewayPing()) +
 						"ms",
 						true

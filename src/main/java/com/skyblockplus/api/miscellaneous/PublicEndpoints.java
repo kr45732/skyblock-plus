@@ -27,6 +27,7 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.general.help.HelpSlashCommand;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.oauth.TokenData;
 import java.net.URI;
 import java.time.Instant;
@@ -136,22 +137,13 @@ public class PublicEndpoints {
 				.replacePath("/api/public/discord/oauth")
 				.build()
 				.toUriString();
+
 			String state = oAuthClient.generateState(redirectUri);
-
-			URI url = new URIBuilder("https://discord.com/api/oauth2/authorize")
-				.addParameter("client_id", selfUserId)
-				.addParameter("redirect_uri", redirectUri)
-				.addParameter("response_type", "code")
-				.addParameter("state", state)
-				.addParameter("scope", "role_connections.write identify")
-				.addParameter("prompt", "consent")
-				.build();
-
 			Cookie stateCookie = new Cookie("clientState", state);
 			stateCookie.setMaxAge(1000 * 60 * 5);
 			res.addCookie(stateCookie);
 
-			return ResponseEntity.status(HttpStatus.FOUND).location(url).build();
+			return ResponseEntity.status(HttpStatus.FOUND).location(oAuthClient.createAuthorizationUri(state)).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -179,7 +171,7 @@ public class PublicEndpoints {
 			TokenData tokenData = oAuthClient.postToken(code, redirectUri);
 			String userId = oAuthClient.getDiscord(tokenData);
 
-			if (updateLinkedRolesMetadata(userId, database.getByDiscord(userId)).get()) {
+			if (TokenData.updateLinkedRolesMetadata(userId, database.getByDiscord(userId), null, false).get()) {
 				res.sendRedirect("/success.html");
 				return new ResponseEntity<>(HttpStatus.FOUND);
 			}
@@ -187,47 +179,5 @@ public class PublicEndpoints {
 			e.printStackTrace();
 		}
 		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-
-	public static CompletableFuture<Boolean> updateLinkedRolesMetadata(String discord, LinkedAccount linkedAccount) {
-		try {
-			TokenData tokenData = oAuthClient.getToken(discord);
-			if (tokenData == null) {
-				return CompletableFuture.completedFuture(false);
-			}
-
-			JsonObject body = new JsonObject();
-			JsonObject metadata = new JsonObject();
-			if (linkedAccount != null) {
-				body.addProperty("platform_username", linkedAccount.username());
-				metadata.addProperty("verified", 1);
-			} else {
-				metadata.addProperty("verified", 0);
-			}
-			body.addProperty("platform_name", "Skyblock Plus");
-			body.add("metadata", metadata);
-
-			return CompletableFuture.supplyAsync(
-				() -> {
-					try {
-						return (
-							putJson(
-								"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
-								body,
-								new BasicHeader("Authorization", "Bearer " + tokenData.accessToken())
-							) !=
-							null
-						);
-					} catch (Exception e) {
-						e.printStackTrace();
-						return false;
-					}
-				},
-				executor
-			);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return CompletableFuture.completedFuture(false);
-		}
 	}
 }

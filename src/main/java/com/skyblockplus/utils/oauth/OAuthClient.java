@@ -18,18 +18,20 @@
 
 package com.skyblockplus.utils.oauth;
 
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.httpClient;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
 public class OAuthClient {
@@ -71,7 +73,7 @@ public class OAuthClient {
 			CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
 			InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
 		) {
-			return TokenData.from(JsonParser.parseReader(in));
+			return new TokenData(JsonParser.parseReader(in));
 		}
 	}
 
@@ -94,8 +96,7 @@ public class OAuthClient {
 				CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
 				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
 			) {
-				tokenData = TokenData.from(JsonParser.parseReader(in));
-				discordToToken.put(discord, tokenData);
+				tokenData.refreshData(JsonParser.parseReader(in));
 			}
 		}
 		return tokenData;
@@ -113,5 +114,16 @@ public class OAuthClient {
 			discordToToken.put(discord, tokenData);
 			return discord;
 		}
+	}
+
+	public URI createAuthorizationUri(String state) throws URISyntaxException {
+		return new URIBuilder("https://discord.com/api/oauth2/authorize")
+			.addParameter("client_id", selfUserId)
+			.addParameter("redirect_uri", states.get(state))
+			.addParameter("response_type", "code")
+			.addParameter("state", state)
+			.addParameter("scope", "role_connections.write identify")
+			.addParameter("prompt", "consent")
+			.build();
 	}
 }

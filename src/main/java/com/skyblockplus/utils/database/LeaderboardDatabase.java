@@ -24,8 +24,10 @@ import static com.skyblockplus.utils.Constants.skyblockStats;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.utils.oauth.TokenData;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
@@ -219,6 +221,9 @@ public class LeaderboardDatabase {
 								)
 						);
 					}
+
+					LinkedAccount linkedAccount = database.getByUuid(player.getUuid());
+					TokenData.updateLinkedRolesMetadata(linkedAccount.discord(), linkedAccount, player, true);
 				}
 				statement.executeUpdate();
 			}

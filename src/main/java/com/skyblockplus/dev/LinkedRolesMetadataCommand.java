@@ -44,12 +44,18 @@ public class LinkedRolesMetadataCommand extends Command {
 			@Override
 			protected void execute() {
 				JsonArray body = new JsonArray();
+
 				JsonObject role = new JsonObject();
 				role.addProperty("key", "verified");
 				role.addProperty("name", "Verified");
 				role.addProperty("description", "Verified");
 				role.addProperty("type", 7);
 				body.add(role);
+
+				body.add(generateNumericRole("level", "Skyblock Level"));
+				body.add(generateNumericRole("networth", "Networth"));
+				body.add(generateNumericRole("weight", "Senither Weight"));
+				body.add(generateNumericRole("lily_weight", "Lily Weight"));
 
 				JsonElement response = putJson(
 					"https://discord.com/api/v10/applications/" + selfUserId + "/role-connections/metadata",
@@ -60,5 +66,14 @@ public class LinkedRolesMetadataCommand extends Command {
 			}
 		}
 			.queue();
+	}
+
+	private static JsonObject generateNumericRole(String key, String name) {
+		JsonObject role = new JsonObject();
+		role.addProperty("key", key);
+		role.addProperty("name", name);
+		role.addProperty("description", "Keep this set to 1");
+		role.addProperty("type", 2);
+		return role;
 	}
 }
