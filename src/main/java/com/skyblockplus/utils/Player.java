@@ -1158,14 +1158,11 @@ public class Player {
 		return higherDepth(profileJson(), "leveling.experience", 0) / 100.0;
 	}
 
-	public double getLevel() {
-		if (higherDepth(profileJson(), "leveling.experience") != null) {
-			return getLevel();
-		}
-
+	public double getEstimatedLevel() {
 		return (
 			(
 				LevelSlashCommand.getCoreTasksEmbed(this).total() +
+				LevelSlashCommand.getEventTasksEmbed(this).total() +
 				LevelSlashCommand.getDungeonTasks(this).total() +
 				LevelSlashCommand.getEssenceShopTasks(this).total() +
 				LevelSlashCommand.getSlayingTasks(this).total() +
@@ -1175,6 +1172,10 @@ public class Player {
 			) /
 			100.0
 		);
+	}
+
+	public double getLevel() {
+		return higherDepth(profileJson(), "leveling.experience") != null ? getExactLevel() : getEstimatedLevel();
 	}
 
 	public String getLevelColor(int level) {
