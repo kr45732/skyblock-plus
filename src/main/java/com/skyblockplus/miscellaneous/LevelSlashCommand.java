@@ -398,7 +398,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 		int essenceSbXp = 0;
 		JsonArray essenceSteps = higherDepth(getSbLevelsJson(), "essence_shop_task.essence_shop_xp").getAsJsonArray();
-		JsonObject essencePerks = higherDepth(player.profileJson(), "perks").getAsJsonObject();
+		JsonElement essencePerks = higherDepth(player.profileJson(), "perks");
 
 		for (Map.Entry<String, JsonElement> essenceShop : getEssenceShopsJson().entrySet()) {
 			int shopSbXp = 0;
