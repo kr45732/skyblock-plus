@@ -74,7 +74,7 @@ public class LinkSlashCommand extends SlashCommand {
 			return playerInfo.failCause().endsWith(" is not linked on Hypixel")
 				? new MessageEditBuilder()
 					.setEmbeds(invalidEmbed(playerInfo.failCause()).build())
-					.setActionRow(Button.link("https://streamable.com/sdq8tp", "Help Linking"))
+					.setActionRow(Button.primary("verify_help_button", "Help Linking"))
 				: invalidEmbed(playerInfo.failCause());
 		}
 
