@@ -1222,7 +1222,7 @@ public class Player {
 		List<InvItem> accessoryBag = accessoryBagMap
 			.values()
 			.stream()
-			.filter(Objects::nonNull)
+			.filter(o -> o != null && o.getRarity() != null)
 			.sorted(Comparator.comparingInt(o -> Integer.parseInt(RARITY_TO_NUMBER_MAP.get(o.getRarity()).replace(";", ""))))
 			.collect(Collectors.toCollection(ArrayList::new));
 		// Don't reverse the rarity because we are iterating reverse order
