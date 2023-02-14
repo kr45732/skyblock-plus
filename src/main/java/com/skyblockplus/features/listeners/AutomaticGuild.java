@@ -102,6 +102,20 @@ public class AutomaticGuild {
 		5,
 		TimeUnit.MINUTES
 	);
+	private static final ScheduledFuture<?> updateGuildFuture = scheduler.scheduleWithFixedDelay(
+		() ->
+			guildMap
+				.values()
+				.forEach(g -> {
+					try {
+						TimeUnit.SECONDS.sleep(1);
+						g.updateGuild();
+					} catch (Exception ignored) {}
+				}),
+		5,
+		60,
+		TimeUnit.MINUTES
+	);
 
 	/* Apply */
 	public final List<ApplyGuild> applyGuild = new ArrayList<>();
@@ -166,7 +180,6 @@ public class AutomaticGuild {
 		JsonElement serverSettings = allServerSettings.remove(guildId);
 		applyConstructor(event, serverSettings);
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
-		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, (int) (Math.random() * 60 + 5), 60, TimeUnit.MINUTES));
 		scheduleSbEventFuture(higherDepth(serverSettings, "sbEvent"));
 		jacobGuild = new JacobGuild(higherDepth(serverSettings, "jacobSettings"), this);
 		eventGuild = new EventGuild(higherDepth(serverSettings, "eventNotif"), this);
@@ -869,9 +882,10 @@ public class AutomaticGuild {
 				}
 			}
 
-			logCommand(
-				guild,
-				"Update Guild | Time (" +
+			System.out.println(
+				"Update Guild | " +
+				guild.getId() +
+				" | Time (" +
 				roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) +
 				"s)" +
 				(!memberToRoleChanges.isEmpty() ? " | Users (" + memberToRoleChanges.size() + ")" : "") +

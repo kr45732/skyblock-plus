@@ -440,6 +440,11 @@ public class HelpSlashCommand extends SlashCommand {
 									"Add a player to the blacklist. Reason will default to 'not provided' if not set.",
 									"add <player> [reason]"
 								),
+								new HelpData(
+									"ban",
+									"Add a player to the blacklist and ban them from the server. Reason will default to 'not provided' if not set.",
+									"ban <player> <discord> [reason]"
+								),
 								new HelpData("remove", "Remove a player from the blacklist.", "remove <player>"),
 								new HelpData(
 									"search",
@@ -905,7 +910,11 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 			create("settings delete all", "Delete the current server settings") +
 			create("settings blacklist", "List all players that are blacklisted") +
-			create("settings blacklist add <player> [reason]", "Blacklist a player from using the application system on this server") +
+			create("settings blacklist add <player> [reason]", "Blacklist a player from verifying or applying in this server") +
+			create(
+				"settings blacklist ban <player> <discord> [reason]",
+				"Ban and blacklist a player from verifying or applying in this serve"
+			) +
 			create("settings blacklist remove <player>", "Remove a player from the blacklist") +
 			create("settings blacklist search <player>", "Remove a player from the blacklist") +
 			create("settings blacklist share <server_id>", "Share your blacklist with another server") +

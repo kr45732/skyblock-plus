@@ -68,7 +68,7 @@ public class ApiHandler {
 		try {
 			reloadSettingsJson();
 			cacheDatabase.initializeParties();
-			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 0, 3, TimeUnit.HOURS);
+			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 90, 3, TimeUnit.HOURS);
 			cacheDatabase.initializeCommandUses();
 			cacheDatabase.initializeJacobData();
 			cacheDatabase.initializeTokens();

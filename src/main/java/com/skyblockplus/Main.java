@@ -176,8 +176,6 @@ public class Main {
 				30,
 				TimeUnit.SECONDS
 			); // Sorry for the war crimes
-
-			scheduler.schedule(ApiHandler::updateBotStatistics, 90, TimeUnit.SECONDS);
 		}
 
 		log.info("Bot ready with " + jda.getShardsTotal() + " shards and " + jda.getGuilds().size() + " guilds");

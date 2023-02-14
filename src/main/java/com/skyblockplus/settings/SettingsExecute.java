@@ -43,6 +43,7 @@ import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.vdurmont.emoji.EmojiParser;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -50,9 +51,7 @@ import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -111,7 +110,10 @@ public class SettingsExecute {
 			if (args.length == 2) {
 				return displayPlayerBlacklist();
 			} else if ((args.length >= 4) && args[2].equals("add")) {
-				eb = addToBlacklist(args[3], args.length == 5 ? args[4] : "not provided");
+				eb = addToBlacklist(args[3], args.length == 5 ? args[4] : "not provided", null);
+			} else if ((args.length >= 4) && args[2].equals("ban")) {
+				args = content.split("\\s+", 6);
+				eb = addToBlacklist(args[3], args.length == 6 ? args[5] : "not provided", args[4]);
 			} else if (args.length == 4) {
 				eb =
 					switch (args[2]) {
@@ -2335,10 +2337,22 @@ public class SettingsExecute {
 		return invalidEmbed(uuidStruct.nameMcHyperLink() + " is not blacklisted");
 	}
 
-	public EmbedBuilder addToBlacklist(String username, String reason) {
+	public EmbedBuilder addToBlacklist(String username, String reason, String memberMention) {
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
 		if (!uuidStruct.isValid()) {
 			return invalidEmbed(uuidStruct.failCause());
+		}
+
+		if (memberMention != null) {
+			Object eb = checkMember(memberMention);
+			if (eb instanceof EmbedBuilder e) {
+				return e;
+			}
+			try {
+				guild.ban((Member) eb, 0, TimeUnit.SECONDS).reason(reason).complete();
+			} catch (Exception e) {
+				return invalidEmbed("Unable to ban member");
+			}
 		}
 
 		JsonObject blacklistSettings = getBlacklistSettings();
@@ -2901,7 +2915,7 @@ public class SettingsExecute {
 			role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
 		} catch (Exception e) {
 			try {
-				role = guild.getRolesByName(roleMention.replaceAll("[<#>]", ""), true).get(0);
+				role = guild.getRolesByName(roleMention.replaceAll("[<@&>]", ""), true).get(0);
 			} catch (Exception ex) {
 				return invalidEmbed("The provided role is invalid");
 			}
@@ -2916,6 +2930,27 @@ public class SettingsExecute {
 		}
 
 		return role;
+	}
+
+	public Object checkMember(String memberMention) {
+		Member member;
+		try {
+			member = guild.getMemberById(memberMention.replaceAll("[<@!>]", ""));
+		} catch (Exception e) {
+			try {
+				member = guild.getMembersByName(memberMention.replaceAll("[<@!>]", ""), true).get(0);
+			} catch (Exception ex) {
+				return invalidEmbed("The provided member is invalid");
+			}
+		}
+
+		if (member == null) {
+			return invalidEmbed("The provided member does not exist");
+		} else if (member.getUser().isBot()) {
+			return invalidEmbed("The member cannot be a bot");
+		}
+
+		return member;
 	}
 
 	public Object checkTextChannel(String channelMention) {
