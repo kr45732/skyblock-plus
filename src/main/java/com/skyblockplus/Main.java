@@ -18,11 +18,8 @@
 
 package com.skyblockplus;
 
-import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
-import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
 import static com.skyblockplus.utils.Utils.*;
 
-import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -36,15 +33,13 @@ import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.listeners.MainListener;
 import com.skyblockplus.features.mayor.MayorHandler;
 import com.skyblockplus.price.AuctionTracker;
-import com.skyblockplus.utils.ApiHandler;
-import com.skyblockplus.utils.AuctionFlipper;
-import com.skyblockplus.utils.Constants;
-import com.skyblockplus.utils.Utils;
+import com.skyblockplus.utils.*;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandClient;
 import com.skyblockplus.utils.database.Database;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
+import com.skyblockplus.utils.oauth.OAuthClient;
 import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -109,6 +104,8 @@ public class Main {
 
 		slashCommandClient =
 			new SlashCommandClient().setOwnerId(client.getOwnerId()).addCommands(springContext.getBeansOfType(SlashCommand.class).values());
+
+		oAuthClient = new OAuthClient(selfUserId, CLIENT_SECRET);
 
 		log.info(
 			"Loaded " + client.getCommands().size() + " prefix commands and " + slashCommandClient.getCommands().size() + " slash commands"
@@ -179,8 +176,6 @@ public class Main {
 				30,
 				TimeUnit.SECONDS
 			); // Sorry for the war crimes
-
-			scheduler.schedule(ApiHandler::updateBotStatistics, 90, TimeUnit.SECONDS);
 		}
 
 		log.info("Bot ready with " + jda.getShardsTotal() + " shards and " + jda.getGuilds().size() + " guilds");
@@ -188,40 +183,16 @@ public class Main {
 
 	@PreDestroy
 	public void onExit() {
-		if (isMainBot()) {
-			try (JDAWebhookClient webhook = botStatusWebhook) {
-				webhook.send(client.getSuccess() + " Restarting for an update");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		if (!isMainBot()) {
+			return;
 		}
 
 		log.info("Stopping");
 
-		log.info("Canceling cache update future: " + updateCacheTask.cancel(true));
-
-		log.info("Canceling leaderboard update task: " + leaderboardDatabase.updateTask.cancel(true));
-
-		log.info("Caching Apply Users");
-		cacheApplyGuildUsers();
-
-		log.info("Caching Parties");
-		cacheParties();
-
-		log.info("Caching Command Uses");
-		cacheCommandUses();
-
-		log.info("Caching Auction Tracker");
-		cacheAhTracker();
-
-		log.info("Caching Jacob Data");
-		cacheJacobData();
-
-		log.info("Closing Http Client");
-		closeHttpClient();
-
-		log.info("Closing leaderboard database");
-		leaderboardDatabase.close();
+		botStatusWebhook.send(client.getSuccess() + " Restarting for an update");
+		ApiHandler.updateCaches();
+		Utils.closeHttpClient();
+		ApiHandler.leaderboardDatabase.close();
 
 		log.info("Finished");
 	}

@@ -92,11 +92,7 @@ public class SacksSlashCommand extends SlashCommand {
 						}
 
 						return (
-							-(
-								npcPrice != -1
-									? npcPrice
-									: higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0)
-							) *
+							-(npcPrice != -1 ? npcPrice : higherDepth(bazaarPrices, entry.getKey() + ".sell_summary", 0.0)) *
 							entry.getValue()
 						);
 					})
@@ -107,11 +103,7 @@ public class SacksSlashCommand extends SlashCommand {
 						npcPrice = getNpcSellPrice(currentSack.getKey());
 					}
 					double sackPrice =
-						(
-							npcPrice != -1
-								? npcPrice
-								: higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0)
-						) *
+						(npcPrice != -1 ? npcPrice : higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary", 0.0)) *
 						currentSack.getValue();
 
 					String emoji = higherDepth(

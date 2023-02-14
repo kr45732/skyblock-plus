@@ -24,8 +24,10 @@ import static com.skyblockplus.utils.Constants.skyblockStats;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.utils.oauth.TokenData;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
@@ -38,7 +40,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.utils.data.DataObject;
@@ -101,7 +102,6 @@ public class LeaderboardDatabase {
 		Player.Gamemode.STRANDED
 	);
 	public int userCount = -1;
-	public ScheduledFuture<?> updateTask;
 
 	public LeaderboardDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -110,7 +110,7 @@ public class LeaderboardDatabase {
 		dataSource = new HikariDataSource(config);
 
 		if (isMainBot()) {
-			updateTask = scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
+			scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
 	}
 
@@ -220,6 +220,11 @@ public class LeaderboardDatabase {
 								)
 						);
 					}
+
+					LinkedAccount linkedAccount = database.getByUuid(player.getUuid());
+					TokenData.updateLinkedRolesMetadata(linkedAccount.discord(), linkedAccount, player, true);
+
+					players.remove(j);
 				}
 				statement.executeUpdate();
 			}
@@ -661,6 +666,8 @@ public class LeaderboardDatabase {
 	}
 
 	public void close() {
+		log.info("Closing leaderboard database");
 		dataSource.close();
+		log.info("Successfully closed leaderboard database");
 	}
 }

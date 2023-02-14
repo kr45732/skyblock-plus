@@ -94,7 +94,7 @@ public class SetupCommandHandler {
 						)
 						.build()
 				)
-				.queue();
+				.queue(ignored -> buttonEvent.getHook().editOriginalComponents().queue());
 			case ROLES -> {
 				buttonEvent
 					.editMessageEmbeds(

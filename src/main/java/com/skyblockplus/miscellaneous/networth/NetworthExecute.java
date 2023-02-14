@@ -90,9 +90,9 @@ public class NetworthExecute {
 		bazaarJson = getBazaarJson();
 		extraPrices = getExtraPricesJson();
 
-		recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary.[0].pricePerUnit", 0.0);
-		hpbPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
-		fumingPrice = higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
+		recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary", 0.0);
+		hpbPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary", 0.0);
+		fumingPrice = higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary", 0.0);
 		return this;
 	}
 
@@ -180,6 +180,8 @@ public class NetworthExecute {
 		if (event == null) {
 			return invalidEmbed("Was not triggered by command");
 		}
+
+		player.profileToNetworth.put(player.getProfileIndex(), getNetworth());
 
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 		Map<SelectOption, EmbedBuilder> pages = getPages(player, false);
@@ -713,9 +715,7 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			essenceExtras =
-				item.getEssenceCount() *
-				higherDepth(bazaarJson, "ESSENCE_" + item.getEssenceType() + ".sell_summary.[0].pricePerUnit", 0.0);
+			essenceExtras = item.getEssenceCount() * higherDepth(bazaarJson, "ESSENCE_" + item.getEssenceType() + ".sell_summary", 0.0);
 		} catch (Exception ignored) {}
 
 		StringBuilder miscStr = verbose ? new StringBuilder("[") : null;
@@ -865,10 +865,7 @@ public class NetworthExecute {
 
 		for (int i = enchantLevel; i >= Math.max(1, ignoredLevels); i--) {
 			try {
-				return (
-					Math.pow(2, enchantLevel - i) *
-					higherDepth(bazaarJson, enchantName + ";" + i + ".buy_summary.[0].pricePerUnit").getAsDouble()
-				);
+				return (Math.pow(2, enchantLevel - i) * higherDepth(bazaarJson, enchantName + ";" + i + ".buy_summary").getAsDouble());
 			} catch (Exception ignored) {}
 		}
 
@@ -902,7 +899,7 @@ public class NetworthExecute {
 		}
 
 		if (higherDepth(bazaarJson, itemId) != null) {
-			double bazaarPrice = higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit", 0.0);
+			double bazaarPrice = higherDepth(bazaarJson, itemId + ".sell_summary", 0.0);
 			if (source != null) {
 				source.append("bazaar");
 			}

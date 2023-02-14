@@ -31,7 +31,7 @@ public class GifWriter implements Closeable {
 
 	private final ImageWriter gifWriter;
 	private final ImageWriteParam imageWriteParam;
-	private final IIOMetadata imageMetaData;
+	private final IIOMetadata imageMetadata;
 
 	public GifWriter(
 		ImageOutputStream outputStream,
@@ -43,9 +43,9 @@ public class GifWriter implements Closeable {
 		gifWriter = getWriter();
 		imageWriteParam = gifWriter.getDefaultWriteParam();
 		ImageTypeSpecifier imageTypeSpecifier = ImageTypeSpecifier.createFromBufferedImageType(imageType);
-		imageMetaData = gifWriter.getDefaultImageMetadata(imageTypeSpecifier, imageWriteParam);
-		String metaFormatName = imageMetaData.getNativeMetadataFormatName();
-		IIOMetadataNode root = (IIOMetadataNode) imageMetaData.getAsTree(metaFormatName);
+		imageMetadata = gifWriter.getDefaultImageMetadata(imageTypeSpecifier, imageWriteParam);
+		String metaFormatName = imageMetadata.getNativeMetadataFormatName();
+		IIOMetadataNode root = (IIOMetadataNode) imageMetadata.getAsTree(metaFormatName);
 		IIOMetadataNode graphicsControlExtensionNode = getNode(root, "GraphicControlExtension");
 		graphicsControlExtensionNode.setAttribute("disposalMethod", "none");
 		graphicsControlExtensionNode.setAttribute("userInputFlag", "FALSE");
@@ -59,7 +59,7 @@ public class GifWriter implements Closeable {
 		int loop = loopContinuously ? 0 : 1;
 		child.setUserObject(new byte[] { 0x1, (byte) (loop & 0xFF), (byte) 0 });
 		appExtensionsNode.appendChild(child);
-		imageMetaData.setFromTree(metaFormatName, root);
+		imageMetadata.setFromTree(metaFormatName, root);
 		gifWriter.setOutput(outputStream);
 		gifWriter.prepareWriteSequence(null);
 	}
@@ -69,7 +69,7 @@ public class GifWriter implements Closeable {
 	}
 
 	public void writeToSequence(RenderedImage img) throws IOException {
-		gifWriter.writeToSequence(new IIOImage(img, null, imageMetaData), imageWriteParam);
+		gifWriter.writeToSequence(new IIOImage(img, null, imageMetadata), imageWriteParam);
 	}
 
 	public void close() throws IOException {

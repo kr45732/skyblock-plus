@@ -19,19 +19,25 @@
 package com.skyblockplus.api.miscellaneous;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.general.help.HelpSlashCommand;
+import com.skyblockplus.utils.oauth.TokenData;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.apache.groovy.util.Maps;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping(value = "/api/public")
@@ -86,7 +92,7 @@ public class PublicEndpoints {
 			}
 
 			JacobHandler.setJacobData(jacobData);
-			cacheJacobData();
+			cacheDatabase.cacheJacobData();
 			jda.getTextChannelById("937894945564545035").sendMessage(client.getSuccess() + " Received jacob data").queue();
 			return new ResponseEntity<>(DataObject.empty().put("success", true).toMap(), HttpStatus.OK);
 		} else {
@@ -114,5 +120,57 @@ public class PublicEndpoints {
 		} else {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	@GetMapping("/discord/verify")
+	public ResponseEntity<?> getDiscordVerify(HttpServletResponse res, HttpServletRequest req) {
+		try {
+			String redirectUri = ServletUriComponentsBuilder
+				.fromRequest(req)
+				.replacePath("/api/public/discord/oauth")
+				.build()
+				.toUriString();
+
+			String state = oAuthClient.generateState(redirectUri);
+			Cookie stateCookie = new Cookie("clientState", state);
+			stateCookie.setMaxAge(1000 * 60 * 5);
+			res.addCookie(stateCookie);
+
+			return ResponseEntity.status(HttpStatus.FOUND).location(oAuthClient.createAuthorizationUri(state)).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/discord/oauth")
+	public ResponseEntity<?> getDiscordOauth(
+		HttpServletResponse res,
+		HttpServletRequest req,
+		@RequestParam(value = "code") String code,
+		@RequestParam(value = "state") String state,
+		@CookieValue(value = "clientState") String clientState
+	) {
+		try {
+			if (!Objects.equals(clientState, state)) {
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			}
+
+			String redirectUri = oAuthClient.consumeState(state);
+			if (redirectUri == null) {
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			}
+
+			TokenData tokenData = oAuthClient.postToken(code, redirectUri);
+			String userId = oAuthClient.getDiscord(tokenData);
+
+			if (TokenData.updateLinkedRolesMetadata(userId, database.getByDiscord(userId), null, false).get()) {
+				res.sendRedirect("/success.html");
+				return new ResponseEntity<>(HttpStatus.FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

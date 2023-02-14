@@ -44,7 +44,7 @@ public class JacobHandler {
 						.queue();
 				} catch (Exception ignored) {}
 			},
-			YEAR_0 + 446400000L * getSkyblockYear() + 300000 - Instant.now().toEpochMilli(),
+			YEAR_0 + 446400000L * getSkyblockYear() + 600000 - Instant.now().toEpochMilli(),
 			446400000L,
 			TimeUnit.MILLISECONDS
 		);

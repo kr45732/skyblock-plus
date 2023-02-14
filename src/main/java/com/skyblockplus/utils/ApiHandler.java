@@ -63,36 +63,33 @@ public class ApiHandler {
 	public static String ahApiUrl = "";
 	public static int mojangApiNum = 0;
 	public static boolean allowMojangApi = false;
-	public static ScheduledFuture<?> updateCacheTask;
 
 	public static void initialize() {
 		try {
 			reloadSettingsJson();
 			cacheDatabase.initializeParties();
-			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 0, 3, TimeUnit.HOURS);
+			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 90, 3 * 60 * 60, TimeUnit.SECONDS);
 			cacheDatabase.initializeCommandUses();
 			cacheDatabase.initializeJacobData();
+			cacheDatabase.initializeTokens();
 			cacheDatabase.initializeAhTracker();
 			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
-			updateCacheTask =
-				scheduler.scheduleWithFixedDelay(
-					() -> {
-						try {
-							cacheApplyGuildUsers();
-							cacheParties();
-							cacheCommandUses();
-							cacheAhTracker();
-						} catch (Exception e) {
-							log.error("Exception when interval caching", e);
-						}
-					},
-					60,
-					60,
-					TimeUnit.MINUTES
-				);
+			scheduler.scheduleWithFixedDelay(ApiHandler::updateCaches, 60, 60, TimeUnit.MINUTES);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			log.error("Exception when initializing the ApiHandler", e);
+		}
+	}
+
+	public static void updateCaches() {
+		try {
+			cacheApplyGuildUsers();
+			cacheDatabase.cachePartyData();
+			cacheDatabase.cacheCommandUsesData();
+			cacheDatabase.cacheAhTrackerData();
+			cacheDatabase.cacheTokensData();
+		} catch (Exception e) {
+			log.error("Exception when interval caching", e);
 		}
 	}
 

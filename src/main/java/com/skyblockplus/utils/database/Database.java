@@ -36,6 +36,7 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import com.skyblockplus.utils.oauth.TokenData;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -291,6 +292,7 @@ public class Database {
 	}
 
 	public boolean deleteByDiscord(String discord) {
+		TokenData.updateLinkedRolesMetadata(discord, null, null, false);
 		return deleteBy("discord", discord);
 	}
 
