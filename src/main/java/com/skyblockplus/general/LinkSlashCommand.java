@@ -93,7 +93,7 @@ public class LinkSlashCommand extends SlashCommand {
 						)
 						.build()
 				)
-				.setActionRow(Button.link("https://streamable.com/sdq8tp", "Help Linking"));
+				.setActionRow(Button.primary("verify_help_button", "Help Linking"));
 		}
 
 		LinkedAccount toAdd = new LinkedAccount(Instant.now().toEpochMilli(), member.getId(), playerInfo.uuid(), playerInfo.username());
