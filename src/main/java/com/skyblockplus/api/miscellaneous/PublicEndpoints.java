@@ -169,7 +169,7 @@ public class PublicEndpoints {
 			LinkedAccount linkedAccount = database.getByDiscord(userId);
 			Player player = null;
 			if (linkedAccount != null) {
-				player = new Player(linkedAccount.username());
+				player = new Player(linkedAccount.uuid());
 			}
 			if (TokenData.updateLinkedRolesMetadata(userId, linkedAccount, player, false).get()) {
 				res.sendRedirect("/success.html");
