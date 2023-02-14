@@ -22,9 +22,11 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.general.help.HelpSlashCommand;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.oauth.TokenData;
 import java.time.Instant;
 import java.util.*;
@@ -164,7 +166,12 @@ public class PublicEndpoints {
 			TokenData tokenData = oAuthClient.postToken(code, redirectUri);
 			String userId = oAuthClient.getDiscord(tokenData);
 
-			if (TokenData.updateLinkedRolesMetadata(userId, database.getByDiscord(userId), null, false).get()) {
+			LinkedAccount linkedAccount = database.getByDiscord(userId);
+			Player player = null;
+			if (linkedAccount != null) {
+				player = new Player(linkedAccount.username());
+			}
+			if (TokenData.updateLinkedRolesMetadata(userId, linkedAccount, player, false).get()) {
 				res.sendRedirect("/success.html");
 				return new ResponseEntity<>(HttpStatus.FOUND);
 			}

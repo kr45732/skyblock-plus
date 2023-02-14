@@ -106,7 +106,7 @@ public final class TokenData {
 			if (linkedAccount != null) {
 				String platformUsername = linkedAccount.username();
 
-				if (player != null) {
+				if (player != null && player.isValid()) {
 					platformUsername += " | " + player.getProfileName();
 					metadata.addProperty("level", (long) Math.max(1, player.getLevel()));
 					metadata.addProperty("networth", (long) Math.max(1, player.getNetworth()));
