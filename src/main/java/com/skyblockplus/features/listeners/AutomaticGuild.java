@@ -163,7 +163,7 @@ public class AutomaticGuild {
 			}
 		}
 
-		JsonElement serverSettings = allServerSettings.get(guildId);
+		JsonElement serverSettings = allServerSettings.remove(guildId);
 		applyConstructor(event, serverSettings);
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
 		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, (int) (Math.random() * 60 + 5), 60, TimeUnit.MINUTES));

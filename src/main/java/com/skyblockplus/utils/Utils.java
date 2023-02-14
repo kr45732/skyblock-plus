@@ -321,7 +321,12 @@ public class Utils {
 						continue;
 					}
 
-					tempBazaarJson.add(id, entry.getValue());
+					JsonObject j = new JsonObject();
+					j.addProperty("buy_summary", higherDepth(entry.getValue(), "buy_summary.[0].pricePerUnit", 0.0));
+					j.addProperty("sell_summary", higherDepth(entry.getValue(), "sell_summary.[0].pricePerUnit", 0.0));
+					j.addProperty("buyVolume", higherDepth(entry.getValue(), "quick_status.buyVolume", 0L));
+					j.addProperty("sellVolume", higherDepth(entry.getValue(), "quick_status.sellVolume", 0L));
+					tempBazaarJson.add(id, j);
 				}
 				bazaarJson = tempBazaarJson;
 				bazaarJsonLastUpdated = Instant.now();
@@ -1131,9 +1136,9 @@ public class Utils {
 	}
 
 	public static void initialize() {
-		try {
+		try (FileInputStream fs = new FileInputStream("DevSettings.properties")) {
 			Properties appProps = new Properties();
-			appProps.load(new FileInputStream("DevSettings.properties"));
+			appProps.load(fs);
 			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
 			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
 			DATABASE_URL = ((String) appProps.get("DATABASE_URL"));

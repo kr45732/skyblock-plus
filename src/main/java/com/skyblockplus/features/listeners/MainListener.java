@@ -68,7 +68,7 @@ public class MainListener extends ListenerAdapter {
 			return;
 		}
 
-		if (isUniqueGuild(event.getGuild().getId())) {
+		if (!guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
 		}
 	}
@@ -90,7 +90,7 @@ public class MainListener extends ListenerAdapter {
 			return;
 		}
 
-		if (isUniqueGuild(event.getGuild().getId())) {
+		if (!guildMap.containsKey(event.getGuild().getId())) {
 			try {
 				EmbedBuilder eb = defaultEmbed("Thank you!")
 					.setDescription(
@@ -130,10 +130,6 @@ public class MainListener extends ListenerAdapter {
 
 			guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
 		}
-	}
-
-	private boolean isUniqueGuild(String guildId) {
-		return !guildMap.containsKey(guildId);
 	}
 
 	@Override

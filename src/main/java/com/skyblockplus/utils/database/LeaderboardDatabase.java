@@ -223,6 +223,8 @@ public class LeaderboardDatabase {
 
 					LinkedAccount linkedAccount = database.getByUuid(player.getUuid());
 					TokenData.updateLinkedRolesMetadata(linkedAccount.discord(), linkedAccount, player, true);
+
+					players.remove(j);
 				}
 				statement.executeUpdate();
 			}

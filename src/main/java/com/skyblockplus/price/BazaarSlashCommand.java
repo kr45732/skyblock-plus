@@ -67,11 +67,11 @@ public class BazaarSlashCommand extends SlashCommand {
 
 		JsonElement itemInfo = higherDepth(bazaarItems, itemId);
 		return defaultEmbed(idToName(itemId), "https://bazaartracker.com/product/" + itemId)
-			.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buy_summary.[0].pricePerUnit", 0.0)), true)
-			.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sell_summary.[0].pricePerUnit", 0.0)), true)
+			.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buy_summary", 0.0)), true)
+			.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sell_summary", 0.0)), true)
 			.addBlankField(true)
-			.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.buyVolume", 0L)), true)
-			.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.sellVolume", 0L)), true)
+			.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "buyVolume", 0L)), true)
+			.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "sellVolume", 0L)), true)
 			.addBlankField(true)
 			.setThumbnail(getItemThumbnail(itemId));
 	}
