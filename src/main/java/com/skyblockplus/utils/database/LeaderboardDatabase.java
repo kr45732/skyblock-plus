@@ -1,18 +1,18 @@
 /*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience create Skyblock players and guild staff!
  * Copyright (c) 2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * it under the terms create the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 create the
  * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty create
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy create the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -118,14 +118,10 @@ public class LeaderboardDatabase {
 		return dataSource.getConnection();
 	}
 
-	public void insertIntoLeaderboard(Player player) {
-		insertIntoLeaderboard(player, true);
-	}
-
-	public void insertIntoLeaderboard(Player player, boolean makeCopy) {
+	public void insertIntoLeaderboard(Player.Profile player) {
 		if (player.isValid()) {
 			leaderboardDbInsertQueue.submit(() -> {
-				List<Player> players = List.of(makeCopy ? player.copy() : player);
+				List<Player.Profile> players = List.of(player);
 				for (Player.Gamemode gamemode : leaderboardGamemodes) {
 					insertIntoLeaderboard(players, gamemode);
 				}
@@ -136,7 +132,7 @@ public class LeaderboardDatabase {
 	/**
 	 * Once called, these players should not be used again to access stats (does not copy)
 	 */
-	public void insertIntoLeaderboard(List<Player> players) {
+	public void insertIntoLeaderboard(List<Player.Profile> players) {
 		players.removeIf(p -> !p.isValid());
 		if (!players.isEmpty()) {
 			for (int i = 0; i < players.size(); i += MAX_INSERT_COUNT) {
@@ -150,11 +146,11 @@ public class LeaderboardDatabase {
 		}
 	}
 
-	private void insertIntoLeaderboard(List<Player> players, Player.Gamemode gamemode) {
+	private void insertIntoLeaderboard(List<Player.Profile> players, Player.Gamemode gamemode) {
 		insertIntoLeaderboard(players, 0, gamemode);
 	}
 
-	private void insertIntoLeaderboard(List<Player> players, int startingIndex, Player.Gamemode gamemode) {
+	private void insertIntoLeaderboard(List<Player.Profile> players, int startingIndex, Player.Gamemode gamemode) {
 		try {
 			String paramStr = "?,".repeat(types.size() + 1); // Add 1 for last_updated
 			paramStr = paramStr.substring(0, paramStr.length() - 1);
@@ -164,7 +160,7 @@ public class LeaderboardDatabase {
 					);
 			multiParamsStr = multiParamsStr.substring(0, multiParamsStr.length() - 1);
 
-			boolean updateNetworth = players.size() == 1 || players.stream().noneMatch(p -> p.profileToNetworth.isEmpty());
+			boolean updateNetworth = players.size() == 1 || players.stream().noneMatch(p -> p.getProfileToNetworth().isEmpty());
 
 			try (
 				Connection connection = getConnection();
@@ -188,7 +184,7 @@ public class LeaderboardDatabase {
 			) {
 				// J is for the list while K is for the params offset
 				for (int j = startingIndex, k = 0; j < Math.min(startingIndex + MAX_INSERT_COUNT, players.size()); j++, k++) {
-					Player player = players.get(j);
+					Player.Profile player = players.get(j);
 					int offset = k * (3 + typesSubList.size());
 
 					statement.setObject(1 + offset, stringToUuid(player.getUuid()));
@@ -237,12 +233,12 @@ public class LeaderboardDatabase {
 	/**
 	 * Sync insert into requestedGamemode and async insert for other gamemodes
 	 */
-	public void insertIntoLeaderboardSync(Player player, Player.Gamemode requestedGamemode) {
+	public void insertIntoLeaderboardSync(Player.Profile player, Player.Gamemode requestedGamemode) {
 		if (!player.isValid()) {
 			return;
 		}
 
-		List<Player> players = List.of(player);
+		List<Player.Profile> players = List.of(player);
 		insertIntoLeaderboard(players, requestedGamemode);
 		leaderboardDbInsertQueue.submit(() -> {
 			for (Player.Gamemode gamemode : leaderboardGamemodes) {
@@ -430,7 +426,7 @@ public class LeaderboardDatabase {
 		}
 
 		if (!uuids.isEmpty()) {
-			List<Player> players = new ArrayList<>();
+			List<Player.Profile> players = new ArrayList<>();
 			List<CompletableFuture<DataObject>> futuresList = new ArrayList<>();
 
 			if (hypixelKey != null) {
@@ -451,7 +447,8 @@ public class LeaderboardDatabase {
 						asyncSkyblockProfilesFromUuid(uuid, hypixelKey)
 							.thenApplyAsync(
 								profilesJson -> {
-									Player player = new Player(uuid, uuidToUsername(uuid).username(), profilesJson, false);
+									Player.Profile player = new Player(uuidToUsername(uuid).username(), uuid, profilesJson, false)
+										.getSelectedProfile();
 
 									if (player.isValid()) {
 										players.add(player);
@@ -482,7 +479,7 @@ public class LeaderboardDatabase {
 					futuresList.add(
 						CompletableFuture.supplyAsync(
 							() -> {
-								Player player = new Player(uuid, false);
+								Player.Profile player = new Player(uuid, false).getSelectedProfile();
 								if (player.isValid()) {
 									players.add(player);
 
@@ -559,7 +556,7 @@ public class LeaderboardDatabase {
 		try {
 			int count = 0;
 			long start = System.currentTimeMillis();
-			List<Player> players = new ArrayList<>();
+			List<Player.Profile> players = new ArrayList<>();
 
 			if (userCount != -1) {
 				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/users.json")
@@ -579,12 +576,13 @@ public class LeaderboardDatabase {
 								false
 							);
 							if (profileResponse.isValid()) {
-								Player player = new Player(
-									usernameUuidStruct.uuid(),
+								Player.Profile player = new Player(
 									usernameUuidStruct.username(),
+									usernameUuidStruct.uuid(),
 									profileResponse.response(),
 									false
-								);
+								)
+									.getSelectedProfile();
 								player.getHighestAmount("networth");
 								players.add(player);
 							}
@@ -629,12 +627,13 @@ public class LeaderboardDatabase {
 						false
 					);
 					if (profileResponse.isValid()) {
-						Player player = new Player(
-							usernameUuidStruct.uuid(),
+						Player.Profile player = new Player(
 							usernameUuidStruct.username(),
+							usernameUuidStruct.uuid(),
 							profileResponse.response(),
 							false
-						);
+						)
+							.getSelectedProfile();
 						player.getHighestAmount("networth");
 						players.add(player);
 					}

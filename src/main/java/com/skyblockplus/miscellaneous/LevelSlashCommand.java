@@ -1,18 +1,18 @@
 /*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience create Skyblock players and guild staff!
  * Copyright (c) 2021 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * it under the terms create the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 create the
  * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty create
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy create the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -72,7 +72,7 @@ public class LevelSlashCommand extends SlashCommand {
 	}
 
 	public static EmbedBuilder getLevel(String username, String profileName, SlashCommandEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		Player.Profile player = Player.create(username, profileName);
 		if (!player.isValid()) {
 			return player.getFailEmbed();
 		}
@@ -176,7 +176,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return null;
 	}
 
-	public static LevelRecord getCoreTasksEmbed(Player player) {
+	public static LevelRecord getCoreTasksEmbed(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Core Tasks");
 
 		// Skills
@@ -282,7 +282,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	public static LevelRecord getEventTasksEmbed(Player player) {
+	public static LevelRecord getEventTasksEmbed(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Event Tasks");
 
 		// Mining fiesta
@@ -321,7 +321,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	public static LevelRecord getDungeonTasks(Player player) {
+	public static LevelRecord getDungeonTasks(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Dungeon Tasks");
 
 		// Catacombs
@@ -393,7 +393,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	public static LevelRecord getEssenceShopTasks(Player player) {
+	public static LevelRecord getEssenceShopTasks(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Essence Shop Tasks");
 
 		int essenceSbXp = 0;
@@ -437,7 +437,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	public static LevelRecord getSlayingTasks(Player player) {
+	public static LevelRecord getSlayingTasks(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Slaying Tasks");
 
 		// Slayer level up
@@ -595,7 +595,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	public static LevelRecord getSkillRelatedTasks(Player player) {
+	public static LevelRecord getSkillRelatedTasks(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Skill Related Tasks");
 
 		// Mining
@@ -667,7 +667,7 @@ public class LevelSlashCommand extends SlashCommand {
 		// Crystal nucleus runs
 		int crystalNucleusRuns = higherDepth(player.profileJson(), "leveling.completions.NUCLEUS_RUNS", 0) * 4;
 
-		// Peak of the mountain
+		// Peak create the mountain
 		int peakOfTheMountainSbXp = 0;
 		int potmLevel = higherDepth(player.profileJson(), "mining_core.nodes.special_0", 0);
 		for (int i = 1; i <= potmLevel; i++) {
@@ -760,7 +760,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	public static LevelRecord getMiscellaneousTasks(Player player) {
+	public static LevelRecord getMiscellaneousTasks(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Miscellaneous Tasks");
 
 		// Accessory bag upgrade count
@@ -882,7 +882,7 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	public static LevelRecord getStoryTasks(Player player) {
+	public static LevelRecord getStoryTasks(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Story Tasks");
 
 		// Objectives/quests

@@ -1,18 +1,18 @@
 /*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience create Skyblock players and guild staff!
  * Copyright (c) 2021 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * it under the terms create the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 create the
  * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty create
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy create the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -172,7 +172,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("members", "Get a list of all members in a player's guild")
+			return new SubcommandData("members", "Get a list create all members in a player's guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false);
 		}
@@ -267,7 +267,7 @@ public class GuildSlashCommand extends SlashCommand {
 			return new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
-				.addOptions(new OptionData(OptionType.INTEGER, "days", "Number of days").setRequiredRange(1, 7));
+				.addOptions(new OptionData(OptionType.INTEGER, "days", "Number create days").setRequiredRange(1, 7));
 		}
 
 		public static EmbedBuilder getGuildExperience(String username, String guildName, long days, SlashCommandEvent event) {
@@ -570,7 +570,7 @@ public class GuildSlashCommand extends SlashCommand {
 		) {
 			String[] reqsArr = reqs.split("] \\[");
 			if (reqsArr.length > 5) {
-				return invalidEmbed("You can only enter a maximum of 5 sets of requirements");
+				return invalidEmbed("You can only enter a maximum create 5 sets create requirements");
 			}
 			for (int i = 0; i < reqsArr.length; i++) {
 				String[] indvReqs = reqsArr[i].replace("[", "").replace("]", "").split("\\s+");
@@ -1144,7 +1144,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData(name, "Get a guild's Skyblock statistics of slayer, skills, catacombs, and weight")
+			return new SubcommandData(name, "Get a guild's Skyblock statistics create slayer, skills, catacombs, and weight")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
 				.addOptions(
@@ -1345,7 +1345,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 			JsonArray guildMembers = guildResponse.get("members").getAsJsonArray();
 			List<CompletableFuture<String>> futuresList = new ArrayList<>();
-			List<Player> players = new ArrayList<>();
+			List<Player.Profile> players = new ArrayList<>();
 
 			for (JsonElement guildMember : guildMembers) {
 				String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
@@ -1361,12 +1361,13 @@ public class GuildSlashCommand extends SlashCommand {
 					asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey)
 						.thenApplyAsync(
 							guildMemberProfileJsonResponse -> {
-								Player player = new Player(
-									guildMemberUuid,
+								Player.Profile player = new Player(
 									uuidToUsername(guildMemberUuid).username(),
+									guildMemberUuid,
 									guildMemberProfileJsonResponse,
 									false
-								);
+								)
+									.getSelectedProfile();
 
 								if (player.isValid()) {
 									boolean invEnabled = excludeArr.contains("inventory") || player.isInventoryApiEnabled();

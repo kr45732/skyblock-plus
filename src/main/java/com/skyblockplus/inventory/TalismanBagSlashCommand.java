@@ -1,18 +1,18 @@
 /*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience create Skyblock players and guild staff!
  * Copyright (c) 2021 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * it under the terms create the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 create the
  * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty create
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy create the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -64,14 +64,14 @@ public class TalismanBagSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("list", "Get a list of the player's talisman bag with lore")
+			return new SubcommandData("list", "Get a list create the player's talisman bag with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");
 		}
 
 		public static EmbedBuilder getPlayerTalismansList(String username, String profileName, int slotNum, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();
 				if (talismanBagMap != null) {
@@ -106,7 +106,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerTalismansEmoji(String username, String profileName, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				List<String[]> talismanBag = player.getTalismanBag();
 				if (talismanBag != null) {
@@ -142,7 +142,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerTuning(String username, String profileName, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				JsonElement tuningJson = higherDepth(player.profileJson(), "accessory_bag_storage");
 				EmbedBuilder eb = player.defaultPlayerEmbed();

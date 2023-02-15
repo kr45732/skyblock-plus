@@ -1,18 +1,18 @@
 /*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience create Skyblock players and guild staff!
  * Copyright (c) 2021 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * it under the terms create the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 create the
  * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty create
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy create the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -64,7 +64,7 @@ public class CalcWeightSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Calculate predicted weight change for a reaching certain skill/slayer/catacombs amount")
 			.addOptions(
-				new OptionData(OptionType.STRING, "type", "Skill, slayer, or dungeon type to see change of", true)
+				new OptionData(OptionType.STRING, "type", "Skill, slayer, or dungeon type to see change create", true)
 					.addChoice("Sven", "sven")
 					.addChoice("Revenant", "rev")
 					.addChoice("Tarantula", "tara")
@@ -100,116 +100,117 @@ public class CalcWeightSlashCommand extends SlashCommand {
 			return invalidEmbed("Invalid amount");
 		}
 
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			Weight weight = Weight.of(weightType, player).calculateWeight(type);
-			Weight predictedWeight = Weight.of(weightType, player).calculateWeight(type);
-			WeightStruct pre;
-			WeightStruct post;
-			EmbedBuilder eb = player.defaultPlayerEmbed();
-			if (type.equals("catacombs")) {
-				SkillsStruct current = player.getCatacombs();
-				SkillsStruct target = player.skillInfoFromLevel(amount, type);
-				pre = weight.getDungeonsWeight().getDungeonWeight();
-				post = predictedWeight.getDungeonsWeight().getDungeonWeight(target);
-
-				eb
-					.addField(
-						"Current",
-						"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
-						false
-					)
-					.addField(
-						"Target",
-						"Level: " +
-						amount +
-						"\nXP: " +
-						formatNumber(target.totalExp()) +
-						" (+" +
-						formatNumber(target.totalExp() - current.totalExp()) +
-						")",
-						false
-					);
-			} else if (ALL_SKILL_NAMES.contains(type)) {
-				SkillsStruct current = player.getSkill(type);
-				if (current == null) {
-					return invalidEmbed("Skills API disabled");
-				}
-				SkillsStruct target = player.skillInfoFromLevel(amount, type);
-				pre = weight.getSkillsWeight().getSkillsWeight(type);
-				post = predictedWeight.getSkillsWeight().getSkillsWeight(type, target);
-
-				eb
-					.addField(
-						"Current",
-						"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
-						false
-					)
-					.addField(
-						"Target",
-						"Level: " +
-						amount +
-						"\nXP: " +
-						formatNumber(target.totalExp()) +
-						" (+" +
-						formatNumber(target.totalExp() - current.totalExp()) +
-						")",
-						false
-					)
-					.addField(
-						"Skill Average Change",
-						roundAndFormat(player.getSkillAverage()) + " ➜ " + roundAndFormat(player.getSkillAverage(type, amount)),
-						false
-					);
-			} else if (SLAYER_NAMES.contains(type)) {
-				int curXp = player.getSlayer(type);
-				pre = weight.getSlayerWeight().getSlayerWeight(type);
-				post = predictedWeight.getSlayerWeight().getSlayerWeight(type, amount);
-
-				eb
-					.addField("Current", "Level: " + player.getSlayerLevel(type) + "\nXP: " + formatNumber(curXp), false)
-					.addField(
-						"Target",
-						"Level: " +
-						player.getSlayerLevel(type, amount) +
-						"\nXP: " +
-						formatNumber(amount) +
-						" (+" +
-						formatNumber(amount - curXp) +
-						")",
-						false
-					)
-					.addField(
-						"Total Slayer XP Change",
-						roundAndFormat(player.getTotalSlayer()) + " ➜ " + roundAndFormat(player.getTotalSlayer(type, amount)),
-						false
-					);
-			} else {
-				return invalidEmbed("Invalid type");
-			}
-
-			if (post.getRaw() <= pre.getRaw()) {
-				return invalidEmbed("You cannot choose a lower level or xp than your current amount");
-			}
-
-			return eb.addField(
-				capitalizeString(weightType.name()) + " Weight Change",
-				"Total: " +
-				weight.getTotalWeight().getFormatted(false) +
-				" ➜ " +
-				predictedWeight.getTotalWeight().getFormatted(false) +
-				"\n" +
-				capitalizeString(type) +
-				": " +
-				pre.getFormatted(false) +
-				" ➜ " +
-				post.getFormatted(false) +
-				" (+" +
-				roundAndFormat(post.getRaw() - pre.getRaw()) +
-				")",
-				false
-			);
+		Player.Profile player = Player.create(username, profileName);
+		if (!player.isValid()) {
+			return player.getFailEmbed();
 		}
-		return player.getFailEmbed();
+
+		Weight weight = Weight.of(weightType, player).calculateWeight(type);
+		Weight predictedWeight = Weight.of(weightType, player).calculateWeight(type);
+		WeightStruct pre;
+		WeightStruct post;
+		EmbedBuilder eb = player.defaultPlayerEmbed();
+		if (type.equals("catacombs")) {
+			SkillsStruct current = player.getCatacombs();
+			SkillsStruct target = player.skillInfoFromLevel(amount, type);
+			pre = weight.getDungeonsWeight().getDungeonWeight();
+			post = predictedWeight.getDungeonsWeight().getDungeonWeight(target);
+
+			eb
+				.addField(
+					"Current",
+					"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+					false
+				)
+				.addField(
+					"Target",
+					"Level: " +
+					amount +
+					"\nXP: " +
+					formatNumber(target.totalExp()) +
+					" (+" +
+					formatNumber(target.totalExp() - current.totalExp()) +
+					")",
+					false
+				);
+		} else if (ALL_SKILL_NAMES.contains(type)) {
+			SkillsStruct current = player.getSkill(type);
+			if (current == null) {
+				return invalidEmbed("Skills API disabled");
+			}
+			SkillsStruct target = player.skillInfoFromLevel(amount, type);
+			pre = weight.getSkillsWeight().getSkillsWeight(type);
+			post = predictedWeight.getSkillsWeight().getSkillsWeight(type, target);
+
+			eb
+				.addField(
+					"Current",
+					"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+					false
+				)
+				.addField(
+					"Target",
+					"Level: " +
+					amount +
+					"\nXP: " +
+					formatNumber(target.totalExp()) +
+					" (+" +
+					formatNumber(target.totalExp() - current.totalExp()) +
+					")",
+					false
+				)
+				.addField(
+					"Skill Average Change",
+					roundAndFormat(player.getSkillAverage()) + " ➜ " + roundAndFormat(player.getSkillAverage(type, amount)),
+					false
+				);
+		} else if (SLAYER_NAMES.contains(type)) {
+			int curXp = player.getSlayer(type);
+			pre = weight.getSlayerWeight().getSlayerWeight(type);
+			post = predictedWeight.getSlayerWeight().getSlayerWeight(type, amount);
+
+			eb
+				.addField("Current", "Level: " + player.getSlayerLevel(type) + "\nXP: " + formatNumber(curXp), false)
+				.addField(
+					"Target",
+					"Level: " +
+					player.getSlayerLevel(type, amount) +
+					"\nXP: " +
+					formatNumber(amount) +
+					" (+" +
+					formatNumber(amount - curXp) +
+					")",
+					false
+				)
+				.addField(
+					"Total Slayer XP Change",
+					roundAndFormat(player.getTotalSlayer()) + " ➜ " + roundAndFormat(player.getTotalSlayer(type, amount)),
+					false
+				);
+		} else {
+			return invalidEmbed("Invalid type");
+		}
+
+		if (post.getRaw() <= pre.getRaw()) {
+			return invalidEmbed("You cannot choose a lower level or xp than your current amount");
+		}
+
+		return eb.addField(
+			capitalizeString(weightType.name()) + " Weight Change",
+			"Total: " +
+			weight.getTotalWeight().getFormatted(false) +
+			" ➜ " +
+			predictedWeight.getTotalWeight().getFormatted(false) +
+			"\n" +
+			capitalizeString(type) +
+			": " +
+			pre.getFormatted(false) +
+			" ➜ " +
+			post.getFormatted(false) +
+			" (+" +
+			roundAndFormat(post.getRaw() - pre.getRaw()) +
+			")",
+			false
+		);
 	}
 }

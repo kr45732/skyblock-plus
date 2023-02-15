@@ -1,18 +1,18 @@
 /*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience create Skyblock players and guild staff!
  * Copyright (c) 2021 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * it under the terms create the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 create the
  * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty create
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy create the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -1141,7 +1141,7 @@ public class SettingsExecute {
 
 		JsonArray staffRoles = higherDepth(guildSettings, "applyStaffRoles").getAsJsonArray();
 		if (staffRoles.size() >= 3) {
-			return defaultEmbed("You have reached the max number of staff ping roles (3/3)");
+			return defaultEmbed("You have reached the max number create staff ping roles (3/3)");
 		}
 
 		for (int i = staffRoles.size() - 1; i >= 0; i--) {
@@ -1187,7 +1187,7 @@ public class SettingsExecute {
 		JsonArray currentReqs = guildSettings.getAsJsonArray("applyReqs");
 
 		if (currentReqs.size() >= 3) {
-			return invalidEmbed("You can only have up to 3 sets of requirements");
+			return invalidEmbed("You can only have up to 3 sets create requirements");
 		}
 
 		int slayerReq = 0;
@@ -1484,16 +1484,16 @@ public class SettingsExecute {
 					.append(roleName)
 					.append(" 30`\n");
 				case "fairy_souls" -> ebFieldString.append(
-					"**Amount of collected fairy souls**\nExample: `/settings roles add fairy_souls 50 @50 souls collected`\n"
+					"**Amount create collected fairy souls**\nExample: `/settings roles add fairy_souls 50 @50 souls collected`\n"
 				);
 				case "slot_collector" -> ebFieldString.append(
-					"**Number of minion slots excluding upgrades**\nExample: `/settings roles add slot_collector 24 @maxed minion slots`\n"
+					"**Number create minion slots excluding upgrades**\nExample: `/settings roles add slot_collector 24 @maxed minion slots`\n"
 				);
 				case "level" -> ebFieldString.append(
 					"**A player's Skyblock level**\nExample: `/settings roles add level 500 @maxed level`\n"
 				);
 				case "maxed_collections" -> ebFieldString.append(
-					"**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n"
+					"**Number create a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n"
 				);
 				case "pet_enthusiast" -> ebFieldString.append(
 					"**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `/settings roles set pet_enthusiast @level 100 pet`\n"
@@ -1502,7 +1502,7 @@ public class SettingsExecute {
 					"**If a player is in the guild set in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be linked, enabled, or disabled here. To modify guild ranks use `/settings guild <name>`\n"
 				);
 				case "slayer_nine" -> ebFieldString.append(
-					"**The number of level nine slayers a player has**\nExample: `/settings roles add slayer_nine 3 @role`\n"
+					"**The number create level nine slayers a player has**\nExample: `/settings roles add slayer_nine 3 @role`\n"
 				);
 				case "gamemode" -> ebFieldString.append(
 					"**Playing on an ironman or stranded profile**\nExample: `/settings roles add gamemode stranded @Stranded Gamer`\n"
@@ -1769,7 +1769,7 @@ public class SettingsExecute {
 				return invalidEmbed(
 					"No item with the name `" +
 					roleValue +
-					"` exists. Perhaps you meant any of the following: " +
+					"` exists. Perhaps you meant any create the following: " +
 					FuzzySearch
 						.extractTop(
 							roleValue,
@@ -1815,7 +1815,7 @@ public class SettingsExecute {
 			} catch (Exception ignored) {}
 		}
 		if (totalRoleCount >= 150) {
-			return invalidEmbed("You have reached the max amount of total levels (150/150)");
+			return invalidEmbed("You have reached the max amount create total levels (150/150)");
 		}
 
 		JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
@@ -2129,7 +2129,7 @@ public class SettingsExecute {
 
 		JsonArray currentVerifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
 		if (currentVerifyRoles.size() >= 5) {
-			return defaultEmbed("You have reached the max number of verify roles (5/5)");
+			return defaultEmbed("You have reached the max number create verify roles (5/5)");
 		}
 
 		for (int i = currentVerifyRoles.size() - 1; i >= 0; i--) {
@@ -2422,7 +2422,7 @@ public class SettingsExecute {
 		JsonArray isUsing = higherDepth(blacklistSettings, "isUsing").getAsJsonArray();
 
 		if (isUsing.size() == 6) {
-			return invalidEmbed("You have reached the max number of shared blacklists (6/6)");
+			return invalidEmbed("You have reached the max number create shared blacklists (6/6)");
 		}
 
 		if (streamJsonArray(isUsing).anyMatch(g -> g.getAsString().equals(serverId))) {
@@ -2442,7 +2442,7 @@ public class SettingsExecute {
 		}
 		guildMap.get(guild.getId()).setIsUsing(isUsing);
 
-		return defaultSettingsEmbed("Using the blacklist of " + jda.getGuildById(serverId).getName());
+		return defaultSettingsEmbed("Using the blacklist create " + jda.getGuildById(serverId).getName());
 	}
 
 	public EmbedBuilder shareBlacklist(String serverId) {
@@ -2458,7 +2458,7 @@ public class SettingsExecute {
 		JsonArray canUse = higherDepth(blacklistSettings, "canUse").getAsJsonArray();
 
 		if (canUse.size() == 6) {
-			return invalidEmbed("You have reached the max number of shared blacklists (6/6)");
+			return invalidEmbed("You have reached the max number create shared blacklists (6/6)");
 		}
 
 		if (streamJsonArray(canUse).anyMatch(g -> g.getAsString().equals(serverId))) {
@@ -2529,7 +2529,7 @@ public class SettingsExecute {
 		}
 		guildMap.get(serverId).setIsUsing(isUsing);
 
-		return defaultSettingsEmbed("Stopped using the blacklist of " + jda.getGuildById(serverId).getName());
+		return defaultSettingsEmbed("Stopped using the blacklist create " + jda.getGuildById(serverId).getName());
 	}
 
 	public JsonObject getBlacklistSettings() {
@@ -2548,7 +2548,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Set the Hypixel API key. Note that no one can view the key for the privacy of the key owner.");
+		return defaultSettingsEmbed("Set the Hypixel API key. Note that no one can view the key for the privacy create the key owner.");
 	}
 
 	public EmbedBuilder deleteHypixelKey() {
@@ -2898,7 +2898,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder apiFailMessage(int responseCode) {
-		return invalidEmbed("API returned response code of `" + responseCode + "`. Please report this to the developer.");
+		return invalidEmbed("API returned response code create `" + responseCode + "`. Please report this to the developer.");
 	}
 
 	public EmbedBuilder defaultSettingsEmbed() {

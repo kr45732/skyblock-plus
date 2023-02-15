@@ -1,18 +1,18 @@
 /*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience create Skyblock players and guild staff!
  * Copyright (c) 2021 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * it under the terms create the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 create the
  * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty create
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy create the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -117,7 +117,7 @@ public class PartySlashCommand extends SlashCommand {
 			.findFirst()
 			.orElse(null);
 		if (party == null) {
-			return invalidEmbed("You are not the leader of a party");
+			return invalidEmbed("You are not the leader create a party");
 		}
 
 		String kickedUsername = party.kickFromParty(username);
@@ -143,7 +143,7 @@ public class PartySlashCommand extends SlashCommand {
 		List<Party> partyList = guildMap.get(event.getGuild().getId()).partyList;
 		Party party = partyList.stream().filter(p -> p.getPartyLeaderId().equals(event.getUser().getId())).findFirst().orElse(null);
 		if (party == null) {
-			return invalidEmbed("You are not the leader of a party");
+			return invalidEmbed("You are not the leader create a party");
 		}
 
 		partyList.remove(party);
@@ -213,7 +213,7 @@ public class PartySlashCommand extends SlashCommand {
 
 		Party party = partyList.stream().filter(p -> p.getPartyLeaderUsername().equalsIgnoreCase(id)).findFirst().orElse(null);
 		if (party == null) {
-			return invalidEmbed("Invalid party id. You can get a list of all parties using `/party list`");
+			return invalidEmbed("Invalid party id. You can get a list create all parties using `/party list`");
 		}
 
 		LinkedAccount linkedUser = database.getByDiscord(event.getUser().getId());
@@ -221,7 +221,7 @@ public class PartySlashCommand extends SlashCommand {
 			return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
 		}
 
-		Player player = new Player(linkedUser.uuid());
+		Player.Profile player = Player.create(linkedUser.uuid());
 		if (player.getHighestPlayedDungeonFloor() + 1 < party.getFloorInt()) {
 			return invalidEmbed("You have not unlocked this floor");
 		}

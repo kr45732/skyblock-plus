@@ -1,18 +1,18 @@
 /*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience create Skyblock players and guild staff!
  * Copyright (c) 2021 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * it under the terms create the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 create the
  * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty create
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy create the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -76,7 +76,7 @@ public class MissingSlashCommand extends SlashCommand {
 	}
 
 	public static EmbedBuilder getMissingTalismans(String username, String profileName, SlashCommandEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
 			if (!player.isInventoryApiEnabled()) {
 				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
@@ -193,7 +193,11 @@ public class MissingSlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static Map.Entry<Double, List<String>> getMissingInfo(List<String> missingInternalArr, Player player, NetworthExecute calc) {
+	public static Map.Entry<Double, List<String>> getMissingInfo(
+		List<String> missingInternalArr,
+		Player.Profile player,
+		NetworthExecute calc
+	) {
 		if (soulboundItems == null) {
 			soulboundItems =
 				getSkyblockItemsJson()

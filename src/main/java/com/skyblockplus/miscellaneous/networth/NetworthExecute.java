@@ -1,18 +1,18 @@
 /*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience create Skyblock players and guild staff!
  * Copyright (c) 2021 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * it under the terms create the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 create the
  * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty create
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy create the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -73,7 +73,7 @@ public class NetworthExecute {
 		return calc.getNetworth();
 	}
 
-	public static double getNetworth(Player player) {
+	public static double getNetworth(Player.Profile player) {
 		NetworthExecute calc = new NetworthExecute();
 		calc.getPlayerNetworth(player, null);
 		return calc.getNetworth();
@@ -97,10 +97,10 @@ public class NetworthExecute {
 	}
 
 	public EmbedBuilder getPlayerNetworth(String username, String profileName, GenericInteractionCreateEvent event) {
-		return getPlayerNetworth(profileName == null ? new Player(username) : new Player(username, profileName), event);
+		return getPlayerNetworth(Player.create(username, profileName), event);
 	}
 
-	public EmbedBuilder getPlayerNetworth(Player player, GenericInteractionCreateEvent event) {
+	public EmbedBuilder getPlayerNetworth(Player.Profile player, GenericInteractionCreateEvent event) {
 		if (!player.isValid()) {
 			return player.getFailEmbed();
 		}
@@ -181,7 +181,7 @@ public class NetworthExecute {
 			return invalidEmbed("Was not triggered by command");
 		}
 
-		player.profileToNetworth.put(player.getProfileIndex(), getNetworth());
+		player.getProfileToNetworth().put(player.getProfileIndex(), getNetworth());
 
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 		Map<SelectOption, EmbedBuilder> pages = getPages(player, false);
@@ -230,7 +230,7 @@ public class NetworthExecute {
 		return null;
 	}
 
-	private Map<SelectOption, EmbedBuilder> getPages(Player player, boolean ignoreSoulbound) {
+	private Map<SelectOption, EmbedBuilder> getPages(Player.Profile player, boolean ignoreSoulbound) {
 		StringBuilder echestStr = getSectionString(getItems("enderchest", ignoreSoulbound));
 		StringBuilder sacksStr = getSectionString(getItems("sacks", ignoreSoulbound));
 		StringBuilder personalVaultStr = getSectionString(getItems("personal_vault", ignoreSoulbound));
@@ -912,7 +912,7 @@ public class NetworthExecute {
 			for (String item : recipe) {
 				String[] idCountSplit = item.split(":");
 
-				if (idCountSplit[0].equals("SKYBLOCK_NORTH_STAR")) { // Can't calculate value of a "currency"
+				if (idCountSplit[0].equals("SKYBLOCK_NORTH_STAR")) { // Can't calculate value create a "currency"
 					craftCost = 0;
 					break;
 				}

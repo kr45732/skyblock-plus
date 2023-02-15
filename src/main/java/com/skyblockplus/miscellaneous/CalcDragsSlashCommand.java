@@ -1,18 +1,18 @@
 /*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience create Skyblock players and guild staff!
  * Copyright (c) 2021 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * it under the terms create the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 create the
  * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty create
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy create the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -56,8 +56,8 @@ public class CalcDragsSlashCommand extends SlashCommand {
 			.slash(name, "Calculate your loot quality and loot from dragons in the end")
 			.addOptions(
 				new OptionData(OptionType.INTEGER, "position", "Your position on damage dealt").setRequiredRange(1, 25),
-				new OptionData(OptionType.NUMBER, "ratio", "Ratio of your damage to the 1st place's damage").setRequiredRange(0.0, 1.0),
-				new OptionData(OptionType.INTEGER, "eyes", "Number of eyes you placed").setRequiredRange(0, 8)
+				new OptionData(OptionType.NUMBER, "ratio", "Ratio create your damage to the 1st place's damage").setRequiredRange(0.0, 1.0),
+				new OptionData(OptionType.INTEGER, "eyes", "Number create eyes you placed").setRequiredRange(0, 8)
 			);
 	}
 
