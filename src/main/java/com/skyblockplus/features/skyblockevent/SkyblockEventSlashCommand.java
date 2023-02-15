@@ -78,7 +78,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("create", "Interactive message to of a Skyblock event");
+			return new SubcommandData("create", "Interactive message to create a Skyblock event");
 		}
 
 		public static EmbedBuilder createSkyblockEvent(SlashCommandEvent event) {

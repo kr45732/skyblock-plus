@@ -867,7 +867,7 @@ public class HelpSlashCommand extends SlashCommand {
 		);
 
 		paginateBuilder.addItems(
-			create("party create", "Interactive message to of a party") +
+			create("party create", "Interactive message to create a party") +
 			create("party current", "Get information about your current party") +
 			create("party join <username>", "Join a party") +
 			create("party leave", "Leave your current party") +

@@ -1141,7 +1141,7 @@ public class SettingsExecute {
 
 		JsonArray staffRoles = higherDepth(guildSettings, "applyStaffRoles").getAsJsonArray();
 		if (staffRoles.size() >= 3) {
-			return defaultEmbed("You have reached the max number create staff ping roles (3/3)");
+			return defaultEmbed("You have reached the max number of staff ping roles (3/3)");
 		}
 
 		for (int i = staffRoles.size() - 1; i >= 0; i--) {
