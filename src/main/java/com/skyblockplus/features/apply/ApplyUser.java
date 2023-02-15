@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -122,7 +122,7 @@ public class ApplyUser implements Serializable {
 			}
 			this.applicationChannelId = applicationChannel.getId();
 
-			Player player = new Player(playerUsername);
+			Player.Profile player = Player.create(playerUsername);
 			String[] profileNames = player.getAllProfileNames(Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all")));
 			this.playerUuid = player.getUuid();
 
@@ -234,7 +234,7 @@ public class ApplyUser implements Serializable {
 	}
 
 	public void caseOne(String profile, JsonElement currentSettings, TextChannel applicationChannel) {
-		Player player = new Player(playerUsername, profile);
+		Player.Profile player = Player.create(playerUsername, profile);
 
 		JsonArray currentReqs = higherDepth(currentSettings, "applyReqs").getAsJsonArray();
 
@@ -306,7 +306,7 @@ public class ApplyUser implements Serializable {
 			);
 			reqEmbed.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr);
 			reqEmbed.appendDescription(
-				"\nIf you any of these value seem incorrect, then make sure all your APIs are enabled and/or try relinking"
+				"\nIf any of these value seem incorrect, then make sure all your APIs are enabled and/or try relinking"
 			);
 
 			playerSlayer = formatNumber(player.getTotalSlayer());

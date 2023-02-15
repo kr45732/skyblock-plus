@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -56,13 +56,13 @@ public class InventoryListPaginator {
 	private final Map<Integer, InvItem> items;
 	private final SlashCommandEvent event;
 	private final Map<String, String> renderedCache;
-	private final Player player;
+	private final Player.Profile player;
 	private final Message message;
 	private final int maxPageNumber;
 	private Instant lastEdit = Instant.now();
 	private int pageNumber;
 
-	public InventoryListPaginator(Player player, Map<Integer, InvItem> items, int slot, SlashCommandEvent event) {
+	public InventoryListPaginator(Player.Profile player, Map<Integer, InvItem> items, int slot, SlashCommandEvent event) {
 		this.items = items;
 		this.event = event;
 		this.renderedCache = new HashMap<>();

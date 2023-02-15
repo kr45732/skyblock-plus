@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -608,7 +608,7 @@ public class AutomaticGuild {
 
 						List<Role> toAddRoles = new ArrayList<>(verifyRolesAdd);
 						List<Role> toRemoveRoles = new ArrayList<>(verifyRolesRemove);
-						Player player = null;
+						Player.Profile player = null;
 
 						if (verifyEnabled) {
 							String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
@@ -680,9 +680,16 @@ public class AutomaticGuild {
 											if (player == null) {
 												HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
 												player =
-													!response.isValid()
-														? new Player()
-														: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
+													(
+														!response.isValid()
+															? new Player()
+															: new Player(
+																linkedAccount.username(),
+																linkedAccount.uuid(),
+																response.response(),
+																true
+															)
+													).getSelectedProfile();
 											}
 
 											if (player.isValid()) {
@@ -741,8 +748,9 @@ public class AutomaticGuild {
 								HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
 								player =
 									!response.isValid()
-										? new Player()
-										: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
+										? new Player().getSelectedProfile()
+										: new Player(linkedAccount.username(), linkedAccount.uuid(), response.response(), true)
+											.getSelectedProfile();
 							}
 
 							if (player.isValid()) {

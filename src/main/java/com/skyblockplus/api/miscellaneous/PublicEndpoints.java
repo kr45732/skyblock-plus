@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -167,9 +167,9 @@ public class PublicEndpoints {
 			String userId = oAuthClient.getDiscord(tokenData);
 
 			LinkedAccount linkedAccount = database.getByDiscord(userId);
-			Player player = null;
+			Player.Profile player = null;
 			if (linkedAccount != null) {
-				player = new Player(linkedAccount.uuid());
+				player = Player.create(linkedAccount.uuid());
 			}
 			if (TokenData.updateLinkedRolesMetadata(userId, linkedAccount, player, false).get()) {
 				res.sendRedirect("/success.html");

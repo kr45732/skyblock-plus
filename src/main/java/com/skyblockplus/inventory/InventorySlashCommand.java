@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -67,7 +67,7 @@ public class InventorySlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerInventoryList(String username, String profileName, int slotNum, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				Map<Integer, InvItem> inventoryMap = player.getInventoryMap(true);
 				if (inventoryMap != null) {
@@ -102,7 +102,7 @@ public class InventorySlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerInventory(String username, String profileName, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				String[] playerInventory = player.getInventory();
 				if (playerInventory != null) {

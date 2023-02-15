@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -67,7 +67,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerEnderChestList(String username, String profileName, int slotNum, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				Map<Integer, InvItem> echestMap = player.getEnderChestMap();
 				if (echestMap != null) {
@@ -102,7 +102,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerEnderChest(String username, String profileName, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				List<String[]> enderChestPages = player.getEnderChest();
 				if (enderChestPages != null) {

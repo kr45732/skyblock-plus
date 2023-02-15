@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021-2022 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -148,7 +148,7 @@ public class LinkSlashCommand extends SlashCommand {
 		String updatedNickname = "false";
 		String updatedRoles = "false";
 
-		Player player = null;
+		Player.Profile player = null;
 		HypixelPlayer hypixelPlayer = null;
 		String key = database.getServerHypixelApiKey(member.getGuild().getId());
 
@@ -214,9 +214,11 @@ public class LinkSlashCommand extends SlashCommand {
 							if (player == null) {
 								HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
 								player =
-									response.isValid()
-										? new Player(linkedAccount.uuid(), linkedAccount.username(), response.response())
-										: new Player();
+									(
+										response.isValid()
+											? new Player(linkedAccount.username(), linkedAccount.uuid(), response.response(), true)
+											: new Player()
+									).getSelectedProfile();
 							}
 
 							if (player.isValid()) {
@@ -278,9 +280,11 @@ public class LinkSlashCommand extends SlashCommand {
 						if (player == null) {
 							HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
 							player =
-								!response.isValid()
-									? new Player()
-									: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
+								(
+									!response.isValid()
+										? new Player()
+										: new Player(linkedAccount.username(), linkedAccount.uuid(), response.response(), true)
+								).getSelectedProfile();
 						}
 
 						if (player.isValid()) {

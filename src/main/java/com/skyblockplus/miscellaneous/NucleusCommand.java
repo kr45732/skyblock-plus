@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,7 +20,6 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
@@ -42,44 +41,45 @@ public class NucleusCommand extends Command {
 	}
 
 	public static EmbedBuilder getNuc(String username) {
-		Player player = new Player(username);
-		if (player.isValid()) {
-			EmbedBuilder eb = player.defaultPlayerEmbed();
-			int achievementCount = higherDepth(player.getHypixelPlayerJson(), "achievements.skyblock_crystal_nucleus", -1);
-			Map<String, Integer> sbCounts = new HashMap<>();
-			for (JsonElement profile : player.getProfileArray()) {
-				if (higherDepth(profile, "members." + player.getUuid() + ".mining_core.crystals") != null) {
-					sbCounts.put(
-						higherDepth(profile, "cute_name", "null"),
-						higherDepth(profile, "members." + player.getUuid() + ".mining_core.crystals")
-							.getAsJsonObject()
-							.entrySet()
-							.stream()
-							.map(m -> higherDepth(m.getValue(), "total_placed", -1))
-							.filter(m -> m != -1)
-							.min(Comparator.naturalOrder())
-							.orElse(0)
-					);
-				}
-			}
-			int sbCount = sbCounts.values().stream().mapToInt(Integer::intValue).sum();
+		Player.Profile player = Player.create(username);
+		if (!player.isValid()) {
+			return player.getFailEmbed();
+		}
 
-			eb.addField("Difference", formatNumber(Math.max(achievementCount, 0) - sbCount), false);
-			eb.addField(
+		int achievementCount = higherDepth(player.getHypixelPlayerJson(), "achievements.skyblock_crystal_nucleus", -1);
+		Map<String, Integer> sbCounts = new HashMap<>();
+		for (Player.Profile profile : player.getProfileArray()) {
+			if (higherDepth(profile.getOuterProfileJson(), "members." + player.getUuid() + ".mining_core.crystals") != null) {
+				sbCounts.put(
+					profile.getProfileName(),
+					higherDepth(profile.getOuterProfileJson(), "members." + player.getUuid() + ".mining_core.crystals")
+						.getAsJsonObject()
+						.entrySet()
+						.stream()
+						.map(m -> higherDepth(m.getValue(), "total_placed", -1))
+						.filter(m -> m != -1)
+						.min(Comparator.naturalOrder())
+						.orElse(0)
+				);
+			}
+		}
+		int sbCount = sbCounts.values().stream().mapToInt(Integer::intValue).sum();
+
+		return player
+			.defaultPlayerEmbed()
+			.addField("Difference", formatNumber(Math.max(achievementCount, 0) - sbCount), false)
+			.addField(
 				"Achievement Nucleus Count",
 				achievementCount != -1 ? formatNumber(achievementCount) : "Achievement not found in API",
 				false
-			);
-			eb.addField(
+			)
+			.addField(
 				"Skyblock Nucleus Count",
 				sbCount +
 				"\n\n**Profiles:**\n" +
 				sbCounts.entrySet().stream().map(e -> e.getKey() + " - " + e.getValue()).collect(Collectors.joining("\n• ", "• ", "")),
 				false
 			);
-			return eb;
-		}
-		return invalidEmbed(player.getFailCause());
 	}
 
 	@Override

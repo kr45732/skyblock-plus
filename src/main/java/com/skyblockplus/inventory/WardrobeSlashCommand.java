@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -67,7 +67,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerWardrobeList(String username, String profileName, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
 				if (armorStructMap != null) {
@@ -120,7 +120,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerWardrobe(String username, String profileName, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				List<String[]> wardrobe = player.getWardrobe();
 				if (wardrobe != null) {

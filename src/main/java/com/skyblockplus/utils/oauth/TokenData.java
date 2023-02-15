@@ -88,7 +88,7 @@ public final class TokenData {
 	public static CompletableFuture<Boolean> updateLinkedRolesMetadata(
 		String discord,
 		LinkedAccount linkedAccount,
-		Player player,
+		Player.Profile player,
 		boolean runCheck
 	) {
 		try {

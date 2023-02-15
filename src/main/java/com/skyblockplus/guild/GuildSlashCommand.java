@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -1345,7 +1345,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 			JsonArray guildMembers = guildResponse.get("members").getAsJsonArray();
 			List<CompletableFuture<String>> futuresList = new ArrayList<>();
-			List<Player> players = new ArrayList<>();
+			List<Player.Profile> players = new ArrayList<>();
 
 			for (JsonElement guildMember : guildMembers) {
 				String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
@@ -1361,12 +1361,13 @@ public class GuildSlashCommand extends SlashCommand {
 					asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey)
 						.thenApplyAsync(
 							guildMemberProfileJsonResponse -> {
-								Player player = new Player(
-									guildMemberUuid,
+								Player.Profile player = new Player(
 									uuidToUsername(guildMemberUuid).username(),
+									guildMemberUuid,
 									guildMemberProfileJsonResponse,
 									false
-								);
+								)
+									.getSelectedProfile();
 
 								if (player.isValid()) {
 									boolean invEnabled = excludeArr.contains("inventory") || player.isInventoryApiEnabled();

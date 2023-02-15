@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -74,7 +74,7 @@ public class RolesSlashCommand extends SlashCommand {
 			}
 
 			String username = linkedInfo.username();
-			Player player = profile == null ? new Player(username) : new Player(username, profile);
+			Player.Profile player = Player.create(username, profile);
 			if (!player.isValid()) {
 				return player.getFailEmbed();
 			}
@@ -101,7 +101,7 @@ public class RolesSlashCommand extends SlashCommand {
 			return "• <@&" + name + "\n";
 		}
 
-		public static Object updateRoles(Player player, Member member) {
+		public static Object updateRoles(Player.Profile player, Member member) {
 			return updateRoles(player, member, database.getRolesSettings(member.getGuild().getId()), false);
 		}
 
@@ -109,7 +109,7 @@ public class RolesSlashCommand extends SlashCommand {
 		 * @param skipRoles Whether to skip roles that require extra API requests (guild roles, guild ranks, dungeon secrets)
 		 * @return eb or [eb, toAdd, toRemove]
 		 */
-		public static Object updateRoles(Player player, Member member, JsonElement rolesJson, boolean skipRoles) {
+		public static Object updateRoles(Player.Profile player, Member member, JsonElement rolesJson, boolean skipRoles) {
 			if (rolesJson == null || rolesJson.isJsonNull()) {
 				return invalidEmbed("Unable to fetch roles settings");
 			}

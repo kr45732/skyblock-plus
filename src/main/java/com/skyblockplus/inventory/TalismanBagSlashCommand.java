@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -71,7 +71,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerTalismansList(String username, String profileName, int slotNum, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();
 				if (talismanBagMap != null) {
@@ -106,7 +106,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerTalismansEmoji(String username, String profileName, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				List<String[]> talismanBag = player.getTalismanBag();
 				if (talismanBag != null) {
@@ -142,7 +142,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder getPlayerTuning(String username, String profileName, SlashCommandEvent event) {
-			Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				JsonElement tuningJson = higherDepth(player.profileJson(), "accessory_bag_storage");
 				EmbedBuilder eb = player.defaultPlayerEmbed();

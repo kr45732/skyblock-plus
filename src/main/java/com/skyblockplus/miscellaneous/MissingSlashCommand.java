@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -76,7 +76,7 @@ public class MissingSlashCommand extends SlashCommand {
 	}
 
 	public static EmbedBuilder getMissingTalismans(String username, String profileName, SlashCommandEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
 			if (!player.isInventoryApiEnabled()) {
 				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
@@ -193,7 +193,11 @@ public class MissingSlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static Map.Entry<Double, List<String>> getMissingInfo(List<String> missingInternalArr, Player player, NetworthExecute calc) {
+	public static Map.Entry<Double, List<String>> getMissingInfo(
+		List<String> missingInternalArr,
+		Player.Profile player,
+		NetworthExecute calc
+	) {
 		if (soulboundItems == null) {
 			soulboundItems =
 				getSkyblockItemsJson()

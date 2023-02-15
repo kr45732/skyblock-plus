@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -25,11 +25,11 @@ import com.skyblockplus.utils.Player;
 
 public class SenitherWeight extends Weight {
 
-	public SenitherWeight(Player player) {
+	public SenitherWeight(Player.Profile player) {
 		this(player, false);
 	}
 
-	public SenitherWeight(Player player, boolean calculateWeight) {
+	public SenitherWeight(Player.Profile player, boolean calculateWeight) {
 		super(calculateWeight, new SenitherSlayerWeight(player), new SenitherSkillsWeight(player), new SenitherDungeonsWeight(player));
 	}
 

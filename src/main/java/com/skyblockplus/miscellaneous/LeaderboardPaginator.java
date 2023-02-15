@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2022 kr45732
+ * Copyright (c) 2022-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -58,7 +58,7 @@ public class LeaderboardPaginator {
 	public LeaderboardPaginator(
 		String lbType,
 		Player.Gamemode gamemode,
-		Player player,
+		Player.Profile player,
 		int page,
 		int rank,
 		double amount,

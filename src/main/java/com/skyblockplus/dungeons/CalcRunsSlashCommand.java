@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -114,7 +114,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 			return invalidEmbed("Invalid floor");
 		}
 
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
 			EmbedBuilder regEmbed = getCalcRunsEmbed(player, targetLevel, floor, false, weightType);
 			EmbedBuilder ringEmbed = getCalcRunsEmbed(player, targetLevel, floor, true, weightType)
@@ -156,7 +156,13 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		return player.getFailEmbed();
 	}
 
-	public static EmbedBuilder getCalcRunsEmbed(Player player, int targetLevel, int floor, boolean useRing, Player.WeightType weightType) {
+	public static EmbedBuilder getCalcRunsEmbed(
+		Player.Profile player,
+		int targetLevel,
+		int floor,
+		boolean useRing,
+		Player.WeightType weightType
+	) {
 		SkillsStruct current = player.getCatacombs();
 		SkillsStruct target = player.skillInfoFromLevel(targetLevel, "catacombs");
 		if (current.totalExp() >= target.totalExp()) {

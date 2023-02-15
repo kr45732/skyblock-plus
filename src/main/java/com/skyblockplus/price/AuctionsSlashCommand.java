@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -109,7 +109,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 		boolean verbose,
 		SlashCommandEvent event
 	) {
-		Player player = new Player(username);
+		Player.Profile player = Player.create(username);
 		if (!player.isValid()) {
 			return player.getFailEmbed();
 		}
@@ -120,8 +120,10 @@ public class AuctionsSlashCommand extends SlashCommand {
 		}
 
 		JsonArray auctionsArray = auctionsResponse.response().getAsJsonArray();
-		List<String> validProfileIds = streamJsonArray(player.getProfileArray())
-			.map(prof -> higherDepth(prof, "profile_id").getAsString())
+		List<String> validProfileIds = player
+			.getProfileArray()
+			.stream()
+			.map(prof -> higherDepth(prof.getOuterProfileJson(), "profile_id").getAsString())
 			.collect(Collectors.toCollection(ArrayList::new));
 		Stream<JsonElement> stream = streamJsonArray(auctionsArray)
 			.filter(auc -> validProfileIds.contains(higherDepth(auc, "profile_id").getAsString()));
