@@ -292,6 +292,7 @@ public class Player {
 			this.profileName = higherDepth(profileJson, "cute_name", null);
 		}
 
+		/* Getters */
 		public Map<Integer, Double> getProfileToNetworth() {
 			return Player.this.profileToNetworth;
 		}
@@ -324,7 +325,6 @@ public class Player {
 			return invalidEmbed(failCause);
 		}
 
-		/* Getters */
 		public JsonElement profileJson() {
 			return higherDepth(profileJson, "members." + uuid);
 		}
@@ -365,14 +365,6 @@ public class Player {
 			}
 
 			return hypixelPlayerJson;
-		}
-
-		public String getAuctionUrl() {
-			return Utils.getAuctionUrl(uuid);
-		}
-
-		public String getAvatarUrl() {
-			return Utils.getAvatarlUrl(uuid);
 		}
 
 		public int getDungeonSecrets() {
@@ -516,6 +508,14 @@ public class Player {
 		/* Links */
 		public String skyblockStatsLink() {
 			return Utils.skyblockStatsLink(uuid, getProfileName());
+		}
+
+		public String getAuctionUrl() {
+			return Utils.getAuctionUrl(uuid);
+		}
+
+		public String getAvatarUrl() {
+			return Utils.getAvatarlUrl(uuid);
 		}
 
 		/* Bank and purse */
