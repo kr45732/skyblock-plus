@@ -1192,7 +1192,7 @@ public class Utils {
 
 	/**
 	 * @param toMatch name to match
-	 * @param matchFrom list create ID (will convert to their names)
+	 * @param matchFrom list of ID (will convert to their names)
 	 */
 	public static String getClosestMatchFromIds(String toMatch, Collection<String> matchFrom) {
 		if (matchFrom == null || matchFrom.isEmpty()) {

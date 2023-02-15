@@ -51,7 +51,7 @@ public class CalcDropsSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Calculate the drop rate and cost create all chests for a floor")
+			.slash(name, "Calculate the drop rate and cost of all chests for a floor")
 			.addOptions(
 				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)
 					.addChoice("Floor 1", 1)

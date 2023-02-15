@@ -53,7 +53,7 @@ public class InformationSlashCommand extends SlashCommand {
 			.setEmbeds(
 				defaultEmbed("Skyblock Plus")
 					.setDescription(
-						"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval create Skyblock stats plus customizable features for a better Skyblock experience."
+						"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
 					)
 					.addField(
 						"Statistics",
@@ -105,7 +105,7 @@ public class InformationSlashCommand extends SlashCommand {
 				),
 				ActionRow.of(
 					Button.link("https://skyblock-plus.vercel.app", "Website Link"),
-					Button.link("https://skyblock-plus.vercel.app/tos", "Terms create Service"),
+					Button.link("https://skyblock-plus.vercel.app/tos", "Terms of Service"),
 					Button.link("https://skyblock-plus.vercel.app/privacy-policy", "Privacy Policy")
 				)
 			);

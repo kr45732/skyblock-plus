@@ -96,7 +96,7 @@ public class HelpSlashCommand extends SlashCommand {
 	public SlashCommandData getCommandData() {
 		return Commands
 			.slash(name, "Show the help page for this bot")
-			.addOption(OptionType.STRING, "command", "Name create command or page number", false, true);
+			.addOption(OptionType.STRING, "command", "Name of command or page number", false, true);
 	}
 
 	@Override
@@ -134,14 +134,13 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("slayer", "Get a player's slayer data.", "slayer [player] [profile]").setCategory("slayer"),
 				new HelpData(
 					"calcslayer",
-					"Calculate the number create slayer bosses needed to reach a certain level or xp amount.",
+					"Calculate the number of slayer bosses needed to reach a certain level or xp amount.",
 					"calcslayer <type> [player] [profile] [level] [xp] [system]"
 				)
 					.setCategory("slayer"),
 				// Skills
 				new HelpData("skills", "Get a player's skill data.", "skills [player] [profile]").setCategory("skills"),
-				new HelpData("hotm", "Get a player's heart create the mountain statistics.", "hotm [player] [profile]")
-					.setCategory("skills"),
+				new HelpData("hotm", "Get a player's heart of the mountain statistics.", "hotm [player] [profile]").setCategory("skills"),
 				new HelpData("forge", "Get a player's forge items and ending times.", "forge [player] [profile]").setCategory("skills"),
 				new HelpData("crimson", "Get a player's crimson isle statistics.", "crimson [player] [profile]").setCategory("skills"),
 				// Dungeons
@@ -150,13 +149,13 @@ public class HelpSlashCommand extends SlashCommand {
 					.addSubcommands(
 						new HelpData(
 							"upgrade",
-							"Interactive message to calculate the amount create essence and items to upgrade an item.",
+							"Interactive message to calculate the amount of essence and items to upgrade an item.",
 							"upgrade <item>"
 						)
 							.addExamples("upgrade Hyperion"),
 						new HelpData(
 							"information",
-							"Get the amount create essence and items to upgrade an item for each level.",
+							"Get the amount of essence and items to upgrade an item for each level.",
 							"information <item>"
 						)
 							.addExamples("information Hyperion"),
@@ -165,13 +164,13 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("dungeons"),
 				new HelpData(
 					"calcruns",
-					"Calculate the number create runs needed to reach a certain catacombs level.",
+					"Calculate the number of runs needed to reach a certain catacombs level.",
 					"calcruns <level> <floor> [player] [profile] [system]"
 				)
 					.setCategory("dungeons"),
 				new HelpData(
 					"calcdrops",
-					"Calculate the drop rate and cost create all chests for a dungeons floor",
+					"Calculate the drop rate and cost of all chests for a dungeons floor",
 					"calcdrops <floor> [luck] [accessory]"
 				)
 					.setCategory("dungeons"),
@@ -192,12 +191,12 @@ public class HelpSlashCommand extends SlashCommand {
 						),
 						new HelpData(
 							"kicker",
-							"Get all player's who don't meet the provided requirements. Requirements are in the format `[type:value ...] ...`.  The requirement type can be skills, slayer, catacombs, or weight. The requirement value must be an integer. You can have up to 3 sets create requirements. Set key to true to force use this server's Hypixel API key for more accurate results.",
+							"Get all player's who don't meet the provided requirements. Requirements are in the format `[type:value ...] ...`.  The requirement type can be skills, slayer, catacombs, or weight. The requirement value must be an integer. You can have up to 3 sets of requirements. Set key to true to force use this server's Hypixel API key for more accurate results.",
 							"kicker <requirements> [player] [gamemode] [key]"
 						),
 						new HelpData(
 							"statistics",
-							"Get a guild's average and top 5 leaderboards create slayer, skills, catacombs, weight, networth, and level. Set key to true to force use this server's Hypixel API key for more accurate results.",
+							"Get a guild's average and top 5 leaderboards of slayer, skills, catacombs, weight, networth, and level. Set key to true to force use this server's Hypixel API key for more accurate results.",
 							"statistics [player] [guild] [gamemode] [key]"
 						),
 						new HelpData(
@@ -224,24 +223,24 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("viewauction", "Get information about an auction by it's UUID.", "viewauction <uuid>")
 					.addExamples("viewauction 77df55d9c0084473b113265ef48fb396")
 					.setCategory("price"),
-				new HelpData("bin", "Get the lowest bin create an item.", "bin <item>")
+				new HelpData("bin", "Get the lowest bin of an item.", "bin <item>")
 					.addExamples("bin Wither Chestplate")
 					.setCategory("price"),
-				new HelpData("bazaar", "Get the bazaar prices create an item.", "bazaar <item>")
+				new HelpData("bazaar", "Get the bazaar prices of an item.", "bazaar <item>")
 					.addExamples("bazaar Booster Cookie")
 					.setCategory("price"),
-				new HelpData("average", "Get the average auction and bin price create an item.", "average <item>")
+				new HelpData("average", "Get the average auction and bin price of an item.", "average <item>")
 					.addExamples("average Necron's Handle")
 					.setCategory("price"),
 				new HelpData("bids", "Get a player's auction house bids", "bids [player]").setCategory("price"),
 				new HelpData(
 					"price",
-					"Query the auction house for the lowest price create an item. Allows for more specific queries than bin or average command. Defaults to searching auctions and bins.",
+					"Query the auction house for the lowest price of an item. Allows for more specific queries than bin or average command. Defaults to searching auctions and bins.",
 					"price <item> [type]"
 				)
 					.addExamples("price Necron's Chestplate ✪✪✪✪✪")
 					.setCategory("price"),
-				new HelpData("bits", "Get the bits cost create an item from the bits shop.", "bits <item>")
+				new HelpData("bits", "Get the bits cost of an item from the bits shop.", "bits <item>")
 					.addExamples("bits God Potion")
 					.setCategory("price"),
 				new HelpData("coinsperbit", "Get the coins to bits ratio for items in the bits shop.", "coinsperbit <item>")
@@ -288,7 +287,7 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("miscellaneous"),
 				new HelpData(
 					"networth",
-					"Calculate a player's networth. Set verbose to true to get a detailed breakdown create the calculations.",
+					"Calculate a player's networth. Set verbose to true to get a detailed breakdown of the calculations.",
 					"networth [player] [profile] [verbose]"
 				)
 					.setCategory("miscellaneous"),
@@ -309,7 +308,7 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("miscellaneous"),
 				new HelpData("check-api", "Get a player's enabled and disabled Skyblock APIs", "check-api [player] [profile]")
 					.setCategory("miscellaneous"),
-				new HelpData("profiles", "Get information about all create a player's profiles.", "profiles [player]")
+				new HelpData("profiles", "Get information about all of a player's profiles.", "profiles [player]")
 					.setCategory("miscellaneous"),
 				new HelpData("cakes", "Get a player's active and inactive cake buffs.", "cakes [player] [profile]")
 					.setCategory("miscellaneous"),
@@ -325,11 +324,11 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
 				new HelpData("leaderboard", "Get a global leaderboard.", "leaderboard <type> [player] [mode] [page] [rank] [amount]")
 					.setCategory("miscellaneous"),
-				new HelpData("skyblock", "Get an overview create a player's Skyblock statistics", "skyblock [player] [profile]")
+				new HelpData("skyblock", "Get an overview of a player's Skyblock statistics", "skyblock [player] [profile]")
 					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
 					.setCategory("miscellaneous"),
-				new HelpData("recipe", "Get the crafting recipe create an item.", "recipe <item>").setCategory("miscellaneous"),
+				new HelpData("recipe", "Get the crafting recipe of an item.", "recipe <item>").setCategory("miscellaneous"),
 				new HelpData("calendar", "Get the current Skyblock datetime and running or upcoming events").setCategory("miscellaneous"),
 				new HelpData(
 					"scammer",
@@ -381,13 +380,13 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("delete", "Delete certain settings from the database.")
 							.addSubcommands(
 								new HelpData("all", "Delete the current server settings."),
-								new HelpData("hypixel_key", "Delete the set Hypixel API create this server.")
+								new HelpData("hypixel_key", "Delete the set Hypixel API of this server.")
 							),
 						new HelpData("set", "Set certain settings.")
 							.addSubcommands(
 								new HelpData(
 									"hypixel_key",
-									"Set a Hypixel API key for this server. Once set, this cannot be viewed for the privacy create the key owner.",
+									"Set a Hypixel API key for this server. Once set, this cannot be viewed for the privacy of the key owner.",
 									"hypixel_key <key>"
 								),
 								new HelpData(
@@ -412,7 +411,7 @@ public class HelpSlashCommand extends SlashCommand {
 								),
 								new HelpData(
 									"guest_role",
-									"Set the role that will be given to linked users that are not in any create the setup automatic guilds. Requires at least one automatic guild to be setup.",
+									"Set the role that will be given to linked users that are not in any of the setup automatic guilds. Requires at least one automatic guild to be setup.",
 									"guest_role <@role>"
 								),
 								new HelpData(
@@ -432,7 +431,7 @@ public class HelpSlashCommand extends SlashCommand {
 							),
 						new HelpData("blacklist", "View or manage the application blacklist for this server.")
 							.addSecondData(
-								"Get a list create all the blacklisted players on this server with the reasons and NameMC links.",
+								"Get a list of all the blacklisted players on this server with the reasons and NameMC links.",
 								"blacklist"
 							)
 							.addSubcommands(
@@ -489,7 +488,7 @@ public class HelpSlashCommand extends SlashCommand {
 									.addSubcommands(
 										new HelpData(
 											"add",
-											"Add a role that user will receive upon being verified. The role cannot be @everyone or a managed role. You can add a max create 5 roles.",
+											"Add a role that user will receive upon being verified. The role cannot be @everyone or a managed role. You can add a max of 5 roles.",
 											"add <@role>"
 										),
 										new HelpData("remove", "Remove a verify role.", "remove <@role>")
@@ -639,7 +638,7 @@ public class HelpSlashCommand extends SlashCommand {
 										),
 										new HelpData(
 											"category",
-											"Category where new apply channels will be made. Run `categories` to get the ID's create all categories in the server.",
+											"Category where new apply channels will be made. Run `categories` to get the ID's of all categories in the server.",
 											"settings guild <name> apply category <category>",
 											true
 										),
@@ -688,7 +687,7 @@ public class HelpSlashCommand extends SlashCommand {
 											.addSubcommands(
 												new HelpData(
 													"add",
-													"Add a requirement that applicant must meet. At least one create the requirement types must be set.",
+													"Add a requirement that applicant must meet. At least one of the requirement types must be set.",
 													"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount] [lily_weight:amount] [level:amount]",
 													true
 												),
@@ -709,10 +708,10 @@ public class HelpSlashCommand extends SlashCommand {
 							)
 					),
 				new HelpData("setup", "A guide on how to setup the bot.").setCategory("settings"),
-				new HelpData("categories", "Get the ids create all categories in this server.").setCategory("settings"),
+				new HelpData("categories", "Get the ids of all categories in this server.").setCategory("settings"),
 				new HelpData(
 					"reload",
-					"Reload the automatic guild application(s) and automatic verification settings. This is required for most changes to take effect for both create these features."
+					"Reload the automatic guild application(s) and automatic verification settings. This is required for most changes to take effect for both of these features."
 				)
 					.setCategory("settings")
 			)
@@ -760,35 +759,35 @@ public class HelpSlashCommand extends SlashCommand {
 		);
 
 		paginateBuilder.addItems(
-			create("slayer [player] [profile]", "Get the slayer data create a player") +
+			create("slayer [player] [profile]", "Get the slayer data of a player") +
 			create(
 				"calcslayer <type> [player] [profile] [level] [xp] [system]",
-				"Calculate the number create bosses needed to reach a level or xp amount"
+				"Calculate the number of bosses needed to reach a level or xp amount"
 			)
 		);
 
 		paginateBuilder.addItems(
-			create("skills [player] [profile]", "Get the skills data create a player") +
-			create("hotm [player] [profile]", "Get a player's heart create the mountain statistics") +
+			create("skills [player] [profile]", "Get the skills data of a player") +
+			create("hotm [player] [profile]", "Get a player's heart of the mountain statistics") +
 			create("forge [player] [profile]", "Get a player's forge items & ending times") +
-			create("crimson [player] [profile]", "Get the crimson isle stats create a player")
+			create("crimson [player] [profile]", "Get the crimson isle stats of a player")
 		);
 
 		paginateBuilder.addItems(
-			create("dungeons [player] [profile]", "Get the dungeons data create a player") +
+			create("dungeons [player] [profile]", "Get the dungeons data of a player") +
 			create("essence upgrade <item>", "Interactive message to find the essence amount to upgrade an item") +
-			create("essence information <item>", "Get the amount create essence to upgrade an item for each level") +
+			create("essence information <item>", "Get the amount of essence to upgrade an item for each level") +
 			create("essence player [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
 			create(
 				"calcruns <level> <floor> [player] [profile] [system]",
-				"Calculate the number create runs needed to reach a certain catacombs level"
+				"Calculate the number of runs needed to reach a certain catacombs level"
 			) +
-			create("calcdrops <floor> [luck] [accessory]", "Calculate the drop rate and cost create all chests for a floor")
+			create("calcdrops <floor> [luck] [accessory]", "Calculate the drop rate and cost of all chests for a floor")
 		);
 
 		paginateBuilder.addItems(
 			create("guild information [player] [guild]", "Get information and statistics about a guild") +
-			create("guild members [player] [guild]", "Get a list create all members in a guild") +
+			create("guild members [player] [guild]", "Get a list of all members in a guild") +
 			create("guild experience [player] [guild]", "Get the experience leaderboard for a guild") +
 			create("guild leaderboard <type> [player] [guild] [mode] [key]", "Get a leaderboard for a player's guild") +
 			create("guild kicker <requirements> [player] [gamemode] [key]", "Get all player's who don't meet the provided requirements") +
@@ -798,7 +797,7 @@ public class HelpSlashCommand extends SlashCommand {
 			) +
 			create(
 				"guild statistics [player] [guild] [gamemode] [key]",
-				"Get a guild's Skyblock statistics create slayer, skills, catacombs, weight, level, and networth"
+				"Get a guild's Skyblock statistics of slayer, skills, catacombs, weight, level, and networth"
 			) +
 			create("guild api [player] [exclude]", "Get which Skyblock APIs players have enabled or disabled for a guild")
 		);
@@ -806,12 +805,12 @@ public class HelpSlashCommand extends SlashCommand {
 		paginateBuilder.addItems(
 			create("auctions [player] [filter] [sort] [verbose]", "Get a player's unclaimed auctions on all profiles") +
 			create("viewauction <uuid>", "Get an auction by its UUID") +
-			create("bin <item>", "Get the lowest bin create an item") +
-			create("bazaar <item>", "Get bazaar prices create an item") +
-			create("average <item>", "Get the average auction price create an item") +
+			create("bin <item>", "Get the lowest bin of an item") +
+			create("bazaar <item>", "Get bazaar prices of an item") +
+			create("average <item>", "Get the average auction price of an item") +
 			create("bids [player]", "Get a player's auction house bids") +
-			create("price <item> [auction_type]", "Query the auction house for the lowest bin create an item") +
-			create("bits <item>", "Get the bits cost create an item from the bits shop") +
+			create("price <item> [auction_type]", "Query the auction house for the lowest bin of an item") +
+			create("bits <item>", "Get the bits cost of an item from the bits shop") +
 			create("coinsperbit <item>", "Get the coins to bits ratio for items in the bits shop") +
 			create("flips", "Get current auction flips")
 		);
@@ -846,7 +845,7 @@ public class HelpSlashCommand extends SlashCommand {
 				"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount"
 			) +
 			create("hypixel [player]", "Get Hypixel information about a player") +
-			create("profiles [player]", "Get information about all create a player's profiles") +
+			create("profiles [player]", "Get information about all of a player's profiles") +
 			create("missing [player] [profile]", "Get a player's missing talismans") +
 			create("fetchur", "Get the item that fetchur wants today") +
 			create("cakes [player] [profile]", "Get a player's inactive and active cake buffs") +
@@ -859,8 +858,8 @@ public class HelpSlashCommand extends SlashCommand {
 			create("mayor", "Get information about the current mayor or the running election") +
 			create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
 			create("leaderboard <type> [player] [gamemode] [page] [rank] [amount]", "Get a global leaderboard") +
-			create("skyblock [player] [profile]", "Get an overview create a player's Skyblock statistics") +
-			create("recipe <item>", "Get the crafting recipe create an item") +
+			create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
+			create("recipe <item>", "Get the crafting recipe of an item") +
 			create("check-api [player]", "Check which Skyblock APIs a player has enabled or disabled") +
 			create("calcdrags [position] [ratio] [eyes]", "Calculate loot quality and loot from dragons in the end") +
 			create("reforge <stone>", "Get the reforge stone stats for each rarity") +
@@ -868,7 +867,7 @@ public class HelpSlashCommand extends SlashCommand {
 		);
 
 		paginateBuilder.addItems(
-			create("party create", "Interactive message to create a party") +
+			create("party create", "Interactive message to of a party") +
 			create("party current", "Get information about your current party") +
 			create("party join <username>", "Join a party") +
 			create("party leave", "Leave your current party") +
@@ -891,7 +890,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings", "View the current settings for the Discord server") +
 			create("settings general", "View the bot's general settings for this server") +
 			create("setup", "A short walk-through on how to setup the bot") +
-			create("categories", "Get the name and id create all categories in this server") +
+			create("categories", "Get the name and id of all categories in this server") +
 			create("reload", "Reload the guild application and verification settings") +
 			create("settings set hypixel_key <key>", "Set a Hypixel API key for this server") +
 			create(
@@ -908,7 +907,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings set log_channel <#channel>", "Set the action log channel") +
 			create("settings bot_manager add <@role>", "Add a bot manager role") +
 			create("settings bot_manager remove <@role>", "Remove a bot manager role") +
-			create("settings delete hypixel_key", "Delete the set Hypixel API key create this server") +
+			create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 			create("settings delete all", "Delete the current server settings") +
 			create("settings blacklist", "List all players that are blacklisted") +
 			create("settings blacklist add <player> [reason]", "Blacklist a player from verifying or applying in this server") +
@@ -999,7 +998,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings guild <name> apply deny_message <message>", "Message that will be sent if applicant is denied") +
 			create(
 				"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount]",
-				"Add a requirement that applicant must meet. At least one create the requirement types must be set. Can be empty"
+				"Add a requirement that applicant must meet. At least one of the requirement types must be set. Can be empty"
 			) +
 			create(
 				"settings guild <name> apply requirements remove <index>",

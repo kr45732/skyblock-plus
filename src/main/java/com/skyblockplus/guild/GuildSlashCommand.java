@@ -172,7 +172,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("members", "Get a list create all members in a player's guild")
+			return new SubcommandData("members", "Get a list of all members in a player's guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false);
 		}
@@ -267,7 +267,7 @@ public class GuildSlashCommand extends SlashCommand {
 			return new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
-				.addOptions(new OptionData(OptionType.INTEGER, "days", "Number create days").setRequiredRange(1, 7));
+				.addOptions(new OptionData(OptionType.INTEGER, "days", "Number of days").setRequiredRange(1, 7));
 		}
 
 		public static EmbedBuilder getGuildExperience(String username, String guildName, long days, SlashCommandEvent event) {
@@ -570,7 +570,7 @@ public class GuildSlashCommand extends SlashCommand {
 		) {
 			String[] reqsArr = reqs.split("] \\[");
 			if (reqsArr.length > 5) {
-				return invalidEmbed("You can only enter a maximum create 5 sets create requirements");
+				return invalidEmbed("You can only enter a maximum of 5 sets of requirements");
 			}
 			for (int i = 0; i < reqsArr.length; i++) {
 				String[] indvReqs = reqsArr[i].replace("[", "").replace("]", "").split("\\s+");
@@ -1144,7 +1144,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData(name, "Get a guild's Skyblock statistics create slayer, skills, catacombs, and weight")
+			return new SubcommandData(name, "Get a guild's Skyblock statistics of slayer, skills, catacombs, and weight")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
 				.addOptions(

@@ -304,9 +304,9 @@ public class ApplyUser implements Serializable {
 				" | Level - " +
 				roundAndFormat(player.getLevel())
 			);
-			reqEmbed.appendDescription("\n\n**You do not meet any create the following requirements:**\n" + missingReqsStr);
+			reqEmbed.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr);
 			reqEmbed.appendDescription(
-				"\nIf you any create these value seem incorrect, then make sure all your APIs are enabled and/or try relinking"
+				"\nIf any of these value seem incorrect, then make sure all your APIs are enabled and/or try relinking"
 			);
 
 			playerSlayer = formatNumber(player.getTotalSlayer());

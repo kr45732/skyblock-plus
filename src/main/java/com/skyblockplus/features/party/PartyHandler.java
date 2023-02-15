@@ -107,7 +107,7 @@ public class PartyHandler {
 						menuId = classMenu.getId();
 						event
 							.getHook()
-							.editOriginalEmbeds(getCreationEmbed().setDescription("Choose the number create healers").build())
+							.editOriginalEmbeds(getCreationEmbed().setDescription("Choose the number of healers").build())
 							.setActionRow(classMenu)
 							.queue();
 					}
@@ -186,7 +186,7 @@ public class PartyHandler {
 					menuId = nextClassMenu.getId();
 					event
 						.getHook()
-						.editOriginalEmbeds(getCreationEmbed().setDescription("Choose the number create " + nextClassName + "s").build())
+						.editOriginalEmbeds(getCreationEmbed().setDescription("Choose the number of " + nextClassName + "s").build())
 						.setActionRow(nextClassMenu)
 						.queue();
 				}

@@ -58,7 +58,7 @@ public class RecipeSlashCommand extends SlashCommand {
 
 	@Override
 	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get the crafting recipe create an item").addOption(OptionType.STRING, "item", "Item name", true, true);
+		return Commands.slash(name, "Get the crafting recipe of an item").addOption(OptionType.STRING, "item", "Item name", true, true);
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class RecipeSlashCommand extends SlashCommand {
 			return invalidEmbed("No recipe found for " + name);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Recipe create " + name);
+		EmbedBuilder eb = defaultEmbed("Recipe of " + name);
 		for (Map.Entry<String, JsonElement> entry : higherDepth(infoJson, "recipe").getAsJsonObject().entrySet()) {
 			if (entry.getKey().equals("count")) {
 				continue;

@@ -63,7 +63,7 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Calculate the number create slayer bosses needed to reach a certain level or xp amount")
+			.slash(name, "Calculate the number of slayer bosses needed to reach a certain level or xp amount")
 			.addOptions(
 				new OptionData(OptionType.STRING, "type", "Slayer type", true)
 					.addChoice("Sven Packmaster", "sven")

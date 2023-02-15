@@ -1256,7 +1256,7 @@ public class AutomaticGuild {
 								ActionRow.of(
 									TextInput
 										.create("items", "Items Calculated Incorrectly", TextInputStyle.PARAGRAPH)
-										.setPlaceholder("Description create the items calculated incorrectly")
+										.setPlaceholder("Description of the items calculated incorrectly")
 										.build()
 								),
 								ActionRow.of(

@@ -89,7 +89,7 @@ public class SetupCommandHandler {
 						.addActionRow(
 							TextInput
 								.create("value", "Guild Name", TextInputStyle.SHORT)
-								.setPlaceholder("Name create your Hypixel guild")
+								.setPlaceholder("Name of your Hypixel guild")
 								.build()
 						)
 						.build()

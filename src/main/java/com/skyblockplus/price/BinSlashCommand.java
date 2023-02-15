@@ -51,7 +51,7 @@ public class BinSlashCommand extends SlashCommand {
 
 	@Override
 	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get the lowest bin create an item").addOption(OptionType.STRING, "item", "Item name", true, true);
+		return Commands.slash(name, "Get the lowest bin of an item").addOption(OptionType.STRING, "item", "Item name", true, true);
 	}
 
 	@Override

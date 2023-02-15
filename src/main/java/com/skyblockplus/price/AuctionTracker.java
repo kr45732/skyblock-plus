@@ -46,7 +46,7 @@ public class AuctionTracker {
 
 		if (curTrack != null && curTrack.uuid().equals(uuidStruct.uuid())) {
 			return invalidEmbed(
-				"You are already tracking the auctions create [**" + uuidStruct.username() + "**](" + uuidStruct.getAuctionUrl() + ")"
+				"You are already tracking the auctions of [**" + uuidStruct.username() + "**](" + uuidStruct.getAuctionUrl() + ")"
 			);
 		}
 
@@ -54,11 +54,11 @@ public class AuctionTracker {
 		return defaultEmbed("Auction Tracker")
 			.setDescription(
 				(curTrack != null ? "Stopped tracking [**" + curTrack.username() + "**](" + curTrack.getAuctionUrl() + "). " : "") +
-				"Now tracking the auctions create [**" +
+				"Now tracking the auctions of [**" +
 				uuidStruct.username() +
 				"**](" +
 				uuidStruct.getAuctionUrl() +
-				"). You will receive a DM whenever any create their auctions sells."
+				"). You will receive a DM whenever any of their auctions sells."
 			);
 	}
 
@@ -149,7 +149,7 @@ public class AuctionTracker {
 			commandAuthorToTrackingUser.remove(userId);
 			return defaultEmbed("Auction Tracker")
 				.setDescription(
-					"Stopped tracking the auctions create [**" + stoppedTracking.username() + "**](" + stoppedTracking.getAuctionUrl() + ")"
+					"Stopped tracking the auctions of [**" + stoppedTracking.username() + "**](" + stoppedTracking.getAuctionUrl() + ")"
 				);
 		}
 

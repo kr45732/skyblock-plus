@@ -667,7 +667,7 @@ public class LevelSlashCommand extends SlashCommand {
 		// Crystal nucleus runs
 		int crystalNucleusRuns = higherDepth(player.profileJson(), "leveling.completions.NUCLEUS_RUNS", 0) * 4;
 
-		// Peak create the mountain
+		// Peak of the mountain
 		int peakOfTheMountainSbXp = 0;
 		int potmLevel = higherDepth(player.profileJson(), "mining_core.nodes.special_0", 0);
 		for (int i = 1; i <= potmLevel; i++) {

@@ -58,7 +58,7 @@ public class ProfilesSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Get a information about all create a player's profiles")
+			.slash(name, "Get a information about all of a player's profiles")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
 	}
 

@@ -53,7 +53,7 @@ public class SetupSlashCommand extends SlashCommand {
 			.setEmbeds(
 				defaultEmbed("Setup")
 					.setDescription(
-						"Choose one create the buttons below to setup the corresponding feature. Note that setting up a feature may override previous settings."
+						"Choose one of the buttons below to setup the corresponding feature. Note that setting up a feature may override previous settings."
 					)
 					.build()
 			)

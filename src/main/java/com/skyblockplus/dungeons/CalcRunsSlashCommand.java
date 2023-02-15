@@ -65,7 +65,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Calculate the number create runs needed to reach a catacombs level")
+			.slash(name, "Calculate the number of runs needed to reach a catacombs level")
 			.addOptions(
 				new OptionData(OptionType.INTEGER, "level", "Target catacombs level", true).setRequiredRange(1, 50),
 				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)

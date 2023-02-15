@@ -56,7 +56,7 @@ public class NetworthSlashCommand extends SlashCommand {
 			.slash(name, "Calculate a player's networth")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOptions(profilesCommandOption)
-			.addOption(OptionType.BOOLEAN, "verbose", "Links a detailed JSON with a breakdown create value create each item");
+			.addOption(OptionType.BOOLEAN, "verbose", "Links a detailed JSON with a breakdown of value of each item");
 	}
 
 	@Override

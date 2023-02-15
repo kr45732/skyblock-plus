@@ -56,10 +56,10 @@ public class PriceSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Query the auction house for the price create an item")
+			.slash(name, "Query the auction house for the price of an item")
 			.addOption(OptionType.STRING, "item", "Item name", true, true)
 			.addOptions(
-				new OptionData(OptionType.STRING, "auction_type", "Which type create auctions to show")
+				new OptionData(OptionType.STRING, "auction_type", "Which type of auctions to show")
 					.addChoice("Bin", "bin")
 					.addChoice("Regular auctions", "auction")
 					.addChoice("All auctions", "both")

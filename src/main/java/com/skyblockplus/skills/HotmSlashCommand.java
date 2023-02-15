@@ -54,7 +54,7 @@ public class HotmSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Get a player's heart create the mountain statistics")
+			.slash(name, "Get a player's heart of the mountain statistics")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOptions(profilesCommandOption);
 	}
@@ -71,7 +71,7 @@ public class HotmSlashCommand extends SlashCommand {
 		if (player.isValid()) {
 			SkillsStruct skillInfo = player.getHOTM();
 			if (skillInfo == null) {
-				return invalidEmbed("Player has not unlocked heart create the mountain");
+				return invalidEmbed("Player has not unlocked heart of the mountain");
 			}
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 			JsonElement miningJson = higherDepth(player.profileJson(), "mining_core");

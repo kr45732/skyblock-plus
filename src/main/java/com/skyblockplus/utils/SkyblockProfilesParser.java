@@ -59,7 +59,7 @@ public class SkyblockProfilesParser {
 
 	/**
 	 * Tries to begin reading a JSON array or JSON object, returning {@code null} if
-	 * the next element is neither create those.
+	 * the next element is neither of those.
 	 */
 	private static JsonElement tryBeginNesting(JsonReader in, JsonToken peeked) throws IOException {
 		switch (peeked) {

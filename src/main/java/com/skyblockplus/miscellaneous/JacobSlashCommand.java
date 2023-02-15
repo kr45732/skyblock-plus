@@ -53,7 +53,7 @@ public class JacobSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Get a list create upcoming farming contests")
+			.slash(name, "Get a list of upcoming farming contests")
 			.addOptions(
 				new OptionData(OptionType.STRING, "crop", "Crop to filter by")
 					.addChoices(

@@ -912,7 +912,7 @@ public class NetworthExecute {
 			for (String item : recipe) {
 				String[] idCountSplit = item.split(":");
 
-				if (idCountSplit[0].equals("SKYBLOCK_NORTH_STAR")) { // Can't calculate value create a "currency"
+				if (idCountSplit[0].equals("SKYBLOCK_NORTH_STAR")) { // Can't calculate value of a "currency"
 					craftCost = 0;
 					break;
 				}

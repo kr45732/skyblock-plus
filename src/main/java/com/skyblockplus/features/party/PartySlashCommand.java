@@ -117,7 +117,7 @@ public class PartySlashCommand extends SlashCommand {
 			.findFirst()
 			.orElse(null);
 		if (party == null) {
-			return invalidEmbed("You are not the leader create a party");
+			return invalidEmbed("You are not the leader of a party");
 		}
 
 		String kickedUsername = party.kickFromParty(username);
@@ -143,7 +143,7 @@ public class PartySlashCommand extends SlashCommand {
 		List<Party> partyList = guildMap.get(event.getGuild().getId()).partyList;
 		Party party = partyList.stream().filter(p -> p.getPartyLeaderId().equals(event.getUser().getId())).findFirst().orElse(null);
 		if (party == null) {
-			return invalidEmbed("You are not the leader create a party");
+			return invalidEmbed("You are not the leader of a party");
 		}
 
 		partyList.remove(party);
@@ -213,7 +213,7 @@ public class PartySlashCommand extends SlashCommand {
 
 		Party party = partyList.stream().filter(p -> p.getPartyLeaderUsername().equalsIgnoreCase(id)).findFirst().orElse(null);
 		if (party == null) {
-			return invalidEmbed("Invalid party id. You can get a list create all parties using `/party list`");
+			return invalidEmbed("Invalid party id. You can get a list of all parties using `/party list`");
 		}
 
 		LinkedAccount linkedUser = database.getByDiscord(event.getUser().getId());

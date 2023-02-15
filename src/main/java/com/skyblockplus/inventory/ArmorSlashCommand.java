@@ -60,7 +60,7 @@ public class ArmorSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("list", "Get a list create the player's equipped armor and equipment with lore")
+			return new SubcommandData("list", "Get a list of the player's equipped armor and equipment with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");

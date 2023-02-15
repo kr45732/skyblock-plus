@@ -48,7 +48,7 @@ public class BitsSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Get the price create an item from the bits shop")
+			.slash(name, "Get the price of an item from the bits shop")
 			.addOption(OptionType.STRING, "item", "Item name", true, true);
 	}
 

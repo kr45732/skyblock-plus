@@ -52,7 +52,7 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Get the average auction price create an item")
+			.slash(name, "Get the average auction price of an item")
 			.addOption(OptionType.STRING, "item", "Item name", true, true);
 	}
 
