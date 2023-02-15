@@ -35,6 +35,7 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
@@ -52,7 +53,7 @@ public class Player {
 	private int selectedProfileIndex;
 	private boolean valid = false;
 	private String failCause = "Unknown fail cause";
-	public final Map<Integer, Double> profileToNetworth = new HashMap<>();
+	public final Map<Integer, Double> profileToNetworth = new ConcurrentHashMap<>();
 
 	public static Profile create(String username) {
 		return create(username, null);
@@ -293,6 +294,10 @@ public class Player {
 		}
 
 		/* Getters */
+		public Player getOuter() {
+			return Player.this;
+		}
+
 		public Map<Integer, Double> getProfileToNetworth() {
 			return Player.this.profileToNetworth;
 		}
@@ -1695,6 +1700,25 @@ public class Player {
 			}
 
 			return belt;
+		}
+
+		@Override
+		public String toString() {
+			return (
+				"Player.Profile{" +
+				"valid=" +
+				valid +
+				", uuid='" +
+				uuid +
+				'\'' +
+				", username='" +
+				username +
+				'\'' +
+				", profile='" +
+				profileName +
+				'\'' +
+				'}'
+			);
 		}
 	}
 

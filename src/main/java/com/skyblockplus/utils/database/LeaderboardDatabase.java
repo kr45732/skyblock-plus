@@ -221,7 +221,6 @@ public class LeaderboardDatabase {
 					if (linkedAccount != null) {
 						TokenData.updateLinkedRolesMetadata(linkedAccount.discord(), linkedAccount, player, true);
 					}
-					//					players.remove(j);
 				}
 				statement.executeUpdate();
 			}
