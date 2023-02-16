@@ -235,16 +235,36 @@ public class Database {
 			String username = linkedAccount.username();
 			String uuid = linkedAccount.uuid();
 
+			//			try (
+			//				Connection connection = getConnection();
+			//				PreparedStatement statement = connection.prepareStatement(
+			//					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?, ?, ?) ON CONFLICT (discord, username, uuid) DO UPDATE SET last_updated = EXCLUDED.last_updated, discord = EXCLUDED.discord, username = EXCLUDED.username, uuid = EXCLUDED.uuid RETURNING discord"
+			//				)
+			//			) {
+			//				statement.setLong(1, lastUpdated);
+			//				statement.setString(2, discord);
+			//				statement.setString(3, username);
+			//				statement.setString(4, uuid);
+			//				try (ResultSet response = statement.executeQuery()) {
+			//					if (response.next() && member != null && verifySettings != null) {
+			//						String discordOld = response.getString("discord");
+			//						if (!discord.equals(discordOld)) {
+			//							UnlinkSlashCommand.unlinkAccount(member, verifySettings);
+			//						}
+			//					}
+			//					return true;
+			//				}
+			//			}
+
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?, ?, ?) ON CONFLICT (discord, username, uuid) DO UPDATE SET last_updated = EXCLUDED.last_updated, discord = EXCLUDED.discord, username = EXCLUDED.username, uuid = EXCLUDED.uuid RETURNING discord"
+					"DELETE FROM linked_account WHERE discord = ? OR username = ? or uuid = ? RETURNING discord"
 				)
 			) {
-				statement.setLong(1, lastUpdated);
-				statement.setString(2, discord);
-				statement.setString(3, username);
-				statement.setString(4, uuid);
+				statement.setString(1, discord);
+				statement.setString(2, username);
+				statement.setString(3, uuid);
 				try (ResultSet response = statement.executeQuery()) {
 					if (response.next() && member != null && verifySettings != null) {
 						String discordOld = response.getString("discord");
@@ -252,8 +272,20 @@ public class Database {
 							UnlinkSlashCommand.unlinkAccount(member, verifySettings);
 						}
 					}
-					return true;
 				}
+			}
+
+			try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?, ?, ?)"
+				)
+			) {
+				statement.setLong(1, lastUpdated);
+				statement.setString(2, discord);
+				statement.setString(3, username);
+				statement.setString(4, uuid);
+				return statement.executeUpdate() == 1;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
