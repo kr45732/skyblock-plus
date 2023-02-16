@@ -1089,15 +1089,15 @@ public class Utils {
 		return profileNameToEmoji.getOrDefault(profileName, null);
 	}
 
-	public static EmbedBuilder checkHypixelKey(String hypixelKey) {
-		return checkHypixelKey(hypixelKey, true);
-	}
-
 	public static TextChannel getNetworthBugReportChannel() {
 		if (networthBugReportChannel == null) {
 			networthBugReportChannel = jda.getGuildById("796790757947867156").getTextChannelById("1017573342288564264");
 		}
 		return networthBugReportChannel;
+	}
+
+	public static EmbedBuilder checkHypixelKey(String hypixelKey) {
+		return checkHypixelKey(hypixelKey, true);
 	}
 
 	public static EmbedBuilder checkHypixelKey(String hypixelKey, boolean checkRatelimit) {
