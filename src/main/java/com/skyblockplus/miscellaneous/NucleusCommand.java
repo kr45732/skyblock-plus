@@ -48,7 +48,7 @@ public class NucleusCommand extends Command {
 
 		int achievementCount = higherDepth(player.getHypixelPlayerJson(), "achievements.skyblock_crystal_nucleus", -1);
 		Map<String, Integer> sbCounts = new HashMap<>();
-		for (Player.Profile profile : player.getProfiles()) {
+		for (Player.Profile profile : player.getProfiles().values()) {
 			if (higherDepth(profile.getOuterProfileJson(), "members." + player.getUuid() + ".mining_core.crystals") != null) {
 				sbCounts.put(
 					profile.getProfileName(),
