@@ -2781,12 +2781,12 @@ public class SettingsExecute {
 					StringBuilder reqsString = new StringBuilder("\n");
 					for (int i = 0; i < reqs.size(); i++) {
 						JsonElement req = reqs.get(i);
-						int slayerReq = Integer.parseInt(higherDepth(req, "slayerReq").getAsString());
-						int skillsReq = Integer.parseInt(higherDepth(req, "skillsReq").getAsString());
-						int cataReq = Integer.parseInt(higherDepth(req, "catacombsReq").getAsString());
-						int weightReq = Integer.parseInt(higherDepth(req, "weightReq").getAsString());
-						int lilyWeightReq = Integer.parseInt(higherDepth(req, "lilyWeightReq").getAsString());
-						int levelReq = Integer.parseInt(higherDepth(req, "levelReq").getAsString());
+						int slayerReq = Integer.parseInt(higherDepth(req, "slayerReq", "0"));
+						int skillsReq = Integer.parseInt(higherDepth(req, "skillsReq", "0"));
+						int cataReq = Integer.parseInt(higherDepth(req, "catacombsReq", "0"));
+						int weightReq = Integer.parseInt(higherDepth(req, "weightReq", "0"));
+						int lilyWeightReq = Integer.parseInt(higherDepth(req, "lilyWeightReq", "0"));
+						int levelReq = Integer.parseInt(higherDepth(req, "levelReq", "0"));
 
 						reqsString
 							.append("`")
