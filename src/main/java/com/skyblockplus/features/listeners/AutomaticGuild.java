@@ -885,6 +885,7 @@ public class AutomaticGuild {
 			for (Map.Entry<Member, RoleModifyRecord> entry : memberToRoleChanges.entrySet()) {
 				if (guild.getSelfMember().canInteract(entry.getKey()) && !blacklist.contains(entry.getValue().uuid())) {
 					try {
+						entry.getValue().validate();
 						guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue();
 					} catch (Exception ignored) {}
 				}

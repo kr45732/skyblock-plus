@@ -21,6 +21,7 @@ package com.skyblockplus.utils.structs;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Role;
+import org.apache.commons.collections4.ListUtils;
 
 public record RoleModifyRecord(List<Role> add, List<Role> remove, String uuid) {
 	public RoleModifyRecord(String uuid) {
@@ -39,5 +40,11 @@ public record RoleModifyRecord(List<Role> add, List<Role> remove, String uuid) {
 			}
 		}
 		return this;
+	}
+
+	public void validate() {
+		// Theoretically duplicate roles should only be the same automatic guild member/ranks roles
+		// If it's in both lists, it means the player is in one of the guilds, so then keep the role
+		remove.removeAll(ListUtils.intersection(add, remove));
 	}
 }
