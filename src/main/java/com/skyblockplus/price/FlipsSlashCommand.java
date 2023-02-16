@@ -24,9 +24,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -55,17 +53,23 @@ public class FlipsSlashCommand extends SlashCommand {
 			return invalidEmbed("Flips not updated");
 		}
 
-		JsonElement avgAuctionJson = getAverageAuctionJson();
-		EmbedBuilder eb = defaultEmbed("Flips");
-
-		for (JsonElement auction : underBinJson
+		List<JsonElement> flips = underBinJson
 			.getAsJsonObject()
 			.entrySet()
 			.stream()
 			.map(Map.Entry::getValue)
 			.sorted(Comparator.comparingLong(c -> -higherDepth(c, "profit", 0L)))
 			.limit(5)
-			.collect(Collectors.toCollection(ArrayList::new))) {
+			.collect(Collectors.toCollection(ArrayList::new));
+
+		if (flips.isEmpty()) {
+			return invalidEmbed("No auction flips found at the moment");
+		}
+
+		EmbedBuilder eb = defaultEmbed("Flips");
+		JsonElement avgAuctionJson = getAverageAuctionJson();
+
+		for (JsonElement auction : flips) {
 			String itemId = higherDepth(auction, "id").getAsString();
 			if (isVanillaItem(itemId) || itemId.equals("BEDROCK")) {
 				continue;
