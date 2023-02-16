@@ -70,12 +70,15 @@ public final class TokenData {
 		return lastMetadataUpdate == -1 || Duration.between(Instant.ofEpochMilli(lastMetadataUpdate), Instant.now()).toMinutes() >= 5;
 	}
 
-	public long getMetadata(String key, long defaultValue) {
-		return higherDepth(body, "metadata." + key, defaultValue);
+	public void refreshLastMetadataUpdate() {
+		this.lastMetadataUpdate = Instant.now().toEpochMilli();
+	}
+
+	public JsonObject getBody() {
+		return body;
 	}
 
 	public boolean updateMetadata(JsonObject body) {
-		this.lastMetadataUpdate = Instant.now().toEpochMilli();
 		this.body = body;
 		JsonElement data = putJson(
 			"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
@@ -101,22 +104,42 @@ public final class TokenData {
 				return CompletableFuture.completedFuture(false);
 			}
 
-			JsonObject body = new JsonObject();
-			JsonObject metadata = new JsonObject();
+			// Deep copy otherwise it will modify the cached body too
+			JsonObject body = tokenData.getBody() != null ? tokenData.getBody().deepCopy() : new JsonObject();
+			JsonObject metadata = body.has("metadata") ? body.getAsJsonObject("metadata") : new JsonObject();
 			if (linkedAccount != null) {
 				String platformUsername = linkedAccount.username();
 
 				if (player != null && player.isValid()) {
 					platformUsername += " | " + player.getProfileName();
-					metadata.addProperty("level", (long) Math.max(1, player.getLevel()));
-					metadata.addProperty("networth", (long) Math.max(1, player.getNetworth()));
-					metadata.addProperty("weight", (long) Math.max(1, player.getWeight()));
-					metadata.addProperty("lily_weight", (long) Math.max(1, player.getLilyWeight()));
+
+					long level = (long) player.getLevel();
+					if (level > 0) {
+						metadata.addProperty("level", level);
+					}
+
+					long networth = (long) player.getNetworth();
+					if (networth > 0) {
+						metadata.addProperty("networth", networth);
+					}
+
+					if (player.isSkillsApiEnabled()) {
+						long weight = (long) player.getWeight();
+						if (weight > 0) {
+							metadata.addProperty("weight", weight);
+						}
+
+						long lilyWeight = (long) player.getLilyWeight();
+						if (lilyWeight > 0) {
+							metadata.addProperty("lily_weight", lilyWeight);
+						}
+					}
 				} else {
-					metadata.addProperty("level", tokenData.getMetadata("level", 1));
-					metadata.addProperty("networth", tokenData.getMetadata("networth", 1));
-					metadata.addProperty("weight", tokenData.getMetadata("weight", 1));
-					metadata.addProperty("lily_weight", tokenData.getMetadata("lily_weight", 1));
+					// Append the profile name if it exists
+					String platformUsernameCached = higherDepth(body, "platform_username", null);
+					if (platformUsernameCached != null && platformUsernameCached.contains(" | ")) {
+						platformUsername += " | " + platformUsernameCached.split(" \\| ")[1];
+					}
 				}
 
 				metadata.addProperty("verified", 1);
@@ -127,8 +150,10 @@ public final class TokenData {
 			}
 			body.add("metadata", metadata);
 
-			// Don't update if same as the old metadata
-			if (tokenData.body != null && tokenData.body.equals(body)) {
+			tokenData.refreshLastMetadataUpdate();
+
+			// Don't update if same as the old body
+			if (tokenData.getBody() != null && tokenData.getBody().equals(body)) {
 				return CompletableFuture.completedFuture(true);
 			}
 
