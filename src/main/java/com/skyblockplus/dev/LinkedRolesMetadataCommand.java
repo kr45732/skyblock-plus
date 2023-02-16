@@ -72,7 +72,7 @@ public class LinkedRolesMetadataCommand extends Command {
 		JsonObject role = new JsonObject();
 		role.addProperty("key", key);
 		role.addProperty("name", name);
-		role.addProperty("description", name + " (set this to 1)");
+		role.addProperty("description", name + " (leave this disabled)");
 		role.addProperty("type", 2);
 		return role;
 	}

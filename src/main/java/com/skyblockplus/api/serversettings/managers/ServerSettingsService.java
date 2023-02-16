@@ -243,11 +243,10 @@ public class ServerSettingsService {
 		if (currentServerSettings != null) {
 			List<AutomatedGuild> automatedGuilds = currentServerSettings.getAutomatedGuilds();
 
-			for (int i = automatedGuilds.size() - 1; i >= 0; i--) {
+			for (int i = 0; i < automatedGuilds.size(); i++) {
 				AutomatedGuild automatedGuild = automatedGuilds.get(i);
 
 				if (automatedGuild.getGuildName() != null && automatedGuild.getGuildName().equalsIgnoreCase(name)) {
-					automatedGuild.setServerSettings(null);
 					automatedGuilds.remove(i);
 					currentServerSettings.setAutomatedGuilds(automatedGuilds);
 					settingsRepository.save(currentServerSettings);

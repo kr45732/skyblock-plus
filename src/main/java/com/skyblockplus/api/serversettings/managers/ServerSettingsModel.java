@@ -54,7 +54,7 @@ public class ServerSettingsModel {
 	@Embedded
 	private AutomatedVerify automatedVerify = new AutomatedVerify();
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "serverSettings")
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "serverSettings", orphanRemoval = true)
 	private List<AutomatedGuild> automatedGuilds = new ArrayList<>();
 
 	@Embedded

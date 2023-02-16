@@ -46,7 +46,7 @@ import org.apache.groovy.util.Maps;
 
 public class Player {
 
-	private final List<Profile> profilesArray = new ArrayList<>();
+	private final List<Profile> profiles = new ArrayList<>();
 	private JsonElement hypixelPlayerJson;
 	private String uuid;
 	private String username;
@@ -81,10 +81,7 @@ public class Player {
 				return;
 			}
 
-			JsonArray profilesArray = response.response().getAsJsonArray();
-			for (int i = 0; i < profilesArray.size(); i++) {
-				this.profilesArray.add(new Profile(profilesArray.get(i), i));
-			}
+			populateProfiles(response.response());
 
 			if (findProfileBySelected()) {
 				return;
@@ -112,10 +109,7 @@ public class Player {
 				return;
 			}
 
-			JsonArray profilesArray = response.response().getAsJsonArray();
-			for (int i = 0; i < profilesArray.size(); i++) {
-				this.profilesArray.add(new Profile(profilesArray.get(i), i));
-			}
+			populateProfiles(response.response());
 
 			if (findProfileByName(profileName)) {
 				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : failCause;
@@ -142,10 +136,7 @@ public class Player {
 				return;
 			}
 
-			JsonArray profilesArray = profileArray.getAsJsonArray();
-			for (int i = 0; i < profilesArray.size(); i++) {
-				this.profilesArray.add(new Profile(profilesArray.get(i), i));
-			}
+			populateProfiles(profileArray);
 
 			if (findProfileBySelected()) {
 				return;
@@ -173,10 +164,7 @@ public class Player {
 				return;
 			}
 
-			JsonArray profilesArray = profileArray.getAsJsonArray();
-			for (int i = 0; i < profilesArray.size(); i++) {
-				this.profilesArray.add(new Profile(profilesArray.get(i), i));
-			}
+			populateProfiles(profileArray);
 
 			if (findProfileByName(profileName)) {
 				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : "";
@@ -209,10 +197,7 @@ public class Player {
 				return;
 			}
 
-			JsonArray profilesArray = response.response().getAsJsonArray();
-			for (int i = 0; i < profilesArray.size(); i++) {
-				this.profilesArray.add(new Profile(profilesArray.get(i), i));
-			}
+			populateProfiles(response.response());
 
 			if (findProfileBySelected()) {
 				return;
@@ -243,8 +228,8 @@ public class Player {
 	 */
 	private boolean findProfileByName(String profileName) {
 		try {
-			for (int i = 0; i < profilesArray.size(); i++) {
-				if (profilesArray.get(i).getProfileName().equalsIgnoreCase(profileName)) {
+			for (int i = 0; i < profiles.size(); i++) {
+				if (profiles.get(i).getProfileName().equalsIgnoreCase(profileName)) {
 					this.selectedProfileIndex = i;
 					return false;
 				}
@@ -258,8 +243,8 @@ public class Player {
 	 */
 	private boolean findProfileBySelected() {
 		try {
-			for (int i = 0; i < profilesArray.size(); i++) {
-				if (higherDepth(profilesArray.get(i).getOuterProfileJson(), "selected", false)) {
+			for (int i = 0; i < profiles.size(); i++) {
+				if (higherDepth(profiles.get(i).getOuterProfileJson(), "selected", false)) {
 					this.selectedProfileIndex = i;
 					break;
 				}
@@ -270,14 +255,22 @@ public class Player {
 		return true;
 	}
 
+	private void populateProfiles(JsonElement profileArray) {
+		int i = 0;
+		for (Iterator<JsonElement> iterator = profileArray.getAsJsonArray().iterator(); iterator.hasNext(); i++) {
+			this.profiles.add(new Profile(i, iterator.next()));
+			iterator.remove();
+		}
+	}
+
 	/**
 	 * @return selected profile if valid else invalid profile
 	 */
 	public Profile getSelectedProfile() {
 		if (valid) {
-			return profilesArray.get(selectedProfileIndex);
+			return profiles.get(selectedProfileIndex);
 		} else {
-			return new Profile(null, -1);
+			return new Profile(-1, null);
 		}
 	}
 
@@ -287,7 +280,7 @@ public class Player {
 		private final JsonElement profileJson;
 		private final String profileName;
 
-		public Profile(JsonElement profileJson, int profileIndex) {
+		public Profile(int profileIndex, JsonElement profileJson) {
 			this.profileJson = profileJson;
 			this.profileIndex = profileIndex;
 			this.profileName = higherDepth(profileJson, "cute_name", null);
@@ -314,8 +307,8 @@ public class Player {
 			return uuid;
 		}
 
-		public List<Profile> getProfileArray() {
-			return profilesArray;
+		public List<Profile> getProfiles() {
+			return profiles;
 		}
 
 		public boolean isValid() {
@@ -349,7 +342,7 @@ public class Player {
 		public String[] getAllProfileNames(Gamemode gamemode) {
 			List<String> profileNameList = new ArrayList<>();
 
-			for (Profile profile : profilesArray) {
+			for (Profile profile : profiles) {
 				try {
 					if (gamemode.isGamemode(profile.getGamemode())) {
 						profileNameList.add(profile.getProfileName().toLowerCase());
@@ -382,7 +375,8 @@ public class Player {
 
 		public double getHighestAmount(String type, Gamemode gamemode) {
 			double highestAmount = -1.0;
-			for (Profile profile : profilesArray) {
+
+			for (Profile profile : profiles) {
 				if (profile.isGamemode(gamemode)) {
 					switch (type) {
 						case "slayer":
@@ -1397,7 +1391,7 @@ public class Player {
 			List<InvItem> accessoryBag = accessoryBagMap
 				.values()
 				.stream()
-				.filter(o -> o != null && o.getRarity() != null)
+				.filter(o -> o != null && RARITY_TO_NUMBER_MAP.containsKey(o.getRarity()))
 				.sorted(Comparator.comparingInt(o -> Integer.parseInt(RARITY_TO_NUMBER_MAP.get(o.getRarity()).replace(";", ""))))
 				.collect(Collectors.toCollection(ArrayList::new));
 			// Don't reverse the rarity because we are iterating reverse order

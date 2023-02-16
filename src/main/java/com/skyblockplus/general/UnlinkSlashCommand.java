@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -42,7 +43,7 @@ public class UnlinkSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.embed(unlinkAccount(event));
+		event.embed(unlinkAccount(event.getMember(), null));
 	}
 
 	@Override
@@ -50,32 +51,38 @@ public class UnlinkSlashCommand extends SlashCommand {
 		return Commands.slash(name, "Unlink your account from this bot");
 	}
 
-	public static EmbedBuilder unlinkAccount(SlashCommandEvent event) {
-		database.deleteByDiscord(event.getUser().getId());
+	public static EmbedBuilder unlinkAccount(Member member, JsonElement verifySettings) {
+		if (verifySettings == null) { // Was run by a user
+			database.deleteByDiscord(member.getId());
+			verifySettings = database.getVerifySettings(member.getGuild().getId());
+		}
 
-		JsonElement verifySettings = database.getVerifySettings(event.getGuild().getId());
 		if (verifySettings != null && !verifySettings.isJsonNull()) {
 			List<Role> toAdd = new ArrayList<>();
 			try {
-				toAdd.add(event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
+				toAdd.add(member.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
 			} catch (Exception ignored) {}
-			event
-				.getGuild()
-				.modifyMemberRoles(
-					event.getMember(),
-					toAdd,
-					streamJsonArray(higherDepth(verifySettings, "verifiedRoles"))
-						.map(r -> {
-							try {
-								return event.getGuild().getRoleById(r.getAsString());
-							} catch (Exception e) {
-								return null;
-							}
-						})
-						.filter(Objects::nonNull)
-						.collect(Collectors.toCollection(ArrayList::new))
-				)
-				.queue();
+			List<Role> toRemove = streamJsonArray(higherDepth(verifySettings, "verifiedRoles"))
+					.map(r -> {
+						try {
+							return member.getGuild().getRoleById(r.getAsString());
+						} catch (Exception e) {
+							return null;
+						}
+					})
+					.filter(Objects::nonNull)
+					.collect(Collectors.toCollection(ArrayList::new));
+
+			if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
+				member
+						.getGuild()
+						.modifyMemberRoles(
+								member,
+								toAdd,
+								toRemove
+						)
+						.queue();
+			}
 		}
 
 		return defaultEmbed("Success").setDescription("You were unlinked");

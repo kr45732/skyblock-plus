@@ -902,8 +902,8 @@ public class LevelSlashCommand extends SlashCommand {
 		}
 
 		// Story tasks total
-		LevelRecord levelRecord = new LevelRecord(eb, objectivesSbXp, 105);
-		eb.appendDescription("\n" + getEmoji("BOOK") + " Complete Objectives: " + formatNumber(objectivesSbXp) + " / 105");
+		LevelRecord levelRecord = new LevelRecord(eb, objectivesSbXp, 125);
+		eb.appendDescription("\n" + getEmoji("BOOK") + " Complete Objectives: " + formatNumber(objectivesSbXp) + " / 125");
 		eb.getDescriptionBuilder().insert(0, getEmoji("BOOK_AND_QUILL") + " **Story Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;

@@ -166,12 +166,7 @@ public class PublicEndpoints {
 			TokenData tokenData = oAuthClient.postToken(code, redirectUri);
 			String userId = oAuthClient.getDiscord(tokenData);
 
-			LinkedAccount linkedAccount = database.getByDiscord(userId);
-			Player.Profile player = null;
-			if (linkedAccount != null) {
-				player = Player.create(linkedAccount.uuid());
-			}
-			if (TokenData.updateLinkedRolesMetadata(userId, linkedAccount, player, false).get()) {
+			if (TokenData.updateLinkedRolesMetadata(userId, database.getByDiscord(userId), null, false).get()) {
 				res.sendRedirect("/success.html");
 				return new ResponseEntity<>(HttpStatus.FOUND);
 			}

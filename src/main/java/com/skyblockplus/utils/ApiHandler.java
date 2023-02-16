@@ -626,7 +626,7 @@ public class ApiHandler {
 							username ->
 								username != null &&
 								database.insertLinkedAccount(
-									new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username)
+									new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username), null, null
 								),
 							executor
 						)

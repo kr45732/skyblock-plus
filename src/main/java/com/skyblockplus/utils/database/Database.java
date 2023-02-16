@@ -36,6 +36,7 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import com.skyblockplus.general.UnlinkSlashCommand;
 import com.skyblockplus.utils.oauth.TokenData;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
@@ -44,6 +45,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.dv8tion.jda.api.entities.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -226,7 +229,7 @@ public class Database {
 		return dataSource.getConnection();
 	}
 
-	public boolean insertLinkedAccount(LinkedAccount linkedAccount) {
+	public boolean insertLinkedAccount(LinkedAccount linkedAccount, Member member, JsonElement verifySettings) {
 		try {
 			String discord = linkedAccount.discord();
 			long lastUpdated = linkedAccount.lastUpdated();
@@ -236,26 +239,22 @@ public class Database {
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"DELETE FROM linked_account WHERE discord = ? OR username = ? or uuid = ?"
-				)
-			) {
-				statement.setString(1, discord);
-				statement.setString(2, username);
-				statement.setString(3, uuid);
-				statement.executeUpdate();
-			}
-
-			try (
-				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?, ?, ?)"
+					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?, ?, ?) ON CONFLICT (discord, username, uuid) DO UPDATE SET last_updated = EXCLUDED.last_updated, discord = EXCLUDED.discord, username = EXCLUDED.username, uuid = EXCLUDED.uuid RETURNING discord"
 				)
 			) {
 				statement.setLong(1, lastUpdated);
 				statement.setString(2, discord);
 				statement.setString(3, username);
 				statement.setString(4, uuid);
-				return statement.executeUpdate() == 1;
+				try (ResultSet response = statement.executeQuery()) {
+					if (response.next() && member != null && verifySettings != null) {
+						String discordOld = response.getString("discord");
+						if (!discord.equals(discordOld)) {
+							UnlinkSlashCommand.unlinkAccount(member, verifySettings);
+						}
+					}
+					return true;
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -292,7 +291,6 @@ public class Database {
 	}
 
 	public boolean deleteByDiscord(String discord) {
-		TokenData.updateLinkedRolesMetadata(discord, null, null, false);
 		return deleteBy("discord", discord);
 	}
 
@@ -322,14 +320,20 @@ public class Database {
 	private boolean deleteBy(String type, String value) {
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("DELETE FROM linked_account WHERE " + type + " = ?")
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM linked_account WHERE " + type + " = ? RETURNING discord")
 		) {
 			statement.setString(1, value);
-			return statement.executeUpdate() == 1;
+
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					TokenData.updateLinkedRolesMetadata(response.getString("discord"), null, null, false);
+					return true;
+				}
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
 		}
+		return false;
 	}
 
 	private LinkedAccount responseToRecord(ResultSet response) throws SQLException {
