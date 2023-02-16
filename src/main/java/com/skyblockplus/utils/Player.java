@@ -46,7 +46,7 @@ import org.apache.groovy.util.Maps;
 
 public class Player {
 
-	private final Map<Integer, Profile> profiles = new TreeMap<>();
+	private final List<Profile> profiles = new ArrayList<>();
 	private JsonElement hypixelPlayerJson;
 	private String uuid;
 	private String username;
@@ -228,9 +228,9 @@ public class Player {
 	 */
 	private boolean findProfileByName(String profileName) {
 		try {
-			for (int i = 0; i < profiles.size(); i++) {
-				if (profiles.get(i).getProfileName().equalsIgnoreCase(profileName)) {
-					this.selectedProfileIndex = i;
+			for (Profile profile : profiles) {
+				if (profile.getProfileName().equalsIgnoreCase(profileName)) {
+					this.selectedProfileIndex = profile.getProfileIndex();
 					return false;
 				}
 			}
@@ -243,9 +243,9 @@ public class Player {
 	 */
 	private boolean findProfileBySelected() {
 		try {
-			for (int i = 0; i < profiles.size(); i++) {
-				if (higherDepth(profiles.get(i).getOuterProfileJson(), "selected", false)) {
-					this.selectedProfileIndex = i;
+			for (Profile profile : profiles) {
+				if (higherDepth(profile.getOuterProfileJson(), "selected", false)) {
+					this.selectedProfileIndex = profile.getProfileIndex();
 					return false;
 				}
 			}
@@ -255,8 +255,8 @@ public class Player {
 
 	private void populateProfiles(JsonElement profileElement) {
 		JsonArray profileArray = profileElement.getAsJsonArray();
-		for (int i = profileArray.getAsJsonArray().size() - 1; i >= 0; i--) {
-			this.profiles.put(i, new Profile(i, profileArray.get(i)));
+		for (int i = 0; i < profileArray.getAsJsonArray().size(); i++) {
+			this.profiles.add(new Profile(i, profileArray.get(i)));
 		}
 	}
 
@@ -304,7 +304,7 @@ public class Player {
 			return uuid;
 		}
 
-		public Map<Integer, Profile> getProfiles() {
+		public List<Profile> getProfiles() {
 			return profiles;
 		}
 
@@ -339,7 +339,7 @@ public class Player {
 		public String[] getAllProfileNames(Gamemode gamemode) {
 			List<String> profileNameList = new ArrayList<>();
 
-			for (Profile profile : profiles.values()) {
+			for (Profile profile : profiles) {
 				try {
 					if (gamemode.isGamemode(profile.getGamemode())) {
 						profileNameList.add(profile.getProfileName().toLowerCase());
@@ -373,7 +373,7 @@ public class Player {
 		public double getHighestAmount(String type, Gamemode gamemode) {
 			double highestAmount = -1.0;
 
-			for (Profile profile : profiles.values()) {
+			for (Profile profile : profiles) {
 				if (profile.isGamemode(gamemode)) {
 					switch (type) {
 						case "slayer":

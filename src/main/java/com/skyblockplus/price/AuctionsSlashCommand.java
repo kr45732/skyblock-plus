@@ -122,7 +122,6 @@ public class AuctionsSlashCommand extends SlashCommand {
 		JsonArray auctionsArray = auctionsResponse.response().getAsJsonArray();
 		List<String> validProfileIds = player
 			.getProfiles()
-			.values()
 			.stream()
 			.map(prof -> higherDepth(prof.getOuterProfileJson(), "profile_id").getAsString())
 			.collect(Collectors.toCollection(ArrayList::new));
