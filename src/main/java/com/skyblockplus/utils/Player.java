@@ -256,7 +256,7 @@ public class Player {
 	private void populateProfiles(JsonElement profileElement) {
 		JsonArray profileArray = profileElement.getAsJsonArray();
 		for (int i = profileArray.getAsJsonArray().size() - 1; i >= 0; i--) {
-			this.profiles.put(i, new Profile(i, profileArray.remove(i)));
+			this.profiles.put(i, new Profile(i, profileArray.get(i)));
 		}
 	}
 
