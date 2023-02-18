@@ -1660,7 +1660,7 @@ public class Player {
 		}
 
 		public boolean isSkillsApiEnabled() {
-			return getSkill("combat") != null;
+			return higherDepth(profileJson(), "experience_skill_combat") != null;
 		}
 
 		public int getDojoPoints() {
