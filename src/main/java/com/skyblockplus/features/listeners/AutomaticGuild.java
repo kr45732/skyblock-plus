@@ -503,6 +503,10 @@ public class AutomaticGuild {
 
 			Guild guild = jda.getGuildById(guildId);
 
+			if (guild == null) {
+				return;
+			}
+
 			JsonElement serverSettings = database.getServerSettings(guild.getId());
 			List<AutomatedGuild> guildSettings = database.getAllGuildSettings(guild.getId());
 
