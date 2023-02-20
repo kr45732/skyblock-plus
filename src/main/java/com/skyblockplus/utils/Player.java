@@ -47,13 +47,14 @@ import org.apache.groovy.util.Maps;
 public class Player {
 
 	private final List<Profile> profiles = new ArrayList<>();
-	private JsonElement hypixelPlayerJson;
 	private String uuid;
 	private String username;
 	private int selectedProfileIndex;
 	private boolean valid = false;
 	private String failCause = "Unknown fail cause";
 	public final Map<Integer, Double> profileToNetworth = new ConcurrentHashMap<>();
+	private int dungeonSecretsAchievement = -2;
+	private int crystalNucleusAchievement = -2;
 
 	public static Profile create(String username) {
 		return create(username, null);
@@ -70,7 +71,7 @@ public class Player {
 	}
 
 	public Player(String username, boolean updateLb) {
-		if (usernameToUuid(username)) {
+		if (checkUsername(username)) {
 			return;
 		}
 
@@ -98,7 +99,7 @@ public class Player {
 	}
 
 	public Player(String username, String profileName) {
-		if (usernameToUuid(username)) {
+		if (checkUsername(username)) {
 			return;
 		}
 
@@ -186,7 +187,7 @@ public class Player {
 	 * Used only for leaderboard command
 	 */
 	public Player(String username, Gamemode gamemode) {
-		if (usernameToUuid(username)) {
+		if (checkUsername(username)) {
 			return;
 		}
 
@@ -211,7 +212,10 @@ public class Player {
 		leaderboardDatabase.insertIntoLeaderboardSync(getSelectedProfile(), gamemode);
 	}
 
-	private boolean usernameToUuid(String username) {
+	/**
+	 * @return true if invalid
+	 */
+	private boolean checkUsername(String username) {
 		UsernameUuidStruct response = ApiHandler.usernameToUuid(username);
 		if (!response.isValid()) {
 			failCause = response.failCause();
@@ -289,7 +293,7 @@ public class Player {
 		}
 
 		public Map<Integer, Double> getProfileToNetworth() {
-			return Player.this.profileToNetworth;
+			return profileToNetworth;
 		}
 
 		public String getUsername() {
@@ -354,16 +358,24 @@ public class Player {
 			return getEmoji(itemName.toUpperCase(), "❓");
 		}
 
-		public JsonElement getHypixelPlayerJson() {
-			if (hypixelPlayerJson == null) {
-				hypixelPlayerJson = playerFromUuid(uuid).response();
-			}
-
-			return hypixelPlayerJson;
+		private void refreshAchievementsJson() {
+			JsonElement achievementsJson = playerFromUuid(uuid).response();
+			dungeonSecretsAchievement = higherDepth(achievementsJson, "achievements.skyblock_treasure_hunter", 0);
+			crystalNucleusAchievement = higherDepth(achievementsJson, "achievements.skyblock_crystal_nucleus", -1);
 		}
 
 		public int getDungeonSecrets() {
-			return higherDepth(getHypixelPlayerJson(), "achievements.skyblock_treasure_hunter", 0);
+			if (dungeonSecretsAchievement == -2) {
+				refreshAchievementsJson();
+			}
+			return dungeonSecretsAchievement;
+		}
+
+		public int getCrystalNucleusAchievements() {
+			if (crystalNucleusAchievement == -2) {
+				refreshAchievementsJson();
+			}
+			return crystalNucleusAchievement;
 		}
 
 		public double getHighestAmount(String type) {
