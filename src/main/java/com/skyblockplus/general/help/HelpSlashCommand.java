@@ -362,7 +362,9 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("create", "Interactive message to create a Skyblock event."),
 						new HelpData("current", "Get information about the current event."),
 						new HelpData("join", "Join the current event."),
+						new HelpData("add", "Force add a player to the current event.", "add <player> [profile]"),
 						new HelpData("leave", "Leave the current event."),
+						new HelpData("remove", "Force remove a player from the current event.", "remove <player>"),
 						new HelpData("leaderboard", "Get the leaderboard for current event."),
 						new HelpData(
 							"end",
@@ -533,7 +535,7 @@ public class HelpSlashCommand extends SlashCommand {
 										),
 										new HelpData("disable", "Disable verification automatic DM on join sync")
 									),
-								new HelpData("roles_claim", "Enable or disable automatic roles sync on join")
+								new HelpData("roles_claim", "Enable or disable SB roles sync on join")
 									.addSubcommands(
 										new HelpData(
 											"enable",
@@ -882,6 +884,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("event join [profile]", "Join the current event") +
 			create("event add <player> [profile]", "Force add a player to the event") +
 			create("event leave", "Leave the current event") +
+			create("event remove <player>", "Force remove a player from the event") +
 			create("event leaderboard", "Get the leaderboard for current event") +
 			create("event end [silent]", "Force end or cancel the event")
 		);
@@ -952,8 +955,8 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
 			create("settings verify sync <enable|disable>", "Enable or disable automatic verify role and nickname syncing") +
 			create("settings verify roles_sync <enable|disable>", "Enable or disable automatic roles syncing") +
-			create("settings verify dm_on_join <enable|disable>", "Enable or disable DMing the user on syncing") +
-			create("settings verify roles_claim <enable|disable>", "Enable or disable automatic role syncing")
+			create("settings verify dm_on_join <enable|disable>", "Enable or disable DMing the user on join sync") +
+			create("settings verify roles_claim <enable|disable>", "Enable or disable SB role sync on join")
 		);
 
 		paginateBuilder.addItems(

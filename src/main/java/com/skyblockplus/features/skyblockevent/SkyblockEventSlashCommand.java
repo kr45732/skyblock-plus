@@ -399,6 +399,42 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		}
 	}
 
+	public static class RemoveSubcommand extends Subcommand {
+
+		public RemoveSubcommand() {
+			this.name = "remove";
+		}
+
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			event.embed(removeFromSkyblockEvent(event.getGuild().getId(), event.getOptionStr("player")));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("remove", "Force remove a player from the current event")
+				.addOption(OptionType.STRING, "player", "Player username or mention", true, true);
+		}
+
+		public static EmbedBuilder removeFromSkyblockEvent(String guildId, String player) {
+			if (!higherDepth(database.getSkyblockEventSettings(guildId), "eventType", "").isEmpty()) {
+				UsernameUuidStruct usernameUuidStruct = usernameToUuid(player);
+				if (!usernameUuidStruct.isValid()) {
+					return invalidEmbed(usernameUuidStruct.failCause());
+				}
+
+				int code = database.removeMemberFromSkyblockEvent(guildId, usernameUuidStruct.uuid());
+				if (code == 200) {
+					return defaultEmbed("Success").setDescription("Removed " + usernameUuidStruct.username() + " from the event");
+				} else {
+					return invalidEmbed("An error occurred when leaving the event");
+				}
+			} else {
+				return defaultEmbed("No event running");
+			}
+		}
+	}
+
 	public static class LeaderboardSubcommand extends Subcommand {
 
 		public LeaderboardSubcommand() {

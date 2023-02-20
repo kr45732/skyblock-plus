@@ -20,13 +20,12 @@ package com.skyblockplus.dev;
 
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import org.apache.http.message.BasicHeader;
+import java.util.ArrayList;
+import java.util.List;
+import net.dv8tion.jda.api.entities.RoleConnectionMetadata;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -43,37 +42,37 @@ public class LinkedRolesMetadataCommand extends Command {
 		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
-				JsonArray body = new JsonArray();
-
-				JsonObject role = new JsonObject();
-				role.addProperty("key", "verified");
-				role.addProperty("name", "Verified");
-				role.addProperty("description", "Hypixel account linked to the bot");
-				role.addProperty("type", 7);
-				body.add(role);
-
-				body.add(generateNumericRole("level", "Skyblock Level"));
-				body.add(generateNumericRole("networth", "Networth"));
-				body.add(generateNumericRole("weight", "Senither Weight"));
-				body.add(generateNumericRole("lily_weight", "Lily Weight"));
-
-				JsonElement response = putJson(
-					"https://discord.com/api/v10/applications/" + selfUserId + "/role-connections/metadata",
-					body,
-					new BasicHeader("Authorization", "Bot " + BOT_TOKEN)
+				List<RoleConnectionMetadata> metadataList = new ArrayList<>();
+				metadataList.add(
+					new RoleConnectionMetadata(
+						RoleConnectionMetadata.MetadataType.BOOLEAN_EQUAL,
+						"Verified",
+						"verified",
+						"Hypixel account linked to the bot"
+					)
 				);
-				event.getChannel().sendMessage(makeHastePost(response)).queue();
+				metadataList.add(generateNumericRole("level", "Skyblock Level"));
+				metadataList.add(generateNumericRole("networth", "Networth"));
+				metadataList.add(generateNumericRole("weight", "Senither Weight"));
+				metadataList.add(generateNumericRole("lily_weight", "Lily Weight"));
+
+				jda
+					.getShardById(0)
+					.updateRoleConnectionMetadata(metadataList)
+					.queue(s ->
+						event.getChannel().sendMessageEmbeds(defaultEmbed("Success - added " + s.size() + " linked roles").build()).queue()
+					);
 			}
 		}
 			.queue();
 	}
 
-	private static JsonObject generateNumericRole(String key, String name) {
-		JsonObject role = new JsonObject();
-		role.addProperty("key", key);
-		role.addProperty("name", name);
-		role.addProperty("description", name + " (leave this disabled)");
-		role.addProperty("type", 2);
-		return role;
+	private static RoleConnectionMetadata generateNumericRole(String key, String name) {
+		return new RoleConnectionMetadata(
+			RoleConnectionMetadata.MetadataType.INTEGER_GREATER_THAN_OR_EQUAL,
+			name,
+			key,
+			name + " (keep this disabled)"
+		);
 	}
 }

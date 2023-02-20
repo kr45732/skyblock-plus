@@ -76,7 +76,7 @@ public class SetupCommandHandler {
 								.addOption("Remove Role", "remove_role")
 								.addOption("Toggle Sync Roles & Name", "sync")
 								.addOption("Toggle DM On Join Sync", "dm_on_join")
-								.addOption("Toggle Automatic Roles Claim", "roles_claim")
+								.addOption("Toggle SB Roles Sync On Join", "roles_claim")
 								.build()
 						)
 						.build()

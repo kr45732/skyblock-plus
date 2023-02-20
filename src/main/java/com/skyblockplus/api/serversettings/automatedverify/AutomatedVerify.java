@@ -55,7 +55,7 @@ public class AutomatedVerify {
 
 	private String enableAutomaticSync = "false";
 	private String enableAutomaticRolesSync = "false";
-	private String dmOnSync = "true";
+	private String dmOnSync = "false";
 
 	private String enableRolesClaim = "false";
 }
