@@ -1379,17 +1379,18 @@ public class Constants {
 					.collect(Collectors.toCollection(ArrayList::new));
 
 			/* ALL_TALISMANS */
-			ALL_TALISMANS = new HashSet<>();
-			for (Map.Entry<String, JsonElement> talismanUpgrade : higherDepth(getTalismanJson(), "ACCESSORIES")
-				.getAsJsonObject()
-				.entrySet()) {
-				ALL_TALISMANS.add(talismanUpgrade.getKey());
-				if (higherDepth(getTalismanJson(), "ACCESSORY_DUPLICATES." + talismanUpgrade.getKey()) != null) {
-					for (JsonElement duplicate : higherDepth(getTalismanJson(), "ACCESSORY_DUPLICATES." + talismanUpgrade.getKey())
-						.getAsJsonArray()) {
-						ALL_TALISMANS.add(duplicate.getAsString());
-					}
-				}
+			ALL_TALISMANS =
+				getSkyblockItemsJson()
+					.entrySet()
+					.stream()
+					.filter(e -> higherDepth(e.getValue(), "category", "").equals("ACCESSORY"))
+					.map(Map.Entry::getKey)
+					.collect(Collectors.toCollection(HashSet::new));
+			for (JsonElement extraAccessory : higherDepth(CONSTANTS, "EXTRA_ACCESSORIES").getAsJsonArray()) {
+				ALL_TALISMANS.add(extraAccessory.getAsString());
+			}
+			for (JsonElement ignoredAccessory : higherDepth(CONSTANTS, "IGNORED_ACCESSORIES").getAsJsonArray()) {
+				ALL_TALISMANS.remove(ignoredAccessory.getAsString());
 			}
 
 			/* NUMBER_TO_RARITY_MAP */

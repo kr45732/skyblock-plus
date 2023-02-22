@@ -65,8 +65,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -145,7 +143,6 @@ public class Utils {
 		.addSerializationExclusionStrategy(new ExposeExclusionStrategy())
 		.create();
 	public static final Consumer<Object> ignore = ignored -> {};
-	private static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
 	public static final AtomicInteger remainingLimit = new AtomicInteger(240);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
@@ -173,6 +170,7 @@ public class Utils {
 	public static String SBZ_SCAMMER_DB_KEY = "";
 	public static String LEADERBOARD_DB_URL = "";
 	public static String CLIENT_SECRET = "";
+	public static String BASE_URL = "";
 	/* JSON */
 	private static JsonObject essenceCostsJson;
 	private static JsonObject levelingJson;
@@ -184,7 +182,6 @@ public class Utils {
 	private static JsonObject reforgeStonesJson;
 	private static JsonObject bitsJson;
 	private static JsonObject miscJson;
-	private static JsonObject talismanJson;
 	private static JsonObject lowestBinJson;
 	private static JsonObject averageAuctionJson;
 	private static JsonObject bazaarJson;
@@ -438,24 +435,6 @@ public class Utils {
 		return essenceShopsJson;
 	}
 
-	public static JsonObject getTalismanJson() {
-		if (talismanJson == null) {
-			talismanJson =
-				parseJsString(
-					"{" +
-					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/development/src/constants/accessories.js")
-						.replace("export const ", "")
-						.replace(" = ", ": ")
-						.replace(";", ",")
-						.split("// Getting Unique Accessories Count")[0] +
-					"}"
-				)
-					.getAsJsonObject();
-		}
-
-		return talismanJson;
-	}
-
 	public static JsonObject getBitsJson() {
 		if (bitsJson == null) {
 			bitsJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/BitPricesJson.json");
@@ -641,25 +620,6 @@ public class Utils {
 				},
 				executor
 			);
-	}
-
-	public static String getSkyCryptData(String dataUrl) {
-		try {
-			HttpGet httpGet = new HttpGet(dataUrl);
-			httpGet.setHeader("Authorization", "token " + GITHUB_TOKEN);
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				InputStream inputStream = httpResponse.getEntity().getContent();
-				ByteArrayOutputStream result = new ByteArrayOutputStream();
-				byte[] buffer = new byte[1024];
-				for (int length; (length = inputStream.read(buffer)) != -1;) {
-					result.write(buffer, 0, length);
-				}
-				return result.toString();
-			}
-		} catch (Exception ignored) {}
-		return null;
 	}
 
 	public static String getHasteUrl() {
@@ -1011,15 +971,6 @@ public class Utils {
 		return join("", nCopies(number, "i")).replace("iiiii", "v").replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
 	}
 
-	public static JsonElement parseJsString(String jsString) {
-		try {
-			return JsonParser.parseString(jsScriptEngine.eval(String.format("JSON.stringify(%s);", jsString)).toString());
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return null;
-		}
-	}
-
 	public static String convertSkyblockIdName(String itemName) {
 		try {
 			return higherDepth(getCollectionsJson(), itemName + ".name").getAsString();
@@ -1151,6 +1102,7 @@ public class Utils {
 			SBZ_SCAMMER_DB_KEY = (String) appProps.get("SBZ_SCAMMER_DB_KEY");
 			LEADERBOARD_DB_URL = (String) appProps.get("LEADERBOARD_DB_URL");
 			CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
+			BASE_URL = (String) appProps.get("BASE_URL");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -1164,6 +1116,7 @@ public class Utils {
 			SBZ_SCAMMER_DB_KEY = System.getenv("SBZ_SCAMMER_DB_KEY");
 			LEADERBOARD_DB_URL = System.getenv("LEADERBOARD_DB_URL");
 			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
+			BASE_URL = System.getenv("BASE_URL");
 		}
 	}
 

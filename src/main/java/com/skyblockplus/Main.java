@@ -25,7 +25,7 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.command.CommandListener;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.api.miscellaneous.PublicEndpoints;
+import com.skyblockplus.api.controller.ApiController;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.features.event.EventHandler;
 import com.skyblockplus.features.fetchur.FetchurHandler;
@@ -159,7 +159,7 @@ public class Main {
 		ApiHandler.initialize();
 		AuctionTracker.initialize();
 		AuctionFlipper.initialize(true);
-		PublicEndpoints.initialize();
+		ApiController.initialize();
 		FetchurHandler.initialize();
 		MayorHandler.initialize();
 		JacobHandler.initialize();

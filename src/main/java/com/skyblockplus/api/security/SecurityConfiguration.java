@@ -28,6 +28,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -45,15 +46,10 @@ public class SecurityConfiguration {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http
-			.userDetailsService(
-				new InMemoryUserDetailsManager(
-					User.builder().username(API_USERNAME).password(passwordEncoder().encode(API_PASSWORD)).roles("ADMIN").build()
-				)
-			)
+			.formLogin()
+			.and()
 			.authorizeRequests()
-			.antMatchers("/api/public/**")
-			.permitAll()
-			.antMatchers("/api/private/**")
+			.antMatchers("/private/**")
 			.authenticated()
 			.and()
 			.httpBasic()
@@ -66,5 +62,12 @@ public class SecurityConfiguration {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public UserDetailsService users() {
+		return new InMemoryUserDetailsManager(
+			User.builder().username(API_USERNAME).password(passwordEncoder().encode(API_PASSWORD)).roles("ADMIN").build()
+		);
 	}
 }

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.api.miscellaneous;
+package com.skyblockplus.api.controller;
 
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.boot.web.servlet.error.ErrorController;
