@@ -154,4 +154,7 @@ public class AutomatedRoles {
 
 	@Embedded
 	private RoleModel level = new RoleModel();
+
+	@Embedded
+	private RoleModel social = new RoleModel();
 }

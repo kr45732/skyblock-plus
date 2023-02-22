@@ -1392,7 +1392,8 @@ public class SettingsExecute {
 			"player_items",
 			"mage_rep",
 			"barbarian_rep",
-			"level"
+			"level",
+			"social"
 		);
 		Map<String, Integer> rolePageMap = IntStream
 			.range(0, allRoles.size())
@@ -1468,6 +1469,7 @@ public class SettingsExecute {
 					"mining",
 					"taming",
 					"enchanting",
+					"social",
 					"skill_average",
 					"pet_score",
 					"catacombs",

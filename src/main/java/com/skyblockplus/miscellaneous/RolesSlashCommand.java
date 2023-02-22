@@ -292,6 +292,7 @@ public class RolesSlashCommand extends SlashCommand {
 						"maxed_collections",
 						"mage_rep",
 						"barbarian_rep",
+						"social",
 						"slayer_nine" -> {
 						double roleAmount = -1;
 						switch (currentRoleName) {
@@ -313,7 +314,16 @@ public class RolesSlashCommand extends SlashCommand {
 							}
 							case "level" -> roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getLevel();
 							case "pet_score" -> roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getPetScore();
-							case "alchemy", "combat", "fishing", "farming", "foraging", "carpentry", "mining", "taming", "enchanting" -> {
+							case "alchemy",
+								"combat",
+								"fishing",
+								"farming",
+								"foraging",
+								"carpentry",
+								"mining",
+								"taming",
+								"enchanting",
+								"social" -> {
 								if (useHighest) {
 									roleAmount = player.getHighestAmount(currentRoleName);
 								} else if (player.getSkill(currentRoleName) != null) {
