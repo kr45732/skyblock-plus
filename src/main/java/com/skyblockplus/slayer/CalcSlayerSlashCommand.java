@@ -129,18 +129,22 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 				int killsNeeded = (int) Math.ceil(xpNeeded / xpPerBoss);
 				long cost =
 					killsNeeded *
-					(slayerType.equals("blaze") ? switch (i) {
-						case 0 -> 10000L;
-						case 1 -> 25000L;
-						case 2 -> 60000L;
-						default -> 150000L;
-					} : switch (i) {
-						case 0 -> 2000L;
-						case 1 -> 7500L;
-						case 2 -> 20000L;
-						case 3 -> 50000L;
-						default -> 100000L;
-					});
+					(
+						slayerType.equals("blaze")
+							? switch (i) {
+								case 0 -> 10000L;
+								case 1 -> 25000L;
+								case 2 -> 60000L;
+								default -> 150000L;
+							}
+							: switch (i) {
+								case 0 -> 2000L;
+								case 1 -> 7500L;
+								case 2 -> 20000L;
+								case 3 -> 50000L;
+								default -> 100000L;
+							}
+					);
 
 				out
 					.append("\n")
