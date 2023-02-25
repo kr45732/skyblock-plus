@@ -68,11 +68,6 @@ public class LinkedRolesMetadataCommand extends Command {
 	}
 
 	private static RoleConnectionMetadata generateNumericRole(String key, String name) {
-		return new RoleConnectionMetadata(
-			RoleConnectionMetadata.MetadataType.INTEGER_GREATER_THAN_OR_EQUAL,
-			name,
-			key,
-			name
-		);
+		return new RoleConnectionMetadata(RoleConnectionMetadata.MetadataType.INTEGER_GREATER_THAN_OR_EQUAL, name, key, name);
 	}
 }
