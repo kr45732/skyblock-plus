@@ -77,7 +77,7 @@ public class VerifyController {
 			LinkedAccount linkedAccount = database.getByDiscord(userId);
 			Player.Profile player = null;
 			if (linkedAccount != null) {
-				player = Player.create(linkedAccount.uuid();
+				player = Player.create(linkedAccount.uuid());
 			}
 			if (TokenData.updateLinkedRolesMetadata(userId, linkedAccount, player, false).get()) {
 				res.sendRedirect("/success.html");
