@@ -206,6 +206,7 @@ public class MissingSlashCommand extends SlashCommand {
 					.filter(e -> higherDepth(e.getValue(), "soulbound", null) != null)
 					.map(Map.Entry::getKey)
 					.collect(Collectors.toCollection(ArrayList::new));
+			soulboundItems.add("KUUDRA_FOLLOWER_ARTIFACT");
 		}
 
 		List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");
