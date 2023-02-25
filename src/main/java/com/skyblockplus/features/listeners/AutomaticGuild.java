@@ -1282,34 +1282,6 @@ public class AutomaticGuild {
 								),
 						ignore
 					);
-				//				getNetworthBugReportChannel()
-				//					.retrieveMessageById(split[1])
-				//					.queue(
-				//						m ->
-				//							jda
-				//								.retrieveUserById(split[0])
-				//								.queue(
-				//									u ->
-				//										u
-				//											.openPrivateChannel()
-				//											.queue(
-				//												c ->
-				//													c
-				//														.sendMessageEmbeds(
-				//															defaultEmbed(null).setDescription(m.getEmbeds().get(0).getDescription()).build()
-				//														)
-				//														.setContent(
-				//															client.getSuccess() +
-				//															" Your networth bug report has been resolved by " +
-				//															event.getUser().getAsMention()
-				//														)
-				//														.queue(ignore, ignore),
-				//												ignore
-				//											),
-				//									ignore
-				//								),
-				//						ignore
-				//					);
 			}
 		} else if (event.getComponentId().startsWith("nw_run_")) {
 			event.deferReply(true).complete();
