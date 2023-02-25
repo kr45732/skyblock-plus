@@ -64,17 +64,17 @@ public class NetworthExecute {
 	);
 	private static final Map<String, Double> enchantWorth = Maps.of(
 		"COUNTER_STRIKE",
-		0.2,
+		0.25,
 		"BIG_BRAIN",
-		0.35,
+		0.40,
 		"ULTIMATE_INFERNO",
-		0.35,
+		0.40,
 		"OVERLOAD",
-		0.35,
+		0.40,
 		"ULTIMATE_SOUL_EATER",
-		0.35,
+		0.40,
 		"ULTIMATE_FATAL_TEMPO",
-		0.65
+		0.7
 	);
 	private static final List<String> locations = List.of(
 		"inventory",
@@ -725,7 +725,7 @@ public class NetworthExecute {
 
 					double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
 					if (!item.getId().equals("ENCHANTED_BOOK")) {
-						enchantPrice *= enchantWorth.getOrDefault(enchant.split(";")[0], 0.85) + 0.05;
+						enchantPrice *= enchantWorth.getOrDefault(enchant.split(";")[0], 0.9);
 					}
 					enchantsExtras += enchantPrice;
 					if (verbose) {
