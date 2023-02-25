@@ -32,14 +32,50 @@ import com.skyblockplus.utils.command.SelectMenuPaginator;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import org.apache.groovy.util.Maps;
 
 public class NetworthExecute {
 
 	private static final List<String> allowedRecombCategories = List.of("ACCESSORY", "NECKLACE", "GLOVES", "BRACELET", "BELT", "CLOAK");
+	private static final Map<String, String> attributesBaseCosts = Maps.of(
+		"GLOWSTONE_GAUNTLET",
+		"GLOWSTONE_GAUNTLET",
+		"VANQUISHED_GLOWSTONE_GAUNTLET",
+		"GLOWSTONE_GAUNTLET",
+		"BLAZE_BELT",
+		"BLAZE_BELT",
+		"VANQUISHED_BLAZE_BELT",
+		"BLAZE_BELT",
+		"MAGMA_NECKLACE",
+		"MAGMA_NECKLACE",
+		"VANQUISHED_MAGMA_NECKLACE",
+		"MAGMA_NECKLACE",
+		"MAGMA_ROD",
+		"MAGMA_ROD",
+		"INFERNO_ROD",
+		"MAGMA_ROD",
+		"HELLFIRE_ROD",
+		"MAGMA_ROD"
+	);
+	private static final Map<String, Double> enchantWorth = Maps.of(
+		"COUNTER_STRIKE",
+		0.2,
+		"BIG_BRAIN",
+		0.35,
+		"ULTIMATE_INFERNO",
+		0.35,
+		"OVERLOAD",
+		0.35,
+		"ULTIMATE_SOUL_EATER",
+		0.35,
+		"ULTIMATE_FATAL_TEMPO",
+		0.65
+	);
 	private static final List<String> locations = List.of(
 		"inventory",
 		"talisman",
@@ -666,7 +702,7 @@ public class NetworthExecute {
 				item.getDungeonFloor() == -1 &&
 				(!item.getEnchantsFormatted().isEmpty() || allowedRecombCategories.contains(getItemCategory(item.getId())))
 			) {
-				recombobulatedExtra = recombPrice;
+				recombobulatedExtra = recombPrice * 0.85;
 			}
 		} catch (Exception ignored) {}
 
@@ -675,7 +711,7 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			fumingExtras = item.getFumingCount() * fumingPrice * 0.66;
+			fumingExtras = item.getFumingCount() * fumingPrice * 0.65;
 		} catch (Exception ignored) {}
 
 		StringBuilder enchStr = verbose ? new StringBuilder("[") : null;
@@ -683,13 +719,13 @@ public class NetworthExecute {
 			List<String> enchants = item.getEnchantsFormatted();
 			for (String enchant : enchants) {
 				try {
-					if (item.getDungeonFloor() != -1 && enchant.equalsIgnoreCase("scavenger;5")) {
+					if (!item.getId().equals("ENCHANTED_BOOK") && enchant.equalsIgnoreCase("SCAVENGER;5")) {
 						continue;
 					}
 
 					double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
 					if (!item.getId().equals("ENCHANTED_BOOK")) {
-						enchantPrice *= enchant.startsWith("ULTIMATE_SOUL_EATER") || enchant.startsWith("OVERLOAD") ? 0.40 : 0.90;
+						enchantPrice *= enchantWorth.getOrDefault(item.getId(), 0.9);
 					}
 					enchantsExtras += enchantPrice;
 					if (verbose) {
@@ -715,13 +751,59 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			essenceExtras = item.getEssenceCount() * higherDepth(bazaarJson, "ESSENCE_" + item.getEssenceType() + ".sell_summary", 0.0);
+			essenceExtras =
+				item.getEssenceCount() * higherDepth(bazaarJson, "ESSENCE_" + item.getEssenceType() + ".sell_summary", 0.0) * 0.8;
 		} catch (Exception ignored) {}
 
 		StringBuilder miscStr = verbose ? new StringBuilder("[") : null;
 		try {
 			for (Map.Entry<String, Integer> extraItem : item.getExtraStats().entrySet()) {
-				double miscPrice = getLowestPrice(extraItem.getKey()) * (extraItem.getKey().startsWith("ATTRIBUTE_SHARD_") ? 0.6 : 1);
+				double miscPrice = 0;
+
+				if (extraItem.getKey().startsWith("ATTRIBUTE_SHARD_")) {
+					if (extraItem.getValue() == 1) {
+						continue;
+					}
+
+					double baseAttributePrice = getLowestPrice(extraItem.getKey());
+					if (attributesBaseCosts.containsKey(item.getId())) {
+						double calcBasePrice = getLowestPrice(attributesBaseCosts.get(item.getId()));
+						if (calcBasePrice > 0) {
+							baseAttributePrice = Math.min(baseAttributePrice, calcBasePrice);
+						}
+					} else if (
+						item
+							.getId()
+							.matches(
+								"(|HOT_|BURNING_|FIERY_|INFERNAL_)(CRIMSON|FERVOR|HOLLOW|TERROR|AURORA)_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
+							)
+					) {
+						double calcBasePrice = Stream
+							.of("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS")
+							.map(a ->
+								higherDepth(
+									extraPrices,
+									("KUUDRA_" + a + "_" + extraItem.getKey().split("ATTRIBUTE_SHARD_")[1]).toLowerCase()
+								)
+							)
+							.filter(Objects::nonNull)
+							.mapToDouble(JsonElement::getAsDouble)
+							.average()
+							.orElse(0);
+						if (calcBasePrice > 0) {
+							baseAttributePrice = Math.min(baseAttributePrice, calcBasePrice);
+						}
+					}
+
+					if (baseAttributePrice > 0) {
+						miscPrice = baseAttributePrice;
+					}
+				}
+				if (miscPrice == 0) {
+					miscPrice = getLowestPrice(extraItem.getKey());
+				}
+				miscPrice *= 0.95;
+
 				miscExtras += miscPrice * extraItem.getValue();
 				if (verbose) {
 					miscStr
@@ -912,12 +994,14 @@ public class NetworthExecute {
 			for (String item : recipe) {
 				String[] idCountSplit = item.split(":");
 
-				if (idCountSplit[0].equals("SKYBLOCK_NORTH_STAR")) { // Can't calculate value of a "currency"
+				double itemLowestPrice = getLowestPrice(idCountSplit[0].replace("-", ":"));
+
+				if (itemLowestPrice == 0) {
 					craftCost = 0;
 					break;
 				}
 
-				craftCost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
+				craftCost += itemLowestPrice * Integer.parseInt(idCountSplit[1]);
 			}
 			craftCost /= getRecipeCount(itemId);
 		}

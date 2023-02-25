@@ -1099,6 +1099,50 @@ public class AutomaticGuild {
 			} else if (ebOrMb instanceof MessageEditBuilder mb) {
 				event.getHook().editOriginal(mb.build()).queue(ignore, ignore);
 			}
+		} else if (event.getModalId().startsWith("nw_reply_")) {
+			if (event.getUser().getId().equals(client.getOwnerId())) {
+				event
+					.editComponents(
+						ActionRow.of(
+							event
+								.getMessage()
+								.getButtons()
+								.stream()
+								.filter(b -> b.getStyle() == ButtonStyle.LINK)
+								.collect(Collectors.toCollection(ArrayList::new))
+						)
+					)
+					.queue();
+
+				String replyMessage = event.getValue("value").getAsString();
+				String userId = event.getModalId().split("nw_reply_")[1].split("_")[0];
+				jda
+					.retrieveUserById(userId)
+					.queue(
+						u ->
+							u
+								.openPrivateChannel()
+								.queue(
+									c ->
+										c
+											.sendMessageEmbeds(
+												defaultEmbed(null)
+													.setDescription(event.getMessage().getEmbeds().get(0).getDescription())
+													.build()
+											)
+											.setContent(
+												client.getSuccess() +
+												" Your networth bug report has been resolved by " +
+												event.getUser().getAsMention() +
+												"\nComment: " +
+												replyMessage
+											)
+											.queue(ignore, ignore),
+									ignore
+								),
+						ignore
+					);
+			}
 		} else if (event.getModalId().startsWith("nw_")) {
 			event.deferReply(true).complete();
 
@@ -1149,17 +1193,15 @@ public class AutomaticGuild {
 						.setDescription(event.getValue("items").getAsString() + "\n\n" + event.getValue("prices").getAsString())
 						.build()
 				)
-				.queue(m ->
-					m
-						.editMessageComponents(
-							ActionRow.of(
-								Button.link(getHasteUrl() + finalSplit[3], "Verbose Link"),
-								Button.primary("nw_run_" + finalSplit[0] + "_" + finalSplit[1], "Run Networth"),
-								Button.success("nw_resolved_" + event.getUser().getId() + "_" + m.getId(), "Resolved")
-							)
-						)
-						.queue()
-				);
+				.setComponents(
+					ActionRow.of(
+						Button.link(getHasteUrl() + finalSplit[3], "Verbose Link"),
+						Button.primary("nw_run_" + finalSplit[0] + "_" + finalSplit[1], "Run Networth"),
+						Button.success("nw_resolved_" + event.getUser().getId(), "Resolved"),
+						Button.success("nw_reply_" + event.getUser().getId(), "Reply")
+					)
+				)
+				.queue();
 
 			event.getHook().editOriginal(client.getSuccess() + " Bug report sent").queue();
 		}
@@ -1189,6 +1231,17 @@ public class AutomaticGuild {
 				.queue();
 		} else if (event.getComponentId().equals("mayor_jerry_button")) {
 			event.replyEmbeds(jerryEmbed).setEphemeral(true).queue();
+		} else if (event.getComponentId().startsWith("nw_reply_")) {
+			if (event.getUser().getId().equals(client.getOwnerId())) {
+				event
+					.replyModal(
+						Modal
+							.create(event.getComponentId(), "Networth Bug Report Reply")
+							.addActionRow(TextInput.create("value", "Repy", TextInputStyle.PARAGRAPH).build())
+							.build()
+					)
+					.queue();
+			}
 		} else if (event.getComponentId().startsWith("nw_resolved_")) {
 			if (event.getUser().getId().equals(client.getOwnerId())) {
 				event
@@ -1203,36 +1256,60 @@ public class AutomaticGuild {
 						)
 					)
 					.queue();
-				// 0 = user id, 1 = message id
-				String[] split = event.getComponentId().split("nw_resolved_")[1].split("_");
-				getNetworthBugReportChannel()
-					.retrieveMessageById(split[1])
+
+				String userId = event.getComponentId().split("nw_resolved_")[1].split("_")[0];
+				jda
+					.retrieveUserById(userId)
 					.queue(
-						m ->
-							jda
-								.retrieveUserById(split[0])
+						u ->
+							u
+								.openPrivateChannel()
 								.queue(
-									u ->
-										u
-											.openPrivateChannel()
-											.queue(
-												c ->
-													c
-														.sendMessageEmbeds(
-															defaultEmbed(null).setDescription(m.getEmbeds().get(0).getDescription()).build()
-														)
-														.setContent(
-															client.getSuccess() +
-															" Your networth bug report has been resolved by " +
-															event.getUser().getAsMention()
-														)
-														.queue(ignore, ignore),
-												ignore
-											),
+									c ->
+										c
+											.sendMessageEmbeds(
+												defaultEmbed(null)
+													.setDescription(event.getMessage().getEmbeds().get(0).getDescription())
+													.build()
+											)
+											.setContent(
+												client.getSuccess() +
+												" Your networth bug report has been resolved by " +
+												event.getUser().getAsMention()
+											)
+											.queue(ignore, ignore),
 									ignore
 								),
 						ignore
 					);
+				//				getNetworthBugReportChannel()
+				//					.retrieveMessageById(split[1])
+				//					.queue(
+				//						m ->
+				//							jda
+				//								.retrieveUserById(split[0])
+				//								.queue(
+				//									u ->
+				//										u
+				//											.openPrivateChannel()
+				//											.queue(
+				//												c ->
+				//													c
+				//														.sendMessageEmbeds(
+				//															defaultEmbed(null).setDescription(m.getEmbeds().get(0).getDescription()).build()
+				//														)
+				//														.setContent(
+				//															client.getSuccess() +
+				//															" Your networth bug report has been resolved by " +
+				//															event.getUser().getAsMention()
+				//														)
+				//														.queue(ignore, ignore),
+				//												ignore
+				//											),
+				//									ignore
+				//								),
+				//						ignore
+				//					);
 			}
 		} else if (event.getComponentId().startsWith("nw_run_")) {
 			event.deferReply(true).complete();
