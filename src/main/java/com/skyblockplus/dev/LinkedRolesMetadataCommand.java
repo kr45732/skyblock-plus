@@ -72,7 +72,7 @@ public class LinkedRolesMetadataCommand extends Command {
 			RoleConnectionMetadata.MetadataType.INTEGER_GREATER_THAN_OR_EQUAL,
 			name,
 			key,
-			name + " (keep this disabled)"
+			name
 		);
 	}
 }
