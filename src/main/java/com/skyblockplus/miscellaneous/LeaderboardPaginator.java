@@ -221,7 +221,7 @@ public class LeaderboardPaginator {
 				.replyModal(
 					Modal
 						.create("leaderboard_paginator_search_modal_" + event.getMessageId(), "Search")
-						.addActionRows(
+						.addComponents(
 							ActionRow.of(TextInput.create("rank", "Rank", TextInputStyle.SHORT).setRequired(false).build()),
 							ActionRow.of(TextInput.create("player", "Player", TextInputStyle.SHORT).setRequired(false).build()),
 							ActionRow.of(TextInput.create("page", "Page", TextInputStyle.SHORT).setRequired(false).build()),

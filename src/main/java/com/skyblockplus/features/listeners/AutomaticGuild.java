@@ -1306,7 +1306,7 @@ public class AutomaticGuild {
 					.replyModal(
 						Modal
 							.create(event.getComponentId(), "Networth Bug Report")
-							.addActionRows(
+							.addComponents(
 								ActionRow.of(
 									TextInput
 										.create("items", "Items Calculated Incorrectly", TextInputStyle.PARAGRAPH)
