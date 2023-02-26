@@ -96,7 +96,10 @@ public class OAuthClient {
 				CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
 				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
 			) {
-				tokenData.refreshData(JsonParser.parseReader(in));
+				if (!tokenData.refreshData(JsonParser.parseReader(in))) {
+					discordToToken.remove(discord);
+					return null;
+				}
 			}
 		}
 		return tokenData;

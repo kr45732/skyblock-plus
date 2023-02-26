@@ -55,11 +55,16 @@ public final class TokenData {
 		return tokenType;
 	}
 
-	public void refreshData(JsonElement json) {
-		this.accessToken = higherDepth(json, "access_token").getAsString();
-		this.refreshToken = higherDepth(json, "refresh_token").getAsString();
-		this.tokenType = higherDepth(json, "token_type").getAsString();
-		this.expiresAt = Instant.now().plusSeconds(higherDepth(json, "expires_in").getAsLong()).toEpochMilli();
+	public boolean refreshData(JsonElement json) {
+		try {
+			this.accessToken = higherDepth(json, "access_token").getAsString();
+			this.refreshToken = higherDepth(json, "refresh_token").getAsString();
+			this.tokenType = higherDepth(json, "token_type").getAsString();
+			this.expiresAt = Instant.now().plusSeconds(higherDepth(json, "expires_in").getAsLong()).toEpochMilli();
+			return true;
+		} catch (Exception e) {
+			return false; // Authorization revoked
+		}
 	}
 
 	public boolean isExpired() {
