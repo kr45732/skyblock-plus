@@ -498,11 +498,18 @@ public class GuildSlashCommand extends SlashCommand {
 				}
 			}
 
+			double averageAmt = (double) total / playerList.size();
+			averageAmt = lbType.equals("networth") ? (long) averageAmt : averageAmt;
+
 			String ebStr =
 				"**Total " +
 				capitalizeString(lbType.replace("_", " ")) +
 				":** " +
 				formatNumber(total) +
+				"\n**Average " +
+				capitalizeString(lbType.replace("_", " ")) +
+				":** " +
+				formatNumber(averageAmt) +
 				(
 					username != null
 						? "\n**Player:** " +
