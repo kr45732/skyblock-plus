@@ -989,6 +989,7 @@ public class NetworthExecute {
 		}
 
 		List<String> recipe = getRecipe(itemId);
+		boolean useCraft = recipe != null;
 		double craftCost = 0;
 		if (recipe != null) {
 			for (String item : recipe) {
@@ -997,14 +998,14 @@ public class NetworthExecute {
 				double itemLowestPrice = getLowestPrice(idCountSplit[0].replace("-", ":"));
 
 				if (itemLowestPrice == 0) {
-					craftCost = 0;
-					break;
+					useCraft = false;
 				}
 
 				craftCost += itemLowestPrice * Integer.parseInt(idCountSplit[1]);
 			}
 			craftCost /= getRecipeCount(itemId);
 		}
+		useCraft = useCraft && craftCost > 0;
 
 		if (!ignoreAh) {
 			double lowestBin = -1;
@@ -1023,7 +1024,7 @@ public class NetworthExecute {
 			} catch (Exception ignored) {}
 
 			double minBinAverage = getMin(lowestBin, averageAuction);
-			if (minBinAverage != -1 && (craftCost <= 0 || minBinAverage <= craftCost)) {
+			if (minBinAverage != -1 && (!useCraft || minBinAverage <= craftCost)) {
 				if (source != null) {
 					if (minBinAverage == lowestBin) {
 						source.append("lowest BIN");
