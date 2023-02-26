@@ -1047,8 +1047,10 @@ public class NetworthExecute {
 		}
 
 		double npcPrice = getNpcSellPrice(itemId);
-		if (source != null && npcPrice != -1) {
-			source.append("npc sell");
+		if (npcPrice != -1) {
+			if (source != null) {
+				source.append("npc sell");
+			}
 			return npcPrice;
 		}
 
