@@ -33,7 +33,7 @@ public class SubdomainFilter implements Filter {
 		MutableHttpServletRequestWrapper reqWrapper = new MutableHttpServletRequestWrapper(((HttpServletRequest) req));
 
 		String serverName = req.getServerName();
-		if (!serverName.equals(BASE_URL)) {
+		if (serverName.contains(BASE_URL) && !serverName.equals(BASE_URL)) {
 			String test = req.getServerName().split("." + BASE_URL)[0];
 			reqWrapper.addHeader("X-Subdomain-Internal", test);
 		}
