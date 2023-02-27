@@ -194,7 +194,7 @@ public class NetworthExecute {
 		if (sacksMap != null) {
 			for (Map.Entry<String, Integer> sackEntry : sacksMap.entrySet()) {
 				if (sackEntry.getValue() > 0) {
-					double itemPrice = getLowestPrice(sackEntry.getKey(), true, null) * sackEntry.getValue();
+					double itemPrice = getLowestPrice(sackEntry.getKey(), true, null, false) * sackEntry.getValue();
 					addTotal("sacks", itemPrice);
 					if (event != null) {
 						String emoji = getEmojiOr(sackEntry.getKey(), null);
@@ -687,7 +687,7 @@ public class NetworthExecute {
 						source.append("dark auction price paid");
 					}
 				} else {
-					itemCost = getLowestPrice(item.getId().toUpperCase(), false, source);
+					itemCost = getLowestPrice(item.getId().toUpperCase(), false, source, false);
 				}
 			}
 		} catch (Exception ignored) {}
@@ -956,10 +956,10 @@ public class NetworthExecute {
 	}
 
 	public double getLowestPrice(String itemId) {
-		return getLowestPrice(itemId, false, null);
+		return getLowestPrice(itemId, false, null, false);
 	}
 
-	public double getLowestPrice(String itemId, boolean ignoreAh, StringBuilder source) {
+	public double getLowestPrice(String itemId, boolean ignoreAh, StringBuilder source, boolean onlyFullCraft) {
 		double priceOverride = getPriceOverride(itemId);
 		if (priceOverride != -1) {
 			if (source != null) {
@@ -989,23 +989,20 @@ public class NetworthExecute {
 		}
 
 		List<String> recipe = getRecipe(itemId);
-		boolean useCraft = recipe != null;
 		double craftCost = 0;
 		if (recipe != null) {
 			for (String item : recipe) {
 				String[] idCountSplit = item.split(":");
 
-				double itemLowestPrice = getLowestPrice(idCountSplit[0].replace("-", ":"));
-
+				double itemLowestPrice = getLowestPrice(idCountSplit[0].replace("-", ":"), false, null, true);
 				if (itemLowestPrice == 0) {
-					useCraft = false;
+					craftCost = 0;
+					break;
 				}
-
 				craftCost += itemLowestPrice * Integer.parseInt(idCountSplit[1]);
 			}
 			craftCost /= getRecipeCount(itemId);
 		}
-		useCraft = useCraft && craftCost > 0;
 
 		if (!ignoreAh) {
 			double lowestBin = -1;
@@ -1024,7 +1021,7 @@ public class NetworthExecute {
 			} catch (Exception ignored) {}
 
 			double minBinAverage = getMin(lowestBin, averageAuction);
-			if (minBinAverage != -1 && (!useCraft || minBinAverage <= craftCost)) {
+			if (minBinAverage != -1 && (craftCost == 0 || minBinAverage <= craftCost)) {
 				if (source != null) {
 					if (minBinAverage == lowestBin) {
 						source.append("lowest BIN");
@@ -1036,23 +1033,34 @@ public class NetworthExecute {
 			}
 		}
 
-		if (craftCost > 0) {
-			if (source != null) {
-				if (higherDepth(getInternalJsonMappings(), itemId + ".recipe") != null) {
-					source.append("craft");
-				} else {
-					source.append("npc buy");
+		if (!onlyFullCraft) {
+			if (recipe != null) {
+				double partialCraftCost = 0;
+				for (String item : recipe) {
+					String[] idCountSplit = item.split(":");
+					partialCraftCost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
+				}
+				partialCraftCost /= getRecipeCount(itemId);
+
+				if (partialCraftCost > 0) {
+					if (source != null) {
+						if (higherDepth(getInternalJsonMappings(), itemId + ".recipe") != null) {
+							source.append("craft");
+						} else {
+							source.append("npc buy");
+						}
+					}
+					return partialCraftCost;
 				}
 			}
-			return craftCost;
-		}
 
-		double npcPrice = getNpcSellPrice(itemId);
-		if (npcPrice != -1) {
-			if (source != null) {
-				source.append("npc sell");
+			double npcPrice = getNpcSellPrice(itemId);
+			if (npcPrice != -1) {
+				if (source != null) {
+					source.append("npc sell");
+				}
+				return npcPrice;
 			}
-			return npcPrice;
 		}
 
 		//		tempSet.add(itemId + " - " + iName);

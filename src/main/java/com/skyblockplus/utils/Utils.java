@@ -1975,6 +1975,14 @@ public class Utils {
 					}
 				}
 
+				if (higherDepth(CONSTANTS, "EXTRA_INTERNAL_MAPPINGS." + itemId) != null) {
+					for (Map.Entry<String, JsonElement> entry : higherDepth(CONSTANTS, "EXTRA_INTERNAL_MAPPINGS." + itemId)
+						.getAsJsonObject()
+						.entrySet()) {
+						toAdd.add(entry.getKey(), entry.getValue());
+					}
+				}
+
 				outputObj.add(itemId, toAdd);
 			} catch (Exception e) {
 				e.printStackTrace();
