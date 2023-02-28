@@ -61,14 +61,8 @@ public class InvItem {
 	 * Will only set it for midas sword or midas staff
 	 */
 	public void setDarkAuctionPrice(long darkAuctionPrice) {
-		if (id == null) {
-			return;
-		}
-
-		if (id.equals("MIDAS_SWORD")) {
-			this.darkAuctionPrice = Math.min(darkAuctionPrice, 50000000);
-		} else if (id.equals("MIDAS_STAFF")) {
-			this.darkAuctionPrice = Math.min(darkAuctionPrice, 100000000);
+		if (id != null && (id.equals("MIDAS_SWORD") || id.equals("MIDAS_STAFF"))) {
+			this.darkAuctionPrice = darkAuctionPrice;
 		}
 	}
 

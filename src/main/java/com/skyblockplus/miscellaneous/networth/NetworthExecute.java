@@ -682,7 +682,17 @@ public class NetworthExecute {
 				return -1;
 			} else {
 				if (item.getDarkAuctionPrice() != -1) {
-					itemCost = item.getDarkAuctionPrice();
+					long darkAhPrice = item.getDarkAuctionPrice();
+
+					long maxBid = item.getId().equals("MIDAS_SWORD") ? 50000000 : 100000000;
+					String type = item.getId().equals("MIDAS_SWORD") ? "midas_word_50m" : "midas_staff_100m";
+
+					if (darkAhPrice >= maxBid) {
+						itemCost = higherDepth(extraPrices, type, maxBid);
+					} else {
+						itemCost = darkAhPrice;
+					}
+
 					if (verbose) {
 						source.append("dark auction price paid");
 					}
