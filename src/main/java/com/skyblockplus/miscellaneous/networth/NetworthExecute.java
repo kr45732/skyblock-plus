@@ -688,7 +688,7 @@ public class NetworthExecute {
 					String type = item.getId().equals("MIDAS_SWORD") ? "midas_word_50m" : "midas_staff_100m";
 
 					if (darkAhPrice >= maxBid) {
-						itemCost = higherDepth(extraPrices, type, maxBid);
+						itemCost = higherDepth(extraPrices, type, maxBid) * 0.9823;
 					} else {
 						itemCost = darkAhPrice;
 					}
