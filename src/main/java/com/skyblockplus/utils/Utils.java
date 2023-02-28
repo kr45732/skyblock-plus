@@ -1228,6 +1228,14 @@ public class Utils {
 							itemInfo.setId(itemInfo.getId() + "_" + item.get("tag.ExtraAttributes.new_years_cake"));
 						}
 
+						if (
+							item.containsKey("tag.ExtraAttributes.price") &&
+							item.containsKey("tag.ExtraAttributes.auction") &&
+							item.containsKey("tag.ExtraAttributes.bid")
+						) {
+							itemInfo.setShensAuctionPrice(item.getLong("tag.ExtraAttributes.price", -1));
+						}
+
 						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
 							List<String> enchantsList = new ArrayList<>();
 							for (Map.Entry<String, Object> enchant : item.getCompound("tag.ExtraAttributes.enchantments").entrySet()) {
@@ -1282,6 +1290,8 @@ public class Utils {
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.art_of_war_count", 0), "THE_ART_OF_WAR");
 
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.artOfPeaceApplied", 0), "THE_ART_OF_PEACE");
+
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.tuned_transmission", 0), "TRANSMISSION_TUNER");
 
 						// Master stars
 						if (

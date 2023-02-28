@@ -48,6 +48,7 @@ public class InvItem {
 	private int essenceCount;
 	private String essenceType;
 	private long darkAuctionPrice = -1;
+	private long shensAuctionPrice = -1;
 	private int dungeonFloor = -1;
 	private boolean soulbound = false;
 	private NBTCompound nbtTag;
@@ -64,6 +65,10 @@ public class InvItem {
 		if (id != null && (id.equals("MIDAS_SWORD") || id.equals("MIDAS_STAFF"))) {
 			this.darkAuctionPrice = darkAuctionPrice;
 		}
+	}
+
+	public void setShensAuctionPrice(long shensAuctionPrice) {
+		this.shensAuctionPrice = shensAuctionPrice;
 	}
 
 	public String getName() {

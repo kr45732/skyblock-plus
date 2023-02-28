@@ -698,6 +698,14 @@ public class NetworthExecute {
 					}
 				} else {
 					itemCost = getLowestPrice(item.getId().toUpperCase(), false, source, false);
+
+					if (item.getShensAuctionPrice() != -1 && item.getShensAuctionPrice() * 0.9 > itemCost) {
+						itemCost = item.getShensAuctionPrice() * 0.9;
+						if (verbose) {
+							source.setLength(0);
+							source.append("shens auction price paid");
+						}
+					}
 				}
 			}
 		} catch (Exception ignored) {}
