@@ -18,10 +18,10 @@
 
 package com.skyblockplus.api.miscellaneous;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 
 public class MutableHttpServletRequestWrapper extends HttpServletRequestWrapper {
 

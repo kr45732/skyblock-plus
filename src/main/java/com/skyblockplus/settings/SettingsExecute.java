@@ -2772,6 +2772,14 @@ public class SettingsExecute {
 	}
 
 	/* Helper functions */
+	private int tryParseInt(String s, int defaultValue) {
+		try {
+			return Integer.parseInt(s);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
 	public String displaySettings(JsonElement jsonSettings, String settingName) {
 		if (higherDepth(jsonSettings, settingName) != null) {
 			switch (settingName) {
@@ -2783,12 +2791,12 @@ public class SettingsExecute {
 					StringBuilder reqsString = new StringBuilder("\n");
 					for (int i = 0; i < reqs.size(); i++) {
 						JsonElement req = reqs.get(i);
-						int slayerReq = Integer.parseInt(higherDepth(req, "slayerReq", "0"));
-						int skillsReq = Integer.parseInt(higherDepth(req, "skillsReq", "0"));
-						int cataReq = Integer.parseInt(higherDepth(req, "catacombsReq", "0"));
-						int weightReq = Integer.parseInt(higherDepth(req, "weightReq", "0"));
-						int lilyWeightReq = Integer.parseInt(higherDepth(req, "lilyWeightReq", "0"));
-						int levelReq = Integer.parseInt(higherDepth(req, "levelReq", "0"));
+						int slayerReq = tryParseInt(higherDepth(req, "slayerReq", "0"), 0);
+						int skillsReq = tryParseInt(higherDepth(req, "skillsReq", "0"), 0);
+						int cataReq = tryParseInt(higherDepth(req, "catacombsReq", "0"), 0);
+						int weightReq = tryParseInt(higherDepth(req, "weightReq", "0"), 0);
+						int lilyWeightReq = tryParseInt(higherDepth(req, "lilyWeightReq", "0"), 0);
+						int levelReq = tryParseInt(higherDepth(req, "levelReq", "0"), 0);
 
 						reqsString
 							.append("`")

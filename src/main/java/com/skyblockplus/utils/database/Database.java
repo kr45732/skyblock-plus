@@ -64,7 +64,7 @@ public class Database {
 	}
 
 	public int removeGuildSettings(String serverId, String name) {
-		return settingsService.removeGuildSettings(serverId, name).getStatusCodeValue();
+		return settingsService.removeGuildSettings(serverId, name).getStatusCode().value();
 	}
 
 	public List<ServerSettingsModel> getAllServerSettings() {
@@ -76,15 +76,15 @@ public class Database {
 	}
 
 	public int newServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
-		return settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
+		return settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCode().value();
 	}
 
 	public int setServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
-		return settingsService.setServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
+		return settingsService.setServerSettings(serverId, serverSettingsModel).getStatusCode().value();
 	}
 
 	public int deleteServerSettings(String serverId) {
-		return settingsService.deleteServerSettings(serverId).getStatusCodeValue();
+		return settingsService.deleteServerSettings(serverId).getStatusCode().value();
 	}
 
 	public JsonElement getVerifySettings(String serverId) {
@@ -92,7 +92,7 @@ public class Database {
 	}
 
 	public int setVerifySettings(String serverId, JsonElement newVerifySettings) {
-		return settingsService.setVerifySettings(serverId, gson.fromJson(newVerifySettings, AutomatedVerify.class)).getStatusCodeValue();
+		return settingsService.setVerifySettings(serverId, gson.fromJson(newVerifySettings, AutomatedVerify.class)).getStatusCode().value();
 	}
 
 	public JsonElement getRolesSettings(String serverId) {
@@ -100,7 +100,7 @@ public class Database {
 	}
 
 	public int setRolesSettings(String serverId, JsonElement newRoleSettings) {
-		return settingsService.setRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCodeValue();
+		return settingsService.setRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCode().value();
 	}
 
 	public boolean serverByServerIdExists(String serverId) {
@@ -112,11 +112,11 @@ public class Database {
 	}
 
 	public int setRoleSettings(String serverId, String roleName, JsonElement newRoleSettings) {
-		return settingsService.setRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName).getStatusCodeValue();
+		return settingsService.setRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName).getStatusCode().value();
 	}
 
 	public int setApplyCacheSettings(String serverId, String name, String currentSettings) {
-		return settingsService.setApplyUsersCache(serverId, name, currentSettings).getStatusCodeValue();
+		return settingsService.setApplyUsersCache(serverId, name, currentSettings).getStatusCode().value();
 	}
 
 	public JsonArray getApplyCacheSettings(String serverId, String name) {
@@ -128,15 +128,15 @@ public class Database {
 	}
 
 	public int deleteApplyCacheSettings(String serverId, String name) {
-		return settingsService.setApplyUsersCache(serverId, name, "[]").getStatusCodeValue();
+		return settingsService.setApplyUsersCache(serverId, name, "[]").getStatusCode().value();
 	}
 
 	public int setSkyblockEventSettings(String serverId, EventSettings currentSettings) {
-		return settingsService.setSkyblockEventSettings(serverId, currentSettings).getStatusCodeValue();
+		return settingsService.setSkyblockEventSettings(serverId, currentSettings).getStatusCode().value();
 	}
 
 	public int addMemberToSkyblockEvent(String serverId, EventMember newEventMember) {
-		return settingsService.addMemberToSkyblockEvent(serverId, newEventMember).getStatusCodeValue();
+		return settingsService.addMemberToSkyblockEvent(serverId, newEventMember).getStatusCode().value();
 	}
 
 	public JsonElement getSkyblockEventSettings(String serverId) {
@@ -144,7 +144,7 @@ public class Database {
 	}
 
 	public int removeMemberFromSkyblockEvent(String serverId, String minecraftUuid) {
-		return settingsService.removeMemberFromSkyblockEvent(serverId, minecraftUuid).getStatusCodeValue();
+		return settingsService.removeMemberFromSkyblockEvent(serverId, minecraftUuid).getStatusCode().value();
 	}
 
 	public boolean eventHasMemberByUuid(String serverId, String minecraftUuid) {
@@ -152,11 +152,11 @@ public class Database {
 	}
 
 	public int setApplyReqs(String serverId, String name, JsonArray newApplyReqs) {
-		return settingsService.setApplyReqs(serverId, name, gson.fromJson(newApplyReqs, ApplyRequirements[].class)).getStatusCodeValue();
+		return settingsService.setApplyReqs(serverId, name, gson.fromJson(newApplyReqs, ApplyRequirements[].class)).getStatusCode().value();
 	}
 
 	public int setVerifyRolesSettings(String serverId, JsonArray newSettings) {
-		return settingsService.setVerifyRolesSettings(serverId, gson.fromJson(newSettings, String[].class)).getStatusCodeValue();
+		return settingsService.setVerifyRolesSettings(serverId, gson.fromJson(newSettings, String[].class)).getStatusCode().value();
 	}
 
 	public String getServerHypixelApiKey(String serverId) {
@@ -165,7 +165,7 @@ public class Database {
 	}
 
 	public int setServerHypixelApiKey(String serverId, String newKey) {
-		return settingsService.setServerHypixelApiKey(serverId, newKey).getStatusCodeValue();
+		return settingsService.setServerHypixelApiKey(serverId, newKey).getStatusCode().value();
 	}
 
 	public JsonElement getBlacklistSettings(String serverId) {
@@ -173,7 +173,7 @@ public class Database {
 	}
 
 	public int setBlacklistSettings(String serverId, JsonElement newSettings) {
-		return settingsService.setBlacklistSettings(serverId, gson.fromJson(newSettings, Blacklist.class)).getStatusCodeValue();
+		return settingsService.setBlacklistSettings(serverId, gson.fromJson(newSettings, Blacklist.class)).getStatusCode().value();
 	}
 
 	public List<AutomatedGuild> getAllGuildSettings(String serverId) {
@@ -185,43 +185,43 @@ public class Database {
 	}
 
 	public int setGuildSettings(String serverId, JsonElement newSettings) {
-		return settingsService.setGuildSettings(serverId, gson.fromJson(newSettings, AutomatedGuild.class)).getStatusCodeValue();
+		return settingsService.setGuildSettings(serverId, gson.fromJson(newSettings, AutomatedGuild.class)).getStatusCode().value();
 	}
 
 	public int setApplyGuestRole(String serverId, String newSettings) {
-		return settingsService.setApplyGuestRole(serverId, newSettings).getStatusCodeValue();
+		return settingsService.setApplyGuestRole(serverId, newSettings).getStatusCode().value();
 	}
 
 	public int setJacobSettings(String serverId, JsonElement newSettings) {
-		return settingsService.setJacobSettings(serverId, gson.fromJson(newSettings, JacobSettings.class)).getStatusCodeValue();
+		return settingsService.setJacobSettings(serverId, gson.fromJson(newSettings, JacobSettings.class)).getStatusCode().value();
 	}
 
 	public int setEventSettings(String serverId, JsonElement newSettings) {
-		return settingsService.setEventSettings(serverId, gson.fromJson(newSettings, EventNotifSettings.class)).getStatusCodeValue();
+		return settingsService.setEventSettings(serverId, gson.fromJson(newSettings, EventNotifSettings.class)).getStatusCode().value();
 	}
 
 	public int setFetchurChannel(String serverId, String newSettings) {
-		return settingsService.setFetchurChannel(serverId, newSettings).getStatusCodeValue();
+		return settingsService.setFetchurChannel(serverId, newSettings).getStatusCode().value();
 	}
 
 	public int setFetchurRole(String serverId, String newSettings) {
-		return settingsService.setFetchurRole(serverId, newSettings).getStatusCodeValue();
+		return settingsService.setFetchurRole(serverId, newSettings).getStatusCode().value();
 	}
 
 	public int setMayorChannel(String serverId, String newSettings) {
-		return settingsService.setMayorChannel(serverId, newSettings).getStatusCodeValue();
+		return settingsService.setMayorChannel(serverId, newSettings).getStatusCode().value();
 	}
 
 	public int setMayorRole(String serverId, String newSettings) {
-		return settingsService.setMayorRole(serverId, newSettings).getStatusCodeValue();
+		return settingsService.setMayorRole(serverId, newSettings).getStatusCode().value();
 	}
 
 	public int setBotManagerRoles(String serverId, JsonArray newSettings) {
-		return settingsService.setBotManagerRoles(serverId, gson.fromJson(newSettings, String[].class)).getStatusCodeValue();
+		return settingsService.setBotManagerRoles(serverId, gson.fromJson(newSettings, String[].class)).getStatusCode().value();
 	}
 
 	public int setLogChannel(String serverId, String newSettings) {
-		return settingsService.setLogChannel(serverId, newSettings).getStatusCodeValue();
+		return settingsService.setLogChannel(serverId, newSettings).getStatusCode().value();
 	}
 
 	public Connection getConnection() throws SQLException {

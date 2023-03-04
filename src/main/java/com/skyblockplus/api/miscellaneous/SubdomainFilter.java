@@ -20,9 +20,9 @@ package com.skyblockplus.api.miscellaneous;
 
 import static com.skyblockplus.utils.Utils.BASE_URL;
 
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 @Component

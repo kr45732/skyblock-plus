@@ -23,7 +23,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.0'
 
     // Spring boot
-    id 'org.springframework.boot' version '2.7.5'
+    id 'org.springframework.boot' version '3.0.4'
     id "io.spring.dependency-management" version "1.1.0"
 
     // Lombok annotations
@@ -79,9 +79,9 @@ dependencies {
     implementation 'me.nullicorn:Nedit:2.2.0'
 
     // Spring boot and postgresql
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.5'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.7.5'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.5'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.4'
     runtimeOnly 'org.postgresql:postgresql:42.5.4'
 
     // MySQL
@@ -97,7 +97,7 @@ dependencies {
     implementation "org.codehaus.groovy:groovy:3.0.15"
 
     // Logging
-    implementation 'ch.qos.logback:logback-classic:1.2.11'
+    implementation 'ch.qos.logback:logback-classic:1.4.5'
 
     // Git
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r'

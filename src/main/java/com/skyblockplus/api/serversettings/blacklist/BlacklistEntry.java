@@ -18,7 +18,7 @@
 
 package com.skyblockplus.api.serversettings.blacklist;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
