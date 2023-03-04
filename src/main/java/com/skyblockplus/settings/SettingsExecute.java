@@ -55,25 +55,27 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 public class SettingsExecute {
 
 	private final Guild guild;
-	private final MessageChannel channel;
 	private final User author;
 	private final JsonObject serverSettings;
+	private final InteractionHook interactionHook;
 
 	public SettingsExecute(Guild guild, MessageReceivedEvent event) {
-		this(guild, event.getChannel(), event.getAuthor());
+		this(guild, event.getAuthor(), null);
 	}
 
-	public SettingsExecute(Guild guild, MessageChannel channel, User author) {
+	public SettingsExecute(Guild guild, User author, InteractionHook interactionHook) {
 		this.guild = guild;
-		this.channel = channel;
 		this.author = author;
+		this.interactionHook = interactionHook;
 
 		if (!database.serverByServerIdExists(guild.getId())) {
 			database.newServerSettings(guild.getId(), new ServerSettingsModel(guild.getName(), guild.getId()));
@@ -81,8 +83,8 @@ public class SettingsExecute {
 		this.serverSettings = database.getServerSettings(guild.getId()).getAsJsonObject();
 	}
 
-	public EmbedBuilder getSettingsEmbed(String content, String[] args) {
-		EmbedBuilder eb = null;
+	public Object getSettingsEmbed(String content, String[] args) {
+		Object eb = null;
 
 		if (args.length >= 4 && args[1].equals("set")) {
 			eb =
@@ -94,7 +96,7 @@ public class SettingsExecute {
 					case "mayor_channel" -> setMayorChannel(args[3]);
 					case "mayor_ping" -> setMayorPing(args[3]);
 					case "log_channel" -> setLogChannel(args[3]);
-					default -> errorEmbed("settings set");
+					default -> getHelpEmbed("settings set");
 				};
 		} else if (args.length == 3 && args[1].equals("delete")) {
 			eb =
@@ -103,7 +105,7 @@ public class SettingsExecute {
 						? defaultEmbed("Success").setDescription("Server settings deleted")
 						: invalidEmbed("Error deleting server settings");
 					case "hypixel_key" -> deleteHypixelKey();
-					default -> errorEmbed("settings delete");
+					default -> getHelpEmbed("settings delete");
 				};
 		} else if (args.length >= 2 && args[1].equals("blacklist")) {
 			args = content.split("\\s+", 5);
@@ -128,7 +130,7 @@ public class SettingsExecute {
 			}
 
 			if (eb == null) {
-				eb = errorEmbed("settings blacklist");
+				eb = getHelpEmbed("settings blacklist");
 			}
 		} else if (args.length == 4 && args[1].equals("bot_manager")) {
 			if (args[2].equals("add")) {
@@ -138,7 +140,7 @@ public class SettingsExecute {
 			}
 
 			if (eb == null) {
-				eb = errorEmbed("settings bot_manager");
+				eb = getHelpEmbed("settings bot_manager");
 			}
 		} else if (args.length == 1) {
 			eb =
@@ -206,7 +208,7 @@ public class SettingsExecute {
 			}
 
 			if (eb == null) {
-				eb = errorEmbed("settings jacob");
+				eb = getHelpEmbed("settings jacob");
 			}
 		} else if (args.length >= 2 && args[1].equals("event")) {
 			if (args.length == 2) {
@@ -224,7 +226,7 @@ public class SettingsExecute {
 			}
 
 			if (eb == null) {
-				eb = errorEmbed("settings event");
+				eb = getHelpEmbed("settings event");
 			}
 		} else if (args.length >= 2 && args[1].equals("roles")) {
 			if (args.length == 2) {
@@ -266,7 +268,7 @@ public class SettingsExecute {
 			}
 
 			if (eb == null) {
-				eb = errorEmbed("settings roles");
+				eb = getHelpEmbed("settings roles");
 			}
 		} else if (content.split("\\s+", 4).length >= 2 && content.split("\\s+", 4)[1].equals("verify")) {
 			args = content.split("\\s+", 4);
@@ -321,7 +323,7 @@ public class SettingsExecute {
 			}
 
 			if (eb == null) {
-				eb = errorEmbed("settings verify");
+				eb = getHelpEmbed("settings verify");
 			}
 		} else if ((args.length >= 2) && args[1].equals("guild")) {
 			if (content.split("\\s+", 4).length == 4 && (args[2].equals("create") || args[2].equals("remove"))) {
@@ -333,13 +335,13 @@ public class SettingsExecute {
 						default -> null;
 					};
 			} else if (args.length == 2) {
-				eb = defaultSettingsEmbed();
 				JsonArray automatedGuilds = higherDepth(serverSettings, "automatedGuilds").getAsJsonArray();
 				if (automatedGuilds.isEmpty()) {
-					eb.setDescription("No guilds setup");
+					eb = defaultSettingsEmbed().setDescription("No guilds setup");
 				} else {
+					EmbedBuilder eb1 = defaultSettingsEmbed();
 					for (JsonElement automatedGuild : automatedGuilds) {
-						eb.addField(
+						eb1.addField(
 							"Automatic Guild",
 							"Name: " +
 							higherDepth(automatedGuild, "guildName").getAsString() +
@@ -349,6 +351,7 @@ public class SettingsExecute {
 							false
 						);
 					}
+					eb = eb1;
 				}
 			} else if (args.length == 3) {
 				return getGuildSettings(args[2]);
@@ -455,11 +458,11 @@ public class SettingsExecute {
 			}
 
 			if (eb == null) {
-				eb = errorEmbed("settings guild");
+				eb = getHelpEmbed("settings guild");
 			}
 		}
 
-		return eb == null ? errorEmbed("settings") : eb;
+		return eb == null ? getHelpEmbed("settings") : eb;
 	}
 
 	/* Jacob Settings */
@@ -1346,7 +1349,7 @@ public class SettingsExecute {
 
 		eb.addField("Guild Counter", higherDepth(settings, "guildCounterEnable", "false").equals("true") ? "Enabled" : "Disabled", false);
 		extras.addEmbedPage(eb);
-		paginateBuilder.setPaginatorExtras(extras).build().paginate(channel, 0);
+		paginateBuilder.setPaginatorExtras(extras).build().paginate(interactionHook, 0);
 		return null;
 	}
 
@@ -1613,7 +1616,7 @@ public class SettingsExecute {
 			paginateBuilder.addItems(ebFieldString.toString());
 		}
 
-		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles)).build().paginate(channel, pageNum);
+		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles)).build().paginate(interactionHook, pageNum);
 		return null;
 	}
 
@@ -2307,7 +2310,7 @@ public class SettingsExecute {
 			);
 		}
 
-		paginateBuilder.build().paginate(channel, 0);
+		paginateBuilder.build().paginate(interactionHook, 0);
 		return null;
 	}
 
@@ -2982,5 +2985,11 @@ public class SettingsExecute {
 		}
 
 		return channel;
+	}
+
+	public MessageEditBuilder getHelpEmbed(String name) {
+		return new MessageEditBuilder()
+			.setEmbeds(defaultEmbed("Invalid input. Run `/help " + name + "` or press the button below for help").build())
+			.setActionRow(Button.primary("s_help_" + name, "Help"));
 	}
 }

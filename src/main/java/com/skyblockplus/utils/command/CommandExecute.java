@@ -118,10 +118,6 @@ public abstract class CommandExecute extends CommandEvent {
 		}
 	}
 
-	protected void sendErrorEmbed() {
-		ebMessage.editMessageEmbeds(errorEmbed(command.getName()).build()).queue(ignore, ignore);
-	}
-
 	/**
 	 * @return true if the command's author is not linked, false otherwise (the
 	 * command's author is linked)

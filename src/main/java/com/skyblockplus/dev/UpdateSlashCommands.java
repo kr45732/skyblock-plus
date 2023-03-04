@@ -54,12 +54,10 @@ public class UpdateSlashCommands extends Command {
 								.sendMessageEmbeds(defaultEmbed("Success - added " + s.size() + " slash commands for this guild").build())
 								.queue()
 						);
-					return;
-				} else if (args.length == 2) {
+				} else {
 					if (args[1].equals("clear")) {
 						jda.getGuildById(event.getGuild().getId()).updateCommands().queue();
 						event.getChannel().sendMessageEmbeds(defaultEmbed("Success - cleared commands for this guild").build()).queue();
-						return;
 					} else if (args[1].equals("global")) {
 						jda
 							.getShardById(0)
@@ -71,12 +69,8 @@ public class UpdateSlashCommands extends Command {
 									.sendMessageEmbeds(defaultEmbed("Success - added " + s.size() + " slash commands globally").build())
 									.queue()
 							);
-
-						return;
 					}
 				}
-
-				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
 			}
 		}
 			.queue();

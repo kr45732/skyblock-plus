@@ -20,6 +20,7 @@ package com.skyblockplus.features.listeners;
 
 import static com.skyblockplus.utils.Utils.*;
 
+import com.skyblockplus.features.setup.SetupSlashCommand;
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.Comparator;
 import java.util.Map;
@@ -39,6 +40,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 public class MainListener extends ListenerAdapter {
@@ -116,7 +118,10 @@ public class MainListener extends ListenerAdapter {
 							.orElse(null)
 					);
 				if (channel != null) {
-					channel.sendMessageEmbeds(eb.build()).queue(ignore, ignore);
+					channel
+						.sendMessageEmbeds(eb.build())
+						.addActionRow(Button.primary("thank_you_setup", "Setup The Bot"))
+						.queue(ignore, ignore);
 				}
 			} catch (Exception ignored) {}
 
@@ -195,7 +200,7 @@ public class MainListener extends ListenerAdapter {
 		}
 
 		if (guildMap.containsKey(event.getGuild().getId())) {
-			guildMap.get(event.getGuild().getId()).onButtonClick(event);
+			guildMap.get(event.getGuild().getId()).onButtonInteraction(event);
 		}
 	}
 

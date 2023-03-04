@@ -97,7 +97,7 @@ public class DevSettingsCommand extends Command {
 					}
 				}
 
-				sendErrorEmbed();
+				embed(invalidEmbed("Invalid input"));
 			}
 		}
 			.queue();

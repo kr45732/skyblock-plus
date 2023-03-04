@@ -46,8 +46,7 @@ public class SettingsSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			new SettingsExecute(event.getGuild(), event.getChannel(), event.getUser()).getSettingsEmbed(content, content.split("\\s+")),
-			true
+			new SettingsExecute(event.getGuild(), event.getUser(), event.getHook()).getSettingsEmbed(content, content.split("\\s+"))
 		);
 	}
 

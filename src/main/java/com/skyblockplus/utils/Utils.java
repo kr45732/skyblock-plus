@@ -82,6 +82,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.sharding.ShardManager;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import okhttp3.OkHttpClient;
 import org.apache.http.Header;
 import org.apache.http.client.methods.*;
@@ -820,10 +821,6 @@ public class Utils {
 		return defaultEmbed(null).setImage("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
 	}
 
-	public static EmbedBuilder errorEmbed(String name) {
-		return defaultEmbed("Invalid input. Run `help " + name + "` for help");
-	}
-
 	public static CustomPaginator.Builder defaultPaginator(User... eventAuthor) {
 		return new CustomPaginator.Builder()
 			.setEventWaiter(waiter)
@@ -1073,12 +1070,7 @@ public class Utils {
 					higherDepth(JsonParser.parseReader(in), "record.key").getAsString();
 				}
 
-				if (!keyCooldownMap.containsKey(hypixelKey)) {
-					keyCooldownMap.put(
-						hypixelKey,
-						new HypixelKeyRecord(new AtomicInteger(remainingLimit), new AtomicInteger(timeTillReset))
-					);
-				}
+				keyCooldownMap.put(hypixelKey, new HypixelKeyRecord(new AtomicInteger(remainingLimit), new AtomicInteger(timeTillReset)));
 			}
 		} catch (Exception e) {
 			return invalidEmbed("You must set a valid Hypixel API key to use this feature or command");

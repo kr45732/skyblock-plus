@@ -37,10 +37,13 @@ import com.skyblockplus.features.event.EventGuild;
 import com.skyblockplus.features.jacob.JacobGuild;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
+import com.skyblockplus.features.setup.SetupSlashCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.general.LinkSlashCommand;
+import com.skyblockplus.general.help.HelpData;
+import com.skyblockplus.general.help.HelpSlashCommand;
 import com.skyblockplus.miscellaneous.MayorSlashCommand;
 import com.skyblockplus.miscellaneous.RolesSlashCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
@@ -89,6 +92,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -510,7 +514,7 @@ public class AutomaticGuild {
 			JsonElement serverSettings = database.getServerSettings(guild.getId());
 			List<AutomatedGuild> guildSettings = database.getAllGuildSettings(guild.getId());
 
-			// Should only happens if the server settings don't exist
+			// Should only happen if the server settings don't exist
 			if (serverSettings == null || guildSettings == null) {
 				return;
 			}
@@ -621,6 +625,7 @@ public class AutomaticGuild {
 
 								Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
 								HypixelPlayer hypixelPlayer = null;
+								boolean updateNick = true;
 								while (matcher.find()) {
 									String category = matcher.group(1).toUpperCase();
 									String type = matcher.group(2).toUpperCase();
@@ -713,6 +718,9 @@ public class AutomaticGuild {
 														extra
 													);
 											}
+										} else {
+											updateNick = false;
+											break;
 										}
 									} else if (category.equals("HYPIXEL") && type.equals("RANK")) {
 										if (key != null) {
@@ -733,17 +741,20 @@ public class AutomaticGuild {
 												nicknameTemplate =
 													nicknameTemplate.replace(matcher.group(0), hypixelPlayer.getRank() + extra);
 											}
+										} else {
+											updateNick = false;
+											break;
 										}
 									}
 
 									nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
 								}
 
-								if ((player != null && !player.isValid()) || (hypixelPlayer != null && !hypixelPlayer.isValid())) {
-									continue;
+								if (
+									updateNick && (player == null || player.isValid()) && (hypixelPlayer == null || hypixelPlayer.isValid())
+								) {
+									linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
 								}
-
-								linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
 							}
 						}
 
@@ -1207,7 +1218,7 @@ public class AutomaticGuild {
 		}
 	}
 
-	public void onButtonClick(ButtonInteractionEvent event) {
+	public void onButtonInteraction(ButtonInteractionEvent event) {
 		if (event.getComponentId().equals("verify_button")) {
 			verifyGuild.onButtonClick(event);
 		} else if (event.getComponentId().equals("verify_help_button")) {
@@ -1215,6 +1226,15 @@ public class AutomaticGuild {
 				.replyFiles(FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4")))
 				.setEphemeral(true)
 				.queue();
+		} else if (event.getComponentId().startsWith("s_help_")) {
+			// settings help button
+			String[] cmdSplit = event.getComponentId().split("s_help_")[1].split("\\s+", 2);
+			HelpData matchCmd = HelpSlashCommand.helpDataList.stream().filter(cmd -> cmd.matchTo(cmdSplit[0])).findFirst().orElse(null);
+			event.replyEmbeds(matchCmd.getHelp(cmdSplit.length == 2 ? cmdSplit[1] : null).build()).setEphemeral(true).queue();
+		} else if (event.getComponentId().equals("thank_you_setup")) {
+			if (isAdmin(event.getMember())) {
+				event.reply(MessageCreateData.fromEditData(SetupSlashCommand.getSetupEmbed().build())).queue();
+			}
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {

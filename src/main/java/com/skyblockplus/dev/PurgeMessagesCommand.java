@@ -37,7 +37,7 @@ public class PurgeMessagesCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
+		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
 				if (args.length == 2) {
@@ -51,11 +51,8 @@ public class PurgeMessagesCommand extends Command {
 							.complete()
 							.delete()
 							.queueAfter(3, TimeUnit.SECONDS);
-						return;
 					} catch (Exception ignored) {}
 				}
-
-				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
 			}
 		}
 			.queue();

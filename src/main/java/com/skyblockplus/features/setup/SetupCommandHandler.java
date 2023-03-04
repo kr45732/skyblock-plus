@@ -37,8 +37,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
@@ -102,21 +104,19 @@ public class SetupCommandHandler {
 							.setDescription(
 								"""
 														**__Overview__**
-														1) When a user runs `roles claim [player]` their stats are fetched
-														2) Depending on the roles setup for this server and the users stats, the corresponding roles will be given
+														1) When a user runs `/roles claim` their stats are fetched
+														2) Based on the roles setup for this server and the users stats, the corresponding roles will be given
 
 														**__Setup__**
 														- In order to enable automatic roles, there must be at least one role setting enabled:
-														- `settings roles add [role_name] [value] [@role]` - add a level to a role
-														- `settings roles remove [role_name] [value]` - remove a level from a role
-														- `settings roles set [role_name] [@role]` - set a one level role's role
-														- `settings roles enable [role_name]` - enable a role.
-														• Tutorial video linked [__here__](https://streamable.com/wninsw)
+														- `/settings roles add <role_name> <value> <@role>` - add a level to a role
+														- `/settings roles set <role_name> <@role>` - set a one level role's role
+														- `/settings roles enable <role_name>` - enable a role.
 
 														**__Enable__**
-														- Once all these settings are set run `settings roles enable` to enable roles
-														- To view all the roles, their descriptions, and examples, type `settings roles`
-														- For more help type `help settings roles` or watch the video linked above
+														- Once all these settings are set run `/settings roles enable` to enable roles
+														- To view all the roles, their descriptions, and examples, run `/settings roles`
+														- For more help, run `/help settings roles` or follow the example video [__here__](https://streamable.com/wninsw)
 														"""
 							)
 							.build()
@@ -153,7 +153,7 @@ public class SetupCommandHandler {
 						.build()
 				)
 				.queue();
-			case JACOB -> buttonEvent // TODO: select menu with each crop and then press on crop to set role
+			case JACOB -> buttonEvent
 				.editMessage(
 					new MessageEditBuilder()
 						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the jacob settings").build())
@@ -180,20 +180,15 @@ public class SetupCommandHandler {
 				event.getMessage().getId().equals(buttonEvent.getMessageId()) &&
 				event.getUser().getId().equals(buttonEvent.getUser().getId())
 			);
-		} else if (genericEvent instanceof StringSelectInteractionEvent event) {
-			return (
-				event.isFromGuild() &&
-				event.getMessageId().equals(buttonEvent.getMessageId()) &&
-				event.getUser().getId().equals(buttonEvent.getUser().getId())
-			);
-		} else if (genericEvent instanceof EntitySelectInteractionEvent event) {
-			if (
-				event.isFromGuild() &&
-				event.getUser().getId().equals(buttonEvent.getUser().getId()) &&
-				event.getComponentId().startsWith("setup_command_")
-			) {
-				String[] split = event.getComponentId().split("setup_command_")[1].split("_", 2);
-				return split.length >= 1 && split[0].equals(buttonEvent.getMessageId());
+		} else if (genericEvent instanceof GenericSelectMenuInteractionEvent event) {
+			if (event.isFromGuild() && event.getUser().getId().equals(buttonEvent.getUser().getId())) {
+				if (event.getMessageId().equals(buttonEvent.getMessageId())) {
+					return true;
+				}
+				if (event.getComponentId().startsWith("setup_command_")) {
+					String[] split = event.getComponentId().split("setup_command_")[1].split("_", 2);
+					return split.length >= 1 && split[0].equals(buttonEvent.getMessageId());
+				}
 			}
 		}
 		return false;
@@ -299,57 +294,57 @@ public class SetupCommandHandler {
 						)
 						.setEphemeral(true)
 						.queue();
-					case "sync" -> {
-						event.deferReply(true).complete();
-						event
-							.getHook()
-							.editOriginalEmbeds(
-								getSettings()
-									.setVerifySyncEnable(
-										!higherDepth(
-											database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
-											"enableAutomaticSync",
-											false
+					case "sync" -> event
+						.deferReply(true)
+						.queue(hook ->
+							hook
+								.editOriginalEmbeds(
+									getSettings()
+										.setVerifySyncEnable(
+											!higherDepth(
+												database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
+												"enableAutomaticSync",
+												false
+											)
 										)
-									)
-									.build()
-							)
-							.queue();
-					}
-					case "dm_on_join" -> {
-						event.deferReply(true).complete();
-						event
-							.getHook()
-							.editOriginalEmbeds(
-								getSettings()
-									.setVerifyDmOnSync(
-										!higherDepth(
-											database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
-											"dmOnSync",
-											true
+										.build()
+								)
+								.queue()
+						);
+					case "dm_on_join" -> event
+						.deferReply(true)
+						.queue(hook ->
+							hook
+								.editOriginalEmbeds(
+									getSettings()
+										.setVerifyDmOnSync(
+											!higherDepth(
+												database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
+												"dmOnSync",
+												true
+											)
 										)
-									)
-									.build()
-							)
-							.queue();
-					}
-					case "roles_claim" -> {
-						event.deferReply(true).complete();
-						event
-							.getHook()
-							.editOriginalEmbeds(
-								getSettings()
-									.setVerifyRolesClaimEnable(
-										!higherDepth(
-											database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
-											"enableRolesClaim",
-											false
+										.build()
+								)
+								.queue()
+						);
+					case "roles_claim" -> event
+						.deferReply(true)
+						.queue(hook ->
+							hook
+								.editOriginalEmbeds(
+									getSettings()
+										.setVerifyRolesClaimEnable(
+											!higherDepth(
+												database.getVerifySettings(event.getGuild().getId()).getAsJsonObject(),
+												"enableRolesClaim",
+												false
+											)
 										)
-									)
-									.build()
-							)
-							.queue();
-					}
+										.build()
+								)
+								.queue()
+						);
 				}
 			}
 			case GUILD -> {
@@ -672,14 +667,24 @@ public class SetupCommandHandler {
 						}
 						event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
 					}
-					case "crops" -> event
-						.replyModal(
-							Modal
-								.create("setup_command_" + selectedOption, "Setup")
-								.addActionRow(TextInput.create("value", "Crops", TextInputStyle.SHORT).build())
-								.build()
-						)
-						.queue();
+					case "crops" -> {
+						List<SelectOption> cropOptions = cropNameToEmoji
+							.keySet()
+							.stream()
+							.map(c -> SelectOption.of(c, "crop_type_" + c))
+							.collect(Collectors.toCollection(ArrayList::new));
+						cropOptions.add(SelectOption.of("All", "crop_type_all"));
+						event
+							.replyEmbeds(defaultEmbed("Setup").setDescription("Crop Type").build())
+							.setActionRow(
+								StringSelectMenu
+									.create("setup_command_" + buttonEvent.getMessageId() + "_crop_type")
+									.addOptions(cropOptions)
+									.build()
+							)
+							.setEphemeral(true)
+							.queue();
+					}
 					case "channel" -> event
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Jacob Channel").build())
 						.setActionRow(
@@ -693,6 +698,22 @@ public class SetupCommandHandler {
 						)
 						.setEphemeral(true)
 						.queue();
+					default -> {
+						if (selectedOption.startsWith("crop_type")) {
+							event
+								.replyEmbeds(defaultEmbed("Setup").setDescription("Crop Role").build())
+								.setActionRow(
+									EntitySelectMenu
+										.create(
+											"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
+											EntitySelectMenu.SelectTarget.ROLE
+										)
+										.build()
+								)
+								.setEphemeral(true)
+								.queue();
+						}
+					}
 				}
 			}
 		}
@@ -702,11 +723,11 @@ public class SetupCommandHandler {
 	public boolean onEntitySelectInteraction(EntitySelectInteractionEvent event) {
 		event.deferReply(true).complete();
 
-		String[] split = event.getComponentId().split("setup_command_")[1].split("_", 2);
+		String feature = event.getComponentId().split("setup_command_")[1].split("_", 2)[1];
 		switch (featureType) {
 			case VERIFY -> {
 				EmbedBuilder eb = null;
-				switch (split[1]) {
+				switch (feature) {
 					case "roles" -> {
 						database.setVerifyRolesSettings(event.getGuild().getId(), new JsonArray());
 						for (Role verifyRole : event.getMentions().getRoles()) {
@@ -732,7 +753,7 @@ public class SetupCommandHandler {
 			}
 			case GUILD_APPLY -> {
 				EmbedBuilder eb = null;
-				switch (split[1]) {
+				switch (feature) {
 					case "channel" -> eb =
 						getSettings().setApplyChannel(getGuildSettings(), event.getMentions().getChannels().get(0).getId());
 					case "staff_channel" -> eb =
@@ -766,7 +787,7 @@ public class SetupCommandHandler {
 			}
 			case MAYOR -> {
 				EmbedBuilder eb = null;
-				switch (split[1]) {
+				switch (feature) {
 					case "channel" -> {
 						eb = getSettings().setMayorChannel(event.getMentions().getChannels().get(0).getId());
 						if (eb.build().getTitle().equals("Settings")) {
@@ -782,7 +803,7 @@ public class SetupCommandHandler {
 			}
 			case FETCHUR -> {
 				EmbedBuilder eb = null;
-				switch (split[1]) {
+				switch (feature) {
 					case "channel" -> {
 						eb = getSettings().setFetchurChannel(event.getMentions().getChannels().get(0).getId());
 						if (eb.build().getTitle().equals("Settings")) {
@@ -798,8 +819,12 @@ public class SetupCommandHandler {
 			}
 			case JACOB -> {
 				EmbedBuilder eb = null;
-				switch (split[1]) {
-					case "channel" -> eb = getSettings().setJacobChannel(event.getMentions().getChannels().get(0).getId());
+				if (feature.equals("channel")) {
+					eb = getSettings().setJacobChannel(event.getMentions().getChannels().get(0).getId());
+				} else if (feature.startsWith("crop_type_")) {
+					String cropType = feature.split("crop_type_")[1];
+					String roleId = event.getMentions().getRoles().get(0).getId();
+					eb = getSettings().addJacobCrop(cropType, roleId);
 				}
 				if (!eb.build().getTitle().equals("Settings")) {
 					eb.appendDescription("\n\nPlease try again.");
@@ -920,34 +945,6 @@ public class SetupCommandHandler {
 				}
 				event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
 			}
-			case JACOB -> {
-				EmbedBuilder eb = null;
-				switch (event.getModalId().split("setup_command_")[1]) {
-					case "crops" -> {
-						String in = event.getValues().get(0).getAsString();
-						List<String> crops = new ArrayList<>();
-
-						if (in.equalsIgnoreCase("all")) {
-							crops.addAll(cropNameToEmoji.keySet());
-						} else {
-							for (String crop : in.split(",")) {
-								crops.add(capitalizeString(crop.trim()));
-							}
-						}
-
-						for (String crop : crops) {
-							eb = getSettings().addJacobCrop(crop, null);
-							if (!eb.build().getTitle().equals("Settings")) {
-								break;
-							}
-						}
-					}
-				}
-				if (!eb.build().getTitle().equals("Settings")) {
-					eb.appendDescription("\n\nPlease try again.");
-				}
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
 		}
 		return false;
 	}
@@ -955,7 +952,7 @@ public class SetupCommandHandler {
 	private SettingsExecute getSettings() {
 		return settings != null
 			? settings
-			: (this.settings = new SettingsExecute(buttonEvent.getGuild(), buttonEvent.getChannel(), buttonEvent.getUser()));
+			: (this.settings = new SettingsExecute(buttonEvent.getGuild(), buttonEvent.getUser(), buttonEvent.getHook()));
 	}
 
 	private JsonObject getGuildSettings() {

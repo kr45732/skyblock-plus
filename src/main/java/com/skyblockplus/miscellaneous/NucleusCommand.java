@@ -89,16 +89,11 @@ public class NucleusCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length == 3 || args.length == 2 || args.length == 1) {
-					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-						return;
-					}
-
-					embed(getNuc(player));
+				if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 					return;
 				}
 
-				sendErrorEmbed();
+				embed(getNuc(player));
 			}
 		}
 			.queue();

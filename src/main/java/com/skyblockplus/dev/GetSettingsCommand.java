@@ -45,17 +45,13 @@ public class GetSettingsCommand extends Command {
 			protected void execute() {
 				if (args.length == 1) {
 					event.getChannel().sendMessage(getServerSettings(event.getGuild().getId())).queue();
-					return;
-				} else if (args.length == 2) {
+				} else {
 					if (args[1].equals("all")) {
 						event.getChannel().sendMessage(getAllServerSettings()).queue();
 					} else {
 						event.getChannel().sendMessage(getServerSettings(args[1])).queue();
 					}
-					return;
 				}
-
-				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
 			}
 		}
 			.queue();

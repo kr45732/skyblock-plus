@@ -92,14 +92,8 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	}
 
 	public void paginate(Object ebOrMb) {
-		paginate(ebOrMb, false);
-	}
-
-	public void paginate(Object ebOrMb, boolean deleteOriginal) {
 		if (ebOrMb != null) {
 			embed(ebOrMb);
-		} else if (deleteOriginal) {
-			getHook().deleteOriginal().queue();
 		}
 	}
 
