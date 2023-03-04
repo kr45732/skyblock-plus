@@ -20,7 +20,6 @@ package com.skyblockplus.api.controller;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
-import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.Utils.client;
 import static com.skyblockplus.utils.Utils.jda;
