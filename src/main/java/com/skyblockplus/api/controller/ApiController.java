@@ -19,11 +19,17 @@
 package com.skyblockplus.api.controller;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
+import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.client;
+import static com.skyblockplus.utils.Utils.jda;
 
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
+import com.skyblockplus.features.jacob.JacobData;
+import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.general.help.HelpSlashCommand;
 import java.time.Instant;
 import java.util.*;
@@ -101,6 +107,28 @@ public class ApiController {
 			return new ResponseEntity<>(Maps.of("last_updated", lastUpdated == null ? -1 : lastUpdated.toEpochMilli()), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "/jacob", consumes = "application/json", produces = "application/json")
+	public ResponseEntity<?> postJacobData(@RequestBody JacobData jacobData, @RequestHeader String key) {
+		if (key.equals("2d7569ff0decff164a46e8d417e7b692")) {
+			if (jacobData.getContests().isEmpty()) {
+				return new ResponseEntity<>(
+					DataObject.empty().put("success", false).put("cause", "Contests list empty").toMap(),
+					HttpStatus.BAD_REQUEST
+				);
+			}
+
+			JacobHandler.setJacobData(jacobData);
+			cacheDatabase.cacheJacobData();
+			jda.getTextChannelById("937894945564545035").sendMessage(client.getSuccess() + " Received jacob data").queue();
+			return new ResponseEntity<>(DataObject.empty().put("success", true).toMap(), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(
+				DataObject.empty().put("success", false).put("cause", "Not authorized").toMap(),
+				HttpStatus.FORBIDDEN
+			);
 		}
 	}
 
