@@ -685,7 +685,8 @@ public class NetworthExecute {
 					long darkAhPrice = item.getDarkAuctionPrice();
 
 					long maxBid = item.getId().equals("MIDAS_SWORD") ? 50000000 : 100000000;
-					String type = item.getId().equals("MIDAS_SWORD") ? "midas_word_50m" : "midas_staff_100m";
+					// MIDAS_SWORD_50000000 or MIDAS_STAFF_100000000
+					String type = item.getId().equals("MIDAS_SWORD") ? "midas_sword_50m" : "midas_staff_100m";
 
 					if (darkAhPrice >= maxBid) {
 						itemCost = higherDepth(extraPrices, type, maxBid) * 0.9823;
