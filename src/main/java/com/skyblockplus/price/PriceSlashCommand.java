@@ -132,9 +132,11 @@ public class PriceSlashCommand extends SlashCommand {
 			boolean isBin = higherDepth(auction, "bin", false);
 			double startingBid = higherDepth(auction, "starting_bid").getAsDouble();
 			double highestBid = higherDepth(auction, "highest_bid").getAsDouble();
+			int count = higherDepth(auction, "count", 1);
+
 			String ahStr =
 				"**Price:** " +
-				roundAndFormat(isBin || highestBid == 0 ?  : ) +
+				roundAndFormat(Math.max(startingBid, highestBid)) +
 				"\n**Rarity:** " +
 				higherDepth(auction, "tier").getAsString().toLowerCase() +
 				"\n**" +
@@ -146,7 +148,6 @@ public class PriceSlashCommand extends SlashCommand {
 				Instant.ofEpochMilli(higherDepth(auction, "end_t").getAsLong()).getEpochSecond() +
 				":R>";
 
-			int count = higherDepth(auction, "count", 1);
 			eb.addField(
 				getEmoji(higherDepth(auction, "item_id").getAsString()) +
 				" " +
