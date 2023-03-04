@@ -355,7 +355,7 @@ public class Player {
 		}
 
 		public String itemToEmoji(String itemName) {
-			return getEmoji(itemName.toUpperCase(), "❓");
+			return getEmojiOr(itemName.toUpperCase(), "❓");
 		}
 
 		private void refreshAchievementsJson() {
