@@ -170,7 +170,7 @@ public class AuctionFlipper {
 		return null;
 	}
 
-	private static double calculateWithTaxes(double price) {
+	public static double calculateWithTaxes(double price) {
 		return price * (price >= 1000000 ? 0.98 : 0.99);
 	}
 }

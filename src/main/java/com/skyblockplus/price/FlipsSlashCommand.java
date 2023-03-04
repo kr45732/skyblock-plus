@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.AuctionFlipper.underBinJson;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.AuctionFlipper;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.*;
@@ -75,13 +76,22 @@ public class FlipsSlashCommand extends SlashCommand {
 				continue;
 			}
 
-			int sales = higherDepth(avgAuctionJson, itemId + ".sales", -1);
+			int sales = higherDepth(avgAuctionJson, itemId + ".sales", 0);
 			if (sales < 5) {
 				continue;
 			}
 
-			double profit = higherDepth(auction, "profit").getAsLong();
+			double pastBinPrice = Math.min(
+				higherDepth(auction, "past_bin_price").getAsLong(),
+				AuctionFlipper.calculateWithTaxes(higherDepth(avgAuctionJson, itemId + ".price").getAsDouble())
+			);
 			long startingBid = higherDepth(auction, "starting_bid").getAsLong();
+			double profit = pastBinPrice - startingBid;
+
+			if (profit < 1000000) {
+				continue;
+			}
+
 			String itemName = higherDepth(auction, "name").getAsString();
 			String auctionUuid = higherDepth(auction, "uuid").getAsString();
 
