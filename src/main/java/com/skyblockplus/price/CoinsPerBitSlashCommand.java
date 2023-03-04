@@ -63,7 +63,9 @@ public class CoinsPerBitSlashCommand extends SlashCommand {
 			.stream()
 			.sorted(Comparator.comparingDouble(v -> -v.getValue()))
 			.collect(Collectors.toCollection(ArrayList::new))) {
-			eb.appendDescription(getEmoji(entry.getKey()) + " " + idToName(entry.getKey()) + " ➜ " + roundAndFormat(entry.getValue()) + "\n");
+			eb.appendDescription(
+				getEmoji(entry.getKey()) + " " + idToName(entry.getKey()) + " ➜ " + roundAndFormat(entry.getValue()) + "\n"
+			);
 		}
 		return eb;
 	}
