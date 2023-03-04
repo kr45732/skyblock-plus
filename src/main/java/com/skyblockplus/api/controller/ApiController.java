@@ -66,7 +66,7 @@ public class ApiController {
 		return new ResponseEntity<>(apiCommandList, HttpStatus.OK);
 	}
 
-	@CrossOrigin({ "https://skyblock-plus.vercel.app", "skyblock-plus.ml" })
+	@CrossOrigin({ "https://skyblock-plus.vercel.app", "https://skyblock-plus.ml" })
 	@GetMapping("/stats")
 	public ResponseEntity<?> getStats() {
 		Map<String, Integer> commandUses = getCommandUses();
