@@ -129,13 +129,16 @@ public class PriceSlashCommand extends SlashCommand {
 			);
 		}
 		for (JsonElement auction : auctionsArr) {
+			boolean isBin = higherDepth(auction, "bin", false);
+			double startingBid = higherDepth(auction, "starting_bid").getAsDouble();
+			double highestBid = higherDepth(auction, "highest_bid").getAsDouble();
 			String ahStr =
 				"**Price:** " +
-				roundAndFormat(higherDepth(auction, "starting_bid").getAsDouble()) +
+				roundAndFormat(isBin || highestBid == 0 ?  : ) +
 				"\n**Rarity:** " +
 				higherDepth(auction, "tier").getAsString().toLowerCase() +
 				"\n**" +
-				(higherDepth(auction, "bin", false) ? "Bin" : "Auction") +
+				(isBin ? "Bin" : "Auction") +
 				":** `/viewauction " +
 				higherDepth(auction, "uuid").getAsString() +
 				"`" +
