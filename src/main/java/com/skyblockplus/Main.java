@@ -166,16 +166,16 @@ public class Main {
 		EventHandler.initialize();
 
 		if (isMainBot()) {
-			scheduler.scheduleWithFixedDelay(
-				() -> {
-					if (Runtime.getRuntime().totalMemory() > 1250000000) {
-						System.gc();
-					}
-				},
-				60,
-				30,
-				TimeUnit.SECONDS
-			); // Sorry for the war crimes
+			//			scheduler.scheduleWithFixedDelay(
+			//				() -> {
+			//					if (Runtime.getRuntime().totalMemory() > 1250000000) {
+			//						System.gc();
+			//					}
+			//				},
+			//				60,
+			//				30,
+			//				TimeUnit.SECONDS
+			//			); // Sorry for the war crimes
 		}
 
 		log.info("Bot ready with " + jda.getShardsTotal() + " shards and " + jda.getGuilds().size() + " guilds");

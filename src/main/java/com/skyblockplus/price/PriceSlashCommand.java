@@ -170,7 +170,7 @@ public class PriceSlashCommand extends SlashCommand {
 			return switch (this) {
 				case BIN -> "bins";
 				case AUCTION -> "auctions";
-				case BOTH -> "bins or auctions";
+				case BOTH -> "bins and auctions";
 			};
 		}
 	}

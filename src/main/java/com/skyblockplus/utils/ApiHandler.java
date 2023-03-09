@@ -412,9 +412,9 @@ public class ApiHandler {
 									JsonElement profiles = SkyblockProfilesParser.parse(jsonIn, uuid);
 
 									// Json parsing probably takes more memory than the HTTP request
-									if (Runtime.getRuntime().totalMemory() > 1250000000) {
-										System.gc();
-									}
+									//									if (Runtime.getRuntime().totalMemory() > 1250000000) {
+									//										System.gc();
+									//									}
 
 									return higherDepth(profiles, "profiles").getAsJsonArray();
 								}
