@@ -104,9 +104,9 @@ public class InformationSlashCommand extends SlashCommand {
 					Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
 				),
 				ActionRow.of(
-					Button.link("https://skyblock-plus.vercel.app", "Website Link"),
-					Button.link("https://skyblock-plus.vercel.app/tos", "Terms of Service"),
-					Button.link("https://skyblock-plus.vercel.app/privacy-policy", "Privacy Policy")
+					Button.link("https://skyblock-plus.ml", "Website Link"),
+					Button.link("https://skyblock-plus.ml/tos", "Terms of Service"),
+					Button.link("https://skyblock-plus.ml/privacy-policy", "Privacy Policy")
 				)
 			);
 	}

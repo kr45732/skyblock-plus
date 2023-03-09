@@ -78,7 +78,7 @@ public class HelpData {
 
 		EmbedBuilder eb = defaultEmbed(
 			getCategory() + " | " + getName(),
-			"https://skyblock-plus.vercel.app/commands?command=" + getName().replace(" ", "+")
+			"https://skyblock-plus.ml/commands?command=" + getName().replace(" ", "+")
 		);
 		eb.addField("Description", getDescription(), false);
 		eb.addField("Usage", getUsageFormatted(), false);

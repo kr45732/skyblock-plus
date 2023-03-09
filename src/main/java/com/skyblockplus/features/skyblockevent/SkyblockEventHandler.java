@@ -574,7 +574,7 @@ public class SkyblockEventHandler {
 	}
 
 	private boolean setSkyblockEventInDatabase() {
-		if (!database.serverByServerIdExists(slashCommandEvent.getGuild().getId())) {
+		if (database.getServerSettings(slashCommandEvent.getGuild().getId()) == null) {
 			database.newServerSettings(
 				slashCommandEvent.getGuild().getId(),
 				new ServerSettingsModel(slashCommandEvent.getGuild().getName(), slashCommandEvent.getGuild().getId())

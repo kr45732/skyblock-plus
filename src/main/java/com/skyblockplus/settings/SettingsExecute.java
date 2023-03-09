@@ -77,7 +77,7 @@ public class SettingsExecute {
 		this.author = author;
 		this.interactionHook = interactionHook;
 
-		if (!database.serverByServerIdExists(guild.getId())) {
+		if (database.getServerSettings(guild.getId()) != null) {
 			database.newServerSettings(guild.getId(), new ServerSettingsModel(guild.getName(), guild.getId()));
 		}
 		this.serverSettings = database.getServerSettings(guild.getId()).getAsJsonObject();

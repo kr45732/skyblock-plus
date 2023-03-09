@@ -103,10 +103,6 @@ public class Database {
 		return settingsService.setRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCode().value();
 	}
 
-	public boolean serverByServerIdExists(String serverId) {
-		return settingsService.serverByServerIdExists(serverId);
-	}
-
 	public JsonElement getRoleSettings(String serverId, String roleName) {
 		return gson.toJsonTree(settingsService.getRoleSettings(serverId, roleName).getBody());
 	}

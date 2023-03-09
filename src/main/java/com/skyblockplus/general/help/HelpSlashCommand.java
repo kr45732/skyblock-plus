@@ -744,7 +744,7 @@ public class HelpSlashCommand extends SlashCommand {
 			.updateExtras(extra ->
 				extra
 					.setTitles(pageTitleToCategory.keySet().stream().toList())
-					.setTitleUrls(pageTitleToCategory.values().stream().map(u -> "https://skyblock-plus.vercel.app/commands" + u).toList())
+					.setTitleUrls(pageTitleToCategory.values().stream().map(u -> "https://skyblock-plus.ml/commands" + u).toList())
 			);
 
 		paginateBuilder.addItems(
@@ -1044,7 +1044,7 @@ public class HelpSlashCommand extends SlashCommand {
 					.append(":** ")
 					.append("[")
 					.append(entry.getKey())
-					.append("](https://skyblock-plus.vercel.app/commands")
+					.append("](https://skyblock-plus.ml/commands")
 					.append(entry.getValue())
 					.append(")");
 				i++;

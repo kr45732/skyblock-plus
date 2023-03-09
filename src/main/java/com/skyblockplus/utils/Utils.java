@@ -624,12 +624,12 @@ public class Utils {
 	}
 
 	public static String getHasteUrl() {
-		return "https://hste.vercel.app/api/";
+		return "https://haste.skyblock-plus.ml/api/";
 	}
 
 	public static String makeHastePost(Object body) {
 		try {
-			HttpPost httpPost = new HttpPost("https://hste.vercel.app/api?key=cab35a7a9b1242beeaf0e6dfb69404d5");
+			HttpPost httpPost = new HttpPost("https://haste.skyblock-plus.ml/api?key=cab35a7a9b1242beeaf0e6dfb69404d5");
 
 			StringEntity entity = new StringEntity(body.toString(), "UTF-8");
 			httpPost.setEntity(entity);

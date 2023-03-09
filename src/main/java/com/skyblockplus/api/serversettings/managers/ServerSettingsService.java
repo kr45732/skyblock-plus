@@ -50,10 +50,6 @@ public class ServerSettingsService {
 	}
 
 	// General
-	public boolean serverByServerIdExists(String serverId) {
-		return settingsRepository.findServerByServerId(serverId) != null;
-	}
-
 	public List<ServerSettingsModel> getAllServerSettings() {
 		List<ServerSettingsModel> serverSettingsModels = new ArrayList<>();
 		settingsRepository.findAll().forEach(o1 -> serverSettingsModels.add(o1.copy(true)));
@@ -94,7 +90,6 @@ public class ServerSettingsService {
 	}
 
 	public ResponseEntity<HttpStatus> setServerSettings(String serverId, ServerSettingsModel newServerSettings) {
-		settingsRepository.deleteByServerId(serverId);
 		settingsRepository.save(newServerSettings);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
