@@ -101,12 +101,17 @@ public class EssenceSlashCommand extends SlashCommand {
 						case "items" -> {}
 						case "type" -> eb.setDescription("**Essence Type:** " + capitalizeString(essenceType));
 						case "dungeonize" -> eb.appendDescription(
-							"\n➜ **Dungeonize:** " +  ESSENCE_EMOJI_MAP.get(essenceType) + " x" + higherDepth(itemJson, level).getAsString()
+							"\n➜ **Dungeonize:** " + ESSENCE_EMOJI_MAP.get(essenceType) + " x" + higherDepth(itemJson, level).getAsString()
 						);
 						default -> eb.appendDescription(
 							"\n➜ **" +
 							level +
-							" Star" + (level.equals("1") ? "" : "s") + ":** " + ESSENCE_EMOJI_MAP.get(essenceType) + " x" + higherDepth(itemJson, level).getAsString() +
+							" Star" +
+							(level.equals("1") ? "" : "s") +
+							":** " +
+							ESSENCE_EMOJI_MAP.get(essenceType) +
+							" x" +
+							higherDepth(itemJson, level).getAsString() +
 							(
 								higherDepth(itemJson, "items." + level) != null
 									? streamJsonArray(higherDepth(itemJson, "items." + level))
