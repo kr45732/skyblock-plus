@@ -99,36 +99,21 @@ public class EssenceSlashCommand extends SlashCommand {
 				for (String level : getJsonKeys(itemJson)) {
 					switch (level) {
 						case "items" -> {}
-						case "type" -> eb.setDescription("**Essence Type:** " + essenceType);
+						case "type" -> eb.setDescription("**Essence Type:** " + capitalizeString(essenceType));
 						case "dungeonize" -> eb.appendDescription(
-							"\n➜ **Dungeonize:** " + higherDepth(itemJson, level).getAsString() + " " + ESSENCE_EMOJI_MAP.get(essenceType)
-						);
-						case "1" -> eb.appendDescription(
-							"\n➜ **" +
-							level +
-							" Star:** " +
-							higherDepth(itemJson, level).getAsString() +
-							" " +
-							ESSENCE_EMOJI_MAP.get(essenceType) +
-							(
-								higherDepth(itemJson, "items.1") != null
-									? streamJsonArray(higherDepth(itemJson, "items.1"))
-										.map(i -> parseMcCodes(i.getAsString()))
-										.collect(Collectors.joining(", ", ", ", ""))
-									: ""
-							)
+							"\n➜ **Dungeonize:** " +  ESSENCE_EMOJI_MAP.get(essenceType) + " x" + higherDepth(itemJson, level).getAsString()
 						);
 						default -> eb.appendDescription(
 							"\n➜ **" +
 							level +
-							" Stars:** " +
-							higherDepth(itemJson, level).getAsString() +
-							" " +
-							ESSENCE_EMOJI_MAP.get(essenceType) +
+							" Star" + (level.equals("1") ? "" : "s") + ":** " + ESSENCE_EMOJI_MAP.get(essenceType) + " x" + higherDepth(itemJson, level).getAsString() +
 							(
 								higherDepth(itemJson, "items." + level) != null
 									? streamJsonArray(higherDepth(itemJson, "items." + level))
-										.map(i -> parseMcCodes(i.getAsString()))
+										.map(i -> {
+											String[] split = i.getAsString().split(":");
+											return getEmojiOr(split[0], idToName(split[0])) + " x" + split[1];
+										})
 										.collect(Collectors.joining(", ", ", ", ""))
 									: ""
 							)

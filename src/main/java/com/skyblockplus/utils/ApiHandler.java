@@ -39,7 +39,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.Activity;
@@ -60,9 +59,10 @@ public class ApiHandler {
 		"[\\da-f]{32}|[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}"
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-	public static String ahApiUrl = "";
+	public static String ahApiUrl;
 	public static int mojangApiNum = 0;
 	public static boolean allowMojangApi = false;
+	public static String neuBranch = "master";
 
 	public static void initialize() {
 		try {
@@ -95,9 +95,10 @@ public class ApiHandler {
 
 	public static void reloadSettingsJson() {
 		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json");
-		ahApiUrl = higherDepth(settings, "ahApiUrl", "");
+		ahApiUrl = higherDepth(settings, "ahApiUrl").getAsString();
 		mojangApiNum = higherDepth(settings, "mojangApiNum", 0);
 		allowMojangApi = higherDepth(settings, "allowMojangApi", false);
+		neuBranch = higherDepth(settings, "neuBranch").getAsString();
 	}
 
 	public static void updateBotStatistics() {

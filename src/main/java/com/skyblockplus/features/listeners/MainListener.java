@@ -18,9 +18,9 @@
 
 package com.skyblockplus.features.listeners;
 
+import static com.skyblockplus.utils.ApiHandler.neuBranch;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.skyblockplus.features.setup.SetupSlashCommand;
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.Comparator;
 import java.util.Map;
@@ -162,7 +162,7 @@ public class MainListener extends ListenerAdapter {
 			isMainBot() && event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")
 		) {
 			String commitSha = higherDepth(
-				getJson("https://api.github.com/repos/NotEnoughUpdates/NotEnoughUpdates-REPO/commits?per_page=1"),
+				getJson("https://api.github.com/repos/NotEnoughUpdates/NotEnoughUpdates-REPO/commits?per_page=1&sha=" + neuBranch),
 				"[0].sha",
 				null
 			);

@@ -140,16 +140,10 @@ public class EssenceHandler {
 
 			if (higherDepth(itemJson, "items." + i) != null) {
 				for (JsonElement upgrade : higherDepth(itemJson, "items." + i).getAsJsonArray()) {
-					String strUpgrade = upgrade.getAsString();
-					String name = parseMcCodes(strUpgrade);
-					int count = 1;
-					if (strUpgrade.contains(" §8x")) {
-						String[] nameCountSplit = strUpgrade.split(" §8x");
-						name = parseMcCodes(nameCountSplit[0]);
-						count = Integer.parseInt(nameCountSplit[1]);
-					}
-					int finalCount = count;
-					items.compute(name, (k, v) -> (v != null ? v : 0) + finalCount);
+					String[] upgradeSplit = upgrade.getAsString().split(":");
+					String name = idToName(upgradeSplit[0]);
+					int count = Integer.parseInt(upgradeSplit[1]);
+					items.compute(name, (k, v) -> (v != null ? v : 0) + count);
 				}
 			}
 		}
