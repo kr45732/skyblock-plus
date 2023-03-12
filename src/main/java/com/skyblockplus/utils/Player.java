@@ -37,6 +37,7 @@ import com.skyblockplus.skills.CrimsonSlashCommand;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.*;
+import com.skyblockplus.utils.utils.StringUtils;
 import com.skyblockplus.utils.utils.Utils;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -596,11 +597,11 @@ public class Player {
 
 		/* Links */
 		public String skyblockStatsLink() {
-			return skyblockStatsLink(uuid, getProfileName());
+			return StringUtils.skyblockStatsLink(uuid, getProfileName());
 		}
 
 		public String getAuctionUrl() {
-			return getAuctionUrl(uuid);
+			return StringUtils.getAuctionUrl(uuid);
 		}
 
 		public String getAvatarUrl() {

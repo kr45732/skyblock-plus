@@ -22,8 +22,8 @@ import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.ApiHandler.neuBranch;
 import static com.skyblockplus.utils.Constants.getConstant;
-import static getJson;
-import static getJsonObject;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
+import static com.skyblockplus.utils.utils.HttpUtils.getJsonObject;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
