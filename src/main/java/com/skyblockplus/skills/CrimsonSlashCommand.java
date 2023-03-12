@@ -19,7 +19,9 @@
 package com.skyblockplus.skills;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -61,30 +63,6 @@ public class CrimsonSlashCommand extends SlashCommand {
 
 	public CrimsonSlashCommand() {
 		this.name = "crimson";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(getCrimson(event.player, event.getOptionStr("profile"), event));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's crimson isle statistics")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
 	}
 
 	public static EmbedBuilder getCrimson(String username, String profileName, SlashCommandEvent event) {
@@ -235,6 +213,30 @@ public class CrimsonSlashCommand extends SlashCommand {
 			new SelectMenuPaginator("stats", new PaginatorExtras().setSelectPages(pages), event);
 			return null;
 		}
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(getCrimson(event.player, event.getOptionStr("profile"), event));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's crimson isle statistics")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

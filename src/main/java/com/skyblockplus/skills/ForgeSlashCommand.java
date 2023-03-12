@@ -19,7 +19,12 @@
 package com.skyblockplus.skills;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getInternalJsonMappings;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.idToName;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -41,30 +46,6 @@ public class ForgeSlashCommand extends SlashCommand {
 
 	public ForgeSlashCommand() {
 		this.name = "forge";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(getForge(event.player, event.getOptionStr("profile")));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's forge items")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
 	}
 
 	public static EmbedBuilder getForge(String username, String profileName) {
@@ -126,6 +107,30 @@ public class ForgeSlashCommand extends SlashCommand {
 			}
 			return eb;
 		}
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.embed(getForge(event.player, event.getOptionStr("profile")));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's forge items")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

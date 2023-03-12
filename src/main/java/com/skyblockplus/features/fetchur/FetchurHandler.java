@@ -19,7 +19,7 @@
 package com.skyblockplus.features.fetchur;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.scheduler;
+import static com.skyblockplus.utils.utils.Utils.scheduler;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.FetchurSlashCommand;

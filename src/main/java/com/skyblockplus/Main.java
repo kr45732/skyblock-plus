@@ -18,7 +18,7 @@
 
 package com.skyblockplus;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -33,17 +33,20 @@ import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.listeners.MainListener;
 import com.skyblockplus.features.mayor.MayorHandler;
 import com.skyblockplus.price.AuctionTracker;
-import com.skyblockplus.utils.*;
+import com.skyblockplus.utils.ApiHandler;
+import com.skyblockplus.utils.AuctionFlipper;
+import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandClient;
 import com.skyblockplus.utils.database.Database;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import com.skyblockplus.utils.oauth.OAuthClient;
+import com.skyblockplus.utils.utils.HttpUtils;
+import com.skyblockplus.utils.utils.Utils;
 import jakarta.annotation.PreDestroy;
 import java.io.File;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.JDA;
@@ -191,7 +194,7 @@ public class Main {
 
 		botStatusWebhook.send(client.getSuccess() + " Restarting for an update");
 		ApiHandler.updateCaches();
-		Utils.closeHttpClient();
+		HttpUtils.closeHttpClient();
 		ApiHandler.leaderboardDatabase.close();
 
 		log.info("Finished");

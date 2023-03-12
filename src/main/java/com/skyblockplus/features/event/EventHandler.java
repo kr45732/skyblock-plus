@@ -21,7 +21,8 @@ package com.skyblockplus.features.event;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.currentJerryMayor;
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.CalendarSlashCommand;

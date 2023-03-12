@@ -18,8 +18,8 @@
 
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.defaultPerms;
-import static com.skyblockplus.utils.Utils.makeHastePost;
+import static com.skyblockplus.utils.utils.Utils.defaultPerms;
+import static com.skyblockplus.utils.utils.Utils.makeHastePost;
 
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;

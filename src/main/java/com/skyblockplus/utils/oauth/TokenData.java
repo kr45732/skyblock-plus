@@ -18,8 +18,9 @@
 
 package com.skyblockplus.utils.oauth;
 
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.executor;
+import static com.skyblockplus.utils.utils.HttpUtils.putJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -41,56 +42,6 @@ public final class TokenData {
 
 	public TokenData(JsonElement json) {
 		refreshData(json);
-	}
-
-	public String accessToken() {
-		return accessToken;
-	}
-
-	public String refreshToken() {
-		return refreshToken;
-	}
-
-	public String tokenType() {
-		return tokenType;
-	}
-
-	public boolean refreshData(JsonElement json) {
-		try {
-			this.accessToken = higherDepth(json, "access_token").getAsString();
-			this.refreshToken = higherDepth(json, "refresh_token").getAsString();
-			this.tokenType = higherDepth(json, "token_type").getAsString();
-			this.expiresAt = Instant.now().plusSeconds(higherDepth(json, "expires_in").getAsLong()).toEpochMilli();
-			return true;
-		} catch (Exception e) {
-			return false; // Authorization revoked
-		}
-	}
-
-	public boolean isExpired() {
-		return Instant.ofEpochMilli(expiresAt).isBefore(Instant.now());
-	}
-
-	public boolean shouldUpdateMetadata() {
-		return lastMetadataUpdate == -1 || Duration.between(Instant.ofEpochMilli(lastMetadataUpdate), Instant.now()).toMinutes() >= 5;
-	}
-
-	public void refreshLastMetadataUpdate() {
-		this.lastMetadataUpdate = Instant.now().toEpochMilli();
-	}
-
-	public JsonObject getBody() {
-		return body;
-	}
-
-	public boolean updateMetadata(JsonObject body) {
-		this.body = body;
-		JsonElement data = putJson(
-			"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
-			body,
-			new BasicHeader("Authorization", "Bearer " + accessToken())
-		);
-		return higherDepth(data, "metadata") != null;
 	}
 
 	public static CompletableFuture<Boolean> updateLinkedRolesMetadata(
@@ -167,5 +118,55 @@ public final class TokenData {
 			e.printStackTrace();
 			return CompletableFuture.completedFuture(false);
 		}
+	}
+
+	public String accessToken() {
+		return accessToken;
+	}
+
+	public String refreshToken() {
+		return refreshToken;
+	}
+
+	public String tokenType() {
+		return tokenType;
+	}
+
+	public boolean refreshData(JsonElement json) {
+		try {
+			this.accessToken = higherDepth(json, "access_token").getAsString();
+			this.refreshToken = higherDepth(json, "refresh_token").getAsString();
+			this.tokenType = higherDepth(json, "token_type").getAsString();
+			this.expiresAt = Instant.now().plusSeconds(higherDepth(json, "expires_in").getAsLong()).toEpochMilli();
+			return true;
+		} catch (Exception e) {
+			return false; // Authorization revoked
+		}
+	}
+
+	public boolean isExpired() {
+		return Instant.ofEpochMilli(expiresAt).isBefore(Instant.now());
+	}
+
+	public boolean shouldUpdateMetadata() {
+		return lastMetadataUpdate == -1 || Duration.between(Instant.ofEpochMilli(lastMetadataUpdate), Instant.now()).toMinutes() >= 5;
+	}
+
+	public void refreshLastMetadataUpdate() {
+		this.lastMetadataUpdate = Instant.now().toEpochMilli();
+	}
+
+	public JsonObject getBody() {
+		return body;
+	}
+
+	public boolean updateMetadata(JsonObject body) {
+		this.body = body;
+		JsonElement data = putJson(
+			"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
+			body,
+			new BasicHeader("Authorization", "Bearer " + accessToken())
+		);
+		return higherDepth(data, "metadata") != null;
 	}
 }

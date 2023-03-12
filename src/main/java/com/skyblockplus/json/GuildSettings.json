@@ -106,8 +106,10 @@
         "lobbyist"
       ],
       "default_rank": {
-        "requirements" : [],
-        "names": ["customer"]
+        "requirements": [],
+        "names": [
+          "customer"
+        ]
       },
       "ranks": [
         {
@@ -343,8 +345,10 @@
         "modérateur"
       ],
       "default_rank": {
-        "requirements" : [],
-        "names": ["nouveau"]
+        "requirements": [],
+        "names": [
+          "nouveau"
+        ]
       },
       "ranks": [
         {
@@ -439,8 +443,10 @@
         "master"
       ],
       "default_rank": {
-        "requirements" : [],
-        "names": ["novice"]
+        "requirements": [],
+        "names": [
+          "novice"
+        ]
       },
       "ranks": [
         {
@@ -471,7 +477,7 @@
         }
       ]
     }
-  }, 
+  },
   "63cae4db8ea8c999a1004b22": {
     "name": "Skill N Chill 2",
     "guild_leaderboard": {
@@ -481,8 +487,10 @@
         "master"
       ],
       "default_rank": {
-        "requirements" : [],
-        "names": ["novice"]
+        "requirements": [],
+        "names": [
+          "novice"
+        ]
       },
       "ranks": [
         {

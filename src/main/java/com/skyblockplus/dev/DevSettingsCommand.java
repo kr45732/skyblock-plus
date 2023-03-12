@@ -19,7 +19,8 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -97,7 +98,7 @@ public class DevSettingsCommand extends Command {
 					}
 				}
 
-				embed(invalidEmbed("Invalid input"));
+				embed(errorEmbed("Invalid input"));
 			}
 		}
 			.queue();

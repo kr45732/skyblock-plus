@@ -22,7 +22,10 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.miscellaneous.CalendarSlashCommand.YEAR_0;
 import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
 import static com.skyblockplus.utils.Constants.MAYOR_NAME_TO_SKIN;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -47,7 +50,7 @@ public class MayorHandler {
 	public static int currentMayorYear = 0;
 	public static ScheduledFuture<?> jerryFuture;
 	public static ScheduledFuture<?> mayorElectedFuture;
-	public static MessageEmbed jerryEmbed = invalidEmbed("Jerry is not currently mayor").build();
+	public static MessageEmbed jerryEmbed = errorEmbed("Jerry is not currently mayor").build();
 
 	public static void initialize() {
 		try {
@@ -166,7 +169,7 @@ public class MayorHandler {
 		try {
 			if (!currentMayor.equals("Jerry")) {
 				jerryFuture = null;
-				jerryEmbed = invalidEmbed("Jerry is not currently mayor").build();
+				jerryEmbed = errorEmbed("Jerry is not currently mayor").build();
 				return;
 			}
 

@@ -19,7 +19,7 @@
 package com.skyblockplus.utils.command;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.Permission;
@@ -27,9 +27,9 @@ import net.dv8tion.jda.api.utils.data.SerializableData;
 
 public abstract class AbstractSlashCommand {
 
-	protected final Permission[] botPermissions = defaultPerms(true);
+	protected final Permission[] botPermissions = defaultPerms();
 	protected String name = "null";
-	protected int cooldown = globalCooldown;
+	protected int cooldown = GLOBAL_COOLDOWN;
 	protected boolean logCommand = true;
 	protected Permission[] userPermissions = new Permission[0];
 
@@ -54,7 +54,7 @@ public abstract class AbstractSlashCommand {
 							.queue(dm ->
 								dm
 									.sendMessageEmbeds(
-										invalidEmbed(
+										errorEmbed(
 											"I need the " + p.getName() + " permission in " + event.getGuildChannel().getAsMention() + "!"
 										)
 											.build()
@@ -62,13 +62,13 @@ public abstract class AbstractSlashCommand {
 									.queue(ignore, ignore)
 							);
 					} else {
-						event.embed(invalidEmbed("I need the " + p.getName() + " permission in this channel!"));
+						event.embed(errorEmbed("I need the " + p.getName() + " permission in this channel!"));
 					}
 					return;
 				}
 			} else {
 				if (!event.getGuild().getSelfMember().hasPermission(p)) {
-					event.embed(invalidEmbed("I need the " + p.getName() + " permission in this server!"));
+					event.embed(errorEmbed("I need the " + p.getName() + " permission in this server!"));
 					return;
 				}
 			}
@@ -82,18 +82,18 @@ public abstract class AbstractSlashCommand {
 
 				if (p.isChannel()) {
 					if (!event.getMember().hasPermission(event.getGuildChannel(), p)) {
-						event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
+						event.embed(errorEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
 						return;
 					}
 				} else {
 					if (p == Permission.ADMINISTRATOR) {
 						if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
-							event.embed(invalidEmbed("You are missing the required permissions or roles to use this command"));
+							event.embed(errorEmbed("You are missing the required permissions or roles to use this command"));
 							return;
 						}
 					} else {
 						if (!event.getMember().hasPermission(p)) {
-							event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
+							event.embed(errorEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
 							return;
 						}
 					}
@@ -130,7 +130,7 @@ public abstract class AbstractSlashCommand {
 		event
 			.getHook()
 			.editOriginalEmbeds(
-				invalidEmbed("That command is on cooldown for " + remainingCooldown + " more second" + (remainingCooldown == 1 ? "" : "s"))
+				errorEmbed("That command is on cooldown for " + remainingCooldown + " more second" + (remainingCooldown == 1 ? "" : "s"))
 					.build()
 			)
 			.queue();

@@ -18,7 +18,7 @@
 
 package com.skyblockplus.general;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;

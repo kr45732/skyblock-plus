@@ -19,7 +19,7 @@
 package com.skyblockplus.miscellaneous.networth;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -34,7 +34,7 @@ public class NetworthSlashCommand extends SlashCommand {
 
 	public NetworthSlashCommand() {
 		this.name = "networth";
-		this.cooldown = globalCooldown + 1;
+		this.cooldown = GLOBAL_COOLDOWN + 1;
 	}
 
 	@Override

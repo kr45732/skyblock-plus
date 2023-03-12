@@ -18,7 +18,9 @@
 
 package com.skyblockplus.general;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -36,16 +38,6 @@ public class InformationSlashCommand extends SlashCommand {
 
 	public InformationSlashCommand() {
 		this.name = "information";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getInformation());
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get information about this bot");
 	}
 
 	public static MessageEditBuilder getInformation() {
@@ -109,5 +101,15 @@ public class InformationSlashCommand extends SlashCommand {
 					Button.link("https://skyblock-plus.ml/privacy-policy", "Privacy Policy")
 				)
 			);
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getInformation());
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Get information about this bot");
 	}
 }

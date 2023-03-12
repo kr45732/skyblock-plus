@@ -20,7 +20,9 @@ package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -57,49 +59,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 
 	public AuctionsSlashCommand() {
 		this.name = "auctions";
-		this.cooldown = globalCooldown + 1;
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(
-			getPlayerAuction(
-				event.player,
-				AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
-				AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),
-				event.getOptionBoolean("verbose", false),
-				event
-			)
-		);
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get player's active (not claimed) auctions on all profiles")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(
-				new OptionData(OptionType.STRING, "filter", "How the auctions should be filtered")
-					.addChoice("Sold", "sold")
-					.addChoice("Unsold", "Unsold")
-			)
-			.addOptions(
-				new OptionData(OptionType.STRING, "sort", "How the auctions should be sorted")
-					.addChoice("Low", "low")
-					.addChoice("High", "high")
-			)
-			.addOption(OptionType.BOOLEAN, "verbose", "Get more information & a detailed breakdown for each auction");
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
+		this.cooldown = GLOBAL_COOLDOWN + 1;
 	}
 
 	public static Object getPlayerAuction(
@@ -111,12 +71,12 @@ public class AuctionsSlashCommand extends SlashCommand {
 	) {
 		Player.Profile player = Player.create(username);
 		if (!player.isValid()) {
-			return player.getFailEmbed();
+			return player.getErrorEmbed();
 		}
 
 		HypixelResponse auctionsResponse = getAuctionFromPlayer(player.getUuid());
 		if (!auctionsResponse.isValid()) {
-			return invalidEmbed(auctionsResponse.failCause());
+			return auctionsResponse.getErrorEmbed();
 		}
 
 		JsonArray auctionsArray = auctionsResponse.response().getAsJsonArray();
@@ -219,7 +179,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 			}
 			if (extras.getEmbedFields().size() == 0) {
 				return new MessageEditBuilder()
-					.setEmbeds(invalidEmbed("No auctions found for " + player.getUsernameFixed()).build())
+					.setEmbeds(errorEmbed("No auctions found for " + player.getUsernameFixed()).build())
 					.setActionRow(button);
 			}
 
@@ -330,7 +290,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 			}
 
 			if (extras.getEmbedPages().size() == 0) {
-				return invalidEmbed("No auctions found for " + player.getUsernameFixed());
+				return errorEmbed("No auctions found for " + player.getUsernameFixed());
 			}
 
 			for (int i = 0; i < extras.getEmbedPages().size(); i++) {
@@ -364,6 +324,48 @@ public class AuctionsSlashCommand extends SlashCommand {
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		}
 		return null;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(
+			getPlayerAuction(
+				event.player,
+				AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
+				AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),
+				event.getOptionBoolean("verbose", false),
+				event
+			)
+		);
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get player's active (not claimed) auctions on all profiles")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(
+				new OptionData(OptionType.STRING, "filter", "How the auctions should be filtered")
+					.addChoice("Sold", "sold")
+					.addChoice("Unsold", "Unsold")
+			)
+			.addOptions(
+				new OptionData(OptionType.STRING, "sort", "How the auctions should be sorted")
+					.addChoice("Low", "low")
+					.addChoice("High", "high")
+			)
+			.addOption(OptionType.BOOLEAN, "verbose", "Get more information & a detailed breakdown for each auction");
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 
 	public enum AuctionFilterType {

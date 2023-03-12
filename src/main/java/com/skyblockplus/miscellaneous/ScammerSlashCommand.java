@@ -20,7 +20,10 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
+import static com.skyblockplus.utils.utils.StringUtils.nameMcLink;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -42,33 +45,10 @@ public class ScammerSlashCommand extends SlashCommand {
 		this.name = "scammer";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(getScammer(event.player));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Check if a player is marked as a scammer in the SBZ database")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static EmbedBuilder getScammer(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (!usernameUuid.isValid()) {
-			return invalidEmbed(usernameUuid.failCause());
+			return errorEmbed(usernameUuid.failCause());
 		}
 
 		JsonElement scammerJson = getScammerJson(usernameUuid.uuid());
@@ -102,5 +82,28 @@ public class ScammerSlashCommand extends SlashCommand {
 			);
 		}
 		return eb;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.embed(getScammer(event.player));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Check if a player is marked as a scammer in the SBZ database")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

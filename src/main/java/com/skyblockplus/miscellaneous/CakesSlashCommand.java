@@ -19,7 +19,9 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -40,30 +42,6 @@ public class CakesSlashCommand extends SlashCommand {
 
 	public CakesSlashCommand() {
 		this.name = "cakes";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(getCakes(event.player, event.getOptionStr("profile")));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's active and inactive cake buffs")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
 	}
 
 	public static EmbedBuilder getCakes(String username, String profileName) {
@@ -116,6 +94,30 @@ public class CakesSlashCommand extends SlashCommand {
 
 			return eb;
 		}
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.embed(getCakes(event.player, event.getOptionStr("profile")));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's active and inactive cake buffs")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

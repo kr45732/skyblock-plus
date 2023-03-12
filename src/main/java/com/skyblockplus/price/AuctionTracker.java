@@ -19,7 +19,10 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -41,11 +44,11 @@ public class AuctionTracker {
 
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
 		if (!uuidStruct.isValid()) {
-			return invalidEmbed(uuidStruct.failCause());
+			return errorEmbed(uuidStruct.failCause());
 		}
 
 		if (curTrack != null && curTrack.uuid().equals(uuidStruct.uuid())) {
-			return invalidEmbed(
+			return errorEmbed(
 				"You are already tracking the auctions of [**" + uuidStruct.username() + "**](" + uuidStruct.getAuctionUrl() + ")"
 			);
 		}
@@ -153,7 +156,7 @@ public class AuctionTracker {
 				);
 		}
 
-		return invalidEmbed("You are not tracking this player");
+		return errorEmbed("You are not tracking this player");
 	}
 
 	public static void insertAhTrack(String key, UsernameUuidStruct value) {

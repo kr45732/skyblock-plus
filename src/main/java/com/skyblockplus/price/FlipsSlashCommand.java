@@ -19,13 +19,21 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.AuctionFlipper.underBinJson;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HypixelUtils.isVanillaItem;
+import static com.skyblockplus.utils.utils.JsonUtils.getAverageAuctionJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.AuctionFlipper;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -39,19 +47,9 @@ public class FlipsSlashCommand extends SlashCommand {
 		this.name = "flips";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getFlips());
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get current auction flips");
-	}
-
 	public static EmbedBuilder getFlips() {
 		if (underBinJson == null) {
-			return invalidEmbed("Flips not updated");
+			return errorEmbed("Flips not updated");
 		}
 
 		List<JsonElement> flips = underBinJson
@@ -64,7 +62,7 @@ public class FlipsSlashCommand extends SlashCommand {
 			.collect(Collectors.toCollection(ArrayList::new));
 
 		if (flips.isEmpty()) {
-			return invalidEmbed("No auction flips found at the moment");
+			return errorEmbed("No auction flips found at the moment");
 		}
 
 		EmbedBuilder eb = defaultEmbed("Flips");
@@ -111,5 +109,15 @@ public class FlipsSlashCommand extends SlashCommand {
 		}
 
 		return eb;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getFlips());
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Get current auction flips");
 	}
 }

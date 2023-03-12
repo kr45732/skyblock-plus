@@ -19,7 +19,10 @@
 package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
+import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -35,7 +38,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import org.eclipse.jgit.util.StringUtils;
 
 public class ApplyGuild {
 
@@ -154,7 +156,7 @@ public class ApplyGuild {
 
 		Player.Profile player = Player.create(linkedAccount.username());
 		if (!player.isValid()) {
-			return client.getError() + " Unable to fetch player data. Failed cause: `" + player.getFailCause() + "`";
+			return client.getError() + " Failed to fetch player data: `" + player.getFailCause() + "`";
 		} else {
 			Player.Gamemode gamemode = Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all"));
 			if (player.getAllProfileNames(gamemode).length == 0) {
@@ -176,7 +178,7 @@ public class ApplyGuild {
 					(collectionsEnabled ? "" : "collections, ") +
 					(vaultEnabled ? "" : "vault, ") +
 					(skillsEnabled ? "" : "skills, ");
-				out = StringUtils.capitalize(out.substring(0, out.length() - 2));
+				out = capitalizeString(out.substring(0, out.length() - 2));
 
 				return client.getError() + " " + out + " API" + (out.contains(",") ? "s" : "") + " not enabled";
 			}

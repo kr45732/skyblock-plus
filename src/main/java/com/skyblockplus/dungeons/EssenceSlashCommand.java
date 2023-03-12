@@ -19,14 +19,17 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.utils.StringUtils;
+import com.skyblockplus.utils.utils.Utils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -44,6 +47,23 @@ public class EssenceSlashCommand extends SlashCommand {
 
 	public EssenceSlashCommand() {
 		this.name = "essence";
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Get essence upgrade information for an item");
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("item")) {
+			event.replyClosestMatch(
+				event.getFocusedOption().getValue(),
+				ESSENCE_ITEM_NAMES.stream().map(StringUtils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new))
+			);
+		} else if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 
 	public static class UpgradeSubcommand extends Subcommand {
@@ -70,17 +90,6 @@ public class EssenceSlashCommand extends SlashCommand {
 			this.name = "information";
 		}
 
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			event.embed(getEssenceInformation(event.getOptionStr("item")));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData("information", "Get the amount of essence to upgrade an item for each level")
-				.addOption(OptionType.STRING, "item", "Item name", true, true);
-		}
-
 		public static EmbedBuilder getEssenceInformation(String itemName) {
 			JsonElement essenceCostsJson = getEssenceCostsJson();
 
@@ -96,12 +105,12 @@ public class EssenceSlashCommand extends SlashCommand {
 			EmbedBuilder eb = defaultEmbed(idToName(itemId));
 			if (itemJson != null) {
 				String essenceType = higherDepth(itemJson, "type", "None").toLowerCase();
-				for (String level : getJsonKeys(itemJson)) {
-					switch (level) {
+				for (Map.Entry<String, JsonElement> level : itemJson.getAsJsonObject().entrySet()) {
+					switch (level.getKey()) {
 						case "items" -> {}
 						case "type" -> eb.setDescription("**Essence Type:** " + capitalizeString(essenceType));
 						case "dungeonize" -> eb.appendDescription(
-							"\n➜ **Dungeonize:** " + ESSENCE_EMOJI_MAP.get(essenceType) + " x" + higherDepth(itemJson, level).getAsString()
+							"\n➜ **Dungeonize:** " + ESSENCE_EMOJI_MAP.get(essenceType) + " x" + level.getValue().getAsString()
 						);
 						default -> eb.appendDescription(
 							"\n➜ **" +
@@ -111,13 +120,13 @@ public class EssenceSlashCommand extends SlashCommand {
 							":** " +
 							ESSENCE_EMOJI_MAP.get(essenceType) +
 							" x" +
-							higherDepth(itemJson, level).getAsString() +
+							level.getValue().getAsString() +
 							(
 								higherDepth(itemJson, "items." + level) != null
-									? streamJsonArray(higherDepth(itemJson, "items." + level))
+									? streamJsonArray(higherDepth(itemJson, "items." + level.getKey()))
 										.map(i -> {
 											String[] split = i.getAsString().split(":");
-											return getEmojiOr(split[0], idToName(split[0])) + " x" + split[1];
+											return Utils.getEmoji(split[0], idToName(split[0])) + " x" + split[1];
 										})
 										.collect(Collectors.joining(", ", ", ", ""))
 									: ""
@@ -130,27 +139,23 @@ public class EssenceSlashCommand extends SlashCommand {
 			}
 			return defaultEmbed("Invalid item name");
 		}
+
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			event.embed(getEssenceInformation(event.getOptionStr("item")));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("information", "Get the amount of essence to upgrade an item for each level")
+				.addOption(OptionType.STRING, "item", "Item name", true, true);
+		}
 	}
 
 	public static class PlayerSubcommand extends Subcommand {
 
 		public PlayerSubcommand() {
 			this.name = "player";
-		}
-
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			if (event.invalidPlayerOption()) {
-				return;
-			}
-			event.paginate(getPlayerEssence(event.player, event.getOptionStr("profile"), event));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData("player", "Get the amount of each essence a player has")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerEssence(String username, String profileName, SlashCommandEvent event) {
@@ -202,24 +207,22 @@ public class EssenceSlashCommand extends SlashCommand {
 
 				return null;
 			}
-			return player.getFailEmbed();
+			return player.getErrorEmbed();
 		}
-	}
 
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get essence upgrade information for an item");
-	}
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			if (event.invalidPlayerOption()) {
+				return;
+			}
+			event.paginate(getPlayerEssence(event.player, event.getOptionStr("profile"), event));
+		}
 
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("item")) {
-			event.replyClosestMatch(
-				event.getFocusedOption().getValue(),
-				ESSENCE_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new))
-			);
-		} else if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("player", "Get the amount of each essence a player has")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOptions(profilesCommandOption);
 		}
 	}
 }

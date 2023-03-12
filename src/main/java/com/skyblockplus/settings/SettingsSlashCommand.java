@@ -18,7 +18,7 @@
 
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -35,7 +35,7 @@ public class SettingsSlashCommand extends SlashCommand {
 		this.name = "settings";
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 		this.logCommand = false;
-		this.cooldown = globalCooldown + 2;
+		this.cooldown = GLOBAL_COOLDOWN + 2;
 	}
 
 	@Override

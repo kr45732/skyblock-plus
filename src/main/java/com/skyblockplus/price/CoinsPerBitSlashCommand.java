@@ -18,7 +18,11 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getBitsJson;
+import static com.skyblockplus.utils.utils.StringUtils.idToName;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
@@ -41,16 +45,6 @@ public class CoinsPerBitSlashCommand extends SlashCommand {
 		this.name = "coinsperbit";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getCoinsPerBit());
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get the coins to bits ratio for items in the bits shop");
-	}
-
 	public static EmbedBuilder getCoinsPerBit() {
 		Map<String, Double> values = new HashMap<>();
 		NetworthExecute calc = new NetworthExecute().initPrices();
@@ -68,5 +62,15 @@ public class CoinsPerBitSlashCommand extends SlashCommand {
 			);
 		}
 		return eb;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getCoinsPerBit());
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Get the coins to bits ratio for items in the bits shop");
 	}
 }

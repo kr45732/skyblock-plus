@@ -19,16 +19,18 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
+import static com.skyblockplus.utils.utils.HttpUtils.okHttpClient;
+import static com.skyblockplus.utils.utils.HypixelUtils.isVanillaItem;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,9 +38,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
 
 public class AuctionFlipper {
 
@@ -51,9 +50,9 @@ public class AuctionFlipper {
 		.setHttpClient(okHttpClient)
 		.buildJDA();
 	private static final Cache<String, String> auctionUuidToMessage = Caffeine.newBuilder().expireAfterWrite(45, TimeUnit.MINUTES).build();
+	public static JsonElement underBinJson;
 	private static boolean enable = false;
 	private static Instant lastUpdated = Instant.now();
-	public static JsonElement underBinJson;
 
 	public static boolean onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
@@ -61,7 +60,7 @@ public class AuctionFlipper {
 				lastUpdated = Instant.now();
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
 				if (desc.contains(" query auctions into database in ")) {
-					queryItems = null;
+					resetQueryItems();
 				}
 				if (enable && isMainBot() && desc.contains("Successfully updated under bins file in ")) {
 					flip();
@@ -154,18 +153,7 @@ public class AuctionFlipper {
 
 	public static JsonElement getUnderBinJson() {
 		try {
-			HttpGet httpGet = new HttpGet(getQueryApiUrl("underbin"));
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URI uri = new URIBuilder(httpGet.getURI()).addParameter("key", AUCTION_API_KEY).build();
-			httpGet.setURI(uri);
-
-			try (
-				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
-				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
-			) {
-				return JsonParser.parseReader(in);
-			}
+			return getJson(getQueryApiUrl("underbin").toString());
 		} catch (Exception ignored) {}
 		return null;
 	}

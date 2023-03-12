@@ -21,7 +21,9 @@ package com.skyblockplus.utils.database;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.collectionNameToId;
 import static com.skyblockplus.utils.Constants.skyblockStats;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
@@ -48,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 public class LeaderboardDatabase {
 
+	public static final List<String> formattedTypesSubList = new ArrayList<>();
 	private static final int MAX_INSERT_COUNT = 75;
 	private static final List<String> types = new ArrayList<>(
 		List.of(
@@ -81,7 +84,7 @@ public class LeaderboardDatabase {
 		)
 	);
 	private static final List<String> typesSubList = new ArrayList<>();
-	public static final List<String> formattedTypesSubList = new ArrayList<>();
+	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
 
 	static {
 		types.addAll(collectionNameToId.keySet());
@@ -92,8 +95,6 @@ public class LeaderboardDatabase {
 			typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toCollection(ArrayList::new))
 		);
 	}
-
-	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
 
 	private final HikariDataSource dataSource;
 	private final List<Player.Gamemode> leaderboardGamemodes = Arrays.asList(
@@ -112,6 +113,24 @@ public class LeaderboardDatabase {
 		if (isMainBot()) {
 			scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
+	}
+
+	public static String getType(String lbType) {
+		lbType =
+			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
+				case "nw" -> "networth";
+				case "wolf" -> "sven";
+				case "spider" -> "tara";
+				case "zombie" -> "rev";
+				case "eman" -> "enderman";
+				default -> lbType;
+			};
+
+		if (!typesSubList.contains(lbType)) {
+			lbType = getClosestMatch(lbType, typesSubList);
+		}
+
+		return lbType;
 	}
 
 	public Connection getConnection() throws SQLException {
@@ -262,7 +281,7 @@ public class LeaderboardDatabase {
 
 	/**
 	 * @param rankStart Exclusive
-	 * @param rankEnd Inclusive
+	 * @param rankEnd   Inclusive
 	 */
 	public Map<Integer, DataObject> getLeaderboard(String lbType, Player.Gamemode mode, int rankStart, int rankEnd) {
 		rankStart = Math.max(0, rankStart);
@@ -644,24 +663,6 @@ public class LeaderboardDatabase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public static String getType(String lbType) {
-		lbType =
-			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
-				case "nw" -> "networth";
-				case "wolf" -> "sven";
-				case "spider" -> "tara";
-				case "zombie" -> "rev";
-				case "eman" -> "enderman";
-				default -> lbType;
-			};
-
-		if (!typesSubList.contains(lbType)) {
-			lbType = getClosestMatch(lbType, typesSubList);
-		}
-
-		return lbType;
 	}
 
 	public void close() {

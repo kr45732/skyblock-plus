@@ -18,7 +18,7 @@
 
 package com.skyblockplus.api.linkedaccounts;
 
-import static com.skyblockplus.utils.Utils.database;
+import static com.skyblockplus.utils.utils.Utils.database;
 
 import java.util.List;
 import net.dv8tion.jda.api.utils.data.DataObject;

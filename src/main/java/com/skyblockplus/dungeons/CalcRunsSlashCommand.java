@@ -19,7 +19,11 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.skyblockplus.miscellaneous.weight.weight.Weight;
 import com.skyblockplus.utils.Player;
@@ -44,61 +48,6 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		this.name = "calcruns";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(
-			getCalcRuns(
-				event.player,
-				event.getOptionStr("profile"),
-				event.getOptionInt("level", 1),
-				event.getOptionInt("floor", 0),
-				Player.WeightType.of(event.getOptionStr("system", "senither")),
-				event
-			)
-		);
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Calculate the number of runs needed to reach a catacombs level")
-			.addOptions(
-				new OptionData(OptionType.INTEGER, "level", "Target catacombs level", true).setRequiredRange(1, 50),
-				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)
-					.addChoice("Entrance", 0)
-					.addChoice("Floor 1", 1)
-					.addChoice("Floor 2", 2)
-					.addChoice("Floor 3", 3)
-					.addChoice("Floor 4", 4)
-					.addChoice("Floor 5", 5)
-					.addChoice("Floor 6", 6)
-					.addChoice("Floor 7", 7)
-					.addChoice("Master Floor 1", 8)
-					.addChoice("Master Floor 2", 9)
-					.addChoice("Master Floor 3", 10)
-					.addChoice("Master Floor 4", 11)
-					.addChoice("Master Floor 5", 12)
-					.addChoice("Master Floor 6", 13)
-					.addChoice("Master Floor 7", 14),
-				new OptionData(OptionType.STRING, "system", "Weight system that should be used")
-					.addChoice("Senither", "senither")
-					.addChoice("Lily", "lily")
-			)
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static Object getCalcRuns(
 		String username,
 		String profileName,
@@ -108,10 +57,10 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		SlashCommandEvent event
 	) {
 		if (targetLevel <= 0 || targetLevel > 50) {
-			return invalidEmbed("Target level must be between 1 and 50");
+			return errorEmbed("Target level must be between 1 and 50");
 		}
 		if (floor < 0 || floor > 14) {
-			return invalidEmbed("Invalid floor");
+			return errorEmbed("Invalid floor");
 		}
 
 		Player.Profile player = Player.create(username, profileName);
@@ -153,7 +102,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 			return null;
 		}
 
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
 	}
 
 	public static EmbedBuilder getCalcRunsEmbed(
@@ -166,7 +115,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		SkillsStruct current = player.getCatacombs();
 		SkillsStruct target = player.skillInfoFromLevel(targetLevel, "catacombs");
 		if (current.totalExp() >= target.totalExp()) {
-			return invalidEmbed("You are already level " + targetLevel);
+			return errorEmbed("You are already level " + targetLevel);
 		}
 
 		int completions = higherDepth(
@@ -256,5 +205,60 @@ public class CalcRunsSlashCommand extends SlashCommand {
 				post.getFormatted(false),
 				false
 			);
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(
+			getCalcRuns(
+				event.player,
+				event.getOptionStr("profile"),
+				event.getOptionInt("level", 1),
+				event.getOptionInt("floor", 0),
+				Player.WeightType.of(event.getOptionStr("system", "senither")),
+				event
+			)
+		);
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Calculate the number of runs needed to reach a catacombs level")
+			.addOptions(
+				new OptionData(OptionType.INTEGER, "level", "Target catacombs level", true).setRequiredRange(1, 50),
+				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)
+					.addChoice("Entrance", 0)
+					.addChoice("Floor 1", 1)
+					.addChoice("Floor 2", 2)
+					.addChoice("Floor 3", 3)
+					.addChoice("Floor 4", 4)
+					.addChoice("Floor 5", 5)
+					.addChoice("Floor 6", 6)
+					.addChoice("Floor 7", 7)
+					.addChoice("Master Floor 1", 8)
+					.addChoice("Master Floor 2", 9)
+					.addChoice("Master Floor 3", 10)
+					.addChoice("Master Floor 4", 11)
+					.addChoice("Master Floor 5", 12)
+					.addChoice("Master Floor 6", 13)
+					.addChoice("Master Floor 7", 14),
+				new OptionData(OptionType.STRING, "system", "Weight system that should be used")
+					.addChoice("Senither", "senither")
+					.addChoice("Lily", "lily")
+			)
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.utils.Utils.invalidEmbed;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.skyblockplus.Main;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -76,11 +76,11 @@ public class SlashCommandClient extends ListenerAdapter {
 	@Override
 	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
 		if (!event.isFromGuild()) {
-			event.replyEmbeds(invalidEmbed("This command cannot be used in direct messages").build()).queue();
+			event.replyEmbeds(errorEmbed("This command cannot be used in direct messages").build()).queue();
 			return;
 		}
 		if (event.getChannelType() == ChannelType.PRIVATE) {
-			event.replyEmbeds(invalidEmbed("This command can only be used in text channels or threads").build()).queue();
+			event.replyEmbeds(errorEmbed("This command can only be used in text channels or threads").build()).queue();
 			return;
 		}
 

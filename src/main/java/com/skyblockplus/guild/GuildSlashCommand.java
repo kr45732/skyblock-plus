@@ -19,9 +19,13 @@
 package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
+import static com.skyblockplus.utils.utils.HypixelUtils.guildExpToLevel;
+import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromLevel;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -55,32 +59,24 @@ public class GuildSlashCommand extends SlashCommand {
 		this.name = "guild";
 	}
 
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Main guild command");
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		} else if (event.getFocusedOption().getName().equals("type")) {
+			event.replyClosestMatch(event.getFocusedOption().getValue(), formattedTypesSubList);
+		}
+	}
+
 	public static class InformationSubcommand extends Subcommand {
 
 		public InformationSubcommand() {
 			this.name = "information";
-		}
-
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			String guild = event.getOptionStr("guild");
-			if (guild != null) {
-				event.embed(getGuildInformation(null, guild));
-				return;
-			}
-
-			if (event.invalidPlayerOption()) {
-				return;
-			}
-
-			event.embed(getGuildInformation(event.player, null));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData("information", "Get information and statistics about a guild")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "guild", "Guild name", false);
 		}
 
 		public static EmbedBuilder getGuildInformation(String username, String guildName) {
@@ -90,14 +86,14 @@ public class GuildSlashCommand extends SlashCommand {
 			} else {
 				UsernameUuidStruct usernameUuid = usernameToUuid(username);
 				if (!usernameUuid.isValid()) {
-					return invalidEmbed(usernameUuid.failCause());
+					return errorEmbed(usernameUuid.failCause());
 				}
 
 				hypixelResponse = getGuildFromPlayer(usernameUuid.uuid());
 			}
 
 			if (!hypixelResponse.isValid()) {
-				return invalidEmbed(hypixelResponse.failCause());
+				return hypixelResponse.getErrorEmbed();
 			}
 
 			String guildInfo = "";
@@ -147,19 +143,12 @@ public class GuildSlashCommand extends SlashCommand {
 			eb.addField("Guild statistics:", guildInfo, false);
 			return eb;
 		}
-	}
-
-	public static class MembersSubcommand extends Subcommand {
-
-		public MembersSubcommand() {
-			this.name = "members";
-		}
 
 		@Override
 		protected void execute(SlashCommandEvent event) {
 			String guild = event.getOptionStr("guild");
 			if (guild != null) {
-				event.paginate(getGuildMembers(null, guild, event));
+				event.embed(getGuildInformation(null, guild));
 				return;
 			}
 
@@ -167,14 +156,21 @@ public class GuildSlashCommand extends SlashCommand {
 				return;
 			}
 
-			event.paginate(getGuildMembers(event.player, null, event));
+			event.embed(getGuildInformation(event.player, null));
 		}
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("members", "Get a list of all members in a player's guild")
+			return new SubcommandData("information", "Get information and statistics about a guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false);
+		}
+	}
+
+	public static class MembersSubcommand extends Subcommand {
+
+		public MembersSubcommand() {
+			this.name = "members";
 		}
 
 		public static EmbedBuilder getGuildMembers(String username, String guildName, SlashCommandEvent event) {
@@ -184,14 +180,14 @@ public class GuildSlashCommand extends SlashCommand {
 			} else {
 				UsernameUuidStruct usernameUuid = usernameToUuid(username);
 				if (!usernameUuid.isValid()) {
-					return invalidEmbed(usernameUuid.failCause());
+					return errorEmbed(usernameUuid.failCause());
 				}
 
 				hypixelResponse = getGuildFromPlayer(usernameUuid.uuid());
 			}
 
 			if (!hypixelResponse.isValid()) {
-				return invalidEmbed(hypixelResponse.failCause());
+				return hypixelResponse.getErrorEmbed();
 			}
 
 			JsonElement guildJson = hypixelResponse.response();
@@ -237,6 +233,28 @@ public class GuildSlashCommand extends SlashCommand {
 			event.paginate(paginateBuilder);
 			return null;
 		}
+
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			String guild = event.getOptionStr("guild");
+			if (guild != null) {
+				event.paginate(getGuildMembers(null, guild, event));
+				return;
+			}
+
+			if (event.invalidPlayerOption()) {
+				return;
+			}
+
+			event.paginate(getGuildMembers(event.player, null, event));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("members", "Get a list of all members in a player's guild")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "guild", "Guild name", false);
+		}
 	}
 
 	public static class ExperienceSubcommand extends Subcommand {
@@ -245,34 +263,9 @@ public class GuildSlashCommand extends SlashCommand {
 			this.name = "experience";
 		}
 
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			int numDays = event.getOptionInt("days", 7);
-
-			String guild = event.getOptionStr("guild");
-			if (guild != null) {
-				event.paginate(getGuildExperience(null, guild, numDays, event));
-				return;
-			}
-
-			if (event.invalidPlayerOption()) {
-				return;
-			}
-
-			event.paginate(getGuildExperience(event.player, null, numDays, event));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "guild", "Guild name", false)
-				.addOptions(new OptionData(OptionType.INTEGER, "days", "Number of days").setRequiredRange(1, 7));
-		}
-
 		public static EmbedBuilder getGuildExperience(String username, String guildName, long days, SlashCommandEvent event) {
 			if (days < 1 || days > 7) {
-				return invalidEmbed("Days must be between 1 to 7");
+				return errorEmbed("Days must be between 1 to 7");
 			}
 
 			UsernameUuidStruct usernameUuid = null;
@@ -282,14 +275,14 @@ public class GuildSlashCommand extends SlashCommand {
 			} else {
 				usernameUuid = usernameToUuid(username);
 				if (!usernameUuid.isValid()) {
-					return invalidEmbed(usernameUuid.failCause());
+					return errorEmbed(usernameUuid.failCause());
 				}
 
 				hypixelResponse = getGuildFromPlayer(usernameUuid.uuid());
 			}
 
 			if (!hypixelResponse.isValid()) {
-				return invalidEmbed(hypixelResponse.failCause());
+				return hypixelResponse.getErrorEmbed();
 			}
 
 			JsonElement members = hypixelResponse.get("members");
@@ -301,17 +294,15 @@ public class GuildSlashCommand extends SlashCommand {
 				futures.add(
 					asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString())
 						.thenApplyAsync(
-							currentUsername -> {
-								JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
-								List<String> keys = getJsonKeys(expHistory);
-								int totalPlayerExp = 0;
-
-								for (int j = 0; j < days; j++) {
-									String value = keys.get(j);
-									totalPlayerExp += higherDepth(expHistory, value, 0);
-								}
-								return currentUsername + "=:=" + totalPlayerExp;
-							},
+							currentUsername ->
+								currentUsername +
+								"=:=" +
+								higherDepth(membersArr.get(finalI), "expHistory")
+									.getAsJsonObject()
+									.entrySet()
+									.stream()
+									.mapToInt(e -> e.getValue().getAsInt())
+									.sum(),
 							executor
 						)
 				);
@@ -363,29 +354,14 @@ public class GuildSlashCommand extends SlashCommand {
 
 			return null;
 		}
-	}
-
-	public static class LeaderboardSubcommand extends Subcommand {
-
-		public LeaderboardSubcommand() {
-			this.name = "leaderboard";
-			this.cooldown = globalCooldown + 2;
-		}
 
 		@Override
 		protected void execute(SlashCommandEvent event) {
+			int numDays = event.getOptionInt("days", 7);
+
 			String guild = event.getOptionStr("guild");
 			if (guild != null) {
-				event.paginate(
-					getLeaderboard(
-						event.getOptionStr("type"),
-						null,
-						guild,
-						Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-						event.getOptionBoolean("key", false),
-						event
-					)
-				);
+				event.paginate(getGuildExperience(null, guild, numDays, event));
 				return;
 			}
 
@@ -393,31 +369,23 @@ public class GuildSlashCommand extends SlashCommand {
 				return;
 			}
 
-			event.paginate(
-				getLeaderboard(
-					event.getOptionStr("type"),
-					event.player,
-					null,
-					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-					event.getOptionBoolean("key", false),
-					event
-				)
-			);
+			event.paginate(getGuildExperience(event.player, null, numDays, event));
 		}
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData(name, "Get a leaderboard for a guild. The API key must be set for this server.")
-				.addOptions(new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true))
+			return new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
-				.addOptions(
-					new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
-						.addChoice("All", "all")
-						.addChoice("Ironman", "ironman")
-						.addChoice("Stranded", "stranded")
-				)
-				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
+				.addOptions(new OptionData(OptionType.INTEGER, "days", "Number of days").setRequiredRange(1, 7));
+		}
+	}
+
+	public static class LeaderboardSubcommand extends Subcommand {
+
+		public LeaderboardSubcommand() {
+			this.name = "leaderboard";
+			this.cooldown = GLOBAL_COOLDOWN + 2;
 		}
 
 		public static EmbedBuilder getLeaderboard(
@@ -445,14 +413,14 @@ public class GuildSlashCommand extends SlashCommand {
 			if (username != null) {
 				usernameUuidStruct = usernameToUuid(username);
 				if (!usernameUuidStruct.isValid()) {
-					return invalidEmbed(usernameUuidStruct.failCause());
+					return errorEmbed(usernameUuidStruct.failCause());
 				}
 				guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
 			} else {
 				guildResponse = getGuildFromName(guildName);
 			}
 			if (!guildResponse.isValid()) {
-				return invalidEmbed(guildResponse.failCause());
+				return guildResponse.getErrorEmbed();
 			}
 
 			JsonElement guildJson = guildResponse.response();
@@ -460,7 +428,7 @@ public class GuildSlashCommand extends SlashCommand {
 			String guildId = higherDepth(guildJson, "_id").getAsString();
 
 			if (hypixelGuildQueue.contains(guildId)) {
-				return invalidEmbed("This guild is currently updating, please try again in a few seconds");
+				return errorEmbed("This guild is currently updating, please try again in a few seconds");
 			}
 			hypixelGuildQueue.add(guildId);
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
@@ -528,25 +496,33 @@ public class GuildSlashCommand extends SlashCommand {
 
 			return null;
 		}
-	}
-
-	public static class KickerSubcommand extends Subcommand {
-
-		public KickerSubcommand() {
-			this.name = "kicker";
-			this.cooldown = globalCooldown + 2;
-		}
 
 		@Override
 		protected void execute(SlashCommandEvent event) {
+			String guild = event.getOptionStr("guild");
+			if (guild != null) {
+				event.paginate(
+					getLeaderboard(
+						event.getOptionStr("type"),
+						null,
+						guild,
+						Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+						event.getOptionBoolean("key", false),
+						event
+					)
+				);
+				return;
+			}
+
 			if (event.invalidPlayerOption()) {
 				return;
 			}
 
 			event.paginate(
-				getGuildKicker(
+				getLeaderboard(
+					event.getOptionStr("type"),
 					event.player,
-					event.getOptionStr("requirements"),
+					null,
 					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 					event.getOptionBoolean("key", false),
 					event
@@ -556,9 +532,10 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData(name, "Get helper which shows who to promote or demote in your guild")
-				.addOption(OptionType.STRING, "requirements", "The requirements a player must meet", true)
+			return new SubcommandData(name, "Get a leaderboard for a guild. The API key must be set for this server.")
+				.addOptions(new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true))
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "guild", "Guild name", false)
 				.addOptions(
 					new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
 						.addChoice("All", "all")
@@ -567,9 +544,18 @@ public class GuildSlashCommand extends SlashCommand {
 				)
 				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
 		}
+	}
+
+	public static class KickerSubcommand extends Subcommand {
+
+		public KickerSubcommand() {
+			this.name = "kicker";
+			this.cooldown = GLOBAL_COOLDOWN + 2;
+		}
 
 		public static EmbedBuilder getGuildKicker(
 			String username,
+			String guildName,
 			String reqs,
 			Player.Gamemode gamemode,
 			boolean useKey,
@@ -577,14 +563,14 @@ public class GuildSlashCommand extends SlashCommand {
 		) {
 			String[] reqsArr = reqs.split("] \\[");
 			if (reqsArr.length > 5) {
-				return invalidEmbed("You can only enter a maximum of 5 sets of requirements");
+				return errorEmbed("You can only enter a maximum of 5 sets of requirements");
 			}
 			for (int i = 0; i < reqsArr.length; i++) {
 				String[] indvReqs = reqsArr[i].replace("[", "").replace("]", "").split("\\s+");
 				for (String indvReq : indvReqs) {
 					String[] reqDashSplit = indvReq.split(":");
 					if (reqDashSplit.length != 2) {
-						return invalidEmbed(indvReq + " is an invalid requirement format");
+						return errorEmbed(indvReq + " is an invalid requirement format");
 					}
 
 					if (
@@ -593,13 +579,13 @@ public class GuildSlashCommand extends SlashCommand {
 						!reqDashSplit[0].equals("catacombs") &&
 						!reqDashSplit[0].equals("weight")
 					) {
-						return invalidEmbed(indvReq + " is an invalid requirement type");
+						return errorEmbed(indvReq + " is an invalid requirement type");
 					}
 
 					try {
 						Double.parseDouble(reqDashSplit[1]);
 					} catch (Exception e) {
-						return invalidEmbed(indvReq + " is an invalid requirement value");
+						return errorEmbed(indvReq + " is an invalid requirement value");
 					}
 				}
 
@@ -616,19 +602,25 @@ public class GuildSlashCommand extends SlashCommand {
 				}
 			}
 
-			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-			if (!usernameUuidStruct.isValid()) {
-				return invalidEmbed(usernameUuidStruct.failCause());
+			HypixelResponse guildResponse;
+			if (username != null) {
+				UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+				if (!usernameUuidStruct.isValid()) {
+					return errorEmbed(usernameUuidStruct.failCause());
+				}
+				guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
+			} else {
+				guildResponse = getGuildFromName(guildName);
 			}
-			HypixelResponse guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
 			if (!guildResponse.isValid()) {
-				return invalidEmbed(guildResponse.failCause());
+				return guildResponse.getErrorEmbed();
 			}
+
 			JsonElement guildJson = guildResponse.response();
 			String guildId = higherDepth(guildJson, "_id").getAsString();
 
 			if (hypixelGuildQueue.contains(guildId)) {
-				return invalidEmbed("This guild is currently updating, please try again in a few seconds");
+				return errorEmbed("This guild is currently updating, please try again in a few seconds");
 			}
 			hypixelGuildQueue.add(guildId);
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
@@ -697,24 +689,33 @@ public class GuildSlashCommand extends SlashCommand {
 			event.paginate(paginateBuilder);
 			return null;
 		}
-	}
-
-	public static class RanksSubcommand extends Subcommand {
-
-		public RanksSubcommand() {
-			this.name = "ranks";
-			this.cooldown = globalCooldown + 2;
-		}
 
 		@Override
 		protected void execute(SlashCommandEvent event) {
+			String guild = event.getOptionStr("guild");
+			if (guild != null) {
+				event.paginate(
+					getGuildKicker(
+						null,
+						guild,
+						event.getOptionStr("requirements"),
+						Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+						event.getOptionBoolean("key", false),
+						event
+					)
+				);
+				return;
+			}
+
 			if (event.invalidPlayerOption()) {
 				return;
 			}
 
 			event.paginate(
-				getRanks(
+				getGuildKicker(
 					event.player,
+					null,
+					event.getOptionStr("requirements"),
 					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 					event.getOptionBoolean("key", false),
 					event
@@ -725,14 +726,24 @@ public class GuildSlashCommand extends SlashCommand {
 		@Override
 		protected SubcommandData getCommandData() {
 			return new SubcommandData(name, "Get helper which shows who to promote or demote in your guild")
+				.addOption(OptionType.STRING, "requirements", "The requirements a player must meet", true)
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "guild", "Guild name", false)
 				.addOptions(
 					new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
 						.addChoice("All", "all")
 						.addChoice("Ironman", "ironman")
 						.addChoice("Stranded", "stranded")
 				)
-				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more accurate results");
+				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
+		}
+	}
+
+	public static class RanksSubcommand extends Subcommand {
+
+		public RanksSubcommand() {
+			this.name = "ranks";
+			this.cooldown = GLOBAL_COOLDOWN + 2;
 		}
 
 		public static EmbedBuilder getRanks(String username, Player.Gamemode gamemode, boolean useKey, SlashCommandEvent event) {
@@ -748,12 +759,12 @@ public class GuildSlashCommand extends SlashCommand {
 
 			UsernameUuidStruct usernameUuid = usernameToUuid(username);
 			if (!usernameUuid.isValid()) {
-				return invalidEmbed(usernameUuid.failCause());
+				return errorEmbed(usernameUuid.failCause());
 			}
 
 			HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.uuid());
 			if (!guildResponse.isValid()) {
-				return invalidEmbed(guildResponse.failCause());
+				return guildResponse.getErrorEmbed();
 			}
 
 			JsonElement guildJson = guildResponse.response();
@@ -770,7 +781,7 @@ public class GuildSlashCommand extends SlashCommand {
 					)
 						.getAsJsonObject();
 			} catch (Exception e) {
-				return invalidEmbed(
+				return errorEmbed(
 					guildName +
 					"'s rank settings are not setup. Please join the [Skyblock Plus Discord](" +
 					DISCORD_SERVER_INVITE_LINK +
@@ -791,7 +802,7 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 
 			if (hypixelGuildQueue.contains(guildId)) {
-				return invalidEmbed("This guild is currently updating, please try again in a few seconds");
+				return errorEmbed("This guild is currently updating, please try again in a few seconds");
 			}
 			hypixelGuildQueue.add(guildId);
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
@@ -1109,41 +1120,18 @@ public class GuildSlashCommand extends SlashCommand {
 
 			return null;
 		}
-	}
-
-	public static class StatisticsSubcommand extends Subcommand {
-
-		public StatisticsSubcommand() {
-			this.name = "statistics";
-			this.cooldown = globalCooldown + 2;
-		}
 
 		@Override
 		protected void execute(SlashCommandEvent event) {
-			String guild = event.getOptionStr("guild");
-			if (guild != null) {
-				event.embed(
-					getStatistics(
-						null,
-						guild,
-						event.getOptionBoolean("key", false),
-						Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-						event
-					)
-				);
-				return;
-			}
-
 			if (event.invalidPlayerOption()) {
 				return;
 			}
 
-			event.embed(
-				getStatistics(
+			event.paginate(
+				getRanks(
 					event.player,
-					null,
-					event.getOptionBoolean("key", false),
 					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+					event.getOptionBoolean("key", false),
 					event
 				)
 			);
@@ -1151,16 +1139,23 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData(name, "Get a guild's Skyblock statistics of slayer, skills, catacombs, and weight")
+			return new SubcommandData(name, "Get helper which shows who to promote or demote in your guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "guild", "Guild name", false)
 				.addOptions(
 					new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
 						.addChoice("All", "all")
 						.addChoice("Ironman", "ironman")
 						.addChoice("Stranded", "stranded")
 				)
-				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
+				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more accurate results");
+		}
+	}
+
+	public static class StatisticsSubcommand extends Subcommand {
+
+		public StatisticsSubcommand() {
+			this.name = "statistics";
+			this.cooldown = GLOBAL_COOLDOWN + 2;
 		}
 
 		public static EmbedBuilder getStatistics(
@@ -1185,7 +1180,7 @@ public class GuildSlashCommand extends SlashCommand {
 			if (username != null) {
 				usernameUuidStruct = usernameToUuid(username);
 				if (!usernameUuidStruct.isValid()) {
-					return invalidEmbed(usernameUuidStruct.failCause());
+					return errorEmbed(usernameUuidStruct.failCause());
 				}
 
 				guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
@@ -1193,7 +1188,7 @@ public class GuildSlashCommand extends SlashCommand {
 				guildResponse = getGuildFromName(guildName);
 			}
 			if (!guildResponse.isValid()) {
-				return invalidEmbed(guildResponse.failCause());
+				return guildResponse.getErrorEmbed();
 			}
 
 			JsonElement guildJson = guildResponse.response();
@@ -1201,7 +1196,7 @@ public class GuildSlashCommand extends SlashCommand {
 			String guildId = higherDepth(guildJson, "_id").getAsString();
 
 			if (hypixelGuildQueue.contains(guildId)) {
-				return invalidEmbed("This guild is currently updating, please try again in a few seconds");
+				return errorEmbed("This guild is currently updating, please try again in a few seconds");
 			}
 
 			hypixelGuildQueue.add(guildId);
@@ -1297,29 +1292,58 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 			return str.toString();
 		}
+
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			String guild = event.getOptionStr("guild");
+			if (guild != null) {
+				event.embed(
+					getStatistics(
+						null,
+						guild,
+						event.getOptionBoolean("key", false),
+						Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+						event
+					)
+				);
+				return;
+			}
+
+			if (event.invalidPlayerOption()) {
+				return;
+			}
+
+			event.embed(
+				getStatistics(
+					event.player,
+					null,
+					event.getOptionBoolean("key", false),
+					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+					event
+				)
+			);
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData(name, "Get a guild's Skyblock statistics of slayer, skills, catacombs, and weight")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "guild", "Guild name", false)
+				.addOptions(
+					new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
+						.addChoice("All", "all")
+						.addChoice("Ironman", "ironman")
+						.addChoice("Stranded", "stranded")
+				)
+				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
+		}
 	}
 
 	public static class ApiSubcommand extends Subcommand {
 
 		public ApiSubcommand() {
 			this.name = "api";
-			this.cooldown = globalCooldown + 2;
-		}
-
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			if (event.invalidPlayerOption()) {
-				return;
-			}
-
-			event.paginate(getGuildCheckApi(event.player, event.getOptionStr("exclude", ""), event));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData(name, "Get which Skyblock APIs players have enabled or disabled for a guild")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "exclude", "Exclude certain APIs from being checked (comma separated)", false);
+			this.cooldown = GLOBAL_COOLDOWN + 2;
 		}
 
 		public static EmbedBuilder getGuildCheckApi(String username, String exclude, SlashCommandEvent event) {
@@ -1328,7 +1352,7 @@ public class GuildSlashCommand extends SlashCommand {
 				excludeArr.addAll(List.of(exclude.toLowerCase().split(",")));
 				for (String s : excludeArr) {
 					if (!List.of("inventory", "bank", "collections", "vault", "skills").contains(s)) {
-						return invalidEmbed("Invalid exclude type: " + s);
+						return errorEmbed("Invalid exclude type: " + s);
 					}
 				}
 			}
@@ -1342,12 +1366,12 @@ public class GuildSlashCommand extends SlashCommand {
 
 			UsernameUuidStruct usernameUuid = usernameToUuid(username);
 			if (!usernameUuid.isValid()) {
-				return invalidEmbed(usernameUuid.failCause());
+				return errorEmbed(usernameUuid.failCause());
 			}
 
 			HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.uuid());
 			if (!guildResponse.isValid()) {
-				return invalidEmbed(guildResponse.failCause());
+				return guildResponse.getErrorEmbed();
 			}
 
 			JsonArray guildMembers = guildResponse.get("members").getAsJsonArray();
@@ -1437,19 +1461,21 @@ public class GuildSlashCommand extends SlashCommand {
 			);
 			return null;
 		}
-	}
 
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Main guild command");
-	}
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			if (event.invalidPlayerOption()) {
+				return;
+			}
 
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		} else if (event.getFocusedOption().getName().equals("type")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), formattedTypesSubList);
+			event.paginate(getGuildCheckApi(event.player, event.getOptionStr("exclude", ""), event));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData(name, "Get which Skyblock APIs players have enabled or disabled for a guild")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "exclude", "Exclude certain APIs from being checked (comma separated)", false);
 		}
 	}
 }

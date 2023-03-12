@@ -20,13 +20,16 @@ package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,32 +47,10 @@ public class BinSlashCommand extends SlashCommand {
 		this.name = "bin";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getLowestBin(event.getOptionStr("item")));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get the lowest bin of an item").addOption(OptionType.STRING, "item", "Item name", true, true);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("item")) {
-			if (getLowestBinJson() != null) {
-				event.replyClosestMatch(
-					event.getFocusedOption().getValue(),
-					getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new))
-				);
-			}
-		}
-	}
-
 	public static EmbedBuilder getLowestBin(String item) {
 		JsonElement lowestBinJson = getLowestBinJson();
 		if (lowestBinJson == null) {
-			return invalidEmbed("Error fetching auctions");
+			return errorEmbed("Error fetching auctions");
 		}
 
 		EmbedBuilder eb = defaultEmbed("Lowest bin");
@@ -125,5 +106,32 @@ public class BinSlashCommand extends SlashCommand {
 		}
 
 		return defaultEmbed("No bin found for " + idToName(item));
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getLowestBin(event.getOptionStr("item")));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Get the lowest bin of an item").addOption(OptionType.STRING, "item", "Item name", true, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("item")) {
+			if (getLowestBinJson() != null) {
+				event.replyClosestMatch(
+					event.getFocusedOption().getValue(),
+					getLowestBinJson()
+						.keySet()
+						.stream()
+						.map(StringUtils::idToName)
+						.distinct()
+						.collect(Collectors.toCollection(ArrayList::new))
+				);
+			}
+		}
 	}
 }

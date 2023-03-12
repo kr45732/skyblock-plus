@@ -18,7 +18,8 @@
 
 package com.skyblockplus.api.controller;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.database;
+import static com.skyblockplus.utils.utils.Utils.oAuthClient;
 
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
@@ -26,7 +27,7 @@ import com.skyblockplus.utils.oauth.TokenData;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

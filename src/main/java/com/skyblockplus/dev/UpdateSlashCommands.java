@@ -18,7 +18,7 @@
 
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

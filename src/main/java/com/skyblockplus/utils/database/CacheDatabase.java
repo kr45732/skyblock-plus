@@ -19,7 +19,9 @@
 package com.skyblockplus.utils.database;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -49,10 +51,9 @@ import org.slf4j.LoggerFactory;
 public class CacheDatabase {
 
 	private static final Logger log = LoggerFactory.getLogger(CacheDatabase.class);
-
+	public final Map<String, List<Party>> partyCaches = new HashMap<>();
 	private final HikariDataSource dataSource;
 	private final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
-	public final Map<String, List<Party>> partyCaches = new HashMap<>();
 
 	public CacheDatabase() {
 		HikariConfig config = new HikariConfig();

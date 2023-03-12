@@ -19,12 +19,15 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.Constants.BITS_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getBitsJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
-import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -38,6 +41,16 @@ public class BitsSlashCommand extends SlashCommand {
 
 	public BitsSlashCommand() {
 		this.name = "bits";
+	}
+
+	public static EmbedBuilder getBitPrices(String itemName) {
+		String closestMatch = getClosestMatchFromIds(nameToId(itemName), BITS_ITEM_NAMES);
+		if (closestMatch != null) {
+			return defaultEmbed("Bits Price")
+				.addField(idToName(closestMatch), formatNumber(higherDepth(getBitsJson(), closestMatch, 0L)), false);
+		}
+
+		return defaultEmbed("No bit price found for " + capitalizeString(itemName));
 	}
 
 	@Override
@@ -57,18 +70,8 @@ public class BitsSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
 				event.getFocusedOption().getValue(),
-				BITS_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new))
+				BITS_ITEM_NAMES.stream().map(StringUtils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new))
 			);
 		}
-	}
-
-	public static EmbedBuilder getBitPrices(String itemName) {
-		String closestMatch = getClosestMatchFromIds(nameToId(itemName), BITS_ITEM_NAMES);
-		if (closestMatch != null) {
-			return defaultEmbed("Bits Price")
-				.addField(idToName(closestMatch), formatNumber(higherDepth(getBitsJson(), closestMatch, 0L)), false);
-		}
-
-		return defaultEmbed("No bit price found for " + capitalizeString(itemName));
 	}
 }

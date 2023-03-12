@@ -21,7 +21,9 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.settings.SettingsExecute.isOneLevelRole;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HypixelUtils.petLevelFromXp;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -49,22 +51,23 @@ public class RolesSlashCommand extends SlashCommand {
 		this.name = "roles";
 	}
 
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Main roles command");
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
+	}
+
 	public static class ClaimSubcommand extends Subcommand {
 
 		public ClaimSubcommand() {
 			this.name = "claim";
-			this.cooldown = globalCooldown + 2;
-		}
-
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			event.embed(updateRoles(event.getOptionStr("profile"), event.getMember()));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
-				.addOptions(profilesCommandOption);
+			this.cooldown = GLOBAL_COOLDOWN + 2;
 		}
 
 		public static EmbedBuilder updateRoles(String profile, Member member) {
@@ -76,7 +79,7 @@ public class RolesSlashCommand extends SlashCommand {
 			String username = linkedInfo.username();
 			Player.Profile player = Player.create(username, profile);
 			if (!player.isValid()) {
-				return player.getFailEmbed();
+				return player.getErrorEmbed();
 			}
 
 			Object out = updateRoles(player, member);
@@ -88,7 +91,7 @@ public class RolesSlashCommand extends SlashCommand {
 			try {
 				member.getGuild().modifyMemberRoles(member, (List<Role>) outArr[1], (List<Role>) outArr[2]).queue();
 			} catch (InsufficientPermissionException e) {
-				return invalidEmbed("Missing permission: " + e.getPermission().getName());
+				return errorEmbed("Missing permission: " + e.getPermission().getName());
 			}
 			return (EmbedBuilder) outArr[0];
 		}
@@ -111,11 +114,11 @@ public class RolesSlashCommand extends SlashCommand {
 		 */
 		public static Object updateRoles(Player.Profile player, Member member, JsonElement rolesJson, boolean skipRoles) {
 			if (rolesJson == null || rolesJson.isJsonNull()) {
-				return invalidEmbed("Unable to fetch roles settings");
+				return errorEmbed("Unable to fetch roles settings");
 			}
 
 			if (!higherDepth(rolesJson, "enable", false)) {
-				return invalidEmbed("Automatic roles not setup or enabled for this server");
+				return errorEmbed("Automatic roles not setup or enabled for this server");
 			}
 
 			Guild guild = member.getGuild();
@@ -123,7 +126,7 @@ public class RolesSlashCommand extends SlashCommand {
 			allRoleNames.remove("enable");
 			Role botRole = guild.getSelfMember().getRoles().get(0);
 			if (botRole == null) {
-				return invalidEmbed("My role in this server doesn't exist. Please report this to the developer.");
+				return errorEmbed("My role in this server doesn't exist. Please report this to the developer.");
 			}
 			boolean useHighest = higherDepth(rolesJson, "useHighest", false);
 
@@ -574,22 +577,23 @@ public class RolesSlashCommand extends SlashCommand {
 
 			return new Object[] { eb, toAdd, toRemove };
 		}
+
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			event.embed(updateRoles(event.getOptionStr("profile"), event.getMember()));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
+				.addOptions(profilesCommandOption);
+		}
 	}
 
 	public static class ListSubcommand extends Subcommand {
 
 		public ListSubcommand() {
 			this.name = "list";
-		}
-
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			event.paginate(listRoles(event));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData("list", "List all roles that can be claimed through the bot");
 		}
 
 		public static EmbedBuilder listRoles(SlashCommandEvent event) {
@@ -634,17 +638,15 @@ public class RolesSlashCommand extends SlashCommand {
 			event.paginate(paginateBuilder);
 			return null;
 		}
-	}
 
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Main roles command");
-	}
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			event.paginate(listRoles(event));
+		}
 
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("list", "List all roles that can be claimed through the bot");
 		}
 	}
 }

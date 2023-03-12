@@ -20,7 +20,9 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.HARP_SONG_ID_TO_NAME;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -39,30 +41,6 @@ public class HarpSlashCommand extends SlashCommand {
 
 	public HarpSlashCommand() {
 		this.name = "harp";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(getHarp(event.player, event.getOptionStr("profile")));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's harp statistics")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
 	}
 
 	public static EmbedBuilder getHarp(String username, String profileName) {
@@ -105,6 +83,30 @@ public class HarpSlashCommand extends SlashCommand {
 
 			return eb;
 		}
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.embed(getHarp(event.player, event.getOptionStr("profile")));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's harp statistics")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

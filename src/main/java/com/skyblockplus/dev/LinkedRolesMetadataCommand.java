@@ -18,7 +18,7 @@
 
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -35,6 +35,10 @@ public class LinkedRolesMetadataCommand extends Command {
 		this.name = "d-linked-roles";
 		this.ownerCommand = true;
 		this.botPermissions = defaultPerms();
+	}
+
+	private static RoleConnectionMetadata generateNumericRole(String key, String name) {
+		return new RoleConnectionMetadata(RoleConnectionMetadata.MetadataType.INTEGER_GREATER_THAN_OR_EQUAL, name, key, name);
 	}
 
 	@Override
@@ -65,9 +69,5 @@ public class LinkedRolesMetadataCommand extends Command {
 			}
 		}
 			.queue();
-	}
-
-	private static RoleConnectionMetadata generateNumericRole(String key, String name) {
-		return new RoleConnectionMetadata(RoleConnectionMetadata.MetadataType.INTEGER_GREATER_THAN_OR_EQUAL, name, key, name);
 	}
 }

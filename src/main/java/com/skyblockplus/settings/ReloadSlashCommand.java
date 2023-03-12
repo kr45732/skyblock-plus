@@ -20,8 +20,8 @@ package com.skyblockplus.settings;
 
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -38,7 +38,13 @@ public class ReloadSlashCommand extends SlashCommand {
 	public ReloadSlashCommand() {
 		this.name = "reload";
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
-		this.cooldown = globalCooldown + 2;
+		this.cooldown = GLOBAL_COOLDOWN + 2;
+	}
+
+	public static EmbedBuilder getReloadEmbed(Guild guild) {
+		return defaultEmbed("Reload Settings for " + guild.getName())
+			.addField("Apply settings reload status", onApplyReload(guild.getId()), false)
+			.addField("Verify settings reload status", onVerifyReload(guild.getId()), false);
 	}
 
 	@Override
@@ -49,11 +55,5 @@ public class ReloadSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands.slash(name, "Reload the guild application and verification settings");
-	}
-
-	public static EmbedBuilder getReloadEmbed(Guild guild) {
-		return defaultEmbed("Reload Settings for " + guild.getName())
-			.addField("Apply settings reload status", onApplyReload(guild.getId()), false)
-			.addField("Verify settings reload status", onVerifyReload(guild.getId()), false);
 	}
 }

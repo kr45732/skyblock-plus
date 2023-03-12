@@ -19,8 +19,8 @@
 package com.skyblockplus.utils.structs;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.idToName;
-import static com.skyblockplus.utils.Utils.parseMcCodes;
+import static com.skyblockplus.utils.utils.StringUtils.idToName;
+import static com.skyblockplus.utils.utils.StringUtils.parseMcCodes;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -18,14 +18,15 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.price.PriceSlashCommand;
@@ -34,7 +35,6 @@ import com.skyblockplus.utils.database.LeaderboardDatabase;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -42,8 +42,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.Activity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
@@ -51,9 +49,9 @@ import org.slf4j.LoggerFactory;
 
 public class ApiHandler {
 
-	private static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
 	public static final CacheDatabase cacheDatabase = new CacheDatabase();
 	public static final LeaderboardDatabase leaderboardDatabase = new LeaderboardDatabase();
+	private static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
 	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);
 	private static final Pattern minecraftUuidRegex = Pattern.compile(
 		"[\\da-f]{32}|[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}"
@@ -289,15 +287,14 @@ public class ApiHandler {
 					.thenApplyAsync(
 						uuidToUsernameJson -> {
 							try {
-								String username = Utils
-									.higherDepth(
-										uuidToUsernameJson,
-										switch (mojangApiNum) {
-											case 1 -> "data.player.username";
-											case 2, 3 -> "name";
-											default -> "username";
-										}
-									)
+								String username = higherDepth(
+									uuidToUsernameJson,
+									switch (mojangApiNum) {
+										case 1 -> "data.player.username";
+										case 2, 3 -> "name";
+										default -> "username";
+									}
+								)
 									.getAsString();
 								uuidToUsernameCache.put(uuid, username);
 								return username;
@@ -506,43 +503,28 @@ public class ApiHandler {
 		return getGuildGeneric("&name=" + guildName.replace(" ", "%20").replace("_", "%20"));
 	}
 
-	public static String getQueryApiUrl(String path) {
-		// ahApiUrl should end with a '/'
-		return ahApiUrl + path;
+	public static URIBuilder getQueryApiUrl(String path) {
+		try {
+			return new URIBuilder(ahApiUrl).setPath(path).addParameter("key", AUCTION_API_KEY);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static JsonArray getBidsFromPlayer(String uuid) {
 		try {
-			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URI uri = new URIBuilder(httpGet.getURI())
-				.addParameter("bids", uuid)
-				.addParameter("limit", "-1")
-				.addParameter("key", AUCTION_API_KEY)
-				.build();
-			httpGet.setURI(uri);
-
-			try (
-				CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet);
-				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
-			) {
-				return JsonParser.parseReader(in).getAsJsonArray();
-			}
+			return getJson(getQueryApiUrl("query").addParameter("bids", uuid).addParameter("limit", "-1").toString()).getAsJsonArray();
 		} catch (Exception ignored) {}
 		return null;
 	}
 
 	public static JsonArray queryLowestBin(String query, boolean isName, PriceSlashCommand.AuctionType auctionType) {
 		try {
-			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
+			URIBuilder uriBuilder = getQueryApiUrl("query")
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "5")
-				.addParameter("key", AUCTION_API_KEY);
+				.addParameter("limit", "5");
 			if (isName) {
 				uriBuilder.addParameter("item_name", "%" + query + "%");
 			} else {
@@ -553,30 +535,20 @@ public class ApiHandler {
 			} else if (auctionType == PriceSlashCommand.AuctionType.AUCTION) {
 				uriBuilder.addParameter("bin", "false");
 			}
-			httpGet.setURI(uriBuilder.build());
 
-			try (
-				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
-				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
-			) {
-				return JsonParser.parseReader(in).getAsJsonArray();
-			}
+			return getJson(uriBuilder.toString()).getAsJsonArray();
 		} catch (Exception ignored) {}
 		return null;
 	}
 
 	public static JsonArray queryLowestBinPet(String petName, String rarity, PriceSlashCommand.AuctionType auctionType) {
 		try {
-			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
+			URIBuilder uriBuilder = getQueryApiUrl("query")
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_name", "%" + petName + "%")
 				.addParameter("item_id", "PET")
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "5")
-				.addParameter("key", AUCTION_API_KEY);
+				.addParameter("limit", "5");
 			if (!rarity.equals("ANY")) {
 				uriBuilder.addParameter("tier", rarity);
 			}
@@ -585,29 +557,15 @@ public class ApiHandler {
 			} else if (auctionType == PriceSlashCommand.AuctionType.AUCTION) {
 				uriBuilder.addParameter("bin", "false");
 			}
-			httpGet.setURI(uriBuilder.build());
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-			}
+			return getJson(uriBuilder.toString()).getAsJsonArray();
 		} catch (Exception ignored) {}
 		return null;
 	}
 
 	public static JsonArray getAuctionPetsByName(String query) {
 		try {
-			HttpGet httpGet = new HttpGet(getQueryApiUrl("pets"));
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URI uri = new URIBuilder(httpGet.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY).build();
-			httpGet.setURI(uri);
-
-			try (
-				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
-				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
-			) {
-				return JsonParser.parseReader(in).getAsJsonArray();
-			}
+			return getJson(getQueryApiUrl("pets").addParameter("query", query).toString()).getAsJsonArray();
 		} catch (Exception ignored) {}
 		return null;
 	}

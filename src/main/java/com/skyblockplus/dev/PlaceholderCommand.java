@@ -18,7 +18,9 @@
 
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.defaultPerms;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

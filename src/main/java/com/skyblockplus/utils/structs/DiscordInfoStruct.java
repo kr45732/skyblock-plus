@@ -18,6 +18,9 @@
 
 package com.skyblockplus.utils.structs;
 
+import com.skyblockplus.utils.utils.Utils;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 public record DiscordInfoStruct(String discordTag, String username, String uuid, String failCause) {
 	public DiscordInfoStruct(String discordTag, String username, String uuid) {
 		this(discordTag, username, uuid, null);
@@ -33,5 +36,9 @@ public record DiscordInfoStruct(String discordTag, String username, String uuid,
 
 	public boolean isValid() {
 		return discordTag != null && username != null && uuid != null;
+	}
+
+	public EmbedBuilder getErrorEmbed() {
+		return Utils.errorEmbed(failCause);
 	}
 }

@@ -18,9 +18,9 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.globalCooldown;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
+import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -38,7 +38,30 @@ public class LeaderboardSlashCommand extends SlashCommand {
 
 	public LeaderboardSlashCommand() {
 		this.name = "leaderboard";
-		this.cooldown = globalCooldown + 1;
+		this.cooldown = GLOBAL_COOLDOWN + 1;
+	}
+
+	public static EmbedBuilder getLeaderboard(
+		String lbType,
+		String username,
+		Player.Gamemode gamemode,
+		int page,
+		int rank,
+		double amount,
+		SlashCommandEvent event
+	) {
+		lbType = getType(lbType);
+
+		Player.Profile player = null;
+		if (username != null) {
+			player = new Player(username, gamemode).getSelectedProfile();
+			if (!player.isValid()) {
+				return player.getErrorEmbed();
+			}
+		}
+
+		new LeaderboardPaginator(lbType, gamemode, player, page, rank, amount, event);
+		return null;
 	}
 
 	@Override
@@ -84,28 +107,5 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		} else if (event.getFocusedOption().getName().equals("type")) {
 			event.replyClosestMatch(event.getFocusedOption().getValue(), formattedTypesSubList);
 		}
-	}
-
-	public static EmbedBuilder getLeaderboard(
-		String lbType,
-		String username,
-		Player.Gamemode gamemode,
-		int page,
-		int rank,
-		double amount,
-		SlashCommandEvent event
-	) {
-		lbType = getType(lbType);
-
-		Player.Profile player = null;
-		if (username != null) {
-			player = new Player(username, gamemode).getSelectedProfile();
-			if (!player.isValid()) {
-				return player.getFailEmbed();
-			}
-		}
-
-		new LeaderboardPaginator(lbType, gamemode, player, page, rank, amount, event);
-		return null;
 	}
 }

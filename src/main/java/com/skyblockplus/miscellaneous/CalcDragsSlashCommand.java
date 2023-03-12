@@ -18,7 +18,11 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getDragonLootJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -41,24 +45,6 @@ public class CalcDragsSlashCommand extends SlashCommand {
 
 	public CalcDragsSlashCommand() {
 		this.name = "calcdrags";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.paginate(
-			getCalcDrags(event.getOptionInt("position", 1), event.getOptionDouble("ratio", 1), event.getOptionInt("eyes", 8), event)
-		);
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Calculate your loot quality and loot from dragons in the end")
-			.addOptions(
-				new OptionData(OptionType.INTEGER, "position", "Your position on damage dealt").setRequiredRange(1, 25),
-				new OptionData(OptionType.NUMBER, "ratio", "Ratio of your damage to the 1st place's damage").setRequiredRange(0.0, 1.0),
-				new OptionData(OptionType.INTEGER, "eyes", "Number of eyes you placed").setRequiredRange(0, 8)
-			);
 	}
 
 	public static EmbedBuilder getCalcDrags(int position, double damageRatio, int eyesPlaced, SlashCommandEvent event) {
@@ -131,5 +117,23 @@ public class CalcDragsSlashCommand extends SlashCommand {
 
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		return null;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.paginate(
+			getCalcDrags(event.getOptionInt("position", 1), event.getOptionDouble("ratio", 1), event.getOptionInt("eyes", 8), event)
+		);
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Calculate your loot quality and loot from dragons in the end")
+			.addOptions(
+				new OptionData(OptionType.INTEGER, "position", "Your position on damage dealt").setRequiredRange(1, 25),
+				new OptionData(OptionType.NUMBER, "ratio", "Ratio of your damage to the 1st place's damage").setRequiredRange(0.0, 1.0),
+				new OptionData(OptionType.INTEGER, "eyes", "Number of eyes you placed").setRequiredRange(0, 8)
+			);
 	}
 }

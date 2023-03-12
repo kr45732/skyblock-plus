@@ -20,7 +20,9 @@ package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.ApiHandler.getAuctionFromUuid;
 import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -43,22 +45,10 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 		this.name = "viewauction";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getAuctionByUuid(event.getOptionStr("uuid")));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get information about an auction by it's UUID")
-			.addOption(OptionType.STRING, "uuid", "Auction UUID", true);
-	}
-
 	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
 		HypixelResponse auctionResponse = getAuctionFromUuid(auctionUuid);
 		if (!auctionResponse.isValid()) {
-			return invalidEmbed(auctionResponse.failCause());
+			return auctionResponse.getErrorEmbed();
 		}
 
 		JsonElement auctionJson = auctionResponse.get("[0]");
@@ -118,5 +108,17 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 		}
 
 		return eb.setDescription(ebStr).setThumbnail(getItemThumbnail(itemId));
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getAuctionByUuid(event.getOptionStr("uuid")));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get information about an auction by it's UUID")
+			.addOption(OptionType.STRING, "uuid", "Auction UUID", true);
 	}
 }

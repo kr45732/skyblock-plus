@@ -20,13 +20,15 @@ package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,35 +44,6 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 
 	public AverageAuctionSlashCommand() {
 		this.name = "average";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getAverageAuctionPrice(event.getOptionStr("item")));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get the average auction price of an item")
-			.addOption(OptionType.STRING, "item", "Item name", true, true);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("item")) {
-			if (getAverageAuctionJson() != null) {
-				event.replyClosestMatch(
-					event.getFocusedOption().getValue(),
-					getAverageAuctionJson()
-						.keySet()
-						.stream()
-						.map(Utils::idToName)
-						.distinct()
-						.collect(Collectors.toCollection(ArrayList::new))
-				);
-			}
-		}
 	}
 
 	public static EmbedBuilder getAverageAuctionPrice(String item) {
@@ -143,5 +116,34 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 		}
 
 		return defaultEmbed("No auctions found for " + idToName(item));
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getAverageAuctionPrice(event.getOptionStr("item")));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get the average auction price of an item")
+			.addOption(OptionType.STRING, "item", "Item name", true, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("item")) {
+			if (getAverageAuctionJson() != null) {
+				event.replyClosestMatch(
+					event.getFocusedOption().getValue(),
+					getAverageAuctionJson()
+						.keySet()
+						.stream()
+						.map(StringUtils::idToName)
+						.distinct()
+						.collect(Collectors.toCollection(ArrayList::new))
+				);
+			}
+		}
 	}
 }

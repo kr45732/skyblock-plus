@@ -20,7 +20,8 @@ package com.skyblockplus.features.party;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.ArrayList;
@@ -203,7 +204,7 @@ public class PartyHandler {
 			this::action,
 			2,
 			TimeUnit.MINUTES,
-			() -> message.editMessageEmbeds(invalidEmbed("Party creation timeout").build()).setComponents().queue()
+			() -> message.editMessageEmbeds(errorEmbed("Party creation timeout").build()).setComponents().queue()
 		);
 	}
 

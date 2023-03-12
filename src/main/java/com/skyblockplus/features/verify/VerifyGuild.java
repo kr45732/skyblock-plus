@@ -19,7 +19,9 @@
 package com.skyblockplus.features.verify;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
@@ -36,10 +38,10 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 
 public class VerifyGuild {
 
+	public final boolean enable;
 	public TextChannel messageChannel;
 	public Message originalMessage;
 	public JsonElement verifySettings;
-	public final boolean enable;
 
 	public VerifyGuild(TextChannel messageChannel, Message originalMessage, JsonElement verifySettings) {
 		this.messageChannel = messageChannel;

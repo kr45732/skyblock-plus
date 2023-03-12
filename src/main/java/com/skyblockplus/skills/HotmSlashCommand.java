@@ -19,7 +19,9 @@
 package com.skyblockplus.skills;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -42,36 +44,12 @@ public class HotmSlashCommand extends SlashCommand {
 		this.name = "hotm";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(getHotm(event.player, event.getOptionStr("profile")));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's heart of the mountain statistics")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static EmbedBuilder getHotm(String username, String profileName) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
 			SkillsStruct skillInfo = player.getHOTM();
 			if (skillInfo == null) {
-				return invalidEmbed("Player has not unlocked heart of the mountain");
+				return errorEmbed("Player has not unlocked heart of the mountain");
 			}
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 			JsonElement miningJson = higherDepth(player.profileJson(), "mining_core");
@@ -120,6 +98,30 @@ public class HotmSlashCommand extends SlashCommand {
 			eb.addField("Perks", perksStr.toString(), false);
 			return eb;
 		}
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.embed(getHotm(event.player, event.getOptionStr("profile")));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's heart of the mountain statistics")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

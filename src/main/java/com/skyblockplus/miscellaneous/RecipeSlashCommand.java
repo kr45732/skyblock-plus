@@ -18,13 +18,18 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getInternalJsonMappings;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.utils.StringUtils;
+import com.skyblockplus.utils.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +56,41 @@ public class RecipeSlashCommand extends SlashCommand {
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
+	public static EmbedBuilder getRecipe(String item) {
+		String id = nameToId(item);
+
+		if (higherDepth(getInternalJsonMappings(), id) == null) {
+			id = getClosestMatchFromIds(item, allRecipeIds);
+		}
+		String name = idToName(id);
+
+		JsonElement infoJson = getInternalJsonMappings().get(id);
+		if (higherDepth(infoJson, "recipe") == null) {
+			return errorEmbed("No recipe found for " + name);
+		}
+
+		EmbedBuilder eb = defaultEmbed("Recipe of " + name);
+		for (Map.Entry<String, JsonElement> entry : higherDepth(infoJson, "recipe").getAsJsonObject().entrySet()) {
+			if (entry.getKey().equals("count")) {
+				continue;
+			}
+			String[] idCountSplit = entry.getValue().getAsString().split(":");
+			if (entry.getKey().equals("B1") || entry.getKey().equals("C1")) {
+				eb.appendDescription("\n");
+			}
+			if (idCountSplit.length == 1) {
+				eb.appendDescription(Utils.getEmoji("EMPTY", "❓"));
+				eb.addBlankField(true);
+			} else {
+				String entryId = idCountSplit[0].replace("-", ":");
+				eb.appendDescription(Utils.getEmoji(entryId, "❓"));
+				eb.addField(idToName(entryId), idCountSplit[1], true);
+			}
+		}
+		eb.setThumbnail(getItemThumbnail(id));
+		return eb;
+	}
+
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.embed(getRecipe(event.getOptionStr("item")));
@@ -66,43 +106,8 @@ public class RecipeSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
 				event.getFocusedOption().getValue(),
-				allRecipeIds.stream().map(Utils::idToName).collect(Collectors.toCollection(ArrayList::new))
+				allRecipeIds.stream().map(StringUtils::idToName).collect(Collectors.toCollection(ArrayList::new))
 			);
 		}
-	}
-
-	public static EmbedBuilder getRecipe(String item) {
-		String id = nameToId(item);
-
-		if (higherDepth(getInternalJsonMappings(), id) == null) {
-			id = getClosestMatchFromIds(item, allRecipeIds);
-		}
-		String name = idToName(id);
-
-		JsonElement infoJson = getInternalJsonMappings().get(id);
-		if (higherDepth(infoJson, "recipe") == null) {
-			return invalidEmbed("No recipe found for " + name);
-		}
-
-		EmbedBuilder eb = defaultEmbed("Recipe of " + name);
-		for (Map.Entry<String, JsonElement> entry : higherDepth(infoJson, "recipe").getAsJsonObject().entrySet()) {
-			if (entry.getKey().equals("count")) {
-				continue;
-			}
-			String[] idCountSplit = entry.getValue().getAsString().split(":");
-			if (entry.getKey().equals("B1") || entry.getKey().equals("C1")) {
-				eb.appendDescription("\n");
-			}
-			if (idCountSplit.length == 1) {
-				eb.appendDescription(getEmojiOr("EMPTY", "❓"));
-				eb.addBlankField(true);
-			} else {
-				String entryId = idCountSplit[0].replace("-", ":");
-				eb.appendDescription(getEmojiOr(entryId, "❓"));
-				eb.addField(idToName(entryId), idCountSplit[1], true);
-			}
-		}
-		eb.setThumbnail(getItemThumbnail(id));
-		return eb;
 	}
 }

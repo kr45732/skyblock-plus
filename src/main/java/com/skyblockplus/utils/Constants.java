@@ -18,7 +18,11 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
+import static com.skyblockplus.utils.utils.Utils.gson;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

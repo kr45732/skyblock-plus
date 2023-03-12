@@ -18,10 +18,10 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import com.skyblockplus.utils.Utils;
+import com.skyblockplus.utils.utils.Utils;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -78,7 +78,7 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	}
 
 	public EmbedBuilder invalidCommandMessage() {
-		return invalidEmbed("Invalid Command");
+		return errorEmbed("Invalid Command");
 	}
 
 	public void embed(Object ebOrMb) {
@@ -139,7 +139,7 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 
 		if (!onlyCheck) {
 			embed(
-				invalidEmbed(
+				errorEmbed(
 					"<@" +
 					id +
 					"> is not linked to the bot. Please specify a username or " +

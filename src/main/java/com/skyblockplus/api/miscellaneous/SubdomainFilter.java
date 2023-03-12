@@ -18,7 +18,7 @@
 
 package com.skyblockplus.api.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.BASE_URL;
+import static com.skyblockplus.utils.utils.Utils.BASE_URL;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

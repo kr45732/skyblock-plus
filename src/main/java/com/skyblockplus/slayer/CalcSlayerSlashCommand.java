@@ -19,7 +19,10 @@
 package com.skyblockplus.slayer;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getLevelingJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.miscellaneous.weight.weight.Weight;
@@ -42,52 +45,6 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 		this.name = "calcslayer";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(
-			getCalcSlayer(
-				event.player,
-				event.getOptionStr("profile"),
-				event.getOptionStr("type"),
-				event.getOptionInt("level", -1),
-				event.getOptionInt("xp", -1),
-				Player.WeightType.of(event.getOptionStr("system", "senither"))
-			)
-		);
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Calculate the number of slayer bosses needed to reach a certain level or xp amount")
-			.addOptions(
-				new OptionData(OptionType.STRING, "type", "Slayer type", true)
-					.addChoice("Sven Packmaster", "sven")
-					.addChoice("Revenant Horror", "rev")
-					.addChoice("Tarantula Broodfather", "tara")
-					.addChoice("Voidgloom Seraph", "enderman")
-					.addChoice("Inferno Demonlord", "blaze"),
-				new OptionData(OptionType.INTEGER, "level", "Target slayer level").setRequiredRange(1, 9),
-				new OptionData(OptionType.INTEGER, "xp", "Target slayer xp").setMinValue(1),
-				new OptionData(OptionType.STRING, "system", "Weight system that should be used")
-					.addChoice("Senither", "senither")
-					.addChoice("Lily", "lily")
-			)
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static EmbedBuilder getCalcSlayer(
 		String username,
 		String profileName,
@@ -98,14 +55,14 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 	) {
 		slayerType = slayerType.toLowerCase();
 		if (!SLAYER_NAMES.contains(slayerType)) {
-			return invalidEmbed("Invalid slayer type");
+			return errorEmbed("Invalid slayer type");
 		}
 
 		if (targetXp <= 0 && targetLevel <= 0) {
-			return invalidEmbed("Target xp or target level must be provided and at least 1");
+			return errorEmbed("Target xp or target level must be provided and at least 1");
 		}
 		if (targetLevel != -1 && (targetLevel <= 0 || targetLevel > 9)) {
-			return invalidEmbed("Target level must be between 1 and 9");
+			return errorEmbed("Target level must be between 1 and 9");
 		}
 
 		Player.Profile player = Player.create(username, profileName);
@@ -118,7 +75,7 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 					: targetXp;
 
 			if (curXp >= targetXp) {
-				return invalidEmbed("You already have " + roundAndFormat(targetXp) + " xp");
+				return errorEmbed("You already have " + roundAndFormat(targetXp) + " xp");
 			}
 
 			long xpNeeded = targetXp - curXp;
@@ -192,6 +149,52 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 				);
 		}
 
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.embed(
+			getCalcSlayer(
+				event.player,
+				event.getOptionStr("profile"),
+				event.getOptionStr("type"),
+				event.getOptionInt("level", -1),
+				event.getOptionInt("xp", -1),
+				Player.WeightType.of(event.getOptionStr("system", "senither"))
+			)
+		);
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Calculate the number of slayer bosses needed to reach a certain level or xp amount")
+			.addOptions(
+				new OptionData(OptionType.STRING, "type", "Slayer type", true)
+					.addChoice("Sven Packmaster", "sven")
+					.addChoice("Revenant Horror", "rev")
+					.addChoice("Tarantula Broodfather", "tara")
+					.addChoice("Voidgloom Seraph", "enderman")
+					.addChoice("Inferno Demonlord", "blaze"),
+				new OptionData(OptionType.INTEGER, "level", "Target slayer level").setRequiredRange(1, 9),
+				new OptionData(OptionType.INTEGER, "xp", "Target slayer xp").setMinValue(1),
+				new OptionData(OptionType.STRING, "system", "Weight system that should be used")
+					.addChoice("Senither", "senither")
+					.addChoice("Lily", "lily")
+			)
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

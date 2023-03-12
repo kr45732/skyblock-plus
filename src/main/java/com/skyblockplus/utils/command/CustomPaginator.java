@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
@@ -61,15 +61,16 @@ public class CustomPaginator extends Menu {
 	private final int columns;
 	private final int itemsPerPage;
 	private final boolean showPageNumbers;
-	private int pages;
 	private final Consumer<Message> finalAction;
 	private final boolean wrapPageEnds;
 
-	@Setter
-	private List<String> strings;
-
 	@Getter
 	private final PaginatorExtras extras;
+
+	private int pages;
+
+	@Setter
+	private List<String> strings;
 
 	private CustomPaginator(
 		EventWaiter waiter,

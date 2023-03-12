@@ -19,7 +19,10 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
+import static org.springframework.util.StringUtils.countOccurrencesOf;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -34,7 +37,6 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 @Component
 public class BingoSlashCommand extends SlashCommand {
@@ -43,40 +45,17 @@ public class BingoSlashCommand extends SlashCommand {
 		this.name = "bingo";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(getPlayerBingo(event.player));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get the current bingo goals and a player's bingo card")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static Object getPlayerBingo(String username) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (!usernameUuidStruct.isValid()) {
-			return invalidEmbed(usernameUuidStruct.failCause());
+			return errorEmbed(usernameUuidStruct.failCause());
 		}
 
 		JsonElement bingoJson = null;
 		JsonArray bingoArr = new JsonArray();
 		JsonElement bingoInfo = getBingoInfoJson();
 		if (bingoInfo == null || higherDepth(bingoInfo, "goals.[0]") == null) {
-			return invalidEmbed("Error fetching current bingo data");
+			return errorEmbed("Error fetching current bingo data");
 		}
 		try {
 			bingoJson =
@@ -92,7 +71,10 @@ public class BingoSlashCommand extends SlashCommand {
 			bingoArr = higherDepth(bingoJson, "completed_goals").getAsJsonArray();
 		} catch (Exception ignored) {}
 
-		EmbedBuilder eb = defaultEmbed(usernameUuidStruct.username(), skyblockStatsLink(usernameUuidStruct.uuid(), null));
+		EmbedBuilder eb = defaultEmbed(
+			usernameUuidStruct.username(),
+			com.skyblockplus.utils.utils.StringUtils.skyblockStatsLink(usernameUuidStruct.uuid(), null)
+		);
 		StringBuilder regGoals = new StringBuilder();
 		StringBuilder communityGoals = new StringBuilder();
 		StringBuilder cardStr = new StringBuilder(); // C = community done, c = community not done, S = self done, s = self not done
@@ -119,11 +101,11 @@ public class BingoSlashCommand extends SlashCommand {
 					.append(" ")
 					.append(higherDepth(goal, "name").getAsString())
 					.append(": ")
-					.append(simplifyNumber(progress))
+					.append(com.skyblockplus.utils.utils.StringUtils.simplifyNumber(progress))
 					.append("/")
-					.append(simplifyNumber(nextTier))
+					.append(com.skyblockplus.utils.utils.StringUtils.simplifyNumber(nextTier))
 					.append(" (")
-					.append((roundProgress((double) Math.min(progress, nextTier) / nextTier)))
+					.append((com.skyblockplus.utils.utils.StringUtils.roundProgress((double) Math.min(progress, nextTier) / nextTier)))
 					.append(")");
 			} else {
 				boolean completedGoal = streamJsonArray(bingoArr)
@@ -135,7 +117,7 @@ public class BingoSlashCommand extends SlashCommand {
 					.append(" ")
 					.append(higherDepth(goal, "name").getAsString())
 					.append(": ")
-					.append(parseMcCodes(higherDepth(goal, "lore").getAsString()));
+					.append(com.skyblockplus.utils.utils.StringUtils.parseMcCodes(higherDepth(goal, "lore").getAsString()));
 			}
 		}
 		eb.setDescription(
@@ -144,7 +126,7 @@ public class BingoSlashCommand extends SlashCommand {
 					? "**No active bingo profile found**"
 					: (
 						"**Goals Completed:** " +
-						(bingoArr.size() + StringUtils.countOccurrencesOf(cardStr.toString(), "C")) +
+						(bingoArr.size() + countOccurrencesOf(cardStr.toString(), "C")) +
 						"\n**Points:** " +
 						higherDepth(bingoJson, "points", 0)
 					)
@@ -154,5 +136,28 @@ public class BingoSlashCommand extends SlashCommand {
 		eb.appendDescription("\n\n**Community Goals:**" + communityGoals);
 		eb.setThumbnail(usernameUuidStruct.getAvatarUrl());
 		return new MessageEditBuilder().setEmbeds(eb.build()).setActionRow(Button.primary("bingo_" + cardStr, "Bingo Card"));
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.embed(getPlayerBingo(event.player));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get the current bingo goals and a player's bingo card")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

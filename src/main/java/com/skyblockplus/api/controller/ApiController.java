@@ -20,9 +20,7 @@ package com.skyblockplus.api.controller;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.client;
-import static com.skyblockplus.utils.Utils.jda;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
@@ -44,8 +42,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(headers = "X-Subdomain-Internal=api")
 public class ApiController {
 
-	private final ServerSettingsService settingsService;
 	private static List<Map<String, Object>> apiCommandList;
+	private final ServerSettingsService settingsService;
 
 	@Autowired
 	public ApiController(ServerSettingsService settingsService) {

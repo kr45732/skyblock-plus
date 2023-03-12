@@ -19,12 +19,16 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.getAvatarlUrl;
+import static com.skyblockplus.utils.utils.StringUtils.parseMcCodes;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import com.skyblockplus.utils.utils.Utils;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -96,7 +100,11 @@ public class HypixelPlayer {
 	}
 
 	public EmbedBuilder getDefaultEmbed() {
-		return defaultEmbed(username, "https://plancke.io/hypixel/player/stats/" + uuid).setThumbnail(Utils.getAvatarlUrl(uuid));
+		return defaultEmbed(username, "https://plancke.io/hypixel/player/stats/" + uuid).setThumbnail(getAvatarlUrl(uuid));
+	}
+
+	public EmbedBuilder getErrorEmbed() {
+		return Utils.errorEmbed(failCause);
 	}
 
 	/* Hypixel */

@@ -18,8 +18,8 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.utils.Utils.ignore;
-import static com.skyblockplus.utils.Utils.waiter;
+import static com.skyblockplus.utils.utils.Utils.ignore;
+import static com.skyblockplus.utils.utils.Utils.waiter;
 
 import java.util.ArrayList;
 import java.util.List;

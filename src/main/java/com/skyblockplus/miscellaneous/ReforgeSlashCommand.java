@@ -18,16 +18,19 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getReforgeStonesJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.Constants;
-import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -45,28 +48,6 @@ public class ReforgeSlashCommand extends SlashCommand {
 		this.name = "reforge";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getReforgeStone(event.getOptionStr("item")));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get the reforge stone stats for each rarity")
-			.addOption(OptionType.STRING, "item", "Reforge stone name", true, true);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("item")) {
-			event.replyClosestMatch(
-				event.getFocusedOption().getValue(),
-				getReforgeStonesJson().keySet().stream().map(Utils::idToName).collect(Collectors.toCollection(ArrayList::new))
-			);
-		}
-	}
-
 	public static EmbedBuilder getReforgeStone(String reforgeStone) {
 		JsonObject reforgeStonesJson = getReforgeStonesJson();
 		String closestMatch = getClosestMatchFromIds(nameToId(reforgeStone), reforgeStonesJson.keySet());
@@ -79,7 +60,7 @@ public class ReforgeSlashCommand extends SlashCommand {
 			"\n**Item Types:** " +
 			Arrays
 				.stream(higherDepth(reforgeStoneJson, "itemTypes").getAsString().split("\n"))
-				.map(Utils::capitalizeString)
+				.map(StringUtils::capitalizeString)
 				.collect(Collectors.joining(", "))
 		);
 		if (higherDepth(reforgeStoneJson, "reforgeAbility", null) != null) {
@@ -121,5 +102,27 @@ public class ReforgeSlashCommand extends SlashCommand {
 			);
 		}
 		return eb.setThumbnail(getItemThumbnail(closestMatch));
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getReforgeStone(event.getOptionStr("item")));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get the reforge stone stats for each rarity")
+			.addOption(OptionType.STRING, "item", "Reforge stone name", true, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("item")) {
+			event.replyClosestMatch(
+				event.getFocusedOption().getValue(),
+				getReforgeStonesJson().keySet().stream().map(StringUtils::idToName).collect(Collectors.toCollection(ArrayList::new))
+			);
+		}
 	}
 }

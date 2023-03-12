@@ -18,8 +18,8 @@
 
 package com.skyblockplus.general.help;
 
-import static com.skyblockplus.utils.Utils.DISCORD_SERVER_INVITE_LINK;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.DISCORD_SERVER_INVITE_LINK;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -85,34 +85,6 @@ public class HelpSlashCommand extends SlashCommand {
 
 		setHelpList();
 		helpDataList.stream().map(this::commandToNames).forEach(helpNameList::addAll);
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.paginate(getHelp(event.getOptionStr("command"), event));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Show the help page for this bot")
-			.addOption(OptionType.STRING, "command", "Name of command or page number", false, true);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("command")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), helpNameList);
-		}
-	}
-
-	private List<String> commandToNames(HelpData command) {
-		List<String> commands = new ArrayList<>();
-		commands.add(command.getName());
-		for (HelpData subcommand : command.getSubcommands()) {
-			commands.addAll(commandToNames(subcommand));
-		}
-		return commands;
 	}
 
 	public static void setHelpList() {
@@ -1055,5 +1027,33 @@ public class HelpSlashCommand extends SlashCommand {
 
 	private static String create(String commandName, String desc) {
 		return "`/" + commandName + "`: " + desc + "\n";
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.paginate(getHelp(event.getOptionStr("command"), event));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Show the help page for this bot")
+			.addOption(OptionType.STRING, "command", "Name of command or page number", false, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("command")) {
+			event.replyClosestMatch(event.getFocusedOption().getValue(), helpNameList);
+		}
+	}
+
+	private List<String> commandToNames(HelpData command) {
+		List<String> commands = new ArrayList<>();
+		commands.add(command.getName());
+		for (HelpData subcommand : command.getSubcommands()) {
+			commands.addAll(commandToNames(subcommand));
+		}
+		return commands;
 	}
 }

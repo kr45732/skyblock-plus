@@ -23,7 +23,10 @@ import static com.skyblockplus.utils.ApiHandler.queryLowestBin;
 import static com.skyblockplus.utils.ApiHandler.queryLowestBinPet;
 import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getQueryItems;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -46,36 +49,9 @@ public class PriceSlashCommand extends SlashCommand {
 		this.name = "price";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(
-			queryAuctions(event.getOptionStr("item"), AuctionType.valueOf(event.getOptionStr("auction_type", "both").toUpperCase()))
-		);
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Query the auction house for the price of an item")
-			.addOption(OptionType.STRING, "item", "Item name", true, true)
-			.addOptions(
-				new OptionData(OptionType.STRING, "auction_type", "Which type of auctions to show")
-					.addChoice("Bin", "bin")
-					.addChoice("Regular auctions", "auction")
-					.addChoice("All auctions", "both")
-			);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("item")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), getQueryItems());
-		}
-	}
-
 	public static EmbedBuilder queryAuctions(String query, AuctionType auctionType) {
 		if (currentMayor.equals("Derpy")) {
-			return invalidEmbed("This command does not work during Derpy");
+			return errorEmbed("This command does not work during Derpy");
 		}
 
 		JsonArray auctionsArr = null;
@@ -94,7 +70,7 @@ public class PriceSlashCommand extends SlashCommand {
 
 				auctionsArr = queryLowestBinPet(queryFmt, rarity, auctionType);
 				if (auctionsArr == null) {
-					return invalidEmbed("Error fetching auctions data");
+					return errorEmbed("Error fetching auctions data");
 				}
 				break;
 			}
@@ -114,12 +90,12 @@ public class PriceSlashCommand extends SlashCommand {
 			}
 
 			if (auctionsArr == null) {
-				return invalidEmbed("Error fetching auctions data");
+				return errorEmbed("Error fetching auctions data");
 			}
 		}
 
 		if (auctionsArr.size() == 0) {
-			return invalidEmbed("No " + auctionType.getName() + " matching '" + query + "' found");
+			return errorEmbed("No " + auctionType.getName() + " matching '" + query + "' found");
 		}
 
 		EmbedBuilder eb = defaultEmbed("Auction Searcher (" + capitalizeString(auctionType.getName()) + ")");
@@ -159,6 +135,33 @@ public class PriceSlashCommand extends SlashCommand {
 		}
 
 		return eb;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(
+			queryAuctions(event.getOptionStr("item"), AuctionType.valueOf(event.getOptionStr("auction_type", "both").toUpperCase()))
+		);
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Query the auction house for the price of an item")
+			.addOption(OptionType.STRING, "item", "Item name", true, true)
+			.addOptions(
+				new OptionData(OptionType.STRING, "auction_type", "Which type of auctions to show")
+					.addChoice("Bin", "bin")
+					.addChoice("Regular auctions", "auction")
+					.addChoice("All auctions", "both")
+			);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("item")) {
+			event.replyClosestMatch(event.getFocusedOption().getValue(), getQueryItems());
+		}
 	}
 
 	public enum AuctionType {

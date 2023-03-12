@@ -18,7 +18,9 @@
 
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -41,48 +43,12 @@ public class CalcDropsSlashCommand extends SlashCommand {
 		this.name = "calcdrops";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.paginate(
-			getCalcDrops(event.getOptionInt("floor", 1), event.getOptionInt("luck", 1), event.getOptionStr("accessory", "A"), event)
-		);
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Calculate the drop rate and cost of all chests for a floor")
-			.addOptions(
-				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)
-					.addChoice("Floor 1", 1)
-					.addChoice("Floor 2", 2)
-					.addChoice("Floor 3", 3)
-					.addChoice("Floor 4", 4)
-					.addChoice("Floor 5", 5)
-					.addChoice("Floor 6", 6)
-					.addChoice("Floor 7", 7)
-					.addChoice("Master Floor 1", 8)
-					.addChoice("Master Floor 2", 9)
-					.addChoice("Master Floor 3", 10)
-					.addChoice("Master Floor 4", 11)
-					.addChoice("Master Floor 5", 12)
-					.addChoice("Master Floor 6", 13)
-					.addChoice("Master Floor 7", 14),
-				new OptionData(OptionType.STRING, "accessory", "Catacombs accessory")
-					.addChoice("None", "A")
-					.addChoice("Talisman", "B")
-					.addChoice("Ring", "C")
-					.addChoice("Artifact", "D"),
-				new OptionData(OptionType.INTEGER, "luck", "Boss luck level").setRequiredRange(1, 5)
-			);
-	}
-
 	public static EmbedBuilder getCalcDrops(int floor, int bossLuck, String talisman, SlashCommandEvent event) {
 		if (floor < 0 || floor > 14) {
-			return invalidEmbed("Invalid floor");
+			return errorEmbed("Invalid floor");
 		}
 		if (bossLuck < 1 || bossLuck > 5) {
-			return invalidEmbed("Invalid boss luck level");
+			return errorEmbed("Invalid boss luck level");
 		}
 		boolean isMaster = floor > 7;
 
@@ -120,5 +86,41 @@ public class CalcDropsSlashCommand extends SlashCommand {
 		}
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		return null;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.paginate(
+			getCalcDrops(event.getOptionInt("floor", 1), event.getOptionInt("luck", 1), event.getOptionStr("accessory", "A"), event)
+		);
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Calculate the drop rate and cost of all chests for a floor")
+			.addOptions(
+				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)
+					.addChoice("Floor 1", 1)
+					.addChoice("Floor 2", 2)
+					.addChoice("Floor 3", 3)
+					.addChoice("Floor 4", 4)
+					.addChoice("Floor 5", 5)
+					.addChoice("Floor 6", 6)
+					.addChoice("Floor 7", 7)
+					.addChoice("Master Floor 1", 8)
+					.addChoice("Master Floor 2", 9)
+					.addChoice("Master Floor 3", 10)
+					.addChoice("Master Floor 4", 11)
+					.addChoice("Master Floor 5", 12)
+					.addChoice("Master Floor 6", 13)
+					.addChoice("Master Floor 7", 14),
+				new OptionData(OptionType.STRING, "accessory", "Catacombs accessory")
+					.addChoice("None", "A")
+					.addChoice("Talisman", "B")
+					.addChoice("Ring", "C")
+					.addChoice("Artifact", "D"),
+				new OptionData(OptionType.INTEGER, "luck", "Boss luck level").setRequiredRange(1, 5)
+			);
 	}
 }

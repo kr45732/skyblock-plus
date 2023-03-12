@@ -19,7 +19,11 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getEssenceCostsJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.waiter;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommandEvent;

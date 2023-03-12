@@ -22,7 +22,10 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand.getEventTypeFormatted;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromName;
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getCollectionsJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;

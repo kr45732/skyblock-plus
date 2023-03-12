@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils.exceptionhandler;
 
-import static com.skyblockplus.utils.Utils.globalExceptionHandler;
+import static com.skyblockplus.utils.utils.Utils.globalExceptionHandler;
 
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.hooks.EventListener;

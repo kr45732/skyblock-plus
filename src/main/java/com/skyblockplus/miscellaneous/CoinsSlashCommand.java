@@ -20,7 +20,11 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.parseMcCodes;
+import static com.skyblockplus.utils.utils.StringUtils.simplifyNumber;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -47,26 +51,22 @@ public class CoinsSlashCommand extends SlashCommand {
 		this.name = "coins";
 	}
 
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Main coins command");
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
+	}
+
 	public static class PlayerSubcommand extends Subcommand {
 
 		public PlayerSubcommand() {
 			this.name = "player";
-		}
-
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			if (event.invalidPlayerOption()) {
-				return;
-			}
-
-			event.embed(getPlayerBalance(event.player, event.getOptionStr("profile")));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData("player", "Get a player's bank and purse coins")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerBalance(String username, String profileName) {
@@ -110,14 +110,7 @@ public class CoinsSlashCommand extends SlashCommand {
 				eb.addField(getEmoji("GOLD_BARDING") + " Sold Auctions Value", simplifyNumber(auctionCoins), false);
 				return eb;
 			}
-			return player.getFailEmbed();
-		}
-	}
-
-	public static class HistorySubcommand extends Subcommand {
-
-		public HistorySubcommand() {
-			this.name = "history";
+			return player.getErrorEmbed();
 		}
 
 		@Override
@@ -126,14 +119,21 @@ public class CoinsSlashCommand extends SlashCommand {
 				return;
 			}
 
-			event.paginate(getPlayerBankHistory(event.player, event.getOptionStr("profile"), event));
+			event.embed(getPlayerBalance(event.player, event.getOptionStr("profile")));
 		}
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("history", "Get a player's bank transaction history")
+			return new SubcommandData("player", "Get a player's bank and purse coins")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption);
+		}
+	}
+
+	public static class HistorySubcommand extends Subcommand {
+
+		public HistorySubcommand() {
+			this.name = "history";
 		}
 
 		public static EmbedBuilder getPlayerBankHistory(String username, String profileName, SlashCommandEvent event) {
@@ -178,22 +178,26 @@ public class CoinsSlashCommand extends SlashCommand {
 					event.paginate(paginateBuilder);
 					return null;
 				} else {
-					return invalidEmbed("Player banking API disabled");
+					return errorEmbed("Player banking API disabled");
 				}
 			}
-			return player.getFailEmbed();
+			return player.getErrorEmbed();
 		}
-	}
 
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Main coins command");
-	}
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			if (event.invalidPlayerOption()) {
+				return;
+			}
 
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
+			event.paginate(getPlayerBankHistory(event.player, event.getOptionStr("profile"), event));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("history", "Get a player's bank transaction history")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOptions(profilesCommandOption);
 		}
 	}
 }

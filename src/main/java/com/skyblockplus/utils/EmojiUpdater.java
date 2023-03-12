@@ -20,7 +20,12 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
 import static com.skyblockplus.utils.Constants.PET_NAMES;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.getPetUrl;
+import static com.skyblockplus.utils.utils.StringUtils.idToName;
+import static com.skyblockplus.utils.utils.Utils.gson;
+import static com.skyblockplus.utils.utils.Utils.jda;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

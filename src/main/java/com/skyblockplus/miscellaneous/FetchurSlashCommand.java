@@ -19,8 +19,8 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.getItemThumbnail;
+import static com.skyblockplus.utils.utils.StringUtils.getItemThumbnail;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -38,16 +38,6 @@ public class FetchurSlashCommand extends SlashCommand {
 		this.name = "fetchur";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getFetchurItem());
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get the item that fetchur wants today");
-	}
-
 	public static EmbedBuilder getFetchurItem() {
 		int index = LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() % FETCHUR_ITEMS.size() - 1;
 		if (index == -1) {
@@ -56,5 +46,15 @@ public class FetchurSlashCommand extends SlashCommand {
 
 		String[] fetchurItem = FETCHUR_ITEMS.get(index).split("\\|");
 		return defaultEmbed("Fetchur item").setDescription(fetchurItem[0]).setThumbnail(getItemThumbnail(fetchurItem[1]));
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getFetchurItem());
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Get the item that fetchur wants today");
 	}
 }

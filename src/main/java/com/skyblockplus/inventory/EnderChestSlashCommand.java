@@ -19,7 +19,7 @@
 package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -43,10 +43,34 @@ public class EnderChestSlashCommand extends SlashCommand {
 		this.name = "enderchest";
 	}
 
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Main ender chest command");
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
+	}
+
 	public static class ListSubcommand extends Subcommand {
 
 		public ListSubcommand() {
 			this.name = "list";
+		}
+
+		public static EmbedBuilder getPlayerEnderChestList(String username, String profileName, int slotNum, SlashCommandEvent event) {
+			Player.Profile player = Player.create(username, profileName);
+			if (player.isValid()) {
+				Map<Integer, InvItem> echestMap = player.getEnderChestMap();
+				if (echestMap != null) {
+					new InventoryListPaginator(player, echestMap, slotNum, event);
+					return null;
+				}
+			}
+			return player.getErrorEmbed();
 		}
 
 		@Override
@@ -65,24 +89,25 @@ public class EnderChestSlashCommand extends SlashCommand {
 				.addOptions(profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");
 		}
-
-		public static EmbedBuilder getPlayerEnderChestList(String username, String profileName, int slotNum, SlashCommandEvent event) {
-			Player.Profile player = Player.create(username, profileName);
-			if (player.isValid()) {
-				Map<Integer, InvItem> echestMap = player.getEnderChestMap();
-				if (echestMap != null) {
-					new InventoryListPaginator(player, echestMap, slotNum, event);
-					return null;
-				}
-			}
-			return player.getFailEmbed();
-		}
 	}
 
 	public static class EmojiSubcommand extends Subcommand {
 
 		public EmojiSubcommand() {
 			this.name = "emoji";
+		}
+
+		public static EmbedBuilder getPlayerEnderChest(String username, String profileName, SlashCommandEvent event) {
+			Player.Profile player = Player.create(username, profileName);
+			if (player.isValid()) {
+				List<String[]> enderChestPages = player.getEnderChest();
+				if (enderChestPages != null) {
+					new InventoryEmojiPaginator(enderChestPages, "Ender Chest", player, event);
+					return null;
+				}
+				return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+			}
+			return player.getErrorEmbed();
 		}
 
 		@Override
@@ -99,31 +124,6 @@ public class EnderChestSlashCommand extends SlashCommand {
 			return new SubcommandData("emoji", "Get a player's ender chest represented in emojis")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption);
-		}
-
-		public static EmbedBuilder getPlayerEnderChest(String username, String profileName, SlashCommandEvent event) {
-			Player.Profile player = Player.create(username, profileName);
-			if (player.isValid()) {
-				List<String[]> enderChestPages = player.getEnderChest();
-				if (enderChestPages != null) {
-					new InventoryEmojiPaginator(enderChestPages, "Ender Chest", player, event);
-					return null;
-				}
-				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
-			}
-			return player.getFailEmbed();
-		}
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Main ender chest command");
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
 		}
 	}
 }

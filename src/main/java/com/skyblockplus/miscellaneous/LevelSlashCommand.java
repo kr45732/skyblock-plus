@@ -19,7 +19,10 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
+import static com.skyblockplus.utils.utils.Utils.getEmojiObj;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -47,34 +50,10 @@ public class LevelSlashCommand extends SlashCommand {
 		this.name = "level";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(getLevel(event.player, event.getOptionStr("profile"), event));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's Skyblock level")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static EmbedBuilder getLevel(String username, String profileName, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (!player.isValid()) {
-			return player.getFailEmbed();
+			return player.getErrorEmbed();
 		}
 
 		LevelRecord coreTasks = getCoreTasksEmbed(player);
@@ -909,16 +888,6 @@ public class LevelSlashCommand extends SlashCommand {
 		return levelRecord;
 	}
 
-	public record LevelRecord(EmbedBuilder eb, int total, int categoryTotal, int max) {
-		public LevelRecord(EmbedBuilder eb, int total, int max) {
-			this(eb, total, total, max);
-		}
-
-		public String getFormatted() {
-			return formatNumber(categoryTotal) + " / " + formatNumber(max) + " (" + roundProgress((double) categoryTotal / max) + ")";
-		}
-	}
-
 	private static int loopThroughCollection(int[] array, int value) {
 		JsonArray dungeonCollectionXp = higherDepth(getSbLevelsJson(), "slaying_task.boss_collections_xp.dungeon_collection_xp")
 			.getAsJsonArray();
@@ -929,5 +898,39 @@ public class LevelSlashCommand extends SlashCommand {
 			}
 		}
 		return gain;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(getLevel(event.player, event.getOptionStr("profile"), event));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's Skyblock level")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
+	}
+
+	public record LevelRecord(EmbedBuilder eb, int total, int categoryTotal, int max) {
+		public LevelRecord(EmbedBuilder eb, int total, int max) {
+			this(eb, total, total, max);
+		}
+
+		public String getFormatted() {
+			return formatNumber(categoryTotal) + " / " + formatNumber(max) + " (" + roundProgress((double) categoryTotal / max) + ")";
+		}
 	}
 }

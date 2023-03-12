@@ -19,8 +19,8 @@
 package com.skyblockplus.miscellaneous.weight.lily;
 
 import static com.skyblockplus.utils.Constants.CATACOMBS_LEVEL_50_XP;
-import static com.skyblockplus.utils.Utils.getWeightJson;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.getWeightJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

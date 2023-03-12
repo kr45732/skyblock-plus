@@ -20,7 +20,11 @@ package com.skyblockplus.general;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HypixelUtils.getPlayerDiscordInfo;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
@@ -56,26 +60,14 @@ public class LinkSlashCommand extends SlashCommand {
 		this.name = "link";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(linkAccount(event.getOptionStr("player"), event.getMember(), event.getGuild()));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Link your Hypixel account to this bot")
-			.addOption(OptionType.STRING, "player", "Player username", true);
-	}
-
 	public static Object linkAccount(String username, Member member, Guild guild) {
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
 		if (!playerInfo.isValid()) {
 			return playerInfo.failCause().endsWith(" is not linked on Hypixel")
 				? new MessageEditBuilder()
-					.setEmbeds(invalidEmbed(playerInfo.failCause()).build())
+					.setEmbeds(playerInfo.getErrorEmbed().build())
 					.setActionRow(Button.primary("verify_help_button", "Help Linking"))
-				: invalidEmbed(playerInfo.failCause());
+				: playerInfo.getErrorEmbed();
 		}
 
 		if (!member.getUser().getAsTag().equals(playerInfo.discordTag())) {
@@ -106,7 +98,7 @@ public class LinkSlashCommand extends SlashCommand {
 				.findFirst()
 				.orElse(null);
 			if (blacklisted != null) {
-				eb = invalidEmbed("You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`");
+				eb = errorEmbed("You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`");
 			} else {
 				if (verifySettings != null) {
 					String[] result = updateLinkedUser(verifySettings, toAdd, member);
@@ -130,7 +122,7 @@ public class LinkSlashCommand extends SlashCommand {
 			TokenData.updateLinkedRolesMetadata(toAdd.discord(), toAdd, null, true);
 			return eb;
 		} else {
-			return invalidEmbed("Error when inserting into database");
+			return errorEmbed("Error when inserting into database");
 		}
 	}
 
@@ -336,5 +328,17 @@ public class LinkSlashCommand extends SlashCommand {
 			);
 
 		return new String[] { updatedNickname, updatedRoles };
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(linkAccount(event.getOptionStr("player"), event.getMember(), event.getGuild()));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Link your Hypixel account to this bot")
+			.addOption(OptionType.STRING, "player", "Player username", true);
 	}
 }

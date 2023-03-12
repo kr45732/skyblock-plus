@@ -19,7 +19,9 @@
 package com.skyblockplus.features.party;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
@@ -46,36 +48,6 @@ public class PartySlashCommand extends SlashCommand {
 		this.name = "party";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		switch (event.getSubcommandName()) {
-			case "create" -> event.paginate(createParty(event));
-			case "list" -> event.embed(getPartyList(event.getGuild().getId()));
-			case "leave" -> event.embed(leaveParty(event));
-			case "disband" -> event.embed(disbandParty(event));
-			case "join" -> event.embed(joinParty(event.getOptionStr("username"), event));
-			case "kick" -> event.embed(kickMemberFromParty(event.getOptionStr("username"), event));
-			case "current" -> event.embed(getCurrentParty(event));
-			default -> event.embed(event.invalidCommandMessage());
-		}
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Main party command")
-			.addSubcommands(
-				new SubcommandData("create", "Interactive message to create a new party"),
-				new SubcommandData("list", "List all active parties"),
-				new SubcommandData("leave", "Leave your current party"),
-				new SubcommandData("disband", "Disband your current party"),
-				new SubcommandData("current", "Get information about the party you are currently in"),
-				new SubcommandData("join", "Join a party").addOption(OptionType.STRING, "username", "The party leader's username", true),
-				new SubcommandData("kick", "Kick a member from your party")
-					.addOption(OptionType.STRING, "username", "The party member's username", true)
-			);
-	}
-
 	public static EmbedBuilder getCurrentParty(SlashCommandEvent event) {
 		Party party = guildMap
 			.get(event.getGuild().getId())
@@ -87,7 +59,7 @@ public class PartySlashCommand extends SlashCommand {
 			.findFirst()
 			.orElse(null);
 		if (party == null) {
-			return invalidEmbed("Your are not in a party");
+			return errorEmbed("Your are not in a party");
 		}
 
 		return defaultEmbed("Party Finder")
@@ -117,14 +89,14 @@ public class PartySlashCommand extends SlashCommand {
 			.findFirst()
 			.orElse(null);
 		if (party == null) {
-			return invalidEmbed("You are not the leader of a party");
+			return errorEmbed("You are not the leader of a party");
 		}
 
 		String kickedUsername = party.kickFromParty(username);
 		if (kickedUsername != null) {
 			return defaultEmbed("Party Finder").setDescription("Kicked " + kickedUsername + " from the party");
 		} else {
-			return invalidEmbed(username + " is not in your party");
+			return errorEmbed(username + " is not in your party");
 		}
 	}
 
@@ -136,14 +108,14 @@ public class PartySlashCommand extends SlashCommand {
 			}
 		}
 
-		return invalidEmbed("You are not in a party");
+		return errorEmbed("You are not in a party");
 	}
 
 	public static EmbedBuilder disbandParty(SlashCommandEvent event) {
 		List<Party> partyList = guildMap.get(event.getGuild().getId()).partyList;
 		Party party = partyList.stream().filter(p -> p.getPartyLeaderId().equals(event.getUser().getId())).findFirst().orElse(null);
 		if (party == null) {
-			return invalidEmbed("You are not the leader of a party");
+			return errorEmbed("You are not the leader of a party");
 		}
 
 		partyList.remove(party);
@@ -160,12 +132,12 @@ public class PartySlashCommand extends SlashCommand {
 					p.getPartyMembers().stream().anyMatch(pm -> pm.getDiscordId().equals(event.getUser().getId()))
 				)
 		) {
-			return invalidEmbed("You are already a party leader or in a party");
+			return errorEmbed("You are already a party leader or in a party");
 		}
 
 		LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());
 		if (linkedAccount == null) {
-			return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
+			return errorEmbed("You must be linked to run this command. Use `/link <player>` to link");
 		}
 
 		new PartyHandler(linkedAccount.username(), event);
@@ -175,7 +147,7 @@ public class PartySlashCommand extends SlashCommand {
 	public static EmbedBuilder getPartyList(String guildId) {
 		List<Party> partyList = guildMap.get(guildId).partyList;
 		if (partyList.size() == 0) {
-			return invalidEmbed("No active parties");
+			return errorEmbed("No active parties");
 		}
 
 		EmbedBuilder eb = defaultEmbed("Party List");
@@ -208,22 +180,22 @@ public class PartySlashCommand extends SlashCommand {
 					p.getPartyMembers().stream().anyMatch(pm -> pm.getDiscordId().equals(event.getUser().getId()))
 				)
 		) {
-			return invalidEmbed("You are already a party leader or in a party");
+			return errorEmbed("You are already a party leader or in a party");
 		}
 
 		Party party = partyList.stream().filter(p -> p.getPartyLeaderUsername().equalsIgnoreCase(id)).findFirst().orElse(null);
 		if (party == null) {
-			return invalidEmbed("Invalid party id. You can get a list of all parties using `/party list`");
+			return errorEmbed("Invalid party id. You can get a list of all parties using `/party list`");
 		}
 
 		LinkedAccount linkedUser = database.getByDiscord(event.getUser().getId());
 		if (linkedUser == null) {
-			return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
+			return errorEmbed("You must be linked to run this command. Use `/link <player>` to link");
 		}
 
 		Player.Profile player = Player.create(linkedUser.uuid());
 		if (player.getHighestPlayedDungeonFloor() + 1 < party.getFloorInt()) {
-			return invalidEmbed("You have not unlocked this floor");
+			return errorEmbed("You have not unlocked this floor");
 		}
 
 		String selectedClass = player.getSelectedDungeonClass();
@@ -310,12 +282,42 @@ public class PartySlashCommand extends SlashCommand {
 					"/5 members"
 				);
 		} else {
-			return invalidEmbed(
+			return errorEmbed(
 				"The party needs a " +
 				String.join(", or ", new HashSet<>(party.getMissingClasses())) +
 				", however, your selected class is a " +
 				selectedClass
 			);
 		}
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		switch (event.getSubcommandName()) {
+			case "create" -> event.paginate(createParty(event));
+			case "list" -> event.embed(getPartyList(event.getGuild().getId()));
+			case "leave" -> event.embed(leaveParty(event));
+			case "disband" -> event.embed(disbandParty(event));
+			case "join" -> event.embed(joinParty(event.getOptionStr("username"), event));
+			case "kick" -> event.embed(kickMemberFromParty(event.getOptionStr("username"), event));
+			case "current" -> event.embed(getCurrentParty(event));
+			default -> event.embed(event.invalidCommandMessage());
+		}
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Main party command")
+			.addSubcommands(
+				new SubcommandData("create", "Interactive message to create a new party"),
+				new SubcommandData("list", "List all active parties"),
+				new SubcommandData("leave", "Leave your current party"),
+				new SubcommandData("disband", "Disband your current party"),
+				new SubcommandData("current", "Get information about the party you are currently in"),
+				new SubcommandData("join", "Join a party").addOption(OptionType.STRING, "username", "The party leader's username", true),
+				new SubcommandData("kick", "Kick a member from your party")
+					.addOption(OptionType.STRING, "username", "The party member's username", true)
+			);
 	}
 }

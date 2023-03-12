@@ -20,7 +20,10 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.ALL_TALISMANS;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -51,41 +54,17 @@ public class MissingSlashCommand extends SlashCommand {
 		this.name = "missing";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(getMissingTalismans(event.player, event.getOptionStr("profile"), event));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's missing talismans")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static EmbedBuilder getMissingTalismans(String username, String profileName, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
 			if (!player.isInventoryApiEnabled()) {
-				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+				return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 			}
 
 			Map<Integer, InvItem> talismanBag = player.getTalismanBagMap();
 
 			if (talismanBag == null) {
-				return invalidEmbed(player.getUsernameFixed() + " has not unlocked the talisman bag");
+				return errorEmbed(player.getUsernameFixed() + " has not unlocked the talisman bag");
 			}
 
 			Set<String> playerItems = talismanBag
@@ -190,7 +169,7 @@ public class MissingSlashCommand extends SlashCommand {
 			event.paginate(paginateBuilder);
 			return null;
 		}
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
 	}
 
 	public static Map.Entry<Double, List<String>> getMissingInfo(
@@ -278,5 +257,29 @@ public class MissingSlashCommand extends SlashCommand {
 		}
 
 		return new AbstractMap.SimpleEntry<>(totalCost, out);
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(getMissingTalismans(event.player, event.getOptionStr("profile"), event));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's missing talismans")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

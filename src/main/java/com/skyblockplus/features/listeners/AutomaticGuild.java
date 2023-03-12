@@ -21,7 +21,10 @@ package com.skyblockplus.features.listeners;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.jerryEmbed;
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -123,36 +126,36 @@ public class AutomaticGuild {
 
 	/* Apply */
 	public final List<ApplyGuild> applyGuild = new ArrayList<>();
-	private Role applyGuestRole = null;
+	/* Event */
+	public final EventGuild eventGuild;
+	/* Party */
+	public final List<Party> partyList = new ArrayList<>();
+	/* Jacob */
+	public final JacobGuild jacobGuild;
+	public final String guildId;
+	private final Set<String> updatedMembers = new HashSet<>();
+	/* Miscellaneous */
+	private final List<String> botManagerRoles = new ArrayList<>();
+	private final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
+	private final List<MessageEmbed> logQueue = new ArrayList<>();
 	/* Verify */
 	public VerifyGuild verifyGuild;
-	private final Set<String> updatedMembers = new HashSet<>();
 	/* Skyblock event */
 	public SkyblockEventHandler skyblockEventHandler = null;
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
 	public boolean eventCurrentlyUpdating = false;
+	public Message lastMayorElectionOpenMessage = null;
+	public Message lastMayorElectedMessage = null;
+	private Role applyGuestRole = null;
 	private ScheduledFuture<?> sbEventFuture;
-	/* Event */
-	public final EventGuild eventGuild;
 	/* Fetchur */
 	private TextChannel fetchurChannel = null;
 	private Role fetchurPing = null;
 	/* Mayor */
 	private TextChannel mayorChannel = null;
 	private Role mayorPing = null;
-	public Message lastMayorElectionOpenMessage = null;
-	public Message lastMayorElectedMessage = null;
-	/* Party */
-	public final List<Party> partyList = new ArrayList<>();
-	/* Jacob */
-	public final JacobGuild jacobGuild;
-	/* Miscellaneous */
-	private final List<String> botManagerRoles = new ArrayList<>();
-	public final String guildId;
-	private final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	private TextChannel logChannel = null;
-	private final List<MessageEmbed> logQueue = new ArrayList<>();
 	private JsonArray blacklist = new JsonArray();
 	private List<String> isUsing = new ArrayList<>();
 
@@ -258,6 +261,10 @@ public class AutomaticGuild {
 		if (cacheDatabase.partyCaches.containsKey(guildId)) {
 			partyList.addAll(cacheDatabase.partyCaches.get(guildId));
 		}
+	}
+
+	public static Logger getLogger() {
+		return log;
 	}
 
 	/* Apply Methods */
@@ -390,10 +397,6 @@ public class AutomaticGuild {
 			}
 		}
 		return applyStr.length() > 0 ? applyStr.toString() : "• Error reloading";
-	}
-
-	public void setBlacklist(JsonArray blacklist) {
-		this.blacklist = blacklist;
 	}
 
 	/* Verify Methods */
@@ -1244,7 +1247,7 @@ public class AutomaticGuild {
 					(
 						msg != null
 							? new MessageCreateBuilder().applyMessage(msg)
-							: new MessageCreateBuilder().setEmbeds(invalidEmbed("Election is not open").build())
+							: new MessageCreateBuilder().setEmbeds(errorEmbed("Election is not open").build())
 					).build()
 				)
 				.setEphemeral(true)
@@ -1353,10 +1356,10 @@ public class AutomaticGuild {
 					.append(i % 5 == 0 ? "\n" : "")
 					.append(
 						switch (split[i]) {
-							case "C" -> getEmoji("EMERALD_BLOCK", "e");
-							case "c" -> getEmoji("IRON_BLOCK", "e");
-							case "S" -> getEmoji("INK_SACK:10", "e");
-							default -> getEmoji("PAPER", "e");
+							case "C" -> getEmojiWithName("EMERALD_BLOCK", "e");
+							case "c" -> getEmojiWithName("IRON_BLOCK", "e");
+							case "S" -> getEmojiWithName("INK_SACK:10", "e");
+							default -> getEmojiWithName("PAPER", "e");
 						}
 					);
 			}
@@ -1545,10 +1548,6 @@ public class AutomaticGuild {
 		return true;
 	}
 
-	public static Logger getLogger() {
-		return log;
-	}
-
 	public void logAction(EmbedBuilder eb) {
 		logAction(eb, jda.getGuildById(guildId).getSelfMember());
 	}
@@ -1585,6 +1584,10 @@ public class AutomaticGuild {
 			currentBlacklist.addAll(guildMap.get(g).blacklist);
 		}
 		return currentBlacklist;
+	}
+
+	public void setBlacklist(JsonArray blacklist) {
+		this.blacklist = blacklist;
 	}
 
 	public void onEventNotif(Map<String, MessageEmbed> ebs) {

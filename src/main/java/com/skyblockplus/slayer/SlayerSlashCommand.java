@@ -20,8 +20,8 @@ package com.skyblockplus.slayer;
 
 import static com.skyblockplus.utils.Constants.SLAYER_EMOJI_MAP;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
+import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
+import static com.skyblockplus.utils.utils.StringUtils.simplifyNumber;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -38,6 +38,160 @@ public class SlayerSlashCommand extends SlashCommand {
 
 	public SlayerSlashCommand() {
 		this.name = "slayer";
+	}
+
+	public static EmbedBuilder getPlayerSlayer(String username, String profileName) {
+		Player.Profile player = Player.create(username, profileName);
+		if (!player.isValid()) {
+			return player.getErrorEmbed();
+		}
+
+		return getPlayerSlayer(player);
+	}
+
+	public static EmbedBuilder getPlayerSlayer(Player.Profile player) {
+		EmbedBuilder eb = player.defaultPlayerEmbed();
+
+		int svenOneKills = player.getSlayerBossKills("wolf", 0);
+		int svenTwoKills = player.getSlayerBossKills("wolf", 1);
+		int svenThreeKills = player.getSlayerBossKills("wolf", 2);
+		int svenFourKills = player.getSlayerBossKills("wolf", 3);
+
+		int revOneKills = player.getSlayerBossKills("zombie", 0);
+		int revTwoKills = player.getSlayerBossKills("zombie", 1);
+		int revThreeKills = player.getSlayerBossKills("zombie", 2);
+		int revFourKills = player.getSlayerBossKills("zombie", 3);
+		int revFiveKills = player.getSlayerBossKills("zombie", 4);
+
+		int taraOneKills = player.getSlayerBossKills("spider", 0);
+		int taraTwoKills = player.getSlayerBossKills("spider", 1);
+		int taraThreeKills = player.getSlayerBossKills("spider", 2);
+		int taraFourKills = player.getSlayerBossKills("spider", 3);
+
+		int endermanOneKills = player.getSlayerBossKills("enderman", 0);
+		int endermanTwoKills = player.getSlayerBossKills("enderman", 1);
+		int endermanThreeKills = player.getSlayerBossKills("enderman", 2);
+		int endermanFourKills = player.getSlayerBossKills("enderman", 3);
+
+		int blazeOneKills = player.getSlayerBossKills("blaze", 0);
+		int blazeTwoKills = player.getSlayerBossKills("blaze", 1);
+		int blazeThreeKills = player.getSlayerBossKills("blaze", 2);
+		int blazeFourKills = player.getSlayerBossKills("blaze", 3);
+
+		String svenKills =
+			"**Tier 1:** " +
+			svenOneKills +
+			"\n**Tier 2:** " +
+			svenTwoKills +
+			"\n**Tier 3:** " +
+			svenThreeKills +
+			"\n**Tier 4:** " +
+			svenFourKills;
+
+		String revKills =
+			"**Tier 1:** " +
+			revOneKills +
+			"\n**Tier 2:** " +
+			revTwoKills +
+			"\n**Tier 3:** " +
+			revThreeKills +
+			"\n**Tier 4:** " +
+			revFourKills +
+			"\n**Tier 5:** " +
+			revFiveKills;
+
+		String taraKills =
+			"**Tier 1:** " +
+			taraOneKills +
+			"\n**Tier 2:** " +
+			taraTwoKills +
+			"\n**Tier 3:** " +
+			taraThreeKills +
+			"\n**Tier 4:** " +
+			taraFourKills;
+
+		String endermanKills =
+			"**Tier 1:** " +
+			endermanOneKills +
+			"\n**Tier 2:** " +
+			endermanTwoKills +
+			"\n**Tier 3:** " +
+			endermanThreeKills +
+			"\n**Tier 4:** " +
+			endermanFourKills;
+
+		String blazeKills =
+			"**Tier 1:** " +
+			blazeOneKills +
+			"\n**Tier 2:** " +
+			blazeTwoKills +
+			"\n**Tier 3:** " +
+			blazeThreeKills +
+			"\n**Tier 4:** " +
+			blazeFourKills;
+
+		long coinsSpentOnSlayers =
+			2000L *
+			(svenOneKills + revOneKills + taraOneKills + endermanOneKills) +
+			7500L *
+			(svenTwoKills + revTwoKills + taraTwoKills + endermanTwoKills) +
+			20000L *
+			(svenThreeKills + revThreeKills + taraThreeKills + endermanThreeKills) +
+			50000L *
+			(svenFourKills + revFourKills + taraFourKills + endermanFourKills) +
+			100000L *
+			revFiveKills +
+			10000L *
+			blazeOneKills +
+			25000L *
+			blazeTwoKills +
+			60000L *
+			blazeThreeKills +
+			150000L *
+			blazeFourKills;
+		eb.setDescription(
+			"**Total Slayer:** " +
+			formatNumber(player.getTotalSlayer()) +
+			" XP\n**Total Coins Spent:** " +
+			simplifyNumber(coinsSpentOnSlayers)
+		);
+		eb.addField(
+			SLAYER_EMOJI_MAP.get("sven") + " Wolf (" + player.getSlayerLevel("sven") + ")",
+			simplifyNumber(player.getSlayer("sven")) + " XP",
+			true
+		);
+		eb.addField(
+			SLAYER_EMOJI_MAP.get("rev") + " Zombie (" + player.getSlayerLevel("rev") + ")",
+			simplifyNumber(player.getSlayer("rev")) + " XP",
+			true
+		);
+		eb.addField(
+			SLAYER_EMOJI_MAP.get("tara") + " Spider (" + player.getSlayerLevel("tara") + ")",
+			simplifyNumber(player.getSlayer("tara")) + " XP",
+			true
+		);
+
+		eb.addField("Boss Kills", svenKills, true);
+		eb.addField("Boss Kills", revKills, true);
+		eb.addField("Boss Kills", taraKills, true);
+
+		eb.addField(
+			SLAYER_EMOJI_MAP.get("enderman") + " Enderman (" + player.getSlayerLevel("enderman") + ")",
+			simplifyNumber(player.getSlayer("enderman")) + " XP",
+			true
+		);
+		eb.addField(
+			SLAYER_EMOJI_MAP.get("blaze") + " Blaze (" + player.getSlayerLevel("blaze") + ")",
+			simplifyNumber(player.getSlayer("blaze")) + " XP",
+			true
+		);
+		eb.addBlankField(true);
+		eb.addField("Boss Kills", endermanKills, true);
+		eb.addField("Boss Kills", blazeKills, true);
+		eb.addBlankField(true);
+		eb.addBlankField(true);
+
+		return eb;
 	}
 
 	@Override
@@ -62,154 +216,5 @@ public class SlayerSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
-	}
-
-	public static EmbedBuilder getPlayerSlayer(String username, String profileName) {
-		Player.Profile player = Player.create(username, profileName);
-		if (player.isValid()) {
-			EmbedBuilder eb = player.defaultPlayerEmbed();
-
-			int svenOneKills = player.getSlayerBossKills("wolf", 0);
-			int svenTwoKills = player.getSlayerBossKills("wolf", 1);
-			int svenThreeKills = player.getSlayerBossKills("wolf", 2);
-			int svenFourKills = player.getSlayerBossKills("wolf", 3);
-
-			int revOneKills = player.getSlayerBossKills("zombie", 0);
-			int revTwoKills = player.getSlayerBossKills("zombie", 1);
-			int revThreeKills = player.getSlayerBossKills("zombie", 2);
-			int revFourKills = player.getSlayerBossKills("zombie", 3);
-			int revFiveKills = player.getSlayerBossKills("zombie", 4);
-
-			int taraOneKills = player.getSlayerBossKills("spider", 0);
-			int taraTwoKills = player.getSlayerBossKills("spider", 1);
-			int taraThreeKills = player.getSlayerBossKills("spider", 2);
-			int taraFourKills = player.getSlayerBossKills("spider", 3);
-
-			int endermanOneKills = player.getSlayerBossKills("enderman", 0);
-			int endermanTwoKills = player.getSlayerBossKills("enderman", 1);
-			int endermanThreeKills = player.getSlayerBossKills("enderman", 2);
-			int endermanFourKills = player.getSlayerBossKills("enderman", 3);
-
-			int blazeOneKills = player.getSlayerBossKills("blaze", 0);
-			int blazeTwoKills = player.getSlayerBossKills("blaze", 1);
-			int blazeThreeKills = player.getSlayerBossKills("blaze", 2);
-			int blazeFourKills = player.getSlayerBossKills("blaze", 3);
-
-			String svenKills =
-				"**Tier 1:** " +
-				svenOneKills +
-				"\n**Tier 2:** " +
-				svenTwoKills +
-				"\n**Tier 3:** " +
-				svenThreeKills +
-				"\n**Tier 4:** " +
-				svenFourKills;
-
-			String revKills =
-				"**Tier 1:** " +
-				revOneKills +
-				"\n**Tier 2:** " +
-				revTwoKills +
-				"\n**Tier 3:** " +
-				revThreeKills +
-				"\n**Tier 4:** " +
-				revFourKills +
-				"\n**Tier 5:** " +
-				revFiveKills;
-
-			String taraKills =
-				"**Tier 1:** " +
-				taraOneKills +
-				"\n**Tier 2:** " +
-				taraTwoKills +
-				"\n**Tier 3:** " +
-				taraThreeKills +
-				"\n**Tier 4:** " +
-				taraFourKills;
-
-			String endermanKills =
-				"**Tier 1:** " +
-				endermanOneKills +
-				"\n**Tier 2:** " +
-				endermanTwoKills +
-				"\n**Tier 3:** " +
-				endermanThreeKills +
-				"\n**Tier 4:** " +
-				endermanFourKills;
-
-			String blazeKills =
-				"**Tier 1:** " +
-				blazeOneKills +
-				"\n**Tier 2:** " +
-				blazeTwoKills +
-				"\n**Tier 3:** " +
-				blazeThreeKills +
-				"\n**Tier 4:** " +
-				blazeFourKills;
-
-			long coinsSpentOnSlayers =
-				2000L *
-				(svenOneKills + revOneKills + taraOneKills + endermanOneKills) +
-				7500L *
-				(svenTwoKills + revTwoKills + taraTwoKills + endermanTwoKills) +
-				20000L *
-				(svenThreeKills + revThreeKills + taraThreeKills + endermanThreeKills) +
-				50000L *
-				(svenFourKills + revFourKills + taraFourKills + endermanFourKills) +
-				100000L *
-				revFiveKills +
-				10000L *
-				blazeOneKills +
-				25000L *
-				blazeTwoKills +
-				60000L *
-				blazeThreeKills +
-				150000L *
-				blazeFourKills;
-			eb.setDescription(
-				"**Total Slayer:** " +
-				formatNumber(player.getTotalSlayer()) +
-				" XP\n**Total Coins Spent:** " +
-				simplifyNumber(coinsSpentOnSlayers)
-			);
-			eb.addField(
-				SLAYER_EMOJI_MAP.get("sven") + " Wolf (" + player.getSlayerLevel("sven") + ")",
-				simplifyNumber(player.getSlayer("sven")) + " XP",
-				true
-			);
-			eb.addField(
-				SLAYER_EMOJI_MAP.get("rev") + " Zombie (" + player.getSlayerLevel("rev") + ")",
-				simplifyNumber(player.getSlayer("rev")) + " XP",
-				true
-			);
-			eb.addField(
-				SLAYER_EMOJI_MAP.get("tara") + " Spider (" + player.getSlayerLevel("tara") + ")",
-				simplifyNumber(player.getSlayer("tara")) + " XP",
-				true
-			);
-
-			eb.addField("Boss Kills", svenKills, true);
-			eb.addField("Boss Kills", revKills, true);
-			eb.addField("Boss Kills", taraKills, true);
-
-			eb.addField(
-				SLAYER_EMOJI_MAP.get("enderman") + " Enderman (" + player.getSlayerLevel("enderman") + ")",
-				simplifyNumber(player.getSlayer("enderman")) + " XP",
-				true
-			);
-			eb.addField(
-				SLAYER_EMOJI_MAP.get("blaze") + " Blaze (" + player.getSlayerLevel("blaze") + ")",
-				simplifyNumber(player.getSlayer("blaze")) + " XP",
-				true
-			);
-			eb.addBlankField(true);
-			eb.addField("Boss Kills", endermanKills, true);
-			eb.addField("Boss Kills", blazeKills, true);
-			eb.addBlankField(true);
-			eb.addBlankField(true);
-
-			return eb;
-		}
-		return player.getFailEmbed();
 	}
 }

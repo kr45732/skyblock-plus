@@ -18,12 +18,18 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.utils.StringUtils;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -37,27 +43,10 @@ public class BazaarSlashCommand extends SlashCommand {
 		this.name = "bazaar";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getBazaarItem(event.getOptionStr("item")));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get bazaar prices of an item").addOption(OptionType.STRING, "item", "Item name", true, true);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("item")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), getBazaarItems());
-		}
-	}
-
 	public static EmbedBuilder getBazaarItem(String itemNameU) {
 		JsonElement bazaarItems = getBazaarJson();
 		if (bazaarItems == null) {
-			return invalidEmbed("Error getting bazaar data");
+			return errorEmbed("Error getting bazaar data");
 		}
 
 		String itemId = nameToId(itemNameU);
@@ -74,5 +63,25 @@ public class BazaarSlashCommand extends SlashCommand {
 			.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "sellVolume", 0L)), true)
 			.addBlankField(true)
 			.setThumbnail(getItemThumbnail(itemId));
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getBazaarItem(event.getOptionStr("item")));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Get bazaar prices of an item").addOption(OptionType.STRING, "item", "Item name", true, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("item")) {
+			event.replyClosestMatch(
+				event.getFocusedOption().getValue(),
+				getBazaarJson().keySet().stream().map(StringUtils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new))
+			);
+		}
 	}
 }

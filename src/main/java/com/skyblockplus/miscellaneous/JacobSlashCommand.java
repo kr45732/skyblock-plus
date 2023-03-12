@@ -19,7 +19,9 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.cropNameToEmoji;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.skyblockplus.features.jacob.JacobContest;
 import com.skyblockplus.features.jacob.JacobData;
@@ -45,31 +47,10 @@ public class JacobSlashCommand extends SlashCommand {
 		this.name = "jacob";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.paginate(getJacobEmbed(event.getOptionStr("crop", "all"), event));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a list of upcoming farming contests")
-			.addOptions(
-				new OptionData(OptionType.STRING, "crop", "Crop to filter by")
-					.addChoices(
-						cropNameToEmoji
-							.keySet()
-							.stream()
-							.map(c -> new Command.Choice(c, c))
-							.collect(Collectors.toCollection(ArrayList::new))
-					)
-			);
-	}
-
 	public static EmbedBuilder getJacobEmbed(String crop, SlashCommandEvent event) {
 		crop = capitalizeString(crop);
 		if (!cropNameToEmoji.containsKey(crop) && !crop.equals("All")) {
-			return invalidEmbed("Invalid crop");
+			return errorEmbed("Invalid crop");
 		}
 
 		JacobData data = JacobHandler.getJacobData();
@@ -101,5 +82,26 @@ public class JacobSlashCommand extends SlashCommand {
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(12);
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		return null;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.paginate(getJacobEmbed(event.getOptionStr("crop", "all"), event));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a list of upcoming farming contests")
+			.addOptions(
+				new OptionData(OptionType.STRING, "crop", "Crop to filter by")
+					.addChoices(
+						cropNameToEmoji
+							.keySet()
+							.stream()
+							.map(c -> new Command.Choice(c, c))
+							.collect(Collectors.toCollection(ArrayList::new))
+					)
+			);
 	}
 }

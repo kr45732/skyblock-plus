@@ -18,7 +18,7 @@
 
 package com.skyblockplus.api.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.DATABASE_URL;
+import static com.skyblockplus.utils.utils.Utils.DATABASE_URL;
 
 import javax.sql.DataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;

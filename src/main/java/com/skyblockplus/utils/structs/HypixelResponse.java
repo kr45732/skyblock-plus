@@ -18,9 +18,11 @@
 
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.utils.Utils;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public record HypixelResponse(JsonElement response, String failCause) {
 	public HypixelResponse(JsonElement response) {
@@ -37,6 +39,10 @@ public record HypixelResponse(JsonElement response, String failCause) {
 
 	public boolean isValid() {
 		return response != null;
+	}
+
+	public EmbedBuilder getErrorEmbed() {
+		return Utils.errorEmbed(failCause);
 	}
 
 	public JsonElement get(String path) {

@@ -21,7 +21,8 @@ package com.skyblockplus.features.setup;
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
 import static com.skyblockplus.utils.Constants.cropNameToEmoji;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -103,21 +104,21 @@ public class SetupCommandHandler {
 						defaultEmbed("Setup")
 							.setDescription(
 								"""
-														**__Overview__**
-														1) When a user runs `/roles claim` their stats are fetched
-														2) Based on the roles setup for this server and the users stats, the corresponding roles will be given
+                                                        **__Overview__**
+                                                        1) When a user runs `/roles claim` their stats are fetched
+                                                        2) Based on the roles setup for this server and the users stats, the corresponding roles will be given
 
-														**__Setup__**
-														- In order to enable automatic roles, there must be at least one role setting enabled:
-														- `/settings roles add <role_name> <value> <@role>` - add a level to a role
-														- `/settings roles set <role_name> <@role>` - set a one level role's role
-														- `/settings roles enable <role_name>` - enable a role.
+                                                        **__Setup__**
+                                                        - In order to enable automatic roles, there must be at least one role setting enabled:
+                                                        - `/settings roles add <role_name> <value> <@role>` - add a level to a role
+                                                        - `/settings roles set <role_name> <@role>` - set a one level role's role
+                                                        - `/settings roles enable <role_name>` - enable a role.
 
-														**__Enable__**
-														- Once all these settings are set run `/settings roles enable` to enable roles
-														- To view all the roles, their descriptions, and examples, run `/settings roles`
-														- For more help, run `/help settings roles` or follow the example video [__here__](https://streamable.com/wninsw)
-														"""
+                                                        **__Enable__**
+                                                        - Once all these settings are set run `/settings roles enable` to enable roles
+                                                        - To view all the roles, their descriptions, and examples, run `/settings roles`
+                                                        - For more help, run `/help settings roles` or follow the example video [__here__](https://streamable.com/wninsw)
+                                                        """
 							)
 							.build()
 					)
@@ -911,7 +912,7 @@ public class SetupCommandHandler {
 				String[] guildRanks = event.getValues().get(0).getAsString().split(",");
 				EmbedBuilder eb = null;
 				if (guildRanks.length == 0) {
-					eb = invalidEmbed("You must specify at least one rank");
+					eb = errorEmbed("You must specify at least one rank");
 				} else {
 					JsonObject obj = database.getGuildSettings(event.getGuild().getId(), featureType.guildName).getAsJsonObject();
 					obj.add("guildRanks", new JsonArray());

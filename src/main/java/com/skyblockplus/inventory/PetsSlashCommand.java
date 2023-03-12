@@ -20,7 +20,10 @@ package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HypixelUtils.petLevelFromXp;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -31,6 +34,7 @@ import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -45,30 +49,6 @@ public class PetsSlashCommand extends SlashCommand {
 
 	public PetsSlashCommand() {
 		this.name = "pets";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(getPlayerPets(event.player, event.getOptionStr("profile"), event));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's pets menu")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
 	}
 
 	public static EmbedBuilder getPlayerPets(String username, String profileName, SlashCommandEvent event) {
@@ -108,7 +88,7 @@ public class PetsSlashCommand extends SlashCommand {
 
 				String emoji = null;
 				for (int i = 5; emoji == null && i >= 0; i--) {
-					emoji = getEmojiOr(missingPet + ";" + i, null);
+					emoji = Utils.getEmoji(missingPet + ";" + i, null);
 				}
 
 				missingPetItems.add(emoji + " " + capitalizeString(missingPet.toLowerCase().replace("_", " ")));
@@ -151,6 +131,30 @@ public class PetsSlashCommand extends SlashCommand {
 			event.paginate(paginateBuilder);
 			return null;
 		}
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(getPlayerPets(event.player, event.getOptionStr("profile"), event));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's pets menu")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

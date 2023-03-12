@@ -19,7 +19,7 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -72,7 +72,11 @@ public class EvaluateCommand extends Command {
 
 		// import static [name]
 		String[] staticImports = {
-			"com.skyblockplus.utils.Utils.*",
+			"com.skyblockplus.utils.utils.HttpUtils.*",
+			"com.skyblockplus.utils.utils.HypixelUtils.*",
+			"com.skyblockplus.utils.utils.JsonUtils.*",
+			"com.skyblockplus.utils.utils.StringUtils.*",
+			"com.skyblockplus.utils.utils.Utils.*",
 			"com.skyblockplus.Main.*",
 			"com.skyblockplus.utils.ApiHandler.*",
 			"com.skyblockplus.utils.Constants.*",

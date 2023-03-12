@@ -18,7 +18,8 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.StringUtils.getItemThumbnail;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommandEvent;

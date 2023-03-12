@@ -19,7 +19,7 @@
 package com.skyblockplus.miscellaneous.weight;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
 
 import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
 import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
@@ -40,30 +40,6 @@ public class WeightSlashCommand extends SlashCommand {
 
 	public WeightSlashCommand() {
 		this.name = "weight";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(getPlayerWeight(event.player, event.getOptionStr("profile"), event));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's weight")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
 	}
 
 	public static EmbedBuilder getPlayerWeight(String username, String profileName, SlashCommandEvent event) {
@@ -169,6 +145,30 @@ public class WeightSlashCommand extends SlashCommand {
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 			return null;
 		}
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(getPlayerWeight(event.player, event.getOptionStr("profile"), event));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's weight")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

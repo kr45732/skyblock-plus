@@ -20,7 +20,10 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HypixelUtils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -34,6 +37,7 @@ import com.skyblockplus.skills.CrimsonSlashCommand;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.structs.*;
+import com.skyblockplus.utils.utils.Utils;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -46,23 +50,15 @@ import org.apache.groovy.util.Maps;
 
 public class Player {
 
+	public final Map<Integer, Double> profileToNetworth = new ConcurrentHashMap<>();
 	private final List<Profile> profiles = new ArrayList<>();
 	private String uuid;
 	private String username;
 	private int selectedProfileIndex;
 	private boolean valid = false;
 	private String failCause = "Unknown fail cause";
-	public final Map<Integer, Double> profileToNetworth = new ConcurrentHashMap<>();
 	private int dungeonSecretsAchievement = -2;
 	private int crystalNucleusAchievement = -2;
-
-	public static Profile create(String username) {
-		return create(username, null);
-	}
-
-	public static Profile create(String username, String profileName) {
-		return (profileName != null ? new Player(username, profileName) : new Player(username, true)).getSelectedProfile();
-	}
 
 	/* Constructors */
 	// Empty player, always invalid
@@ -212,6 +208,14 @@ public class Player {
 		leaderboardDatabase.insertIntoLeaderboardSync(getSelectedProfile(), gamemode);
 	}
 
+	public static Profile create(String username) {
+		return create(username, null);
+	}
+
+	public static Profile create(String username, String profileName) {
+		return (profileName != null ? new Player(username, profileName) : new Player(username, true)).getSelectedProfile();
+	}
+
 	/**
 	 * @return true if invalid
 	 */
@@ -275,6 +279,83 @@ public class Player {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return (
+			"Player{" +
+			"valid=" +
+			valid +
+			", uuid='" +
+			uuid +
+			'\'' +
+			", username='" +
+			username +
+			'\'' +
+			", profile='" +
+			(valid ? getSelectedProfile().getProfileName() : null) +
+			'\'' +
+			'}'
+		);
+	}
+
+	public enum Gamemode {
+		ALL,
+		REGULAR,
+		STRANDED,
+		IRONMAN,
+		IRONMAN_STRANDED;
+
+		public static Gamemode of(String gamemode) {
+			return valueOf(
+				switch (gamemode = gamemode.toUpperCase()) {
+					case "ISLAND" -> "STRANDED";
+					case "BINGO" -> "REGULAR";
+					case "" -> "ALL";
+					default -> gamemode;
+				}
+			);
+		}
+
+		public String toCacheType() {
+			return (
+				switch (this) {
+					case IRONMAN, STRANDED -> name().toLowerCase();
+					default -> "all";
+				} +
+				"_lb"
+			);
+		}
+
+		public boolean isGamemode(Object gamemode) {
+			if (gamemode instanceof Gamemode mode) {
+				return (this == IRONMAN_STRANDED) ? ((gamemode == IRONMAN) || (gamemode == STRANDED)) : ((this == ALL) || (this == mode));
+			}
+
+			return isGamemode(of((String) gamemode));
+		}
+
+		public String getSymbol(String... prefix) {
+			return (
+				(prefix.length >= 1 ? prefix[0] : "") +
+				switch (this) {
+					case IRONMAN -> "\u267B️";
+					case STRANDED -> "\uD83C\uDFDD";
+					default -> "";
+				}
+			).stripTrailing();
+		}
+	}
+
+	public enum WeightType {
+		NONE,
+		SENITHER,
+		LILY;
+
+		public static WeightType of(String name) {
+			return valueOf(name.toUpperCase());
+		}
+	}
+
 	public class Profile {
 
 		private final int profileIndex;
@@ -320,8 +401,8 @@ public class Player {
 			return failCause;
 		}
 
-		public EmbedBuilder getFailEmbed() {
-			return invalidEmbed(failCause);
+		public EmbedBuilder getErrorEmbed() {
+			return Utils.errorEmbed(failCause);
 		}
 
 		public JsonElement profileJson() {
@@ -355,7 +436,7 @@ public class Player {
 		}
 
 		public String itemToEmoji(String itemName) {
-			return getEmojiOr(itemName.toUpperCase(), "❓");
+			return Utils.getEmoji(itemName.toUpperCase(), "❓");
 		}
 
 		private void refreshAchievementsJson() {
@@ -515,18 +596,19 @@ public class Player {
 
 		/* Links */
 		public String skyblockStatsLink() {
-			return Utils.skyblockStatsLink(uuid, getProfileName());
+			return skyblockStatsLink(uuid, getProfileName());
 		}
 
 		public String getAuctionUrl() {
-			return Utils.getAuctionUrl(uuid);
+			return getAuctionUrl(uuid);
 		}
 
 		public String getAvatarUrl() {
-			return Utils.getAvatarlUrl(uuid);
+			return getAvatarlUrl(uuid);
 		}
 
 		/* Bank and purse */
+
 		/**
 		 * @return Bank balance or -1 if bank API disabled
 		 */
@@ -791,13 +873,11 @@ public class Player {
 
 		public Map<Integer, InvItem> getStorageMap() {
 			try {
-				JsonElement backpackContents = higherDepth(profileJson(), "backpack_contents");
-				List<String> backpackCount = getJsonKeys(backpackContents);
 				Map<Integer, InvItem> storageMap = new HashMap<>();
 				int counter = 1;
-				for (String bp : backpackCount) {
+				for (Map.Entry<String, JsonElement> bp : higherDepth(profileJson(), "backpack_contents").getAsJsonObject().entrySet()) {
 					Collection<InvItem> curBpMap = getGenericInventoryMap(
-						NBTReader.readBase64(higherDepth(backpackContents, bp + ".data").getAsString())
+						NBTReader.readBase64(higherDepth(bp.getValue(), "data").getAsString())
 					)
 						.values();
 					for (InvItem itemSlot : curBpMap) {
@@ -1723,82 +1803,5 @@ public class Player {
 				'}'
 			);
 		}
-	}
-
-	public enum Gamemode {
-		ALL,
-		REGULAR,
-		STRANDED,
-		IRONMAN,
-		IRONMAN_STRANDED;
-
-		public static Gamemode of(String gamemode) {
-			return valueOf(
-				switch (gamemode = gamemode.toUpperCase()) {
-					case "ISLAND" -> "STRANDED";
-					case "BINGO" -> "REGULAR";
-					case "" -> "ALL";
-					default -> gamemode;
-				}
-			);
-		}
-
-		public String toCacheType() {
-			return (
-				switch (this) {
-					case IRONMAN, STRANDED -> name().toLowerCase();
-					default -> "all";
-				} +
-				"_lb"
-			);
-		}
-
-		public boolean isGamemode(Object gamemode) {
-			if (gamemode instanceof Gamemode mode) {
-				return (this == IRONMAN_STRANDED) ? ((gamemode == IRONMAN) || (gamemode == STRANDED)) : ((this == ALL) || (this == mode));
-			}
-
-			return isGamemode(of((String) gamemode));
-		}
-
-		public String getSymbol(String... prefix) {
-			return (
-				(prefix.length >= 1 ? prefix[0] : "") +
-				switch (this) {
-					case IRONMAN -> "\u267B️";
-					case STRANDED -> "\uD83C\uDFDD";
-					default -> "";
-				}
-			).stripTrailing();
-		}
-	}
-
-	public enum WeightType {
-		NONE,
-		SENITHER,
-		LILY;
-
-		public static WeightType of(String name) {
-			return valueOf(name.toUpperCase());
-		}
-	}
-
-	@Override
-	public String toString() {
-		return (
-			"Player{" +
-			"valid=" +
-			valid +
-			", uuid='" +
-			uuid +
-			'\'' +
-			", username='" +
-			username +
-			'\'' +
-			", profile='" +
-			(valid ? getSelectedProfile().getProfileName() : null) +
-			'\'' +
-			'}'
-		);
 	}
 }

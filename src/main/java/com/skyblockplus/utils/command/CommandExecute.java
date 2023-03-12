@@ -18,12 +18,12 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import com.skyblockplus.utils.Utils;
+import com.skyblockplus.utils.utils.Utils;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -32,11 +32,11 @@ import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 public abstract class CommandExecute extends CommandEvent {
 
 	protected final Command command;
+	private final boolean sendLoadingEmbed;
 	protected Message ebMessage;
 	protected String[] args;
 	protected String player;
 	protected EmbedBuilder eb;
-	private final boolean sendLoadingEmbed;
 
 	public CommandExecute(Command command, CommandEvent event) {
 		this(command, event, true);
@@ -159,7 +159,7 @@ public abstract class CommandExecute extends CommandEvent {
 
 		ebMessage
 			.editMessageEmbeds(
-				invalidEmbed(
+				errorEmbed(
 					"<@" +
 					userId +
 					"> is not linked to the bot. Please specify a username or " +

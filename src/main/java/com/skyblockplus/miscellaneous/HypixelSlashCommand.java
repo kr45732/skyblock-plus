@@ -19,7 +19,8 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.HypixelPlayer;
@@ -42,33 +43,10 @@ public class HypixelSlashCommand extends SlashCommand {
 		this.name = "hypixel";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(getHypixelStats(event.player));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get Hypixel information about a player")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static EmbedBuilder getHypixelStats(String username) {
 		HypixelPlayer player = new HypixelPlayer(username);
 		if (!player.isValid()) {
-			return invalidEmbed(player.getFailCause());
+			return player.getErrorEmbed();
 		}
 
 		EmbedBuilder eb = player.getDefaultEmbed();
@@ -222,5 +200,28 @@ public class HypixelSlashCommand extends SlashCommand {
 			eb.addBlankField(true);
 		}
 		return eb;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.embed(getHypixelStats(event.player));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get Hypixel information about a player")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

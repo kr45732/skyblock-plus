@@ -20,7 +20,10 @@ package com.skyblockplus.miscellaneous.networth;
 
 import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HypixelUtils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -30,6 +33,7 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
 import com.skyblockplus.utils.structs.InvItem;
+import com.skyblockplus.utils.utils.Utils;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -138,7 +142,7 @@ public class NetworthExecute {
 
 	public EmbedBuilder getPlayerNetworth(Player.Profile player, GenericInteractionCreateEvent event) {
 		if (!player.isValid()) {
-			return player.getFailEmbed();
+			return player.getErrorEmbed();
 		}
 
 		Map<Integer, InvItem> playerInventory = player.getInventoryMap();
@@ -197,7 +201,7 @@ public class NetworthExecute {
 					double itemPrice = getLowestPrice(sackEntry.getKey(), true, null, false) * sackEntry.getValue();
 					addTotal("sacks", itemPrice);
 					if (event != null) {
-						String emoji = getEmojiOr(sackEntry.getKey(), null);
+						String emoji = Utils.getEmoji(sackEntry.getKey(), null);
 						addItem(
 							"sacks",
 							(emoji == null ? "" : emoji + " ") +
@@ -214,7 +218,7 @@ public class NetworthExecute {
 		calculatePetPrices();
 
 		if (event == null) {
-			return invalidEmbed("Was not triggered by command");
+			return errorEmbed("Was not triggered by command");
 		}
 
 		player.getProfileToNetworth().put(player.getProfileIndex(), getNetworth());
@@ -619,10 +623,10 @@ public class NetworthExecute {
 	}
 
 	public String addItemStr(InvItem item, double itemPrice) {
-		String emoji = getEmojiOr(item.getFormattedId(), null);
+		String emoji = Utils.getEmoji(item.getFormattedId(), null);
 
-		if (item.getSkin() != null && getEmojiOr(item.getSkin(), null) != null) {
-			emoji = getEmojiOr(item.getSkin(), null);
+		if (item.getSkin() != null && Utils.getEmoji(item.getSkin(), null) != null) {
+			emoji = Utils.getEmoji(item.getSkin(), null);
 		}
 
 		String formattedStr =
@@ -632,7 +636,7 @@ public class NetworthExecute {
 			item.getNameFormatted();
 
 		if (item.getPetItem() != null) {
-			String petItemEmoji = getEmojiOr(item.getPetItem(), null);
+			String petItemEmoji = Utils.getEmoji(item.getPetItem(), null);
 			if (petItemEmoji != null) {
 				formattedStr += " " + petItemEmoji;
 			}
@@ -718,9 +722,12 @@ public class NetworthExecute {
 			if (
 				item.isRecombobulated() &&
 				item.getDungeonFloor() == -1 &&
-				(!item.getEnchantsFormatted().isEmpty() || allowedRecombCategories.contains(getItemCategory(item.getId())))
+				(
+					!item.getEnchantsFormatted().isEmpty() ||
+					allowedRecombCategories.contains(higherDepth(getSkyblockItemsJson().get(item.getId()), "category", ""))
+				)
 			) {
-				recombobulatedExtra = recombPrice * 0.85;
+				recombobulatedExtra = recombPrice * 0.9;
 			}
 		} catch (Exception ignored) {}
 
@@ -729,7 +736,7 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			fumingExtras = item.getFumingCount() * fumingPrice * 0.65;
+			fumingExtras = item.getFumingCount() * fumingPrice * 0.7;
 		} catch (Exception ignored) {}
 
 		StringBuilder enchStr = verbose ? new StringBuilder("[") : null;
@@ -747,12 +754,7 @@ public class NetworthExecute {
 					}
 					enchantsExtras += enchantPrice;
 					if (verbose) {
-						enchStr
-							.append("{\"type\":\"")
-							.append(enchant)
-							.append("\",\"price\":\"")
-							.append(simplifyNumber(enchantPrice))
-							.append("\"},");
+						enchStr.append("\"").append(enchant).append("\":\"").append(simplifyNumber(enchantPrice)).append("\",");
 					}
 				} catch (Exception ignored) {}
 			}
@@ -770,7 +772,7 @@ public class NetworthExecute {
 
 		try {
 			essenceExtras =
-				item.getEssenceCount() * higherDepth(bazaarJson, "ESSENCE_" + item.getEssenceType() + ".sell_summary", 0.0) * 0.8;
+				item.getEssenceCount() * higherDepth(bazaarJson, "ESSENCE_" + item.getEssenceType() + ".sell_summary", 0.0) * 0.9;
 		} catch (Exception ignored) {}
 
 		StringBuilder miscStr = verbose ? new StringBuilder("[") : null;

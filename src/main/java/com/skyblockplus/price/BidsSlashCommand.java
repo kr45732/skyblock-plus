@@ -19,7 +19,9 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -44,33 +46,10 @@ public class BidsSlashCommand extends SlashCommand {
 		this.name = "bids";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(getPlayerBids(event.player, event));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's bids")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static EmbedBuilder getPlayerBids(String username, SlashCommandEvent event) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (!usernameUuidStruct.isValid()) {
-			return invalidEmbed(usernameUuidStruct.failCause());
+			return errorEmbed(usernameUuidStruct.failCause());
 		}
 
 		JsonArray bids = getBidsFromPlayer(usernameUuidStruct.uuid());
@@ -124,5 +103,28 @@ public class BidsSlashCommand extends SlashCommand {
 
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		return null;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(getPlayerBids(event.player, event));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's bids")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

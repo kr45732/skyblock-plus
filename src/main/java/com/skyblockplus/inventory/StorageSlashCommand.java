@@ -19,7 +19,7 @@
 package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -37,6 +37,19 @@ public class StorageSlashCommand extends SlashCommand {
 
 	public StorageSlashCommand() {
 		this.name = "storage";
+	}
+
+	public static EmbedBuilder getPlayerStorage(String username, String profileName, SlashCommandEvent event) {
+		Player.Profile player = Player.create(username, profileName);
+		if (player.isValid()) {
+			List<String[]> storagePages = player.getStorage();
+			if (storagePages != null) {
+				new InventoryEmojiPaginator(storagePages, "Storage", player, event);
+				return null;
+			}
+			return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+		}
+		return player.getErrorEmbed();
 	}
 
 	@Override
@@ -61,18 +74,5 @@ public class StorageSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
-	}
-
-	public static EmbedBuilder getPlayerStorage(String username, String profileName, SlashCommandEvent event) {
-		Player.Profile player = Player.create(username, profileName);
-		if (player.isValid()) {
-			List<String[]> storagePages = player.getStorage();
-			if (storagePages != null) {
-				new InventoryEmojiPaginator(storagePages, "Storage", player, event);
-				return null;
-			}
-			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
-		}
-		return player.getFailEmbed();
 	}
 }

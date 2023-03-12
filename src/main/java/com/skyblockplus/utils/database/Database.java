@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.Utils.gson;
+import static com.skyblockplus.utils.utils.Utils.gson;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

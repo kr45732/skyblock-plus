@@ -20,7 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Constants.mayorNameToEmoji;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -40,16 +40,6 @@ public class MayorSlashCommand extends SlashCommand {
 
 	public MayorSlashCommand() {
 		this.name = "mayor";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getMayor());
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get the current mayor and their perks");
 	}
 
 	public static MessageEditBuilder getMayor() {
@@ -107,5 +97,15 @@ public class MayorSlashCommand extends SlashCommand {
 			);
 		}
 		return eb;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getMayor());
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Get the current mayor and their perks");
 	}
 }

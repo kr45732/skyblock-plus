@@ -18,7 +18,7 @@
 
 package com.skyblockplus.features.setup;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -36,16 +36,6 @@ public class SetupSlashCommand extends SlashCommand {
 	public SetupSlashCommand() {
 		this.name = "setup";
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getSetupEmbed());
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Interactive walk-throughs on how to setup different features");
 	}
 
 	public static MessageEditBuilder getSetupEmbed() {
@@ -69,5 +59,15 @@ public class SetupSlashCommand extends SlashCommand {
 					Button.primary("setup_command_fetchur", "Fetchur Notifications")
 				)
 			);
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getSetupEmbed());
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Interactive walk-throughs on how to setup different features");
 	}
 }

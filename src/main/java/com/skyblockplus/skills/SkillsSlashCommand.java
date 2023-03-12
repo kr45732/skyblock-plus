@@ -19,7 +19,10 @@
 package com.skyblockplus.skills;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -46,30 +49,6 @@ public class SkillsSlashCommand extends SlashCommand {
 		this.name = "skills";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(getPlayerSkill(event.player, event.getOptionStr("profile"), event));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get the skills data of a player")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static EmbedBuilder getPlayerSkill(String username, String profileName, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 
@@ -77,36 +56,7 @@ public class SkillsSlashCommand extends SlashCommand {
 			CustomPaginator.Builder paginateBuilder = event.getPaginator();
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 
-			EmbedBuilder eb = player.defaultPlayerEmbed();
-			double trueSA = 0;
-			double progressSA = 0;
-			for (String skillName : ALL_SKILL_NAMES) {
-				SkillsStruct skillInfo = player.getSkill(skillName);
-				if (skillInfo != null) {
-					eb.addField(
-						SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.name()) + " (" + skillInfo.currentLevel() + ")",
-						simplifyNumber(skillInfo.expCurrent()) +
-						" / " +
-						simplifyNumber(skillInfo.expForNext()) +
-						"\nTotal XP: " +
-						simplifyNumber(skillInfo.totalExp()) +
-						"\nProgress: " +
-						(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
-						true
-					);
-					if (!COSMETIC_SKILL_NAMES.contains(skillName)) {
-						trueSA += skillInfo.currentLevel();
-						progressSA += skillInfo.getProgressLevel();
-					}
-				} else {
-					eb.addField(SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillName) + " (?) ", "Unable to retrieve", true);
-				}
-			}
-			trueSA /= SKILL_NAMES.size();
-			progressSA /= SKILL_NAMES.size();
-			eb.setDescription(
-				"**True Skill Average:** " + roundAndFormat(trueSA) + "\n**Progress Skill Average:** " + roundAndFormat(progressSA)
-			);
+			EmbedBuilder eb = getPlayerSkillsFirstPage(player);
 			extras.addEmbedPage(eb);
 
 			eb = player.defaultPlayerEmbed();
@@ -180,6 +130,65 @@ public class SkillsSlashCommand extends SlashCommand {
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 			return null;
 		}
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
+	}
+
+	public static EmbedBuilder getPlayerSkillsFirstPage(Player.Profile player) {
+		EmbedBuilder eb = player.defaultPlayerEmbed();
+		double trueSA = 0;
+		double progressSA = 0;
+		for (String skillName : ALL_SKILL_NAMES) {
+			SkillsStruct skillInfo = player.getSkill(skillName);
+			if (skillInfo != null) {
+				eb.addField(
+					SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.name()) + " (" + skillInfo.currentLevel() + ")",
+					simplifyNumber(skillInfo.expCurrent()) +
+					" / " +
+					simplifyNumber(skillInfo.expForNext()) +
+					"\nTotal XP: " +
+					simplifyNumber(skillInfo.totalExp()) +
+					"\nProgress: " +
+					(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
+					true
+				);
+				if (!COSMETIC_SKILL_NAMES.contains(skillName)) {
+					trueSA += skillInfo.currentLevel();
+					progressSA += skillInfo.getProgressLevel();
+				}
+			} else {
+				eb.addField(SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillName) + " (?) ", "Unable to retrieve", true);
+			}
+		}
+		trueSA /= SKILL_NAMES.size();
+		progressSA /= SKILL_NAMES.size();
+		eb.setDescription(
+			"**True Skill Average:** " + roundAndFormat(trueSA) + "\n**Progress Skill Average:** " + roundAndFormat(progressSA)
+		);
+		eb.addBlankField(true);
+		return eb;
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(getPlayerSkill(event.player, event.getOptionStr("profile"), event));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get the skills data of a player")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

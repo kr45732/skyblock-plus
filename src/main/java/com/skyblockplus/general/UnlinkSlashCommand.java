@@ -18,7 +18,10 @@
 
 package com.skyblockplus.general;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
+import static com.skyblockplus.utils.utils.Utils.database;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -39,16 +42,6 @@ public class UnlinkSlashCommand extends SlashCommand {
 
 	public UnlinkSlashCommand() {
 		this.name = "unlink";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(unlinkAccount(event.getMember(), null));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Unlink your account from this bot");
 	}
 
 	public static EmbedBuilder unlinkAccount(Member member, JsonElement verifySettings) {
@@ -79,5 +72,15 @@ public class UnlinkSlashCommand extends SlashCommand {
 		}
 
 		return defaultEmbed("Success").setDescription("You were unlinked");
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(unlinkAccount(event.getMember(), null));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Unlink your account from this bot");
 	}
 }

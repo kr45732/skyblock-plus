@@ -18,8 +18,11 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.features.mayor.MayorHandler.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.features.mayor.MayorHandler.currentJerryMayor;
+import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
+import static com.skyblockplus.utils.utils.StringUtils.padStart;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -36,6 +39,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CalendarSlashCommand extends SlashCommand {
 
+	public static final long YEAR_0 = 1560275700000L;
 	private static final String[] SEASONS = new String[] {
 		"Early Spring",
 		"Spring",
@@ -54,20 +58,9 @@ public class CalendarSlashCommand extends SlashCommand {
 	public static final long DAY_MS = 24 * HOUR_MS;
 	public static final long MONTH_MS = 31 * DAY_MS;
 	public static final long YEAR_MS = SEASONS.length * MONTH_MS;
-	public static final long YEAR_0 = 1560275700000L;
 
 	public CalendarSlashCommand() {
 		this.name = "calendar";
-	}
-
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.embed(getCalendar());
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get current and upcoming Skyblock events");
 	}
 
 	public static EmbedBuilder getCalendar() {
@@ -325,5 +318,15 @@ public class CalendarSlashCommand extends SlashCommand {
 		} catch (Exception e) {
 			return n + "th";
 		}
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.embed(getCalendar());
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Get current and upcoming Skyblock events");
 	}
 }

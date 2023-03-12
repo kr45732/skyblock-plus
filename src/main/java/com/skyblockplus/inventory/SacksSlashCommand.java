@@ -19,7 +19,10 @@
 package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HypixelUtils.getNpcSellPrice;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -42,37 +45,12 @@ public class SacksSlashCommand extends SlashCommand {
 		this.name = "sacks";
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(getPlayerSacks(event.player, event.getOptionStr("profile"), event.getOptionBoolean("npc", false), event));
-	}
-
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's sacks' content bag represented in a list")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption)
-			.addOption(OptionType.BOOLEAN, "npc", "Use npc sell prices (bazaar will be used for items that don't have an npc price)");
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
-	}
-
 	public static EmbedBuilder getPlayerSacks(String username, String profileName, boolean useNpcPrice, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
 			Map<String, Integer> sacksMap = player.getPlayerSacks();
 			if (sacksMap == null) {
-				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+				return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 			}
 
 			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(20);
@@ -115,7 +93,7 @@ public class SacksSlashCommand extends SlashCommand {
 					paginateBuilder.addItems(
 						(emoji != null ? emoji + " " : "") +
 						"**" +
-						convertSkyblockIdName(currentSack.getKey()) +
+						idToName(currentSack.getKey()) +
 						":** " +
 						formatNumber(currentSack.getValue()) +
 						" ➜ " +
@@ -135,6 +113,31 @@ public class SacksSlashCommand extends SlashCommand {
 			event.paginate(paginateBuilder);
 			return null;
 		}
-		return player.getFailEmbed();
+		return player.getErrorEmbed();
+	}
+
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(getPlayerSacks(event.player, event.getOptionStr("profile"), event.getOptionBoolean("npc", false), event));
+	}
+
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's sacks' content bag represented in a list")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption)
+			.addOption(OptionType.BOOLEAN, "npc", "Use npc sell prices (bazaar will be used for items that don't have an npc price)");
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

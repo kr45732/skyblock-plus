@@ -19,7 +19,10 @@
 package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -47,10 +50,34 @@ public class TalismanBagSlashCommand extends SlashCommand {
 		this.name = "talisman";
 	}
 
+	@Override
+	public SlashCommandData getCommandData() {
+		return Commands.slash(name, "Main talisman bag command");
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
+	}
+
 	public static class ListSubcommand extends Subcommand {
 
 		public ListSubcommand() {
 			this.name = "list";
+		}
+
+		public static EmbedBuilder getPlayerTalismansList(String username, String profileName, int slotNum, SlashCommandEvent event) {
+			Player.Profile player = Player.create(username, profileName);
+			if (player.isValid()) {
+				Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();
+				if (talismanBagMap != null) {
+					new InventoryListPaginator(player, talismanBagMap, slotNum, event);
+					return null;
+				}
+			}
+			return player.getErrorEmbed();
 		}
 
 		@Override
@@ -69,24 +96,25 @@ public class TalismanBagSlashCommand extends SlashCommand {
 				.addOptions(profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");
 		}
-
-		public static EmbedBuilder getPlayerTalismansList(String username, String profileName, int slotNum, SlashCommandEvent event) {
-			Player.Profile player = Player.create(username, profileName);
-			if (player.isValid()) {
-				Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();
-				if (talismanBagMap != null) {
-					new InventoryListPaginator(player, talismanBagMap, slotNum, event);
-					return null;
-				}
-			}
-			return player.getFailEmbed();
-		}
 	}
 
 	public static class EmojiSubcommand extends Subcommand {
 
 		public EmojiSubcommand() {
 			this.name = "emoji";
+		}
+
+		public static EmbedBuilder getPlayerTalismansEmoji(String username, String profileName, SlashCommandEvent event) {
+			Player.Profile player = Player.create(username, profileName);
+			if (player.isValid()) {
+				List<String[]> talismanBag = player.getTalismanBag();
+				if (talismanBag != null) {
+					new InventoryEmojiPaginator(talismanBag, "Talisman Bag", player, event);
+					return null;
+				}
+				return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+			}
+			return player.getErrorEmbed();
 		}
 
 		@Override
@@ -104,41 +132,12 @@ public class TalismanBagSlashCommand extends SlashCommand {
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption);
 		}
-
-		public static EmbedBuilder getPlayerTalismansEmoji(String username, String profileName, SlashCommandEvent event) {
-			Player.Profile player = Player.create(username, profileName);
-			if (player.isValid()) {
-				List<String[]> talismanBag = player.getTalismanBag();
-				if (talismanBag != null) {
-					new InventoryEmojiPaginator(talismanBag, "Talisman Bag", player, event);
-					return null;
-				}
-				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
-			}
-			return player.getFailEmbed();
-		}
 	}
 
 	public static class TuningSubcommand extends Subcommand {
 
 		public TuningSubcommand() {
 			this.name = "tuning";
-		}
-
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			if (event.invalidPlayerOption()) {
-				return;
-			}
-
-			event.paginate(getPlayerTuning(event.player, event.getOptionStr("profile"), event));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData("tuning", "Get a player's power stone stats and tuning stats")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(profilesCommandOption);
 		}
 
 		public static EmbedBuilder getPlayerTuning(String username, String profileName, SlashCommandEvent event) {
@@ -274,19 +273,23 @@ public class TalismanBagSlashCommand extends SlashCommand {
 				return null;
 			}
 
-			return player.getFailEmbed();
+			return player.getErrorEmbed();
 		}
-	}
 
-	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Main talisman bag command");
-	}
+		@Override
+		protected void execute(SlashCommandEvent event) {
+			if (event.invalidPlayerOption()) {
+				return;
+			}
 
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
+			event.paginate(getPlayerTuning(event.player, event.getOptionStr("profile"), event));
+		}
+
+		@Override
+		protected SubcommandData getCommandData() {
+			return new SubcommandData("tuning", "Get a player's power stone stats and tuning stats")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOptions(profilesCommandOption);
 		}
 	}
 }

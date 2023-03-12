@@ -18,8 +18,8 @@
 
 package com.skyblockplus.miscellaneous.weight.senither;
 
-import static com.skyblockplus.utils.Utils.getWeightJson;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.getWeightJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 
 import com.skyblockplus.miscellaneous.weight.weight.DungeonsWeight;
 import com.skyblockplus.utils.Constants;

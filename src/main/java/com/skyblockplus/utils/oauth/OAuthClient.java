@@ -18,7 +18,9 @@
 
 package com.skyblockplus.utils.oauth;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.httpClient;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.Utils.selfUserId;
 
 import com.google.gson.JsonParser;
 import java.io.IOException;

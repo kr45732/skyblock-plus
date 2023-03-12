@@ -19,7 +19,10 @@
 package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -27,7 +30,6 @@ import com.google.gson.JsonParser;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.Utils;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -49,10 +51,10 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
 public class ApplyUser implements Serializable {
 
+	public final Map<String, String> profileEmojiToName = new LinkedHashMap<>();
 	public String applyingUserId;
 	public String currentSettingsString;
 	public String guildId;
-	public final Map<String, String> profileEmojiToName = new LinkedHashMap<>();
 	public String applicationChannelId;
 	public String reactMessageId;
 	public int state = 0;
@@ -444,7 +446,7 @@ public class ApplyUser implements Serializable {
 							playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
 							true
 						);
-						applyPlayerStats.setThumbnail(Utils.getAvatarlUrl(playerUuid));
+						applyPlayerStats.setThumbnail(getAvatarlUrl(playerUuid));
 						String waitlistMsg = higherDepth(currentSettings, "applyWaitlistMessage", null);
 						List<Button> row = new ArrayList<>();
 						row.add(Button.success("apply_user_accept", "Accept"));

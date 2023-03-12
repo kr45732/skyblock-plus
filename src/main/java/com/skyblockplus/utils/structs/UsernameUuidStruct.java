@@ -18,9 +18,10 @@
 
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.Utils.fixUsername;
+import static com.skyblockplus.utils.utils.StringUtils.fixUsername;
+import static com.skyblockplus.utils.utils.StringUtils.getAvatarlUrl;
 
-import com.skyblockplus.utils.Utils;
+import com.skyblockplus.utils.utils.StringUtils;
 
 public record UsernameUuidStruct(String username, String uuid, String failCause) {
 	public UsernameUuidStruct(String username, String uuid) {
@@ -40,15 +41,15 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 	}
 
 	public String getAvatarUrl() {
-		return Utils.getAvatarlUrl(uuid);
+		return getAvatarlUrl(uuid);
 	}
 
 	public String getAuctionUrl() {
-		return Utils.getAuctionUrl(uuid);
+		return StringUtils.getAuctionUrl(uuid);
 	}
 
 	public String nameMcHyperLink() {
-		return Utils.nameMcHyperLink(fixUsername(username), uuid);
+		return StringUtils.nameMcHyperLink(usernameFixed(), uuid);
 	}
 
 	public String usernameFixed() {

@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.Utils.roundAndFormat;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
 
 import lombok.Data;
 

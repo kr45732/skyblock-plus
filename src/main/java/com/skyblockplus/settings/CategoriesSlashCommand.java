@@ -18,7 +18,7 @@
 
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -38,6 +38,15 @@ public class CategoriesSlashCommand extends SlashCommand {
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 	}
 
+	public static EmbedBuilder getCategories(Guild guild) {
+		StringBuilder ebString = new StringBuilder();
+		for (Category category : guild.getCategories()) {
+			ebString.append("\n• ").append(category.getName()).append(" ⇢ `").append(category.getId()).append("`");
+		}
+
+		return defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString());
+	}
+
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.embed(getCategories(event.getGuild()));
@@ -46,14 +55,5 @@ public class CategoriesSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands.slash(name, "Get a list mapping all visible category names to their ids'");
-	}
-
-	public static EmbedBuilder getCategories(Guild guild) {
-		StringBuilder ebString = new StringBuilder();
-		for (Category category : guild.getCategories()) {
-			ebString.append("\n• ").append(category.getName()).append(" ⇢ `").append(category.getId()).append("`");
-		}
-
-		return defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString());
 	}
 }

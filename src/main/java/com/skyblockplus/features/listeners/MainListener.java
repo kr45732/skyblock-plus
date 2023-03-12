@@ -19,7 +19,9 @@
 package com.skyblockplus.features.listeners;
 
 import static com.skyblockplus.utils.ApiHandler.neuBranch;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.Comparator;
