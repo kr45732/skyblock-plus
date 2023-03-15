@@ -1154,7 +1154,7 @@ public class GuildSlashCommand extends SlashCommand {
 	public static class StatisticsSubcommand extends Subcommand {
 
 		public StatisticsSubcommand() {
-			this.name = "statistics";
+			this.name = "top";
 			this.cooldown = GLOBAL_COOLDOWN + 2;
 		}
 

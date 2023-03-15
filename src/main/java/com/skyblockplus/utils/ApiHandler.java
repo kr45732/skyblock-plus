@@ -20,6 +20,7 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.utils.HttpUtils.*;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -71,7 +72,7 @@ public class ApiHandler {
 			cacheDatabase.initializeJacobData();
 			cacheDatabase.initializeTokens();
 			cacheDatabase.initializeAhTracker();
-			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
+			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 30, 60, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCaches, 60, 60, TimeUnit.MINUTES);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 		} catch (Exception e) {
@@ -343,7 +344,7 @@ public class ApiHandler {
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean useCache, boolean shouldCache) {
 		if (useCache) {
-			JsonElement cachedResponse = cacheDatabase.getCachedJson(uuid);
+			JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_PROFILES, uuid);
 			if (cachedResponse != null) {
 				return new HypixelResponse(cachedResponse);
 			}
@@ -351,7 +352,7 @@ public class ApiHandler {
 
 		try {
 			JsonElement profilesJson = getJson(
-				"https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid,
+				getHypixelApiUrl("skyblock/profiles", hypixelApiKey).addParameter("uuid", uuid).toString(),
 				hypixelApiKey,
 				true
 			);
@@ -366,7 +367,7 @@ public class ApiHandler {
 
 				JsonArray profileArray = higherDepth(profilesJson, "profiles").getAsJsonArray();
 				if (shouldCache) {
-					cacheDatabase.cacheJson(uuid, profileArray);
+					cacheDatabase.cacheJson(new CacheDatabase.CacheId(CacheDatabase.CacheType.SKYBLOCK_PROFILES, uuid), profileArray);
 				}
 				return new HypixelResponse(profileArray);
 			} catch (Exception e) {
@@ -383,12 +384,12 @@ public class ApiHandler {
 	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
 		CompletableFuture<JsonElement> future = new CompletableFuture<>();
 
-		JsonElement cachedResponse = cacheDatabase.getCachedJson(uuid);
+		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_PROFILES, uuid);
 		if (cachedResponse != null) {
 			future.complete(cachedResponse);
 		} else {
 			future =
-				asyncGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
+				asyncGet(getHypixelApiUrl("skyblock/profiles", hypixelApiKey).addParameter("uuid", uuid).toString())
 					.thenApplyAsync(
 						profilesResponse -> {
 							try {
@@ -410,9 +411,9 @@ public class ApiHandler {
 									JsonElement profiles = SkyblockProfilesParser.parse(jsonIn, uuid);
 
 									// Json parsing probably takes more memory than the HTTP request
-									//									if (Runtime.getRuntime().totalMemory() > 1250000000) {
-									//										System.gc();
-									//									}
+									if (Runtime.getRuntime().totalMemory() > 1250000000) {
+										System.gc();
+									}
 
 									return higherDepth(profiles, "profiles").getAsJsonArray();
 								}
@@ -427,8 +428,13 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse playerFromUuid(String uuid) {
+		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.PLAYER, uuid);
+		if (cachedResponse != null) {
+			return new HypixelResponse(cachedResponse);
+		}
+
 		try {
-			JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + uuid);
+			JsonElement playerJson = getJson(getHypixelApiUrl("player", HYPIXEL_API_KEY).addParameter("uuid", uuid).toString());
 
 			try {
 				if (higherDepth(playerJson, "player").isJsonNull()) {
@@ -437,6 +443,7 @@ public class ApiHandler {
 				}
 
 				JsonObject playerObject = higherDepth(playerJson, "player").getAsJsonObject();
+				cacheDatabase.cacheJson(new CacheDatabase.CacheId(CacheDatabase.CacheType.PLAYER, uuid), playerObject);
 				return new HypixelResponse(playerObject);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(playerJson, "cause").getAsString());
@@ -446,9 +453,9 @@ public class ApiHandler {
 		return new HypixelResponse();
 	}
 
-	public static HypixelResponse getAuctionGeneric(String query) {
+	public static HypixelResponse getAuctionGeneric(String param, String value) {
 		try {
-			JsonElement auctionResponse = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + query);
+			JsonElement auctionResponse = getJson(getHypixelApiUrl("auction", HYPIXEL_API_KEY).addParameter(param, value).toString());
 			try {
 				return new HypixelResponse(higherDepth(auctionResponse, "auctions").getAsJsonArray());
 			} catch (Exception e) {
@@ -460,29 +467,47 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse getAuctionFromPlayer(String playerUuid) {
-		return getAuctionGeneric("&player=" + playerUuid);
+		return getAuctionGeneric("player", playerUuid);
 	}
 
 	public static HypixelResponse getAuctionFromUuid(String auctionUuid) {
-		HypixelResponse response = getAuctionGeneric("&uuid=" + auctionUuid);
+		HypixelResponse response = getAuctionGeneric("uuid", auctionUuid);
 		return !response.isValid() ? response : (response.get("[0]") != null ? response : new HypixelResponse("Invalid auction UUID"));
 	}
 
-	public static HypixelResponse getGuildGeneric(String query) {
+	public static HypixelResponse getGuildGeneric(String param, String value) {
+		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.GUILD, value);
+		if (cachedResponse != null) {
+			return new HypixelResponse(cachedResponse);
+		}
+
 		try {
-			JsonElement guildResponse = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + query);
+			JsonElement guildResponse = getJson(getHypixelApiUrl("guild", HYPIXEL_API_KEY).addParameter(param, value).toString());
 
 			try {
 				if (higherDepth(guildResponse, "guild").isJsonNull()) {
-					if (query.startsWith("&player=")) {
+					if (param.equals("player")) {
 						return new HypixelResponse("Player is not in a guild");
-					} else if (query.startsWith("&id=")) {
+					} else if (param.equals("id")) {
 						return new HypixelResponse("Invalid guild id");
-					} else if (query.startsWith("&name=")) {
+					} else if (param.equals("name")) {
 						return new HypixelResponse("Invalid guild name");
 					}
 				}
-				return new HypixelResponse(higherDepth(guildResponse, "guild").getAsJsonObject());
+
+				JsonObject guildObject = higherDepth(guildResponse, "guild").getAsJsonObject();
+				cacheDatabase.cacheJson(
+					new CacheDatabase.CacheId(
+						CacheDatabase.CacheType.GUILD,
+						higherDepth(guildObject, "_id").getAsString(),
+						higherDepth(guildObject, "name").getAsString()
+					)
+						.addIds(
+							streamJsonArray(higherDepth(guildObject, "members")).map(m -> higherDepth(m, "uuid").getAsString()).toList()
+						),
+					guildObject
+				);
+				return new HypixelResponse(guildObject);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(guildResponse, "cause").getAsString());
 			}
@@ -492,15 +517,28 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse getGuildFromPlayer(String playerUuid) {
-		return getGuildGeneric("&player=" + playerUuid);
+		return getGuildGeneric("player", playerUuid);
 	}
 
 	public static HypixelResponse getGuildFromId(String guildId) {
-		return getGuildGeneric("&id=" + guildId);
+		return getGuildGeneric("id", guildId);
 	}
 
 	public static HypixelResponse getGuildFromName(String guildName) {
-		return getGuildGeneric("&name=" + guildName.replace(" ", "%20").replace("_", "%20"));
+		return getGuildGeneric("name", guildName.replace("_", " "));
+	}
+
+	public static URIBuilder getHypixelApiUrl(String path, String hypixelApiKey) {
+		try {
+			URIBuilder uriBuilder = new URIBuilder("https://api.hypixel.net").setPath(path);
+			if (hypixelApiKey != null) {
+				uriBuilder.addParameter("key", hypixelApiKey);
+			}
+			return uriBuilder;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static URIBuilder getQueryApiUrl(String path) {

@@ -167,9 +167,9 @@ public class HelpSlashCommand extends SlashCommand {
 							"kicker <requirements> [player] [gamemode] [key]"
 						),
 						new HelpData(
-							"statistics",
+							"top",
 							"Get a guild's average and top 5 leaderboards of slayer, skills, catacombs, weight, networth, and level. Set key to true to force use this server's Hypixel API key for more accurate results.",
-							"statistics [player] [guild] [gamemode] [key]"
+							"top [player] [guild] [gamemode] [key]"
 						),
 						new HelpData(
 							"ranks",
@@ -770,7 +770,7 @@ public class HelpSlashCommand extends SlashCommand {
 				"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild"
 			) +
 			create(
-				"guild statistics [player] [guild] [gamemode] [key]",
+				"guild top [player] [guild] [gamemode] [key]",
 				"Get a guild's Skyblock statistics of slayer, skills, catacombs, weight, level, and networth"
 			) +
 			create("guild api [player] [exclude]", "Get which Skyblock APIs players have enabled or disabled for a guild")

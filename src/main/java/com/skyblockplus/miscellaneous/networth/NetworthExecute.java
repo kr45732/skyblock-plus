@@ -1024,7 +1024,7 @@ public class NetworthExecute {
 			craftCost /= getRecipeCount(itemId);
 		}
 
-		if (!ignoreAh) {
+		if (!ignoreAh && !SOULBOUND_ITEMS.contains(itemId)) {
 			double lowestBin = -1;
 			double averageAuction = -1;
 

@@ -85,7 +85,7 @@ public class Utils {
 	public static final int GLOBAL_COOLDOWN = 3;
 	public static final String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
 	public static final String BOT_INVITE_LINK =
-		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395541081169&scope=bot%20applications.commands";
+		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395541081169&scope=bot+applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static final ExecutorService executor = new ExceptionExecutor(
 		10,

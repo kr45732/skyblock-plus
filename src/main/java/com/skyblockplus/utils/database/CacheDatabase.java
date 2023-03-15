@@ -19,6 +19,7 @@
 package com.skyblockplus.utils.database;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
 import static com.skyblockplus.utils.utils.Utils.*;
@@ -38,13 +39,11 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.lang.reflect.Type;
 import java.sql.*;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,7 @@ public class CacheDatabase {
 	private static final Logger log = LoggerFactory.getLogger(CacheDatabase.class);
 	public final Map<String, List<Party>> partyCaches = new HashMap<>();
 	private final HikariDataSource dataSource;
-	private final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
+	private final Map<CacheId, Long> cacheIdToExpiry = new ConcurrentHashMap<>();
 
 	public CacheDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -65,44 +64,41 @@ public class CacheDatabase {
 		return dataSource.getConnection();
 	}
 
-	public void cacheJson(String uuid, JsonElement json) {
+	public void cacheJson(CacheId id, JsonElement json) {
+		long expiry = Instant.now().plus(90, ChronoUnit.SECONDS).toEpochMilli();
 		executor.submit(() -> {
-			try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
-				Instant now = Instant.now();
-				uuidToTimeSkyblockProfiles.put(uuid, now);
+			try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+					"INSERT INTO cache VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = VALUES(id), expiry = VALUES(expiry), data = VALUES(data)"
+				)
+			) {
+				statement.setString(1, id.getGeneratedId());
+				statement.setLong(2, expiry);
+				statement.setString(3, json.toString());
+				statement.executeUpdate();
 
-				statement.executeUpdate(
-					"INSERT INTO profiles VALUES ('" +
-					uuid +
-					"', " +
-					now.toEpochMilli() +
-					", '" +
-					json +
-					"') ON DUPLICATE KEY UPDATE uuid = VALUES(uuid), time = VALUES(time), data = VALUES(data)"
-				);
+				cacheIdToExpiry.put(id, expiry);
 			} catch (Exception ignored) {}
 		});
 	}
 
-	public JsonElement getCachedJson(String uuid) {
-		Instant lastUpdated = uuidToTimeSkyblockProfiles.getOrDefault(uuid, null);
-		if (lastUpdated != null && Duration.between(lastUpdated, Instant.now()).toMillis() > 90000) {
-			deleteCachedJson(uuid);
-		} else {
+	public JsonElement getCachedJson(CacheType cacheType, String id) {
+		Map.Entry<CacheId, Long> cacheEntry = cacheIdToExpiry
+			.entrySet()
+			.stream()
+			.filter(e -> e.getKey().matches(cacheType, id))
+			.findAny()
+			.orElse(null);
+		if (cacheEntry != null && cacheEntry.getValue() > Instant.now().toEpochMilli()) {
 			try (
 				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement("SELECT * FROM profiles where uuid = ?")
+				PreparedStatement statement = connection.prepareStatement("SELECT data FROM cache WHERE id = ?")
 			) {
-				statement.setString(1, uuid);
+				statement.setString(1, cacheEntry.getKey().getGeneratedId());
 				try (ResultSet response = statement.executeQuery()) {
 					if (response.next()) {
-						Instant lastUpdatedResponse = Instant.ofEpochMilli(response.getLong("time"));
-						if (Duration.between(lastUpdatedResponse, Instant.now()).toMillis() > 90000) {
-							deleteCachedJson(uuid);
-						} else {
-							uuidToTimeSkyblockProfiles.put(uuid, lastUpdatedResponse);
-							return JsonParser.parseString(response.getString("data"));
-						}
+						return JsonParser.parseString(response.getString("data"));
 					}
 				}
 			} catch (Exception ignored) {}
@@ -110,50 +106,31 @@ public class CacheDatabase {
 		return null;
 	}
 
-	public void deleteCachedJson(String... uuids) {
-		if (uuids.length == 0) {
-			return;
-		}
-
-		executor.submit(() -> {
-			StringBuilder query = new StringBuilder();
-			for (String uuid : uuids) {
-				uuidToTimeSkyblockProfiles.remove(uuid);
-				query.append("'").append(uuid).append("',");
-			}
-			if (query.charAt(query.length() - 1) == ',') {
-				query.deleteCharAt(query.length() - 1);
-			}
-
-			try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
-				statement.executeUpdate("DELETE FROM profiles WHERE uuid IN (" + query + ")");
-			} catch (Exception ignored) {}
-		});
-	}
-
 	public void updateCache() {
-		long now = Instant.now().minusSeconds(90).toEpochMilli();
+		long now = Instant.now().toEpochMilli();
+		List<String> expiredCacheIds = new ArrayList<>();
+
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM profiles WHERE time < ?")
+			PreparedStatement statement = connection.prepareStatement("SELECT id FROM cache WHERE expiry <= ?")
 		) {
 			statement.setLong(1, now);
 			try (ResultSet response = statement.executeQuery()) {
-				List<String> expiredCacheUuidList = new ArrayList<>();
 				while (response.next()) {
-					expiredCacheUuidList.add(response.getString("uuid"));
+					expiredCacheIds.add(response.getString("id"));
 				}
-				deleteCachedJson(expiredCacheUuidList.toArray(new String[0]));
 			}
 		} catch (Exception ignored) {}
 
-		try (
-			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("DELETE FROM profiles WHERE time < ?")
-		) {
-			statement.setLong(1, now);
-			statement.executeUpdate();
-		} catch (Exception ignored) {}
+		if (!expiredCacheIds.isEmpty()) {
+			cacheIdToExpiry.keySet().removeIf(cacheId -> expiredCacheIds.contains(cacheId.getGeneratedId()));
+
+			try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+				statement.executeUpdate(
+					"DELETE FROM cache WHERE id IN (" + expiredCacheIds.stream().collect(Collectors.joining("','", "'", "'")) + ")"
+				);
+			} catch (Exception ignored) {}
+		}
 	}
 
 	public void cachePartyData() {
@@ -360,5 +337,46 @@ public class CacheDatabase {
 		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
 			statement.executeUpdate("DELETE FROM party WHERE guild_id IN (" + String.join(",", toDeleteIds) + ")");
 		} catch (Exception ignored) {}
+	}
+
+	public static class CacheId {
+
+		private final CacheType cacheType;
+		private final List<String> ids = new ArrayList<>();
+
+		@lombok.Getter
+		private final String generatedId;
+
+		public CacheId(CacheType cacheType, String... ids) {
+			this.cacheType = cacheType;
+
+			for (String id : ids) {
+				this.ids.add(id.toLowerCase());
+			}
+
+			String generatedId;
+			while (true) {
+				String finalGeneratedId = generatedId = UUID.randomUUID().toString();
+				if (cacheDatabase.cacheIdToExpiry.keySet().stream().noneMatch(c -> c.generatedId.equals(finalGeneratedId))) {
+					break;
+				}
+			}
+			this.generatedId = generatedId;
+		}
+
+		public CacheId addIds(List<String> ids) {
+			this.ids.addAll(ids);
+			return this;
+		}
+
+		public boolean matches(CacheType cacheType, String id) {
+			return this.cacheType == cacheType && this.ids.contains(id.toLowerCase());
+		}
+	}
+
+	public enum CacheType {
+		SKYBLOCK_PROFILES,
+		GUILD,
+		PLAYER,
 	}
 }

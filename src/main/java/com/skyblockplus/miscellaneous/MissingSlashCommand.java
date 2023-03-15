@@ -18,8 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Constants.ALL_TALISMANS;
-import static com.skyblockplus.utils.Constants.profilesCommandOption;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
@@ -47,8 +46,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MissingSlashCommand extends SlashCommand {
-
-	private static List<String> soulboundItems;
 
 	public MissingSlashCommand() {
 		this.name = "missing";
@@ -177,17 +174,6 @@ public class MissingSlashCommand extends SlashCommand {
 		Player.Profile player,
 		NetworthExecute calc
 	) {
-		if (soulboundItems == null) {
-			soulboundItems =
-				getSkyblockItemsJson()
-					.entrySet()
-					.stream()
-					.filter(e -> higherDepth(e.getValue(), "soulbound", null) != null)
-					.map(Map.Entry::getKey)
-					.collect(Collectors.toCollection(ArrayList::new));
-			soulboundItems.add("KUUDRA_FOLLOWER_ARTIFACT");
-		}
-
 		List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");
 
 		List<String> crabHatColors = List.of("RED", "AQUA", "LIME", "PINK", "BLACK", "GREEN", "ORANGE", "PURPLE", "YELLOW");
@@ -211,7 +197,8 @@ public class MissingSlashCommand extends SlashCommand {
 		missingInternalArr.sort(
 			Comparator.comparingDouble(o1 -> {
 				if (
-					soulboundItems.contains(o1) || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
+					SOULBOUND_ITEMS.contains(o1) ||
+					(player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
 				) {
 					return Double.MAX_VALUE;
 				} else if (o1.equals("PARTY_HAT_CRAB")) {
@@ -238,7 +225,7 @@ public class MissingSlashCommand extends SlashCommand {
 			String wikiLink = higherDepth(mappings, curId + ".wiki", null);
 			String name = idToName(curId);
 			String costOut;
-			if (soulboundItems.contains(curId)) {
+			if (SOULBOUND_ITEMS.contains(curId)) {
 				costOut = (cost != 0 ? " ➜ " + roundAndFormat(cost) : "") + " (Soulbound)";
 			} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
 				costOut = " (Unobtainable)";

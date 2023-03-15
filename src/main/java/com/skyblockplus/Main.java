@@ -47,6 +47,7 @@ import com.skyblockplus.utils.utils.Utils;
 import jakarta.annotation.PreDestroy;
 import java.io.File;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.JDA;
@@ -169,16 +170,16 @@ public class Main {
 		EventHandler.initialize();
 
 		if (isMainBot()) {
-			//			scheduler.scheduleWithFixedDelay(
-			//				() -> {
-			//					if (Runtime.getRuntime().totalMemory() > 1250000000) {
-			//						System.gc();
-			//					}
-			//				},
-			//				60,
-			//				30,
-			//				TimeUnit.SECONDS
-			//			); // Sorry for the war crimes
+			scheduler.scheduleWithFixedDelay(
+				() -> {
+					if (Runtime.getRuntime().totalMemory() > 1250000000) {
+						System.gc();
+					}
+				},
+				60,
+				30,
+				TimeUnit.SECONDS
+			); // Sorry for the war crimes
 		}
 
 		log.info("Bot ready with " + jda.getShardsTotal() + " shards and " + jda.getGuilds().size() + " guilds");

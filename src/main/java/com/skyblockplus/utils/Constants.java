@@ -1266,6 +1266,7 @@ public class Constants {
 	public static List<String> PET_ITEM_NAMES;
 	public static Set<String> ALL_TALISMANS;
 	public static Map<String, String> NUMBER_TO_RARITY_MAP;
+	public static List<String> SOULBOUND_ITEMS;
 
 	public static void initialize() {
 		try {
@@ -1400,6 +1401,16 @@ public class Constants {
 			/* NUMBER_TO_RARITY_MAP */
 			NUMBER_TO_RARITY_MAP =
 				RARITY_TO_NUMBER_MAP.entrySet().stream().collect(Collectors.toMap(e -> e.getValue().replace(";", ""), Map.Entry::getKey));
+
+			/* NUMBER_TO_RARITY_MAP */
+			SOULBOUND_ITEMS =
+				getSkyblockItemsJson()
+					.entrySet()
+					.stream()
+					.filter(e -> higherDepth(e.getValue(), "soulbound", null) != null)
+					.map(Map.Entry::getKey)
+					.collect(Collectors.toCollection(ArrayList::new));
+			SOULBOUND_ITEMS.add("KUUDRA_FOLLOWER_ARTIFACT");
 		} catch (Exception e) {
 			Main.log.error("Exception while initializing constants", e);
 		}

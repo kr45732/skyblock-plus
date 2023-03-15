@@ -53,7 +53,7 @@ public class HttpUtils {
 	private static final Logger log = LoggerFactory.getLogger(HttpUtils.class);
 	private static final HttpClient asyncHttpClient = HttpClient
 		.newBuilder()
-		.executor(new ExceptionExecutor(20, 20, 45L, TimeUnit.SECONDS, new LinkedBlockingQueue<>()).setAllowCoreThreadTimeOut(true))
+		.executor(new ExceptionExecutor(20, 20, 15L, TimeUnit.SECONDS, new LinkedBlockingQueue<>()).setAllowCoreThreadTimeOut(true))
 		.build();
 
 	public static String getUrl(String url) {
