@@ -72,7 +72,7 @@ public class ApiHandler {
 			cacheDatabase.initializeJacobData();
 			cacheDatabase.initializeTokens();
 			cacheDatabase.initializeAhTracker();
-			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 30, 60, TimeUnit.SECONDS);
+			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 60, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCaches, 60, 60, TimeUnit.MINUTES);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 		} catch (Exception e) {
