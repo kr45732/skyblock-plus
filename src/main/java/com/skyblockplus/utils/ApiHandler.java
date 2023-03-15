@@ -455,7 +455,7 @@ public class ApiHandler {
 
 	public static HypixelResponse getAuctionGeneric(String param, String value) {
 		try {
-			JsonElement auctionResponse = getJson(getHypixelApiUrl("auction", HYPIXEL_API_KEY).addParameter(param, value).toString());
+			JsonElement auctionResponse = getJson(getHypixelApiUrl("skyblock/auction", HYPIXEL_API_KEY).addParameter(param, value).toString());
 			try {
 				return new HypixelResponse(higherDepth(auctionResponse, "auctions").getAsJsonArray());
 			} catch (Exception e) {
