@@ -439,29 +439,23 @@
     "guild_leaderboard": {
       "lb_type": "amount",
       "ignored_ranks": [
-        "skilled",
+        "expert",
         "master"
       ],
       "default_rank": {
-        "requirements": [],
+        "requirements": [
+          [
+            {
+              "amount": 2500,
+              "type": "weight"
+            }
+          ]
+        ],
         "names": [
-          "novice"
+          "rookie"
         ]
       },
       "ranks": [
-        {
-          "requirements": [
-            [
-              {
-                "amount": 2500,
-                "type": "weight"
-              }
-            ]
-          ],
-          "names": [
-            "rookie"
-          ]
-        },
         {
           "requirements": [
             [
@@ -473,6 +467,19 @@
           ],
           "names": [
             "apprentice"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 6500,
+                "type": "weight"
+              }
+            ]
+          ],
+          "names": [
+            "skilled"
           ]
         }
       ]
