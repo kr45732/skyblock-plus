@@ -24,6 +24,7 @@ import static com.skyblockplus.utils.utils.HttpUtils.*;
 import static com.skyblockplus.utils.utils.HypixelUtils.getNpcSellPrice;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.ApiHandler.neuBranch;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
@@ -829,7 +830,6 @@ public class Utils {
 			Git skyblockPlusDataRepo = Git
 				.cloneRepository()
 				.setURI("https://github.com/kr45732/skyblock-plus-data.git")
-				.setBranch(neuBranch)
 				.setDirectory(skyblockPlusDir)
 				.call();
 
