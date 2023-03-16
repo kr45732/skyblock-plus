@@ -84,6 +84,12 @@ public class DevSettingsCommand extends Command {
 								return;
 							}
 							break;
+						case "mayor":
+							if (args[2].equals("disable")) {
+								embed(new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setMayorChannel("none"));
+								return;
+							}
+							break;
 						case "apply":
 							if (args[2].equals("disable")) {
 								setArgs(5);
