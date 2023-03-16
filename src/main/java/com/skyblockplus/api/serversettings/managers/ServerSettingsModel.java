@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServerSettingsModel {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.TABLE)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	private String serverName;
