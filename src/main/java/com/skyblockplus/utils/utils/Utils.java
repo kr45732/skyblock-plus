@@ -822,12 +822,14 @@ public class Utils {
 			Git neuRepo = Git
 				.cloneRepository()
 				.setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
+				.setBranch(neuBranch)
 				.setDirectory(neuDir)
 				.call();
 
 			Git skyblockPlusDataRepo = Git
 				.cloneRepository()
 				.setURI("https://github.com/kr45732/skyblock-plus-data.git")
+				.setBranch(neuBranch)
 				.setDirectory(skyblockPlusDir)
 				.call();
 
