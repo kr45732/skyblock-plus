@@ -739,7 +739,7 @@ public class NetworthExecute {
 			fumingExtras = item.getFumingCount() * fumingPrice * 0.7;
 		} catch (Exception ignored) {}
 
-		StringBuilder enchStr = verbose ? new StringBuilder("[") : null;
+		StringBuilder enchStr = verbose ? new StringBuilder("{") : null;
 		try {
 			List<String> enchants = item.getEnchantsFormatted();
 			for (String enchant : enchants) {
@@ -763,7 +763,7 @@ public class NetworthExecute {
 			if (enchStr.charAt(enchStr.length() - 1) == ',') {
 				enchStr.deleteCharAt(enchStr.length() - 1);
 			}
-			enchStr.append("]");
+			enchStr.append("}");
 		}
 
 		try {
