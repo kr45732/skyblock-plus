@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.getReforgeStonesJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
@@ -26,7 +27,6 @@ import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -91,7 +91,7 @@ public class ReforgeSlashCommand extends SlashCommand {
 					.entrySet()
 					.stream()
 					.map(e ->
-						Constants.reforgeStatToEmoji.get(e.getKey().toUpperCase()) +
+						reforgeStatToEmoji.get(e.getKey().toUpperCase()) +
 						" " +
 						capitalizeString(e.getKey().replace("_", " ")) +
 						" ➜ " +

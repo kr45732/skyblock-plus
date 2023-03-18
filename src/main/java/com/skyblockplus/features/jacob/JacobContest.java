@@ -18,7 +18,8 @@
 
 package com.skyblockplus.features.jacob;
 
-import com.skyblockplus.utils.Constants;
+import static com.skyblockplus.utils.Constants.*;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -49,7 +50,7 @@ public class JacobContest {
 	public String getCropsFormatted(boolean arrows) {
 		StringBuilder cropsFormatted = new StringBuilder();
 		for (String crop : crops) {
-			cropsFormatted.append(arrows ? "➜ " : "").append(Constants.cropNameToEmoji.get(crop)).append(" ").append(crop).append("\n");
+			cropsFormatted.append(arrows ? "➜ " : "").append(cropNameToEmoji.get(crop)).append(" ").append(crop).append("\n");
 		}
 		return cropsFormatted.toString();
 	}

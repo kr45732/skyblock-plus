@@ -250,20 +250,12 @@ public class SettingsExecute {
 					return displayRoleSettings(args[2]);
 				}
 			} else if (args.length == 4) {
-				switch (args[2]) {
-					case "enable":
-						eb = setRoleEnable(args[3], true);
-						break;
-					case "disable":
-						eb = setRoleEnable(args[3], false);
-						break;
-					case "use_highest":
-						if (args[3].equals("enable")) {
-							eb = setRolesUseHighest(true);
-						} else if (args[3].equals("disable")) {
-							eb = setRolesUseHighest(false);
-						}
-						break;
+				if (args[2].equals("use_highest")) {
+					if (args[3].equals("enable")) {
+						eb = setRolesUseHighest(true);
+					} else if (args[3].equals("disable")) {
+						eb = setRolesUseHighest(false);
+					}
 				}
 			} else if (args.length == 5) {
 				if (args[2].equals("remove")) {
@@ -1449,14 +1441,14 @@ public class SettingsExecute {
 			JsonElement currentRoleSettings = higherDepth(rolesSettings, roleName);
 			StringBuilder ebFieldString = new StringBuilder();
 
-			if (higherDepth(currentRoleSettings, "enable") == null) {
+			if (higherDepth(currentRoleSettings, "levels") == null) {
 				database.setRoleSettings(guild.getId(), roleName, gson.toJsonTree(new RoleModel()));
 				currentRoleSettings = database.getRoleSettings(guild.getId(), roleName);
 			}
 
 			switch (roleName) {
 				case "guild_member" -> ebFieldString.append(
-					"**Member role for Hypixel guilds**\nExample: `/settings roles add guild_member skyblock_forceful @sbf guild member`\n"
+					"**Member role for Hypixel guilds**\nExample: `/settings roles add guild_member skyblock_forceful @guild member`\n"
 				);
 				case "sven", "rev", "tara", "blaze", "enderman" -> ebFieldString
 					.append("**A player's ")
@@ -1510,7 +1502,7 @@ public class SettingsExecute {
 					"**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `/settings roles set pet_enthusiast @level 100 pet`\n"
 				);
 				case "guild_ranks" -> ebFieldString.append(
-					"**If a player is in the guild set in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be linked, enabled, or disabled here. To modify guild ranks use `/settings guild <name>`\n"
+					"**If a player is in a guild setup in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be linked here. To modify guild ranks use `/settings guild <name>`\n"
 				);
 				case "slayer_nine" -> ebFieldString.append(
 					"**The number of level nine slayers a player has**\nExample: `/settings roles add slayer_nine 3 @role`\n"
@@ -1542,16 +1534,7 @@ public class SettingsExecute {
 				);
 			}
 
-			ebFieldString
-				.append("\nSettings\n")
-				.append("**")
-				.append(
-					higherDepth(currentRoleSettings, "enable") != null &&
-						higherDepth(currentRoleSettings, "enable").getAsString().equals("true")
-						? "• Enabled"
-						: "• Disabled"
-				)
-				.append("**");
+			ebFieldString.append("\nSettings\n");
 
 			if (roleName.equals("guild_ranks")) {
 				if (higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() == 0) {
@@ -1658,72 +1641,6 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("**Use highest amount:** " + enable);
-	}
-
-	public EmbedBuilder setRoleEnable(String roleName, boolean enable) {
-		if (roleName.equals("all")) {
-			JsonObject roleSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
-			if (enable) {
-				List<String> enabled = new ArrayList<>();
-				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
-					if (!higherDepth(role.getValue(), "enable", false) && higherDepth(role.getValue(), "levels.[0]") != null) {
-						JsonObject curRole = role.getValue().getAsJsonObject();
-						curRole.addProperty("enable", "true");
-						roleSettings.add(role.getKey(), curRole);
-						enabled.add(role.getKey());
-					}
-				}
-				int responseCode = database.setRolesSettings(guild.getId(), roleSettings);
-				if (responseCode != 200) {
-					return apiFailMessage(responseCode);
-				}
-
-				return defaultSettingsEmbed("**Enabled:** " + (enabled.size() > 0 ? String.join(", ", enabled) : " no roles"));
-			} else {
-				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
-					if (!role.getKey().equals("enable") && !role.getKey().equals("useHighest")) {
-						JsonObject curRole = role.getValue().getAsJsonObject();
-						curRole.addProperty("enable", "false");
-						roleSettings.add(role.getKey(), curRole);
-					}
-				}
-				int responseCode = database.setRolesSettings(guild.getId(), roleSettings);
-				if (responseCode != 200) {
-					return apiFailMessage(responseCode);
-				}
-
-				return defaultSettingsEmbed("Disabled all automatic roles");
-			}
-		}
-
-		JsonObject currentRoleSettings = null;
-		try {
-			currentRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
-		} catch (Exception ignored) {}
-		if (currentRoleSettings == null) {
-			return errorEmbed("Invalid role name");
-		}
-
-		if (!enable) {
-			currentRoleSettings.addProperty("enable", "false");
-			int responseCode = database.setRoleSettings(guild.getId(), roleName, currentRoleSettings);
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
-
-			return defaultSettingsEmbed("**Disabled:** " + roleName);
-		}
-
-		if (currentRoleSettings.get("levels").getAsJsonArray().size() != 0) {
-			currentRoleSettings.addProperty("enable", "true");
-			int responseCode = database.setRoleSettings(guild.getId(), roleName, currentRoleSettings);
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
-
-			return defaultSettingsEmbed("**Enabled:** " + roleName);
-		}
-		return errorEmbed("Specified role must have at least one level");
 	}
 
 	public EmbedBuilder addRoleLevel(String roleName, String roleValue, String roleMention) {
@@ -1883,12 +1800,6 @@ public class SettingsExecute {
 					return apiFailMessage(responseCode);
 				}
 
-				currentRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
-
-				if (currentRoleSettings.get("levels").getAsJsonArray().size() == 0) {
-					setRoleEnable(roleName, false);
-				}
-
 				if (!allowRolesEnable()) {
 					setRolesEnable(false);
 				}
@@ -1934,7 +1845,7 @@ public class SettingsExecute {
 
 		currentSettings.remove("enable");
 		currentSettings.remove("useHighest");
-		return currentSettings.keySet().stream().anyMatch(role -> higherDepth(currentSettings, role + ".enable", false));
+		return currentSettings.keySet().stream().anyMatch(role -> higherDepth(currentSettings, role + ".levels.[0]") != null);
 	}
 
 	/* Verify Settings */

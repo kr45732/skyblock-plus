@@ -21,8 +21,7 @@ package com.skyblockplus.guild;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
-import static com.skyblockplus.utils.utils.HypixelUtils.guildExpToLevel;
-import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromLevel;
+import static com.skyblockplus.utils.utils.HypixelUtils.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
@@ -565,6 +564,9 @@ public class GuildSlashCommand extends SlashCommand {
 			if (reqsArr.length > 5) {
 				return errorEmbed("You can only enter a maximum of 5 sets of requirements");
 			}
+
+			List<String> reqTypes = List.of("slayer", "skills", "catacombs", "weight", "level");
+
 			for (int i = 0; i < reqsArr.length; i++) {
 				String[] indvReqs = reqsArr[i].replace("[", "").replace("]", "").split("\\s+");
 				for (String indvReq : indvReqs) {
@@ -573,12 +575,7 @@ public class GuildSlashCommand extends SlashCommand {
 						return errorEmbed(indvReq + " is an invalid requirement format");
 					}
 
-					if (
-						!reqDashSplit[0].equals("slayer") &&
-						!reqDashSplit[0].equals("skills") &&
-						!reqDashSplit[0].equals("catacombs") &&
-						!reqDashSplit[0].equals("weight")
-					) {
+					if (!reqTypes.contains(reqDashSplit[0])) {
 						return errorEmbed(indvReq + " is an invalid requirement type");
 					}
 
@@ -624,7 +621,7 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 			hypixelGuildQueue.add(guildId);
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
-				List.of("slayer", "skills", "catacombs", "weight"),
+				reqTypes,
 				gamemode,
 				streamJsonArray(higherDepth(guildJson, "members"))
 					.map(u -> higherDepth(u, "uuid", ""))
@@ -632,59 +629,81 @@ public class GuildSlashCommand extends SlashCommand {
 				hypixelKey,
 				event
 			);
+			playerList.sort(Comparator.comparingDouble(e -> e.getDouble("level")));
 			hypixelGuildQueue.remove(guildId);
 
-			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
+			CustomPaginator.Builder paginateBuilder = event
+				.getPaginator()
+				.setItemsPerPage(15)
+				.setPaginatorExtras(new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS));
 
 			for (DataObject guildMember : playerList) {
-				double slayer = guildMember.getDouble("slayer");
-				double skills = guildMember.getDouble("skills");
-				double catacombs = guildMember.getDouble("catacombs");
-				double weight = guildMember.getDouble("weight");
-
-				boolean meetsReqs = false;
+				boolean meetsReqsOr = false;
 
 				for (String req : reqsArr) {
-					String[] reqSplit = req.split("\\s+");
-					double slayerReq = 0;
-					double skillsReq = 0;
-					double catacombsReq = 0;
-					double weightReq = 0;
-					for (String reqIndividual : reqSplit) {
-						switch (reqIndividual.split(":")[0]) {
-							case "slayer" -> slayerReq = Double.parseDouble(reqIndividual.split(":")[1]);
-							case "skills" -> skillsReq = Double.parseDouble(reqIndividual.split(":")[1]);
-							case "catacombs" -> catacombsReq = Double.parseDouble(reqIndividual.split(":")[1]);
-							case "weight" -> weightReq = Double.parseDouble(reqIndividual.split(":")[1]);
+					boolean meetsReqAnd = true;
+
+					for (String reqIndividual : req.split("\\s+")) {
+						// name:value
+						String[] reqInnerSplit = reqIndividual.split(":");
+						double playerValue = Math.max(0, guildMember.getDouble(reqInnerSplit[0]));
+						double reqAmount = Double.parseDouble(reqInnerSplit[1]);
+						if (reqInnerSplit[0].equals("catacombs")) {
+							reqAmount =
+								levelingInfoFromLevel(
+									(int) reqAmount,
+									"catacombs",
+									higherDepth(getLevelingJson(), "leveling_caps.catacombs", 0)
+								)
+									.totalExp();
+						}
+						if (playerValue < reqAmount) {
+							meetsReqAnd = false;
+							break;
 						}
 					}
 
-					if (slayer >= slayerReq && Math.max(0, skills) >= skillsReq && catacombs >= catacombsReq && weight >= weightReq) {
-						meetsReqs = true;
+					if (meetsReqAnd) {
+						meetsReqsOr = true;
 						break;
 					}
 				}
 
-				if (!meetsReqs) {
-					paginateBuilder.addItems(
-						"• **" +
-						guildMember.getString("username") +
-						"** | Slayer: " +
-						formatNumber(slayer) +
-						" | Skills: " +
-						roundAndFormat(skills) +
-						" | Cata: " +
-						roundAndFormat(catacombs) +
-						" | Weight: " +
-						roundAndFormat(weight)
-					);
+				if (!meetsReqsOr) {
+					double slayer = guildMember.getDouble("slayer");
+					double skills = guildMember.getDouble("skills");
+					double catacombs = levelingInfoFromExp(
+						(long) guildMember.getDouble("catacombs"),
+						"catacombs",
+						higherDepth(getLevelingJson(), "leveling_caps.catacombs", 0)
+					)
+						.getProgressLevel();
+					double weight = guildMember.getDouble("weight");
+					double level = guildMember.getDouble("level");
+
+					paginateBuilder
+						.getExtras()
+						.addEmbedField(
+							guildMember.getString("username"),
+							"Slayer: " +
+							formatNumber(slayer) +
+							"\nSkills: " +
+							(skills == -1 ? "?" : roundAndFormat(skills)) +
+							"\nCata: " +
+							roundAndFormat(catacombs) +
+							"\nWeight: " +
+							roundAndFormat(weight) +
+							"\nLevel: " +
+							roundAndFormat(level),
+							true
+						);
 				}
 			}
 
 			paginateBuilder
 				.getExtras()
 				.setEveryPageTitle("Guild Kick Helper")
-				.setEveryPageText("**Total missing requirements:** " + paginateBuilder.size());
+				.setEveryPageText("**Total Missing Requirements:** " + paginateBuilder.size());
 
 			event.paginate(paginateBuilder);
 			return null;

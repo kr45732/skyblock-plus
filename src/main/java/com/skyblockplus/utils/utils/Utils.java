@@ -132,7 +132,7 @@ public class Utils {
 	/* Constants */
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	private static final Color BOT_COLOR = new Color(223, 5, 5);
-	private static final Pattern neuTexturePattern = Pattern.compile("Properties:\\{textures:\\[0:\\{Value:\"(.*)\"}]}");
+	public static final Pattern neuTexturePattern = Pattern.compile("Properties:\\{textures:\\[0:\\{Value:\"(.*)\"}]}");
 	/* Environment */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -806,7 +806,7 @@ public class Utils {
 		return userCount;
 	}
 
-	public static void updateItemMappings() {
+	public static void updateDataRepo() {
 		try {
 			File neuDir = new File("src/main/java/com/skyblockplus/json/neu");
 			if (neuDir.exists()) {

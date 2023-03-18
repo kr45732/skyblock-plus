@@ -163,8 +163,8 @@ public class HelpSlashCommand extends SlashCommand {
 						),
 						new HelpData(
 							"kicker",
-							"Get all player's who don't meet the provided requirements. Requirements are in the format `[type:value ...] ...`.  The requirement type can be skills, slayer, catacombs, or weight. The requirement value must be an integer. You can have up to 3 sets of requirements. Set key to true to force use this server's Hypixel API key for more accurate results.",
-							"kicker <requirements> [player] [gamemode] [key]"
+							"Get all player's who don't meet the provided requirements. Requirements are in the format `[type:value ...] ...`.  The requirement type can be skills, slayer, catacombs, weight, or level. The requirement value must be an integer. You can have up to 3 sets of requirements. Set key to true to force use this server's Hypixel API key for more accurate results.",
+							"kicker <requirements...> [player] [gamemode] [key]"
 						),
 						new HelpData(
 							"top",
@@ -286,6 +286,12 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("miscellaneous"),
 				new HelpData("bestiary", "Get a player's bestiary statistics.", "bestiary [player] [profile]").setCategory("miscellaneous"),
 				new HelpData("harp", "Get a player's harp statistics.", "harp [player] [profile]").setCategory("miscellaneous"),
+				new HelpData(
+					"checkreqs",
+					"Check if a player meets any of the setup automated guild requirements.",
+					"checkreqs [player] [profile]"
+				)
+					.setCategory("miscellaneous"),
 				new HelpData("uuid", "Convert username to UUID or UUID to username.", "uuid [username|uuid]")
 					.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88")
 					.setCategory("miscellaneous"),
@@ -519,12 +525,8 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("roles", "Main command for automatic roles settings.")
 							.addSecondData("Get the current roles settings for the bot.", "roles")
 							.addSubcommands(
-								new HelpData("enable", "Enable automatic roles.")
-									.addSecondData("Enable a specific automatic role (disabled by default).", "enable <role_name>")
-									.addExamples("enable", "enable dungeon_secrets"),
-								new HelpData("disable", "Disable automatic roles.")
-									.addSecondData("Disable a specific automatic role.", "disable <role_name>")
-									.addExamples("disable", "disable dungeon_secrets"),
+								new HelpData("enable", "Enable automatic roles."),
+								new HelpData("disable", "Disable automatic roles."),
 								new HelpData(
 									"add",
 									"Add a new level to a role with its corresponding Discord role.",
@@ -825,6 +827,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("cakes [player] [profile]", "Get a player's inactive and active cake buffs") +
 			create("bestiary [player] [profile]", "Get a player's bestiary stats") +
 			create("harp [player] [profile]", "Get a player's harp statistics") +
+			create("checkreqs [player] [profile]", "Check if a player meets any of the setup automated guild requirements") +
 			create("uuid [player]", "Convert username to UUID or UUID to username") +
 			create("calendar", "Get the current Skyblock datetime and running or upcoming events") +
 			create("scammer [player]", "Check if a player is marked as a scamer in the SBZ database") +
@@ -991,10 +994,6 @@ public class HelpSlashCommand extends SlashCommand {
 			create(
 				"settings roles use_highest <enable|disable>",
 				"Enable or disable using the highest values or last played on profile. Default is false"
-			) +
-			create(
-				"settings roles <enable|disable> <role_name|all>",
-				"Enable or disable a specific automatic role or enable or disable all applicable automatic roles"
 			) +
 			create("settings roles add <role_name> <value> <@role>", "Add a new level to a role with its corresponding Discord role") +
 			create("settings roles remove <role_name> <value>", "Remove a role level for a role") +

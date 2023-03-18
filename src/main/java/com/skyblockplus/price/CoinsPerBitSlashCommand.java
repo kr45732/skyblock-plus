@@ -49,7 +49,10 @@ public class CoinsPerBitSlashCommand extends SlashCommand {
 		Map<String, Double> values = new HashMap<>();
 		NetworthExecute calc = new NetworthExecute().initPrices();
 		for (Map.Entry<String, JsonElement> entry : getBitsJson().entrySet()) {
-			values.put(entry.getKey(), calc.getLowestPrice(entry.getKey()) / entry.getValue().getAsLong());
+			double cpb = calc.getLowestPrice(entry.getKey()) / entry.getValue().getAsLong();
+			if (cpb > 0) {
+				values.put(entry.getKey(), cpb);
+			}
 		}
 		EmbedBuilder eb = defaultEmbed("Coins Per Bit");
 		for (Map.Entry<String, Double> entry : values

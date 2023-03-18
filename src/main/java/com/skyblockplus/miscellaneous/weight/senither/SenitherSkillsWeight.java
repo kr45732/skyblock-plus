@@ -18,12 +18,12 @@
 
 package com.skyblockplus.miscellaneous.weight.senither;
 
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.getWeightJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.miscellaneous.weight.weight.SkillsWeight;
-import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
@@ -55,7 +55,7 @@ public class SenitherSkillsWeight extends SkillsWeight {
 			double currentSkillXp = skillsStruct.totalExp();
 			int maxLevel = skillsStruct.maxLevel();
 			double level = skillsStruct.getProgressLevel();
-			double maxLevelExp = maxLevel == 50 ? Constants.SKILLS_LEVEL_50_XP : Constants.SKILLS_LEVEL_60_XP;
+			double maxLevelExp = maxLevel == 50 ? SKILLS_LEVEL_50_XP : SKILLS_LEVEL_60_XP;
 			double base = Math.pow(level * 10, 0.5 + exponent + (level / 100)) / 1250;
 			if (currentSkillXp <= maxLevelExp) {
 				return weightStruct.add(new WeightStruct(base));

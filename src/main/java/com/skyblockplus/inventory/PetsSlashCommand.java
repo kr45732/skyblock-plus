@@ -18,6 +18,7 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.HypixelUtils.petLevelFromXp;
@@ -27,7 +28,6 @@ import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
@@ -53,7 +53,7 @@ public class PetsSlashCommand extends SlashCommand {
 	public static EmbedBuilder getPlayerPets(String username, String profileName, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
-			List<String> missingPets = new ArrayList<>(Constants.PET_NAMES);
+			List<String> missingPets = new ArrayList<>(PET_NAMES);
 			List<String> petItems = new ArrayList<>();
 			JsonArray playerPets = player.getPets();
 			for (JsonElement pet : playerPets) {

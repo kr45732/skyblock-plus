@@ -18,13 +18,13 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
 import static com.skyblockplus.utils.utils.JsonUtils.getLevelingJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 
-import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
@@ -55,7 +55,7 @@ public class BestiarySlashCommand extends SlashCommand {
 			Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 
 			String bestiaryLevel = roundAndFormat(player.getBestiaryLevel());
-			for (Map.Entry<String, List<String>> location : Constants.bestiaryLocationToFamilies.entrySet()) {
+			for (Map.Entry<String, List<String>> location : bestiaryLocationToFamilies.entrySet()) {
 				EmbedBuilder eb = player.defaultPlayerEmbed();
 				eb.setDescription("**Bestiary Level:** " + bestiaryLevel + "\n**Location:** " + location.getKey());
 				for (String mob : location.getValue()) {
@@ -63,7 +63,7 @@ public class BestiarySlashCommand extends SlashCommand {
 					String type = "MOB";
 					if (location.getKey().equals("Private Island")) {
 						type = "ISLAND";
-					} else if (Constants.bestiaryBosses.contains(mob)) {
+					} else if (bestiaryBosses.contains(mob)) {
 						type = "BOSS";
 					}
 					String mobName = capitalizeString(mob.replace("family_", "").replace("_", " "));

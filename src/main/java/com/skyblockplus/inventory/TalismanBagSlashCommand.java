@@ -26,7 +26,6 @@ import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -176,7 +175,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 
 				StringBuilder accessoryStr = new StringBuilder();
 				int magicPower = 0;
-				for (Map.Entry<String, Integer> entry : Constants.rarityToMagicPower.entrySet()) {
+				for (Map.Entry<String, Integer> entry : rarityToMagicPower.entrySet()) {
 					long count = accessoryBag.stream().filter(i -> i.getRarity().equals(entry.getKey())).count();
 					long power = count * entry.getValue();
 					accessoryStr
@@ -189,7 +188,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 						.append(" magic power)");
 					magicPower += power;
 				}
-				int hegemony = Constants.rarityToMagicPower.getOrDefault(
+				int hegemony = rarityToMagicPower.getOrDefault(
 					accessoryBag.stream().filter(a -> a.getId().equals("HEGEMONY_ARTIFACT")).map(InvItem::getRarity).findFirst().orElse(""),
 					0
 				);
@@ -227,7 +226,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 						.entrySet()) {
 						powerStoneStr
 							.append("\n")
-							.append(Constants.tuningStatToEmoji.get(entry.getKey()))
+							.append(tuningStatToEmoji.get(entry.getKey()))
 							.append(" ")
 							.append(capitalizeString(entry.getKey().replace("_", " ")))
 							.append(": ")
@@ -251,7 +250,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 							tuningPointsSpent += amountSpent;
 							statStr
 								.append("\n")
-								.append(Constants.tuningStatToEmoji.get(stat.getKey()))
+								.append(tuningStatToEmoji.get(stat.getKey()))
 								.append(" ")
 								.append(capitalizeString(stat.getKey().replace("_", " ")))
 								.append(": ")
@@ -259,7 +258,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 								.append(
 									amountSpent > 0
 										? " (+" +
-										roundAndFormat(amountSpent * Constants.tuningStatToMultiplier.getOrDefault(stat.getKey(), 1.0)) +
+										roundAndFormat(amountSpent * tuningStatToMultiplier.getOrDefault(stat.getKey(), 1.0)) +
 										")"
 										: ""
 								);

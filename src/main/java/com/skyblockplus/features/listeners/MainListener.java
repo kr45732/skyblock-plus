@@ -170,7 +170,7 @@ public class MainListener extends ListenerAdapter {
 			);
 			if (!Objects.equals(commitSha, lastRepoCommitSha)) {
 				lastRepoCommitSha = commitSha;
-				updateItemMappings();
+				updateDataRepo();
 			}
 			return;
 		}

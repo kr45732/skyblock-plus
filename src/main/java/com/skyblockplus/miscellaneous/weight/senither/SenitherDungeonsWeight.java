@@ -18,11 +18,11 @@
 
 package com.skyblockplus.miscellaneous.weight.senither;
 
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.getWeightJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 
 import com.skyblockplus.miscellaneous.weight.weight.DungeonsWeight;
-import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
@@ -40,12 +40,12 @@ public class SenitherDungeonsWeight extends DungeonsWeight {
 		double base =
 			Math.pow(currentClassLevel, 4.5) * higherDepth(getWeightJson(), "senither.dungeons.classes." + className).getAsDouble();
 
-		if (currentClassXp <= Constants.CATACOMBS_LEVEL_50_XP) {
+		if (currentClassXp <= CATACOMBS_LEVEL_50_XP) {
 			return weightStruct.add(new WeightStruct(base));
 		}
 
-		double remaining = currentClassXp - Constants.CATACOMBS_LEVEL_50_XP;
-		double splitter = (4 * Constants.CATACOMBS_LEVEL_50_XP) / base;
+		double remaining = currentClassXp - CATACOMBS_LEVEL_50_XP;
+		double splitter = (4 * CATACOMBS_LEVEL_50_XP) / base;
 		return weightStruct.add(new WeightStruct(Math.floor(base), Math.pow(remaining / splitter, 0.968)));
 	}
 
@@ -60,12 +60,12 @@ public class SenitherDungeonsWeight extends DungeonsWeight {
 		double level = catacombs.getProgressLevel();
 		double base = Math.pow(level, 4.5) * higherDepth(getWeightJson(), "senither.dungeons.catacombs").getAsDouble();
 
-		if (catacombsSkillXp <= Constants.CATACOMBS_LEVEL_50_XP) {
+		if (catacombsSkillXp <= CATACOMBS_LEVEL_50_XP) {
 			return weightStruct.add(new WeightStruct(base));
 		}
 
-		double remaining = catacombsSkillXp - Constants.CATACOMBS_LEVEL_50_XP;
-		double splitter = (4 * Constants.CATACOMBS_LEVEL_50_XP) / base;
+		double remaining = catacombsSkillXp - CATACOMBS_LEVEL_50_XP;
+		double splitter = (4 * CATACOMBS_LEVEL_50_XP) / base;
 		return weightStruct.add(new WeightStruct(Math.floor(base), Math.pow(remaining / splitter, 0.968)));
 	}
 }

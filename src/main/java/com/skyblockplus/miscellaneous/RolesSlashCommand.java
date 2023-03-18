@@ -143,7 +143,7 @@ public class RolesSlashCommand extends SlashCommand {
 
 			for (String currentRoleName : allRoleNames) {
 				JsonElement currentRole = higherDepth(rolesJson, currentRoleName);
-				if (!higherDepth(currentRole, "enable", false)) {
+				if (higherDepth(currentRole, "levels.[0]") == null) {
 					continue;
 				}
 
@@ -609,7 +609,7 @@ public class RolesSlashCommand extends SlashCommand {
 			rolesID.remove("enable");
 			for (String currentRoleName : rolesID) {
 				JsonElement currentRole = higherDepth(rolesJson, currentRoleName);
-				if (!higherDepth(currentRole, "enable", false)) {
+				if (higherDepth(currentRole, "levels.[0]") == null) {
 					continue;
 				}
 

@@ -72,7 +72,7 @@ public class JacobSlashCommand extends SlashCommand {
 				.collect(Collectors.toCollection(ArrayList::new))) {
 			extras.addEmbedField(
 				"Contest",
-				"**In:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(false),
+				"<t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(false),
 				true
 			);
 		}

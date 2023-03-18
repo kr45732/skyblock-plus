@@ -21,6 +21,7 @@ package com.skyblockplus.features.mayor;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.miscellaneous.CalendarSlashCommand.YEAR_0;
 import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Constants.MAYOR_NAME_TO_SKIN;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
@@ -30,7 +31,6 @@ import static com.skyblockplus.utils.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
-import com.skyblockplus.utils.Constants;
 import java.io.File;
 import java.time.Instant;
 import java.util.Comparator;
@@ -111,14 +111,14 @@ public class MayorHandler {
 					}
 
 					eb.addField(
-						Constants.mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
+						mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
 						"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
 						false
 					);
 				} else {
 					ebStr
 						.append("\n")
-						.append(Constants.mayorNameToEmoji.get(name.toUpperCase()))
+						.append(mayorNameToEmoji.get(name.toUpperCase()))
 						.append(" **")
 						.append(name)
 						.append(":** ")
@@ -226,7 +226,7 @@ public class MayorHandler {
 				int votes = higherDepth(curMayor, "votes").getAsInt();
 				String name = higherDepth(curMayor, "name").getAsString();
 				eb.addField(
-					Constants.mayorNameToEmoji.get(name.toUpperCase()) +
+					mayorNameToEmoji.get(name.toUpperCase()) +
 					" " +
 					name +
 					" | " +
