@@ -23,6 +23,8 @@ import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.HypixelUtils.petLevelFromXp;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
+import static com.skyblockplus.utils.utils.StringUtils.idToName;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -611,7 +613,7 @@ public class RolesSlashCommand extends SlashCommand {
 					continue;
 				}
 
-				if ("guild_ranks".equals(currentRoleName)) {
+				if (currentRoleName.equals("guild_ranks")) {
 					JsonArray curLevels = higherDepth(currentRole, "levels").getAsJsonArray();
 					for (JsonElement curLevel : curLevels) {
 						JsonElement guildRoleSettings = database.getGuildSettings(
@@ -628,7 +630,20 @@ public class RolesSlashCommand extends SlashCommand {
 				} else {
 					JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
 					for (JsonElement currentLevel : levelsArray) {
-						paginateBuilder.addItems("<@&" + higherDepth(currentLevel, "roleId").getAsString() + ">");
+						String roleValue = higherDepth(currentLevel, "value").getAsString();
+						if (currentRoleName.equals("player_items")) {
+							roleValue = idToName(roleValue);
+						} else {
+							try {
+								roleValue = formatNumber(Long.parseLong(roleValue));
+							} catch (Exception ignored) {}
+						}
+						paginateBuilder.addItems(
+							"<@&" +
+							higherDepth(currentLevel, "roleId").getAsString() +
+							">" +
+							(!currentRoleName.equals("guild_member") ? " - " + roleValue + " " + currentRoleName.replace("_", " ") : "")
+						);
 					}
 				}
 			}

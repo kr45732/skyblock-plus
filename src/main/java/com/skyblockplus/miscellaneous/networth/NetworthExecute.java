@@ -33,7 +33,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
 import com.skyblockplus.utils.structs.InvItem;
-import com.skyblockplus.utils.utils.Utils;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -201,11 +200,11 @@ public class NetworthExecute {
 					double itemPrice = getLowestPrice(sackEntry.getKey(), true, null, false) * sackEntry.getValue();
 					addTotal("sacks", itemPrice);
 					if (event != null) {
-						String emoji = Utils.getEmoji(sackEntry.getKey(), null);
+						String emoji = getEmoji(sackEntry.getKey(), null);
 						addItem(
 							"sacks",
 							(emoji == null ? "" : emoji + " ") +
-							(sackEntry.getValue() != 1 ? sackEntry.getValue() + "x " : "") +
+							(sackEntry.getValue() != 1 ? formatNumber(sackEntry.getValue()) + "x " : "") +
 							idToName(sackEntry.getKey()) +
 							"=:=" +
 							itemPrice
@@ -530,7 +529,7 @@ public class NetworthExecute {
 						.append(simplifyNumber(auctionPrice))
 						.append("\"")
 						.append(
-							miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}" : ""
+							miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"data\":" + miscStr + "}" : ""
 						)
 						.append("},");
 				}
@@ -583,7 +582,7 @@ public class NetworthExecute {
 						.append(simplifyNumber(auctionPrice))
 						.append("\",")
 						.append(
-							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
+							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"data\":" + miscStr + "}," : ""
 						)
 						.append("\"fail_find_lvl\":true},");
 				}
@@ -623,20 +622,20 @@ public class NetworthExecute {
 	}
 
 	public String addItemStr(InvItem item, double itemPrice) {
-		String emoji = Utils.getEmoji(item.getFormattedId(), null);
+		String emoji = getEmoji(item.getFormattedId(), null);
 
-		if (item.getSkin() != null && Utils.getEmoji(item.getSkin(), null) != null) {
-			emoji = Utils.getEmoji(item.getSkin(), null);
+		if (item.getSkin() != null && getEmoji(item.getSkin(), null) != null) {
+			emoji = getEmoji(item.getSkin(), null);
 		}
 
 		String formattedStr =
 			(emoji == null ? "" : emoji + " ") +
-			(item.getCount() != 1 ? item.getCount() + "x " : "") +
+			(item.getCount() != 1 ? formatNumber(item.getCount()) + "x " : "") +
 			(item.getId().equals("PET") ? capitalizeString(item.getPetRarity()) + " " : "") +
 			item.getNameFormatted();
 
 		if (item.getPetItem() != null) {
-			String petItemEmoji = Utils.getEmoji(item.getPetItem(), null);
+			String petItemEmoji = getEmoji(item.getPetItem(), null);
 			if (petItemEmoji != null) {
 				formattedStr += " " + petItemEmoji;
 			}
@@ -883,7 +882,7 @@ public class NetworthExecute {
 			out
 				.append(",\"base_cost\":{\"cost\":\"")
 				.append(simplifyNumber(itemCost))
-				.append("\",\"location\":\"")
+				.append("\",\"source\":\"")
 				.append(source)
 				.append("\"}");
 			out.append(recombobulatedExtra > 0 ? ",\"recomb\":\"" + simplifyNumber(recombobulatedExtra) + "\"" : "");
@@ -900,9 +899,7 @@ public class NetworthExecute {
 			);
 			out.append(hpbExtras > 0 ? ",\"hpb\":\"" + simplifyNumber(hpbExtras) + "\"" : "");
 			out.append(
-				enchantsExtras > 0
-					? ",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"enchants\":" + enchStr + "}"
-					: ""
+				enchantsExtras > 0 ? ",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"data\":" + enchStr + "}" : ""
 			);
 			out.append(fumingExtras > 0 ? ",\"fuming\":\"" + simplifyNumber(fumingExtras) + "\"" : "");
 			out.append(
@@ -910,8 +907,8 @@ public class NetworthExecute {
 					? ",\"reforge\":{\"cost\":\"" + simplifyNumber(reforgeExtras) + "\",\"name\":\"" + item.getModifier() + "\"}"
 					: ""
 			);
-			out.append(miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}" : "");
-			out.append(backpackExtras > 0 ? ",\"bp\":{\"cost\":\"" + simplifyNumber(backpackExtras) + "\",\"bp\":" + bpStr + "}" : "");
+			out.append(miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"data\":" + miscStr + "}" : "");
+			out.append(backpackExtras > 0 ? ",\"bp\":{\"cost\":\"" + simplifyNumber(backpackExtras) + "\",\"data\":" + bpStr + "}" : "");
 			out.append(",\"nbt_tag\":\"").append(parseMcCodes(item.getNbtTag().toString().replace("\"", "\\\""))).append("\"");
 			out.append("},");
 		}

@@ -534,7 +534,7 @@ public class HelpSlashCommand extends SlashCommand {
 								new HelpData("remove", "Remove a role level for a role.", "remove <role_name> <value>")
 									.addExamples("remove sven 400000", "remove alchemy 50"),
 								new HelpData("set", "Set the Discord role for a one level role.", "set <role_name> <@role>")
-									.addExamples("set ironman @ironman player", "set pet_enthusiast @pet lover"),
+									.addExamples("set pet_enthusiast @pet lover"),
 								new HelpData(
 									"use_highest",
 									"Enable or disable using the highest values across all profile. Default is false",

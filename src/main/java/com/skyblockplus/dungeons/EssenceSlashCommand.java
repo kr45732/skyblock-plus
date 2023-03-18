@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -29,7 +30,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.utils.StringUtils;
-import com.skyblockplus.utils.utils.Utils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -126,7 +126,7 @@ public class EssenceSlashCommand extends SlashCommand {
 									? streamJsonArray(higherDepth(itemJson, "items." + level.getKey()))
 										.map(i -> {
 											String[] split = i.getAsString().split(":");
-											return Utils.getEmoji(split[0], idToName(split[0])) + " x" + split[1];
+											return getEmoji(split[0], idToName(split[0])) + " x" + split[1];
 										})
 										.collect(Collectors.joining(", ", ", ", ""))
 									: ""

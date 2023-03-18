@@ -21,15 +21,13 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.utils.utils.JsonUtils.getInternalJsonMappings;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.utils.StringUtils;
-import com.skyblockplus.utils.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -79,11 +77,11 @@ public class RecipeSlashCommand extends SlashCommand {
 				eb.appendDescription("\n");
 			}
 			if (idCountSplit.length == 1) {
-				eb.appendDescription(Utils.getEmoji("EMPTY", "❓"));
+				eb.appendDescription(getEmoji("EMPTY", "❓"));
 				eb.addBlankField(true);
 			} else {
 				String entryId = idCountSplit[0].replace("-", ":");
-				eb.appendDescription(Utils.getEmoji(entryId, "❓"));
+				eb.appendDescription(getEmoji(entryId, "❓"));
 				eb.addField(idToName(entryId), idCountSplit[1], true);
 			}
 		}

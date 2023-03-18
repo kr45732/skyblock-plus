@@ -28,7 +28,6 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.command.Subcommand;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.InvItem;
-import com.skyblockplus.utils.utils.Utils;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -115,13 +114,13 @@ public class ArmorSlashCommand extends SlashCommand {
 					for (int i = 0; i < 8; i++) {
 						if (i % 2 == 0) {
 							try {
-								out.append(Utils.getEmoji(playerEquipment.get(i / 2).getId(), "❓"));
+								out.append(getEmoji(playerEquipment.get(i / 2).getId(), "❓"));
 							} catch (Exception e) {
 								out.append(getEmoji("EMPTY"));
 							}
 						} else {
 							try {
-								out.append(Utils.getEmoji(playerArmor.get((i - 1) / 2).getId(), "❓")).append("\n");
+								out.append(getEmoji(playerArmor.get((i - 1) / 2).getId(), "❓")).append("\n");
 							} catch (Exception e) {
 								out.append(getEmoji("EMPTY")).append("\n");
 							}

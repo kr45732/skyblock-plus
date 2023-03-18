@@ -1458,18 +1458,14 @@ public class SettingsExecute {
 				case "guild_member" -> ebFieldString.append(
 					"**Member role for Hypixel guilds**\nExample: `/settings roles add guild_member skyblock_forceful @sbf guild member`\n"
 				);
-				case "sven" -> ebFieldString.append(
-					"**A player's sven packmaster slayer xp**\nExample: `/settings roles add sven 1000000 @sven 9`\n"
-				);
-				case "rev" -> ebFieldString.append(
-					"**A player's revenant horror xp slayer**\nExample: `/settings roles add rev 400000 @rev 8`\n"
-				);
-				case "tara" -> ebFieldString.append(
-					"**A player's tarantula broodfather slayer xp**\nExample: `/settings roles add tara 100000 @tara 7`\n"
-				);
-				case "blaze" -> ebFieldString.append(
-					"**A player's inferno demonlord slayer xp**\nExample: `/settings roles add blaze 100000 @blaze 7`\n"
-				);
+				case "sven", "rev", "tara", "blaze", "enderman" -> ebFieldString
+					.append("**A player's ")
+					.append(roleName)
+					.append(" slayer xp**\nExample: `/settings roles add ")
+					.append(roleName)
+					.append(" 1000000 @")
+					.append(roleName)
+					.append(" 9`\n");
 				case "coins" -> ebFieldString.append(
 					"**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n"
 				);
@@ -1520,10 +1516,10 @@ public class SettingsExecute {
 					"**The number of level nine slayers a player has**\nExample: `/settings roles add slayer_nine 3 @role`\n"
 				);
 				case "gamemode" -> ebFieldString.append(
-					"**Playing on an ironman or stranded profile**\nExample: `/settings roles add gamemode stranded @Stranded Gamer`\n"
+					"**Playing on an ironman or stranded profile**\nExample: `/settings roles add gamemode stranded @stranded gamer`\n"
 				);
 				case "dungeon_secrets" -> ebFieldString.append(
-					"**A player's dungeon secrets count**\nExample: `/settings roles add dungeon_secrets 25000 @secret sweat`\n"
+					"**A player's dungeon secrets count**\nExample: `/settings roles add dungeon_secrets 25000 @secrets sweat`\n"
 				);
 				case "accessory_count" -> ebFieldString.append(
 					"**A player's dungeon unique accessory count**\nExample: `/settings roles add accessory_count 75 @accessory collector`\n"
@@ -1533,9 +1529,6 @@ public class SettingsExecute {
 				);
 				case "networth" -> ebFieldString.append(
 					"**A player's networth**\nExample: `/settings roles add networth 1000000000 @billionaire`\n"
-				);
-				case "enderman" -> ebFieldString.append(
-					"**A player's voidgloom seraph slayer xp**\nExample: `/settings roles add enderman 100000 @enderman 7`\n"
 				);
 				case "weight" -> ebFieldString.append("**A player's weight**\nExample: `/settings roles add weight 5000 @5k weight`\n");
 				case "total_slayer" -> ebFieldString.append(
@@ -2781,14 +2774,6 @@ public class SettingsExecute {
 	}
 
 	/* Helper functions */
-	private int tryParseInt(String s, int defaultValue) {
-		try {
-			return Integer.parseInt(s);
-		} catch (Exception e) {
-			return defaultValue;
-		}
-	}
-
 	public String displaySettings(JsonElement jsonSettings, String settingName) {
 		if (higherDepth(jsonSettings, settingName) != null) {
 			switch (settingName) {

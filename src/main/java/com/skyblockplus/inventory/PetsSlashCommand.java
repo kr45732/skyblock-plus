@@ -34,7 +34,6 @@ import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import com.skyblockplus.utils.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -88,7 +87,7 @@ public class PetsSlashCommand extends SlashCommand {
 
 				String emoji = null;
 				for (int i = 5; emoji == null && i >= 0; i--) {
-					emoji = Utils.getEmoji(missingPet + ";" + i, null);
+					emoji = getEmoji(missingPet + ";" + i, null);
 				}
 
 				missingPetItems.add(emoji + " " + capitalizeString(missingPet.toLowerCase().replace("_", " ")));

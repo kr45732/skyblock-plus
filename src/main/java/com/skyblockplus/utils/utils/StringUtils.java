@@ -201,8 +201,12 @@ public class StringUtils {
 	}
 
 	public static String idToName(String id) {
+		return idToName(id, false);
+	}
+
+	public static String idToName(String id, boolean strict) {
 		id = id.toUpperCase();
-		return higherDepth(getInternalJsonMappings(), id + ".name", capitalizeString(id.replace("_", " ")));
+		return higherDepth(getInternalJsonMappings(), id + ".name", strict ? null : capitalizeString(id.replace("_", " ")));
 	}
 
 	/**
@@ -271,5 +275,13 @@ public class StringUtils {
 
 	public static String profileNameToEmoji(String profileName) {
 		return profileNameToEmoji.getOrDefault(profileName, null);
+	}
+
+	public static int tryParseInt(String s, int defaultValue) {
+		try {
+			return Integer.parseInt(s);
+		} catch (Exception e) {
+			return defaultValue;
+		}
 	}
 }
