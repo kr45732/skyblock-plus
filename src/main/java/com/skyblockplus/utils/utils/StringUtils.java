@@ -252,9 +252,9 @@ public class StringUtils {
 		if (PET_NAMES.contains(id.split(";")[0].trim())) {
 			return getPetUrl(id);
 		} else if (ENCHANT_NAMES.contains(id.split(";")[0].trim())) {
-			return "https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK";
+			return "https://sky.shiiyu.moe/item/ENCHANTED_BOOK";
 		}
-		return "https://sky.shiiyu.moe/item.gif/" + id;
+		return "https://sky.shiiyu.moe/item/" + id;
 	}
 
 	public static String getAvatarlUrl(String uuid) {
@@ -275,13 +275,5 @@ public class StringUtils {
 
 	public static String profileNameToEmoji(String profileName) {
 		return profileNameToEmoji.getOrDefault(profileName, null);
-	}
-
-	public static int tryParseInt(String s, int defaultValue) {
-		try {
-			return Integer.parseInt(s);
-		} catch (Exception e) {
-			return defaultValue;
-		}
 	}
 }

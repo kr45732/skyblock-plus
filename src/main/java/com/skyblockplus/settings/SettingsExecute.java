@@ -1195,19 +1195,20 @@ public class SettingsExecute {
 			return errorEmbed("You can only have up to 3 sets of requirements");
 		}
 
-		int slayerReq = 0;
-		int skillsReq = 0;
-		int cataReq = 0;
-		int weightReq = 0;
-		int lilyWeightReq = 0;
-		int levelReq = 0;
+		long slayerReq = 0;
+		long skillsReq = 0;
+		long cataReq = 0;
+		long weightReq = 0;
+		long lilyWeightReq = 0;
+		long levelReq = 0;
+		long networthReq = 0;
 
 		for (String req : reqArgs.split("\\s+")) {
 			String[] reqSplit = req.split(":");
 
-			int amount;
+			long amount;
 			try {
-				amount = Integer.parseInt(reqSplit[1].trim());
+				amount = Long.parseLong(reqSplit[1].trim());
 			} catch (Exception e) {
 				return errorEmbed("Invalid requirement amount provided");
 			}
@@ -1219,6 +1220,7 @@ public class SettingsExecute {
 				case "weight" -> weightReq = amount;
 				case "lily_weight" -> lilyWeightReq = amount;
 				case "level" -> levelReq = amount;
+				case "networth" -> networthReq = amount;
 				default -> {
 					return errorEmbed("Invalid requirement type provided");
 				}
@@ -1232,6 +1234,7 @@ public class SettingsExecute {
 		toAddReq.setWeightReq("" + weightReq);
 		toAddReq.setLilyWeightReq("" + lilyWeightReq);
 		toAddReq.setLevelReq("" + levelReq);
+		toAddReq.setNetworthReq("" + networthReq);
 		currentReqs.add(gson.toJsonTree(toAddReq));
 
 		guildSettings.add("applyReqs", currentReqs);
@@ -1247,7 +1250,8 @@ public class SettingsExecute {
 			(cataReq > 0 ? "\n• Catacombs - " + cataReq : "") +
 			(weightReq > 0 ? "\n• Weight - " + weightReq : "") +
 			(lilyWeightReq > 0 ? "\n• Lily weight - " + lilyWeightReq : "") +
-			(levelReq > 0 ? "\n• Level - " + levelReq : "")
+			(levelReq > 0 ? "\n• Level - " + levelReq : "") +
+			(networthReq > 0 ? "\n• Networth - " + networthReq : "")
 		);
 	}
 
@@ -1264,12 +1268,13 @@ public class SettingsExecute {
 				return apiFailMessage(responseCode);
 			}
 
-			int slayerReq = higherDepth(req, "slayerReq", 0);
-			int skillsReq = higherDepth(req, "skillsReq", 0);
-			int catacombsReq = higherDepth(req, "catacombsReq", 0);
-			int weightReq = higherDepth(req, "weightReq", 0);
-			int lilyWeightReq = higherDepth(req, "lilyWeightReq", 0);
-			int levelReq = higherDepth(req, "levelReq", 0);
+			long slayerReq = higherDepth(req, "slayerReq", 0);
+			long skillsReq = higherDepth(req, "skillsReq", 0);
+			long catacombsReq = higherDepth(req, "catacombsReq", 0);
+			long weightReq = higherDepth(req, "weightReq", 0);
+			long lilyWeightReq = higherDepth(req, "lilyWeightReq", 0);
+			long levelReq = higherDepth(req, "levelReq", 0);
+			long networthReq = higherDepth(req, "networthReq", 0L);
 
 			return defaultSettingsEmbed(
 				"Removed an apply requirement:" +
@@ -1278,7 +1283,8 @@ public class SettingsExecute {
 				(catacombsReq > 0 ? "\n• Catacombs - " + catacombsReq : "") +
 				(weightReq > 0 ? "\n• Weight - " + weightReq : "") +
 				(lilyWeightReq > 0 ? "\n• Lily Weight - " + lilyWeightReq : "") +
-				(levelReq > 0 ? "\n• Level - " + levelReq : "")
+				(levelReq > 0 ? "\n• Level - " + levelReq : "") +
+				(networthReq > 0 ? "\n• Networth - " + networthReq : "")
 			);
 		} catch (Exception e) {
 			return errorEmbed("Invalid requirement index. Run `/settings guild <name>` to see the current apply requirements");
@@ -2696,12 +2702,13 @@ public class SettingsExecute {
 					StringBuilder reqsString = new StringBuilder("\n");
 					for (int i = 0; i < reqs.size(); i++) {
 						JsonElement req = reqs.get(i);
-						int slayerReq = tryParseInt(higherDepth(req, "slayerReq", "0"), 0);
-						int skillsReq = tryParseInt(higherDepth(req, "skillsReq", "0"), 0);
-						int cataReq = tryParseInt(higherDepth(req, "catacombsReq", "0"), 0);
-						int weightReq = tryParseInt(higherDepth(req, "weightReq", "0"), 0);
-						int lilyWeightReq = tryParseInt(higherDepth(req, "lilyWeightReq", "0"), 0);
-						int levelReq = tryParseInt(higherDepth(req, "levelReq", "0"), 0);
+						long slayerReq = higherDepth(req, "slayerReq", 0);
+						long skillsReq = higherDepth(req, "skillsReq", 0);
+						long cataReq = higherDepth(req, "catacombsReq", 0);
+						long weightReq = higherDepth(req, "weightReq", 0);
+						long lilyWeightReq = higherDepth(req, "lilyWeightReq", 0);
+						long levelReq = higherDepth(req, "levelReq", 0);
+						long networthReq = higherDepth(req, "networthReq", 0L);
 
 						reqsString
 							.append("`")
@@ -2713,6 +2720,7 @@ public class SettingsExecute {
 							.append(weightReq > 0 ? " " + weightReq + " weight" : "")
 							.append(lilyWeightReq > 0 ? " " + lilyWeightReq + " lily weight" : "")
 							.append(levelReq > 0 ? " " + levelReq + " lvl" : "")
+							.append(networthReq > 0 ? " " + networthReq + " nw" : "")
 							.append("\n");
 					}
 					return reqsString.toString();

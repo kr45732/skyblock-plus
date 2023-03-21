@@ -35,4 +35,5 @@ public class ApplyRequirements {
 	private String weightReq = "";
 	private String lilyWeightReq = "";
 	private String levelReq = "";
+	private String networthReq = "";
 }

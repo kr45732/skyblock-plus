@@ -60,20 +60,23 @@ public class CheckReqsSlashCommand extends SlashCommand {
 		for (AutomatedGuild guild : guilds) {
 			EmbedBuilder eb = player.defaultPlayerEmbed(" | " + capitalizeString(guild.getGuildName().replace("_", " ")));
 			for (ApplyRequirements applyReq : guild.getApplyReqs()) {
-				int slayerReq = tryParseInt(applyReq.getSlayerReq(), 0);
-				int skillsReq = tryParseInt(applyReq.getSkillsReq(), 0);
-				int cataReq = tryParseInt(applyReq.getCatacombsReq(), 0);
-				int weightReq = tryParseInt(applyReq.getWeightReq(), 0);
-				int lilyWeightReq = tryParseInt(applyReq.getLilyWeightReq(), 0);
-				int levelReq = tryParseInt(applyReq.getLevelReq(), 0);
+				long networthReq = 0;
+				try {
+					networthReq = Long.parseLong(applyReq.getNetworthReq());
+				} catch (Exception ignored) {}
 
 				String reqsStr =
-					formatReq("Slayer", slayerReq, (double) player.getTotalSlayer()) +
-					formatReq("Skills", skillsReq, player.getSkillAverage()) +
-					formatReq("Catacombs", cataReq, player.getCatacombs() != null ? player.getCatacombs().getProgressLevel() : null) +
-					formatReq("Weight", weightReq, player.getWeight()) +
-					formatReq("Lily Weight", lilyWeightReq, player.getLilyWeight()) +
-					formatReq("Level", levelReq, player.getLevel());
+					formatReq("Slayer", applyReq.getSlayerReq(), (double) player.getTotalSlayer()) +
+					formatReq("Skills", applyReq.getSkillsReq(), player.getSkillAverage()) +
+					formatReq(
+						"Catacombs",
+						applyReq.getCatacombsReq(),
+						player.getCatacombs() != null ? player.getCatacombs().getProgressLevel() : null
+					) +
+					formatReq("Weight", applyReq.getWeightReq(), player.getWeight()) +
+					formatReq("Lily Weight", applyReq.getLilyWeightReq(), player.getLilyWeight()) +
+					formatReq("Level", applyReq.getLevelReq(), player.getLevel()) +
+					formatReq("Networth", applyReq.getNetworthReq(), networthReq > 0 ? player.getNetworth() : null);
 
 				eb.addField("Requirement", reqsStr, false);
 			}
@@ -84,7 +87,12 @@ public class CheckReqsSlashCommand extends SlashCommand {
 		return null;
 	}
 
-	private static String formatReq(String name, int req, Double playerValue) {
+	private static String formatReq(String name, String reqStr, Double playerValue) {
+		long req = 0;
+		try {
+			req = Long.parseLong(reqStr);
+		} catch (Exception ignored) {}
+
 		return (
 			req > 0
 				? "\n" +
