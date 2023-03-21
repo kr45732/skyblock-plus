@@ -31,7 +31,6 @@ import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonElement;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
@@ -49,15 +48,16 @@ public class AuctionFlipper {
 		.setExecutorService(scheduler)
 		.setHttpClient(okHttpClient)
 		.buildJDA();
-	private static final Cache<String, String> auctionUuidToMessage = Caffeine.newBuilder().expireAfterWrite(45, TimeUnit.MINUTES).build();
+	private static final Cache<String, FlipItem> auctionUuidToMessage = Caffeine
+		.newBuilder()
+		.expireAfterWrite(45, TimeUnit.MINUTES)
+		.build();
 	public static JsonElement underBinJson;
 	private static boolean enable = false;
-	private static Instant lastUpdated = Instant.now();
 
 	public static boolean onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
 			if (event.getChannel().getId().equals("958771784004567063") && event.isWebhookMessage()) {
-				lastUpdated = Instant.now();
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
 				if (desc.contains(" query auctions into database in ")) {
 					resetQueryItems();
@@ -116,7 +116,7 @@ public class AuctionFlipper {
 					.send(
 						defaultEmbed(itemName)
 							.addField("Price", roundAndFormat(startingBid), true)
-							.addField("Previous Lowest Bin", roundAndFormat(pastBinPrice), true)
+							.addField("Resell Price", roundAndFormat(pastBinPrice), true)
 							.addField("Estimated Profit", roundAndFormat(profit), true)
 							.addField("Sales Per Hour", formatNumber(sales), true)
 							.addField("Command", "`/viewauction " + auctionUuid + "`", true)
@@ -125,29 +125,27 @@ public class AuctionFlipper {
 					)
 					.whenComplete((m, e) -> {
 						if (m != null) {
-							auctionUuidToMessage.put(auctionUuid, "" + m.getId());
+							auctionUuidToMessage.put(auctionUuid, new FlipItem(m.getId(), itemName));
 						}
 					});
 			}
 		}
 
 		JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
-		if (higherDepth(endedAuctionsJson, "auctions") == null) {
-			return;
-		}
-
-		Instant jsonLastUpdated = Instant.ofEpochMilli(higherDepth(endedAuctionsJson, "lastUpdated").getAsLong());
-		if (lastUpdated == null || lastUpdated.isBefore(jsonLastUpdated)) {
-			lastUpdated = jsonLastUpdated;
-			Map<String, String> toEdit = auctionUuidToMessage.getAllPresent(
-				streamJsonArray(higherDepth(endedAuctionsJson, "auctions"))
-					.map(a -> higherDepth(a, "auction_id").getAsString())
-					.collect(Collectors.toSet())
-			);
-			for (String messageId : toEdit.values()) {
-				flipperWebhook.edit(messageId, defaultEmbed("Auction Sold").build());
+		if (higherDepth(endedAuctionsJson, "auctions") != null) {
+			for (JsonElement auction : higherDepth(endedAuctionsJson, "auctions").getAsJsonArray()) {
+				String auctionId = higherDepth(auction, "auction_id").getAsString();
+				FlipItem flipItem = auctionUuidToMessage.getIfPresent(auctionId);
+				if (flipItem != null) {
+					auctionUuidToMessage.invalidate(auctionId);
+					flipperWebhook.edit(
+						flipItem.messageId(),
+						defaultEmbed(flipItem.name())
+							.setDescription("Sold for " + formatNumber(higherDepth(auction, "price").getAsLong()))
+							.build()
+					);
+				}
 			}
-			auctionUuidToMessage.invalidateAll(toEdit.keySet());
 		}
 	}
 
@@ -161,4 +159,6 @@ public class AuctionFlipper {
 	public static double calculateWithTaxes(double price) {
 		return price * (price >= 1000000 ? 0.98 : 0.99);
 	}
+
+	private record FlipItem(long messageId, String name) {}
 }
