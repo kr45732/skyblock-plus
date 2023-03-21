@@ -160,6 +160,17 @@ public class HttpUtils {
 			);
 	}
 
+	/**
+	 * @param headers name, value, name, value, ...
+	 */
+	public static CompletableFuture<HttpResponse<InputStream>> asyncPutJson(String url, JsonElement body, String... headers) {
+		HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create(url)).PUT(HttpRequest.BodyPublishers.ofString(body.toString()));
+		if (headers.length > 0) {
+			builder.headers(headers);
+		}
+		return asyncHttpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofInputStream());
+	}
+
 	public static JsonElement postUrl(String url, Object body) {
 		try {
 			HttpPost httpPost = new HttpPost(url);
@@ -189,26 +200,6 @@ public class HttpUtils {
 
 			try (
 				CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
-				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
-			) {
-				return JsonParser.parseReader(in);
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
-
-	public static JsonElement putJson(String url, JsonElement body, Header... headers) {
-		try {
-			HttpPut httpPut = new HttpPut(url);
-
-			StringEntity entity = new StringEntity(body.toString(), "UTF-8");
-			httpPut.setEntity(entity);
-			httpPut.setHeaders(headers);
-			httpPut.setHeader("Content-Type", "application/json");
-			httpPut.setHeader("Accept", "application/json");
-
-			try (
-				CloseableHttpResponse httpResponse = httpClient.execute(httpPut);
 				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())
 			) {
 				return JsonParser.parseReader(in);

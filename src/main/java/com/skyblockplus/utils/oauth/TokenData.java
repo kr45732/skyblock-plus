@@ -18,18 +18,19 @@
 
 package com.skyblockplus.utils.oauth;
 
-import static com.skyblockplus.utils.utils.HttpUtils.putJson;
+import static com.skyblockplus.utils.utils.HttpUtils.asyncPutJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
+import java.io.InputStreamReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
-import org.apache.http.message.BasicHeader;
 
 public final class TokenData {
 
@@ -113,7 +114,7 @@ public final class TokenData {
 				return CompletableFuture.completedFuture(true);
 			}
 
-			return CompletableFuture.supplyAsync(() -> tokenData.updateMetadata(body), executor);
+			return tokenData.updateMetadata(body);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return CompletableFuture.completedFuture(false);
@@ -160,13 +161,27 @@ public final class TokenData {
 		return body;
 	}
 
-	public boolean updateMetadata(JsonObject body) {
+	public CompletableFuture<Boolean> updateMetadata(JsonObject body) {
 		this.body = body;
-		JsonElement data = putJson(
+		return asyncPutJson(
 			"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
 			body,
-			new BasicHeader("Authorization", "Bearer " + accessToken())
-		);
-		return higherDepth(data, "metadata") != null;
+			"Content-Type",
+			"application/json",
+			"Accept",
+			"application/json",
+			"Authorization",
+			"Bearer " + accessToken()
+		)
+			.thenApplyAsync(
+				r -> {
+					try (InputStreamReader in = new InputStreamReader(r.body())) {
+						return higherDepth(JsonParser.parseReader(in), "metadata") != null;
+					} catch (Exception e) {
+						return false;
+					}
+				},
+				executor
+			);
 	}
 }
