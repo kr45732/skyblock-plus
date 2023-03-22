@@ -261,7 +261,7 @@ public class ApplyUser implements Serializable {
 					player.getWeight() >= weightReq &&
 					player.getLilyWeight() >= lilyWeightReq &&
 					player.getLevel() >= levelReq &&
-					(networthReq > 0 && player.getNetworth() >= networthReq)
+					(networthReq == 0 || player.getNetworth() >= networthReq)
 				) {
 					meetReqs = true;
 					break;
