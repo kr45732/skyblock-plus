@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class CheckApiSlashCommand extends SlashCommand {
 
 	public CheckApiSlashCommand() {
-		this.name = "check-api";
+		this.name = "checkapi";
 	}
 
 	public static EmbedBuilder getCheckApi(String username, String profileName) {

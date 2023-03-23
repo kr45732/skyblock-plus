@@ -278,7 +278,7 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("hypixel", "Get Hypixel information about a player.", "hypixel [player]").setCategory("miscellaneous"),
 				new HelpData("missing", "Get a player's missing talismans and cheapest ones to buy.", "missing [player] [profile]")
 					.setCategory("miscellaneous"),
-				new HelpData("check-api", "Get a player's enabled and disabled Skyblock APIs", "check-api [player] [profile]")
+				new HelpData("checkapi", "Get a player's enabled and disabled Skyblock APIs", "checkapi [player] [profile]")
 					.setCategory("miscellaneous"),
 				new HelpData("profiles", "Get information about all of a player's profiles.", "profiles [player]")
 					.setCategory("miscellaneous"),
@@ -837,7 +837,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("leaderboard <type> [player] [gamemode] [page] [rank] [amount]", "Get a global leaderboard") +
 			create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
 			create("recipe <item>", "Get the crafting recipe of an item") +
-			create("check-api [player]", "Check which Skyblock APIs a player has enabled or disabled") +
+			create("checkapi [player]", "Check which Skyblock APIs a player has enabled or disabled") +
 			create("calcdrags [position] [ratio] [eyes]", "Calculate loot quality and loot from dragons in the end") +
 			create("reforge <stone>", "Get the reforge stone stats for each rarity") +
 			create("collections [player] [profile]", "Get a player's island collection counts")
