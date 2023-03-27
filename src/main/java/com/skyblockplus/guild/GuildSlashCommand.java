@@ -825,7 +825,7 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 			hypixelGuildQueue.add(guildId);
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
-				List.of("slayer", "skills", "catacombs", "weight", "networth"),
+				List.of("slayer", "skills", "catacombs", "weight", "networth", "level"),
 				gamemode,
 				streamJsonArray(guildMembers).map(u -> higherDepth(u, "uuid", "")).collect(Collectors.toCollection(ArrayList::new)),
 				hypixelKey,
