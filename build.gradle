@@ -94,7 +94,7 @@ dependencies {
     implementation 'com.vdurmont:emoji-java:5.1.1'
 
     // Groovy
-    implementation "org.codehaus.groovy:groovy:3.0.16"
+    implementation "org.codehaus.groovy:groovy:3.0.17"
 
     // Logging
     implementation 'ch.qos.logback:logback-classic:1.4.5'
