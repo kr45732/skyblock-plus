@@ -411,7 +411,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Guild Member Role").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create("setup_command_" + buttonEvent.getMessageId(), EntitySelectMenu.SelectTarget.ROLE)
+								.create("setup_command_" + buttonEvent.getMessageId() + "_role", EntitySelectMenu.SelectTarget.ROLE)
 								.build()
 						)
 						.setEphemeral(true)
