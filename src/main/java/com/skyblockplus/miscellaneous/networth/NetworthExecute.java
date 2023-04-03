@@ -917,17 +917,14 @@ public class NetworthExecute {
 	}
 
 	public double getLowestPriceModifier(String reforgeName, String itemRarity) {
-		JsonElement reforgesStonesJson = getReforgeStonesJson();
-
-		for (String reforgeStone : REFORGE_STONE_NAMES) {
-			JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
+		for (Map.Entry<String, JsonElement> reforge : getReforgeStonesJson().entrySet()) {
 			if (
-				higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName) ||
-				reforgeStone.equalsIgnoreCase(reforgeName)
+				higherDepth(reforge.getValue(), "reforgeName").getAsString().equalsIgnoreCase(reforgeName) ||
+				reforge.getKey().equalsIgnoreCase(reforgeName)
 			) {
-				String reforgeStoneId = higherDepth(reforgeStoneInfo, "internalName").getAsString();
+				String reforgeStoneId = higherDepth(reforge.getValue(), "internalName").getAsString();
 				double reforgeStoneCost = getLowestPrice(reforgeStoneId);
-				double reforgeApplyCost = higherDepth(reforgeStoneInfo, "reforgeCosts." + itemRarity.toUpperCase()).getAsLong();
+				double reforgeApplyCost = higherDepth(reforge.getValue(), "reforgeCosts." + itemRarity.toUpperCase()).getAsLong();
 				return reforgeStoneCost + reforgeApplyCost;
 			}
 		}

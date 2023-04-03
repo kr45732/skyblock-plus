@@ -1260,7 +1260,6 @@ public class Constants {
 	public static List<String> ALL_SKILL_NAMES;
 	public static List<String> SKILL_NAMES;
 	public static List<String> PET_NAMES;
-	public static List<String> REFORGE_STONE_NAMES;
 	public static List<String> ESSENCE_ITEM_NAMES;
 	public static List<String> BITS_ITEM_NAMES;
 	public static List<String> PET_ITEM_NAMES;
@@ -1364,9 +1363,6 @@ public class Constants {
 
 			/* PET_NAMES */
 			PET_NAMES = new ArrayList<>(getPetNumsJson().getAsJsonObject().keySet());
-
-			/* REFORGE_STONE_NAMES */
-			REFORGE_STONE_NAMES = new ArrayList<>(getReforgeStonesJson().getAsJsonObject().keySet());
 
 			/* ESSENCE_ITEM_NAMES */
 			ESSENCE_ITEM_NAMES = new ArrayList<>(getEssenceCostsJson().getAsJsonObject().keySet());

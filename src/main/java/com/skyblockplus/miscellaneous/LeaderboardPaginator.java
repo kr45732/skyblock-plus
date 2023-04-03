@@ -94,7 +94,7 @@ public class LeaderboardPaginator {
 
 			if (this.player != null && entry.getValue().getString("username", "").equals(this.player)) {
 				playerRank = curRank;
-				playerAmount = roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount);
+				playerAmount = formatAmount(curAmount);
 			}
 
 			if (amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)) {
@@ -139,13 +139,7 @@ public class LeaderboardPaginator {
 			DataObject curPlayer = leaderboardCache.getOrDefault(i, null);
 			if (curPlayer != null) {
 				double curAmount = curPlayer.getDouble(lbType, 0.0);
-				String out =
-					"`" +
-					i +
-					")` " +
-					fixUsername(curPlayer.getString("username", "?")) +
-					": " +
-					(roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount));
+				String out = "`" + i + ")` " + fixUsername(curPlayer.getString("username", "?")) + ": " + formatAmount(curAmount);
 
 				if (i < pageFirstRank + 10) {
 					columnOne.append(out).append("\n");
@@ -284,7 +278,7 @@ public class LeaderboardPaginator {
 
 			if (player != null && entry.getValue().getString("username", "").equals(player.username())) {
 				playerRank = curRank;
-				playerAmount = roundAndFormat(lbType.equals("networth") ? (long) curAmount : curAmount);
+				playerAmount = formatAmount(curAmount);
 			}
 
 			if (amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)) {
@@ -314,6 +308,15 @@ public class LeaderboardPaginator {
 			Button.primary("leaderboard_paginator_search_button", "Search").withEmoji(Emoji.fromFormatted("\uD83D\uDD0E")),
 			Button.primary("leaderboard_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 		);
+	}
+
+	private String formatAmount(double amount) {
+		if (amount > 1000000000) {
+			return simplifyNumber(amount);
+		} else if (amount > 100) {
+			amount = (long) amount;
+		}
+		return roundAndFormat(amount);
 	}
 
 	public void waitForEvent() {
