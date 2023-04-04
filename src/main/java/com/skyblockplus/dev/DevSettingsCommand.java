@@ -19,18 +19,13 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.Utils.*;
 
-import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
-import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import com.skyblockplus.settings.SettingsExecute;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -51,22 +46,25 @@ public class DevSettingsCommand extends Command {
 
 				if (args.length == 4) {
 					switch (args[1]) {
-						case "roles":
-							embed(setRoleSettings(args[2], args[3], event));
-							return;
 						case "delete":
 							switch (args[2]) {
 								case "server" -> {
-									embed(deleteServer(args[3]));
+									embed(defaultEmbed("API returned response code " + database.deleteServerSettings(args[3])));
 									return;
 								}
 								case "apply_cache" -> {
 									setArgs(5);
-									embed(deleteServerApplyCache(args[3], args[4]));
+									embed(
+										defaultEmbed("API returned response code " + database.deleteApplyCacheSettings(args[3], args[4]))
+									);
 									return;
 								}
 								case "skyblock_event" -> {
-									embed(deleteSkyblockEvent(args[3]));
+									embed(
+										defaultEmbed(
+											"API returned response code " + database.setSkyblockEventSettings(args[3], new EventSettings())
+										)
+									);
 									return;
 								}
 							}
@@ -108,39 +106,5 @@ public class DevSettingsCommand extends Command {
 			}
 		}
 			.queue();
-	}
-
-	private EmbedBuilder deleteSkyblockEvent(String serverId) {
-		return defaultEmbed("API returned response code " + database.setSkyblockEventSettings(serverId, new EventSettings()));
-	}
-
-	private EmbedBuilder deleteServerApplyCache(String serverId, String name) {
-		if (database.getServerSettings(serverId) != null) {
-			return defaultEmbed("API returned response code " + database.deleteApplyCacheSettings(serverId, name));
-		}
-		return defaultEmbed("Error updating settings");
-	}
-
-	private EmbedBuilder deleteServer(String serverId) {
-		if (database.getServerSettings(serverId) != null) {
-			return defaultEmbed("API returned response code " + database.deleteServerSettings(serverId));
-		}
-		return defaultEmbed("Error updating settings");
-	}
-
-	private EmbedBuilder setRoleSettings(String roleName, String json, CommandEvent event) {
-		try {
-			JsonElement jsonElement = gson.toJsonTree(gson.fromJson(json, RoleModel.class));
-			if (higherDepth(database.getServerSettings(event.getGuild().getId()), "serverId") == null) {
-				database.newServerSettings(
-					event.getGuild().getId(),
-					new ServerSettingsModel(event.getGuild().getName(), event.getGuild().getId())
-				);
-			}
-
-			int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, jsonElement);
-			return defaultEmbed("API returned response code: " + responseCode);
-		} catch (Exception ignored) {}
-		return defaultEmbed("Error updating settings");
 	}
 }

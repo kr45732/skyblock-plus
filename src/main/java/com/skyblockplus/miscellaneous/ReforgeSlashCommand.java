@@ -18,7 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.reforgeStatToEmoji;
 import static com.skyblockplus.utils.utils.JsonUtils.getReforgeStonesJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;

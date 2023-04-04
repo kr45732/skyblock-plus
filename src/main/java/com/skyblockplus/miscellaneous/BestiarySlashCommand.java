@@ -19,7 +19,6 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
 import static com.skyblockplus.utils.utils.JsonUtils.getLevelingJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;

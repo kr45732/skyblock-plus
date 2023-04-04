@@ -18,7 +18,8 @@
 
 package com.skyblockplus.miscellaneous.weight.senither;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.SKILLS_LEVEL_50_XP;
+import static com.skyblockplus.utils.Constants.SKILLS_LEVEL_60_XP;
 import static com.skyblockplus.utils.utils.JsonUtils.getWeightJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 

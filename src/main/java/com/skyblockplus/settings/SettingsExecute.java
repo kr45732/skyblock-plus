@@ -66,8 +66,137 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import org.apache.groovy.util.Maps;
 
 public class SettingsExecute {
+
+	private static final Map<String, String> allAutomatedRoles = new HashMap<>(
+		Maps.of(
+			"sven",
+			null,
+			"rev",
+			null,
+			"tara",
+			null,
+			"blaze",
+			null,
+			"enderman",
+			null,
+			"alchemy",
+			null,
+			"combat",
+			null,
+			"fishing",
+			null,
+			"farming",
+			null,
+			"foraging",
+			null,
+			"carpentry",
+			null,
+			"mining",
+			null,
+			"taming",
+			null,
+			"enchanting",
+			null,
+			"social",
+			null,
+			"catacombs",
+			null,
+			"healer",
+			null,
+			"mage",
+			null,
+			"berserk",
+			null,
+			"archer",
+			null,
+			"tank",
+			null,
+			"weight",
+			"**A player's weight**\nExample: `/settings roles add weight 5000 @5k weight`\n",
+			"guild_member",
+			"**Member role for Hypixel guilds**\nExample: `/settings roles add guild_member skyblock_forceful @guild member`\n",
+			"guild_ranks",
+			"**If a player is in a guild setup in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be linked here. To modify guild ranks use `/settings guild <name>`\n",
+			"coins",
+			"**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n",
+			"fairy_souls",
+			"**Amount of collected fairy souls**\nExample: `/settings roles add fairy_souls 50 @50 souls collected`\n",
+			"slot_collector",
+			"**Number of minion slots excluding upgrades**\nExample: `/settings roles add slot_collector 24 @maxed minion slots`\n",
+			"pet_enthusiast",
+			"**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `/settings roles set pet_enthusiast @level 100 pet`\n",
+			"total_slayer",
+			"**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n",
+			"slayer_nine",
+			"**The number of level nine slayers a player has**\nExample: `/settings roles add slayer_nine 3 @role`\n",
+			"skill_average",
+			"**A player's skill average**\nExample: `/settings roles add skill_average 55 @maxed skills`\n",
+			"pet_score",
+			"**A player's pet score**\nExample: `/settings roles add pet_score 100 @100 pet score`\n",
+			"dungeon_secrets",
+			"**A player's dungeon secrets count**\nExample: `/settings roles add dungeon_secrets 25000 @secrets sweat`\n",
+			"accessory_count",
+			"**A player's dungeon unique accessory count**\nExample: `/settings roles add accessory_count 75 @accessory collector`\n",
+			"networth",
+			"**A player's networth**\nExample: `/settings roles add networth 1000000000 @billionaire`\n",
+			"gamemode",
+			"**Playing on an ironman or stranded profile**\nExample: `/settings roles add gamemode stranded @stranded gamer`\n",
+			"maxed_collections",
+			"**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n",
+			"player_items",
+			"**Items that a player has**\nExample: `/settings roles add player_items hyperion @mage gamer`\n",
+			"mage_rep",
+			"**A player's mage reputation**\nExample: `/settings roles add mage_rep 1000 @1k mage rep`\n",
+			"barbarian_rep",
+			"**A player's barbarian reputation**\nExample: `/settings roles add barbarian_rep 1000 @1k barbarian rep`\n",
+			"level",
+			"**A player's Skyblock level**\nExample: `/settings roles add level 500 @maxed level`\n"
+		)
+	);
+
+	static {
+		for (String roleName : allAutomatedRoles.keySet()) {
+			String customDescription =
+				switch (roleName) {
+					case "sven", "rev", "tara", "blaze", "enderman" -> "**A player's " +
+					roleName +
+					" slayer xp**\nExample: `/settings roles add " +
+					roleName +
+					" 1000000 @" +
+					roleName +
+					" 9`\n";
+					case "alchemy",
+						"combat",
+						"fishing",
+						"farming",
+						"foraging",
+						"carpentry",
+						"mining",
+						"taming",
+						"enchanting",
+						"social",
+						"catacombs",
+						"healer",
+						"mage",
+						"berserk",
+						"archer",
+						"tank" -> "**A player's " +
+					roleName +
+					" level**\nExample: `/settings roles add " +
+					roleName +
+					" 30 @" +
+					roleName +
+					" 30`\n";
+					default -> null;
+				};
+			if (customDescription != null) {
+				allAutomatedRoles.replace(roleName, customDescription);
+			}
+		}
+	}
 
 	private final Guild guild;
 	private final User author;
@@ -993,7 +1122,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setApplyCheckApiEnable(JsonObject guildSettings, boolean enable) {
-		guildSettings.addProperty("applyCheckApi", "" + enable);
+		guildSettings.addProperty("applyCheckApi", enable);
 		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 
 		if (responseCode != 200) {
@@ -1355,7 +1484,7 @@ public class SettingsExecute {
 			false
 		);
 
-		eb.addField("Guild Counter", higherDepth(settings, "guildCounterEnable", "false").equals("true") ? "Enabled" : "Disabled", false);
+		eb.addField("Guild Counter", higherDepth(settings, "guildCounterEnable", false) ? "Enabled" : "Disabled", false);
 		extras.addEmbedPage(eb);
 		paginateBuilder.setPaginatorExtras(extras).build().paginate(interactionHook, 0);
 		return null;
@@ -1363,55 +1492,13 @@ public class SettingsExecute {
 
 	/* Roles Settings */
 	public EmbedBuilder displayRoleSettings(String roleName) {
-		List<String> allRoles = List.of(
-			"sven",
-			"rev",
-			"tara",
-			"blaze",
-			"enderman",
-			"alchemy",
-			"combat",
-			"fishing",
-			"farming",
-			"foraging",
-			"carpentry",
-			"mining",
-			"taming",
-			"enchanting",
-			"catacombs",
-			"healer",
-			"mage",
-			"berserk",
-			"archer",
-			"tank",
-			"weight",
-			"guild_member",
-			"guild_ranks",
-			"coins",
-			"fairy_souls",
-			"slot_collector",
-			"pet_enthusiast",
-			"total_slayer",
-			"slayer_nine",
-			"skill_average",
-			"pet_score",
-			"dungeon_secrets",
-			"accessory_count",
-			"networth",
-			"gamemode",
-			"maxed_collections",
-			"player_items",
-			"mage_rep",
-			"barbarian_rep",
-			"level",
-			"social"
-		);
-		Map<String, Integer> rolePageMap = IntStream
-			.range(0, allRoles.size())
-			.boxed()
-			.collect(Collectors.toMap(allRoles::get, i -> i + 2, (a, b) -> b));
+		if (allAutomatedRoles.containsKey(roleName)) {
+			List<String> allRoles = new ArrayList<>(allAutomatedRoles.keySet());
+			Map<String, Integer> rolePageMap = IntStream
+				.range(0, allRoles.size())
+				.boxed()
+				.collect(Collectors.toMap(allRoles::get, i -> i + 2, (a, b) -> b));
 
-		if (rolePageMap.containsKey(roleName)) {
 			return displayRolesSettings(database.getRolesSettings(guild.getId()), rolePageMap.get(roleName));
 		} else {
 			try {
@@ -1419,7 +1506,7 @@ public class SettingsExecute {
 			} catch (Exception ignored) {}
 		}
 
-		return errorEmbed("Invalid role name or index");
+		return errorEmbed("Invalid role name or page number");
 	}
 
 	public EmbedBuilder displayRolesSettings(JsonElement rolesSettings, int pageNum) {
@@ -1427,126 +1514,33 @@ public class SettingsExecute {
 
 		ArrayList<String> pageTitles = new ArrayList<>();
 		pageTitles.add("Roles Settings");
-		ArrayList<String> roleNames = getJsonKeys(rolesSettings);
-		StringBuilder pageNumbers = new StringBuilder();
-		roleNames.remove("useHighest");
-		for (int i = 1; i < roleNames.size(); i++) {
-			pageNumbers.append("\n**Page ").append(i + 1).append(":** ").append(roleNames.get(i));
-		}
 
+		List<String> roleNames = new ArrayList<>(allAutomatedRoles.keySet());
+		StringBuilder pageNumbers = new StringBuilder();
+		for (int i = 0; i < roleNames.size(); i++) {
+			pageNumbers.append("\n**Page ").append(i + 2).append(":** ").append(roleNames.get(i));
+		}
 		paginateBuilder.addItems(
-			"**Automated Roles " +
-			(higherDepth(rolesSettings, "enable").getAsString().equals("true") ? "Enabled" : "Disabled") +
-			"**\n**Use highest:** " +
+			"**Automated Roles:** " +
+			(higherDepth(rolesSettings, "enable", false) ? "enabled" : "disabled") +
+			"\n**Use highest:** " +
 			higherDepth(rolesSettings, "useHighest", false) +
 			"\n" +
 			pageNumbers
 		);
-		roleNames.remove("enable");
-		for (String roleName : roleNames) {
-			JsonElement currentRoleSettings = higherDepth(rolesSettings, roleName);
-			StringBuilder ebFieldString = new StringBuilder();
 
-			if (higherDepth(currentRoleSettings, "levels") == null) {
-				database.setRoleSettings(guild.getId(), roleName, gson.toJsonTree(new RoleModel()));
-				currentRoleSettings = database.getRoleSettings(guild.getId(), roleName);
-			}
+		for (Entry<String, String> roleDesc : allAutomatedRoles.entrySet()) {
+			StringBuilder ebFieldString = new StringBuilder().append(roleDesc.getValue()).append("\nSettings\n");
+			JsonElement roleSettings = streamJsonArray(higherDepth(rolesSettings, "roles"))
+				.filter(e -> higherDepth(e, "name", "").equals(roleDesc.getValue()))
+				.findFirst()
+				.orElse(null);
 
-			switch (roleName) {
-				case "guild_member" -> ebFieldString.append(
-					"**Member role for Hypixel guilds**\nExample: `/settings roles add guild_member skyblock_forceful @guild member`\n"
-				);
-				case "sven", "rev", "tara", "blaze", "enderman" -> ebFieldString
-					.append("**A player's ")
-					.append(roleName)
-					.append(" slayer xp**\nExample: `/settings roles add ")
-					.append(roleName)
-					.append(" 1000000 @")
-					.append(roleName)
-					.append(" 9`\n");
-				case "coins" -> ebFieldString.append(
-					"**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n"
-				);
-				case "alchemy",
-					"combat",
-					"fishing",
-					"farming",
-					"foraging",
-					"carpentry",
-					"mining",
-					"taming",
-					"enchanting",
-					"social",
-					"skill_average",
-					"pet_score",
-					"catacombs",
-					"healer",
-					"mage",
-					"berserk",
-					"archer",
-					"tank" -> ebFieldString
-					.append("**A player's ")
-					.append(roleName)
-					.append(" level**\nExample: `/settings roles add ")
-					.append(roleName)
-					.append(" 30 @")
-					.append(roleName)
-					.append(" 30`\n");
-				case "fairy_souls" -> ebFieldString.append(
-					"**Amount of collected fairy souls**\nExample: `/settings roles add fairy_souls 50 @50 souls collected`\n"
-				);
-				case "slot_collector" -> ebFieldString.append(
-					"**Number of minion slots excluding upgrades**\nExample: `/settings roles add slot_collector 24 @maxed minion slots`\n"
-				);
-				case "level" -> ebFieldString.append(
-					"**A player's Skyblock level**\nExample: `/settings roles add level 500 @maxed level`\n"
-				);
-				case "maxed_collections" -> ebFieldString.append(
-					"**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n"
-				);
-				case "pet_enthusiast" -> ebFieldString.append(
-					"**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `/settings roles set pet_enthusiast @level 100 pet`\n"
-				);
-				case "guild_ranks" -> ebFieldString.append(
-					"**If a player is in a guild setup in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be linked here. To modify guild ranks use `/settings guild <name>`\n"
-				);
-				case "slayer_nine" -> ebFieldString.append(
-					"**The number of level nine slayers a player has**\nExample: `/settings roles add slayer_nine 3 @role`\n"
-				);
-				case "gamemode" -> ebFieldString.append(
-					"**Playing on an ironman or stranded profile**\nExample: `/settings roles add gamemode stranded @stranded gamer`\n"
-				);
-				case "dungeon_secrets" -> ebFieldString.append(
-					"**A player's dungeon secrets count**\nExample: `/settings roles add dungeon_secrets 25000 @secrets sweat`\n"
-				);
-				case "accessory_count" -> ebFieldString.append(
-					"**A player's dungeon unique accessory count**\nExample: `/settings roles add accessory_count 75 @accessory collector`\n"
-				);
-				case "player_items" -> ebFieldString.append(
-					"**Items that a player has**\nExample: `/settings roles add player_items hyperion @mage gamer`\n"
-				);
-				case "networth" -> ebFieldString.append(
-					"**A player's networth**\nExample: `/settings roles add networth 1000000000 @billionaire`\n"
-				);
-				case "weight" -> ebFieldString.append("**A player's weight**\nExample: `/settings roles add weight 5000 @5k weight`\n");
-				case "total_slayer" -> ebFieldString.append(
-					"**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n"
-				);
-				case "mage_rep" -> ebFieldString.append(
-					"**A player's mage reputation**\nExample: `/settings roles add mage_rep 1000 @1k mage rep`\n"
-				);
-				case "barbarian_rep" -> ebFieldString.append(
-					"**A player's barbarian reputation**\nExample: `/settings roles add barbarian_rep 1000 @1k barbarian rep`\n"
-				);
-			}
-
-			ebFieldString.append("\nSettings\n");
-
-			if (roleName.equals("guild_ranks")) {
-				if (higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() == 0) {
+			if (roleDesc.getValue().equals("guild_ranks")) {
+				if (higherDepth(roleSettings, "levels.[0]") == null) {
 					ebFieldString.append("\n• No ranks added");
 				} else {
-					for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
+					for (JsonElement roleLevel : higherDepth(roleSettings, "levels").getAsJsonArray()) {
 						String rName = higherDepth(roleLevel, "value").getAsString();
 						ebFieldString
 							.append("\n• ")
@@ -1556,55 +1550,53 @@ public class SettingsExecute {
 							.append("`)");
 					}
 				}
-				pageTitles.add(roleName);
-			} else if (isOneLevelRole(roleName)) {
+			} else if (isOneLevelRole(roleDesc.getValue())) {
 				ebFieldString.append(
-					higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() > 0
-						? "\n• <@&" + higherDepth(currentRoleSettings, "levels.[0].roleId").getAsString() + ">"
+					higherDepth(roleSettings, "levels.[0]") != null
+						? "\n• <@&" + higherDepth(roleSettings, "levels.[0].roleId").getAsString() + ">"
 						: "\n • No role set"
 				);
-				pageTitles.add(roleName + " (__one level role__)");
 			} else {
-				if (roleName.equals("guild_member")) {
-					for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
-						String guildId = higherDepth(roleLevel, "value").getAsString();
-						HypixelResponse guildJson = getGuildFromId(guildId);
-						if (guildJson.isValid()) {
+				if (higherDepth(roleSettings, "levels.[0]") == null) {
+					ebFieldString.append("\n• No ranks added");
+				} else {
+					if (roleDesc.getValue().equals("guild_member")) {
+						for (JsonElement roleLevel : higherDepth(roleSettings, "levels").getAsJsonArray()) {
+							String guildId = higherDepth(roleLevel, "value").getAsString();
+							HypixelResponse guildJson = getGuildFromId(guildId);
+							if (guildJson.isValid()) {
+								ebFieldString
+									.append("\n• ")
+									.append(guildJson.get("name").getAsString())
+									.append(" - ")
+									.append("<@&")
+									.append(higherDepth(roleLevel, "roleId").getAsString())
+									.append(">");
+							} else {
+								ebFieldString
+									.append("\n• ")
+									.append("Invalid guild")
+									.append(" - ")
+									.append("<@&")
+									.append(higherDepth(roleLevel, "roleId").getAsString())
+									.append(">");
+							}
+						}
+					} else {
+						for (JsonElement roleLevel : higherDepth(roleSettings, "levels").getAsJsonArray()) {
 							ebFieldString
 								.append("\n• ")
-								.append(guildJson.get("name").getAsString())
-								.append(" - ")
-								.append("<@&")
-								.append(higherDepth(roleLevel, "roleId").getAsString())
-								.append(">");
-						} else {
-							ebFieldString
-								.append("\n• ")
-								.append("Invalid guild")
+								.append(higherDepth(roleLevel, "value").getAsString())
 								.append(" - ")
 								.append("<@&")
 								.append(higherDepth(roleLevel, "roleId").getAsString())
 								.append(">");
 						}
 					}
-				} else {
-					for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
-						ebFieldString
-							.append("\n• ")
-							.append(higherDepth(roleLevel, "value").getAsString())
-							.append(" - ")
-							.append("<@&")
-							.append(higherDepth(roleLevel, "roleId").getAsString())
-							.append(">");
-					}
 				}
-
-				if (higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() == 0) {
-					ebFieldString.append("\n• No levels added");
-				}
-
-				pageTitles.add(roleName);
 			}
+
+			pageTitles.add(roleDesc.getValue() + (isOneLevelRole(roleDesc.getValue()) ? " (__one level role__)" : ""));
 			paginateBuilder.addItems(ebFieldString.toString());
 		}
 
@@ -1613,34 +1605,23 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setRolesEnable(boolean enable) {
-		if (!enable) {
-			JsonObject newRolesJson = database.getRolesSettings(guild.getId()).getAsJsonObject();
-			newRolesJson.addProperty("enable", false);
-			int responseCode = database.setRolesSettings(guild.getId(), newRolesJson);
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
-
-			return defaultSettingsEmbed("**Automatic roles:** disabled");
+		if (enable && !allowRolesEnable()) {
+			return errorEmbed("At least one automatic role must be setup to enable the automatic roles feature");
 		}
 
-		if (!allowRolesEnable()) {
-			return errorEmbed("At least one individual role must be enabled");
-		}
-
-		JsonObject newRolesJson = database.getRolesSettings(guild.getId()).getAsJsonObject();
-		newRolesJson.addProperty("enable", true);
-		int responseCode = database.setRolesSettings(guild.getId(), newRolesJson);
+		JsonObject rolesSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
+		rolesSettings.addProperty("enable", enable);
+		int responseCode = database.setRolesSettings(guild.getId(), rolesSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("**Roles:** enabled");
+		return defaultSettingsEmbed("**Automatic roles:** " + (enable ? "enabled" : "disabled"));
 	}
 
 	public EmbedBuilder setRolesUseHighest(boolean enable) {
 		JsonObject newRolesJson = database.getRolesSettings(guild.getId()).getAsJsonObject();
-		newRolesJson.addProperty("useHighest", "" + enable);
+		newRolesJson.addProperty("useHighest", enable);
 		int responseCode = database.setRolesSettings(guild.getId(), newRolesJson);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
@@ -1650,43 +1631,35 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder addRoleLevel(String roleName, String roleValue, String roleMention) {
+		if (!allAutomatedRoles.containsKey(roleName)) {
+			return errorEmbed("Invalid role name. Refer to `/settings roles` for a list of all role names");
+		}
+
 		String guildName = "";
-		if (roleName.equals("guild_member")) {
+		if (roleName.equals("guild_ranks")) {
+			JsonElement guildRoleSettings = database.getGuildSettings(guild.getId(), roleValue);
+			if (!higherDepth(guildRoleSettings, "guildRanksEnable", false)) {
+				return errorEmbed("Provided automatic guild name is invalid or automatic guild ranks are not enabled");
+			}
+
+			RoleModel roleSettings = database.getRoleSettings(guild.getId(), "guild_ranks");
+			if (roleSettings == null) {
+				roleSettings = new RoleModel(roleName);
+			}
+			roleSettings.addLevel(roleValue, roleValue);
+
+			int responseCode = database.setRoleSettings(guild.getId(), roleSettings);
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+			return defaultSettingsEmbed("Added guild ranks for automatic guild - `" + roleValue + "`");
+		} else if (roleName.equals("guild_member")) {
 			HypixelResponse guildJson = getGuildFromName(roleValue);
 			if (!guildJson.isValid()) {
 				return guildJson.getErrorEmbed();
 			}
 			roleValue = guildJson.get("_id").getAsString();
 			guildName = guildJson.get("name").getAsString();
-		} else if (roleName.equals("guild_ranks")) {
-			JsonObject newRoleSettings = database.getRoleSettings(guild.getId(), "guild_ranks").getAsJsonObject();
-			JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
-
-			JsonElement guildRoleSettings = database.getGuildSettings(guild.getId(), roleValue);
-			if (
-				guildRoleSettings != null &&
-				!guildRoleSettings.isJsonNull() &&
-				higherDepth(guildRoleSettings, "guildRanksEnable").getAsString().equalsIgnoreCase("true")
-			) {
-				for (JsonElement level : currentLevels) {
-					if (higherDepth(level, "value").getAsString().equals(roleValue)) {
-						currentLevels.remove(level);
-						break;
-					}
-				}
-
-				currentLevels.add(gson.toJsonTree(new RoleObject(roleValue, roleValue)));
-				newRoleSettings.add("levels", currentLevels);
-
-				int responseCode = database.setRoleSettings(guild.getId(), roleName, newRoleSettings);
-				if (responseCode != 200) {
-					return apiFailMessage(responseCode);
-				}
-
-				return defaultSettingsEmbed("Added guild ranks for automatic guild - `" + roleValue + "`");
-			}
-
-			return errorEmbed("Invalid guild role name or guild ranks not enabled");
 		} else if (isOneLevelRole(roleName)) {
 			return errorEmbed("This role does not support multiple values. Use `/settings roles set <role_name> <@role>` instead");
 		} else if (roleName.equals("gamemode")) {
@@ -1700,7 +1673,7 @@ public class SettingsExecute {
 				return errorEmbed(
 					"No item with the name `" +
 					roleValue +
-					"` exists. Perhaps you meant any of the following: " +
+					"` exists. Perhaps you meant one of the following: " +
 					FuzzySearch
 						.extractTop(
 							roleValue,
@@ -1731,13 +1704,6 @@ public class SettingsExecute {
 		}
 		Role role = ((Role) eb);
 
-		JsonObject newRoleSettings;
-		try {
-			newRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
-		} catch (Exception e) {
-			return errorEmbed("Invalid role");
-		}
-
 		JsonObject allRoleSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
 		int totalRoleCount = 0;
 		for (Entry<String, JsonElement> i : allRoleSettings.entrySet()) {
@@ -1746,62 +1712,61 @@ public class SettingsExecute {
 			} catch (Exception ignored) {}
 		}
 		if (totalRoleCount >= 150) {
-			return errorEmbed("You have reached the max amount of total levels (150/150)");
+			return errorEmbed("You have reached the max number of total levels (150/150)");
 		}
 
-		JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
-		for (JsonElement level : currentLevels) {
-			if (higherDepth(level, "value").getAsString().equals(roleValue)) {
-				currentLevels.remove(level);
-				break;
-			}
+		RoleModel roleSettings = database.getRoleSettings(guild.getId(), roleName);
+		if (roleSettings == null) {
+			roleSettings = new RoleModel(roleName);
 		}
+		roleSettings.addLevel(roleValue, role.getId());
 
-		currentLevels.add(gson.toJsonTree(new RoleObject(roleValue, role.getId())));
-
-		if (roleName.equals("guild_member")) {
-			roleValue = guildName;
-		} else if (!roleName.equals("gamemode") && !roleName.equals("player_items")) {
-			currentLevels =
-				collectJsonArray(streamJsonArray(currentLevels).sorted(Comparator.comparingLong(o -> higherDepth(o, "value").getAsLong())));
-		}
-		newRoleSettings.add("levels", currentLevels);
-
-		int responseCode = database.setRoleSettings(guild.getId(), roleName, newRoleSettings);
+		int responseCode = database.setRoleSettings(guild.getId(), roleSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Set " + roleName + " " + roleValue + " to " + role.getAsMention());
+		return defaultSettingsEmbed(
+			"Set " + roleName + " " + (roleName.equals("guild_member") ? guildName : roleValue) + " to " + role.getAsMention()
+		);
 	}
 
 	public EmbedBuilder removeRoleLevel(String roleName, String value) {
+		if (!allAutomatedRoles.containsKey(roleName)) {
+			return errorEmbed("Invalid role name. Refer to `/settings roles` for a list of all role names");
+		}
+
 		if (isOneLevelRole(roleName)) {
 			return defaultEmbed("This role does not multiple values. Use `/settings roles set <role_name> none` instead");
 		}
 
-		JsonObject currentRoleSettings;
-		try {
-			currentRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
-		} catch (Exception e) {
-			return errorEmbed("Invalid role name");
-		}
+		RoleModel roleSettings = database.getRoleSettings(guild.getId(), roleName);
 
-		JsonArray currentLevels = currentRoleSettings.get("levels").getAsJsonArray();
-		for (JsonElement level : currentLevels) {
-			String currentValue = higherDepth(level, "value").getAsString();
+		for (Iterator<RoleObject> iter = roleSettings.getLevels().iterator(); iter.hasNext();) {
+			RoleObject level = iter.next();
+
+			String levelValue = level.getValue();
 			if (roleName.equals("guild_member")) {
-				HypixelResponse guildJson = getGuildFromId(higherDepth(level, "value").getAsString());
+				HypixelResponse guildJson = getGuildFromId(levelValue);
 				if (!guildJson.isValid()) {
-					return guildJson.getErrorEmbed();
+					iter.remove();
 				}
-				currentValue = guildJson.get("name").getAsString();
+				levelValue = guildJson.get("name").getAsString();
 			}
 
-			if (currentValue.equalsIgnoreCase(value.replace("_", " "))) {
-				currentLevels.remove(level);
-				currentRoleSettings.add("levels", currentLevels);
-				int responseCode = database.setRoleSettings(guild.getId(), roleName, currentRoleSettings);
+			if (levelValue.equalsIgnoreCase(value.replace("_", " "))) {
+				try {
+					iter.remove();
+				} catch (Exception ignored) {
+					// Catches already removed invalid guild values (see above lines)
+				}
+
+				int responseCode;
+				if (roleSettings.getLevels().isEmpty()) {
+					responseCode = database.removeRoleSettings(guild.getId(), roleName);
+				} else {
+					responseCode = database.setRoleSettings(guild.getId(), roleSettings);
+				}
 				if (responseCode != 200) {
 					return apiFailMessage(responseCode);
 				}
@@ -1821,24 +1786,28 @@ public class SettingsExecute {
 			return errorEmbed("This role is not a one level role. Use `/settings roles add <role_name> <value> <@role>` instead");
 		}
 
+		if (roleMention.equalsIgnoreCase("none")) {
+			int responseCode = database.removeRoleSettings(guild.getId(), roleName);
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+
+			return defaultSettingsEmbed("Removed " + roleName);
+		}
+
 		Object eb = checkRole(roleMention);
 		if (eb instanceof EmbedBuilder e) {
 			return e;
 		}
 		Role role = ((Role) eb);
 
-		JsonObject newRoleSettings;
-		try {
-			newRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
-		} catch (Exception e) {
-			return errorEmbed("Invalid role");
+		RoleModel roleSettings = database.getRoleSettings(guild.getId(), roleName);
+		if (roleSettings == null) {
+			roleSettings = new RoleModel(roleName);
 		}
+		roleSettings.addLevel("default", role.getId());
 
-		JsonArray currentLevels = new JsonArray();
-		currentLevels.add(gson.toJsonTree(new RoleObject("default", role.getId())));
-		newRoleSettings.add("levels", currentLevels);
-
-		int responseCode = database.setRoleSettings(guild.getId(), roleName, newRoleSettings);
+		int responseCode = database.setRoleSettings(guild.getId(), roleSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
@@ -1847,11 +1816,8 @@ public class SettingsExecute {
 	}
 
 	public boolean allowRolesEnable() {
-		JsonObject currentSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
-
-		currentSettings.remove("enable");
-		currentSettings.remove("useHighest");
-		return currentSettings.keySet().stream().anyMatch(role -> higherDepth(currentSettings, role + ".levels.[0]") != null);
+		return streamJsonArray(higherDepth(database.getRolesSettings(guild.getId()), "roles"))
+			.anyMatch(role -> higherDepth(role, "levels.[0]") != null);
 	}
 
 	/* Verify Settings */
@@ -1907,12 +1873,12 @@ public class SettingsExecute {
 
 	public EmbedBuilder setVerifyMessageText(String verifyText) {
 		verifyText = verifyText.replace("\\n", "\n");
-		String verifyTextEmoj = EmojiParser.parseToAliases(verifyText);
-		if (verifyText.isEmpty() || verifyTextEmoj.length() > 1500) {
+		String verifyTextEmoji = EmojiParser.parseToAliases(verifyText);
+		if (verifyText.isEmpty() || verifyTextEmoji.length() > 1500) {
 			return errorEmbed("Text must be between 1 to 1500 characters");
 		}
 
-		int responseCode = updateVerifySettings("messageText", verifyTextEmoj);
+		int responseCode = updateVerifySettings("messageText", verifyTextEmoji);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}

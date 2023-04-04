@@ -18,8 +18,12 @@
 
 package com.skyblockplus.api.serversettings.automatedroles;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,126 +39,6 @@ public class AutomatedRoles {
 	private String enable = "false";
 	private String useHighest = "false";
 
-	@Embedded
-	private RoleModel sven = new RoleModel();
-
-	@Embedded
-	private RoleModel rev = new RoleModel();
-
-	@Embedded
-	private RoleModel tara = new RoleModel();
-
-	@Embedded
-	private RoleModel blaze = new RoleModel();
-
-	@Embedded
-	private RoleModel enderman = new RoleModel();
-
-	@Embedded
-	private RoleModel alchemy = new RoleModel();
-
-	@Embedded
-	private RoleModel combat = new RoleModel();
-
-	@Embedded
-	private RoleModel fishing = new RoleModel();
-
-	@Embedded
-	private RoleModel farming = new RoleModel();
-
-	@Embedded
-	private RoleModel foraging = new RoleModel();
-
-	@Embedded
-	private RoleModel carpentry = new RoleModel();
-
-	@Embedded
-	private RoleModel mining = new RoleModel();
-
-	@Embedded
-	private RoleModel taming = new RoleModel();
-
-	@Embedded
-	private RoleModel enchanting = new RoleModel();
-
-	@Embedded
-	private RoleModel catacombs = new RoleModel();
-
-	@Embedded
-	private RoleModel healer = new RoleModel();
-
-	@Embedded
-	private RoleModel mage = new RoleModel();
-
-	@Embedded
-	private RoleModel berserk = new RoleModel();
-
-	@Embedded
-	private RoleModel archer = new RoleModel();
-
-	@Embedded
-	private RoleModel tank = new RoleModel();
-
-	@Embedded
-	private RoleModel weight = new RoleModel();
-
-	@Embedded
-	private RoleModel guild_member = new RoleModel();
-
-	@Embedded
-	private RoleModel guild_ranks = new RoleModel();
-
-	@Embedded
-	private RoleModel coins = new RoleModel();
-
-	@Embedded
-	private RoleModel fairy_souls = new RoleModel();
-
-	@Embedded
-	private RoleModel slot_collector = new RoleModel();
-
-	@Embedded
-	private RoleModel pet_enthusiast = new RoleModel();
-
-	@Embedded
-	private RoleModel total_slayer = new RoleModel();
-
-	@Embedded
-	private RoleModel slayer_nine = new RoleModel();
-
-	@Embedded
-	private RoleModel skill_average = new RoleModel();
-
-	@Embedded
-	private RoleModel pet_score = new RoleModel();
-
-	@Embedded
-	private RoleModel dungeon_secrets = new RoleModel();
-
-	@Embedded
-	private RoleModel accessory_count = new RoleModel();
-
-	@Embedded
-	private RoleModel networth = new RoleModel();
-
-	@Embedded
-	private RoleModel gamemode = new RoleModel();
-
-	@Embedded
-	private RoleModel maxed_collections = new RoleModel();
-
-	@Embedded
-	private RoleModel player_items = new RoleModel();
-
-	@Embedded
-	private RoleModel mage_rep = new RoleModel();
-
-	@Embedded
-	private RoleModel barbarian_rep = new RoleModel();
-
-	@Embedded
-	private RoleModel level = new RoleModel();
-
-	@Embedded
-	private RoleModel social = new RoleModel();
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "serverSettings", orphanRemoval = true)
+	private List<RoleModel> roles = new ArrayList<>();
 }

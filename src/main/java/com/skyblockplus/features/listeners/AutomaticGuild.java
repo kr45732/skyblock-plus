@@ -756,7 +756,11 @@ public class AutomaticGuild {
 								if (
 									updateNick && (player == null || player.isValid()) && (hypixelPlayer == null || hypixelPlayer.isValid())
 								) {
-									linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
+									try {
+										linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
+									} catch (PermissionException ignored) {
+										// The permissions should've already been checked but seems to still throw
+									}
 								}
 							}
 						}

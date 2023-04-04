@@ -18,7 +18,7 @@
 
 package com.skyblockplus.features.jacob;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.cropNameToEmoji;
 
 import java.time.Duration;
 import java.time.Instant;

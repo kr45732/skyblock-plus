@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021-2023 kr45732
+ * Copyright (c) 2023 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,28 +18,68 @@
 
 package com.skyblockplus.api.serversettings.automatedroles;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.FetchType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
+import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
+import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Objects;
+import lombok.*;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.springframework.transaction.annotation.Transactional;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Embeddable
-@Transactional
+@Entity
 public class RoleModel {
 
-	private String enable = "false";
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "server_settings_id")
+	@JsonIgnore
+	@Expose(serialize = false, deserialize = false)
+	@ToString.Exclude
+	private ServerSettingsModel serverSettings;
+
+	private String name;
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<RoleObject> levels = new ArrayList<>();
+
+	public RoleModel(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+		RoleModel that = (RoleModel) o;
+		return id != null && Objects.equals(id, that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public void addLevel(String value, String roleId) {
+		levels.removeIf(l -> l.getValue().equals(value));
+		levels.add(new RoleObject(value, roleId));
+		try {
+			levels.sort(Comparator.comparingLong(r -> Long.parseLong(r.getValue())));
+		} catch (Exception ignored) {
+			// Catch for non-numeric roles (e.g. guild member, guild ranks, etc)
+		}
+	}
 }

@@ -19,7 +19,8 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;

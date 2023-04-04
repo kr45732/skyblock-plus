@@ -18,7 +18,7 @@
 
 package com.skyblockplus.miscellaneous.weight.senither;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.CATACOMBS_LEVEL_50_XP;
 import static com.skyblockplus.utils.utils.JsonUtils.getWeightJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 

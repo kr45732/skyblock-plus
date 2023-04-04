@@ -79,8 +79,8 @@ public class Database {
 		return settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCode().value();
 	}
 
-	public int setServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
-		return settingsService.setServerSettings(serverId, serverSettingsModel).getStatusCode().value();
+	public int setServerSettings(ServerSettingsModel serverSettingsModel) {
+		return settingsService.setServerSettings(serverSettingsModel).getStatusCode().value();
 	}
 
 	public int deleteServerSettings(String serverId) {
@@ -103,12 +103,16 @@ public class Database {
 		return settingsService.setRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCode().value();
 	}
 
-	public JsonElement getRoleSettings(String serverId, String roleName) {
-		return gson.toJsonTree(settingsService.getRoleSettings(serverId, roleName).getBody());
+	public RoleModel getRoleSettings(String serverId, String roleName) {
+		return settingsService.getRoleSettings(serverId, roleName).getBody();
 	}
 
-	public int setRoleSettings(String serverId, String roleName, JsonElement newRoleSettings) {
-		return settingsService.setRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName).getStatusCode().value();
+	public int setRoleSettings(String serverId, RoleModel newRoleSettings) {
+		return settingsService.setRoleSettings(serverId, newRoleSettings).getStatusCode().value();
+	}
+
+	public int removeRoleSettings(String serverId, String roleName) {
+		return settingsService.removeRoleSettings(serverId, roleName).getStatusCode().value();
 	}
 
 	public int setApplyCacheSettings(String serverId, String name, String currentSettings) {

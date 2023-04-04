@@ -19,8 +19,6 @@
 package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
-import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.HypixelUtils.petLevelFromXp;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;

@@ -303,7 +303,7 @@ public class ApplyGuild {
 				);
 		} catch (Exception ignored) {}
 
-		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS, ignore);
+		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS, ignore, ignore);
 		return client.getSuccess() + " Player was invited";
 	}
 }
