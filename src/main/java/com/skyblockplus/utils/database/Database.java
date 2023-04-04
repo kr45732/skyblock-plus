@@ -99,6 +99,9 @@ public class Database {
 		return gson.toJsonTree(settingsService.getRolesSettings(serverId).getBody());
 	}
 
+	/**
+	 * Only updates enable and use_highest
+	 */
 	public int setRolesSettings(String serverId, JsonElement newRoleSettings) {
 		return settingsService.setRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCode().value();
 	}

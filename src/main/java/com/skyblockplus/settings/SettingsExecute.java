@@ -70,7 +70,7 @@ import org.apache.groovy.util.Maps;
 
 public class SettingsExecute {
 
-	private static final Map<String, String> allAutomatedRoles = new HashMap<>(
+	private static final Map<String, String> allAutomatedRoles = new LinkedHashMap<>(
 		Maps.of(
 			"sven",
 			null,
@@ -1530,13 +1530,13 @@ public class SettingsExecute {
 		);
 
 		for (Entry<String, String> roleDesc : allAutomatedRoles.entrySet()) {
-			StringBuilder ebFieldString = new StringBuilder().append(roleDesc.getValue()).append("\nSettings\n");
+			StringBuilder ebFieldString = new StringBuilder().append(roleDesc.getValue()).append("\nSettings");
 			JsonElement roleSettings = streamJsonArray(higherDepth(rolesSettings, "roles"))
-				.filter(e -> higherDepth(e, "name", "").equals(roleDesc.getValue()))
+				.filter(e -> higherDepth(e, "name", "").equals(roleDesc.getKey()))
 				.findFirst()
 				.orElse(null);
 
-			if (roleDesc.getValue().equals("guild_ranks")) {
+			if (roleDesc.getKey().equals("guild_ranks")) {
 				if (higherDepth(roleSettings, "levels.[0]") == null) {
 					ebFieldString.append("\n• No ranks added");
 				} else {
@@ -1550,17 +1550,17 @@ public class SettingsExecute {
 							.append("`)");
 					}
 				}
-			} else if (isOneLevelRole(roleDesc.getValue())) {
+			} else if (isOneLevelRole(roleDesc.getKey())) {
 				ebFieldString.append(
 					higherDepth(roleSettings, "levels.[0]") != null
 						? "\n• <@&" + higherDepth(roleSettings, "levels.[0].roleId").getAsString() + ">"
-						: "\n • No role set"
+						: "\n• No role set"
 				);
 			} else {
 				if (higherDepth(roleSettings, "levels.[0]") == null) {
 					ebFieldString.append("\n• No ranks added");
 				} else {
-					if (roleDesc.getValue().equals("guild_member")) {
+					if (roleDesc.getKey().equals("guild_member")) {
 						for (JsonElement roleLevel : higherDepth(roleSettings, "levels").getAsJsonArray()) {
 							String guildId = higherDepth(roleLevel, "value").getAsString();
 							HypixelResponse guildJson = getGuildFromId(guildId);
@@ -1596,7 +1596,7 @@ public class SettingsExecute {
 				}
 			}
 
-			pageTitles.add(roleDesc.getValue() + (isOneLevelRole(roleDesc.getValue()) ? " (__one level role__)" : ""));
+			pageTitles.add(roleDesc.getKey() + (isOneLevelRole(roleDesc.getKey()) ? " (__one level role__)" : ""));
 			paginateBuilder.addItems(ebFieldString.toString());
 		}
 

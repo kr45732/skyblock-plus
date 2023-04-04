@@ -150,11 +150,16 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
+	/**
+	 * Only updates enable and use_highest
+	 */
 	public ResponseEntity<HttpStatus> setRolesSettings(String serverId, AutomatedRoles newRoleSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			currentServerSettings.setAutomatedRoles(newRoleSettings);
+			AutomatedRoles automatedRoles = currentServerSettings.getAutomatedRoles();
+			automatedRoles.setEnable(newRoleSettings.getEnable());
+			automatedRoles.setUseHighest(newRoleSettings.getUseHighest());
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}

@@ -67,9 +67,8 @@ public class GetSettingsCommand extends Command {
 	}
 
 	private String getServerSettings(String guildId) {
-		Guild guild = jda.getGuildById(guildId);
 		JsonElement currentSettings = database.getServerSettings(guildId);
-		if (guild == null || currentSettings == null) {
+		if (currentSettings == null) {
 			return "No settings for provided guild id";
 		}
 
