@@ -239,7 +239,7 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("inventory"),
 				new HelpData(
 					"sacks",
-					"Get a player's sacks' content bag represented in a list. Sorted by descending price.",
+					"Get a player's sacks content bag represented in a list. Sorted by descending price.",
 					"sacks [player] [profile] [npc]"
 				)
 					.setCategory("inventory"),
@@ -802,7 +802,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("talisman emoji [player] [profile]", "Get a player's talisman bag represented in emojis") +
 			create("talisman list [player] [profile] [slot]", "Get a player's talisman bag with lore") +
 			create("talisman tuning [player] [profile]", "Get a player's power stone stats and tuning stats") +
-			create("sacks [player] [profile] [npc]", "Get a player's sacks' content bag represented in a list") +
+			create("sacks [player] [profile] [npc]", "Get a player's sacks content bag represented in a list") +
 			create("wardrobe emoji [player] [profile]", "Get a player's wardrobe armors represented in emojis") +
 			create("wardrobe list [player] [profile]", "Get a player's wardrobe armors represented in a list") +
 			create("pets [player] [profile]", "Get a player's pets")
