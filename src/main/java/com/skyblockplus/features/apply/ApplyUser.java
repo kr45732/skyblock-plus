@@ -367,7 +367,7 @@ public class ApplyUser implements Serializable {
 			try {
 				playerLevel = roundAndFormat(player.getLevel());
 			} catch (Exception e) {
-				playerLilyWeight = "API disabled";
+				playerLevel = "API disabled";
 			}
 
 			playerUsername = player.getUsername();

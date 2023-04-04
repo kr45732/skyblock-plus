@@ -55,6 +55,9 @@ public class CheckReqsSlashCommand extends SlashCommand {
 		}
 
 		Player.Profile player = Player.create(username, profileName);
+		if (!player.isValid()) {
+			return player.getErrorEmbed();
+		}
 
 		CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES, event.getUser());
 
