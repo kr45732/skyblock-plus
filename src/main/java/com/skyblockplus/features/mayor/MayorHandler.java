@@ -245,7 +245,7 @@ public class MayorHandler {
 				ImageIO.write(
 					ImageIO.read(
 						new URIBuilder("https://quickchart.io/chart")
-							.addParameter("bkg", "#2f3136")
+							.addParameter("bkg", "#2b2d31")
 							.addParameter(
 								"c",
 								"{ type: 'bar', data: { labels: [" +
