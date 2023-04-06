@@ -23,12 +23,12 @@ import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.Utils.*;
 
+import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -39,10 +39,11 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
 
 public class MainListener extends ListenerAdapter {
@@ -96,14 +97,6 @@ public class MainListener extends ListenerAdapter {
 
 		if (!guildMap.containsKey(event.getGuild().getId())) {
 			try {
-				EmbedBuilder eb = defaultEmbed("Thank you!")
-					.setDescription(
-						"- Thank you for adding me to " +
-						event.getGuild().getName() +
-						"\n- You can view my commands by running `/help`\n- Make sure to check out `/setup` or the forum post [**here**](" +
-						FORUM_POST_LINK +
-						") on how to setup customizable features such as automatic roles, verification, notifications, and much more!"
-					);
 				TextChannel channel = event
 					.getGuild()
 					.getTextChannels()
@@ -121,8 +114,28 @@ public class MainListener extends ListenerAdapter {
 					);
 				if (channel != null) {
 					channel
-						.sendMessageEmbeds(eb.build())
-						.addActionRow(Button.primary("thank_you_setup", "Setup The Bot"))
+						.sendMessageEmbeds(
+							defaultEmbed("Thank you!")
+								.setDescription(
+									"- Thank you for adding me to " +
+									event.getGuild().getName() +
+									"\n- You can view my commands by running `/help`\n- Make sure to check out `/setup`, use the select menu below, or view the [forum post](" +
+									FORUM_POST_LINK +
+									") on how to setup customizable features such as automatic roles, verification, notifications, and much more!"
+								)
+								.build()
+						)
+						.addActionRow(
+							StringSelectMenu
+								.create("thank_you_setup")
+								.addOption("Automatic Verification", "verify")
+								.addOption("Automatic Guild Application, Roles & Ranks", "guild_name")
+								.addOption("Automatic Roles", "roles")
+								.addOption("Jacob Event Notifications", "jacob")
+								.addOption("Mayor Notifications", "mayor")
+								.addOption("Fetchur Notifications", "fetchur")
+								.build()
+						)
 						.queue(ignore, ignore);
 				}
 			} catch (Exception ignored) {}
@@ -221,6 +234,17 @@ public class MainListener extends ListenerAdapter {
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onGuildMemberJoin(event);
+		}
+	}
+
+	@Override
+	public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
+		if (event.getUser().isBot() || event.getGuild() == null) {
+			return;
+		}
+
+		if (guildMap.get(event.getGuild().getId()).isAdmin(event.getMember()) && event.getComponentId().equals("thank_you_setup")) {
+			new SetupCommandHandler(event.getHook(), event.getSelectedOptions().get(0).getValue());
 		}
 	}
 }

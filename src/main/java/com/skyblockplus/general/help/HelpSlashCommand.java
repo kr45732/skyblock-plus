@@ -543,7 +543,7 @@ public class HelpSlashCommand extends SlashCommand {
 									"use_highest <enable|disable>"
 								)
 							),
-						new HelpData("guild", "Main command for automatic guild (application and guild roles/ranks).")
+						new HelpData("guild", "Main command for automatic guild (application and guild role/ranks).")
 							.addSecondData("List all setup automatic guilds.", "guild")
 							.addSubcommands(
 								new HelpData("create", "Create a new automatic guild for a guild.", "create <name>")

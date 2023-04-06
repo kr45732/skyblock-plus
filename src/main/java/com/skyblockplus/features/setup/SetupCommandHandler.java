@@ -22,10 +22,12 @@ import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
 import static com.skyblockplus.utils.Constants.cropNameToEmoji;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.settings.SettingsExecute;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +38,10 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
@@ -50,20 +52,21 @@ import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 public class SetupCommandHandler {
 
-	private final ButtonInteractionEvent buttonEvent;
+	private final InteractionHook hook;
 	private SettingsExecute settings;
 	private FeatureType featureType;
 	private boolean fetchurOrMayorChannelSet = false;
+	private String messageId;
 
-	public SetupCommandHandler(ButtonInteractionEvent buttonEvent, String feature) {
-		this.buttonEvent = buttonEvent;
+	public SetupCommandHandler(InteractionHook hook, String feature) {
+		this.hook = hook;
 		this.featureType = FeatureType.valueOf(feature.toUpperCase());
 
 		// TODO: add buttons to go back
 		// TODO: add sb event notif setup
 		switch (this.featureType) {
-			case VERIFY -> buttonEvent
-				.editMessage(
+			case VERIFY -> hook
+				.editOriginal(
 					new MessageEditBuilder()
 						.setEmbeds(
 							defaultEmbed("Setup").setDescription("Use the menu below to configure the verification settings").build()
@@ -84,49 +87,54 @@ public class SetupCommandHandler {
 						)
 						.build()
 				)
-				.queue();
-			case GUILD -> buttonEvent
-				.replyModal(
-					Modal
-						.create("setup_command_" + featureType, "Setup")
-						.addActionRow(
-							TextInput
-								.create("value", "Guild Name", TextInputStyle.SHORT)
-								.setPlaceholder("Name of your Hypixel guild")
-								.build()
+				.queue(m -> waitForEvent(m.getId()));
+			case GUILD_NAME -> {
+				List<SelectOption> selectOptions = new ArrayList<>();
+				for (AutomatedGuild guildSettings : database.getAllGuildSettings(hook.getInteraction().getGuild().getId())) {
+					selectOptions.add(
+						SelectOption.of(capitalizeString(guildSettings.getGuildName().replace("_", " ")), guildSettings.getGuildName())
+					);
+				}
+				selectOptions.add(SelectOption.of("Create New Automatic Guild", "$new"));
+				hook
+					.editOriginal(
+						new MessageEditBuilder()
+							.setEmbeds(
+								defaultEmbed("Setup")
+									.setDescription("Use the menu below to choose an existing automatic guild or create a new one")
+									.build()
+							)
+							.setActionRow(StringSelectMenu.create("setup_command_" + featureType).addOptions(selectOptions).build())
+							.build()
+					)
+					.queue(m -> waitForEvent(m.getId()));
+			}
+			case ROLES -> hook
+				.editOriginalEmbeds(
+					defaultEmbed("Setup")
+						.setDescription(
+							"""
+                                                        **__Overview__**
+                                                        1) When a user runs `/roles claim` or when their roles are synced, their stats are fetched
+                                                        2) Based on the roles configuration for this server and the user's stats, the corresponding roles will be given
+
+                                                        **__Setup__**
+                                                        - In order to enable automatic roles, there must be at least one role setup:
+                                                        - `/settings roles add <role_name> <value> <@role>` - add a level to a role
+                                                        - `/settings roles set <role_name> <@role>` - set a one level role
+
+                                                        **__Enable__**
+                                                        - Once at least one role is setup, run `/settings roles enable` to enable roles
+                                                        - To view all the roles, their descriptions, and examples, run `/settings roles`
+                                                        - For more help, run `/help settings roles` or follow the example video [__here__](https://streamable.com/wninsw) (outdated)
+                                                        """
 						)
 						.build()
 				)
-				.queue(ignored -> buttonEvent.getHook().editOriginalComponents().queue());
-			case ROLES -> {
-				buttonEvent
-					.editMessageEmbeds(
-						defaultEmbed("Setup")
-							.setDescription(
-								"""
-                                                        **__Overview__**
-                                                        1) When a user runs `/roles claim` their stats are fetched
-                                                        2) Based on the roles setup for this server and the users stats, the corresponding roles will be given
-
-                                                        **__Setup__**
-                                                        - In order to enable automatic roles, there must be at least one role setting enabled:
-                                                        - `/settings roles add <role_name> <value> <@role>` - add a level to a role
-                                                        - `/settings roles set <role_name> <@role>` - set a one level role's role
-
-                                                        **__Enable__**
-                                                        - Once all these settings are set run `/settings roles enable` to enable roles
-                                                        - To view all the roles, their descriptions, and examples, run `/settings roles`
-                                                        - For more help, run `/help settings roles` or follow the example video [__here__](https://streamable.com/wninsw)
-                                                        """
-							)
-							.build()
-					)
-					.setComponents()
-					.queue();
-				return;
-			}
-			case FETCHUR -> buttonEvent
-				.editMessage(
+				.setComponents()
+				.queue();
+			case FETCHUR -> hook
+				.editOriginal(
 					new MessageEditBuilder()
 						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the fetchur settings").build())
 						.setActionRow(
@@ -138,9 +146,9 @@ public class SetupCommandHandler {
 						)
 						.build()
 				)
-				.queue();
-			case MAYOR -> buttonEvent
-				.editMessage(
+				.queue(m -> waitForEvent(m.getId()));
+			case MAYOR -> hook
+				.editOriginal(
 					new MessageEditBuilder()
 						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the mayor settings").build())
 						.setActionRow(
@@ -152,9 +160,9 @@ public class SetupCommandHandler {
 						)
 						.build()
 				)
-				.queue();
-			case JACOB -> buttonEvent
-				.editMessage(
+				.queue(m -> waitForEvent(m.getId()));
+			case JACOB -> hook
+				.editOriginal(
 					new MessageEditBuilder()
 						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the jacob settings").build())
 						.setActionRow(
@@ -167,9 +175,8 @@ public class SetupCommandHandler {
 						)
 						.build()
 				)
-				.queue();
+				.queue(m -> waitForEvent(m.getId()));
 		}
-		waitForEvent();
 	}
 
 	private boolean condition(GenericInteractionCreateEvent genericEvent) {
@@ -177,17 +184,17 @@ public class SetupCommandHandler {
 			return (
 				event.isFromGuild() &&
 				event.getMessage() != null &&
-				event.getMessage().getId().equals(buttonEvent.getMessageId()) &&
-				event.getUser().getId().equals(buttonEvent.getUser().getId())
+				event.getMessage().getId().equals(messageId) &&
+				event.getUser().getId().equals(hook.getInteraction().getUser().getId())
 			);
 		} else if (genericEvent instanceof GenericSelectMenuInteractionEvent event) {
-			if (event.isFromGuild() && event.getUser().getId().equals(buttonEvent.getUser().getId())) {
-				if (event.getMessageId().equals(buttonEvent.getMessageId())) {
+			if (event.isFromGuild() && event.getUser().getId().equals(hook.getInteraction().getUser().getId())) {
+				if (event.getMessageId().equals(messageId)) {
 					return true;
 				}
 				if (event.getComponentId().startsWith("setup_command_")) {
 					String[] split = event.getComponentId().split("setup_command_")[1].split("_", 2);
-					return split.length >= 1 && split[0].equals(buttonEvent.getMessageId());
+					return split.length >= 1 && split[0].equals(messageId);
 				}
 			}
 		}
@@ -247,10 +254,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Roles given when verifying").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.ROLE
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.ROLE)
 								.setMaxValues(3)
 								.build()
 						)
@@ -260,10 +264,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Verification Channel").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.CHANNEL
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.CHANNEL)
 								.setChannelTypes(ChannelType.TEXT)
 								.build()
 						)
@@ -286,10 +287,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Role removed when verified").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.ROLE
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.ROLE)
 								.build()
 						)
 						.setEphemeral(true)
@@ -347,6 +345,41 @@ public class SetupCommandHandler {
 						);
 				}
 			}
+			case GUILD_NAME -> {
+				String selectedOption = event.getSelectedOptions().get(0).getValue();
+				featureType = FeatureType.GUILD;
+				if (selectedOption.equals("$new")) {
+					event
+						.replyModal(
+							Modal
+								.create("setup_command_" + featureType, "Setup")
+								.addActionRow(
+									TextInput
+										.create("value", "Guild Name", TextInputStyle.SHORT)
+										.setPlaceholder("Name of the Hypixel guild")
+										.build()
+								)
+								.build()
+						)
+						.queue();
+				} else {
+					featureType.setGuildName(selectedOption);
+					event
+						.editMessageEmbeds(
+							defaultEmbed("Setup").setDescription("Use the menu below to setup an automatic guild feature").build()
+						)
+						.setActionRow(
+							StringSelectMenu
+								.create("setup_command_" + featureType)
+								.addOption("Automated Apply", "guild_apply")
+								.addOption("Guild Member Role", "guild_role")
+								.addOption("Guild Ranks", "guild_ranks")
+								.addOption("Guild Member Counter", "guild_counter")
+								.build()
+						)
+						.queue();
+				}
+			}
 			case GUILD -> {
 				featureType =
 					FeatureType.valueOf(event.getSelectedOptions().get(0).getValue().toUpperCase()).setGuildName(featureType.guildName);
@@ -389,6 +422,7 @@ public class SetupCommandHandler {
 								.getHook()
 								.editOriginalEmbeds(defaultEmbed("Success").setDescription("Enabled guild member counter").build())
 								.queue(ignore, ignore);
+							event.getMessage().editMessageComponents().queue();
 							return true;
 						} else {
 							event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again").build()).queue();
@@ -410,9 +444,7 @@ public class SetupCommandHandler {
 					case GUILD_ROLE -> event
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Guild Member Role").build())
 						.setActionRow(
-							EntitySelectMenu
-								.create("setup_command_" + buttonEvent.getMessageId() + "_role", EntitySelectMenu.SelectTarget.ROLE)
-								.build()
+							EntitySelectMenu.create("setup_command_" + messageId + "_role", EntitySelectMenu.SelectTarget.ROLE).build()
 						)
 						.setEphemeral(true)
 						.queue();
@@ -462,10 +494,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Application Channel").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.CHANNEL
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.CHANNEL)
 								.setChannelTypes(ChannelType.TEXT)
 								.build()
 						)
@@ -475,10 +504,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("New Application Category").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.CHANNEL
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.CHANNEL)
 								.setChannelTypes(ChannelType.CATEGORY)
 								.build()
 						)
@@ -488,10 +514,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Staff Channel").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.CHANNEL
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.CHANNEL)
 								.setChannelTypes(ChannelType.TEXT)
 								.build()
 						)
@@ -501,10 +524,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Staff Ping Role").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.ROLE
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.ROLE)
 								.build()
 						)
 						.setEphemeral(true)
@@ -532,10 +552,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Waiting Channel").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.CHANNEL
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.CHANNEL)
 								.setChannelTypes(ChannelType.TEXT)
 								.build()
 						)
@@ -598,10 +615,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Fetchur Role").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.ROLE
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.ROLE)
 								.build()
 						)
 						.setEphemeral(true)
@@ -610,10 +624,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Fetchur Channel").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.CHANNEL
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.CHANNEL)
 								.setChannelTypes(ChannelType.TEXT)
 								.build()
 						)
@@ -628,10 +639,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Mayor Role").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.ROLE
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.ROLE)
 								.build()
 						)
 						.setEphemeral(true)
@@ -640,10 +648,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Mayor Channel").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.CHANNEL
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.CHANNEL)
 								.setChannelTypes(ChannelType.TEXT)
 								.build()
 						)
@@ -677,10 +682,7 @@ public class SetupCommandHandler {
 						event
 							.replyEmbeds(defaultEmbed("Setup").setDescription("Crop Type").build())
 							.setActionRow(
-								StringSelectMenu
-									.create("setup_command_" + buttonEvent.getMessageId() + "_crop_type")
-									.addOptions(cropOptions)
-									.build()
+								StringSelectMenu.create("setup_command_" + messageId + "_crop_type").addOptions(cropOptions).build()
 							)
 							.setEphemeral(true)
 							.queue();
@@ -689,10 +691,7 @@ public class SetupCommandHandler {
 						.replyEmbeds(defaultEmbed("Setup").setDescription("Jacob Channel").build())
 						.setActionRow(
 							EntitySelectMenu
-								.create(
-									"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-									EntitySelectMenu.SelectTarget.CHANNEL
-								)
+								.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.CHANNEL)
 								.setChannelTypes(ChannelType.TEXT)
 								.build()
 						)
@@ -704,10 +703,7 @@ public class SetupCommandHandler {
 								.replyEmbeds(defaultEmbed("Setup").setDescription("Crop Role").build())
 								.setActionRow(
 									EntitySelectMenu
-										.create(
-											"setup_command_" + buttonEvent.getMessageId() + "_" + selectedOption,
-											EntitySelectMenu.SelectTarget.ROLE
-										)
+										.create("setup_command_" + messageId + "_" + selectedOption, EntitySelectMenu.SelectTarget.ROLE)
 										.build()
 								)
 								.setEphemeral(true)
@@ -860,7 +856,7 @@ public class SetupCommandHandler {
 					event
 						.getHook()
 						.editOriginalEmbeds(
-							defaultEmbed("Setup").setDescription("Use the buttons below to setup the corresponding features").build()
+							defaultEmbed("Setup").setDescription("Use the menu below to setup an automatic guild feature").build()
 						)
 						.setActionRow(
 							StringSelectMenu
@@ -952,14 +948,22 @@ public class SetupCommandHandler {
 	private SettingsExecute getSettings() {
 		return settings != null
 			? settings
-			: (this.settings = new SettingsExecute(buttonEvent.getGuild(), buttonEvent.getUser(), buttonEvent.getHook()));
+			: (this.settings = new SettingsExecute(hook.getInteraction().getGuild(), hook.getInteraction().getUser(), hook));
 	}
 
 	private JsonObject getGuildSettings() {
-		return database.getGuildSettings(buttonEvent.getGuild().getId(), featureType.guildName).getAsJsonObject();
+		return database.getGuildSettings(hook.getInteraction().getGuild().getId(), featureType.guildName).getAsJsonObject();
 	}
 
 	private void waitForEvent() {
+		waitForEvent(null);
+	}
+
+	private void waitForEvent(String messageId) {
+		if (messageId != null) {
+			this.messageId = messageId;
+		}
+
 		waiter.waitForEvent(
 			GenericInteractionCreateEvent.class,
 			this::condition,
@@ -969,11 +973,10 @@ public class SetupCommandHandler {
 			() -> {
 				try {
 					if ((featureType == FeatureType.FETCHUR || featureType == FeatureType.MAYOR) && fetchurOrMayorChannelSet) {
-						buttonEvent.getMessage().editMessageComponents().queue(ignore, ignore);
+						hook.editOriginalComponents().queue(ignore, ignore);
 					} else {
-						buttonEvent
-							.getMessage()
-							.editMessageEmbeds(defaultEmbed("Setup").setDescription("Timeout").build())
+						hook
+							.editOriginalEmbeds(defaultEmbed("Setup").setDescription("Timeout").build())
 							.setComponents()
 							.queue(ignore, ignore);
 					}
@@ -992,7 +995,8 @@ public class SetupCommandHandler {
 		GUILD_ROLE,
 		GUILD_RANKS,
 		GUILD_COUNTER,
-		GUILD_APPLY;
+		GUILD_APPLY,
+		GUILD_NAME;
 
 		String guildName;
 

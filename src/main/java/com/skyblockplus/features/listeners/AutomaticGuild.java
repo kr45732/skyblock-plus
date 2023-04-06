@@ -39,8 +39,6 @@ import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.event.EventGuild;
 import com.skyblockplus.features.jacob.JacobGuild;
 import com.skyblockplus.features.party.Party;
-import com.skyblockplus.features.setup.SetupCommandHandler;
-import com.skyblockplus.features.setup.SetupSlashCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
 import com.skyblockplus.features.verify.VerifyGuild;
@@ -95,7 +93,6 @@ import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1240,10 +1237,6 @@ public class AutomaticGuild {
 			String[] cmdSplit = event.getComponentId().split("s_help_")[1].split("\\s+", 2);
 			HelpData matchCmd = HelpSlashCommand.helpDataList.stream().filter(cmd -> cmd.matchTo(cmdSplit[0])).findFirst().orElse(null);
 			event.replyEmbeds(matchCmd.getHelp(cmdSplit.length == 2 ? cmdSplit[1] : null).build()).setEphemeral(true).queue();
-		} else if (event.getComponentId().equals("thank_you_setup")) {
-			if (isAdmin(event.getMember())) {
-				event.reply(MessageCreateData.fromEditData(SetupSlashCommand.getSetupEmbed().build())).queue();
-			}
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {
@@ -1438,15 +1431,6 @@ public class AutomaticGuild {
 						}
 					}
 				});
-		} else if (event.getComponentId().startsWith("setup_command_")) {
-			if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
-				event
-					.reply(client.getError() + " You are missing the required permissions or roles to use this")
-					.setEphemeral(true)
-					.queue();
-			} else {
-				new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
-			}
 		} else if (event.getComponentId().startsWith("party_finder_channel_close_")) {
 			if (event.getUser().getId().equals(event.getComponentId().split("party_finder_channel_close_")[1])) {
 				event

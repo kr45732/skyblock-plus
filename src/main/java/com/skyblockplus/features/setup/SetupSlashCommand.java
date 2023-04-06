@@ -18,16 +18,13 @@
 
 package com.skyblockplus.features.setup;
 
-import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
-
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -38,36 +35,23 @@ public class SetupSlashCommand extends SlashCommand {
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 	}
 
-	public static MessageEditBuilder getSetupEmbed() {
-		return new MessageEditBuilder()
-			.setEmbeds(
-				defaultEmbed("Setup")
-					.setDescription(
-						"Choose one of the buttons below to setup the corresponding feature. Note that setting up a feature may override previous settings."
-					)
-					.build()
-			)
-			.setComponents(
-				ActionRow.of(
-					Button.primary("setup_command_verify", "Verification"),
-					Button.primary("setup_command_guild", "Guild Application, Roles & Ranks"),
-					Button.primary("setup_command_roles", "Skyblock Roles")
-				),
-				ActionRow.of(
-					Button.primary("setup_command_jacob", "Farming Event Notifications"),
-					Button.primary("setup_command_mayor", "Mayor Notifications"),
-					Button.primary("setup_command_fetchur", "Fetchur Notifications")
-				)
-			);
-	}
-
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.embed(getSetupEmbed());
+		new SetupCommandHandler(event.getHook(), event.getOptionStr("feature"));
 	}
 
 	@Override
 	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Interactive walk-throughs on how to setup different features");
+		return Commands
+			.slash(name, "Interactive walk-through on how to setup different features of the bot")
+			.addOptions(
+				new OptionData(OptionType.STRING, "feature", "Feature to setup", true)
+					.addChoice("Automatic Verification", "verify")
+					.addChoice("Automatic Guild Application, Roles & Ranks", "guild_name")
+					.addChoice("Automatic Roles", "roles")
+					.addChoice("Jacob Event Notifications", "jacob")
+					.addChoice("Mayor Notifications", "mayor")
+					.addChoice("Fetchur Notifications", "fetchur")
+			);
 	}
 }
