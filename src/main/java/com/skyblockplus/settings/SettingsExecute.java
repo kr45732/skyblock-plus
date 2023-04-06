@@ -1484,7 +1484,17 @@ public class SettingsExecute {
 			false
 		);
 
-		eb.addField("Guild Counter", higherDepth(settings, "guildCounterEnable", false) ? "Enabled" : "Disabled", false);
+		eb.addField(
+			"Guild Counter",
+			"• " +
+			(higherDepth(settings, "guildCounterEnable", false) ? "Enabled" : "Disabled") +
+			(
+				higherDepth(settings, "guildCounterEnable", false)
+					? "\n• Counter Channel: " + displaySettings(settings, "guildCounterChannel")
+					: ""
+			),
+			false
+		);
 		extras.addEmbedPage(eb);
 		paginateBuilder.setPaginatorExtras(extras).build().paginate(interactionHook, 0);
 		return null;
@@ -2761,6 +2771,7 @@ public class SettingsExecute {
 					case "messageTextChannelId":
 					case "channel":
 					case "applyCategory":
+					case "guildCounterChannel":
 						return "<#" + currentSettingValue + ">";
 					case "roleId":
 					case "guildMemberRole":
