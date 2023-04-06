@@ -39,7 +39,7 @@ import org.apache.groovy.util.Maps;
 public class Constants {
 
 	/* Harcoded constants */
-	public static final List<String> essenceTypes = List.of("undead", "wither", "dragon", "spider", "ice", "crimson");
+	public static final List<String> essenceTypes = List.of("undead", "wither", "dragon", "spider", "ice", "crimson", "diamond", "gold");
 	public static final Map<String, String> cropNameToEmoji = Maps.of(
 		"Wheat",
 		getEmoji("WHEAT"),

@@ -22,6 +22,7 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.utils.Utils.*;
 
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
@@ -129,27 +130,27 @@ public class ApiController {
 		}
 	}
 
-	@GetMapping("/private/all")
+	@GetMapping("/private/server/all")
 	public List<ServerSettingsModel> getAllServerSettings() {
 		return settingsService.getAllServerSettings();
 	}
 
-	@GetMapping("/private/byId")
+	@GetMapping("/private/server/byId")
 	public ResponseEntity<?> getServerSettings(@RequestParam(value = "guildId") String serverId) {
 		return settingsService.getServerSettingsById(serverId);
 	}
 
-	@GetMapping("/private/verify")
+	@GetMapping("/private/server/verify")
 	public ResponseEntity<?> getVerifySettings(@RequestParam(value = "guildId") String serverId) {
 		return settingsService.getVerifySettings(serverId);
 	}
 
-	@GetMapping("/private/roles")
+	@GetMapping("/private/server/roles")
 	public ResponseEntity<?> getRolesSettings(@RequestParam(value = "guildId") String serverId) {
 		return settingsService.getRolesSettings(serverId);
 	}
 
-	@GetMapping("/private/role")
+	@GetMapping("/private/server/role")
 	public ResponseEntity<?> getRoleSettings(
 		@RequestParam(value = "guildId") String serverId,
 		@RequestParam(value = "roleName") String roleName
@@ -157,18 +158,43 @@ public class ApiController {
 		return settingsService.getRoleSettings(serverId, roleName);
 	}
 
-	@GetMapping("/private/guild/all")
+	@GetMapping("/private/server/guild/all")
 	public List<AutomatedGuild> getAllGuildSettings(@RequestParam(value = "guildId") String serverId) {
 		return settingsService.getAllGuildSettings(serverId);
 	}
 
-	@GetMapping("/private/guild/byName")
+	@GetMapping("/private/server/guild/byName")
 	public ResponseEntity<?> getGuildSettings(@RequestParam(value = "guildId") String serverId, @RequestParam(value = "name") String name) {
 		return settingsService.getGuildSettings(serverId, name);
 	}
 
-	@GetMapping("/private/event")
+	@GetMapping("/private/server/event")
 	public ResponseEntity<?> getSkyblockEventSettings(@RequestParam(value = "guildId") String serverId) {
 		return settingsService.getSkyblockEventSettings(serverId);
+	}
+
+	@GetMapping("/private/linked/all")
+	public List<LinkedAccount> getAllLinkedAccounts() {
+		return database.getAllLinkedAccounts();
+	}
+
+	@GetMapping("/private/linked/by")
+	public ResponseEntity<?> getLinkedAccountBy(
+		@RequestParam(value = "discord", required = false) String discord,
+		@RequestParam(value = "uuid", required = false) String uuid,
+		@RequestParam(value = "username", required = false) String username
+	) {
+		if (discord != null) {
+			return new ResponseEntity<>(database.getByDiscord(discord), HttpStatus.OK);
+		} else if (uuid != null) {
+			return new ResponseEntity<>(database.getByUuid(uuid), HttpStatus.OK);
+		} else if (username != null) {
+			return new ResponseEntity<>(database.getByUsername(username), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(
+				DataObject.empty().put("success", false).put("cause", "No parameter provided from: id, uuid, username").toMap(),
+				HttpStatus.BAD_REQUEST
+			);
+		}
 	}
 }
