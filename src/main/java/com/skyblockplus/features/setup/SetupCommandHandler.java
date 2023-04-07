@@ -90,10 +90,13 @@ public class SetupCommandHandler {
 				.queue(m -> waitForEvent(m.getId()));
 			case GUILD_NAME -> {
 				List<SelectOption> selectOptions = new ArrayList<>();
-				for (AutomatedGuild guildSettings : database.getAllGuildSettings(hook.getInteraction().getGuild().getId())) {
-					selectOptions.add(
-						SelectOption.of(capitalizeString(guildSettings.getGuildName().replace("_", " ")), guildSettings.getGuildName())
-					);
+				List<AutomatedGuild> allGuildSettings = database.getAllGuildSettings(hook.getInteraction().getGuild().getId());
+				if (allGuildSettings != null) {
+					for (AutomatedGuild guildSettings : allGuildSettings) {
+						selectOptions.add(
+							SelectOption.of(capitalizeString(guildSettings.getGuildName().replace("_", " ")), guildSettings.getGuildName())
+						);
+					}
 				}
 				selectOptions.add(SelectOption.of("Create New Automatic Guild", "$new"));
 				hook
