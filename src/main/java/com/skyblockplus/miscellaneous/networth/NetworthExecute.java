@@ -749,7 +749,7 @@ public class NetworthExecute {
 
 					double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
 					if (!item.getId().equals("ENCHANTED_BOOK")) {
-						enchantPrice *= enchantWorth.getOrDefault(enchant.split(";")[0], 0.9);
+						enchantPrice *= enchantWorth.getOrDefault(enchant.toUpperCase().split(";")[0], 0.9);
 					}
 					enchantsExtras += enchantPrice;
 					if (verbose) {
