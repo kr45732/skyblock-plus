@@ -114,10 +114,14 @@ public class Utils {
 		.setAllowCoreThreadTimeOut(true);
 	public static final ConcurrentHashMap<String, HypixelKeyRecord> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final List<String> hypixelGuildQueue = Collections.synchronizedList(new ArrayList<>());
-	public static final Gson gson = new GsonBuilder().addSerializationExclusionStrategy(new ExposeExclusionStrategy()).create();
+	public static final Gson gson = new GsonBuilder()
+		.addSerializationExclusionStrategy(new ExposeExclusionStrategy(true))
+		.addDeserializationExclusionStrategy(new ExposeExclusionStrategy(false))
+		.create();
 	public static final Gson formattedGson = new GsonBuilder()
 		.setPrettyPrinting()
-		.addSerializationExclusionStrategy(new ExposeExclusionStrategy())
+		.addSerializationExclusionStrategy(new ExposeExclusionStrategy(true))
+		.addDeserializationExclusionStrategy(new ExposeExclusionStrategy(false))
 		.create();
 	public static final Consumer<Object> ignore = ignored -> {};
 	public static final AtomicInteger remainingLimit = new AtomicInteger(240);

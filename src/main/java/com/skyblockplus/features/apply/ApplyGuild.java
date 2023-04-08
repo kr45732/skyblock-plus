@@ -50,8 +50,12 @@ public class ApplyGuild {
 	public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
 		this.reactMessage = reactMessage;
 		this.currentSettings = currentSettings;
-		this.applyUserList =
-			getApplyGuildUsersCache(reactMessage.getGuild().getId(), higherDepth(currentSettings, "guildName").getAsString());
+		List<ApplyUser> applyUserList = getApplyGuildUsersCache(
+			reactMessage.getGuild().getId(),
+			higherDepth(currentSettings, "guildName").getAsString()
+		);
+		applyUserList.forEach(a -> a.setParent(this));
+		this.applyUserList = applyUserList;
 		try {
 			this.waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 		} catch (Exception ignored) {}
@@ -184,7 +188,7 @@ public class ApplyGuild {
 			}
 		}
 
-		ApplyUser toAdd = new ApplyUser(event, currentSettings, linkedAccount.username());
+		ApplyUser toAdd = new ApplyUser(event, linkedAccount.username(), this);
 		if (toAdd.failCause != null) {
 			return client.getError() + " " + toAdd.failCause;
 		}

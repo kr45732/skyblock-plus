@@ -26,7 +26,7 @@ import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.annotations.Expose;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
@@ -51,9 +51,11 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
 public class ApplyUser implements Serializable {
 
+	@Expose(serialize = false, deserialize = false)
+	public ApplyGuild parent;
+
 	public final Map<String, String> profileEmojiToName = new LinkedHashMap<>();
 	public String applyingUserId;
-	public String currentSettingsString;
 	public String guildId;
 	public String applicationChannelId;
 	public String reactMessageId;
@@ -74,17 +76,16 @@ public class ApplyUser implements Serializable {
 	public String playerProfileName;
 	public String failCause;
 
-	public ApplyUser(ButtonInteractionEvent event, JsonElement currentSettings, String playerUsername) {
+	public ApplyUser(ButtonInteractionEvent event, String playerUsername, ApplyGuild parent) {
 		try {
 			logCommand(event.getGuild(), event.getUser(), "apply " + playerUsername);
 
-			currentSettings.getAsJsonObject().remove("applyUsersCache");
 			this.applyingUserId = event.getUser().getId();
-			this.currentSettingsString = gson.toJson(currentSettings);
 			this.guildId = event.getGuild().getId();
 			this.playerUsername = playerUsername;
-			Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
+			JsonElement currentSettings = parent.currentSettings;
 
+			Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
 			if (applyCategory.getChannels().size() == 50) {
 				failCause =
 					"Unable to create a new application since the application category has reached 50/50 channels. Please report this to the server's staff.";
@@ -197,7 +198,7 @@ public class ApplyUser implements Serializable {
 
 		TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
 		Message reactMessage = applicationChannel.retrieveMessageById(reactMessageId).complete();
-		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
+		JsonElement currentSettings = parent.currentSettings;
 
 		if (!event.getUser().getId().equals(applyingUserId) && !guildMap.get(guildId).isAdmin(event.getMember())) {
 			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
@@ -386,7 +387,7 @@ public class ApplyUser implements Serializable {
 	}
 
 	public boolean onButtonClick(ButtonInteractionEvent event, ApplyGuild parent, boolean isWait) {
-		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
+		JsonElement currentSettings = parent.currentSettings;
 		if (!event.getUser().getId().equals(applyingUserId) && !guildMap.get(guildId).isAdmin(event.getMember())) {
 			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
 			boolean hasStaffRole = false;
@@ -754,5 +755,9 @@ public class ApplyUser implements Serializable {
 		}
 
 		return false;
+	}
+
+	public void setParent(ApplyGuild parent) {
+		this.parent = parent;
 	}
 }

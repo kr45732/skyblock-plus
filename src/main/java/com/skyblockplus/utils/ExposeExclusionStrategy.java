@@ -24,10 +24,16 @@ import com.google.gson.annotations.Expose;
 
 public class ExposeExclusionStrategy implements ExclusionStrategy {
 
+	private final boolean isSerialize;
+
+	public ExposeExclusionStrategy(boolean isSerialize) {
+		this.isSerialize = isSerialize;
+	}
+
 	@Override
 	public boolean shouldSkipField(FieldAttributes f) {
 		Expose expose = f.getAnnotation(Expose.class);
-		return expose != null && !expose.serialize();
+		return expose != null && !(isSerialize ? expose.serialize() : expose.deserialize());
 	}
 
 	@Override
