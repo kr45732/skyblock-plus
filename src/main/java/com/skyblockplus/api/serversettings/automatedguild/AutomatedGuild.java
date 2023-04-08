@@ -84,9 +84,8 @@ public class AutomatedGuild {
 	@Column(columnDefinition = "TEXT")
 	private String applyUsersCache = "";
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@Fetch(value = FetchMode.SUBSELECT)
-	private List<ApplyRequirements> applyReqs = new ArrayList<>();
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "automatedGuild", orphanRemoval = true)
+	private List<ApplyRequirement> applyReqs = new ArrayList<>();
 
 	// Guild Member Roles
 	private String guildMemberRoleEnable = "false";

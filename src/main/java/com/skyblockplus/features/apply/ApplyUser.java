@@ -239,82 +239,63 @@ public class ApplyUser implements Serializable {
 		Player.Profile player = Player.create(playerUsername, profile);
 
 		JsonArray currentReqs = higherDepth(currentSettings, "applyReqs").getAsJsonArray();
-
-		boolean meetReqs = false;
+		boolean meetReqsOr = currentReqs.isEmpty();
 		StringBuilder missingReqsStr = new StringBuilder();
-		if (currentReqs.size() == 0) {
-			meetReqs = true;
-		} else {
-			for (JsonElement req : currentReqs) {
-				int slayerReq = higherDepth(req, "slayerReq", 0);
-				int skillsReq = higherDepth(req, "skillsReq", 0);
-				int cataReq = higherDepth(req, "catacombsReq", 0);
-				int weightReq = higherDepth(req, "weightReq", 0);
-				int lilyWeightReq = higherDepth(req, "lilyWeightReq", 0);
-				int levelReq = higherDepth(req, "levelReq", 0);
-				long networthReq = higherDepth(req, "networthReq", 0L);
 
-				if (
-					player.getTotalSlayer() >= slayerReq &&
-					player.getSkillAverage() >= skillsReq &&
-					player.getCatacombs().getProgressLevel() >= cataReq &&
-					player.getWeight() >= weightReq &&
-					player.getLilyWeight() >= lilyWeightReq &&
-					player.getLevel() >= levelReq &&
-					(networthReq == 0 || player.getNetworth() >= networthReq)
-				) {
-					meetReqs = true;
+		if (!currentReqs.isEmpty()) {
+			for (JsonElement req : currentReqs) {
+				boolean meetsReqAnd = true;
+				List<String> reqsMissingFmt = new ArrayList<>();
+
+				for (Map.Entry<String, JsonElement> reqEntry : higherDepth(req, "requirements").getAsJsonObject().entrySet()) {
+					long playerAmount = (long) switch (reqEntry.getKey()) {
+						case "slayer" -> player.getTotalSlayer();
+						case "skills" -> player.getSkillAverage();
+						case "catacombs" -> player.getCatacombs().getProgressLevel();
+						case "weight" -> player.getWeight();
+						case "lily_weight" -> player.getLilyWeight();
+						case "level" -> player.getLevel();
+						case "networth" -> player.getNetworth();
+						default -> throw new IllegalStateException("Unexpected value: " + reqEntry.getKey());
+					};
+					long reqAmount = reqEntry.getValue().getAsLong();
+
+					reqsMissingFmt.add(capitalizeString(reqEntry.getKey().replace("_", " ")) + " - " + formatNumber(reqAmount));
+					if (reqAmount > playerAmount) {
+						meetsReqAnd = false;
+					}
+				}
+
+				if (meetsReqAnd) {
+					meetReqsOr = true;
 					break;
 				} else {
-					List<String> reqsFmt = new ArrayList<>();
-					if (slayerReq > 0) {
-						reqsFmt.add("Slayer - " + formatNumber(slayerReq));
-					}
-					if (skillsReq > 0) {
-						reqsFmt.add("Skill Average - " + formatNumber(skillsReq));
-					}
-					if (cataReq > 0) {
-						reqsFmt.add("Catacombs - " + formatNumber(cataReq));
-					}
-					if (weightReq > 0) {
-						reqsFmt.add("Weight - " + formatNumber(weightReq));
-					}
-					if (lilyWeightReq > 0) {
-						reqsFmt.add("Lily weight - " + formatNumber(lilyWeightReq));
-					}
-					if (levelReq > 0) {
-						reqsFmt.add("Level - " + formatNumber(levelReq));
-					}
-					if (networthReq > 0) {
-						reqsFmt.add("Networth - " + formatNumber(networthReq));
-					}
-
-					missingReqsStr.append("• ").append(String.join(" | ", reqsFmt)).append("\n");
+					missingReqsStr.append("• ").append(String.join(" | ", reqsMissingFmt)).append("\n");
 				}
 			}
 		}
 
 		Message reactMessage;
-		if (!meetReqs) {
+		if (!meetReqsOr) {
 			EmbedBuilder reqEmbed = defaultEmbed("Does not meet requirements");
 			reqEmbed.setDescription(
 				"**Your statistics:**\n• Slayer - " +
 				formatNumber(player.getTotalSlayer()) +
 				" | Skill Average - " +
-				(player.isSkillsApiEnabled() ? roundAndFormat(player.getSkillAverage()) : "API disabled") +
+				(player.isSkillsApiEnabled() ? roundAndFormat((long) player.getSkillAverage()) : "API disabled") +
 				" | Catacombs - " +
-				roundAndFormat(player.getCatacombs().getProgressLevel()) +
+				roundAndFormat((long) player.getCatacombs().getProgressLevel()) +
 				" | Weight - " +
-				roundAndFormat(player.getWeight()) +
+				roundAndFormat((long) player.getWeight()) +
 				" | Lily Weight - " +
-				roundAndFormat(player.getLilyWeight()) +
+				roundAndFormat((long) player.getLilyWeight()) +
 				" | Level - " +
-				roundAndFormat(player.getLevel())
+				roundAndFormat((long) player.getLevel()) +
+				" | Networth - " +
+				roundAndFormat((long) player.getNetworth())
 			);
 			reqEmbed.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr);
-			reqEmbed.appendDescription(
-				"\nIf any of these value seem incorrect, then make sure all your APIs are enabled and/or try relinking"
-			);
+			reqEmbed.appendDescription("\nIf any of these value seem incorrect, then make sure all your APIs are enabled");
 
 			playerSlayer = formatNumber(player.getTotalSlayer());
 			playerSkills = roundAndFormat(player.getSkillAverage());

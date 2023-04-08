@@ -165,7 +165,7 @@ public class Main {
 		AuctionFlipper.initialize(true);
 		ApiController.initialize();
 		FetchurHandler.initialize();
-		MayorHandler.initialize();
+		scheduler.scheduleWithFixedDelay(MayorHandler::initialize, 1, 5, TimeUnit.MINUTES);
 		JacobHandler.initialize();
 		EventHandler.initialize();
 

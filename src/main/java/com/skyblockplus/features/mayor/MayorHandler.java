@@ -67,8 +67,6 @@ public class MayorHandler {
 
 			updateCurrentElection();
 
-			scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
-
 			if (currentMayor.equals("Jerry") && jerryFuture == null) {
 				jerryFuture = scheduler.schedule(MayorHandler::updateMayorJerryRotations, 30, TimeUnit.SECONDS);
 			}

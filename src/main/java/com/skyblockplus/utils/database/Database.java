@@ -23,8 +23,9 @@ import static com.skyblockplus.utils.utils.Utils.gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
+import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirement;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
@@ -155,7 +156,10 @@ public class Database {
 	}
 
 	public int setApplyReqs(String serverId, String name, JsonArray newApplyReqs) {
-		return settingsService.setApplyReqs(serverId, name, gson.fromJson(newApplyReqs, ApplyRequirements[].class)).getStatusCode().value();
+		return settingsService
+			.setApplyReqs(serverId, name, gson.fromJson(newApplyReqs, new TypeToken<List<ApplyRequirement>>() {}.getType()))
+			.getStatusCode()
+			.value();
 	}
 
 	public int setVerifyRolesSettings(String serverId, JsonArray newSettings) {

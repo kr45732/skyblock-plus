@@ -31,7 +31,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
-import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
+import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirement;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
@@ -1324,16 +1324,16 @@ public class SettingsExecute {
 			return errorEmbed("You can only have up to 3 sets of requirements");
 		}
 
-		long slayerReq = 0;
-		long skillsReq = 0;
-		long cataReq = 0;
-		long weightReq = 0;
-		long lilyWeightReq = 0;
-		long levelReq = 0;
-		long networthReq = 0;
+		List<String> allApplyReqs = List.of("slayer", "skills", "catacombs", "weight", "lily_weight", "level", "networth");
+		ApplyRequirement newReq = new ApplyRequirement();
 
 		for (String req : reqArgs.split("\\s+")) {
 			String[] reqSplit = req.split(":");
+
+			String reqType = reqSplit[0].trim();
+			if (!allApplyReqs.contains(reqType)) {
+				return errorEmbed("Invalid requirement type provided");
+			}
 
 			long amount;
 			try {
@@ -1342,31 +1342,15 @@ public class SettingsExecute {
 				return errorEmbed("Invalid requirement amount provided");
 			}
 
-			switch (reqSplit[0].trim()) {
-				case "slayer" -> slayerReq = amount;
-				case "skills" -> skillsReq = amount;
-				case "catacombs" -> cataReq = amount;
-				case "weight" -> weightReq = amount;
-				case "lily_weight" -> lilyWeightReq = amount;
-				case "level" -> levelReq = amount;
-				case "networth" -> networthReq = amount;
-				default -> {
-					return errorEmbed("Invalid requirement type provided");
-				}
+			if (amount <= 0) {
+				return errorEmbed("Requirement amount must be positive");
 			}
+
+			newReq.addRequirement(reqType, "" + amount);
 		}
 
-		ApplyRequirements toAddReq = new ApplyRequirements();
-		toAddReq.setSlayerReq("" + slayerReq);
-		toAddReq.setSkillsReq("" + skillsReq);
-		toAddReq.setCatacombsReq("" + cataReq);
-		toAddReq.setWeightReq("" + weightReq);
-		toAddReq.setLilyWeightReq("" + lilyWeightReq);
-		toAddReq.setLevelReq("" + levelReq);
-		toAddReq.setNetworthReq("" + networthReq);
-		currentReqs.add(gson.toJsonTree(toAddReq));
+		currentReqs.add(gson.toJsonTree(newReq));
 
-		guildSettings.add("applyReqs", currentReqs);
 		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
@@ -1374,13 +1358,12 @@ public class SettingsExecute {
 
 		return defaultSettingsEmbed(
 			"Added an apply requirement:" +
-			(slayerReq > 0 ? "\n• Slayer - " + slayerReq : "") +
-			(skillsReq > 0 ? "\n• Skills - " + skillsReq : "") +
-			(cataReq > 0 ? "\n• Catacombs - " + cataReq : "") +
-			(weightReq > 0 ? "\n• Weight - " + weightReq : "") +
-			(lilyWeightReq > 0 ? "\n• Lily weight - " + lilyWeightReq : "") +
-			(levelReq > 0 ? "\n• Level - " + levelReq : "") +
-			(networthReq > 0 ? "\n• Networth - " + networthReq : "")
+			newReq
+				.getRequirements()
+				.entrySet()
+				.stream()
+				.map(e -> "\n• " + capitalizeString(e.getKey().replace("_", " ")) + " - " + e.getValue())
+				.collect(Collectors.joining())
 		);
 	}
 
@@ -1388,32 +1371,22 @@ public class SettingsExecute {
 		JsonArray currentReqs = guildSettings.getAsJsonArray("applyReqs");
 
 		try {
-			JsonElement req = currentReqs.get(Integer.parseInt(reqNumber) - 1);
-			currentReqs.remove(Integer.parseInt(reqNumber) - 1);
-
+			JsonElement req = currentReqs.remove(Integer.parseInt(reqNumber) - 1);
 			guildSettings.add("applyReqs", currentReqs);
+
 			int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 			if (responseCode != 200) {
 				return apiFailMessage(responseCode);
 			}
 
-			long slayerReq = higherDepth(req, "slayerReq", 0);
-			long skillsReq = higherDepth(req, "skillsReq", 0);
-			long catacombsReq = higherDepth(req, "catacombsReq", 0);
-			long weightReq = higherDepth(req, "weightReq", 0);
-			long lilyWeightReq = higherDepth(req, "lilyWeightReq", 0);
-			long levelReq = higherDepth(req, "levelReq", 0);
-			long networthReq = higherDepth(req, "networthReq", 0L);
-
 			return defaultSettingsEmbed(
 				"Removed an apply requirement:" +
-				(slayerReq > 0 ? "\n• Slayer - " + slayerReq : "") +
-				(skillsReq > 0 ? "\n• Skills - " + skillsReq : "") +
-				(catacombsReq > 0 ? "\n• Catacombs - " + catacombsReq : "") +
-				(weightReq > 0 ? "\n• Weight - " + weightReq : "") +
-				(lilyWeightReq > 0 ? "\n• Lily Weight - " + lilyWeightReq : "") +
-				(levelReq > 0 ? "\n• Level - " + levelReq : "") +
-				(networthReq > 0 ? "\n• Networth - " + networthReq : "")
+				higherDepth(req, "requirements")
+					.getAsJsonObject()
+					.entrySet()
+					.stream()
+					.map(e -> "\n• " + capitalizeString(e.getKey().replace("_", " ")) + " - " + e.getValue().getAsString())
+					.collect(Collectors.joining())
 			);
 		} catch (Exception e) {
 			return errorEmbed("Invalid requirement index. Run `/settings guild <name>` to see the current apply requirements");
@@ -2675,31 +2648,30 @@ public class SettingsExecute {
 					if (reqs.isEmpty()) {
 						return "None";
 					}
-					StringBuilder reqsString = new StringBuilder("\n");
+					StringBuilder reqsString = new StringBuilder();
 					for (int i = 0; i < reqs.size(); i++) {
-						JsonElement req = reqs.get(i);
-						long slayerReq = higherDepth(req, "slayerReq", 0);
-						long skillsReq = higherDepth(req, "skillsReq", 0);
-						long cataReq = higherDepth(req, "catacombsReq", 0);
-						long weightReq = higherDepth(req, "weightReq", 0);
-						long lilyWeightReq = higherDepth(req, "lilyWeightReq", 0);
-						long levelReq = higherDepth(req, "levelReq", 0);
-						long networthReq = higherDepth(req, "networthReq", 0L);
+						reqsString.append("\n").append("`").append(i + 1).append(")`");
 
-						reqsString
-							.append("`")
-							.append(i + 1)
-							.append(")`")
-							.append(slayerReq > 0 ? " " + slayerReq + " slayer" : "")
-							.append(skillsReq > 0 ? " " + skillsReq + " skills" : "")
-							.append(cataReq > 0 ? " " + cataReq + " cata" : "")
-							.append(weightReq > 0 ? " " + weightReq + " weight" : "")
-							.append(lilyWeightReq > 0 ? " " + lilyWeightReq + " lily weight" : "")
-							.append(levelReq > 0 ? " " + levelReq + " lvl" : "")
-							.append(networthReq > 0 ? " " + networthReq + " nw" : "")
-							.append("\n");
+						for (Entry<String, JsonElement> reqEntry : higherDepth(reqs.get(i), "requirements").getAsJsonObject().entrySet()) {
+							reqsString
+								.append(formatNumber(reqEntry.getValue().getAsLong()))
+								.append(" ")
+								.append(
+									switch (reqEntry.getKey()) {
+										case "catacombs" -> "cata";
+										case "level" -> "lvl";
+										case "networth" -> "nw";
+										default -> reqEntry.getKey().replace("_", " ");
+									}
+								)
+								.append(", ");
+						}
 					}
-					return reqsString.toString();
+					String reqsStr = reqsString.toString().trim();
+					if (reqsStr.endsWith(",")) {
+						reqsStr = reqsStr.substring(0, reqsStr.length() - 1);
+					}
+					return reqsStr;
 				}
 				case "verifiedRoles", "applyStaffRoles" -> {
 					JsonArray roles = higherDepth(jsonSettings, settingName).getAsJsonArray();

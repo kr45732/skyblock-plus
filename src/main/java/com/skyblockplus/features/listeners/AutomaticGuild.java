@@ -1054,10 +1054,10 @@ public class AutomaticGuild {
 					lastMayorElectionOpenMessage = null;
 				}
 				if (lastMayorElectedMessage != null) {
-					lastMayorElectedMessage = null;
 					if (mayorChannel.canTalk()) {
 						lastMayorElectedMessage.editMessageComponents().queue(ignore, ignore);
 					}
+					lastMayorElectedMessage = null;
 				}
 
 				if (!mayorChannel.canTalk()) {

@@ -23,7 +23,7 @@ import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
 import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
 import static com.skyblockplus.utils.utils.Utils.*;
 
-import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
+import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirement;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -32,6 +32,7 @@ import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.List;
+import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -63,50 +64,38 @@ public class CheckReqsSlashCommand extends SlashCommand {
 
 		for (AutomatedGuild guild : guilds) {
 			EmbedBuilder eb = player.defaultPlayerEmbed(" | " + capitalizeString(guild.getGuildName().replace("_", " ")));
-			for (ApplyRequirements applyReq : guild.getApplyReqs()) {
-				long networthReq = 0;
-				try {
-					networthReq = Long.parseLong(applyReq.getNetworthReq());
-				} catch (Exception ignored) {}
+			for (ApplyRequirement applyReq : guild.getApplyReqs()) {
+				StringBuilder reqsStr = new StringBuilder();
 
-				String reqsStr =
-					formatReq("Slayer", applyReq.getSlayerReq(), (double) player.getTotalSlayer()) +
-					formatReq("Skills", applyReq.getSkillsReq(), player.getSkillAverage()) +
-					formatReq(
-						"Catacombs",
-						applyReq.getCatacombsReq(),
-						player.getCatacombs() != null ? player.getCatacombs().getProgressLevel() : null
-					) +
-					formatReq("Weight", applyReq.getWeightReq(), player.getWeight()) +
-					formatReq("Lily Weight", applyReq.getLilyWeightReq(), player.getLilyWeight()) +
-					formatReq("Level", applyReq.getLevelReq(), player.getLevel()) +
-					formatReq("Networth", applyReq.getNetworthReq(), networthReq > 0 ? player.getNetworth() : null);
+				for (Map.Entry<String, String> reqEntry : applyReq.getRequirements().entrySet()) {
+					long playerAmount = (long) switch (reqEntry.getKey()) {
+						case "slayer" -> player.getTotalSlayer();
+						case "skills" -> player.getSkillAverage();
+						case "catacombs" -> player.getCatacombs().getProgressLevel();
+						case "weight" -> player.getWeight();
+						case "lily_weight" -> player.getLilyWeight();
+						case "level" -> player.getLevel();
+						case "networth" -> player.getNetworth();
+						default -> throw new IllegalStateException("Unexpected value: " + reqEntry.getKey());
+					};
+					long req = Long.parseLong(reqEntry.getValue());
 
-				eb.addField("Requirement", reqsStr, false);
+					reqsStr
+						.append("\n")
+						.append(playerAmount >= req ? client.getSuccess() : client.getError())
+						.append(" ")
+						.append(capitalizeString(reqEntry.getKey().replace("_", " ")))
+						.append(" - ")
+						.append(formatNumber(req));
+				}
+
+				eb.addField("Requirement", reqsStr.toString(), false);
 			}
 			paginateBuilder.getExtras().addEmbedPage(eb);
 		}
 
 		event.paginate(paginateBuilder);
 		return null;
-	}
-
-	private static String formatReq(String name, String reqStr, Double playerValue) {
-		long req = 0;
-		try {
-			req = Long.parseLong(reqStr);
-		} catch (Exception ignored) {}
-
-		return (
-			req > 0
-				? "\n" +
-				(playerValue != null && playerValue >= req ? client.getSuccess() : client.getError()) +
-				" " +
-				name +
-				" - " +
-				formatNumber(req)
-				: ""
-		);
 	}
 
 	@Override

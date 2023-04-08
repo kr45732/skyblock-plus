@@ -18,7 +18,7 @@
 
 package com.skyblockplus.api.serversettings.managers;
 
-import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
+import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirement;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
@@ -32,6 +32,7 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -234,7 +235,10 @@ public class ServerSettingsService {
 				}
 			}
 
-			automatedGuilds.forEach(g -> g.setServerSettings(currentServerSettings));
+			automatedGuilds.forEach(g -> {
+				g.setServerSettings(currentServerSettings);
+				g.getApplyReqs().forEach(r -> r.setAutomatedGuild(g));
+			});
 			currentServerSettings.setAutomatedGuilds(automatedGuilds);
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -306,11 +310,12 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> setApplyReqs(String serverId, String name, ApplyRequirements[] newReqs) {
+	public ResponseEntity<HttpStatus> setApplyReqs(String serverId, String name, List<ApplyRequirement> newReqs) {
 		AutomatedGuild automatedGuild = getGuildSettingsInt(serverId, name);
 
 		if (automatedGuild != null) {
-			automatedGuild.setApplyReqs(new ArrayList<>(Arrays.asList(newReqs)));
+			newReqs.forEach(g -> g.setAutomatedGuild(automatedGuild));
+			automatedGuild.setApplyReqs(newReqs);
 			return setGuildSettings(serverId, automatedGuild);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
