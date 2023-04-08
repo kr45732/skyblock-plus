@@ -32,7 +32,6 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -315,7 +314,9 @@ public class ServerSettingsService {
 
 		if (automatedGuild != null) {
 			newReqs.forEach(g -> g.setAutomatedGuild(automatedGuild));
-			automatedGuild.setApplyReqs(newReqs);
+			List<ApplyRequirement> applyReqs = automatedGuild.getApplyReqs();
+			applyReqs.clear();
+			applyReqs.addAll(newReqs);
 			return setGuildSettings(serverId, automatedGuild);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
