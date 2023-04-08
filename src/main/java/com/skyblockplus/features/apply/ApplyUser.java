@@ -83,6 +83,7 @@ public class ApplyUser implements Serializable {
 			this.applyingUserId = event.getUser().getId();
 			this.guildId = event.getGuild().getId();
 			this.playerUsername = playerUsername;
+			this.parent = parent;
 			JsonElement currentSettings = parent.currentSettings;
 
 			Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
