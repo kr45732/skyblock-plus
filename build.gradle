@@ -103,7 +103,7 @@ dependencies {
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.5.0.202303070854-r'
 
     // Caching
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.5'
+    implementation 'com.github.ben-manes.caffeine:caffeine:v3.1.6'
 
     // Fuzzy Searching
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
