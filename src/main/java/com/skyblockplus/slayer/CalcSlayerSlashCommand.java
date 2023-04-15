@@ -103,8 +103,13 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 							}
 					);
 
+				boolean unlockedTier = i == 0 || player.getSlayerBossKills(slayerType, i - 1) > 0;
+
+				out.append("\n");
+				if (!unlockedTier) {
+					out.append("~~");
+				}
 				out
-					.append("\n")
 					.append(SLAYER_EMOJI_MAP.get(slayerType))
 					.append(" Tier ")
 					.append(toRomanNumerals(i + 1).toUpperCase())
@@ -115,6 +120,9 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 					.append(" ($")
 					.append(formatNumber(cost))
 					.append(")");
+				if (!unlockedTier) {
+					out.append("~~");
+				}
 			}
 
 			Weight weight = Weight.of(weightType, player).calculateWeight(slayerType);

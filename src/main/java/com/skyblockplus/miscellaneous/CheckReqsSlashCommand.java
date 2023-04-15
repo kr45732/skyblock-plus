@@ -76,6 +76,7 @@ public class CheckReqsSlashCommand extends SlashCommand {
 						case "lily_weight" -> player.getLilyWeight();
 						case "level" -> player.getLevel();
 						case "networth" -> player.getNetworth();
+						case "farming_weight" -> player.getWeight("farming");
 						default -> throw new IllegalStateException("Unexpected value: " + reqEntry.getKey());
 					};
 					long req = Long.parseLong(reqEntry.getValue());

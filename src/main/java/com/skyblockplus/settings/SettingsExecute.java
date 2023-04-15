@@ -1324,7 +1324,16 @@ public class SettingsExecute {
 			return errorEmbed("You can only have up to 3 sets of requirements");
 		}
 
-		List<String> allApplyReqs = List.of("slayer", "skills", "catacombs", "weight", "lily_weight", "level", "networth");
+		List<String> allApplyReqs = List.of(
+			"slayer",
+			"skills",
+			"catacombs",
+			"weight",
+			"lily_weight",
+			"level",
+			"networth",
+			"farming_weight"
+		);
 		ApplyRequirement newReq = new ApplyRequirement();
 
 		for (String req : reqArgs.split("\\s+")) {

@@ -101,12 +101,13 @@ public class EvaluateCommand extends Command {
 			@Override
 			protected void execute() {
 				setArgs(2, true);
-				ebMessage = event.getChannel().sendMessage("Loading").complete();
 
 				if (args.length < 2) {
-					ebMessage.editMessage("Invalid Input").queue();
+					event.getChannel().sendMessage("Invalid Input").queue();
 					return;
 				}
+
+				ebMessage = event.getChannel().sendMessage("Loading").complete();
 
 				switch (args[1]) {
 					case "start_session()" -> {

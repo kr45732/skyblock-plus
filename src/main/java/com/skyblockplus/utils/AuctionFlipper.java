@@ -31,6 +31,7 @@ import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonElement;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
@@ -53,6 +54,7 @@ public class AuctionFlipper {
 		.expireAfterWrite(45, TimeUnit.MINUTES)
 		.build();
 	public static JsonElement underBinJson;
+	public static Instant underBinJsonLastUpdated = null;
 	private static boolean enable = false;
 
 	public static boolean onGuildMessageReceived(MessageReceivedEvent event) {
@@ -76,8 +78,12 @@ public class AuctionFlipper {
 	}
 
 	public static void flip() {
-		underBinJson = getUnderBinJson();
+		try {
+			underBinJson = getJson(getQueryApiUrl("underbin").toString());
+		} catch (Exception ignored) {}
+
 		if (underBinJson != null) {
+			underBinJsonLastUpdated = Instant.now();
 			JsonElement avgAuctionJson = getAverageAuctionJson();
 
 			for (JsonElement auction : underBinJson
@@ -147,13 +153,6 @@ public class AuctionFlipper {
 				}
 			}
 		}
-	}
-
-	public static JsonElement getUnderBinJson() {
-		try {
-			return getJson(getQueryApiUrl("underbin").toString());
-		} catch (Exception ignored) {}
-		return null;
 	}
 
 	public static double calculateWithTaxes(double price) {

@@ -19,6 +19,7 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.AuctionFlipper.underBinJson;
+import static com.skyblockplus.utils.AuctionFlipper.underBinJsonLastUpdated;
 import static com.skyblockplus.utils.utils.HypixelUtils.isVanillaItem;
 import static com.skyblockplus.utils.utils.JsonUtils.getAverageAuctionJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
@@ -48,27 +49,22 @@ public class FlipsSlashCommand extends SlashCommand {
 	}
 
 	public static EmbedBuilder getFlips() {
-		if (underBinJson == null) {
-			return errorEmbed("Flips not updated");
+		if (underBinJson == null || underBinJson.getAsJsonObject().isEmpty()) {
+			return errorEmbed("No auction flips found at the moment");
 		}
 
-		List<JsonElement> flips = underBinJson
+		EmbedBuilder eb = defaultEmbed("Flips")
+			.setDescription("**Next Update:** <t:" + underBinJsonLastUpdated.plusSeconds(60).getEpochSecond() + ":R>");
+		JsonElement avgAuctionJson = getAverageAuctionJson();
+
+		for (JsonElement auction : underBinJson
 			.getAsJsonObject()
 			.entrySet()
 			.stream()
 			.map(Map.Entry::getValue)
 			.sorted(Comparator.comparingLong(c -> -higherDepth(c, "profit", 0L)))
-			.limit(5)
-			.collect(Collectors.toCollection(ArrayList::new));
-
-		if (flips.isEmpty()) {
-			return errorEmbed("No auction flips found at the moment");
-		}
-
-		EmbedBuilder eb = defaultEmbed("Flips");
-		JsonElement avgAuctionJson = getAverageAuctionJson();
-
-		for (JsonElement auction : flips) {
+			.limit(15)
+			.collect(Collectors.toCollection(ArrayList::new))) {
 			String itemId = higherDepth(auction, "id").getAsString();
 			if (isVanillaItem(itemId) || itemId.equals("BEDROCK")) {
 				continue;

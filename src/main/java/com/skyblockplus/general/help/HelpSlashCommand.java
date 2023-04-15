@@ -663,8 +663,8 @@ public class HelpSlashCommand extends SlashCommand {
 											.addSubcommands(
 												new HelpData(
 													"add",
-													"Add a requirement that applicant must meet. At least one of the requirement types must be set.",
-													"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount] [lily_weight:amount] [level:amount]",
+													"Add a requirement that applicant must meet. Types are slayer, skills, catacombs, weight, lily_weight, level, networth, and farming_weight At least one of the requirement types must be set.",
+													"settings guild <name> apply requirements add [type:amount] ...",
 													true
 												),
 												new HelpData(
@@ -975,7 +975,7 @@ public class HelpSlashCommand extends SlashCommand {
 			) +
 			create("settings guild <name> apply deny_message <message>", "Message that will be sent if applicant is denied") +
 			create(
-				"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount]",
+				"settings guild <name> apply requirements add [type:amount] ...",
 				"Add a requirement that applicant must meet. At least one of the requirement types must be set. Can be empty"
 			) +
 			create(

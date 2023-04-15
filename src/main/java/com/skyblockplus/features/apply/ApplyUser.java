@@ -258,6 +258,7 @@ public class ApplyUser implements Serializable {
 						case "lily_weight" -> player.getLilyWeight();
 						case "level" -> player.getLevel();
 						case "networth" -> player.getNetworth();
+						case "farming_weight" -> player.getWeight("farming");
 						default -> throw new IllegalStateException("Unexpected value: " + reqEntry.getKey());
 					};
 					long reqAmount = reqEntry.getValue().getAsLong();
@@ -387,7 +388,7 @@ public class ApplyUser implements Serializable {
 		return defaultEmbed(fixUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUsername, playerProfileName));
 	}
 
-	public boolean onButtonClick(ButtonInteractionEvent event, ApplyGuild parent, boolean isWait) {
+	public boolean onButtonClick(ButtonInteractionEvent event, ApplyGuild parent, boolean isWaitlist) {
 		JsonElement currentSettings = parent.currentSettings;
 		if (!event.getUser().getId().equals(applyingUserId) && !guildMap.get(guildId).isAdmin(event.getMember())) {
 			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
@@ -744,7 +745,7 @@ public class ApplyUser implements Serializable {
 				}
 
 				TextChannel appChannel = jda.getTextChannelById(applicationChannelId);
-				if (!isWait) {
+				if (!isWaitlist) {
 					event.getMessage().editMessageComponents().queue();
 					event.getHook().editOriginalEmbeds(defaultEmbed("Closing Channel").build()).complete();
 				} else {
