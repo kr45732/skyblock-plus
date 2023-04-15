@@ -244,6 +244,7 @@ public class MainListener extends ListenerAdapter {
 		}
 
 		if (guildMap.get(event.getGuild().getId()).isAdmin(event.getMember()) && event.getComponentId().equals("thank_you_setup")) {
+			event.deferReply().complete();
 			new SetupCommandHandler(event.getHook(), event.getSelectedOptions().get(0).getValue());
 		}
 	}
