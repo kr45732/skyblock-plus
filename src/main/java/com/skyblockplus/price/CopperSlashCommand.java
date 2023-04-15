@@ -18,9 +18,8 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.utils.JsonUtils.getBitsJson;
-import static com.skyblockplus.utils.utils.StringUtils.idToName;
-import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
@@ -39,31 +38,40 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CoinsPerBitSlashCommand extends SlashCommand {
+public class CopperSlashCommand extends SlashCommand {
 
-	public CoinsPerBitSlashCommand() {
-		this.name = "coinsperbit";
+	public CopperSlashCommand() {
+		this.name = "copper";
 	}
 
 	public static EmbedBuilder getCoinsPerBit() {
 		Map<String, Double> values = new HashMap<>();
 		NetworthExecute calc = new NetworthExecute().initPrices();
-		for (Map.Entry<String, JsonElement> entry : getBitsJson().entrySet()) {
-			double cpb = calc.getLowestPrice(entry.getKey()) / entry.getValue().getAsLong();
-			if (cpb > 0) {
-				values.put(entry.getKey(), cpb);
+		for (Map.Entry<String, JsonElement> entry : getCopperJson().entrySet()) {
+			double cpc = calc.getLowestPrice(entry.getKey()) / entry.getValue().getAsLong();
+			if (cpc > 0) {
+				values.put(entry.getKey(), cpc);
 			}
 		}
-		EmbedBuilder eb = defaultEmbed("Coins Per Bit");
+
+		EmbedBuilder eb = defaultEmbed("Coins Per Copper");
 		for (Map.Entry<String, Double> entry : values
 			.entrySet()
 			.stream()
 			.sorted(Comparator.comparingDouble(v -> -v.getValue()))
 			.collect(Collectors.toCollection(ArrayList::new))) {
 			eb.appendDescription(
-				getEmoji(entry.getKey()) + " " + idToName(entry.getKey()) + " ➜ " + roundAndFormat(entry.getValue()) + "\n"
+				getEmoji(entry.getKey()) +
+				" " +
+				idToName(entry.getKey()) +
+				" ➜ " +
+				roundAndFormat(entry.getValue()) +
+				" (" +
+				formatNumber(higherDepth(getCopperJson(), entry.getKey(), 0)) +
+				" copper)\n"
 			);
 		}
+
 		return eb;
 	}
 
@@ -74,6 +82,6 @@ public class CoinsPerBitSlashCommand extends SlashCommand {
 
 	@Override
 	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Get the coins to bits ratio for items in the bits shop");
+		return Commands.slash(name, "Get the coins to copper ratio for items in the SkyMart shop");
 	}
 }

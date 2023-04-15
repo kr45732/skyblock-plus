@@ -212,12 +212,9 @@ public class HelpSlashCommand extends SlashCommand {
 				)
 					.addExamples("price Necron's Chestplate ✪✪✪✪✪")
 					.setCategory("price"),
-				new HelpData("bits", "Get the bits cost of an item from the bits shop.", "bits <item>")
-					.addExamples("bits God Potion")
-					.setCategory("price"),
-				new HelpData("coinsperbit", "Get the coins to bits ratio for items in the bits shop.", "coinsperbit <item>")
-					.setCategory("price"),
-				new HelpData("flips", "Get current auction flips (**experimental**).", "flips <item>").setCategory("price"),
+				new HelpData("bits", "Get the coins to bits ratio for items in the bits shop.", "bits").setCategory("price"),
+				new HelpData("copper", "Get the coins to copper ratio for items in the SkyMart shop.", "copper").setCategory("price"),
+				new HelpData("flips", "Get current auction flips (**experimental**).", "flips").setCategory("price"),
 				// Inventory
 				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory emoji [player] [profile]")
 					.addSecondData("Get a player's inventory with lore.", "inventory list [player] [profile] [slot]")
@@ -239,8 +236,8 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("inventory"),
 				new HelpData(
 					"sacks",
-					"Get a player's sacks content bag represented in a list. Sorted by descending price.",
-					"sacks [player] [profile] [npc]"
+					"Get a player's sacks content bag represented in a list and sorted by descending price. Costs can be calculated from (source) bazaar only, npc only, or npc and bazaar.",
+					"sacks [player] [profile] [source]"
 				)
 					.setCategory("inventory"),
 				new HelpData("wardrobe", "Get a player's wardrobe armors represented in emojis.", "wardrobe emoji [player] [profile]")
@@ -786,8 +783,8 @@ public class HelpSlashCommand extends SlashCommand {
 			create("average <item>", "Get the average auction price of an item") +
 			create("bids [player]", "Get a player's auction house bids") +
 			create("price <item> [auction_type]", "Query the auction house for the lowest bin of an item") +
-			create("bits <item>", "Get the bits cost of an item from the bits shop") +
-			create("coinsperbit <item>", "Get the coins to bits ratio for items in the bits shop") +
+			create("bits", "Get the coins to bits ratio for items in the bits shop") +
+			create("copper", "Get the coins to copper ratio for items in the SkyMart shop") +
 			create("flips", "Get current auction flips")
 		);
 
@@ -802,7 +799,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("talisman emoji [player] [profile]", "Get a player's talisman bag represented in emojis") +
 			create("talisman list [player] [profile] [slot]", "Get a player's talisman bag with lore") +
 			create("talisman tuning [player] [profile]", "Get a player's power stone stats and tuning stats") +
-			create("sacks [player] [profile] [npc]", "Get a player's sacks content bag represented in a list") +
+			create("sacks [player] [profile] [source]", "Get a player's sacks content bag represented in a list") +
 			create("wardrobe emoji [player] [profile]", "Get a player's wardrobe armors represented in emojis") +
 			create("wardrobe list [player] [profile]", "Get a player's wardrobe armors represented in a list") +
 			create("pets [player] [profile]", "Get a player's pets")

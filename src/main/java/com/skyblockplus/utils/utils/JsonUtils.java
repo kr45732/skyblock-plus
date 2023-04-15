@@ -62,6 +62,7 @@ public class JsonUtils {
 	private static JsonObject parentsJson;
 	private static JsonObject reforgeStonesJson;
 	private static JsonObject bitsJson;
+	private static JsonObject copperJson;
 	private static JsonObject miscJson;
 	private static JsonObject lowestBinJson;
 	private static JsonObject averageAuctionJson;
@@ -216,7 +217,7 @@ public class JsonUtils {
 
 	public static JsonObject getDungeonLootJson() {
 		if (dungeonLootJson == null) {
-			dungeonLootJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/dungeon_loot.json");
+			dungeonLootJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/DungeonLoot.json");
 		}
 
 		return dungeonLootJson;
@@ -224,7 +225,7 @@ public class JsonUtils {
 
 	public static JsonObject getDragonLootJson() {
 		if (dragonLootJson == null) {
-			dragonLootJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/dragon_loot.json");
+			dragonLootJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/DragonLoot.json");
 		}
 
 		return dragonLootJson;
@@ -263,10 +264,18 @@ public class JsonUtils {
 
 	public static JsonObject getBitsJson() {
 		if (bitsJson == null) {
-			bitsJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/BitPricesJson.json");
+			bitsJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/BitPrices.json");
 		}
 
 		return bitsJson;
+	}
+
+	public static JsonObject getCopperJson() {
+		if (copperJson == null) {
+			copperJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/CopperPrices.json");
+		}
+
+		return copperJson;
 	}
 
 	public static JsonObject getReforgeStonesJson() {

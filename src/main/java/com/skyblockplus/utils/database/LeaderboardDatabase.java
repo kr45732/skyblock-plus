@@ -577,7 +577,7 @@ public class LeaderboardDatabase {
 			List<Player.Profile> players = new ArrayList<>();
 
 			if (userCount != -1) {
-				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/users.json")
+				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Users.json")
 					.getAsJsonArray();
 				if (userCount >= members.size()) {
 					log.info("Finished updating all users: " + userCount);

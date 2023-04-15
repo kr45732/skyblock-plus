@@ -1261,7 +1261,6 @@ public class Constants {
 	public static List<String> SKILL_NAMES;
 	public static List<String> PET_NAMES;
 	public static List<String> ESSENCE_ITEM_NAMES;
-	public static List<String> BITS_ITEM_NAMES;
 	public static List<String> PET_ITEM_NAMES;
 	public static Set<String> ALL_TALISMANS;
 	public static Map<String, String> NUMBER_TO_RARITY_MAP;
@@ -1366,9 +1365,6 @@ public class Constants {
 
 			/* ESSENCE_ITEM_NAMES */
 			ESSENCE_ITEM_NAMES = new ArrayList<>(getEssenceCostsJson().getAsJsonObject().keySet());
-
-			/* BITS_ITEM_NAMES */
-			BITS_ITEM_NAMES = new ArrayList<>(getBitsJson().getAsJsonObject().keySet());
 
 			/* PET_ITEM_NAMES */
 			PET_ITEM_NAMES =

@@ -102,7 +102,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				asyncSkyblockProfilesFromUuid(uuid, hypixelKey != null ? hypixelKey : HYPIXEL_API_KEY)
 					.thenApplyAsync(
 						memberProfileJsonResponse -> {
-							Player.Profile profile = new Player(
+							Player.Profile player = new Player(
 								uuidToUsername(uuid).username(),
 								uuid,
 								profileName,
@@ -111,30 +111,31 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 							)
 								.getSelectedProfile();
 
-							if (profile.isValid()) {
-								players.add(profile);
+							if (player.isValid()) {
+								players.add(player);
 
 								double startingAmount = higherDepth(eventMember, "startingAmount").getAsDouble();
 								Double curChange =
 									switch (eventType) {
-										case "slayer" -> profile.getTotalSlayer() - startingAmount;
-										case "catacombs" -> profile.getCatacombs().totalExp() - startingAmount;
-										case "weight" -> profile.getWeight() - startingAmount;
+										case "slayer" -> player.getTotalSlayer() - startingAmount;
+										case "catacombs" -> player.getCatacombs().totalExp() - startingAmount;
 										default -> {
 											if (eventType.startsWith("collection.")) {
-												yield higherDepth(profile.profileJson(), eventType.split("-")[0], 0.0) - startingAmount;
+												yield higherDepth(player.profileJson(), eventType.split("-")[0], 0.0) - startingAmount;
 											} else if (eventType.startsWith("skills.")) {
-												String skillType = eventType.split("skills.")[1];
-												double skillXp = skillType.equals("all")
-													? profile.getTotalSkillsXp()
-													: profile.getSkillXp(skillType);
+												if (player.isSkillsApiEnabled()) {
+													double skillsXp = 0;
 
-												if (skillXp != -1) {
-													yield skillXp - startingAmount;
+													String[] skillTypes = eventType.split("skills.")[1].split("-");
+													for (String skillType : skillTypes) {
+														skillsXp += Math.max(player.getSkillXp(skillType), 0);
+													}
+
+													yield skillsXp - startingAmount;
 												}
 											} else if (eventType.startsWith("weight.")) {
-												String weightTypes = eventType.split("weight.")[1];
-												double weightAmt = profile.getWeight(weightTypes.split("-"));
+												String[] weightTypes = eventType.split("weight.")[1].split("-");
+												double weightAmt = player.getWeight(weightTypes);
 
 												if (weightAmt != -1) {
 													yield weightAmt - startingAmount;
@@ -147,7 +148,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 								if (curChange != null) {
 									return new EventMember(
-										profile.getUsername(),
+										player.getUsername(),
 										uuid,
 										"" + curChange,
 										higherDepth(eventMember, "profileName").getAsString()
@@ -184,10 +185,11 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		if (eventType.startsWith("collection.")) {
 			return eventType.split("-")[1] + " collection";
 		} else if (eventType.startsWith("skills.")) {
-			return eventType.split("skills.")[1].equals("all") ? "skills" : eventType.split("skills.")[1];
+			String[] types = eventType.split("skills.")[1].split("-");
+			return (types.length == 9 ? "skills" : String.join(", ", types) + " skill" + (types.length > 1 ? "s" : "")) + " xp";
 		} else if (eventType.startsWith("weight.")) {
 			String[] types = eventType.split("weight.")[1].split("-");
-			return types.length == 18 ? "weight" : String.join(", ", types) + " weight" + (types.length > 1 ? "s" : "");
+			return types.length == 20 ? "weight" : String.join(", ", types) + " weight" + (types.length > 1 ? "s" : "");
 		}
 
 		return eventType;
@@ -370,17 +372,9 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 								startingAmount = player.getTotalSlayer();
 								startingAmountFormatted = formatNumber(startingAmount) + " total slayer xp";
 							}
-							case "skills" -> {
-								startingAmount = player.getTotalSkillsXp();
-								startingAmountFormatted = formatNumber(startingAmount) + " total skills xp";
-							}
 							case "catacombs" -> {
 								startingAmount = player.getCatacombs().totalExp();
 								startingAmountFormatted = formatNumber(startingAmount) + " total catacombs xp";
-							}
-							case "weight" -> {
-								startingAmount = player.getWeight();
-								startingAmountFormatted = formatNumber(startingAmount) + " weight";
 							}
 							default -> {
 								if (eventType.startsWith("collection.")) {
@@ -388,15 +382,14 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 										higherDepth(player.profileJson(), eventType.split("-")[0]) != null
 											? higherDepth(player.profileJson(), eventType.split("-")[0]).getAsDouble()
 											: 0;
-									startingAmountFormatted = formatNumber(startingAmount) + " " + eventType.split("-")[1] + " collection";
+									startingAmountFormatted = formatNumber(startingAmount) + " " + getEventTypeFormatted(eventType);
 								} else if (eventType.startsWith("skills.")) {
-									String skillType = eventType.split("skills.")[1];
-									startingAmount = skillType.equals("all") ? player.getTotalSkillsXp() : player.getSkillXp(skillType);
-									startingAmountFormatted =
-										formatNumber(startingAmount) +
-										" " +
-										(skillType.equals("all") ? "total skills" : skillType) +
-										"  xp";
+									String[] skillTypes = eventType.split("skills.")[1].split("-");
+									for (String skillType : skillTypes) {
+										startingAmount += Math.max(player.getSkillXp(skillType), 0);
+									}
+
+									startingAmountFormatted = formatNumber(startingAmount) + " " + getEventTypeFormatted(eventType);
 								} else if (eventType.startsWith("weight.")) {
 									String weightTypes = eventType.split("weight.")[1];
 									startingAmount = player.getWeight(weightTypes.split("-"));

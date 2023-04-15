@@ -116,7 +116,7 @@ public class SkyblockEventHandler {
 									.addOption("All", "all")
 									.addOption("Catacombs", "catacombs")
 									.addOptions(weightOptions)
-									.setMaxValues(25)
+									.setMaxValues(weightOptions.size() + 1)
 									.build()
 							)
 							.queue();
@@ -136,6 +136,7 @@ public class SkyblockEventHandler {
 									.create("skyblock_event_" + selectMenuState)
 									.addOption("All", "all")
 									.addOptions(skillsOptions)
+									.setMaxValues(skillsOptions.size())
 									.build()
 							)
 							.queue();
@@ -167,7 +168,11 @@ public class SkyblockEventHandler {
 			}
 			case TYPE_SKILLS -> {
 				selectMenuState = SelectMenuState.CONFIG_GENERIC;
-				eventSettings.setEventType("skills." + event.getSelectedOptions().get(0).getValue());
+				Set<String> skillTypes = event.getSelectedOptions().stream().map(SelectOption::getValue).collect(Collectors.toSet());
+				if (skillTypes.remove("all")) { // Returns true if set contains 'all'
+					skillTypes.addAll(SKILL_NAMES);
+				}
+				eventSettings.setEventType("skills." + String.join("-", skillTypes));
 				eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 				event.editMessage(getGenericConfigMessage()).queue();
 			}

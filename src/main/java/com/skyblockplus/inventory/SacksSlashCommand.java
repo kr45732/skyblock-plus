@@ -35,6 +35,7 @@ import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
 
@@ -45,75 +46,97 @@ public class SacksSlashCommand extends SlashCommand {
 		this.name = "sacks";
 	}
 
-	public static EmbedBuilder getPlayerSacks(String username, String profileName, boolean useNpcPrice, SlashCommandEvent event) {
+	public static EmbedBuilder getPlayerSacks(String username, String profileName, String source, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
-		if (player.isValid()) {
-			Map<String, Integer> sacksMap = player.getPlayerSacks();
-			if (sacksMap == null) {
-				return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
-			}
-
-			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(20);
-
-			JsonElement bazaarPrices = getBazaarJson();
-
-			final double[] total = { 0, 0 };
-			sacksMap
-				.entrySet()
-				.stream()
-				.filter(entry -> entry.getValue() > 0)
-				.sorted(
-					Comparator.comparingDouble(entry -> {
-						double npcPrice = -1;
-						if (useNpcPrice) {
-							npcPrice = getNpcSellPrice(entry.getKey());
-						}
-
-						return (
-							-(npcPrice != -1 ? npcPrice : higherDepth(bazaarPrices, entry.getKey() + ".sell_summary", 0.0)) *
-							entry.getValue()
-						);
-					})
-				)
-				.forEach(currentSack -> {
-					double npcPrice = -1;
-					if (useNpcPrice) {
-						npcPrice = getNpcSellPrice(currentSack.getKey());
-					}
-					double sackPrice =
-						(npcPrice != -1 ? npcPrice : higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary", 0.0)) *
-						currentSack.getValue();
-
-					String emoji = higherDepth(
-						getEmojiMap(),
-						currentSack.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : currentSack.getKey(),
-						null
-					);
-
-					paginateBuilder.addItems(
-						(emoji != null ? emoji + " " : "") +
-						"**" +
-						idToName(currentSack.getKey()) +
-						":** " +
-						formatNumber(currentSack.getValue()) +
-						" ➜ " +
-						simplifyNumber(sackPrice)
-					);
-					total[npcPrice != -1 ? 1 : 0] += sackPrice;
-				});
-
-			paginateBuilder
-				.getExtras()
-				.setEveryPageText(
-					"**Total value:** " +
-					roundAndFormat(total[0] + total[1]) +
-					(useNpcPrice ? " (" + roundAndFormat(total[1]) + " npc + " + roundAndFormat(total[0]) + " bazaar)" : "") +
-					"\n"
-				);
-			event.paginate(paginateBuilder);
-			return null;
+		if (!player.isValid()) {
+			return player.getErrorEmbed();
 		}
-		return player.getErrorEmbed();
+
+		Map<String, Integer> sacksMap = player.getPlayerSacks();
+		if (sacksMap == null) {
+			return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+		}
+		if (sacksMap.isEmpty()) {
+			return errorEmbed(player.getUsernameFixed() + "'s sacks are empty");
+		}
+
+		CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(20);
+
+		JsonElement bazaarPrices = getBazaarJson();
+
+		// {bazaar, npc}
+		final double[] total = { 0, 0 };
+		sacksMap
+			.entrySet()
+			.stream()
+			.filter(entry -> entry.getValue() > 0)
+			.sorted(
+				Comparator.comparingDouble(entry -> {
+					double bazaarPrice = higherDepth(bazaarPrices, entry.getKey() + ".sell_summary", 0.0);
+					double npcPrice = Math.max(getNpcSellPrice(entry.getKey()), 0);
+
+					return (
+						switch (source) {
+							case "bazaar" -> bazaarPrice;
+							case "npc" -> npcPrice;
+							case "bazaar_npc" -> Math.max(bazaarPrice, npcPrice);
+						} *
+						entry.getValue()
+					);
+				})
+			)
+			.forEach(entry -> {
+				double bazaarPrice = higherDepth(bazaarPrices, entry.getKey() + ".sell_summary", 0.0);
+				double npcPrice = Math.max(getNpcSellPrice(entry.getKey()), 0);
+
+				int loc = 0;
+
+				double sackPrice =
+					switch (source) {
+						case "bazaar" -> bazaarPrice;
+						case "npc" -> {
+							loc = 1;
+							yield npcPrice;
+						}
+						case "bazaar_npc" -> {
+							if (npcPrice > bazaarPrice) {
+								loc = 1;
+								yield npcPrice;
+							} else {
+								yield bazaarPrice;
+							}
+						}
+					} *
+					entry.getValue();
+
+				String emoji = higherDepth(
+					getEmojiMap(),
+					entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey(),
+					null
+				);
+
+				paginateBuilder.addItems(
+					(emoji != null ? emoji + " " : "") +
+					"**" +
+					idToName(entry.getKey()) +
+					":** " +
+					formatNumber(entry.getValue()) +
+					" ➜ " +
+					simplifyNumber(sackPrice)
+				);
+				total[loc] += sackPrice;
+			});
+
+		paginateBuilder
+			.getExtras()
+			.setEveryPageText(
+				"**Total value:** " +
+				roundAndFormat(total[0] + total[1]) +
+				(source.equals("bazaar_npc") ? " (" + roundAndFormat(total[0]) + " bazaar + " + roundAndFormat(total[1]) + " npc)" : "") +
+				"\n"
+			);
+		event.paginate(paginateBuilder);
+		return null;
 	}
 
 	@Override
@@ -122,16 +145,21 @@ public class SacksSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(getPlayerSacks(event.player, event.getOptionStr("profile"), event.getOptionBoolean("npc", false), event));
+		event.paginate(getPlayerSacks(event.player, event.getOptionStr("profile"), event.getOptionStr("source", "bazaar_npc"), event));
 	}
 
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Get a player's sacks content bag represented in a list")
+			.slash(name, "Get a player's sacks content represented in a list")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(profilesCommandOption)
-			.addOption(OptionType.BOOLEAN, "npc", "Use npc sell prices (bazaar will be used for items that don't have an npc price)");
+			.addOptions(
+				profilesCommandOption,
+				new OptionData(OptionType.STRING, "source", "Source for prices")
+					.addChoice("Bazaar & NPC (Default)", "bazaar_npc")
+					.addChoice("Bazaar Only", "bazaar")
+					.addChoice("NPC Only", "npc")
+			);
 	}
 
 	@Override

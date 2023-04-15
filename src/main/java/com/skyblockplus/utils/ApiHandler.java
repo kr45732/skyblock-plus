@@ -93,7 +93,7 @@ public class ApiHandler {
 	}
 
 	public static void reloadSettingsJson() {
-		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json");
+		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Settings.json");
 		ahApiUrl = higherDepth(settings, "ahApiUrl").getAsString();
 		mojangApiNum = higherDepth(settings, "mojangApiNum", 0);
 		allowMojangApi = higherDepth(settings, "allowMojangApi", false);

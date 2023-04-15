@@ -18,20 +18,22 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.BITS_ITEM_NAMES;
 import static com.skyblockplus.utils.utils.JsonUtils.getBitsJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.*;
 
+import com.google.gson.JsonElement;
+import com.skyblockplus.miscellaneous.networth.NetworthExecute;
+import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
-import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import com.skyblockplus.utils.utils.StringUtils;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.springframework.stereotype.Component;
@@ -43,35 +45,48 @@ public class BitsSlashCommand extends SlashCommand {
 		this.name = "bits";
 	}
 
-	public static EmbedBuilder getBitPrices(String itemName) {
-		String closestMatch = getClosestMatchFromIds(nameToId(itemName), BITS_ITEM_NAMES);
-		if (closestMatch != null) {
-			return defaultEmbed("Bits Price")
-				.addField(idToName(closestMatch), formatNumber(higherDepth(getBitsJson(), closestMatch, 0L)), false);
+	public static EmbedBuilder getCoinsPerBit(SlashCommandEvent event) {
+		Map<String, Double> values = new HashMap<>();
+		NetworthExecute calc = new NetworthExecute().initPrices();
+		for (Map.Entry<String, JsonElement> entry : getBitsJson().entrySet()) {
+			double cpb = calc.getLowestPrice(entry.getKey()) / entry.getValue().getAsLong();
+			if (cpb > 0) {
+				values.put(entry.getKey(), cpb);
+			}
 		}
 
-		return defaultEmbed("No bit price found for " + capitalizeString(itemName));
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser())
+			.setColumns(1)
+			.setItemsPerPage(20)
+			.updateExtras(e -> e.setEveryPageTitle("Coins Per Bit"));
+		for (Map.Entry<String, Double> entry : values
+			.entrySet()
+			.stream()
+			.sorted(Comparator.comparingDouble(v -> -v.getValue()))
+			.collect(Collectors.toCollection(ArrayList::new))) {
+			paginateBuilder.addItems(
+				getEmoji(entry.getKey()) +
+				" " +
+				idToName(entry.getKey()) +
+				" ➜ " +
+				roundAndFormat(entry.getValue()) +
+				" (" +
+				formatNumber(higherDepth(getBitsJson(), entry.getKey(), 0)) +
+				" bits)"
+			);
+		}
+
+		event.paginate(paginateBuilder);
+		return null;
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.embed(getBitPrices(event.getOptionStr("item")));
+		event.paginate(getCoinsPerBit(event));
 	}
 
 	@Override
 	public SlashCommandData getCommandData() {
-		return Commands
-			.slash(name, "Get the price of an item from the bits shop")
-			.addOption(OptionType.STRING, "item", "Item name", true, true);
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("item")) {
-			event.replyClosestMatch(
-				event.getFocusedOption().getValue(),
-				BITS_ITEM_NAMES.stream().map(StringUtils::idToName).distinct().collect(Collectors.toCollection(ArrayList::new))
-			);
-		}
+		return Commands.slash(name, "Get the coins to bits ratio for items in the bits shop");
 	}
 }
