@@ -663,7 +663,7 @@ public class HelpSlashCommand extends SlashCommand {
 											.addSubcommands(
 												new HelpData(
 													"add",
-													"Add a requirement that applicant must meet. Types are slayer, skills, catacombs, weight, lily_weight, level, networth, and farming_weight At least one of the requirement types must be set.",
+													"Add a requirement that applicant must meet. Types are slayer, skills, catacombs, weight, lily_weight, level, networth, and farming_weight. At least one of the requirement types must be set.",
 													"settings guild <name> apply requirements add [type:amount] ...",
 													true
 												),
