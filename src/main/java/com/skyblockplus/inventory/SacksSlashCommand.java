@@ -79,7 +79,7 @@ public class SacksSlashCommand extends SlashCommand {
 						switch (source) {
 							case "bazaar" -> bazaarPrice;
 							case "npc" -> npcPrice;
-							case "bazaar_npc" -> Math.max(bazaarPrice, npcPrice);
+							default -> Math.max(bazaarPrice, npcPrice);
 						} *
 						entry.getValue()
 					);
@@ -98,7 +98,7 @@ public class SacksSlashCommand extends SlashCommand {
 							loc = 1;
 							yield npcPrice;
 						}
-						case "bazaar_npc" -> {
+						default -> {
 							if (npcPrice > bazaarPrice) {
 								loc = 1;
 								yield npcPrice;
