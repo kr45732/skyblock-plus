@@ -465,6 +465,8 @@ public class Utils {
 
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.tuned_transmission", 0), "TRANSMISSION_TUNER");
 
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.mana_disintegrator_count", 0), "MANA_DISINTEGRATOR");
+
 						// Master stars
 						if (
 							(
@@ -645,10 +647,12 @@ public class Utils {
 						) {
 							List<String> prestigeOrder = List.of("HOT", "BURNING", "FIERY", "INFERNAL");
 							for (int j = 0; j <= prestigeOrder.indexOf(itemInfo.getId().split("_")[0]); j++) {
-								itemInfo.addExtraValues(
-									higherDepth(ARMOR_PRESTIGE_COST.get(prestigeOrder.get(j)), "KUUDRA_TEETH", 0),
-									"KUUDRA_TEETH"
-								);
+								for (Map.Entry<String, JsonElement> entry : ARMOR_PRESTIGE_COST
+									.getAsJsonObject(prestigeOrder.get(j))
+									.entrySet()) {
+									// Not sure what the coin amount is for prestige (2500000 maybe?)
+									itemInfo.addExtraValues(entry.getValue().getAsInt(), entry.getKey());
+								}
 							}
 						}
 
@@ -963,14 +967,6 @@ public class Utils {
 							toAdd.add("forge", higherDepth(recipe, "duration"));
 							break;
 						}
-					}
-				}
-
-				if (higherDepth(CONSTANTS, "EXTRA_INTERNAL_MAPPINGS." + itemId) != null) {
-					for (Map.Entry<String, JsonElement> entry : higherDepth(CONSTANTS, "EXTRA_INTERNAL_MAPPINGS." + itemId)
-						.getAsJsonObject()
-						.entrySet()) {
-						toAdd.add(entry.getKey(), entry.getValue());
 					}
 				}
 
