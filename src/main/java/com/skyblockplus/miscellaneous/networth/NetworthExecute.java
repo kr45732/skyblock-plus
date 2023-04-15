@@ -821,7 +821,9 @@ public class NetworthExecute {
 				if (miscPrice == 0) {
 					miscPrice = getLowestPrice(extraItem.getKey());
 				}
-				miscPrice *= 0.95;
+				if (!extraItem.getKey().equals("SKYBLOCK_COIN")) {
+					miscPrice *= 0.95;
+				}
 
 				miscExtras += miscPrice * extraItem.getValue();
 				if (verbose) {
@@ -898,10 +900,10 @@ public class NetworthExecute {
 					: ""
 			);
 			out.append(hpbExtras > 0 ? ",\"hpb\":\"" + simplifyNumber(hpbExtras) + "\"" : "");
+			out.append(fumingExtras > 0 ? ",\"fuming\":\"" + simplifyNumber(fumingExtras) + "\"" : "");
 			out.append(
 				enchantsExtras > 0 ? ",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"data\":" + enchStr + "}" : ""
 			);
-			out.append(fumingExtras > 0 ? ",\"fuming\":\"" + simplifyNumber(fumingExtras) + "\"" : "");
 			out.append(
 				reforgeExtras > 0
 					? ",\"reforge\":{\"cost\":\"" + simplifyNumber(reforgeExtras) + "\",\"name\":\"" + item.getModifier() + "\"}"

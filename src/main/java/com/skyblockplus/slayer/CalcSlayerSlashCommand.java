@@ -53,16 +53,8 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 		long targetXp,
 		Player.WeightType weightType
 	) {
-		slayerType = slayerType.toLowerCase();
-		if (!SLAYER_NAMES.contains(slayerType)) {
-			return errorEmbed("Invalid slayer type");
-		}
-
 		if (targetXp <= 0 && targetLevel <= 0) {
-			return errorEmbed("Target xp or target level must be provided and at least 1");
-		}
-		if (targetLevel != -1 && (targetLevel <= 0 || targetLevel > 9)) {
-			return errorEmbed("Target level must be between 1 and 9");
+			return errorEmbed("Target xp or target level must be provided");
 		}
 
 		Player.Profile player = Player.create(username, profileName);
@@ -105,13 +97,12 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 
 				boolean unlockedTier = i == 0 || player.getSlayerBossKills(slayerType, i - 1) > 0;
 
-				out.append("\n");
+				out.append("\n").append(SLAYER_EMOJI_MAP.get(slayerType)).append(" ");
 				if (!unlockedTier) {
 					out.append("~~");
 				}
 				out
-					.append(SLAYER_EMOJI_MAP.get(slayerType))
-					.append(" Tier ")
+					.append("Tier ")
 					.append(toRomanNumerals(i + 1).toUpperCase())
 					.append(" ")
 					.append(capitalizeString(slayerType))

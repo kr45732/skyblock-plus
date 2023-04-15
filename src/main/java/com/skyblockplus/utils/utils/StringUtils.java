@@ -21,8 +21,6 @@ package com.skyblockplus.utils.utils;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.getInternalJsonMappings;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
-import static java.lang.String.join;
-import static java.util.Collections.nCopies;
 
 import com.google.gson.JsonElement;
 import java.math.RoundingMode;
@@ -140,7 +138,7 @@ public class StringUtils {
 	}
 
 	public static String toRomanNumerals(int number) {
-		return join("", nCopies(number, "i")).replace("iiiii", "v").replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
+		return "i".repeat(number).replace("iiiii", "v").replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
 	}
 
 	public static String skyblockStatsLink(String username, String profileName) {

@@ -516,7 +516,7 @@ public class Utils {
 										totalEssence += higherDepth(essenceUpgrades, "" + j, 0);
 									}
 								}
-								itemInfo.setEssence(totalEssence, higherDepth(essenceUpgrades, "type").getAsString().toUpperCase());
+								itemInfo.addEssence(totalEssence, higherDepth(essenceUpgrades, "type").getAsString().toUpperCase());
 							}
 						}
 
@@ -651,7 +651,11 @@ public class Utils {
 									.getAsJsonObject(prestigeOrder.get(j))
 									.entrySet()) {
 									// Not sure what the coin amount is for prestige (2500000 maybe?)
-									itemInfo.addExtraValues(entry.getValue().getAsInt(), entry.getKey());
+									if (entry.getKey().equals("CRIMSON_ESSENCE")) {
+										itemInfo.addEssence(entry.getValue().getAsInt(), "CRIMSON");
+									} else {
+										itemInfo.addExtraValues(entry.getValue().getAsInt(), entry.getKey());
+									}
 								}
 							}
 						}

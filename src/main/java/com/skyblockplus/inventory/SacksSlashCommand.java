@@ -75,7 +75,7 @@ public class SacksSlashCommand extends SlashCommand {
 					double bazaarPrice = higherDepth(bazaarPrices, entry.getKey() + ".sell_summary", 0.0);
 					double npcPrice = Math.max(getNpcSellPrice(entry.getKey()), 0);
 
-					return (
+					return -(
 						switch (source) {
 							case "bazaar" -> bazaarPrice;
 							case "npc" -> npcPrice;

@@ -53,8 +53,8 @@ public class InvItem {
 	private boolean soulbound = false;
 	private NBTCompound nbtTag;
 
-	public void setEssence(int essenceCount, String essenceType) {
-		this.essenceCount = essenceCount;
+	public void addEssence(int essenceCount, String essenceType) {
+		this.essenceCount += essenceCount;
 		this.essenceType = essenceType;
 	}
 
