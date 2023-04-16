@@ -50,7 +50,11 @@ public class FlipsSlashCommand extends SlashCommand {
 
 	public static EmbedBuilder getFlips() {
 		if (underBinJson == null || underBinJson.getAsJsonObject().isEmpty()) {
-			return errorEmbed("No auction flips found at the moment");
+			String ebStr = "No auction flips found at the moment";
+			if (underBinJsonLastUpdated != null) {
+				ebStr = "**Next Update:** <t:" + underBinJsonLastUpdated.plusSeconds(60).getEpochSecond() + ":R>\n\n" + ebStr;
+			}
+			return errorEmbed(ebStr);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Flips")
