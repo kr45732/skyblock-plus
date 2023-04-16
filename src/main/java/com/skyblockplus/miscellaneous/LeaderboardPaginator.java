@@ -139,7 +139,7 @@ public class LeaderboardPaginator {
 			DataObject curPlayer = leaderboardCache.getOrDefault(i, null);
 			if (curPlayer != null) {
 				double curAmount = curPlayer.getDouble(lbType, 0.0);
-				String out = "`" + i + ")` " + fixUsername(curPlayer.getString("username", "?")) + ": " + formatAmount(curAmount);
+				String out = "`" + i + ")` " + escapeUsername(curPlayer.getString("username", "?")) + ": " + formatAmount(curAmount);
 
 				if (i < pageFirstRank + 10) {
 					columnOne.append(out).append("\n");
@@ -157,7 +157,7 @@ public class LeaderboardPaginator {
 			.setDescription(
 				player != null
 					? "**Player:** " +
-					fixUsername(player) +
+					escapeUsername(player) +
 					"\n**Rank:** " +
 					(playerRank == -1 ? "Not on leaderboard" : "#" + formatNumber(playerRank)) +
 					"\n**" +

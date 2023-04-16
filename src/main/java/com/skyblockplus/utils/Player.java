@@ -383,7 +383,7 @@ public class Player {
 		}
 
 		public String getUsernameFixed() {
-			return fixUsername(username);
+			return escapeUsername(username);
 		}
 
 		public String getUuid() {
@@ -605,7 +605,7 @@ public class Player {
 		}
 
 		public String getAvatarUrl() {
-			return getAvatarlUrl(uuid);
+			return StringUtils.getAvatarUrl(uuid);
 		}
 
 		/* Bank and purse */
@@ -1258,7 +1258,7 @@ public class Player {
 				for (int i = 0; i < wardrobeFrames.size(); i++) {
 					NBTCompound displayName = wardrobeFrames.getCompound(i).getCompound("tag.display");
 					if (displayName != null) {
-						wardrobeFramesMap.put(i, parseMcCodes(displayName.getString("Name", "Empty")));
+						wardrobeFramesMap.put(i, cleanMcCodes(displayName.getString("Name", "Empty")));
 					} else {
 						wardrobeFramesMap.put(i, "Empty");
 					}
@@ -1393,7 +1393,7 @@ public class Player {
 				for (int i = 0; i < talismanFrames.size(); i++) {
 					NBTCompound displayName = talismanFrames.getCompound(i).getCompound("tag.display");
 					if (displayName != null) {
-						armorFramesMap.put(i, parseMcCodes(displayName.getString("Name", "Empty")));
+						armorFramesMap.put(i, cleanMcCodes(displayName.getString("Name", "Empty")));
 					} else {
 						armorFramesMap.put(i, "Empty");
 					}
@@ -1552,7 +1552,7 @@ public class Player {
 		}
 
 		public EmbedBuilder defaultPlayerEmbed(String extra) {
-			return defaultEmbed(fixUsername(getUsername()) + getSymbol(" ") + extra, skyblockStatsLink()).setThumbnail(getAvatarUrl());
+			return defaultEmbed(escapeUsername(getUsername()) + getSymbol(" ") + extra, skyblockStatsLink()).setThumbnail(getAvatarUrl());
 		}
 
 		public CustomPaginator.Builder defaultPlayerPaginator(User... users) {
@@ -1565,7 +1565,7 @@ public class Player {
 				.setItemsPerPage(1)
 				.setPaginatorExtras(
 					new PaginatorExtras(type)
-						.setEveryPageTitle(fixUsername(getUsername()) + getSymbol(" "))
+						.setEveryPageTitle(escapeUsername(getUsername()) + getSymbol(" "))
 						.setEveryPageThumbnail(getAvatarUrl())
 						.setEveryPageTitleUrl(skyblockStatsLink())
 				);

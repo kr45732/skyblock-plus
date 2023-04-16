@@ -20,8 +20,8 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
-import static com.skyblockplus.utils.utils.StringUtils.getAvatarlUrl;
-import static com.skyblockplus.utils.utils.StringUtils.parseMcCodes;
+import static com.skyblockplus.utils.utils.StringUtils.cleanMcCodes;
+import static com.skyblockplus.utils.utils.StringUtils.getAvatarUrl;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.google.gson.JsonElement;
@@ -100,7 +100,7 @@ public class HypixelPlayer {
 	}
 
 	public EmbedBuilder getDefaultEmbed() {
-		return defaultEmbed(username, "https://plancke.io/hypixel/player/stats/" + uuid).setThumbnail(getAvatarlUrl(uuid));
+		return defaultEmbed(username, "https://plancke.io/hypixel/player/stats/" + uuid).setThumbnail(getAvatarUrl(uuid));
 	}
 
 	public EmbedBuilder getErrorEmbed() {
@@ -164,7 +164,7 @@ public class HypixelPlayer {
 	public String getRank() {
 		String hypixelRank = "NONE";
 		if (playerJson.has("prefix")) {
-			return parseMcCodes(higherDepth(playerJson, "prefix").getAsString());
+			return cleanMcCodes(higherDepth(playerJson, "prefix").getAsString());
 		} else if (playerJson.has("rank") && !higherDepth(playerJson, "rank").getAsString().equals("NORMAL")) {
 			hypixelRank = higherDepth(playerJson, "rank").getAsString();
 		} else if (

@@ -126,7 +126,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 						) +
 						" ";
 					if (item.getId().equals("ENCHANTED_BOOK")) {
-						aucTitle += parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
+						aucTitle += cleanMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
 					} else {
 						aucTitle +=
 							(
@@ -224,7 +224,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 					Duration duration = Duration.between(Instant.now(), endingAt);
 
 					if (higherDepth(currentAuction, "item_name").getAsString().equals("Enchanted Book")) {
-						auctionName = parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
+						auctionName = cleanMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
 					} else {
 						auctionName =
 							(isPet ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " " : "") +

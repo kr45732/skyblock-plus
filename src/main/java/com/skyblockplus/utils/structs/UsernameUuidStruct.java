@@ -18,8 +18,7 @@
 
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.utils.StringUtils.fixUsername;
-import static com.skyblockplus.utils.utils.StringUtils.getAvatarlUrl;
+import static com.skyblockplus.utils.utils.StringUtils.escapeUsername;
 
 import com.skyblockplus.utils.utils.StringUtils;
 
@@ -41,7 +40,7 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 	}
 
 	public String getAvatarUrl() {
-		return getAvatarlUrl(uuid);
+		return StringUtils.getAvatarUrl(uuid);
 	}
 
 	public String getAuctionUrl() {
@@ -53,7 +52,7 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 	}
 
 	public String usernameFixed() {
-		return fixUsername(username());
+		return escapeUsername(username());
 	}
 
 	public boolean isRateLimited() {

@@ -385,7 +385,7 @@ public class ApplyUser implements Serializable {
 	}
 
 	public EmbedBuilder defaultPlayerEmbed() {
-		return defaultEmbed(fixUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUsername, playerProfileName));
+		return defaultEmbed(escapeUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUsername, playerProfileName));
 	}
 
 	public boolean onButtonClick(ButtonInteractionEvent event, ApplyGuild parent, boolean isWaitlist) {
@@ -435,7 +435,7 @@ public class ApplyUser implements Serializable {
 							playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
 							true
 						);
-						applyPlayerStats.setThumbnail(getAvatarlUrl(playerUuid));
+						applyPlayerStats.setThumbnail(getAvatarUrl(playerUuid));
 						String waitlistMsg = higherDepth(currentSettings, "applyWaitlistMessage", null);
 						List<Button> row = new ArrayList<>();
 						row.add(Button.success("apply_user_accept", "Accept"));
@@ -523,7 +523,7 @@ public class ApplyUser implements Serializable {
 						event
 							.getHook()
 							.editOriginal(
-								fixUsername(playerUsername) +
+								escapeUsername(playerUsername) +
 								" (<@" +
 								applyingUserId +
 								">) was accepted by " +
@@ -566,7 +566,7 @@ public class ApplyUser implements Serializable {
 												defaultEmbed("Waiting for invite")
 													.setDescription(
 														"**Player:** " +
-														fixUsername(playerUsername) +
+														escapeUsername(playerUsername) +
 														"\n**Discord:** <@" +
 														applyingUserId +
 														">"
@@ -612,7 +612,7 @@ public class ApplyUser implements Serializable {
 							event
 								.getHook()
 								.editOriginal(
-									fixUsername(playerUsername) +
+									escapeUsername(playerUsername) +
 									" (<@" +
 									applyingUserId +
 									">) was waitlisted by " +
@@ -657,7 +657,7 @@ public class ApplyUser implements Serializable {
 													defaultEmbed("Waiting for invite")
 														.setDescription(
 															"**Player:** " +
-															fixUsername(playerUsername) +
+															escapeUsername(playerUsername) +
 															"\n**Discord:** <@" +
 															applyingUserId +
 															">"

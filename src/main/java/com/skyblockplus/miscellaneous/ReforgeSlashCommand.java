@@ -64,7 +64,7 @@ public class ReforgeSlashCommand extends SlashCommand {
 				.collect(Collectors.joining(", "))
 		);
 		if (higherDepth(reforgeStoneJson, "reforgeAbility", null) != null) {
-			eb.appendDescription("\n**Ability:** " + parseMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility").getAsString()));
+			eb.appendDescription("\n**Ability:** " + cleanMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility").getAsString()));
 		}
 		JsonElement reforgeStats = higherDepth(reforgeStoneJson, "reforgeStats");
 		if (reforgeStats == null) {
@@ -80,7 +80,7 @@ public class ReforgeSlashCommand extends SlashCommand {
 					higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null) != null
 						? (
 							"➜ Ability: " +
-							parseMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null)).replace("\n", " ") +
+							cleanMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null)).replace("\n", " ") +
 							"\n"
 						)
 						: ""

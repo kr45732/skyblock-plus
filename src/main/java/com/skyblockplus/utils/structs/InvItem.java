@@ -19,8 +19,8 @@
 package com.skyblockplus.utils.structs;
 
 import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.utils.StringUtils.cleanMcCodes;
 import static com.skyblockplus.utils.utils.StringUtils.idToName;
-import static com.skyblockplus.utils.utils.StringUtils.parseMcCodes;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -76,7 +76,7 @@ public class InvItem {
 	}
 
 	public String getName(boolean parseMcCodes) {
-		return parseMcCodes ? parseMcCodes(name) : name;
+		return parseMcCodes ? cleanMcCodes(name) : name;
 	}
 
 	public String getFormattedId() {
@@ -115,7 +115,7 @@ public class InvItem {
 	public void setLore(NBTList lore) {
 		if (lore != null) {
 			this.lore = lore.stream().map(line -> (String) line).collect(Collectors.toCollection(ArrayList::new));
-			rarity = parseMcCodes(this.lore.get(this.lore.size() - 1)).trim().split("\\s+")[0];
+			rarity = cleanMcCodes(this.lore.get(this.lore.size() - 1)).trim().split("\\s+")[0];
 			rarity += rarity.startsWith("VERY") ? "_SPECIAL" : "";
 			soulbound = soulbound || this.lore.contains("§8§l* §8Co-op Soulbound §8§l*") || this.lore.contains("§8§l* §8Soulbound §8§l*");
 		}

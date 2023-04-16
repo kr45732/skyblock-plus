@@ -600,7 +600,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 						"`" +
 						(i + 1) +
 						")` " +
-						fixUsername(eventMember.getUsername()) +
+						escapeUsername(eventMember.getUsername()) +
 						" | " +
 						(amt >= 0 ? "+ " + formatNumber(amt) : "API disabled")
 					);
@@ -651,7 +651,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 					"`" +
 					(i + 1) +
 					")` " +
-					fixUsername(eventMember.getUsername()) +
+					escapeUsername(eventMember.getUsername()) +
 					" | " +
 					(amt >= 0 ? "+ " + formatNumber(amt) : "API disabled")
 				);
@@ -754,7 +754,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 					"`" +
 					(i + 1) +
 					")` " +
-					fixUsername(eventMember.getUsername()) +
+					escapeUsername(eventMember.getUsername()) +
 					" | " +
 					(amt >= 0 ? "+ " + formatNumber(amt) : "API disabled")
 				);
@@ -787,7 +787,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 							")` " +
 							higherDepth(eventSettings, "prizeMap." + prizeListKeys.get(i)).getAsString() +
 							" - " +
-							(i < eventLeaderboardList.size() ? fixUsername(eventLeaderboardList.get(i).getUsername()) : " None")
+							(i < eventLeaderboardList.size() ? escapeUsername(eventLeaderboardList.get(i).getUsername()) : " None")
 						);
 					} catch (Exception ignored) {}
 				}

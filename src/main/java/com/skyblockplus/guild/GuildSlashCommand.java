@@ -225,7 +225,7 @@ public class GuildSlashCommand extends SlashCommand {
 				.map(Map.Entry::getKey)
 				.collect(Collectors.toCollection(ArrayList::new))) {
 				if (member != null) {
-					paginateBuilder.addItems("• [" + fixUsername(member) + "](" + skyblockStatsLink(member, null) + ")  ");
+					paginateBuilder.addItems("• [" + escapeUsername(member) + "](" + skyblockStatsLink(member, null) + ")  ");
 				}
 			}
 
@@ -345,7 +345,7 @@ public class GuildSlashCommand extends SlashCommand {
 			for (int i = 0; i < guildExpList.size(); i++) {
 				String[] curG = guildExpList.get(i).split("=:=");
 				paginateBuilder.addItems(
-					"`" + (i + 1) + ")` " + fixUsername(curG[0]) + ": " + formatNumber(Integer.parseInt(curG[1])) + " EXP  "
+					"`" + (i + 1) + ")` " + escapeUsername(curG[0]) + ": " + formatNumber(Integer.parseInt(curG[1])) + " EXP  "
 				);
 			}
 
@@ -456,7 +456,7 @@ public class GuildSlashCommand extends SlashCommand {
 				String formattedAmt = amount == -1 ? "?" : roundAndFormat(amount);
 				String playerUsername = player.getString("username");
 
-				paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(playerUsername) + ": " + formattedAmt);
+				paginateBuilder.addItems("`" + (i + 1) + ")` " + escapeUsername(playerUsername) + ": " + formattedAmt);
 				total += Math.max(0, amount);
 
 				if (username != null && playerUsername.equals(usernameUuidStruct.username())) {
@@ -999,7 +999,9 @@ public class GuildSlashCommand extends SlashCommand {
 								}
 
 								if (!rankNamesList.contains(playerRank.toLowerCase())) {
-									paginateBuilder.addItems(("- /g setrank " + fixUsername(playerUsername) + " " + rankNamesList.get(0)));
+									paginateBuilder.addItems(
+										("- /g setrank " + escapeUsername(playerUsername) + " " + rankNamesList.get(0))
+									);
 									totalChange++;
 								}
 								break;
@@ -1058,7 +1060,7 @@ public class GuildSlashCommand extends SlashCommand {
 						}
 
 						if (!meetsReqOr) {
-							pbItems.add("- /g kick " + fixUsername(gMember.getString("username")) + " doesn't meet reqs");
+							pbItems.add("- /g kick " + escapeUsername(gMember.getString("username")) + " doesn't meet reqs");
 							totalChange++;
 							continue;
 						}
@@ -1110,12 +1112,12 @@ public class GuildSlashCommand extends SlashCommand {
 							.map(JsonElement::getAsString)
 							.collect(Collectors.toCollection(ArrayList::new));
 						if (!rankNamesList.contains(gMember.getString("rank").toLowerCase())) {
-							pbItems.add(("- /g setrank " + fixUsername(gMember.getString("username")) + " " + rankNamesList.get(0)));
+							pbItems.add(("- /g setrank " + escapeUsername(gMember.getString("username")) + " " + rankNamesList.get(0)));
 							totalChange++;
 						}
 					} else {
 						if (!defaultRank.contains(gMember.getString("rank"))) {
-							pbItems.add(("- /g setrank " + fixUsername(gMember.getString("username")) + " " + defaultRank.get(0)));
+							pbItems.add(("- /g setrank " + escapeUsername(gMember.getString("username")) + " " + defaultRank.get(0)));
 							totalChange++;
 						}
 					}
@@ -1293,7 +1295,7 @@ public class GuildSlashCommand extends SlashCommand {
 						.append("...\n`")
 						.append(pos + 1)
 						.append(")` ")
-						.append(fixUsername(cur.getString("username")))
+						.append(escapeUsername(cur.getString("username")))
 						.append(": ")
 						.append(roundAndFormat(cur.getDouble(lbType)))
 						.append("\n");
@@ -1304,7 +1306,7 @@ public class GuildSlashCommand extends SlashCommand {
 					.append("`")
 					.append(i + 1)
 					.append(")` ")
-					.append(fixUsername(cur.getString("username")))
+					.append(escapeUsername(cur.getString("username")))
 					.append(": ")
 					.append(roundAndFormat(cur.getDouble(lbType)))
 					.append("\n");

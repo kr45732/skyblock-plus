@@ -117,7 +117,7 @@ public class BingoSlashCommand extends SlashCommand {
 					.append(" ")
 					.append(higherDepth(goal, "name").getAsString())
 					.append(": ")
-					.append(com.skyblockplus.utils.utils.StringUtils.parseMcCodes(higherDepth(goal, "lore").getAsString()));
+					.append(com.skyblockplus.utils.utils.StringUtils.cleanMcCodes(higherDepth(goal, "lore").getAsString()));
 			}
 		}
 		eb.setDescription(

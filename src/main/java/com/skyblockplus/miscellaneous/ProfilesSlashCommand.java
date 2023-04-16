@@ -20,7 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
-import static com.skyblockplus.utils.utils.StringUtils.fixUsername;
+import static com.skyblockplus.utils.utils.StringUtils.escapeUsername;
 import static com.skyblockplus.utils.utils.StringUtils.skyblockStatsLink;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
@@ -90,7 +90,7 @@ public class ProfilesSlashCommand extends SlashCommand {
 
 			for (String uuid : members.keySet()) {
 				try {
-					profileStr.append("\n• ").append(fixUsername(uuidToUsername.get(uuid).get()));
+					profileStr.append("\n• ").append(escapeUsername(uuidToUsername.get(uuid).get()));
 				} catch (Exception ignored) {}
 			}
 			paginateBuilder.addItems(profileStr.toString());

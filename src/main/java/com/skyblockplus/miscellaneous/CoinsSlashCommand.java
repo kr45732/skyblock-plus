@@ -21,7 +21,7 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
-import static com.skyblockplus.utils.utils.StringUtils.parseMcCodes;
+import static com.skyblockplus.utils.utils.StringUtils.cleanMcCodes;
 import static com.skyblockplus.utils.utils.StringUtils.simplifyNumber;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 import static com.skyblockplus.utils.utils.Utils.getEmoji;
@@ -153,7 +153,7 @@ public class CoinsSlashCommand extends SlashCommand {
 							" " +
 							(higherDepth(currentTransaction, "action").getAsString().equals("DEPOSIT") ? "deposited" : "withdrawn") +
 							" by " +
-							parseMcCodes(higherDepth(currentTransaction, "initiator_name").getAsString());
+							cleanMcCodes(higherDepth(currentTransaction, "initiator_name").getAsString());
 
 						paginateBuilder.addItems(
 							"**<t:" +

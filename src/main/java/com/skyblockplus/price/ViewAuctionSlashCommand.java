@@ -66,7 +66,7 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 		} catch (Exception ignored) {}
 
 		if (itemId.equals("ENCHANTED_BOOK")) {
-			itemName = parseMcCodes(higherDepth(auctionJson, "item_lore").getAsString().split("\n")[0]);
+			itemName = cleanMcCodes(higherDepth(auctionJson, "item_lore").getAsString().split("\n")[0]);
 		} else {
 			itemName =
 				(itemId.equals("PET") ? capitalizeString(higherDepth(auctionJson, "tier").getAsString().toLowerCase()) + " " : "") +

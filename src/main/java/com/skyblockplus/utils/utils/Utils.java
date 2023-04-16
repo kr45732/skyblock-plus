@@ -891,7 +891,7 @@ public class Utils {
 			.collect(Collectors.toCollection(ArrayList::new))) {
 			try {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
-				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
+				String itemName = cleanMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
 				String itemId = higherDepth(itemJson, "internalname").getAsString();
 				if (
 					itemId.endsWith("_MINIBOSS") ||
@@ -926,7 +926,7 @@ public class Utils {
 					itemName = capitalizeString(NUMBER_TO_RARITY_MAP.get(itemId.split(";")[1])) + " " + itemName.split("] ")[1];
 				}
 				if (itemName.equals("Enchanted Book")) {
-					itemName = parseMcCodes(higherDepth(itemJson, "lore.[0]").getAsString());
+					itemName = cleanMcCodes(higherDepth(itemJson, "lore.[0]").getAsString());
 				}
 				if (itemId.contains("-")) {
 					itemId = itemId.replace("-", ":");

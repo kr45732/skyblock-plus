@@ -37,34 +37,38 @@ import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
 public class StringUtils {
 
+	private static final DecimalFormat df = new DecimalFormat("#.##");
+	private static final NumberFormat nf = NumberFormat.getInstance(Locale.US);
+
+	static {
+		df.setRoundingMode(RoundingMode.HALF_UP);
+	}
+
 	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[\\dA-FK-OR]");
 	private static final Pattern uuidDashRegex = Pattern.compile("(.{8})(.{4})(.{4})(.{4})(.{12})");
 
 	public static String formatNumber(long number) {
-		return NumberFormat.getInstance(Locale.US).format(number);
+		return nf.format(number);
 	}
 
 	public static String formatNumber(double number) {
-		return NumberFormat.getInstance(Locale.US).format(number);
+		return nf.format(number);
 	}
 
 	public static String roundAndFormat(double number) {
-		DecimalFormat df = new DecimalFormat("#.##");
-		df.setRoundingMode(RoundingMode.HALF_UP);
 		return formatNumber(Double.parseDouble(df.format(number)));
 	}
 
 	public static String roundProgress(double number) {
-		DecimalFormat df = new DecimalFormat("#.##");
-		df.setRoundingMode(RoundingMode.HALF_UP);
 		return df.format(number * 100) + "%";
 	}
 
 	public static String simplifyNumber(double number) {
 		String formattedNumber;
-		DecimalFormat df = new DecimalFormat("#.##");
-		df.setRoundingMode(RoundingMode.HALF_UP);
-		if (1000000000000D > number && number >= 1000000000) {
+		if (number >= 1000000000000D) {
+			number = number >= 999999999999950D ? 999999999999949D : number;
+			formattedNumber = df.format(number / 1000000000000D) + "T";
+		} else if (number >= 1000000000) {
 			number = number >= 999999999950D ? 999999999949D : number;
 			formattedNumber = df.format(number / 1000000000) + "B";
 		} else if (number >= 1000000) {
@@ -89,11 +93,11 @@ public class StringUtils {
 				.collect(Collectors.joining(" "));
 	}
 
-	public static String parseMcCodes(String unformattedString) {
-		return mcColorPattern.matcher(unformattedString.replace("\u00A7ka", "")).replaceAll("");
+	public static String cleanMcCodes(String str) {
+		return mcColorPattern.matcher(str.replace("\u00A7ka", "")).replaceAll("");
 	}
 
-	public static String fixUsername(String username) {
+	public static String escapeUsername(String username) {
 		return username.replace("_", "\\_");
 	}
 
@@ -128,13 +132,13 @@ public class StringUtils {
 		return "https://mine.ly/" + uuid;
 	}
 
-	public static String padStart(String string, int minLength, char padChar) {
-		return string.length() >= minLength ? string : (String.valueOf(padChar).repeat(minLength - string.length()) + string);
+	public static String padStart(String str, int minLength, char padChar) {
+		return str.length() >= minLength ? str : (String.valueOf(padChar).repeat(minLength - str.length()) + str);
 	}
 
 	public static UUID stringToUuid(String uuid) {
 		Matcher matcher = uuidDashRegex.matcher(uuid);
-		return UUID.fromString(matcher.matches() ? uuidDashRegex.matcher(uuid).replaceAll("$1-$2-$3-$4-$5") : uuid);
+		return UUID.fromString(matcher.matches() ? matcher.replaceAll("$1-$2-$3-$4-$5") : uuid);
 	}
 
 	public static String toRomanNumerals(int number) {
@@ -203,13 +207,12 @@ public class StringUtils {
 	}
 
 	public static String idToName(String id, boolean strict) {
-		id = id.toUpperCase();
-		return higherDepth(getInternalJsonMappings(), id + ".name", strict ? null : capitalizeString(id.replace("_", " ")));
+		return higherDepth(getInternalJsonMappings(), id.toUpperCase() + ".name", strict ? null : capitalizeString(id.replace("_", " ")));
 	}
 
 	/**
 	 * @param toMatch   name to match
-	 * @param matchFrom list of ID (will convert to their names)
+	 * @param matchFrom list of ids (will convert to their names)
 	 */
 	public static String getClosestMatchFromIds(String toMatch, Collection<String> matchFrom) {
 		if (matchFrom == null || matchFrom.isEmpty()) {
@@ -234,7 +237,7 @@ public class StringUtils {
 		return FuzzySearch.extractOne(toMatch, matchFrom).getString();
 	}
 
-	public static List<String> getClosestMatch(String toMatch, List<String> matchFrom, int numMatches) {
+	public static List<String> getClosestMatches(String toMatch, List<String> matchFrom, int numMatches) {
 		if (matchFrom == null || matchFrom.isEmpty()) {
 			return new ArrayList<>(List.of(toMatch));
 		}
@@ -255,7 +258,7 @@ public class StringUtils {
 		return "https://sky.shiiyu.moe/item/" + id;
 	}
 
-	public static String getAvatarlUrl(String uuid) {
+	public static String getAvatarUrl(String uuid) {
 		return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
 	}
 

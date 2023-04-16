@@ -2176,7 +2176,7 @@ public class SettingsExecute {
 			paginateBuilder.addItems(
 				"• " +
 				nameMcHyperLink(
-					fixUsername(higherDepth(blacklisted, "username").getAsString()),
+					escapeUsername(higherDepth(blacklisted, "username").getAsString()),
 					higherDepth(blacklisted, "uuid").getAsString()
 				) +
 				" - " +
@@ -2284,7 +2284,7 @@ public class SettingsExecute {
 				"Reason: " +
 				higherDepth(referent, "reason").getAsString() +
 				"\nNameMC: " +
-				nameMcHyperLink(fixUsername(thisUser), higherDepth(referent, "uuid").getAsString()),
+				nameMcHyperLink(escapeUsername(thisUser), higherDepth(referent, "uuid").getAsString()),
 				false
 			);
 		}

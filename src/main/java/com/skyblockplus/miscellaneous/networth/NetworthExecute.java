@@ -911,7 +911,7 @@ public class NetworthExecute {
 			);
 			out.append(miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"data\":" + miscStr + "}" : "");
 			out.append(backpackExtras > 0 ? ",\"bp\":{\"cost\":\"" + simplifyNumber(backpackExtras) + "\",\"data\":" + bpStr + "}" : "");
-			out.append(",\"nbt_tag\":\"").append(parseMcCodes(item.getNbtTag().toString().replace("\"", "\\\""))).append("\"");
+			out.append(",\"nbt_tag\":\"").append(cleanMcCodes(item.getNbtTag().toString().replace("\"", "\\\""))).append("\"");
 			out.append("},");
 		}
 

@@ -105,7 +105,7 @@ public class MayorHandler {
 							.append("\n➜ ")
 							.append(higherDepth(perk, "name").getAsString())
 							.append(": ")
-							.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+							.append(cleanMcCodes(higherDepth(perk, "description").getAsString()));
 					}
 
 					eb.addField(
@@ -218,7 +218,7 @@ public class MayorHandler {
 						.append("\n➜ ")
 						.append(higherDepth(perk, "name").getAsString())
 						.append(": ")
-						.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+						.append(cleanMcCodes(higherDepth(perk, "description").getAsString()));
 				}
 
 				int votes = higherDepth(curMayor, "votes").getAsInt();

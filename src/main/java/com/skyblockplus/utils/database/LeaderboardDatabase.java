@@ -211,11 +211,11 @@ public class LeaderboardDatabase {
 					statement.setLong(3 + offset, Instant.now().toEpochMilli());
 					for (int i = 0; i < typesSubList.size(); i++) {
 						String type = typesSubList.get(i);
-						statement.setDouble(
+						statement.setFloat(
 							i + 4 + offset,
 							type.equals("networth") && !updateNetworth
 								? 0
-								: player.getHighestAmount(
+								: (float) player.getHighestAmount(
 									type +
 									switch (type) {
 										case "catacombs",
