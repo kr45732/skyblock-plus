@@ -28,11 +28,11 @@ public final class HypixelKeyRecord {
 
 	private final AtomicInteger remainingLimit;
 	private final AtomicInteger timeTillReset;
-	private final Instant time;
+	private Instant time;
 
-	public HypixelKeyRecord(AtomicInteger remainingLimit, AtomicInteger timeTillReset) {
-		this.remainingLimit = remainingLimit;
-		this.timeTillReset = timeTillReset;
+	public HypixelKeyRecord(int remainingLimit, int timeTillReset) {
+		this.remainingLimit = new AtomicInteger(remainingLimit);
+		this.timeTillReset = new AtomicInteger(timeTillReset);
 		this.time = Instant.now();
 	}
 
@@ -40,12 +40,10 @@ public final class HypixelKeyRecord {
 		return remainingLimit.get() < 5 && timeTillReset.get() > 0 && time.plusSeconds(timeTillReset.get()).isAfter(Instant.now());
 	}
 
-	public AtomicInteger remainingLimit() {
-		return remainingLimit;
-	}
-
-	public AtomicInteger timeTillReset() {
-		return timeTillReset;
+	public void update(int remainingLimit, int timeTillReset) {
+		this.remainingLimit.set(remainingLimit);
+		this.timeTillReset.set(timeTillReset);
+		this.time = Instant.now();
 	}
 
 	public long getTimeTillReset() {

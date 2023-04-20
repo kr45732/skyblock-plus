@@ -31,10 +31,6 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 		this(null, null, failCause);
 	}
 
-	public UsernameUuidStruct() {
-		this("Unknown fail cause");
-	}
-
 	public boolean isValid() {
 		return username != null && uuid != null;
 	}

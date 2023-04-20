@@ -80,18 +80,11 @@ public class HttpUtils {
 	}
 
 	public static JsonElement getJson(String jsonUrl, String hypixelApiKey) {
-		return getJson(jsonUrl, hypixelApiKey, false);
-	}
-
-	public static JsonElement getJson(String jsonUrl, String hypixelApiKey, boolean isSkyblockProfiles) {
-		boolean isMain = hypixelApiKey.equals(HYPIXEL_API_KEY);
 		try {
-			if (
-				jsonUrl.contains(hypixelApiKey) && (isMain ? remainingLimit.get() < 5 : keyCooldownMap.get(hypixelApiKey).isRateLimited())
-			) {
-				long timeTillResetInt = isMain ? timeTillReset.get() : keyCooldownMap.get(hypixelApiKey).getTimeTillReset();
-				log.info("Sleeping for " + timeTillResetInt + " seconds (" + isMain + ")");
-				TimeUnit.SECONDS.sleep(timeTillResetInt);
+			if (jsonUrl.contains(hypixelApiKey) && keyCooldownMap.get(hypixelApiKey).isRateLimited()) {
+				long timeTillReset = keyCooldownMap.get(hypixelApiKey).getTimeTillReset();
+				log.info("Sleeping for " + timeTillReset + " seconds (" + isMainHypixelKey(hypixelApiKey) + ")");
+				TimeUnit.SECONDS.sleep(timeTillReset);
 			}
 		} catch (Exception ignored) {}
 
@@ -106,12 +99,11 @@ public class HttpUtils {
 				if (jsonUrl.contains("api.hypixel.net")) {
 					if (jsonUrl.contains(hypixelApiKey)) {
 						try {
-							(isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).set(
-									Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue())
-								);
-							(isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).set(
-									Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue())
-								);
+							updateHypixelKey(
+								hypixelApiKey,
+								Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue()),
+								Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue())
+							);
 						} catch (Exception ignored) {}
 					}
 
@@ -130,7 +122,9 @@ public class HttpUtils {
 					InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent());
 					JsonReader jsonIn = new JsonReader(in)
 				) {
-					return isSkyblockProfiles ? SkyblockProfilesParser.parse(jsonIn) : JsonParser.parseReader(jsonIn);
+					return httpGet.getURI().getPath().equals("/skyblock/profiles")
+						? SkyblockProfilesParser.parse(jsonIn)
+						: JsonParser.parseReader(jsonIn);
 				}
 			}
 		} catch (Exception ignored) {}

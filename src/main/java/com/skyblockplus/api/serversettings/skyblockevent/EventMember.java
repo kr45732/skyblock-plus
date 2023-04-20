@@ -19,6 +19,7 @@
 package com.skyblockplus.api.serversettings.skyblockevent;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,8 +30,22 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class EventMember {
 
+	@Transient
+	private String failCause = null;
+
 	private String username = "";
 	private String uuid = "";
 	private String startingAmount = "";
 	private String profileName = "";
+
+	public EventMember(String username, String uuid, String startingAmount, String profileName) {
+		this.username = username;
+		this.uuid = uuid;
+		this.startingAmount = startingAmount;
+		this.profileName = profileName;
+	}
+
+	public double parseStartingAmount() {
+		return Double.parseDouble(startingAmount);
+	}
 }

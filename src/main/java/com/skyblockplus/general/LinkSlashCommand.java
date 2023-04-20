@@ -167,7 +167,7 @@ public class LinkSlashCommand extends SlashCommand {
 										.stream()
 										.noneMatch(g -> g.getGuildId().equals(gId))
 								) {
-									playerGuild = new HypixelResponse();
+									playerGuild = new HypixelResponse("");
 								}
 							}
 						}

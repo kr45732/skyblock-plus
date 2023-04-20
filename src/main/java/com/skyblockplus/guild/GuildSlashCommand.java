@@ -1412,42 +1412,45 @@ public class GuildSlashCommand extends SlashCommand {
 				futuresList.add(
 					asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey)
 						.thenApplyAsync(
-							guildMemberProfileJsonResponse -> {
-								Player.Profile player = new Player(
-									uuidToUsername(guildMemberUuid).username(),
-									guildMemberUuid,
-									guildMemberProfileJsonResponse,
-									false
-								)
-									.getSelectedProfile();
+							hypixelResponse -> {
+								UsernameUuidStruct usernameUuidStruct = uuidToUsername(guildMemberUuid);
+								if (hypixelResponse.isValid()) {
+									Player.Profile player = new Player(
+										usernameUuidStruct.username(),
+										guildMemberUuid,
+										hypixelResponse.response(),
+										false
+									)
+										.getSelectedProfile();
 
-								if (player.isValid()) {
-									boolean invEnabled = excludeArr.contains("inventory") || player.isInventoryApiEnabled();
-									boolean bankEnabled = excludeArr.contains("bank") || player.isBankApiEnabled();
-									boolean collectionsEnabled = excludeArr.contains("collections") || player.isCollectionsApiEnabled();
-									boolean vaultEnabled = excludeArr.contains("vault") || player.isVaultApiEnabled();
-									boolean skillsEnabled = excludeArr.contains("skills") || player.isSkillsApiEnabled();
+									if (player.isValid()) {
+										boolean invEnabled = excludeArr.contains("inventory") || player.isInventoryApiEnabled();
+										boolean bankEnabled = excludeArr.contains("bank") || player.isBankApiEnabled();
+										boolean collectionsEnabled = excludeArr.contains("collections") || player.isCollectionsApiEnabled();
+										boolean vaultEnabled = excludeArr.contains("vault") || player.isVaultApiEnabled();
+										boolean skillsEnabled = excludeArr.contains("skills") || player.isSkillsApiEnabled();
 
-									if (invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) {
-										return client.getSuccess() + " **" + player.getUsernameFixed() + ":** all APIs enabled";
-									} else {
-										String out =
-											(invEnabled ? "" : "Inventory API, ") +
-											(bankEnabled ? "" : "Bank API, ") +
-											(collectionsEnabled ? "" : "Collections API, ") +
-											(vaultEnabled ? "" : "Vault API, ") +
-											(skillsEnabled ? "" : "Skills API, ");
+										if (invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) {
+											return client.getSuccess() + " **" + player.getUsernameFixed() + ":** all APIs enabled";
+										} else {
+											String out =
+												(invEnabled ? "" : "Inventory API, ") +
+												(bankEnabled ? "" : "Bank API, ") +
+												(collectionsEnabled ? "" : "Collections API, ") +
+												(vaultEnabled ? "" : "Vault API, ") +
+												(skillsEnabled ? "" : "Skills API, ");
 
-										return (
-											client.getError() +
-											" **" +
-											player.getUsernameFixed() +
-											":** " +
-											out.substring(0, out.length() - 2)
-										);
+											return (
+												client.getError() +
+												" **" +
+												player.getUsernameFixed() +
+												":** " +
+												out.substring(0, out.length() - 2)
+											);
+										}
 									}
 								}
-								return client.getError() + " **" + player.getUsernameFixed() + ":** unable to get data";
+								return client.getError() + " **" + usernameUuidStruct.usernameFixed() + ":** unable to get data";
 							},
 							executor
 						)

@@ -124,8 +124,6 @@ public class Utils {
 		.addDeserializationExclusionStrategy(new ExposeExclusionStrategy(false))
 		.create();
 	public static final Consumer<Object> ignore = ignored -> {};
-	public static final AtomicInteger remainingLimit = new AtomicInteger(240);
-	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
 	public static final JDAWebhookClient botStatusWebhook = new WebhookClientBuilder(
 		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
@@ -286,6 +284,8 @@ public class Utils {
 			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
 			BASE_URL = System.getenv("BASE_URL");
 		}
+
+		keyCooldownMap.put(HYPIXEL_API_KEY, new HypixelKeyRecord(240, 0));
 	}
 
 	public static String getEmojiWithName(String id, String name) {
@@ -358,7 +358,7 @@ public class Utils {
 					higherDepth(JsonParser.parseReader(in), "record.key").getAsString();
 				}
 
-				keyCooldownMap.put(hypixelKey, new HypixelKeyRecord(new AtomicInteger(remainingLimit), new AtomicInteger(timeTillReset)));
+				updateHypixelKey(hypixelKey, remainingLimit, timeTillReset);
 			}
 		} catch (Exception e) {
 			return errorEmbed("You must set a valid Hypixel API key to use this feature or command");
@@ -797,6 +797,18 @@ public class Utils {
 
 	public static boolean isMainBot() {
 		return DEFAULT_PREFIX.equals("+");
+	}
+
+	public static boolean isMainHypixelKey(String key) {
+		return key.equals(HYPIXEL_API_KEY);
+	}
+
+	public static void updateHypixelKey(String key, int remainingLimit, int timeTillReset) {
+		if (!keyCooldownMap.containsKey(key)) {
+			keyCooldownMap.put(key, new HypixelKeyRecord(remainingLimit, timeTillReset));
+		} else {
+			keyCooldownMap.get(key).update(remainingLimit, timeTillReset);
+		}
 	}
 
 	public static Map<String, Integer> getCommandUses() {

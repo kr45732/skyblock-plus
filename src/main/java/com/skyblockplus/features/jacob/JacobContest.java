@@ -44,13 +44,9 @@ public class JacobContest {
 	}
 
 	public String getCropsFormatted() {
-		return getCropsFormatted(true);
-	}
-
-	public String getCropsFormatted(boolean arrows) {
 		StringBuilder cropsFormatted = new StringBuilder();
 		for (String crop : crops) {
-			cropsFormatted.append(arrows ? "➜ " : "").append(cropNameToEmoji.get(crop)).append(" ").append(crop).append("\n");
+			cropsFormatted.append(cropNameToEmoji.get(crop)).append(" ").append(crop).append("\n");
 		}
 		return cropsFormatted.toString();
 	}

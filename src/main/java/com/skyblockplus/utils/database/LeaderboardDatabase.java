@@ -464,18 +464,28 @@ public class LeaderboardDatabase {
 					futuresList.add(
 						asyncSkyblockProfilesFromUuid(uuid, hypixelKey)
 							.thenApplyAsync(
-								profilesJson -> {
-									Player.Profile player = new Player(uuidToUsername(uuid).username(), uuid, profilesJson, false)
-										.getSelectedProfile();
+								hypixelResponse -> {
+									if (hypixelResponse.isValid()) {
+										Player.Profile player = new Player(
+											uuidToUsername(uuid).username(),
+											uuid,
+											hypixelResponse.response(),
+											false
+										)
+											.getSelectedProfile();
 
-									if (player.isValid()) {
-										players.add(player);
+										if (player.isValid()) {
+											players.add(player);
 
-										DataObject playerObj = DataObject.empty().put("username", player.getUsername()).put("uuid", uuid);
-										for (String lbType : lbTypes) {
-											playerObj.put(lbType, player.getHighestAmount(lbType, mode));
+											DataObject playerObj = DataObject
+												.empty()
+												.put("username", player.getUsername())
+												.put("uuid", uuid);
+											for (String lbType : lbTypes) {
+												playerObj.put(lbType, player.getHighestAmount(lbType, mode));
+											}
+											return playerObj;
 										}
-										return playerObj;
 									}
 									return null;
 								},

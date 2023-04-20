@@ -165,7 +165,7 @@ public class Player {
 			populateProfiles(profileArray);
 
 			if (findProfileByName(profileName)) {
-				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : "";
+				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : failCause;
 				return;
 			}
 		} catch (Exception e) {

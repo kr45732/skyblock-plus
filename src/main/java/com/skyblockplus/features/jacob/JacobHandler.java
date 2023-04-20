@@ -76,7 +76,7 @@ public class JacobHandler {
 								.setDescription(
 									"The next farming contest is starting <t:" + nextContest.getTimeInstant().getEpochSecond() + ":R>\n"
 								)
-								.addField("Crops", nextContest.getCropsFormatted(false), false)
+								.addField("Crops", nextContest.getCropsFormatted(), false)
 								.build();
 
 							int updateCount = 0;

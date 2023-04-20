@@ -74,7 +74,7 @@ public class MayorSlashCommand extends SlashCommand {
 		int nextSpecial = year % 8 == 0 ? year : ((year + 8) - (year % 8));
 
 		String[] mayorNames = new String[] { "Scorpius", "Derpy", "Jerry" };
-		EmbedBuilder eb = defaultEmbed("Special Mayors");
+		EmbedBuilder eb = defaultEmbed("Next Special Mayors");
 		for (int i = nextSpecial; i < nextSpecial + 24; i += 8) {
 			int mayorIndex = 0;
 			if ((i - 8) % 24 == 0) {
