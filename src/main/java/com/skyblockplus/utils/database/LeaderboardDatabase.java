@@ -42,6 +42,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.utils.data.DataObject;
@@ -102,7 +103,7 @@ public class LeaderboardDatabase {
 		Player.Gamemode.IRONMAN,
 		Player.Gamemode.STRANDED
 	);
-	public int userCount = -1;
+	private ScheduledFuture<?> leaderboardUpdateTask;
 
 	public LeaderboardDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -111,7 +112,7 @@ public class LeaderboardDatabase {
 		dataSource = new HikariDataSource(config);
 
 		if (isMainBot()) {
-			scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
+			leaderboardUpdateTask = scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
 	}
 
@@ -582,46 +583,7 @@ public class LeaderboardDatabase {
 
 	public void updateLeaderboard() {
 		try {
-			int count = 0;
 			long start = System.currentTimeMillis();
-			List<Player.Profile> players = new ArrayList<>();
-
-			if (userCount != -1) {
-				JsonArray members = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Users.json")
-					.getAsJsonArray();
-				if (userCount >= members.size()) {
-					log.info("Finished updating all users: " + userCount);
-					userCount = -1;
-				} else {
-					for (count = 0; count <= 90 && userCount < members.size() && System.currentTimeMillis() - start < 55000; userCount++) {
-						UsernameUuidStruct usernameUuidStruct = uuidToUsername(members.get(userCount).getAsString());
-						if (usernameUuidStruct.isValid()) {
-							count++;
-							HypixelResponse profileResponse = skyblockProfilesFromUuid(
-								usernameUuidStruct.uuid(),
-								count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "d317116a-beff-4ed1-bf0a-f246c6dd7ea9",
-								true,
-								false
-							);
-							if (profileResponse.isValid()) {
-								Player.Profile player = new Player(
-									usernameUuidStruct.username(),
-									usernameUuidStruct.uuid(),
-									profileResponse.response(),
-									false
-								)
-									.getSelectedProfile();
-								player.getHighestAmount("networth");
-								players.add(player);
-							}
-						}
-					}
-					System.out.println("Finished up to user count: " + userCount);
-				}
-
-				insertIntoLeaderboard(players);
-				return;
-			}
 
 			List<String> out = new ArrayList<>();
 			try (
@@ -640,20 +602,18 @@ public class LeaderboardDatabase {
 				return;
 			}
 
+			int count = 0;
+			List<Player.Profile> players = new ArrayList<>();
 			for (String uuid : out) {
-				if (count == 90 || System.currentTimeMillis() - start >= 55000) {
+				if (count >= 90 || System.currentTimeMillis() - start >= 55000) {
 					break;
 				}
 
 				UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
 				if (usernameUuidStruct.isValid()) {
+					HypixelResponse profileResponse = skyblockProfilesFromUuid(usernameUuidStruct.uuid(), HYPIXEL_API_KEY, true, false);
 					count++;
-					HypixelResponse profileResponse = skyblockProfilesFromUuid(
-						usernameUuidStruct.uuid(),
-						count < 45 ? "9312794c-8ed1-4350-968a-dedf71601e90" : "d317116a-beff-4ed1-bf0a-f246c6dd7ea9",
-						true,
-						false
-					);
+
 					if (profileResponse.isValid()) {
 						Player.Profile player = new Player(
 							usernameUuidStruct.username(),
@@ -678,6 +638,9 @@ public class LeaderboardDatabase {
 	public void close() {
 		log.info("Closing leaderboard database");
 		dataSource.close();
+		if (leaderboardUpdateTask != null) {
+			leaderboardUpdateTask.cancel(true);
+		}
 		log.info("Successfully closed leaderboard database");
 	}
 }
