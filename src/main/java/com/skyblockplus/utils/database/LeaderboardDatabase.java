@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 public class LeaderboardDatabase {
 
 	public static final List<String> formattedTypesSubList = new ArrayList<>();
-	private static final int MAX_INSERT_COUNT = 75;
+	private static final int MAX_INSERT_COUNT = 60;
 	private static final List<String> types = new ArrayList<>(
 		List.of(
 			"username",
