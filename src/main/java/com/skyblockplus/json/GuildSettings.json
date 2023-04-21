@@ -657,5 +657,49 @@
         }
       ]
     }
+  },
+  "5f08f4428ea8c91f4e30145f": {
+    "name": "25FPS",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "storm",
+        "necron"
+      ],
+      "default_rank": {
+        "requirements": [],
+        "names": [
+          "bonzo"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 864000,
+                "type": "duration"
+              }
+            ]
+          ],
+          "names": [
+            "livid"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 2592000,
+                "type": "duration"
+              }
+            ]
+          ],
+          "names": [
+            "sadan"
+          ]
+        }
+      ]
+    }
   }
 }
