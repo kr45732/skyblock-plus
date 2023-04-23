@@ -43,6 +43,7 @@ public class InvItem {
 	private List<String> lore;
 	private String creationTimestamp;
 	private List<String> enchantsFormatted = new ArrayList<>();
+	private List<String> runesFormatted = new ArrayList<>();
 	private Map<String, Integer> extraStats = new HashMap<>();
 	private List<InvItem> backpackItems = new ArrayList<>();
 	private int essenceCount;
@@ -84,6 +85,8 @@ public class InvItem {
 			return getName().split("] ")[1].toUpperCase().replace(" ", "_").replace("_✦", "") + RARITY_TO_NUMBER_MAP.get(getPetRarity());
 		} else if (id.equals("ENCHANTED_BOOK")) {
 			return enchantsFormatted.isEmpty() ? id : enchantsFormatted.get(0).toUpperCase();
+		} else if (id.equals("RUNE")) {
+			return runesFormatted.isEmpty() ? id : runesFormatted.get(0).toUpperCase();
 		} else {
 			return id;
 		}

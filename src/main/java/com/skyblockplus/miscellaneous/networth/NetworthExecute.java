@@ -45,6 +45,15 @@ import org.apache.groovy.util.Maps;
 public class NetworthExecute {
 
 	private static final List<String> allowedRecombCategories = List.of("ACCESSORY", "NECKLACE", "GLOVES", "BRACELET", "BELT", "CLOAK");
+	private static final List<String> validRunes = List.of(
+		"MUSIC_RUNE;1",
+		"MUSIC_RUNE;2",
+		"MUSIC_RUNE;3",
+		"ENCHANT_RUNE;1",
+		"ENCHANT_RUNE;2",
+		"ENCHANT_RUNE;3",
+		"GRAND_SEARING_RUNE;3"
+	);
 	private static final Map<String, String> attributesBaseCosts = Maps.of(
 		"GLOWSTONE_GAUNTLET",
 		"GLOWSTONE_GAUNTLET",
@@ -197,15 +206,29 @@ public class NetworthExecute {
 		if (sacksMap != null) {
 			for (Map.Entry<String, Integer> sackEntry : sacksMap.entrySet()) {
 				if (sackEntry.getValue() > 0) {
-					double itemPrice = getLowestPrice(sackEntry.getKey(), true, null, false) * sackEntry.getValue();
+					double itemPrice;
+					String itemId = sackEntry.getKey();
+					if (itemId.startsWith("RUNE_")) {
+						String rune = itemId.split("RUNE_")[1];
+						int idx = rune.lastIndexOf("_");
+						itemId = rune.substring(0, idx) + "_RUNE;" + rune.substring(idx + 1);
+						if (!validRunes.contains(itemId)) {
+							continue;
+						}
+						itemPrice = getLowestPrice(itemId);
+					} else {
+						itemPrice = getLowestPrice(itemId, true, null, false);
+					}
+					itemPrice *= sackEntry.getValue();
+
 					addTotal("sacks", itemPrice);
 					if (event != null) {
-						String emoji = getEmoji(sackEntry.getKey(), null);
+						String emoji = getEmoji(itemId, null);
 						addItem(
 							"sacks",
 							(emoji == null ? "" : emoji + " ") +
 							(sackEntry.getValue() != 1 ? formatNumber(sackEntry.getValue()) + "x " : "") +
-							idToName(sackEntry.getKey()) +
+							idToName(itemId) +
 							"=:=" +
 							itemPrice
 						);
@@ -659,8 +682,8 @@ public class NetworthExecute {
 			return 0;
 		}
 
-		double itemCost = 0;
 		double itemCount = 1;
+		double itemCost = 0;
 		double recombobulatedExtra = 0;
 		double hpbExtras = 0;
 		double enchantsExtras = 0;
@@ -669,6 +692,7 @@ public class NetworthExecute {
 		double miscExtras = 0;
 		double backpackExtras = 0;
 		double essenceExtras = 0;
+		double runesExtras = 0;
 
 		StringBuilder source = verbose ? new StringBuilder() : null;
 		try {
@@ -763,6 +787,33 @@ public class NetworthExecute {
 				enchStr.deleteCharAt(enchStr.length() - 1);
 			}
 			enchStr.append("}");
+		}
+
+		StringBuilder runesStr = verbose ? new StringBuilder("{") : null;
+		try {
+			List<String> runes = item.getRunesFormatted();
+			for (String rune : runes) {
+				try {
+					if (!validRunes.contains(rune)) {
+						continue;
+					}
+
+					double runePrice = getLowestPrice(rune.toUpperCase());
+					if (!item.getId().equals("RUNE")) {
+						runePrice *= 0.65;
+					}
+					runesExtras += runePrice;
+					if (verbose) {
+						runesStr.append("\"").append(rune).append("\":\"").append(simplifyNumber(runePrice)).append("\",");
+					}
+				} catch (Exception ignored) {}
+			}
+		} catch (Exception ignored) {}
+		if (verbose) {
+			if (runesStr.charAt(runesStr.length() - 1) == ',') {
+				runesStr.deleteCharAt(runesStr.length() - 1);
+			}
+			runesStr.append("}");
 		}
 
 		try {
@@ -872,7 +923,8 @@ public class NetworthExecute {
 				reforgeExtras +
 				miscExtras +
 				backpackExtras +
-				essenceExtras
+				essenceExtras +
+				runesExtras
 			);
 
 		if (verbose) {
@@ -904,6 +956,7 @@ public class NetworthExecute {
 			out.append(
 				enchantsExtras > 0 ? ",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"data\":" + enchStr + "}" : ""
 			);
+			out.append(runesExtras > 0 ? ",\"runes\":{\"total\":\"" + simplifyNumber(runesExtras) + "\",\"data\":" + runesStr + "}" : "");
 			out.append(
 				reforgeExtras > 0
 					? ",\"reforge\":{\"cost\":\"" + simplifyNumber(reforgeExtras) + "\",\"name\":\"" + item.getModifier() + "\"}"

@@ -52,7 +52,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -429,6 +428,14 @@ public class Utils {
 								enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
 							}
 							itemInfo.setEnchantsFormatted(enchantsList);
+						}
+
+						if (item.containsTag("tag.ExtraAttributes.runes", TagType.COMPOUND)) {
+							List<String> runesList = new ArrayList<>();
+							for (Map.Entry<String, Object> rune : item.getCompound("tag.ExtraAttributes.runes").entrySet()) {
+								runesList.add(rune.getKey() + "_RUNE;" + rune.getValue());
+							}
+							itemInfo.setRunesFormatted(runesList);
 						}
 
 						if (item.containsTag("tag.ExtraAttributes.attributes", TagType.COMPOUND)) {
