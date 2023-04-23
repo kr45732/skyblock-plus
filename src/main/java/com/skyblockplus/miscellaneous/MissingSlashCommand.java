@@ -197,8 +197,8 @@ public class MissingSlashCommand extends SlashCommand {
 		NetworthExecute calc
 	) {
 		// Only one edition is needed (if both are missing, it means they don't have any edition)
-		boolean missing2021 = missingInternalArr.removeIf(o -> o.startsWith("PARTY_HAT_CRAB_") && !o.endsWith("_ANIMATED"));
-		boolean missing2022 = missingInternalArr.removeIf(o -> o.startsWith("PARTY_HAT_CRAB_") && o.endsWith("_ANIMATED"));
+		boolean missing2021 = missingInternalArr.remove("PARTY_HAT_CRAB");
+		boolean missing2022 = missingInternalArr.remove("PARTY_HAT_CRAB_ANIMATED");
 		if (missing2021 && missing2022) {
 			double crabHatCost = -1;
 			String crabHatId = "";
