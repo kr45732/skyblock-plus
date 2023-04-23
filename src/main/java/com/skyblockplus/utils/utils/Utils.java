@@ -393,7 +393,12 @@ public class Utils {
 							(itemInfo.getId().equals("PARTY_HAT_CRAB") || itemInfo.getId().equals("PARTY_HAT_CRAB_ANIMATED")) &&
 							item.containsKey("tag.ExtraAttributes.party_hat_color")
 						) {
-							itemInfo.setId(itemInfo.getId() + "_" + item.getString("tag.ExtraAttributes.party_hat_color").toUpperCase());
+							boolean is2022 = itemInfo.getId().equals("PARTY_HAT_CRAB_ANIMATED");
+							itemInfo.setId(
+								"PARTY_HAT_CRAB_" +
+								item.getString("tag.ExtraAttributes.party_hat_color").toUpperCase() +
+								(is2022 ? "_ANIMATED" : "")
+							);
 						}
 
 						if (itemInfo.getId().equals("NEW_YEAR_CAKE") && item.containsKey("tag.ExtraAttributes.new_years_cake")) {

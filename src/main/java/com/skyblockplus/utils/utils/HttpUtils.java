@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils.utils;
 
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -122,9 +123,20 @@ public class HttpUtils {
 					InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent());
 					JsonReader jsonIn = new JsonReader(in)
 				) {
-					return httpGet.getURI().getPath().equals("/skyblock/profiles")
+					JsonElement json = httpGet.getURI().getPath().equals("/skyblock/profiles")
 						? SkyblockProfilesParser.parse(jsonIn)
 						: JsonParser.parseReader(jsonIn);
+
+					if (jsonUrl.contains("api.hypixel.net") && higherDepth(json, "throttle", false) && higherDepth(json, "global", false)) {
+						JsonObject obj = new JsonObject();
+						obj.addProperty(
+							"cause",
+							"Hypixel API returned 429 too many requests. The API is globally throttled and may be down."
+						);
+						return obj;
+					}
+
+					return json;
 				}
 			}
 		} catch (Exception ignored) {}

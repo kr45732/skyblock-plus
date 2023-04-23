@@ -33,7 +33,6 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.price.PriceSlashCommand;
 import com.skyblockplus.utils.database.CacheDatabase;
 import com.skyblockplus.utils.database.LeaderboardDatabase;
-import com.skyblockplus.utils.structs.HypixelKeyRecord;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.InputStreamReader;
@@ -411,6 +410,12 @@ public class ApiHandler {
 										Integer.parseInt(httpResponse.headers().firstValue("RateLimit-Reset").get())
 									);
 								} catch (Exception ignored) {}
+
+								if (higherDepth(profilesJson, "throttle", false) && higherDepth(profilesJson, "global", false)) {
+									return new HypixelResponse(
+										"Hypixel API returned 429 too many requests. The API is globally throttled and may be down."
+									);
+								}
 
 								try {
 									if (

@@ -54,16 +54,14 @@ import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.apache.groovy.util.Maps;
@@ -516,6 +514,7 @@ public class SettingsExecute {
 						switch (args[4]) {
 							case "enable" -> setApplyEnable(guildSettings.getAsJsonObject(), true);
 							case "disable" -> setApplyEnable(guildSettings.getAsJsonObject(), false);
+							case "close" -> setApplyClose(guildSettings.getAsJsonObject());
 							default -> null;
 						};
 				}
@@ -1092,6 +1091,35 @@ public class SettingsExecute {
 			" automated applications for " +
 			higherDepth(guildSettings, "guildName").getAsString().replace("_", " ") +
 			"\n\nRun `/reload` to reload the settings"
+		);
+	}
+
+	public EmbedBuilder setApplyClose(JsonObject guildSettings) {
+		if (!higherDepth(guildSettings, "applyEnable", false)) {
+			return errorEmbed("Automatic application not enabled");
+		}
+
+		Message message = null;
+		try {
+			message =
+				guild
+					.getTextChannelById(higherDepth(guildSettings, "applyMessageChannel").getAsString())
+					.retrieveMessageById(higherDepth(guildSettings, "applyPrevMessage").getAsString())
+					.complete();
+		} catch (Exception ignored) {}
+
+		if (message == null) {
+			return errorEmbed("Unable to fetch application message");
+		}
+
+		message
+			.editMessageComponents(ActionRow.of(Button.danger("create_application_button_disabled", "Applications Closed").asDisabled()))
+			.queue();
+
+		return defaultSettingsEmbed(
+			"Closed automated applications for " +
+			higherDepth(guildSettings, "guildName").getAsString().replace("_", " ") +
+			"\n\nUse `/reload` to re-open applications"
 		);
 	}
 
