@@ -701,5 +701,30 @@
         }
       ]
     }
+  },
+  "643322a68ea8c97beea092b3": {
+    "name": "TheHex",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "co-owner",
+        "head officer",
+        "moderator"
+      ],
+      "default_rank": {
+        "requirements": [
+          [
+            {
+              "amount": 200000000,
+              "type": "networth"
+            }
+          ]
+        ],
+        "names": [
+          "members"
+        ]
+      },
+      "ranks": []
+    }
   }
 }
