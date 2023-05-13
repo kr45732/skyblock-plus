@@ -1212,8 +1212,6 @@ public class NetworthExecute {
 		);
 	}
 
-	record NetworthItem(String item, double price, boolean soulbound) {}
-
 	public double getTotal(String location, boolean ignoreSoulbound) {
 		// soulboundIgnoredTotals does not include souldbound items
 		return (ignoreSoulbound ? soulboundIgnoredTotals : totals).getOrDefault(location, 0.0);
@@ -1222,4 +1220,6 @@ public class NetworthExecute {
 	public List<NetworthItem> getItems(String location) {
 		return items.getOrDefault(location, new ArrayList<>());
 	}
+
+	record NetworthItem(String item, double price, boolean soulbound) {}
 }
