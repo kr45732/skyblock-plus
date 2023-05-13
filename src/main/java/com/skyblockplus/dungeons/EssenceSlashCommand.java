@@ -114,9 +114,9 @@ public class EssenceSlashCommand extends SlashCommand {
 						);
 						default -> eb.appendDescription(
 							"\n➜ **" +
-							level +
+							level.getKey() +
 							" Star" +
-							(level.equals("1") ? "" : "s") +
+							(level.getKey().equals("1") ? "" : "s") +
 							":** " +
 							ESSENCE_EMOJI_MAP.get(essenceType) +
 							" x" +

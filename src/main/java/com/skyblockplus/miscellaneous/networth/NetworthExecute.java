@@ -101,8 +101,7 @@ public class NetworthExecute {
 	);
 	//	private final Set<String> tempSet = new HashSet<>();
 	private final Map<String, List<InvItem>> pets = new HashMap<>();
-	private final Map<String, List<String>> items = new HashMap<>();
-	private final Map<String, List<String>> soulboundIgnoredItems = new HashMap<>();
+	private final Map<String, List<NetworthItem>> items = new HashMap<>();
 	private final Map<String, Double> totals = new HashMap<>();
 	private final Map<String, Double> soulboundIgnoredTotals = new HashMap<>();
 	private StringBuilder calcItemsJsonStr = new StringBuilder("[");
@@ -134,7 +133,7 @@ public class NetworthExecute {
 
 	public NetworthExecute initPrices() {
 		lowestBinJson = getLowestBinJson();
-		averageAuctionJson = getAverageAuctionJson();
+		averageAuctionJson = getAveragePriceJson();
 		bazaarJson = getBazaarJson();
 		extraPrices = getExtraPricesJson();
 
@@ -194,7 +193,7 @@ public class NetworthExecute {
 							// If event is null, no need to update the soulbound fields even if soulbound
 							addTotal(location, itemPrice, event != null && item.isSoulbound());
 							if (event != null) {
-								addItem(location, addItemStr(item, itemPrice), item.isSoulbound());
+								addItem(location, addItemStr(item), itemPrice, item.isSoulbound());
 							}
 						}
 					}
@@ -228,8 +227,7 @@ public class NetworthExecute {
 							"sacks",
 							(emoji == null ? "" : emoji + " ") +
 							(sackEntry.getValue() != 1 ? formatNumber(sackEntry.getValue()) + "x " : "") +
-							idToName(itemId) +
-							"=:=" +
+							idToName(itemId),
 							itemPrice
 						);
 					}
@@ -293,14 +291,14 @@ public class NetworthExecute {
 	}
 
 	private Map<SelectOption, EmbedBuilder> getPages(Player.Profile player, boolean ignoreSoulbound) {
-		StringBuilder echestStr = getSectionString(getItems("enderchest", ignoreSoulbound));
-		StringBuilder sacksStr = getSectionString(getItems("sacks", ignoreSoulbound));
-		StringBuilder personalVaultStr = getSectionString(getItems("personal_vault", ignoreSoulbound));
-		StringBuilder storageStr = getSectionString(getItems("storage", ignoreSoulbound));
-		StringBuilder invStr = getSectionString(getItems("inventory", ignoreSoulbound));
-		StringBuilder armorStr = getSectionString(getItems("armor", ignoreSoulbound));
-		StringBuilder petsStr = getSectionString(getItems("pets", ignoreSoulbound));
-		StringBuilder talismanStr = getSectionString(getItems("talisman", ignoreSoulbound));
+		StringBuilder echestStr = getSectionString(getItems("enderchest"), ignoreSoulbound);
+		StringBuilder sacksStr = getSectionString(getItems("sacks"), ignoreSoulbound);
+		StringBuilder personalVaultStr = getSectionString(getItems("personal_vault"), ignoreSoulbound);
+		StringBuilder storageStr = getSectionString(getItems("storage"), ignoreSoulbound);
+		StringBuilder invStr = getSectionString(getItems("inventory"), ignoreSoulbound);
+		StringBuilder armorStr = getSectionString(getItems("armor"), ignoreSoulbound);
+		StringBuilder petsStr = getSectionString(getItems("pets"), ignoreSoulbound);
+		StringBuilder talismanStr = getSectionString(getItems("talisman"), ignoreSoulbound);
 
 		double totalNetworth = getNetworth(ignoreSoulbound);
 		//			int position = leaderboardDatabase.getNetworthPosition(player.getGamemode(), player.getUuid());
@@ -474,13 +472,17 @@ public class NetworthExecute {
 		return pages;
 	}
 
-	public StringBuilder getSectionString(List<String> items) {
-		items.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("=:=")[1])));
+	public StringBuilder getSectionString(List<NetworthItem> items, boolean ignoreSoulbound) {
+		items.sort(Comparator.comparingDouble(item -> -item.price()));
 		StringBuilder str = new StringBuilder();
 
-		for (int i = 0; i < items.size(); i++) {
-			String item = items.get(i);
-			str.append(item.split("=:=")[0]).append(" ➜ ").append(simplifyNumber(Double.parseDouble(item.split("=:=")[1]))).append("\n");
+		int i = 0;
+		for (NetworthItem item : items) {
+			if (ignoreSoulbound && item.soulbound()) {
+				continue;
+			}
+
+			str.append(item.item()).append(" ➜ ").append(simplifyNumber(item.price())).append("\n");
 			if (i == 4) {
 				str.append("\n");
 			} else if (i == 24) {
@@ -490,6 +492,7 @@ public class NetworthExecute {
 				}
 				break;
 			}
+			i++;
 		}
 
 		return str;
@@ -535,9 +538,8 @@ public class NetworthExecute {
 				}
 				miscStr.append("]");
 
-				String itemStr = addItemStr(item, auctionPrice + miscExtras);
 				double totalPrice = auctionPrice + miscExtras;
-				addItem(location, itemStr);
+				addItem(location, addItemStr(item), totalPrice);
 				addTotal(location, totalPrice);
 
 				if (verbose) {
@@ -590,8 +592,9 @@ public class NetworthExecute {
 				}
 				miscStr.append("]");
 
-				addItem(location, addItemStr(item, auctionPrice + miscExtras));
-				addTotal(location, auctionPrice + miscExtras);
+				double itemPrice = auctionPrice + miscExtras;
+				addItem(location, addItemStr(item), itemPrice);
+				addTotal(location, itemPrice);
 
 				if (verbose) {
 					calcItemsJsonStr
@@ -644,7 +647,7 @@ public class NetworthExecute {
 		);
 	}
 
-	public String addItemStr(InvItem item, double itemPrice) {
+	public String addItemStr(InvItem item) {
 		String emoji = getEmoji(item.getFormattedId(), null);
 
 		if (item.getSkin() != null && getEmoji(item.getSkin(), null) != null) {
@@ -664,7 +667,7 @@ public class NetworthExecute {
 			}
 		}
 
-		formattedStr += (item.isRecombobulated() ? " " + getEmoji("RECOMBOBULATOR_3000") : "") + "=:=" + itemPrice;
+		formattedStr += (item.isRecombobulated() ? " " + getEmoji("RECOMBOBULATOR_3000") : "");
 
 		return formattedStr;
 	}
@@ -1194,35 +1197,29 @@ public class NetworthExecute {
 		}
 	}
 
-	public void addItem(String location, String item) {
-		addItem(location, item, false);
+	public void addItem(String location, String item, double price) {
+		addItem(location, item, price, false);
 	}
 
-	public void addItem(String location, String item, boolean isSoulbound) {
+	public void addItem(String location, String item, double price, boolean isSoulbound) {
 		location = location.equals("equipment") || location.equals("wardrobe") ? "armor" : location;
 		items.compute(
 			location,
 			(k, v) -> {
-				(v = (v == null ? new ArrayList<>() : v)).add(item);
+				(v = (v == null ? new ArrayList<>() : v)).add(new NetworthItem(item, price, isSoulbound));
 				return v;
 			}
 		);
-		if (!isSoulbound) {
-			soulboundIgnoredItems.compute(
-				location,
-				(k, v) -> {
-					(v = (v == null ? new ArrayList<>() : v)).add(item);
-					return v;
-				}
-			);
-		}
 	}
 
+	record NetworthItem(String item, double price, boolean soulbound) {}
+
 	public double getTotal(String location, boolean ignoreSoulbound) {
+		// soulboundIgnoredTotals does not include souldbound items
 		return (ignoreSoulbound ? soulboundIgnoredTotals : totals).getOrDefault(location, 0.0);
 	}
 
-	public List<String> getItems(String location, boolean ignoreSoulbound) {
-		return (ignoreSoulbound ? soulboundIgnoredItems : items).getOrDefault(location, new ArrayList<>());
+	public List<NetworthItem> getItems(String location) {
+		return items.getOrDefault(location, new ArrayList<>());
 	}
 }

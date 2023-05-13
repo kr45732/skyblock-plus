@@ -905,7 +905,7 @@ public class AutomaticGuild {
 				if (guild.getSelfMember().canInteract(entry.getKey()) && !blacklist.contains(entry.getValue().uuid())) {
 					try {
 						entry.getValue().validate();
-						guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue();
+						guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue(ignore, ignore);
 					} catch (Exception ignored) {}
 				}
 			}

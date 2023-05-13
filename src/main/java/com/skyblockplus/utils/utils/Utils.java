@@ -662,7 +662,6 @@ public class Utils {
 								for (Map.Entry<String, JsonElement> entry : ARMOR_PRESTIGE_COST
 									.getAsJsonObject(prestigeOrder.get(j))
 									.entrySet()) {
-									// Not sure what the coin amount is for prestige (2500000 maybe?)
 									if (entry.getKey().equals("CRIMSON_ESSENCE")) {
 										itemInfo.addEssence(entry.getValue().getAsInt(), "CRIMSON");
 									} else {

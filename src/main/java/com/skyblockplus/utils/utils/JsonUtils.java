@@ -22,8 +22,7 @@ import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.ApiHandler.neuBranch;
 import static com.skyblockplus.utils.Constants.getConstant;
-import static com.skyblockplus.utils.utils.HttpUtils.getJson;
-import static com.skyblockplus.utils.utils.HttpUtils.getJsonObject;
+import static com.skyblockplus.utils.utils.HttpUtils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -49,7 +48,9 @@ public class JsonUtils {
 	public static List<String> queryItems = new ArrayList<>();
 	public static List<String> vanillaItems = new ArrayList<>();
 	private static Instant lowestBinJsonLastUpdated = Instant.now();
+	private static Instant averagePriceJsonLastUpdated = Instant.now();
 	private static Instant averageAuctionJsonLastUpdated = Instant.now();
+	private static Instant averageBinJsonLastUpdated = Instant.now();
 	private static Instant bingoJsonLastUpdated = Instant.now();
 	private static Instant bazaarJsonLastUpdated = Instant.now();
 	private static Instant extraPricesJsonLastUpdated = Instant.now();
@@ -65,7 +66,9 @@ public class JsonUtils {
 	private static JsonObject copperJson;
 	private static JsonObject miscJson;
 	private static JsonObject lowestBinJson;
+	private static JsonObject averagePriceJson;
 	private static JsonObject averageAuctionJson;
+	private static JsonObject averageBinJson;
 	private static JsonObject bazaarJson;
 	private static JsonObject extraPricesJson;
 	private static JsonObject emojiMap;
@@ -112,9 +115,31 @@ public class JsonUtils {
 		return emojiMap;
 	}
 
+	public static JsonObject getAveragePriceJson() {
+		if (averagePriceJson == null || Duration.between(averagePriceJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
+			// Other requests will use the old json while the new json is being fetched (since it takes a few seconds)
+			averagePriceJsonLastUpdated = Instant.now();
+
+			URIBuilder uriBuilder = getQueryApiUrl("average");
+			if (!currentMayor.equals("Derpy")) {
+				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli()).addParameter("step", "60");
+			}
+			averagePriceJson = getJsonObject(uriBuilder.toString());
+
+			if (averagePriceJson == null) {
+				averagePriceJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
+			}
+		}
+
+		return averagePriceJson;
+	}
+
 	public static JsonObject getAverageAuctionJson() {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			URIBuilder uriBuilder = getQueryApiUrl("average");
+			// Other requests will use the old json while the new json is being fetched (since it takes a few seconds)
+			averageAuctionJsonLastUpdated = Instant.now();
+
+			URIBuilder uriBuilder = getQueryApiUrl("average_auction");
 			if (!currentMayor.equals("Derpy")) {
 				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli()).addParameter("step", "60");
 			}
@@ -123,10 +148,28 @@ public class JsonUtils {
 			if (averageAuctionJson == null) {
 				averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
 			}
-			averageAuctionJsonLastUpdated = Instant.now();
 		}
 
 		return averageAuctionJson;
+	}
+
+	public static JsonObject getAverageBinJson() {
+		if (averageBinJson == null || Duration.between(averageBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
+			// Other requests will use the old json while the new json is being fetched (since it takes a few seconds)
+			averageBinJsonLastUpdated = Instant.now();
+
+			URIBuilder uriBuilder = getQueryApiUrl("average_bin");
+			if (!currentMayor.equals("Derpy")) {
+				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli()).addParameter("step", "60");
+			}
+			averageBinJson = getJsonObject(uriBuilder.toString());
+
+			if (averageBinJson == null) {
+				averageBinJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
+			}
+		}
+
+		return averageBinJson;
 	}
 
 	public static JsonObject getBingoInfoJson() {

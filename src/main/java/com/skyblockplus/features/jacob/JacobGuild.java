@@ -25,8 +25,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.features.listeners.AutomaticGuild;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
@@ -53,7 +54,7 @@ public class JacobGuild {
 					return false;
 				}
 
-				List<String> roleMentions = new ArrayList<>();
+				Set<String> roleMentions = new HashSet<>();
 				for (RoleObject wantedCrop : wantedCrops) {
 					if (crops.contains(wantedCrop.getValue())) {
 						roleMentions.add("<@&" + wantedCrop.getRoleId() + ">");

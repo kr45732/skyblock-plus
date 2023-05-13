@@ -84,7 +84,7 @@ public class AuctionFlipper {
 
 		if (underBinJson != null) {
 			underBinJsonLastUpdated = Instant.now();
-			JsonElement avgAuctionJson = getAverageAuctionJson();
+			JsonElement avgAuctionJson = getAveragePriceJson();
 
 			for (JsonElement auction : underBinJson
 				.getAsJsonObject()

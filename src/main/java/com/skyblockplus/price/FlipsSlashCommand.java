@@ -21,7 +21,7 @@ package com.skyblockplus.price;
 import static com.skyblockplus.utils.AuctionFlipper.underBinJson;
 import static com.skyblockplus.utils.AuctionFlipper.underBinJsonLastUpdated;
 import static com.skyblockplus.utils.utils.HypixelUtils.isVanillaItem;
-import static com.skyblockplus.utils.utils.JsonUtils.getAverageAuctionJson;
+import static com.skyblockplus.utils.utils.JsonUtils.getAveragePriceJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
 import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
@@ -33,7 +33,6 @@ import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -59,7 +58,7 @@ public class FlipsSlashCommand extends SlashCommand {
 
 		EmbedBuilder eb = defaultEmbed("Flips")
 			.setDescription("**Next Update:** <t:" + underBinJsonLastUpdated.plusSeconds(60).getEpochSecond() + ":R>");
-		JsonElement avgAuctionJson = getAverageAuctionJson();
+		JsonElement avgAuctionJson = getAveragePriceJson();
 
 		for (JsonElement auction : underBinJson
 			.getAsJsonObject()

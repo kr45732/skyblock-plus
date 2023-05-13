@@ -64,7 +64,7 @@ public class EssenceHandler {
 
 		StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("essence_upgrade_command");
 		if (higherDepth(itemJson, "dungeonize") != null) {
-			menuBuilder.addOption("Dungeonize", "-1");
+			menuBuilder.addOption("Not Dungeonized", "-1");
 		}
 		for (int i = 0; i <= max - 1; i++) {
 			menuBuilder.addOption("" + i, "" + i);
