@@ -90,7 +90,7 @@ public class HelpSlashCommand extends SlashCommand {
 	public static void setHelpList() {
 		helpDataList.clear();
 		helpDataList.addAll(
-			Arrays.asList(
+			List.of(
 				// General
 				new HelpData("help", "Show the help menu with all commands or a specific command.", "help [command]")
 					.addExamples("help", "help settings guild create")
@@ -142,8 +142,8 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("dungeons"),
 				new HelpData(
 					"calcdrops",
-					"Calculate the drop rate and cost of all chests for a dungeons floor",
-					"calcdrops <floor> [luck] [accessory]"
+					"Calculate the drop rate and cost of all chests for a dungeons floor or for an item.",
+					"calcdrops <floor> [item] [luck] [accessory]"
 				)
 					.setCategory("dungeons"),
 				// Guild
@@ -761,7 +761,7 @@ public class HelpSlashCommand extends SlashCommand {
 				"calcruns <level> <floor> [player] [profile] [system]",
 				"Calculate the number of runs needed to reach a certain catacombs level"
 			) +
-			create("calcdrops <floor> [luck] [accessory]", "Calculate the drop rate and cost of all chests for a floor")
+			create("calcdrops <floor> [item] [luck] [accessory]", "Calculate the drop rate and cost of all chests for a floor or item")
 		);
 
 		paginateBuilder.addItems(

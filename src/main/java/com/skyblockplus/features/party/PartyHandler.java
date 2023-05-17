@@ -38,7 +38,7 @@ public class PartyHandler {
 	private final SlashCommandEvent slashCommandEvent;
 	private final Message message;
 	private final String username;
-	private final List<String> classes = new ArrayList<>(Arrays.asList("any", "any", "any", "any"));
+	private final List<String> classes = new ArrayList<>(List.of("any", "any", "any", "any"));
 	private String menuId;
 	private int classIndex = 0;
 	private String floor;

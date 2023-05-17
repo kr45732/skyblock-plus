@@ -119,7 +119,7 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			AutomatedVerify verifySettings = currentServerSettings.getAutomatedVerify();
-			verifySettings.setVerifiedRoles(new ArrayList<>(Arrays.asList(newSettings)));
+			verifySettings.setVerifiedRoles(new ArrayList<>(List.of(newSettings)));
 			currentServerSettings.setAutomatedVerify(verifySettings);
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -518,7 +518,7 @@ public class ServerSettingsService {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			currentServerSettings.setBotManagerRoles(new ArrayList<>(Arrays.asList(newSettings)));
+			currentServerSettings.setBotManagerRoles(new ArrayList<>(List.of(newSettings)));
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}

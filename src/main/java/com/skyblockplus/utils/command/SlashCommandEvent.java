@@ -156,6 +156,6 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	}
 
 	public CustomPaginator.Builder getPaginator() {
-		return defaultPaginator(getUser()).setColumns(1).setItemsPerPage(1);
+		return defaultPaginator(getUser());
 	}
 }

@@ -1561,8 +1561,6 @@ public class Player {
 
 		public CustomPaginator.Builder defaultPlayerPaginator(PaginatorExtras.PaginatorType type, User... users) {
 			return defaultPaginator(users)
-				.setColumns(1)
-				.setItemsPerPage(1)
 				.setPaginatorExtras(
 					new PaginatorExtras(type)
 						.setEveryPageTitle(escapeUsername(getUsername()) + getSymbol(" "))

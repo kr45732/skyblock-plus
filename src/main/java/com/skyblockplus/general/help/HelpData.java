@@ -160,7 +160,7 @@ public class HelpData {
 	}
 
 	public HelpData addExamples(String... examples) {
-		this.examples.addAll(Arrays.asList(examples));
+		this.examples.addAll(List.of(examples));
 		return this;
 	}
 

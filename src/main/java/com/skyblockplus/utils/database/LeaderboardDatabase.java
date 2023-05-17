@@ -96,7 +96,7 @@ public class LeaderboardDatabase {
 	}
 
 	private final HikariDataSource dataSource;
-	private final List<Player.Gamemode> leaderboardGamemodes = Arrays.asList(
+	private final List<Player.Gamemode> leaderboardGamemodes = List.of(
 		Player.Gamemode.ALL,
 		Player.Gamemode.IRONMAN,
 		Player.Gamemode.STRANDED

@@ -56,7 +56,6 @@ public class BitsSlashCommand extends SlashCommand {
 		}
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser())
-			.setColumns(1)
 			.setItemsPerPage(20)
 			.updateExtras(e -> e.setEveryPageTitle("Coins Per Bit"));
 		for (Map.Entry<String, Double> entry : values

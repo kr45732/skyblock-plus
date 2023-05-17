@@ -627,7 +627,6 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			}
 
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(user)
-				.setColumns(1)
 				.setItemsPerPage(25)
 				.updateExtras(e -> e.setEveryPageTitle("Event Leaderboard"));
 
@@ -745,7 +744,6 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			} catch (Exception ignored) {}
 
 			CustomPaginator.Builder paginateBuilder = defaultPaginator()
-				.setColumns(1)
 				.setItemsPerPage(25)
 				.updateExtras(extra -> extra.setEveryPageTitle("Event Leaderboard"))
 				.setTimeout(24, TimeUnit.HOURS);
@@ -765,7 +763,6 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			try {
 				paginateBuilder =
 					defaultPaginator()
-						.setColumns(1)
 						.setItemsPerPage(25)
 						.updateExtras(extra -> extra.setEveryPageTitle("Prizes"))
 						.setTimeout(24, TimeUnit.HOURS);

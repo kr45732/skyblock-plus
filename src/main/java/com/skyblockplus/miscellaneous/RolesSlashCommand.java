@@ -318,7 +318,7 @@ public class RolesSlashCommand extends SlashCommand {
 					}
 					case "pet_enthusiast" -> {
 						JsonArray playerPets = player.getPets();
-						ArrayList<String> excludedPets = new ArrayList<>(Arrays.asList("guardian", "jellyfish", "parrot", "sheep"));
+						ArrayList<String> excludedPets = new ArrayList<>(List.of("guardian", "jellyfish", "parrot", "sheep"));
 
 						Role petEnthusiastRole = guild.getRoleById(higherDepth(roleSettings, "levels.[0].roleId").getAsString());
 						if (petEnthusiastRole == null) {

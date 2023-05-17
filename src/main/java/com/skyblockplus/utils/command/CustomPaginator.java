@@ -433,7 +433,7 @@ public class CustomPaginator extends Menu {
 		}
 
 		public void addItems(String... items) {
-			addItems(Arrays.asList(items));
+			addItems(List.of(items));
 		}
 
 		public Builder addItems(Collection<String> items) {

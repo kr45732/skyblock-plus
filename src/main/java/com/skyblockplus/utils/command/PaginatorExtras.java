@@ -74,12 +74,6 @@ public class PaginatorExtras {
 		return this;
 	}
 
-	public PaginatorExtras setTitles(String[] titles) {
-		this.titles.clear();
-		this.titles.addAll(Arrays.asList(titles));
-		return this;
-	}
-
 	public PaginatorExtras setTitleUrls(List<String> titleUrls) {
 		this.titleUrls.clear();
 		this.titleUrls.addAll(titleUrls);

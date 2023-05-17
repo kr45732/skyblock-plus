@@ -82,7 +82,7 @@ public class HypixelUtils {
 	}
 
 	public static boolean isVanillaItem(String id) {
-		if (vanillaItems == null) {
+		if (vanillaItems.isEmpty()) {
 			getPriceOverrideJson();
 		}
 

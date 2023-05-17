@@ -789,7 +789,7 @@ public class SettingsExecute {
 		}
 
 		event = event.toLowerCase();
-		List<String> validEvents = Arrays.asList(
+		List<String> validEvents = List.of(
 			"bingo_start",
 			"bingo_end",
 			"zoo",
@@ -1530,7 +1530,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder displayRolesSettings(JsonElement rolesSettings, int pageNum) {
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(1);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(author);
 
 		ArrayList<String> pageTitles = new ArrayList<>();
 		pageTitles.add("Roles Settings");
@@ -2176,7 +2176,7 @@ public class SettingsExecute {
 		JsonElement blacklistSettings = getBlacklistSettings();
 		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(30);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setItemsPerPage(30);
 		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Settings"));
 		String canUse = streamJsonArray(higherDepth(blacklistSettings, "canUse"))
 			.map(g -> jda.getGuildById(g.getAsString()))

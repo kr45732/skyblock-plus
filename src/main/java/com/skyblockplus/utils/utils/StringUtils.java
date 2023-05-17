@@ -212,6 +212,7 @@ public class StringUtils {
 	/**
 	 * @param toMatch   name to match
 	 * @param matchFrom list of ids (will convert to their names)
+	 * @return id of the closest matching name
 	 */
 	public static String getClosestMatchFromIds(String toMatch, Collection<String> matchFrom) {
 		if (matchFrom == null || matchFrom.isEmpty()) {

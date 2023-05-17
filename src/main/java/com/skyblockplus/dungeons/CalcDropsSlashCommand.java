@@ -18,7 +18,9 @@
 
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Constants.dungeonLootChestToEmoji;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getDungeonLootItems;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 
@@ -28,7 +30,10 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
-import java.util.Arrays;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.utils.StringUtils;
+import java.util.*;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -39,68 +44,121 @@ import org.springframework.stereotype.Component;
 @Component
 public class CalcDropsSlashCommand extends SlashCommand {
 
+	private static final List<String> chests = List.of("Wood", "Gold", "Diamond", "Emerald", "Obsidian", "Bedrock");
+
 	public CalcDropsSlashCommand() {
 		this.name = "calcdrops";
 	}
 
-	public static EmbedBuilder getCalcDrops(int floor, int bossLuck, String talisman, SlashCommandEvent event) {
-		if (floor < 0 || floor > 14) {
-			return errorEmbed("Invalid floor");
+	public static EmbedBuilder getCalcDrops(int floor, String item, int bossLuck, String talisman, SlashCommandEvent event) {
+		if (floor == -1 && item == null) {
+			return errorEmbed("Floor or item must be provided");
 		}
-		if (bossLuck < 1 || bossLuck > 5) {
-			return errorEmbed("Invalid boss luck level");
-		}
-		boolean isMaster = floor > 7;
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
-		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
-
-		JsonObject data = getDungeonLootJson().get("" + floor).getAsJsonObject();
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setItemsPerPage(4);
 		String combo = talisman + bossLuck;
-		for (String chest : Arrays.asList("Wood", "Gold", "Diamond", "Emerald", "Obsidian", "Bedrock")) {
-			if (higherDepth(data, chest) == null) {
-				continue;
+
+		if (floor != -1) {
+			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			paginateBuilder.setPaginatorExtras(extras);
+			boolean isMaster = floor > 7;
+
+			JsonObject data = getDungeonLootJson().get("" + floor).getAsJsonObject();
+			for (String chest : chests) {
+				if (higherDepth(data, chest) == null) {
+					continue;
+				}
+				EmbedBuilder eb = defaultEmbed(
+					(isMaster ? "Master " : "") + "Floor " + (isMaster ? floor - 7 : floor) + " Loot",
+					"https://wiki.hypixel.net/Catacombs_Floor_" + toRomanNumerals(isMaster ? floor - 7 : floor).toUpperCase()
+				)
+					.setDescription("**Chest:** " + chest + "\nDrop chances listed as `not S+, S+`\n");
+				for (JsonElement itemData : higherDepth(data, chest).getAsJsonArray()) {
+					String name = higherDepth(itemData, "item").getAsString();
+					eb.appendDescription(
+						"\n" +
+						higherDepth(getEmojiMap(), nameToId(name), "") +
+						" **" +
+						name +
+						"**: " +
+						higherDepth(itemData, "drop_chances.S" + combo).getAsString() +
+						", " +
+						higherDepth(itemData, "drop_chances.S+" + combo).getAsString() +
+						" ($" +
+						formatNumber(higherDepth(itemData, "cost").getAsLong()) +
+						")"
+					);
+				}
+				extras.addEmbedPage(eb);
 			}
-			EmbedBuilder eb = defaultEmbed(
-				(isMaster ? "Master " : "") + "Floor " + (isMaster ? floor - 7 : floor) + " Loot",
-				"https://wiki.hypixel.net/Catacombs_Floor_" + toRomanNumerals(isMaster ? floor - 7 : floor).toUpperCase()
-			)
-				.setDescription("**Chest:** " + chest + "\nDrop chances listed as `not S+, S+`\n");
-			for (JsonElement itemData : higherDepth(data, chest).getAsJsonArray()) {
-				String name = higherDepth(itemData, "item").getAsString();
-				eb.appendDescription(
-					"\n" +
-					higherDepth(getEmojiMap(), nameToId(name), "") +
-					" **" +
-					name +
-					"**: " +
-					higherDepth(itemData, "drop_chances.S" + combo).getAsString() +
-					", " +
-					higherDepth(itemData, "drop_chances.S+" + combo).getAsString() +
-					" ($" +
-					formatNumber(higherDepth(itemData, "cost").getAsLong()) +
-					")"
-				);
+		} else {
+			String itemId = getClosestMatchFromIds(item, getDungeonLootItems());
+
+			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
+			paginateBuilder.setPaginatorExtras(extras);
+			extras
+				.setEveryPageTitle(idToName(itemId) + " Dungeon Loot")
+				.setEveryPageTitleUrl("https://wiki.hypixel.net/Dungeon")
+				.setEveryPageText("Drop chances listed as `not S+, S+`")
+				.setEveryPageThumbnail(getItemThumbnail(itemId));
+
+			for (Map.Entry<String, JsonElement> floorEntry : getDungeonLootJson()
+				.entrySet()
+				.stream()
+				.sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey())))
+				.toList()) {
+				floor = Integer.parseInt(floorEntry.getKey());
+				boolean isMaster = floor > 7;
+				StringBuilder ebStr = new StringBuilder();
+
+				for (Map.Entry<String, JsonElement> chestEntry : floorEntry.getValue().getAsJsonObject().entrySet()) {
+					for (JsonElement itemEntry : chestEntry.getValue().getAsJsonArray()) {
+						if (higherDepth(itemEntry, "id").getAsString().equals(itemId)) {
+							ebStr
+								.append("\n")
+								.append(dungeonLootChestToEmoji.get(chestEntry.getKey().toLowerCase()))
+								.append(" **")
+								.append(chestEntry.getKey())
+								.append("**: ")
+								.append(higherDepth(itemEntry, "drop_chances.S" + combo).getAsString())
+								.append(", ")
+								.append(higherDepth(itemEntry, "drop_chances.S+" + combo).getAsString())
+								.append(" ($")
+								.append(formatNumber(higherDepth(itemEntry, "cost").getAsLong()))
+								.append(")");
+						}
+					}
+				}
+
+				if (!ebStr.isEmpty()) {
+					extras.addEmbedField((isMaster ? "Master " : "") + "Floor " + (isMaster ? floor - 7 : floor), ebStr.toString(), false);
+				}
 			}
-			extras.addEmbedPage(eb);
 		}
-		event.paginate(paginateBuilder.setPaginatorExtras(extras));
+
+		event.paginate(paginateBuilder);
 		return null;
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.paginate(
-			getCalcDrops(event.getOptionInt("floor", 1), event.getOptionInt("luck", 1), event.getOptionStr("accessory", "A"), event)
+			getCalcDrops(
+				event.getOptionInt("floor", -1),
+				event.getOptionStr("item"),
+				event.getOptionInt("luck", 1),
+				event.getOptionStr("accessory", "A"),
+				event
+			)
 		);
 	}
 
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Calculate the drop rate and cost of all chests for a floor")
+			.slash(name, "Calculate the drop rate and cost of all chests for a floor or for an item")
 			.addOptions(
-				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)
+				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor")
 					.addChoice("Floor 1", 1)
 					.addChoice("Floor 2", 2)
 					.addChoice("Floor 3", 3)
@@ -115,6 +173,7 @@ public class CalcDropsSlashCommand extends SlashCommand {
 					.addChoice("Master Floor 5", 12)
 					.addChoice("Master Floor 6", 13)
 					.addChoice("Master Floor 7", 14),
+				new OptionData(OptionType.STRING, "item", "Item name", false, true),
 				new OptionData(OptionType.STRING, "accessory", "Catacombs accessory")
 					.addChoice("None", "A")
 					.addChoice("Talisman", "B")
@@ -122,5 +181,15 @@ public class CalcDropsSlashCommand extends SlashCommand {
 					.addChoice("Artifact", "D"),
 				new OptionData(OptionType.INTEGER, "luck", "Boss luck level").setRequiredRange(1, 5)
 			);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("item")) {
+			event.replyClosestMatch(
+				event.getFocusedOption().getValue(),
+				getDungeonLootItems().stream().map(StringUtils::idToName).collect(Collectors.toCollection(ArrayList::new))
+			);
+		}
 	}
 }

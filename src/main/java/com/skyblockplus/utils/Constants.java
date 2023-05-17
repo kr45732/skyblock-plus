@@ -40,6 +40,20 @@ public class Constants {
 
 	/* Harcoded constants */
 	public static final List<String> essenceTypes = List.of("undead", "wither", "dragon", "spider", "ice", "crimson", "diamond", "gold");
+	public static final Map<String, String> dungeonLootChestToEmoji = Maps.of(
+		"wood",
+		"<:dungeon_wood_chest:1108163538905739336>",
+		"gold",
+		"<:dungeon_gold_chest:1108163535437049927>",
+		"diamond",
+		"<:dungeon_diamond_chest:1108163532693975141>",
+		"emerald",
+		"<:dungeon_emerald_chest:1108163534124236830>",
+		"obsidian",
+		"<:dungeon_obsidian_chest:1108163537462906930>",
+		"bedrock",
+		"<:dungeon_bedrock_chest:1108163530596827227>"
+	);
 	public static final Map<String, String> cropNameToEmoji = Maps.of(
 		"Wheat",
 		getEmoji("WHEAT"),

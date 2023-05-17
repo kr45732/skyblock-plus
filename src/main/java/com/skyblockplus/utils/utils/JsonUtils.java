@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.ApiHandler.neuBranch;
 import static com.skyblockplus.utils.Constants.getConstant;
 import static com.skyblockplus.utils.utils.HttpUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.nameToId;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -32,9 +33,7 @@ import java.io.FileReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,8 +44,9 @@ import org.apache.http.client.utils.URIBuilder;
 public class JsonUtils {
 
 	private static final Pattern bazaarEnchantPattern = Pattern.compile("ENCHANTMENT_(\\D*)_(\\d+)");
-	public static List<String> queryItems = new ArrayList<>();
-	public static List<String> vanillaItems = new ArrayList<>();
+	private static List<String> queryItems = new ArrayList<>();
+	public static final List<String> vanillaItems = new ArrayList<>();
+	private static final Set<String> dungeonLootItems = new HashSet<>();
 	private static Instant lowestBinJsonLastUpdated = Instant.now();
 	private static Instant averagePriceJsonLastUpdated = Instant.now();
 	private static Instant averageAuctionJsonLastUpdated = Instant.now();
@@ -228,6 +228,14 @@ public class JsonUtils {
 		return queryItems;
 	}
 
+	public static Set<String> getDungeonLootItems() {
+		if (dungeonLootItems.isEmpty()) {
+			getDungeonLootJson();
+		}
+
+		return dungeonLootItems;
+	}
+
 	public static Map<String, JsonElement> getSkyblockItemsJson() {
 		if (skyblockItemsJson == null) {
 			skyblockItemsJson =
@@ -261,6 +269,15 @@ public class JsonUtils {
 	public static JsonObject getDungeonLootJson() {
 		if (dungeonLootJson == null) {
 			dungeonLootJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/DungeonLoot.json");
+			for (Map.Entry<String, JsonElement> floor : dungeonLootJson.entrySet()) {
+				for (Map.Entry<String, JsonElement> chest : floor.getValue().getAsJsonObject().entrySet()) {
+					for (JsonElement item : chest.getValue().getAsJsonArray()) {
+						String itemId = nameToId(higherDepth(item, "item").getAsString());
+						item.getAsJsonObject().addProperty("id", itemId);
+						dungeonLootItems.add(itemId);
+					}
+				}
+			}
 		}
 
 		return dungeonLootJson;

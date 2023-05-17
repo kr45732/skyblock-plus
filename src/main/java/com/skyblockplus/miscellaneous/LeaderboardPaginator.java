@@ -182,7 +182,7 @@ public class LeaderboardPaginator {
 			return (
 				event.isFromGuild() &&
 				event.getUser().getId().equals(this.event.getUser().getId()) &&
-				event.getModalId().equals("inv_list_search_modal_" + message.getId())
+				event.getModalId().equals("leaderboard_paginator_search_modal_" + message.getId())
 			);
 		}
 		return false;
