@@ -18,8 +18,7 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.AuctionFlipper.underBinJson;
-import static com.skyblockplus.utils.AuctionFlipper.underBinJsonLastUpdated;
+import static com.skyblockplus.utils.AuctionFlipper.*;
 import static com.skyblockplus.utils.utils.HypixelUtils.isVanillaItem;
 import static com.skyblockplus.utils.utils.JsonUtils.getAveragePriceJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
@@ -78,12 +77,12 @@ public class FlipsSlashCommand extends SlashCommand {
 				continue;
 			}
 
-			double pastBinPrice = Math.min(
+			double resellPrice = Math.min(
 				higherDepth(auction, "past_bin_price").getAsLong(),
-				AuctionFlipper.calculateWithTaxes(higherDepth(avgAuctionJson, itemId + ".price").getAsDouble())
+				higherDepth(avgAuctionJson, itemId + ".price").getAsDouble()
 			);
-			long startingBid = higherDepth(auction, "starting_bid").getAsLong();
-			double profit = pastBinPrice - startingBid;
+			long buyPrice = higherDepth(auction, "starting_bid").getAsLong();
+			double profit = calculateWithTaxes(resellPrice) - buyPrice;
 
 			if (profit < 1000000) {
 				continue;
@@ -95,9 +94,11 @@ public class FlipsSlashCommand extends SlashCommand {
 			eb.addField(
 				getEmoji(itemId) + " " + itemName,
 				"**Price:** " +
-				roundAndFormat(startingBid) +
+				roundAndFormat(buyPrice) +
 				"\n**Estimated Profit:** " +
-				roundAndFormat(profit) +
+				roundAndFormat((long) profit) +
+				"\n**Resell Price:** " +
+				roundAndFormat((long) resellPrice) +
 				"\n**Sales Per Hour:** " +
 				formatNumber(sales) +
 				"\n**Command:** `/viewauction " +

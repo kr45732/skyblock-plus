@@ -104,12 +104,12 @@ public class AuctionFlipper {
 					continue;
 				}
 
-				double pastBinPrice = Math.min(
+				double resellPrice = Math.min(
 					higherDepth(auction, "past_bin_price").getAsLong(),
-					calculateWithTaxes(higherDepth(avgAuctionJson, itemId + ".price").getAsDouble())
+					higherDepth(avgAuctionJson, itemId + ".price").getAsDouble()
 				);
-				long startingBid = higherDepth(auction, "starting_bid").getAsLong();
-				double profit = pastBinPrice - startingBid;
+				long buyPrice = higherDepth(auction, "starting_bid").getAsLong();
+				double profit = calculateWithTaxes(resellPrice) - buyPrice;
 
 				if (profit < 1000000) {
 					continue;
@@ -121,9 +121,9 @@ public class AuctionFlipper {
 				flipperWebhook
 					.send(
 						defaultEmbed(itemName)
-							.addField("Price", roundAndFormat(startingBid), true)
-							.addField("Resell Price", roundAndFormat(pastBinPrice), true)
-							.addField("Estimated Profit", roundAndFormat(profit), true)
+							.addField("Price", roundAndFormat(buyPrice), true)
+							.addField("Resell Price", roundAndFormat((long) resellPrice), true)
+							.addField("Estimated Profit", roundAndFormat((long) profit), true)
 							.addField("Sales Per Hour", formatNumber(sales), true)
 							.addField("Command", "`/viewauction " + auctionUuid + "`", true)
 							.setThumbnail(getItemThumbnail(itemId))
@@ -131,7 +131,7 @@ public class AuctionFlipper {
 					)
 					.whenComplete((m, e) -> {
 						if (m != null) {
-							auctionUuidToMessage.put(auctionUuid, new FlipItem(m.getId(), itemName));
+							auctionUuidToMessage.put(auctionUuid, new FlipItem(m.getId(), itemName, (long) profit));
 						}
 					});
 			}
@@ -147,7 +147,12 @@ public class AuctionFlipper {
 					flipperWebhook.edit(
 						flipItem.messageId(),
 						defaultEmbed(flipItem.name())
-							.setDescription("Sold for " + formatNumber(higherDepth(auction, "price").getAsLong()))
+							.setDescription(
+								"Sold for " +
+								formatNumber(higherDepth(auction, "price").getAsLong()) +
+								"\nEstimated profit: " +
+								roundAndFormat(flipItem.profit())
+							)
 							.build()
 					);
 				}
@@ -156,8 +161,10 @@ public class AuctionFlipper {
 	}
 
 	public static double calculateWithTaxes(double price) {
+		// 1% for claiming bin over 1m (when buying)
+		// 1% for starting new bin (when reselling)
 		return price * (price >= 1000000 ? 0.98 : 0.99);
 	}
 
-	private record FlipItem(long messageId, String name) {}
+	private record FlipItem(long messageId, String name, long profit) {}
 }
