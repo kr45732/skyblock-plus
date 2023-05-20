@@ -18,16 +18,16 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.miscellaneous.CraftCommandHandler.ignoredCategories;
 import static com.skyblockplus.utils.utils.JsonUtils.getInternalJsonMappings;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import com.skyblockplus.utils.utils.StringUtils;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -38,15 +38,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class CraftSlashCommand extends SlashCommand {
 
+	private static List<String> craftItems;
+
 	public CraftSlashCommand() {
 		this.name = "craft";
+		craftItems =
+			getInternalJsonMappings()
+				.entrySet()
+				.stream()
+				.filter(e -> {
+					String category = higherDepth(e.getValue(), "category", null);
+					return category != null && !ignoredCategories.contains(category);
+				})
+				.map(e -> idToName(e.getKey()))
+				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	public static EmbedBuilder getCraft(String item, SlashCommandEvent event) {
-		if (!event.isOwner()) {
-			return errorEmbed("This command can only be used by the developer");
-		}
-
 		String id = nameToId(item);
 
 		if (higherDepth(getInternalJsonMappings(), id) == null) {
@@ -65,17 +73,14 @@ public class CraftSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Calculate the cost of an item and added stats")
+			.slash(name, "Calculate the cost of an item and added upgrades")
 			.addOption(OptionType.STRING, "item", "Item name", true, true);
 	}
 
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			event.replyClosestMatch(
-				event.getFocusedOption().getValue(),
-				getInternalJsonMappings().keySet().stream().map(StringUtils::idToName).collect(Collectors.toCollection(ArrayList::new))
-			);
+			event.replyClosestMatch(event.getFocusedOption().getValue(), craftItems);
 		}
 	}
 }

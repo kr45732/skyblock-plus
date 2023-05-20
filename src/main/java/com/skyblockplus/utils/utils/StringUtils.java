@@ -39,13 +39,12 @@ public class StringUtils {
 
 	private static final DecimalFormat df = new DecimalFormat("#.##");
 	private static final NumberFormat nf = NumberFormat.getInstance(Locale.US);
+	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[\\dA-FK-OR]");
+	private static final Pattern uuidDashRegex = Pattern.compile("(.{8})(.{4})(.{4})(.{4})(.{12})");
 
 	static {
 		df.setRoundingMode(RoundingMode.HALF_UP);
 	}
-
-	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[\\dA-FK-OR]");
-	private static final Pattern uuidDashRegex = Pattern.compile("(.{8})(.{4})(.{4})(.{4})(.{12})");
 
 	public static String formatNumber(long number) {
 		return nf.format(number);
