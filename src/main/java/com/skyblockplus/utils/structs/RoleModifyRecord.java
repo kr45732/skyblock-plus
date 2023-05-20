@@ -20,6 +20,7 @@ package com.skyblockplus.utils.structs;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import org.apache.commons.collections4.ListUtils;
 
@@ -28,14 +29,14 @@ public record RoleModifyRecord(List<Role> add, List<Role> remove, String uuid) {
 		this(new ArrayList<>(), new ArrayList<>(), uuid);
 	}
 
-	public RoleModifyRecord update(List<Role> add, List<Role> remove) {
+	public RoleModifyRecord update(List<Role> add, List<Role> remove, Member selfMember) {
 		for (Role role : add) {
-			if (role != null && this.add.size() < 10) {
+			if (role != null && this.add.size() < 10 && selfMember.canInteract(role)) {
 				this.add.add(role);
 			}
 		}
 		for (Role role : remove) {
-			if (role != null && this.remove.size() < 10) {
+			if (role != null && this.remove.size() < 10 && selfMember.canInteract(role)) {
 				this.remove.add(role);
 			}
 		}

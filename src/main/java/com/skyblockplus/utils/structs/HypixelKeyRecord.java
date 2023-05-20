@@ -37,7 +37,7 @@ public final class HypixelKeyRecord {
 	}
 
 	public boolean isRateLimited() {
-		return remainingLimit.get() < 5 && timeTillReset.get() > 0 && time.plusSeconds(timeTillReset.get()).isAfter(Instant.now());
+		return remainingLimit.get() < 5 && getTimeTillReset() > 0;
 	}
 
 	public void update(int remainingLimit, int timeTillReset) {

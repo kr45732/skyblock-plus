@@ -18,7 +18,7 @@
 
 package com.skyblockplus.features.listeners;
 
-import static com.skyblockplus.utils.ApiHandler.neuBranch;
+import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.Utils.*;
@@ -177,7 +177,7 @@ public class MainListener extends ListenerAdapter {
 			isMainBot() && event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")
 		) {
 			String commitSha = higherDepth(
-				getJson("https://api.github.com/repos/NotEnoughUpdates/NotEnoughUpdates-REPO/commits?per_page=1&sha=" + neuBranch),
+				getJson("https://api.github.com/repos/NotEnoughUpdates/NotEnoughUpdates-REPO/commits?per_page=1&sha=" + getNeuBranch()),
 				"[0].sha",
 				null
 			);

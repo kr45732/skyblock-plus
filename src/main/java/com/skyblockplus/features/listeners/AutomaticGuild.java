@@ -551,7 +551,11 @@ public class AutomaticGuild {
 			int counterUpdate = 0;
 			if (roleOrRankEnabled || verifyEnabled || rolesEnabled) {
 				discordToUuid.putAll(
-					database.getAllLinkedAccounts().stream().collect(Collectors.toMap(LinkedAccount::discord, Function.identity()))
+					database
+						.getAllLinkedAccounts()
+						.stream()
+						.filter(o -> !blacklist.contains(o.uuid()))
+						.collect(Collectors.toMap(LinkedAccount::discord, Function.identity()))
 				);
 
 				CountDownLatch latch = new CountDownLatch(1);
@@ -603,24 +607,19 @@ public class AutomaticGuild {
 				for (Member linkedMember : inGuildUsers) {
 					// updatedMembers.add returns true if ele not in set
 					if (numUpdated < updateLimit && updatedMembers.add(linkedMember.getId())) {
-						if (!guild.getSelfMember().canInteract(linkedMember)) {
-							continue;
-						}
-
 						LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
-						if (blacklist.contains(linkedAccount.uuid())) {
-							continue;
-						}
 
 						numUpdated++;
 
-						List<Role> toAddRoles = new ArrayList<>(verifyRolesAdd);
-						List<Role> toRemoveRoles = new ArrayList<>(verifyRolesRemove);
+						List<Role> toAddRoles = new ArrayList<>();
+						List<Role> toRemoveRoles = new ArrayList<>();
 						Player.Profile player = null;
 
 						if (verifyEnabled) {
+							toAddRoles.addAll(verifyRolesAdd);
+							toRemoveRoles.addAll(verifyRolesRemove);
 							String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
-							if (nicknameTemplate.contains("[IGN]")) {
+							if (nicknameTemplate.contains("[IGN]") && guild.getSelfMember().canInteract(linkedMember)) {
 								nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
 
 								Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
@@ -791,7 +790,7 @@ public class AutomaticGuild {
 								linkedMember,
 								memberToRoleChanges
 									.getOrDefault(linkedMember, new RoleModifyRecord(discordToUuid.get(linkedMember.getId()).uuid()))
-									.update(toAddRoles, toRemoveRoles)
+									.update(toAddRoles, toRemoveRoles, guild.getSelfMember())
 							);
 						}
 					}
@@ -823,10 +822,6 @@ public class AutomaticGuild {
 						Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getGuildMemberRole()) : null;
 						Role applyGuestRole = guildMap.get(guildId).applyGuestRole;
 						for (Member linkedMember : inGuildUsers) {
-							if (!guild.getSelfMember().canInteract(linkedMember)) {
-								continue;
-							}
-
 							List<Role> rolesToAdd = new ArrayList<>();
 							List<Role> rolesToRemove = new ArrayList<>();
 
@@ -869,7 +864,7 @@ public class AutomaticGuild {
 									linkedMember,
 									memberToRoleChanges
 										.getOrDefault(linkedMember, new RoleModifyRecord(discordToUuid.get(linkedMember.getId()).uuid()))
-										.update(rolesToAdd, rolesToRemove)
+										.update(rolesToAdd, rolesToRemove, guild.getSelfMember())
 								);
 							}
 						}
@@ -902,12 +897,10 @@ public class AutomaticGuild {
 			}
 
 			for (Map.Entry<Member, RoleModifyRecord> entry : memberToRoleChanges.entrySet()) {
-				if (guild.getSelfMember().canInteract(entry.getKey()) && !blacklist.contains(entry.getValue().uuid())) {
-					try {
-						entry.getValue().validate();
-						guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue(ignore, ignore);
-					} catch (Exception ignored) {}
-				}
+				try {
+					entry.getValue().validate();
+					guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue(ignore, ignore);
+				} catch (Exception ignored) {}
 			}
 
 			System.out.println(

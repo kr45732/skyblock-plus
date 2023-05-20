@@ -229,6 +229,23 @@ public class StringUtils {
 			.getKey();
 	}
 
+	public static List<String> getClosestMatchesFromIds(String toMatch, Collection<String> matchFrom, int numMatches) {
+		if (matchFrom == null || matchFrom.isEmpty()) {
+			return new ArrayList<>(List.of(toMatch));
+		}
+
+		return FuzzySearch
+			.extractTop(
+				toMatch,
+				matchFrom.stream().collect(Collectors.toMap(Function.identity(), StringUtils::idToName)).entrySet(),
+				Map.Entry::getValue,
+				numMatches
+			)
+			.stream()
+			.map(e -> e.getReferent().getKey())
+			.collect(Collectors.toCollection(ArrayList::new));
+	}
+
 	public static String getClosestMatch(String toMatch, List<String> matchFrom) {
 		if (matchFrom == null || matchFrom.isEmpty()) {
 			return toMatch;

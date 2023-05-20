@@ -19,7 +19,7 @@
 package com.skyblockplus.utils.utils;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.neuBranch;
+import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.HttpUtils.*;
 import static com.skyblockplus.utils.utils.HypixelUtils.getNpcSellPrice;
@@ -509,7 +509,7 @@ public class Utils {
 							}
 						}
 
-						// Regular or crimson essence
+						// Essence counts and essence item upgrades
 						if (
 							item.containsKey("tag.ExtraAttributes.dungeon_item_level") ||
 							item.containsKey("tag.ExtraAttributes.upgrade_level")
@@ -527,29 +527,16 @@ public class Utils {
 									} else {
 										totalEssence += higherDepth(essenceUpgrades, "" + j, 0);
 									}
+
+									JsonElement itemUpgrades = higherDepth(essenceUpgrades, "items." + j);
+									if (itemUpgrades != null) {
+										for (JsonElement itemUpgrade : itemUpgrades.getAsJsonArray()) {
+											String[] itemUpgradeSplit = itemUpgrade.getAsString().split(":");
+											itemInfo.addExtraValues(Integer.parseInt(itemUpgradeSplit[1]), itemUpgradeSplit[0]);
+										}
+									}
 								}
 								itemInfo.addEssence(totalEssence, higherDepth(essenceUpgrades, "type").getAsString().toUpperCase());
-							}
-						}
-
-						// Crimson item upgrades
-						if (
-							item.containsKey("tag.ExtraAttributes.upgrade_level") &&
-							higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".type", "").equals("Crimson")
-						) {
-							JsonElement itemUpgrades = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".items");
-							if (itemUpgrades != null) {
-								int crimsonStar = item.getInt("tag.ExtraAttributes.upgrade_level", 0);
-								for (Map.Entry<String, JsonElement> entry : itemUpgrades.getAsJsonObject().entrySet()) {
-									if (Integer.parseInt(entry.getKey()) > crimsonStar) {
-										break;
-									}
-
-									for (JsonElement itemUpgrade : entry.getValue().getAsJsonArray()) {
-										String[] itemUpgradeSplit = itemUpgrade.getAsString().split(":");
-										itemInfo.addExtraValues(Integer.parseInt(itemUpgradeSplit[1]), itemUpgradeSplit[0]);
-									}
-								}
 							}
 						}
 
@@ -858,7 +845,7 @@ public class Utils {
 			Git neuRepo = Git
 				.cloneRepository()
 				.setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
-				.setBranch(neuBranch)
+				.setBranch(getNeuBranch())
 				.setDirectory(neuDir)
 				.call();
 

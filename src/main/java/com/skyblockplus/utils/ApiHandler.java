@@ -61,7 +61,7 @@ public class ApiHandler {
 	public static String ahApiUrl;
 	public static int mojangApiNum = 0;
 	public static boolean allowMojangApi = false;
-	public static String neuBranch = "master";
+	private static String neuBranch = null;
 
 	public static void initialize() {
 		try {
@@ -97,7 +97,14 @@ public class ApiHandler {
 		ahApiUrl = higherDepth(settings, "ahApiUrl").getAsString();
 		mojangApiNum = higherDepth(settings, "mojangApiNum", 0);
 		allowMojangApi = higherDepth(settings, "allowMojangApi", false);
-		neuBranch = higherDepth(settings, "neuBranch").getAsString();
+	}
+
+	public static String getNeuBranch() {
+		if (neuBranch == null) {
+			JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Settings.json");
+			neuBranch = higherDepth(settings, "neuBranch").getAsString();
+		}
+		return neuBranch;
 	}
 
 	public static void updateBotStatistics() {

@@ -2455,7 +2455,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Set the Hypixel API key. Note that no one can view the key for the privacy of the key owner.");
+		return defaultSettingsEmbed("Set the Hypixel API key. The key cannot be viewed again for the privacy of the key's owner.");
 	}
 
 	public EmbedBuilder deleteHypixelKey() {
