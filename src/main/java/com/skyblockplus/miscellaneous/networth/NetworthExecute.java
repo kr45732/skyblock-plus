@@ -216,7 +216,7 @@ public class NetworthExecute {
 						}
 						itemPrice = getLowestPrice(itemId);
 					} else {
-						itemPrice = getLowestPrice(itemId, true, null, false);
+						itemPrice = getLowestPrice(itemId, true, false, null);
 					}
 					itemPrice *= sackEntry.getValue();
 
@@ -715,9 +715,9 @@ public class NetworthExecute {
 					long maxBid = item.getId().equals("MIDAS_SWORD") ? 50000000 : 100000000;
 
 					if (item.getDarkAuctionPrice() >= maxBid) {
-						itemCost = getLowestPrice(item.getId() + "_" + maxBid, false, source, false);
+						itemCost = getLowestPrice(item.getId() + "_" + maxBid, false, false, source);
 						if (itemCost == 0) {
-							itemCost = getLowestPrice(item.getId(), false, source, false);
+							itemCost = getLowestPrice(item.getId(), false, false, source);
 						}
 					} else {
 						itemCost = item.getDarkAuctionPrice();
@@ -727,7 +727,7 @@ public class NetworthExecute {
 						source.append("dark auction price paid");
 					}
 				} else {
-					itemCost = getLowestPrice(item.getId().toUpperCase(), false, source, false);
+					itemCost = getLowestPrice(item.getId().toUpperCase(), false, false, source);
 
 					if (item.getShensAuctionPrice() != -1 && item.getShensAuctionPrice() * 0.9 > itemCost) {
 						itemCost = item.getShensAuctionPrice() * 0.9;
@@ -1028,10 +1028,10 @@ public class NetworthExecute {
 	}
 
 	public double getLowestPrice(String itemId) {
-		return getLowestPrice(itemId, false, null, false);
+		return getLowestPrice(itemId, false, false, null);
 	}
 
-	public double getLowestPrice(String itemId, boolean ignoreAh, StringBuilder source, boolean onlyFullCraft) {
+	public double getLowestPrice(String itemId, boolean ignoreAh, boolean onlyFullCraft, StringBuilder source) {
 		double priceOverride = getPriceOverride(itemId);
 		if (priceOverride != -1) {
 			if (source != null) {
@@ -1066,7 +1066,7 @@ public class NetworthExecute {
 			for (String item : recipe) {
 				String[] idCountSplit = item.split(":");
 
-				double itemLowestPrice = getLowestPrice(idCountSplit[0].replace("-", ":"), false, null, true);
+				double itemLowestPrice = getLowestPrice(idCountSplit[0].replace("-", ":"), false, true, null);
 				if (itemLowestPrice == 0) {
 					craftCost = 0;
 					break;
@@ -1105,6 +1105,18 @@ public class NetworthExecute {
 			}
 		}
 
+		// If it's positive, it is a full craft
+		if (craftCost > 0) {
+			if (source != null) {
+				if (higherDepth(getInternalJsonMappings(), itemId + ".recipe") != null) {
+					source.append("craft");
+				} else {
+					source.append("npc buy");
+				}
+			}
+			return craftCost;
+		}
+
 		if (!onlyFullCraft) {
 			if (recipe != null) {
 				double partialCraftCost = 0;
@@ -1117,9 +1129,9 @@ public class NetworthExecute {
 				if (partialCraftCost > 0) {
 					if (source != null) {
 						if (higherDepth(getInternalJsonMappings(), itemId + ".recipe") != null) {
-							source.append("craft");
+							source.append("partial craft");
 						} else {
-							source.append("npc buy");
+							source.append("partial npc buy");
 						}
 					}
 					return partialCraftCost;

@@ -19,8 +19,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.miscellaneous.CraftCommandHandler.ignoredCategories;
-import static com.skyblockplus.utils.utils.JsonUtils.getInternalJsonMappings;
-import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 
 import com.skyblockplus.utils.command.SlashCommand;
@@ -43,7 +42,7 @@ public class CraftSlashCommand extends SlashCommand {
 	public CraftSlashCommand() {
 		this.name = "craft";
 		craftItems =
-			getInternalJsonMappings()
+			getSkyblockItemsJson()
 				.entrySet()
 				.stream()
 				.filter(e -> {
