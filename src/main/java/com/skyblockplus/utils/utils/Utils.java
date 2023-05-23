@@ -661,6 +661,11 @@ public class Utils {
 						// Gemstone slots for armors other than divan
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.gemstone_slots", 0), "GEMSTONE_CHAMBER");
 
+						// Power scrolls (any right click abilities)
+						if (item.containsKey("tag.ExtraAttributes.power_ability_scroll")) {
+							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.power_ability_scroll").toUpperCase());
+						}
+
 						try (
 							ByteArrayInputStream backpackStream = new ByteArrayInputStream(
 								item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data")
@@ -894,6 +899,7 @@ public class Utils {
 	public static JsonElement getUpdatedItemMappingsJson() {
 		JsonObject outputObj = new JsonObject();
 		Map<String, JsonElement> npcBuyCosts = new HashMap<>();
+		Map<String, JsonArray> idToSkins = new HashMap<>();
 
 		for (File child : Arrays
 			.stream(new File("src/main/java/com/skyblockplus/json/neu/items").listFiles())
@@ -924,7 +930,7 @@ public class Utils {
 							}
 							buyCostObj.add("cost", buyCostArr);
 							if (result.length == 2) {
-								buyCostObj.addProperty("count", Integer.parseInt(result[1]));
+								buyCostObj.addProperty("count", (int) Double.parseDouble(result[1]));
 							}
 							npcBuyCosts.put(result[0], buyCostObj);
 						}
@@ -984,6 +990,46 @@ public class Utils {
 					}
 				}
 
+				JsonArray lore = higherDepth(itemJson, "lore").getAsJsonArray();
+
+				for (int i = 0; i < lore.size(); i++) {
+					String line = lore.get(i).getAsString();
+					if (line.equals("§7§7This skin can be applied to")) {
+						// Item name
+						String id = nameToId(cleanMcCodes(lore.get(i + 1).getAsString()), true);
+						if (id != null) {
+							// Skin name
+							String finalItemId = itemId;
+							idToSkins.compute(
+								id,
+								(k, v) -> {
+									(v = v != null ? v : new JsonArray()).add(finalItemId);
+									return v;
+								}
+							);
+						}
+					}
+
+					for (String rarity : raritiesWithColorCode) {
+						if (line.startsWith(rarity)) {
+							String baseRarity = cleanMcCodes(rarity).replace(" ", "_");
+							toAdd.addProperty("base_rarity", baseRarity);
+						}
+					}
+
+					if (i == lore.size() - 1 && !toAdd.has("base_rarity")) {
+						String baseRarity = cleanMcCodes(lore.get(lore.size() - 1).getAsString()).trim().split("\\s+")[0];
+						baseRarity += baseRarity.startsWith("VERY") ? "_SPECIAL" : "";
+						if (rarityToMagicPower.containsKey(baseRarity)) {
+							toAdd.addProperty("base_rarity", baseRarity);
+						}
+					}
+
+					if (line.matches("§6Ability: (.*) §e§lRIGHT CLICK")) {
+						toAdd.addProperty("scrollable", true);
+					}
+				}
+
 				outputObj.add(itemId, toAdd);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -993,6 +1039,12 @@ public class Utils {
 		for (Map.Entry<String, JsonElement> entry : npcBuyCosts.entrySet()) {
 			if (outputObj.has(entry.getKey())) {
 				outputObj.getAsJsonObject(entry.getKey()).add("npc_buy", entry.getValue());
+			}
+		}
+
+		for (Map.Entry<String, JsonArray> entry : idToSkins.entrySet()) {
+			if (outputObj.has(entry.getKey())) {
+				outputObj.getAsJsonObject(entry.getKey()).add("skins", entry.getValue());
 			}
 		}
 

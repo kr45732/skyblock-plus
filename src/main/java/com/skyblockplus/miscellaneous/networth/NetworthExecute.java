@@ -45,15 +45,6 @@ import org.apache.groovy.util.Maps;
 public class NetworthExecute {
 
 	private static final List<String> allowedRecombCategories = List.of("ACCESSORY", "NECKLACE", "GLOVES", "BRACELET", "BELT", "CLOAK");
-	private static final List<String> validRunes = List.of(
-		"MUSIC_RUNE;1",
-		"MUSIC_RUNE;2",
-		"MUSIC_RUNE;3",
-		"ENCHANT_RUNE;1",
-		"ENCHANT_RUNE;2",
-		"ENCHANT_RUNE;3",
-		"GRAND_SEARING_RUNE;3"
-	);
 	private static final Map<String, String> attributesBaseCosts = Maps.of(
 		"GLOWSTONE_GAUNTLET",
 		"GLOWSTONE_GAUNTLET",
@@ -211,7 +202,7 @@ public class NetworthExecute {
 						String rune = itemId.split("RUNE_")[1];
 						int idx = rune.lastIndexOf("_");
 						itemId = rune.substring(0, idx) + "_RUNE;" + rune.substring(idx + 1);
-						if (!validRunes.contains(itemId)) {
+						if (!networthRunes.contains(itemId)) {
 							continue;
 						}
 						itemPrice = getLowestPrice(itemId);
@@ -797,7 +788,7 @@ public class NetworthExecute {
 			List<String> runes = item.getRunesFormatted();
 			for (String rune : runes) {
 				try {
-					if (!validRunes.contains(rune)) {
+					if (!networthRunes.contains(rune)) {
 						continue;
 					}
 

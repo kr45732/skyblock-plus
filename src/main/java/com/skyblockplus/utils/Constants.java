@@ -1454,6 +1454,25 @@ public class Constants {
 		"zucchini",
 		"<:zucchini:828636746358194206>"
 	);
+	public static final List<String> networthRunes = List.of(
+		"MUSIC_RUNE;1",
+		"MUSIC_RUNE;2",
+		"MUSIC_RUNE;3",
+		"ENCHANT_RUNE;1",
+		"ENCHANT_RUNE;2",
+		"ENCHANT_RUNE;3",
+		"GRAND_SEARING_RUNE;3"
+	);
+	public static final List<String> raritiesWithColorCode = List.of(
+		"§f§lCOMMON",
+		"§a§lUNCOMMON",
+		"§9§lRARE",
+		"§5§lEPIC",
+		"§6§lLEGENDARY",
+		"§d§lMYTHIC",
+		"§c§lSPECIAL",
+		"§c§lVERY SPECIAL"
+	);
 	public static final OptionData profilesCommandOption = new OptionData(OptionType.STRING, "profile", "Profile name")
 		.addChoices(
 			profileNameToEmoji
@@ -1499,6 +1518,7 @@ public class Constants {
 	public static Set<String> ALL_TALISMANS;
 	public static Map<String, String> NUMBER_TO_RARITY_MAP;
 	public static List<String> SOULBOUND_ITEMS;
+	public static Map<String, List<String>> CATEGORY_TO_REFORGES;
 
 	public static void initialize() {
 		try {
@@ -1637,6 +1657,22 @@ public class Constants {
 					.map(Map.Entry::getKey)
 					.collect(Collectors.toCollection(ArrayList::new));
 			SOULBOUND_ITEMS.add("KUUDRA_FOLLOWER_ARTIFACT");
+
+			CATEGORY_TO_REFORGES = new HashMap<>();
+			for (Map.Entry<String, JsonElement> reforgeStone : getReforgeStonesJson().entrySet()) {
+				String[] itemTypes = higherDepth(reforgeStone.getValue(), "itemTypes").getAsString().split("/");
+				for (String itemType : itemTypes) {
+					CATEGORY_TO_REFORGES.compute(
+						itemType,
+						(k, v) -> {
+							(v = v != null ? v : new ArrayList<>()).add(
+									higherDepth(reforgeStone.getValue(), "reforgeName").getAsString().toLowerCase()
+								);
+							return v;
+						}
+					);
+				}
+			}
 		} catch (Exception e) {
 			Main.log.error("Exception while initializing constants", e);
 		}
