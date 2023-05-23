@@ -72,7 +72,6 @@ public class CraftCommandHandler {
 	private static final List<String> armorCategories = List.of("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS");
 	private static final List<String> dyeMaterials = List.of("LEATHER_HELMET", "LEATHER_CHESTPLATE", "LEATHER_LEGGINGS", "LEATHER_BOOTS");
 	private static final List<String> necronBladeScrollItems = List.of("NECRON_BLADE", "HYPERION", "VALKYRIE", "ASTRAEA", "SCYLLA");
-	// --
 	private static final List<String> accessoryEnrichments = List.of(
 		"TALISMAN_ENRICHMENT_ATTACK_SPEED",
 		"TALISMAN_ENRICHMENT_CRITICAL_CHANCE",
@@ -170,7 +169,7 @@ public class CraftCommandHandler {
 	private final NetworthExecute calculator;
 	private final String itemId;
 	// Added values
-	private boolean recombobulated = false;
+	private int recombobulatorCount = 0;
 	private final Set<String> enchants = new HashSet<>();
 	private int hpbCount = 0;
 	private int fpbCount = 0;
@@ -188,9 +187,11 @@ public class CraftCommandHandler {
 	private final Set<String> necronBladeScrolls = new HashSet<>();
 	private String skin = null;
 	private String powerScroll = null;
-	private boolean woodSingularityApplied = false;
-	private boolean artOfWarApplied = false;
-	private boolean artOfPeaceApplied = false;
+	private int woodSingularityCount = 0;
+	private int artOfWarCount = 0;
+	private int artOfPeaceCount = 0;
+	private boolean etherwarpApplied = false;
+	private int transmissionTunerCount = 0;
 
 	public CraftCommandHandler(String itemId, SlashCommandEvent slashCommandEvent) {
 		// TODO: Pets (pet skin & held item), attributes
@@ -200,102 +201,96 @@ public class CraftCommandHandler {
 		this.calculator = new NetworthExecute().initPrices();
 
 		JsonElement itemInfo = getSkyblockItemsJson().get(itemId);
-
 		this.category = higherDepth(itemInfo, "category", null);
 		if (category == null || ignoredCategories.contains(category)) {
 			slashCommandEvent.embed(errorEmbed("This item is not supported"));
 			return;
 		}
 
-		StringSelectMenu.Builder selectMenuBuilder = StringSelectMenu
+		StringSelectMenu.Builder selectMenu = StringSelectMenu
 			.create("craft_command_main")
 			.addOption("Toggle Recombobulator", "toggle_recombobulator");
 
 		if (higherDepth(getEnchantsJson(), "enchants." + category) != null) {
-			selectMenuBuilder.addOption("Enchants", "enchants");
+			selectMenu.addOption("Enchants", "enchants");
 		}
 
 		if (weaponCategories.contains(category) || armorCategories.contains(category)) {
-			selectMenuBuilder.addOption("Potato Books", "potato_books");
+			selectMenu.addOption("Potato Books", "potato_books");
 		}
 
 		if (higherDepth(getEssenceCostsJson(), itemId) != null) {
-			selectMenuBuilder.addOption("Stars", "stars");
+			selectMenu.addOption("Stars", "stars");
 		}
 
 		if (CATEGORY_TO_REFORGES.containsKey(category)) {
-			selectMenuBuilder.addOption("Reforge", "reforge");
+			selectMenu.addOption("Reforge", "reforge");
 		}
 
 		if (weaponCategories.contains(category) || category.equals("CHESTPLATE")) {
-			selectMenuBuilder.addOption("Rune", "rune");
+			selectMenu.addOption("Rune", "rune");
 		}
 
 		if (higherDepth(itemInfo, "gemstone_slots") != null) {
-			selectMenuBuilder.addOption("Gemstones", "gemstones");
+			selectMenu.addOption("Gemstones", "gemstones");
 		}
 
 		if (category.equals("DRILL")) {
-			selectMenuBuilder.addOption("Drill Upgrades", "drill_upgrades");
+			selectMenu.addOption("Drill Upgrades", "drill_upgrades");
 		}
 
 		if (dyeMaterials.contains(higherDepth(itemInfo, "material", ""))) {
-			selectMenuBuilder.addOption("Dye", "dye");
+			selectMenu.addOption("Dye", "dye");
 		}
 
 		if (category.equals("ACCESSORY")) {
-			selectMenuBuilder.addOption("Accessory Enrichment", "accessory_enrichment");
+			selectMenu.addOption("Accessory Enrichment", "accessory_enrichment");
 		}
 
 		if (category.equals("DEPLOYABLE") || category.equals("WAND")) {
-			selectMenuBuilder.addOption("Mana Disintegrator", "mana_disintegrator");
+			selectMenu.addOption("Mana Disintegrator", "mana_disintegrator");
 		}
 
 		if (category.equals("HOE") || category.equals("AXE")) {
-			selectMenuBuilder.addOption("Farming For Dummies", "farming_for_dummies");
+			selectMenu.addOption("Farming For Dummies", "farming_for_dummies");
 		}
 
 		if (necronBladeScrollItems.contains(itemId)) {
-			selectMenuBuilder.addOption("Necron's Blade Scrolls", "necron_blade_scrolls");
+			selectMenu.addOption("Necron's Blade Scrolls", "necron_blade_scrolls");
 		}
 
 		if (higherDepth(getInternalJsonMappings(), itemId + ".skins.[0]") != null) {
-			selectMenuBuilder.addOption("Skin", "skin");
+			selectMenu.addOption("Skin", "skin");
 		}
 
 		if (higherDepth(getInternalJsonMappings(), itemId + ".scrollable", false)) {
-			selectMenuBuilder.addOption("Power Scroll", "power_scroll");
+			selectMenu.addOption("Power Scroll", "power_scroll");
 		}
 
 		if (woodSingularityItems.contains(itemId)) {
-			selectMenuBuilder.addOption("Toggle Wood Singularity", "toggle_wood_singularity");
+			selectMenu.addOption("Toggle Wood Singularity", "toggle_wood_singularity");
 		}
 
 		if (weaponCategories.contains(category)) {
-			selectMenuBuilder.addOption("Toggle Art Of War", "toggle_art_of_war");
+			selectMenu.addOption("Toggle Art Of War", "toggle_art_of_war");
 		}
 
 		if (armorCategories.contains(category)) {
-			selectMenuBuilder.addOption("Toggle Art Of Peace", "toggle_art_of_peace");
+			selectMenu.addOption("Toggle Art Of Peace", "toggle_art_of_peace");
 		}
 
-		double basePrice = calculator.getLowestPrice(itemId);
+		if (itemId.equals("ASPECT_OF_THE_END") || itemId.equals("ASPECT_OF_THE_VOID") || itemId.equals("SINSEEKER_SCYTHE")) {
+			selectMenu.addOption("Transmission Tuners", "transmission_tuners");
+		}
+
+		if (itemId.equals("ASPECT_OF_THE_END") || itemId.equals("ASPECT_OF_THE_VOID")) {
+			selectMenu.addOption("Toggle Etherwarp", "toggle_etherwarp");
+		}
+
 		slashCommandEvent
 			.getHook()
-			.editOriginalEmbeds(
-				defaultEmbed("Craft Helper For " + idToName(itemId))
-					.setDescription(
-						getEmoji("ENCHANTED_GOLD") +
-						" **Total Price:** " +
-						roundAndFormat(basePrice) +
-						"\n\n" +
-						getEmoji(itemId) +
-						" Base Price: " +
-						roundAndFormat(basePrice)
-					)
-					.build()
-			)
-			.setActionRow(selectMenuBuilder.build())
+			.editOriginalEmbeds(getMainMessage().build())
+			.setActionRow(selectMenu.build())
 			.queue(
 				m -> {
 					message = m;
@@ -343,15 +338,16 @@ public class CraftCommandHandler {
 			SelectOption selectedOption = event.getSelectedOptions().get(0);
 			switch (selectedOption.getValue()) {
 				case "toggle_recombobulator" -> {
-					recombobulated = !recombobulated;
+					recombobulatorCount = recombobulatorCount == 0 ? 1 : 0;
 					event
-						.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Recombobulated: " + recombobulated).build())
+						.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Recombobulated: " + (recombobulatorCount == 1)).build())
 						.setEphemeral(true)
 						.queue();
-					updateMainMessage();
 				}
 				case "enchants" -> event
-					.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Select an option from the menu below").build())
+					.replyEmbeds(
+						defaultEmbed("Craft Helper").setDescription("Select an option from the menu below to modify enchants").build()
+					)
 					.setActionRow(
 						StringSelectMenu
 							.create("craft_command_enchants_main_" + message.getId())
@@ -362,7 +358,9 @@ public class CraftCommandHandler {
 					.setEphemeral(true)
 					.queue();
 				case "gemstones" -> event
-					.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Select an option from the menu below").build())
+					.replyEmbeds(
+						defaultEmbed("Craft Helper").setDescription("Select an option from the menu below to modify gemstones").build()
+					)
 					.setActionRow(
 						StringSelectMenu
 							.create("craft_command_gemstones_main_" + message.getId())
@@ -373,7 +371,7 @@ public class CraftCommandHandler {
 					.setEphemeral(true)
 					.queue();
 				case "drill_upgrades" -> event
-					.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Select an option from the menu below").build())
+					.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Select a drill upgrade from the menu below").build())
 					.setActionRow(
 						StringSelectMenu
 							.create("craft_command_drill_upgrades_main_" + message.getId())
@@ -471,6 +469,7 @@ public class CraftCommandHandler {
 							.addOption("Implosion", "IMPLOSION_SCROLL")
 							.addOption("Shadow Warp", "SHADOW_WARP_SCROLL")
 							.addOption("Wither Shield", "WITHER_SHIELD_SCROLL")
+							.setMaxValues(3)
 							.build()
 					)
 					.setEphemeral(true)
@@ -494,7 +493,7 @@ public class CraftCommandHandler {
 					.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Select a scroll from the menu below").build())
 					.setActionRow(
 						StringSelectMenu
-							.create("craft_command_skin_" + message.getId())
+							.create("craft_command_power_scroll_" + message.getId())
 							.addOption("None", "none")
 							.addOptions(
 								powerScrolls
@@ -540,32 +539,51 @@ public class CraftCommandHandler {
 					.setEphemeral(true)
 					.queue();
 				case "toggle_wood_singularity" -> {
-					woodSingularityApplied = !woodSingularityApplied;
+					woodSingularityCount = woodSingularityCount == 0 ? 1 : 0;
 					event
 						.replyEmbeds(
-							defaultEmbed("Craft Helper").setDescription("Wood Singularity Applied: " + woodSingularityApplied).build()
+							defaultEmbed("Craft Helper").setDescription("Wood Singularity Applied: " + (woodSingularityCount == 1)).build()
 						)
 						.setEphemeral(true)
 						.queue();
-					updateMainMessage();
 				}
 				case "toggle_art_of_war" -> {
-					artOfWarApplied = !artOfWarApplied;
+					artOfWarCount = artOfWarCount == 0 ? 1 : 0;
 					event
-						.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Art Of War Applied: " + artOfWarApplied).build())
+						.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Art Of War Applied: " + (artOfWarCount == 1)).build())
 						.setEphemeral(true)
 						.queue();
-					updateMainMessage();
 				}
 				case "toggle_art_of_peace" -> {
-					artOfPeaceApplied = !artOfPeaceApplied;
+					artOfPeaceCount = artOfPeaceCount == 0 ? 1 : 0;
 					event
-						.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Art Of Peace Applied: " + artOfPeaceApplied).build())
+						.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Art Of Peace Applied: " + artOfPeaceCount).build())
 						.setEphemeral(true)
 						.queue();
-					updateMainMessage();
 				}
+				case "toggle_etherwarp" -> {
+					etherwarpApplied = !etherwarpApplied;
+					event
+						.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Etherwarp Applied: " + etherwarpApplied).build())
+						.setEphemeral(true)
+						.queue();
+				}
+				case "transmission_tuners" -> event
+					.replyModal(
+						Modal
+							.create("craft_command_transmission_tuners_" + message.getId(), "Craft Helper - Transmission Tuners")
+							.addActionRow(
+								TextInput
+									.create("value", "Transmission Tuners Count", TextInputStyle.SHORT)
+									.setValue("" + transmissionTunerCount)
+									.setRequired(false)
+									.build()
+							)
+							.build()
+					)
+					.queue();
 			}
+			updateMainMessage();
 		} else if (event.getComponentId().startsWith("craft_command_enchants_main_")) {
 			SelectOption selectedOption = event.getSelectedOptions().get(0);
 			switch (selectedOption.getValue()) {
@@ -605,6 +623,7 @@ public class CraftCommandHandler {
 							.addOptions(
 								streamJsonArray(higherDepth(getSkyblockItemsJson().get(itemId), "gemstone_slots"))
 									.map(e -> higherDepth(e, "slot_type").getAsString())
+									.filter(e -> !gemstones.containsKey(e))
 									.map(e -> SelectOption.of(capitalizeString(e) + " Slot", e))
 									.collect(Collectors.toCollection(ArrayList::new))
 							)
@@ -627,7 +646,10 @@ public class CraftCommandHandler {
 											.entrySet()
 											.stream()
 											.map(e ->
-												SelectOption.of(capitalizeString(e.getKey()) + " - " + idToName(e.getValue()), e.getKey())
+												SelectOption.of(
+													capitalizeString(e.getKey()) + " Slot - " + idToName(e.getValue()),
+													e.getKey()
+												)
 											)
 											.collect(Collectors.toCollection(ArrayList::new))
 									)
@@ -639,25 +661,49 @@ public class CraftCommandHandler {
 			}
 		} else if (event.getComponentId().startsWith("craft_command_gemstones_add_")) {
 			String gemstoneSlot = event.getSelectedOptions().get(0).getValue();
-			event
-				.editMessageEmbeds(
-					defaultEmbed("Craft Helper")
-						.setDescription("Select a gemstone variety for the " + gemstoneSlot.toLowerCase() + " slot from the menu below")
-						.build()
-				)
-				.setActionRow(
-					StringSelectMenu
-						.create("craft_command_gemstones_variety_add_" + gemstoneSlot + "_" + message.getId())
-						.addOptions(
-							slotTypeToGemstones
-								.get(gemstoneSlot)
-								.stream()
-								.map(e -> SelectOption.of(capitalizeString(e) + " Variety", e))
-								.collect(Collectors.toCollection(ArrayList::new))
-						)
-						.build()
-				)
-				.queue();
+			List<String> gemstoneVarieties = slotTypeToGemstones.get(gemstoneSlot);
+			if (gemstoneVarieties.size() > 1) {
+				event
+					.editMessageEmbeds(
+						defaultEmbed("Craft Helper")
+							.setDescription("Select a gemstone variety for the " + gemstoneSlot.toLowerCase() + " slot from the menu below")
+							.build()
+					)
+					.setActionRow(
+						StringSelectMenu
+							.create("craft_command_gemstones_variety_add_" + gemstoneSlot + "_" + message.getId())
+							.addOptions(
+								slotTypeToGemstones
+									.get(gemstoneSlot)
+									.stream()
+									.map(e -> SelectOption.of(capitalizeString(e) + " Variety", e))
+									.collect(Collectors.toCollection(ArrayList::new))
+							)
+							.build()
+					)
+					.queue();
+			} else {
+				String gemstoneVariety = gemstoneVarieties.get(0);
+				event
+					.editMessageEmbeds(
+						defaultEmbed("Craft Helper")
+							.setDescription("Select a gemstone tier for the " + gemstoneSlot.toLowerCase() + " slot from the menu below")
+							.build()
+					)
+					.setActionRow(
+						StringSelectMenu
+							.create("craft_command_gemstones_tier_add_" + gemstoneSlot + "_" + message.getId())
+							.addOptions(
+								gemstoneTiers
+									.stream()
+									.map(e -> e + "_" + gemstoneVariety + "_GEM")
+									.map(e -> SelectOption.of(idToName(e), e))
+									.collect(Collectors.toCollection(ArrayList::new))
+							)
+							.build()
+					)
+					.queue();
+			}
 		} else if (event.getComponentId().startsWith("craft_command_gemstones_variety_add_")) {
 			String gemstoneSlot = event.getComponentId().split("craft_command_gemstones_variety_add_")[1].split("_")[0];
 			String gemstoneVariety = event.getSelectedOptions().get(0).getValue();
@@ -698,13 +744,15 @@ public class CraftCommandHandler {
 			SelectOption gemstoneSlot = event.getSelectedOptions().get(0);
 			gemstones.remove(gemstoneSlot.getValue());
 
-			event.editMessageEmbeds(errorEmbed("Removed gemstone slot: " + gemstoneSlot.getLabel()).build()).queue();
+			event.editMessageEmbeds(errorEmbed("Removed gemstone slot: " + gemstoneSlot.getLabel()).build()).setComponents().queue();
 			updateMainMessage();
 		} else if (event.getComponentId().startsWith("craft_command_drill_upgrades_main_")) {
 			SelectOption selectedOption = event.getSelectedOptions().get(0);
 			switch (selectedOption.getValue()) {
 				case "drill_upgrade_module" -> event
-					.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Select a drill upgrade module from the menu below").build())
+					.editMessageEmbeds(
+						defaultEmbed("Craft Helper").setDescription("Select a drill upgrade module from the menu below").build()
+					)
 					.setActionRow(
 						StringSelectMenu
 							.create("craft_command_drill_upgrades_upgrade_module_" + message.getId())
@@ -717,10 +765,9 @@ public class CraftCommandHandler {
 							)
 							.build()
 					)
-					.setEphemeral(true)
 					.queue();
 				case "drill_fuel_tank" -> event
-					.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Select a drill fuel tank from the menu below").build())
+					.editMessageEmbeds(defaultEmbed("Craft Helper").setDescription("Select a drill fuel tank from the menu below").build())
 					.setActionRow(
 						StringSelectMenu
 							.create("craft_command_drill_upgrades_fuel_tank_" + message.getId())
@@ -733,10 +780,9 @@ public class CraftCommandHandler {
 							)
 							.build()
 					)
-					.setEphemeral(true)
 					.queue();
 				case "drill_engine" -> event
-					.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Select a drill engine from the menu below").build())
+					.editMessageEmbeds(defaultEmbed("Craft Helper").setDescription("Select a drill engine from the menu below").build())
 					.setActionRow(
 						StringSelectMenu
 							.create("craft_command_drill_upgrades_engine_" + message.getId())
@@ -749,7 +795,6 @@ public class CraftCommandHandler {
 							)
 							.build()
 					)
-					.setEphemeral(true)
 					.queue();
 			}
 		} else if (event.getComponentId().startsWith("craft_command_enchants_add_choose_")) {
@@ -780,15 +825,15 @@ public class CraftCommandHandler {
 			rune = runeValue.getValue().equals("none") ? null : runeValue.getValue();
 
 			event
-				.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Rune: " + runeValue.getLabel()).build())
-				.setEphemeral(true)
+				.editMessageEmbeds(defaultEmbed("Craft Helper").setDescription("Rune: " + runeValue.getLabel()).build())
+				.setComponents()
 				.queue();
 			updateMainMessage();
 		} else if (event.getComponentId().startsWith("craft_command_necron_blade_scrolls_")) {
+			necronBladeScrolls.clear();
 			List<SelectOption> selectedScrolls = event.getSelectedOptions();
 			for (SelectOption selectedScroll : selectedScrolls) {
 				if (selectedScroll.getValue().equals("none")) {
-					necronBladeScrolls.clear();
 					event
 						.editMessageEmbeds(defaultEmbed("Craft Helper").setDescription("Removed all necron's blade scrolls").build())
 						.setComponents()
@@ -817,8 +862,8 @@ public class CraftCommandHandler {
 			skin = skinValue.getValue().equals("none") ? null : skinValue.getValue();
 
 			event
-				.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Skin: " + skinValue.getLabel()).build())
-				.setEphemeral(true)
+				.editMessageEmbeds(defaultEmbed("Craft Helper").setDescription("Skin: " + skinValue.getLabel()).build())
+				.setComponents()
 				.queue();
 			updateMainMessage();
 		} else if (event.getComponentId().startsWith("craft_command_power_scroll_")) {
@@ -826,8 +871,8 @@ public class CraftCommandHandler {
 			powerScroll = powerScrollValue.getValue().equals("none") ? null : powerScrollValue.getValue();
 
 			event
-				.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Power Scroll: " + powerScrollValue.getLabel()).build())
-				.setEphemeral(true)
+				.editMessageEmbeds(defaultEmbed("Craft Helper").setDescription("Power Scroll: " + powerScrollValue.getLabel()).build())
+				.setComponents()
 				.queue();
 			updateMainMessage();
 		} else if (event.getComponentId().startsWith("craft_command_drill_upgrades_upgrade_module_")) {
@@ -835,10 +880,10 @@ public class CraftCommandHandler {
 			drillUpgradeModule = drillUpgradeModuleValue.getValue().equals("none") ? null : drillUpgradeModuleValue.getValue();
 
 			event
-				.replyEmbeds(
+				.editMessageEmbeds(
 					defaultEmbed("Craft Helper").setDescription("Drill upgrade module: " + drillUpgradeModuleValue.getLabel()).build()
 				)
-				.setEphemeral(true)
+				.setComponents()
 				.queue();
 			updateMainMessage();
 		} else if (event.getComponentId().startsWith("craft_command_drill_upgrades_fuel_tank_")) {
@@ -846,8 +891,8 @@ public class CraftCommandHandler {
 			drillFuelTank = drillFuelTankValue.getValue().equals("none") ? null : drillFuelTankValue.getValue();
 
 			event
-				.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Drill fuel tank: " + drillFuelTankValue.getLabel()).build())
-				.setEphemeral(true)
+				.editMessageEmbeds(defaultEmbed("Craft Helper").setDescription("Drill fuel tank: " + drillFuelTankValue.getLabel()).build())
+				.setComponents()
 				.queue();
 			updateMainMessage();
 		} else if (event.getComponentId().startsWith("craft_command_drill_upgrades_engine_")) {
@@ -855,8 +900,8 @@ public class CraftCommandHandler {
 			drillEngine = drillEngineValue.getValue().equals("none") ? null : drillEngineValue.getValue();
 
 			event
-				.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Drill engine: " + drillEngineValue.getLabel()).build())
-				.setEphemeral(true)
+				.editMessageEmbeds(defaultEmbed("Craft Helper").setDescription("Drill engine: " + drillEngineValue.getLabel()).build())
+				.setComponents()
 				.queue();
 			updateMainMessage();
 		} else if (event.getComponentId().startsWith("craft_command_dye_")) {
@@ -864,8 +909,8 @@ public class CraftCommandHandler {
 			dye = dyeValue.getValue().equals("none") ? null : dyeValue.getValue();
 
 			event
-				.replyEmbeds(defaultEmbed("Craft Helper").setDescription("Dye: " + dyeValue.getLabel()).build())
-				.setEphemeral(true)
+				.editMessageEmbeds(defaultEmbed("Craft Helper").setDescription("Dye: " + dyeValue.getLabel()).build())
+				.setComponents()
 				.queue();
 			updateMainMessage();
 		} else if (event.getComponentId().startsWith("craft_command_accessory_enrichments_")) {
@@ -873,10 +918,10 @@ public class CraftCommandHandler {
 			accessoryEnrichment = accessoryEnrichmentValue.getValue().equals("none") ? null : accessoryEnrichmentValue.getValue();
 
 			event
-				.replyEmbeds(
+				.editMessageEmbeds(
 					defaultEmbed("Craft Helper").setDescription("Accessory enrichment: " + accessoryEnrichmentValue.getLabel()).build()
 				)
-				.setEphemeral(true)
+				.setComponents()
 				.queue();
 			updateMainMessage();
 		}
@@ -884,9 +929,14 @@ public class CraftCommandHandler {
 
 	private void onModalEvent(ModalInteractionEvent event) {
 		if (event.getModalId().startsWith("craft_command_enchants_add_")) {
+			List<String> usedEnchants = enchants.stream().map(e -> e.split(";")[0]).collect(Collectors.toCollection(ArrayList::new));
 			Set<String> validEnchants = new HashSet<>();
 			for (JsonElement enchant : higherDepth(getEnchantsJson(), "enchants." + category).getAsJsonArray()) {
 				String enchantStr = enchant.getAsString().toUpperCase();
+
+				if (usedEnchants.contains(enchantStr)) {
+					continue;
+				}
 
 				for (int i = 1; i <= 10; i++) {
 					String enchantNameLevel = enchantStr + ";" + i;
@@ -1020,7 +1070,10 @@ public class CraftCommandHandler {
 					StringSelectMenu
 						.create("craft_command_reforge_choose_" + message.getId())
 						.addOptions(
-							closestMatches.stream().map(e -> SelectOption.of(e, e)).collect(Collectors.toCollection(ArrayList::new))
+							closestMatches
+								.stream()
+								.map(e -> SelectOption.of(capitalizeString(e), e))
+								.collect(Collectors.toCollection(ArrayList::new))
 						)
 						.build()
 				)
@@ -1070,47 +1123,137 @@ public class CraftCommandHandler {
 				.setEphemeral(true)
 				.queue();
 			updateMainMessage();
+		} else if (event.getModalId().startsWith("craft_command_transmission_tuners_")) {
+			String transmissionTunersValue = event.getValues().get(0).getAsString();
+			int transmissionTunersValueInt = 0;
+			if (!transmissionTunersValue.isEmpty()) {
+				try {
+					transmissionTunersValueInt = Integer.parseInt(transmissionTunersValue);
+				} catch (Exception e) {
+					transmissionTunersValueInt = -1;
+				}
+
+				if (transmissionTunersValueInt < 0 || transmissionTunersValueInt > 4) {
+					event.replyEmbeds(errorEmbed("Transmission tuners count must be between 0 and 4").build()).setEphemeral(true).queue();
+					return;
+				}
+			}
+			transmissionTunerCount = transmissionTunersValueInt;
+
+			event
+				.replyEmbeds(
+					defaultEmbed("Craft Helper").setDescription("Transmission tuners dummies count: " + transmissionTunerCount).build()
+				)
+				.setEphemeral(true)
+				.queue();
+			updateMainMessage();
 		}
 	}
 
 	private void updateMainMessage() {
+		message.editMessageEmbeds(getMainMessage().build()).queue();
+	}
+
+	private EmbedBuilder getMainMessage() {
 		EmbedBuilder eb = defaultEmbed("Craft Helper For " + idToName(itemId)).setThumbnail(getItemThumbnail(itemId));
 		double totalPrice = 0;
 
 		double basePrice = calculator.getLowestPrice(itemId);
+		if (itemId.matches("(HOT|BURNING|FIERY|INFERNAL)_(CRIMSON|FERVOR|HOLLOW|TERROR|AURORA)_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)")) {
+			List<String> prestigeOrder = List.of("HOT", "BURNING", "FIERY", "INFERNAL");
+			for (int j = 0; j <= prestigeOrder.indexOf(itemId.split("_")[0]); j++) {
+				for (Map.Entry<String, JsonElement> entry : ARMOR_PRESTIGE_COST.getAsJsonObject(prestigeOrder.get(j)).entrySet()) {
+					basePrice +=
+						entry.getValue().getAsInt() *
+						calculator.getLowestPrice(entry.getKey().equals("CRIMSON_ESSENCE") ? "ESSENCE_CRIMSON" : entry.getKey());
+				}
+			}
+		}
 		totalPrice += basePrice;
 		eb.appendDescription("\n" + getEmoji(itemId) + " Base Price: " + roundAndFormat(basePrice));
 
-		if (recombobulated) {
-			double recombobulatorPrice = calculator.getLowestPrice("RECOMBOBULATOR_3000");
-			totalPrice += recombobulatorPrice;
-			eb.appendDescription("\n" + getEmoji("RECOMBOBULATOR_3000") + " Recombobulator: " + roundAndFormat(recombobulatorPrice));
+		totalPrice += getPriceFormatted("RECOMBOBULATOR_3000", recombobulatorCount, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted("HOT_POTATO_BOOK", hpbCount, eb.getDescriptionBuilder());
+		totalPrice += getPriceFormatted("FUMING_POTATO_BOOK", fpbCount, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted(drillUpgradeModule, eb.getDescriptionBuilder());
+		totalPrice += getPriceFormatted(drillFuelTank, eb.getDescriptionBuilder());
+		totalPrice += getPriceFormatted(drillEngine, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted(rune, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted(dye, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted(accessoryEnrichment, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted("MANA_DISINTEGRATOR", manaDisintegratorCount, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted("FARMING_FOR_DUMMIES", ffdCount, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted("TRANSMISSION_TUNER", transmissionTunerCount, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted(skin, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted(powerScroll, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted("WOOD_SINGULARITY", woodSingularityCount, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted("THE_ART_OF_WAR", artOfWarCount, eb.getDescriptionBuilder());
+
+		totalPrice += getPriceFormatted("THE_ART_OF_PEACE", artOfPeaceCount, eb.getDescriptionBuilder());
+
+		if (etherwarpApplied) {
+			double etherwarpPrice = calculator.getLowestPrice("ETHERWARP_MERGER");
+			etherwarpPrice += calculator.getLowestPrice("ETHERWARP_CONDUIT");
+			totalPrice += etherwarpPrice;
+			eb.appendDescription("\n" + getEmoji("ETHERWARP_CONDUIT") + " Etherwarp: " + roundAndFormat(etherwarpPrice));
+		}
+
+		if (reforge != null) {
+			String baseRarity = higherDepth(getInternalJsonMappings(), itemId + ".base_rarity").getAsString();
+			if (recombobulatorCount == 1) {
+				baseRarity = NUMBER_TO_RARITY_MAP.get("" + (Integer.parseInt(RARITY_TO_NUMBER_MAP.get(baseRarity).replace(";", "")) + 1));
+			}
+
+			Map.Entry<String, JsonElement> reforgeStone = getReforgeStonesJson()
+				.entrySet()
+				.stream()
+				.filter(e -> reforge.equalsIgnoreCase(higherDepth(e.getValue(), "reforgeName").getAsString()))
+				.findAny()
+				.get();
+
+			double reforgePrice = calculator.getLowestPriceModifier(reforge, baseRarity);
+			totalPrice += reforgePrice;
+			eb.appendDescription(
+				"\n" + getEmoji(reforgeStone.getKey()) + " " + capitalizeString(reforge) + ": " + roundAndFormat(reforgePrice)
+			);
 		}
 
 		if (!enchants.isEmpty()) {
-			for (String enchant : enchants) {
-				double enchantPrice = calculator.getLowestPriceEnchant(enchant);
-				totalPrice += enchantPrice;
-				eb.appendDescription("\n" + getEmoji(enchant) + " " + idToName(enchant) + ": " + roundAndFormat(enchantPrice));
-			}
-		}
+			StringBuilder ebStr = new StringBuilder();
+			double totalEnchantsPrice = 0;
 
-		if (hpbCount > 0) {
-			double hpbPrice = hpbCount * calculator.getLowestPrice("HOT_POTATO_BOOK");
-			totalPrice += hpbPrice;
-			eb.appendDescription("\n" + getEmoji("HOT_POTATO_BOOK") + " Hot Potato Book (" + hpbCount + "): " + roundAndFormat(hpbPrice));
-		}
-		if (fpbCount > 0) {
-			double fpbPrice = fpbCount * calculator.getLowestPrice("FUMING_POTATO_BOOK");
-			totalPrice += fpbPrice;
-			eb.appendDescription(
-				"\n" + getEmoji("FUMING_POTATO_BOOK") + " Fuming Potato Book (" + fpbCount + "): " + roundAndFormat(fpbPrice)
-			);
+			for (String enchant : enchants) {
+				double enchantPrice = calculator.getLowestPriceEnchant(enchant) * 0.986;
+				totalEnchantsPrice += enchantPrice;
+				ebStr
+					.append("\n")
+					.append(getEmoji(enchant))
+					.append(" ")
+					.append(idToName(enchant))
+					.append(": ")
+					.append(roundAndFormat(enchantPrice));
+			}
+
+			totalPrice += totalEnchantsPrice;
+			eb.addField("Enchants (" + enchants.size() + ") | " + simplifyNumber(totalEnchantsPrice), ebStr.toString(), false);
 		}
 
 		if (stars > 0) {
 			JsonElement essenceInfo = higherDepth(getEssenceCostsJson(), itemId);
 			String essenceType = higherDepth(essenceInfo, "type").getAsString();
+			double totalEssencePrice = 0;
 			int essenceCount = 0;
 			int masterStarCount = 0;
 			Map<String, Integer> extraItems = new HashMap<>();
@@ -1133,7 +1276,7 @@ public class CraftCommandHandler {
 
 			String essenceTypeFormatted = "ESSENCE_" + essenceType.toUpperCase();
 			double essencePrice = essenceCount * calculator.getLowestPrice(essenceTypeFormatted);
-			totalPrice += essencePrice;
+			totalEssencePrice += essencePrice;
 			StringBuilder ebStr = new StringBuilder(
 				getEmoji(essenceTypeFormatted) +
 				" " +
@@ -1170,23 +1313,25 @@ public class CraftCommandHandler {
 
 			for (Map.Entry<String, Integer> extraItem : extraItems.entrySet()) {
 				double extraItemPrice = extraItem.getValue() * calculator.getLowestPrice(extraItem.getKey());
-				totalPrice += extraItemPrice;
+				totalEssencePrice += extraItemPrice;
 				ebStr
 					.append("\n")
 					.append(getEmoji(extraItem.getKey()))
 					.append(" ")
 					.append(idToName(extraItem.getKey()))
 					.append(" (")
-					.append(extraItem.getValue())
+					.append(formatNumber(extraItem.getValue()))
 					.append("): ")
-					.append(roundAndFormat(totalPrice));
+					.append(roundAndFormat(extraItemPrice));
 			}
 
-			eb.addField("Stars (" + stars + ")", ebStr.toString(), false);
+			totalPrice += totalEssencePrice;
+			eb.addField("Stars (" + stars + ") | " + simplifyNumber(totalEssencePrice), ebStr.toString(), false);
 		}
 
 		if (!gemstones.isEmpty()) {
 			StringBuilder ebStr = new StringBuilder();
+			double totalGemstonesPrice = 0;
 			Map<String, JsonElement> slotTypeToJson = streamJsonArray(higherDepth(getSkyblockItemsJson().get(itemId), "gemstone_slots"))
 				.collect(Collectors.toMap(e -> higherDepth(e, "slot_type").getAsString(), e -> e));
 
@@ -1200,18 +1345,18 @@ public class CraftCommandHandler {
 						int costCount = (costIsCoins ? higherDepth(cost, "coins") : higherDepth(cost, "amount")).getAsInt();
 						gemstoneSlotUnlockPrice += calculator.getLowestPrice(costItemId) * costCount;
 					}
-					totalPrice += gemstoneSlotUnlockPrice;
+					totalGemstonesPrice += gemstoneSlotUnlockPrice;
 					ebStr
 						.append("\n")
 						.append(getEmoji("GEMSTONE_MIXTURE"))
 						.append(" ")
 						.append(capitalizeString(gemstone.getKey()))
-						.append(" Slot Cost: ")
+						.append(" Slot Unlock Cost: ")
 						.append(roundAndFormat(gemstoneSlotUnlockPrice));
 				}
 
 				double gemstonePrice = calculator.getLowestPrice(gemstone.getValue());
-				totalPrice += gemstonePrice;
+				totalGemstonesPrice += gemstonePrice;
 				ebStr
 					.append("\n")
 					.append(getEmoji(gemstone.getValue()))
@@ -1221,97 +1366,17 @@ public class CraftCommandHandler {
 					.append(roundAndFormat(gemstonePrice));
 			}
 
-			eb.addField("Gemstones (" + gemstones.size() + ")", ebStr.toString(), false);
-		}
-
-		if (reforge != null) {
-			String baseRarity = higherDepth(getInternalJsonMappings(), itemId + ".base_rarity").getAsString();
-			if (recombobulated) {
-				baseRarity = NUMBER_TO_RARITY_MAP.get("" + (Integer.parseInt(RARITY_TO_NUMBER_MAP.get(baseRarity).replace(";", "")) + 1));
-			}
-
-			Map.Entry<String, JsonElement> reforgeStone = getReforgeStonesJson()
-				.entrySet()
-				.stream()
-				.filter(e -> reforge.equalsIgnoreCase(higherDepth(e.getValue(), "reforgeName").getAsString()))
-				.findFirst()
-				.get();
-
-			double reforgePrice = calculator.getLowestPriceModifier(reforge, baseRarity);
-			totalPrice += reforgePrice;
-			eb.appendDescription(
-				"\n" + getEmoji(reforgeStone.getKey()) + " " + capitalizeString(reforge) + ": " + roundAndFormat(reforgePrice)
-			);
-		}
-
-		if (rune != null) {
-			double runePrice = calculator.getLowestPrice(rune);
-			totalPrice += runePrice;
-			eb.appendDescription("\n" + getEmoji(rune) + " " + idToName(rune) + ": " + roundAndFormat(runePrice));
-		}
-
-		if (drillUpgradeModule != null) {
-			double drillUpgradeModulePrice = calculator.getLowestPrice(drillUpgradeModule);
-			totalPrice += drillUpgradeModulePrice;
-			eb.appendDescription(
-				"\n" + getEmoji(drillUpgradeModule) + " " + idToName(drillUpgradeModule) + ": " + roundAndFormat(drillUpgradeModulePrice)
-			);
-		}
-
-		if (drillFuelTank != null) {
-			double drillFuelTankPrice = calculator.getLowestPrice(drillFuelTank);
-			totalPrice += drillFuelTankPrice;
-			eb.appendDescription(
-				"\n" + getEmoji(drillFuelTank) + " " + idToName(drillFuelTank) + ": " + roundAndFormat(drillFuelTankPrice)
-			);
-		}
-
-		if (drillEngine != null) {
-			double drillEnginePrice = calculator.getLowestPrice(drillEngine);
-			totalPrice += drillEnginePrice;
-			eb.appendDescription("\n" + getEmoji(drillEngine) + " " + idToName(drillEngine) + ": " + roundAndFormat(drillEnginePrice));
-		}
-
-		if (dye != null) {
-			double dyePrice = calculator.getLowestPrice(dye);
-			totalPrice += dyePrice;
-			eb.appendDescription("\n" + getEmoji(dye) + " " + idToName(dye) + ": " + roundAndFormat(dyePrice));
-		}
-
-		if (accessoryEnrichment != null) {
-			double accessoryEnrichmentPrice = calculator.getLowestPrice(accessoryEnrichment);
-			totalPrice += accessoryEnrichmentPrice;
-			eb.appendDescription(
-				"\n" + getEmoji(accessoryEnrichment) + " " + idToName(accessoryEnrichment) + ": " + roundAndFormat(accessoryEnrichmentPrice)
-			);
-		}
-
-		if (manaDisintegratorCount > 0) {
-			double manaDisintegratorPrice = manaDisintegratorCount * calculator.getLowestPrice("MANA_DISINTEGRATOR");
-			totalPrice += manaDisintegratorPrice;
-			eb.appendDescription(
-				"\n" +
-				getEmoji("MANA_DISINTEGRATOR") +
-				" Mana Disintegrator (" +
-				manaDisintegratorCount +
-				"): " +
-				roundAndFormat(manaDisintegratorPrice)
-			);
-		}
-
-		if (ffdCount > 0) {
-			double ffdPrice = ffdCount * calculator.getLowestPrice("FARMING_FOR_DUMMIES");
-			totalPrice += ffdPrice;
-			eb.appendDescription(
-				"\n" + getEmoji("FARMING_FOR_DUMMIES") + " Farming For Dummies (" + ffdCount + "): " + roundAndFormat(ffdPrice)
-			);
+			totalPrice += totalGemstonesPrice;
+			eb.addField("Gemstones (" + gemstones.size() + ") | " + simplifyNumber(totalGemstonesPrice), ebStr.toString(), false);
 		}
 
 		if (!necronBladeScrolls.isEmpty()) {
 			StringBuilder ebStr = new StringBuilder();
+			double totalNecronBladeScrollsPrice = 0;
+
 			for (String necronBladeScroll : necronBladeScrolls) {
 				double necronBladeScrollPrice = calculator.getLowestPrice(necronBladeScroll);
-				totalPrice += necronBladeScrollPrice;
+				totalNecronBladeScrollsPrice += necronBladeScrollPrice;
 				ebStr
 					.append("\n")
 					.append(getEmoji(necronBladeScroll))
@@ -1320,41 +1385,38 @@ public class CraftCommandHandler {
 					.append(": ")
 					.append(roundAndFormat(necronBladeScrollPrice));
 			}
-			eb.addField("Necron's Blade Scrolls", ebStr.toString(), false);
-		}
 
-		if (skin != null) {
-			double skinPrice = calculator.getLowestPrice(skin);
-			totalPrice += skinPrice;
-			eb.appendDescription("\n" + getEmoji(skin) + " " + idToName(skin) + ": " + roundAndFormat(skinPrice));
-		}
-
-		if (powerScroll != null) {
-			double powerScrollPrice = calculator.getLowestPrice(powerScroll);
-			totalPrice += powerScrollPrice;
-			eb.appendDescription("\n" + getEmoji(powerScroll) + " " + idToName(powerScroll) + ": " + roundAndFormat(powerScrollPrice));
-		}
-
-		if (woodSingularityApplied) {
-			double woodSingularityPrice = calculator.getLowestPrice("WOOD_SINGULARITY");
-			totalPrice += woodSingularityPrice;
-			eb.appendDescription("\n" + getEmoji("WOOD_SINGULARITY") + " Wood Singularity: " + roundAndFormat(woodSingularityPrice));
-		}
-
-		if (artOfWarApplied) {
-			double artOfWarPrice = calculator.getLowestPrice("THE_ART_OF_WAR");
-			totalPrice += artOfWarPrice;
-			eb.appendDescription("\n" + getEmoji("THE_ART_OF_WAR") + " Art Of War: " + roundAndFormat(artOfWarPrice));
-		}
-
-		if (artOfPeaceApplied) {
-			double artOfPeacePrice = calculator.getLowestPrice("THE_ART_OF_PEACE");
-			totalPrice += artOfPeacePrice;
-			eb.appendDescription("\n" + getEmoji("THE_ART_OF_PEACE") + " Art Of Peace: " + roundAndFormat(artOfPeacePrice));
+			totalPrice += totalNecronBladeScrollsPrice;
+			eb.addField(
+				"Necron's Blade Scrolls (" + necronBladeScrolls.size() + ") | " + simplifyNumber(totalNecronBladeScrollsPrice),
+				ebStr.toString(),
+				false
+			);
 		}
 
 		eb.getDescriptionBuilder().insert(0, getEmoji("ENCHANTED_GOLD") + " **Total Price:** " + roundAndFormat(totalPrice) + "\n");
-		message.editMessageEmbeds(eb.build()).queue();
+		return eb;
+	}
+
+	private double getPriceFormatted(String itemId, StringBuilder sb) {
+		return getPriceFormatted(itemId, 1, sb);
+	}
+
+	private double getPriceFormatted(String itemId, int count, StringBuilder sb) {
+		if (itemId == null || count == 0) {
+			return 0;
+		}
+
+		double price = count * calculator.getLowestPrice(itemId);
+		sb
+			.append("\n")
+			.append(getEmoji(itemId))
+			.append(" ")
+			.append(idToName(itemId))
+			.append(count > 1 ? "s (" + formatNumber(count) + ")" : "")
+			.append(": ")
+			.append(roundAndFormat(price));
+		return price;
 	}
 
 	private void waitForEvent() {

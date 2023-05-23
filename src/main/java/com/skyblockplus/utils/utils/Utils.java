@@ -296,7 +296,7 @@ public class Utils {
 	}
 
 	public static String getEmoji(String id, String defaultValue) {
-		return higherDepth(getEmojiMap(), id, defaultValue);
+		return higherDepth(getEmojiMap(), id.equals("SKYBLOCK_COIN") ? "PIGGY_BANK" : id, defaultValue);
 	}
 
 	public static Emoji getEmojiObj(String id) {
@@ -909,6 +909,7 @@ public class Utils {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
 				String itemName = cleanMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
 				String itemId = higherDepth(itemJson, "internalname").getAsString();
+
 				if (
 					itemId.endsWith("_MINIBOSS") ||
 					itemId.endsWith("_MONSTER") ||
@@ -941,23 +942,26 @@ public class Utils {
 				if (itemName.startsWith("[Lvl")) {
 					itemName = capitalizeString(NUMBER_TO_RARITY_MAP.get(itemId.split(";")[1])) + " " + itemName.split("] ")[1];
 				}
+
 				if (itemName.equals("Enchanted Book")) {
 					itemName = cleanMcCodes(higherDepth(itemJson, "lore.[0]").getAsString());
 				}
+
 				if (itemId.contains("-")) {
 					itemId = itemId.replace("-", ":");
 				}
 
-				JsonObject toAdd = new JsonObject();
-				toAdd.addProperty("name", itemName);
+				JsonObject properties = new JsonObject();
+				properties.addProperty("name", itemName);
 				if (higherDepth(itemJson, "recipe") != null) {
-					toAdd.add("recipe", higherDepth(itemJson, "recipe"));
+					properties.add("recipe", higherDepth(itemJson, "recipe"));
 				}
+
 				if (PET_NAMES.contains(itemId.split(";")[0])) {
 					try {
 						Matcher matcher = neuTexturePattern.matcher(higherDepth(itemJson, "nbttag").getAsString());
 						if (matcher.find()) {
-							toAdd.addProperty(
+							properties.addProperty(
 								"texture",
 								higherDepth(
 									JsonParser.parseString(new String(Base64.getDecoder().decode(matcher.group(1)))),
@@ -973,7 +977,7 @@ public class Utils {
 				if (higherDepth(itemJson, "infoType", "").equals("WIKI_URL")) {
 					for (JsonElement info : higherDepth(itemJson, "info").getAsJsonArray()) {
 						String wikiUrl = info.getAsString();
-						toAdd.addProperty("wiki", wikiUrl);
+						properties.addProperty("wiki", wikiUrl);
 						// Allows for falling back on unofficial wiki if official wiki link doesn't exist
 						if (wikiUrl.startsWith("https://wiki.hypixel.net")) {
 							break;
@@ -984,53 +988,68 @@ public class Utils {
 				if (higherDepth(itemJson, "recipes") != null) {
 					for (JsonElement recipe : higherDepth(itemJson, "recipes").getAsJsonArray()) {
 						if (higherDepth(recipe, "type").getAsString().equals("forge")) {
-							toAdd.add("forge", higherDepth(recipe, "duration"));
+							properties.add("forge", higherDepth(recipe, "duration"));
 							break;
 						}
 					}
 				}
 
 				JsonArray lore = higherDepth(itemJson, "lore").getAsJsonArray();
-
 				for (int i = 0; i < lore.size(); i++) {
 					String line = lore.get(i).getAsString();
 					if (line.equals("§7§7This skin can be applied to")) {
-						// Item name
-						String id = nameToId(cleanMcCodes(lore.get(i + 1).getAsString()), true);
-						if (id != null) {
-							// Skin name
-							String finalItemId = itemId;
-							idToSkins.compute(
-								id,
-								(k, v) -> {
-									(v = v != null ? v : new JsonArray()).add(finalItemId);
-									return v;
-								}
-							);
+						String nextLine = lore.get(i + 1).getAsString();
+						String finalItemId = itemId;
+						if (nextLine.equals("§7§aRadiant Power Orb§7, §9Mana")) {
+							for (String powerOrb : List.of(
+								"RADIANT_POWER_ORB",
+								"MANA_FLUX_POWER_ORB",
+								"OVERFLUX_POWER_ORB",
+								"PLASMAFLUX_POWER_ORB"
+							)) {
+								idToSkins.compute(
+									powerOrb,
+									(k, v) -> {
+										(v = v != null ? v : new JsonArray()).add(finalItemId);
+										return v;
+									}
+								);
+							}
+						} else {
+							String id = nameToId(cleanMcCodes(nextLine), true);
+							if (id != null) {
+								idToSkins.compute(
+									id,
+									(k, v) -> {
+										(v = v != null ? v : new JsonArray()).add(finalItemId);
+										return v;
+									}
+								);
+							}
 						}
 					}
 
 					for (String rarity : raritiesWithColorCode) {
 						if (line.startsWith(rarity)) {
 							String baseRarity = cleanMcCodes(rarity).replace(" ", "_");
-							toAdd.addProperty("base_rarity", baseRarity);
+							properties.addProperty("base_rarity", baseRarity);
 						}
 					}
 
-					if (i == lore.size() - 1 && !toAdd.has("base_rarity")) {
+					if (i == lore.size() - 1 && !properties.has("base_rarity")) {
 						String baseRarity = cleanMcCodes(lore.get(lore.size() - 1).getAsString()).trim().split("\\s+")[0];
 						baseRarity += baseRarity.startsWith("VERY") ? "_SPECIAL" : "";
 						if (rarityToMagicPower.containsKey(baseRarity)) {
-							toAdd.addProperty("base_rarity", baseRarity);
+							properties.addProperty("base_rarity", baseRarity);
 						}
 					}
 
 					if (line.matches("§6Ability: (.*) §e§lRIGHT CLICK")) {
-						toAdd.addProperty("scrollable", true);
+						properties.addProperty("scrollable", true);
 					}
 				}
 
-				outputObj.add(itemId, toAdd);
+				outputObj.add(itemId, properties);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
