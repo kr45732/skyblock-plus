@@ -189,7 +189,7 @@ public class AutomaticGuild {
 		eventGuild = new EventGuild(higherDepth(serverSettings, "eventNotif"), this);
 		try {
 			blacklist = higherDepth(serverSettings, "blacklist.blacklist").getAsJsonArray();
-			setIsUsing(higherDepth(blacklist, "isUsing").getAsJsonArray());
+			setIsUsing(higherDepth(serverSettings, "blacklist.isUsing").getAsJsonArray());
 		} catch (Exception ignored) {}
 		try {
 			fetchurChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "fetchurChannel", null));
