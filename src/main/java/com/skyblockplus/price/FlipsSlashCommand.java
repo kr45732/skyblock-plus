@@ -27,7 +27,6 @@ import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.AuctionFlipper;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.util.ArrayList;

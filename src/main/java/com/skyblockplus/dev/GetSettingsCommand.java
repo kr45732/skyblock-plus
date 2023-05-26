@@ -26,7 +26,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.util.List;
-import net.dv8tion.jda.api.entities.Guild;
 import org.springframework.stereotype.Component;
 
 @Component

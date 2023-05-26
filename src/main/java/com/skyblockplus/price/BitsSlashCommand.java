@@ -21,7 +21,8 @@ package com.skyblockplus.price;
 import static com.skyblockplus.utils.utils.JsonUtils.getBitsJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;

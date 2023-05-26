@@ -28,7 +28,6 @@ import com.skyblockplus.utils.rendering.LoreRenderer;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

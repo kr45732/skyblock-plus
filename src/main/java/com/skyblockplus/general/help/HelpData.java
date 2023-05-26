@@ -21,7 +21,6 @@ package com.skyblockplus.general.help;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 
