@@ -1437,7 +1437,8 @@ public class AutomaticGuild {
 			!event.getComponentId().startsWith("reactive_") &&
 			!event.getComponentId().startsWith("inv_paginator_") &&
 			!event.getComponentId().startsWith("inv_list_paginator_") &&
-			!event.getComponentId().startsWith("leaderboard_paginator_")
+			!event.getComponentId().startsWith("leaderboard_paginator_") &&
+			!event.getComponentId().startsWith("craft_command_")
 		) {
 			event
 				.deferReply(!event.getComponentId().startsWith("apply_user_") || event.getComponentId().startsWith("apply_user_wait_"))

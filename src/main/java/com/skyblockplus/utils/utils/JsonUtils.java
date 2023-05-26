@@ -238,9 +238,22 @@ public class JsonUtils {
 
 	public static Map<String, JsonElement> getSkyblockItemsJson() {
 		if (skyblockItemsJson == null) {
-			skyblockItemsJson =
-				streamJsonArray(higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items"))
-					.collect(Collectors.toMap(o -> higherDepth(o, "id").getAsString(), Function.identity()));
+			skyblockItemsJson = new HashMap<>();
+			for (JsonElement item : higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items").getAsJsonArray()) {
+				if (higherDepth(item, "gemstone_slots") != null) {
+					Map<String, Integer> count = new HashMap<>();
+					for (JsonElement slot : higherDepth(item, "gemstone_slots").getAsJsonArray()) {
+						String slotName = higherDepth(slot, "slot_type").getAsString();
+						slot
+							.getAsJsonObject()
+							.addProperty(
+								"formatted_slot_type",
+								slotName + "_" + count.compute(slotName, (k, v) -> (v == null ? 0 : v + 1))
+							);
+					}
+				}
+				skyblockItemsJson.put(higherDepth(item, "id").getAsString(), item);
+			}
 		}
 
 		return skyblockItemsJson;

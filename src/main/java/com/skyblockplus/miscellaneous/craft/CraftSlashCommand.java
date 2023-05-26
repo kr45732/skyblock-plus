@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.miscellaneous.craft;
 
-import static com.skyblockplus.miscellaneous.CraftCommandHandler.ignoredCategories;
+import static com.skyblockplus.miscellaneous.craft.CraftCommandHandler.ignoredCategories;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 

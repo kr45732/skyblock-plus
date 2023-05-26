@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.miscellaneous.craft;
 
+import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.StringUtils.getClosestMatchesFromIds;
 import static com.skyblockplus.utils.utils.Utils.*;
-import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
@@ -36,13 +36,17 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.apache.groovy.util.Maps;
+import org.apache.http.client.utils.URIBuilder;
 
 public class CraftCommandHandler {
 
@@ -194,7 +198,7 @@ public class CraftCommandHandler {
 	private int transmissionTunerCount = 0;
 
 	public CraftCommandHandler(String itemId, SlashCommandEvent slashCommandEvent) {
-		// TODO: Pets (pet skin & held item), attributes
+		// TODO: Pets (pet skin & held item), attributes, silex
 
 		this.itemId = itemId;
 		this.slashCommandEvent = slashCommandEvent;
@@ -290,10 +294,19 @@ public class CraftCommandHandler {
 		slashCommandEvent
 			.getHook()
 			.editOriginalEmbeds(getMainMessage().build())
-			.setActionRow(selectMenu.build())
+			.setComponents(
+				ActionRow.of(selectMenu.build()),
+				ActionRow.of(Button.primary("craft_command_search_0", "Search Auction House For Matches"))
+			)
 			.queue(
 				m -> {
 					message = m;
+					m
+						.editMessageComponents(
+							ActionRow.of(selectMenu.build()),
+							ActionRow.of(Button.primary("craft_command_search_" + message.getId(), "Search Auction House For Matches"))
+						)
+						.queue();
 					waitForEvent();
 				},
 				ignore
@@ -319,6 +332,13 @@ public class CraftCommandHandler {
 					return split[split.length - 1].equals(message.getId());
 				}
 			}
+		} else if (genericEvent instanceof ButtonInteractionEvent event) {
+			if (event.isFromGuild() && event.getUser().getId().equals(slashCommandEvent.getUser().getId())) {
+				if (event.getComponentId().startsWith("craft_command_search_")) {
+					String[] split = event.getComponentId().split("_");
+					return split[split.length - 1].equals(message.getId());
+				}
+			}
 		}
 		return false;
 	}
@@ -328,6 +348,22 @@ public class CraftCommandHandler {
 			onStringSelectInteraction(event);
 		} else if (genericEvent instanceof ModalInteractionEvent event) {
 			onModalEvent(event);
+		} else if (genericEvent instanceof ButtonInteractionEvent event) {
+			AbstractMap.SimpleEntry<String, Integer> ahSearchUrl = getAhSearchUrl();
+			if (ahSearchUrl.getValue() == 0) {
+				event.replyEmbeds(errorEmbed("At least one upgrade must be added").build()).setEphemeral(true).queue();
+			} else {
+				event
+					.deferReply()
+					.queue(e -> {
+						JsonElement items = getJson(ahSearchUrl.getKey());
+						if (items == null || !items.isJsonArray()) {
+							e.editOriginalEmbeds(errorEmbed("Error fetching").build()).queue();
+							return;
+						}
+						new CraftCommandPaginator(items.getAsJsonArray(), ahSearchUrl.getValue(), event);
+					});
+			}
 		}
 
 		waitForEvent();
@@ -622,9 +658,9 @@ public class CraftCommandHandler {
 							.create("craft_command_gemstones_add_" + message.getId())
 							.addOptions(
 								streamJsonArray(higherDepth(getSkyblockItemsJson().get(itemId), "gemstone_slots"))
-									.map(e -> higherDepth(e, "slot_type").getAsString())
+									.map(e -> higherDepth(e, "formatted_slot_type").getAsString())
 									.filter(e -> !gemstones.containsKey(e))
-									.map(e -> SelectOption.of(capitalizeString(e) + " Slot", e))
+									.map(e -> SelectOption.of(capitalizeString(e.replace("_", "  ")) + " Slot", e))
 									.collect(Collectors.toCollection(ArrayList::new))
 							)
 							.build()
@@ -647,7 +683,7 @@ public class CraftCommandHandler {
 											.stream()
 											.map(e ->
 												SelectOption.of(
-													capitalizeString(e.getKey()) + " Slot - " + idToName(e.getValue()),
+													capitalizeString(e.getKey().replace("_", " ")) + " Slot - " + idToName(e.getValue()),
 													e.getKey()
 												)
 											)
@@ -660,21 +696,23 @@ public class CraftCommandHandler {
 				}
 			}
 		} else if (event.getComponentId().startsWith("craft_command_gemstones_add_")) {
-			String gemstoneSlot = event.getSelectedOptions().get(0).getValue();
-			List<String> gemstoneVarieties = slotTypeToGemstones.get(gemstoneSlot);
+			SelectOption gemstoneSlot = event.getSelectedOptions().get(0);
+			List<String> gemstoneVarieties = slotTypeToGemstones.get(gemstoneSlot.getValue().split("_")[0]);
 			if (gemstoneVarieties.size() > 1) {
 				event
 					.editMessageEmbeds(
 						defaultEmbed("Craft Helper")
-							.setDescription("Select a gemstone variety for the " + gemstoneSlot.toLowerCase() + " slot from the menu below")
+							.setDescription(
+								"Select a gemstone variety for the " + gemstoneSlot.getLabel().toLowerCase() + " from the menu below"
+							)
 							.build()
 					)
 					.setActionRow(
 						StringSelectMenu
-							.create("craft_command_gemstones_variety_add_" + gemstoneSlot + "_" + message.getId())
+							.create("craft_command_gemstones_variety_add_" + gemstoneSlot.getValue() + "_" + message.getId())
 							.addOptions(
 								slotTypeToGemstones
-									.get(gemstoneSlot)
+									.get(gemstoneSlot.getValue().split("_")[0])
 									.stream()
 									.map(e -> SelectOption.of(capitalizeString(e) + " Variety", e))
 									.collect(Collectors.toCollection(ArrayList::new))
@@ -687,12 +725,14 @@ public class CraftCommandHandler {
 				event
 					.editMessageEmbeds(
 						defaultEmbed("Craft Helper")
-							.setDescription("Select a gemstone tier for the " + gemstoneSlot.toLowerCase() + " slot from the menu below")
+							.setDescription(
+								"Select a gemstone tier for the " + gemstoneSlot.getLabel().toLowerCase() + " from the menu below"
+							)
 							.build()
 					)
 					.setActionRow(
 						StringSelectMenu
-							.create("craft_command_gemstones_tier_add_" + gemstoneSlot + "_" + message.getId())
+							.create("craft_command_gemstones_tier_add_" + gemstoneSlot.getValue() + "_" + message.getId())
 							.addOptions(
 								gemstoneTiers
 									.stream()
@@ -705,12 +745,16 @@ public class CraftCommandHandler {
 					.queue();
 			}
 		} else if (event.getComponentId().startsWith("craft_command_gemstones_variety_add_")) {
-			String gemstoneSlot = event.getComponentId().split("craft_command_gemstones_variety_add_")[1].split("_")[0];
+			String[] gemstoneSlotSplit = event.getComponentId().split("craft_command_gemstones_variety_add_")[1].split("_");
+			// 						slot type					slot num
+			String gemstoneSlot = gemstoneSlotSplit[0] + "_" + gemstoneSlotSplit[1];
 			String gemstoneVariety = event.getSelectedOptions().get(0).getValue();
 			event
 				.editMessageEmbeds(
 					defaultEmbed("Craft Helper")
-						.setDescription("Select a gemstone tier for the " + gemstoneSlot.toLowerCase() + " slot from the menu below")
+						.setDescription(
+							"Select a gemstone tier for the " + gemstoneSlot.replace("_", " ").toLowerCase() + " slot from the menu below"
+						)
 						.build()
 				)
 				.setActionRow(
@@ -727,14 +771,15 @@ public class CraftCommandHandler {
 				)
 				.queue();
 		} else if (event.getComponentId().startsWith("craft_command_gemstones_tier_add_")) {
-			String gemstoneSlot = event.getComponentId().split("craft_command_gemstones_tier_add_")[1].split("_")[0];
+			String[] gemstoneSlotSplit = event.getComponentId().split("craft_command_gemstones_tier_add_")[1].split("_");
+			String gemstoneSlot = gemstoneSlotSplit[0] + "_" + gemstoneSlotSplit[1];
 			SelectOption gemstone = event.getSelectedOptions().get(0);
 			gemstones.put(gemstoneSlot, gemstone.getValue());
 
 			event
 				.editMessageEmbeds(
 					defaultEmbed("Craft Helper")
-						.setDescription("Added " + gemstoneSlot.toLowerCase() + " slot: " + gemstone.getLabel())
+						.setDescription("Added " + gemstoneSlot.replace("_", " ").toLowerCase() + " slot: " + gemstone.getLabel())
 						.build()
 				)
 				.setComponents()
@@ -744,7 +789,10 @@ public class CraftCommandHandler {
 			SelectOption gemstoneSlot = event.getSelectedOptions().get(0);
 			gemstones.remove(gemstoneSlot.getValue());
 
-			event.editMessageEmbeds(errorEmbed("Removed gemstone slot: " + gemstoneSlot.getLabel()).build()).setComponents().queue();
+			event
+				.editMessageEmbeds(defaultEmbed("Craft Helper").setDescription("Removed gemstone slot: " + gemstoneSlot.getLabel()).build())
+				.setComponents()
+				.queue();
 			updateMainMessage();
 		} else if (event.getComponentId().startsWith("craft_command_drill_upgrades_main_")) {
 			SelectOption selectedOption = event.getSelectedOptions().get(0);
@@ -1333,7 +1381,7 @@ public class CraftCommandHandler {
 			StringBuilder ebStr = new StringBuilder();
 			double totalGemstonesPrice = 0;
 			Map<String, JsonElement> slotTypeToJson = streamJsonArray(higherDepth(getSkyblockItemsJson().get(itemId), "gemstone_slots"))
-				.collect(Collectors.toMap(e -> higherDepth(e, "slot_type").getAsString(), e -> e));
+				.collect(Collectors.toMap(e -> higherDepth(e, "formatted_slot_type").getAsString(), e -> e));
 
 			for (Map.Entry<String, String> gemstone : gemstones.entrySet()) {
 				JsonElement gemstoneSlotJson = slotTypeToJson.get(gemstone.getKey());
@@ -1350,7 +1398,7 @@ public class CraftCommandHandler {
 						.append("\n")
 						.append(getEmoji("GEMSTONE_MIXTURE"))
 						.append(" ")
-						.append(capitalizeString(gemstone.getKey()))
+						.append(capitalizeString(gemstone.getKey().replace("_", " ")))
 						.append(" Slot Unlock Cost: ")
 						.append(roundAndFormat(gemstoneSlotUnlockPrice));
 				}
@@ -1417,6 +1465,107 @@ public class CraftCommandHandler {
 			.append(": ")
 			.append(roundAndFormat(price));
 		return price;
+	}
+
+	private AbstractMap.SimpleEntry<String, Integer> getAhSearchUrl() {
+		int maxScore = 0;
+		URIBuilder uriBuilder = getQueryApiUrl("query");
+		uriBuilder.addParameter("item_id", itemId);
+		uriBuilder.addParameter("sort_by", "query");
+		uriBuilder.addParameter("limit", "10");
+		if (recombobulatorCount == 1) {
+			uriBuilder.addParameter("recombobulated", "true");
+			maxScore++;
+		}
+		if (!enchants.isEmpty()) {
+			uriBuilder.addParameter("enchants", String.join(",", enchants));
+			maxScore += enchants.size();
+		}
+		if (hpbCount > 0) {
+			uriBuilder.addParameter("potato_book", "" + (hpbCount + fpbCount));
+			maxScore++;
+		}
+		if (stars > 0) {
+			uriBuilder.addParameter("stars", "" + stars);
+			maxScore++;
+		}
+		if (reforge != null) {
+			uriBuilder.addParameter("reforge", reforge);
+			maxScore++;
+		}
+		if (rune != null) {
+			uriBuilder.addParameter("rune", rune);
+			maxScore++;
+		}
+		if (!gemstones.isEmpty()) {
+			uriBuilder.addParameter(
+				"gemstones",
+				gemstones.entrySet().stream().map(e -> e.getKey() + "_" + e.getValue()).collect(Collectors.joining(","))
+			);
+			maxScore += gemstones.size();
+		}
+		if (drillUpgradeModule != null) {
+			uriBuilder.addParameter("drill_upgrade_module", drillUpgradeModule);
+			maxScore++;
+		}
+		if (drillFuelTank != null) {
+			uriBuilder.addParameter("drill_fuel_tank", drillFuelTank);
+			maxScore++;
+		}
+		if (drillEngine != null) {
+			uriBuilder.addParameter("drill_engine", drillEngine);
+			maxScore++;
+		}
+		if (dye != null) {
+			uriBuilder.addParameter("dye", dye);
+			maxScore++;
+		}
+		if (accessoryEnrichment != null) {
+			uriBuilder.addParameter("accessory_enrichment", accessoryEnrichment);
+			maxScore++;
+		}
+		if (manaDisintegratorCount > 0) {
+			uriBuilder.addParameter("mana_disintegrator", "" + manaDisintegratorCount);
+			maxScore++;
+		}
+		if (ffdCount > 0) {
+			uriBuilder.addParameter("farming_for_dummies", "" + ffdCount);
+			maxScore++;
+		}
+		if (!necronBladeScrolls.isEmpty()) {
+			uriBuilder.addParameter("necron_scrolls", String.join(",", necronBladeScrolls));
+			maxScore += necronBladeScrolls.size();
+		}
+		if (skin != null) {
+			uriBuilder.addParameter("skin", skin);
+			maxScore++;
+		}
+		if (powerScroll != null) {
+			uriBuilder.addParameter("power_scroll", powerScroll);
+			maxScore++;
+		}
+		if (woodSingularityCount == 1) {
+			uriBuilder.addParameter("wood_singularity", "true");
+			maxScore++;
+		}
+		if (artOfWarCount == 1) {
+			uriBuilder.addParameter("art_of_war", "true");
+			maxScore++;
+		}
+		if (artOfPeaceCount == 1) {
+			uriBuilder.addParameter("art_of_peace", "true");
+			maxScore++;
+		}
+		if (etherwarpApplied) {
+			uriBuilder.addParameter("etherwarp", "true");
+			maxScore++;
+		}
+		if (transmissionTunerCount == 1) {
+			uriBuilder.addParameter("transmission_tuner", "" + transmissionTunerCount);
+			maxScore++;
+		}
+
+		return new AbstractMap.SimpleEntry<>(uriBuilder.toString(), maxScore);
 	}
 
 	private void waitForEvent() {

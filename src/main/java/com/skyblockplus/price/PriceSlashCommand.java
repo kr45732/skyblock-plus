@@ -70,7 +70,7 @@ public class PriceSlashCommand extends SlashCommand {
 
 				auctionsArr = queryLowestBinPet(queryFmt, rarity, auctionType);
 				if (auctionsArr == null) {
-					return errorEmbed("Error fetching auctions data");
+					return errorEmbed("Error fetching auctions");
 				}
 				break;
 			}
@@ -90,7 +90,7 @@ public class PriceSlashCommand extends SlashCommand {
 			}
 
 			if (auctionsArr == null) {
-				return errorEmbed("Error fetching auctions data");
+				return errorEmbed("Error fetching auctions");
 			}
 		}
 

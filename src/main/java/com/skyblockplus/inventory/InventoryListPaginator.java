@@ -67,7 +67,7 @@ public class InventoryListPaginator {
 		this.items = items;
 		this.event = event;
 		this.renderedCache = new HashMap<>();
-		this.key = Instant.now().getEpochSecond() + "_" + player.getUuid() + "_";
+		this.key = "inv_list_paginator_" + Instant.now().toEpochMilli() + "_" + player.getUuid() + "_";
 		this.player = player;
 		this.maxPageNumber = items.size() - 1;
 		this.pageNumber = Math.min(Math.max(0, slot - 1), maxPageNumber);

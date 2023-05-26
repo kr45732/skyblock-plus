@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.groovy.util.Maps;
 
 public class Constants {
@@ -1673,6 +1674,7 @@ public class Constants {
 					);
 				}
 			}
+			CATEGORY_TO_REFORGES.put("GAUNTLET", ListUtils.union(CATEGORY_TO_REFORGES.get("SWORD"), CATEGORY_TO_REFORGES.get("PICKAXE")));
 		} catch (Exception e) {
 			Main.log.error("Exception while initializing constants", e);
 		}
