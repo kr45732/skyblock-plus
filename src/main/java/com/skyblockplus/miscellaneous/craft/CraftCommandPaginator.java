@@ -217,7 +217,7 @@ public class CraftCommandPaginator {
 
 	private String computeRenderedLore() {
 		JsonElement item = items.get(pageNumber);
-		List<String> lore = Arrays.asList(higherDepth(item, "lore").getAsString().split("\n"));
+		List<String> lore = List.of(higherDepth(item, "lore").getAsString().split("\n"));
 
 		BufferedImage bufferedImage = LoreRenderer.renderLore(lore);
 		File file = new File(loreRenderDir + "/" + key + pageNumber + ".png");
