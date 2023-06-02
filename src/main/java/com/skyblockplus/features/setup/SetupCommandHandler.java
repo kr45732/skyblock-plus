@@ -350,7 +350,6 @@ public class SetupCommandHandler {
 			}
 			case GUILD_NAME -> {
 				String selectedOption = event.getSelectedOptions().get(0).getValue();
-				featureType = FeatureType.GUILD;
 				if (selectedOption.equals("$new")) {
 					event
 						.replyModal(
@@ -366,7 +365,7 @@ public class SetupCommandHandler {
 						)
 						.queue();
 				} else {
-					featureType.setGuildName(selectedOption);
+					featureType = FeatureType.GUILD.setGuildName(selectedOption);
 					event
 						.editMessageEmbeds(
 							defaultEmbed("Setup").setDescription("Use the menu below to setup an automatic guild feature").build()
@@ -848,14 +847,14 @@ public class SetupCommandHandler {
 				}
 				event.getHook().editOriginalEmbeds(eb.build()).queue();
 			}
-			case GUILD -> {
+			case GUILD_NAME -> {
 				String textValue = event.getValues().get(0).getAsString();
 				EmbedBuilder eb = getSettings().createNewGuild(textValue);
 				if (
 					eb.build().getTitle().equals("Settings") ||
 					eb.getDescriptionBuilder().toString().equals("An automated guild already exists for this guild")
 				) {
-					featureType.setGuildName(textValue.toLowerCase().replace(" ", "_"));
+					featureType = FeatureType.GUILD.setGuildName(textValue.toLowerCase().replace(" ", "_"));
 					event
 						.getHook()
 						.editOriginalEmbeds(

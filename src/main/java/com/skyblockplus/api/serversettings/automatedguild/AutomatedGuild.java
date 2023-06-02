@@ -40,7 +40,8 @@ import org.hibernate.annotations.FetchMode;
 public class AutomatedGuild {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(generator = "automated_guild_seq", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "automated_guild_seq", sequenceName = "automated_guild_seq", allocationSize = 1)
 	private Long id;
 
 	@ManyToOne(optional = false)

@@ -45,7 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServerSettingsModel {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(generator = "server_settings_model_seq", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "server_settings_model_seq", sequenceName = "server_settings_model_seq", allocationSize = 1)
 	private Long id;
 
 	private String serverName;

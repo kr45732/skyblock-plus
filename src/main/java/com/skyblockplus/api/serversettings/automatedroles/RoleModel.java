@@ -40,7 +40,8 @@ import org.hibernate.annotations.FetchMode;
 public class RoleModel {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(generator = "role_model_seq", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "role_model_seq", sequenceName = "role_model_seq", allocationSize = 1)
 	private Long id;
 
 	@ManyToOne(optional = false)

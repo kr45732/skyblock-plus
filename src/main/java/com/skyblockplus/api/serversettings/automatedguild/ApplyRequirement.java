@@ -38,7 +38,8 @@ import org.hibernate.annotations.FetchMode;
 public class ApplyRequirement {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(generator = "apply_requirement_seq", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "apply_requirement_seq", sequenceName = "apply_requirement_seq", allocationSize = 1)
 	private Long id;
 
 	@ManyToOne(optional = false)
