@@ -161,9 +161,23 @@ public class AuctionFlipper {
 	}
 
 	public static double calculateWithTaxes(double price) {
+		double tax = 0;
+
 		// 1% for claiming bin over 1m (when buying)
-		// 1% for starting new bin (when reselling)
-		return price * (price >= 1000000 ? 0.98 : 0.99);
+		if (price >= 1000000) {
+			tax += 0.01;
+		}
+
+		// Tax for starting new bin (when reselling)
+		if (price <= 10000000) {
+			tax += 0.01;
+		} else if (price <= 100000000) {
+			tax += 0.02;
+		} else {
+			tax += 0.025;
+		}
+
+		return price * (1 - tax);
 	}
 
 	private record FlipItem(long messageId, String name, long profit) {}
