@@ -314,7 +314,14 @@ public class AutomaticGuild {
 					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
 				}
 			} catch (Exception e) {
-				log.error("Apply constructor error - guildId={" + event.getGuild().getId() + "}, name={" + (currentSetting != null ? currentSetting.getGuildName() : "null AutomatedGuild") + "}", e);
+				log.error(
+					"Apply constructor error - guildId={" +
+					event.getGuild().getId() +
+					"}, name={" +
+					(currentSetting != null ? currentSetting.getGuildName() : "null AutomatedGuild") +
+					"}",
+					e
+				);
 			}
 		}
 	}

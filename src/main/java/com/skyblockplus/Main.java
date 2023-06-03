@@ -59,6 +59,7 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.apache.groovy.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -82,7 +83,9 @@ public class Main {
 		Constants.initialize();
 		selfUserId = isMainBot() ? "796791167366594592" : "799042642092228658";
 
-		springContext = SpringApplication.run(Main.class, args);
+		SpringApplication springApplication = new SpringApplication(Main.class);
+		springApplication.setDefaultProperties(Maps.of("spring.datasource.url", DATABASE_URL));
+		springContext = springApplication.run(args);
 		database = springContext.getBean(Database.class);
 		waiter = new EventWaiter(scheduler, true);
 		client =
@@ -115,10 +118,8 @@ public class Main {
 			"Loaded " + client.getCommands().size() + " prefix commands and " + slashCommandClient.getCommands().size() + " slash commands"
 		);
 
-		allServerSettings = database
-				.getAllServerSettings()
-				.stream()
-				.collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()));
+		allServerSettings =
+			database.getAllServerSettings().stream().collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()));
 
 		jda =
 			DefaultShardManagerBuilder

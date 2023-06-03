@@ -638,21 +638,16 @@ public class ApiHandler {
 
 	public static void updateLinkedAccounts() {
 		try {
-			database
-				.getBeforeLastUpdated(Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli())
-				.forEach(o ->
-					asyncUuidToUsername(o.uuid())
-						.thenApplyAsync(
-							username ->
-								username != null &&
-								database.insertLinkedAccount(
-									new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username),
-									null,
-									null
-								),
-							executor
-						)
-				);
+			for (LinkedAccount o : database.getBeforeLastUpdated(Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli())) {
+				UsernameUuidStruct uuidStruct = usernameToUuid(o.uuid());
+				if (uuidStruct.isValid()) {
+					database.insertLinkedAccount(
+						new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), uuidStruct.username()),
+						null,
+						null
+					);
+				}
+			}
 		} catch (Exception e) {
 			log.error("Exception when updating linked accounts", e);
 		}

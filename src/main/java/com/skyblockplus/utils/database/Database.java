@@ -310,7 +310,9 @@ public class Database {
 	public List<LinkedAccount> getBeforeLastUpdated(long lastUpdated) {
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account WHERE last_updated < ? ORDER BY RANDOM() LIMIT 50")
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM linked_account WHERE last_updated < ? ORDER BY RANDOM() LIMIT 50"
+			)
 		) {
 			statement.setLong(1, lastUpdated);
 			try (ResultSet response = statement.executeQuery()) {
