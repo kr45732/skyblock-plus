@@ -4,15 +4,15 @@ on:
   push:
     branches: [master]
     paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-      - '.gitignore'
+      - "README.md"
+      - "LICENSE"
+      - ".gitignore"
   pull_request:
     branches: [master]
     paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-      - '.gitignore'
+      - "README.md"
+      - "LICENSE"
+      - ".gitignore"
   workflow_dispatch:
 jobs:
   build:

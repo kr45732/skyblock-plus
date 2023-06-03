@@ -24,9 +24,11 @@ import static com.skyblockplus.utils.utils.Utils.API_USERNAME;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -46,18 +48,10 @@ public class SecurityConfiguration {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http
-			.authorizeHttpRequests()
-			.requestMatchers("/private/**")
-			.authenticated()
-			.requestMatchers("/**")
-			.permitAll()
-			.and()
-			.formLogin()
-			.and()
-			.httpBasic()
-			.and()
-			.csrf()
-			.disable()
+			.authorizeHttpRequests(auth -> auth.requestMatchers("/private/**").authenticated().requestMatchers("/**").permitAll())
+			.formLogin(Customizer.withDefaults())
+			.httpBasic(Customizer.withDefaults())
+			.csrf(AbstractHttpConfigurer::disable)
 			.build();
 	}
 
