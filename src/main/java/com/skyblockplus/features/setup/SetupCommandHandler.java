@@ -59,6 +59,7 @@ public class SetupCommandHandler {
 	private String messageId;
 
 	public SetupCommandHandler(InteractionHook hook, String feature) {
+		System.out.println("create: " + this);
 		this.hook = hook;
 		this.featureType = FeatureType.valueOf(feature.toUpperCase());
 
@@ -205,6 +206,7 @@ public class SetupCommandHandler {
 	}
 
 	private void action(GenericInteractionCreateEvent genericEvent) {
+		System.out.println("event: " + this);
 		if (genericEvent instanceof ModalInteractionEvent event) {
 			if (onModalInteraction(event)) {
 				return;
@@ -222,6 +224,7 @@ public class SetupCommandHandler {
 	}
 
 	public boolean onStringSelectInteraction(StringSelectInteractionEvent event) {
+		System.out.println("str: " + this + " | " + event.getComponentId() + " | " + event.getMessageId() + " | " + messageId);
 		switch (featureType) {
 			case VERIFY -> {
 				String selectedOption = event.getSelectedOptions().get(0).getValue();
@@ -834,7 +837,7 @@ public class SetupCommandHandler {
 	}
 
 	public boolean onModalInteraction(ModalInteractionEvent event) {
-		(featureType == FeatureType.GUILD ? event.deferEdit() : event.deferReply(true)).complete();
+		(featureType == FeatureType.GUILD_NAME ? event.deferEdit() : event.deferReply(true)).complete();
 		switch (featureType) {
 			case VERIFY -> {
 				EmbedBuilder eb = null;
