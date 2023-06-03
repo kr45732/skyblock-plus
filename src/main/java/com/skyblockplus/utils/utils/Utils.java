@@ -316,6 +316,14 @@ public class Utils {
 		}
 	}
 
+	public static String makeJsonPost(Object body) {
+		try {
+			body = gson.toJsonTree(body);
+		} catch (Exception ignored) {}
+
+		return makeHastePost(body);
+	}
+
 	/* Miscellaneous */
 	public static TextChannel getNetworthBugReportChannel() {
 		if (networthBugReportChannel == null) {

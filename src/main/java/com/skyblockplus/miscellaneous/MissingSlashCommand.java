@@ -73,12 +73,12 @@ public class MissingSlashCommand extends SlashCommand {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
 			if (!player.isInventoryApiEnabled()) {
-				return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+				return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
 			}
 
 			Map<Integer, InvItem> talismanBag = player.getTalismanBagMap();
 			if (talismanBag == null) {
-				return errorEmbed(player.getUsernameFixed() + " has not unlocked the talisman bag");
+				return errorEmbed(player.getEscapedUsername() + " has not unlocked the talisman bag");
 			}
 
 			Set<String> playerItems = talismanBag

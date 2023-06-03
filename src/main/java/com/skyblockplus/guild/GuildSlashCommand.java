@@ -1431,7 +1431,7 @@ public class GuildSlashCommand extends SlashCommand {
 										boolean skillsEnabled = excludeArr.contains("skills") || player.isSkillsApiEnabled();
 
 										if (invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) {
-											return client.getSuccess() + " **" + player.getUsernameFixed() + ":** all APIs enabled";
+											return client.getSuccess() + " **" + player.getEscapedUsername() + ":** all APIs enabled";
 										} else {
 											String out =
 												(invEnabled ? "" : "Inventory API, ") +
@@ -1443,14 +1443,14 @@ public class GuildSlashCommand extends SlashCommand {
 											return (
 												client.getError() +
 												" **" +
-												player.getUsernameFixed() +
+												player.getEscapedUsername() +
 												":** " +
 												out.substring(0, out.length() - 2)
 											);
 										}
 									}
 								}
-								return client.getError() + " **" + usernameUuidStruct.usernameFixed() + ":** unable to get data";
+								return client.getError() + " **" + usernameUuidStruct.escapeUsername() + ":** unable to get data";
 							},
 							executor
 						)

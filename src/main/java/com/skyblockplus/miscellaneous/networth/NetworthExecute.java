@@ -146,7 +146,7 @@ public class NetworthExecute {
 		Map<Integer, InvItem> playerInventory = player.getInventoryMap();
 		if (playerInventory == null) {
 			addTotal("inventory", -1.0);
-			return defaultEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+			return defaultEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
 		}
 
 		initPrices();

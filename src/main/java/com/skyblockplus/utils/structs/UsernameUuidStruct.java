@@ -18,8 +18,6 @@
 
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.utils.StringUtils.escapeUsername;
-
 import com.skyblockplus.utils.utils.StringUtils;
 
 public record UsernameUuidStruct(String username, String uuid, String failCause) {
@@ -47,8 +45,8 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 		return StringUtils.nameMcHyperLink(username, uuid);
 	}
 
-	public String usernameFixed() {
-		return escapeUsername(username);
+	public String escapeUsername() {
+		return StringUtils.escapeUsername(username);
 	}
 
 	public boolean isRateLimited() {

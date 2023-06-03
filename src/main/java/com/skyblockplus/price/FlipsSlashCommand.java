@@ -55,7 +55,11 @@ public class FlipsSlashCommand extends SlashCommand {
 		}
 
 		EmbedBuilder eb = defaultEmbed("Flips")
-			.setDescription("**Next Update:** <t:" + underBinJsonLastUpdated.plusSeconds(60).getEpochSecond() + ":R>");
+			.setDescription(
+				"**Next Update:** <t:" +
+				underBinJsonLastUpdated.plusSeconds(60).getEpochSecond() +
+				":R>\nLive Updates: [**Join**](https://discord.gg/GZWZbcxpv4)"
+			);
 		JsonElement avgAuctionJson = getAveragePriceJson();
 
 		for (JsonElement auction : underBinJson

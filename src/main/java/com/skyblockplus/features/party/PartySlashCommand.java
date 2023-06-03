@@ -213,7 +213,7 @@ public class PartySlashCommand extends SlashCommand {
 					defaultEmbed("Party Finder")
 						.setDescription(
 							"**" +
-							player.getUsernameFixed() +
+							player.getEscapedUsername() +
 							" joined your party**\nCatacombs: " +
 							roundAndFormat(player.getCatacombs().getProgressLevel()) +
 							"\nSecrets: " +

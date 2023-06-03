@@ -111,7 +111,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 					new InventoryEmojiPaginator(talismanBag, "Talisman Bag", player, event);
 					return null;
 				}
-				return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+				return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
 			}
 			return player.getErrorEmbed();
 		}

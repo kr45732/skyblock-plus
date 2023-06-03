@@ -179,12 +179,12 @@ public class AuctionsSlashCommand extends SlashCommand {
 			}
 			if (extras.getEmbedFields().size() == 0) {
 				return new MessageEditBuilder()
-					.setEmbeds(errorEmbed("No auctions found for " + player.getUsernameFixed()).build())
+					.setEmbeds(errorEmbed("No auctions found for " + player.getEscapedUsername()).build())
 					.setActionRow(button);
 			}
 
 			extras
-				.setEveryPageTitle(player.getUsernameFixed())
+				.setEveryPageTitle(player.getEscapedUsername())
 				.setEveryPageTitleUrl(player.getAuctionUrl())
 				.setEveryPageThumbnail(player.getAvatarUrl())
 				.setEveryPageText(
@@ -213,7 +213,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 			NetworthExecute calc = new NetworthExecute().initPrices().setVerbose(true);
 
 			for (JsonElement currentAuction : auctionsArray) {
-				EmbedBuilder eb = defaultEmbed(player.getUsernameFixed(), player.getAuctionUrl());
+				EmbedBuilder eb = defaultEmbed(player.getEscapedUsername(), player.getAuctionUrl());
 				if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
 					String auctionName;
 
@@ -290,7 +290,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 			}
 
 			if (extras.getEmbedPages().size() == 0) {
-				return errorEmbed("No auctions found for " + player.getUsernameFixed());
+				return errorEmbed("No auctions found for " + player.getEscapedUsername());
 			}
 
 			for (int i = 0; i < extras.getEmbedPages().size(); i++) {
@@ -301,7 +301,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 						extras
 							.getEmbedPages()
 							.get(i)
-							.setTitle(player.getUsernameFixed(), player.getAuctionUrl())
+							.setTitle(player.getEscapedUsername(), player.getAuctionUrl())
 							.setThumbnail(player.getAvatarUrl())
 							.setDescription(
 								(

@@ -54,10 +54,10 @@ public class SacksSlashCommand extends SlashCommand {
 
 		Map<String, Integer> sacksMap = player.getPlayerSacks();
 		if (sacksMap == null) {
-			return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+			return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
 		}
 		if (sacksMap.isEmpty()) {
-			return errorEmbed(player.getUsernameFixed() + "'s sacks are empty");
+			return errorEmbed(player.getEscapedUsername() + "'s sacks are empty");
 		}
 
 		CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(20);

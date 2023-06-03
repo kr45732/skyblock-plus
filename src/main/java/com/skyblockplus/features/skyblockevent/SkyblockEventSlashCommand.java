@@ -472,7 +472,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 							return defaultEmbed(member != null ? "Joined event" : "Added player to event")
 								.setDescription(
 									"**Username:** " +
-									player.getUsername() +
+									player.getEscapedUsername() +
 									"\n**Profile:** " +
 									player.getProfileName() +
 									"\n**Starting amount:** " +

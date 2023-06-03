@@ -47,7 +47,7 @@ public class StorageSlashCommand extends SlashCommand {
 				new InventoryEmojiPaginator(storagePages, "Storage", player, event);
 				return null;
 			}
-			return errorEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
+			return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
 		}
 		return player.getErrorEmbed();
 	}

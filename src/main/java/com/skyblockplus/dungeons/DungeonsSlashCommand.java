@@ -123,7 +123,7 @@ public class DungeonsSlashCommand extends SlashCommand {
 				event.paginate(paginateBuilder);
 				return null;
 			} catch (Exception e) {
-				return errorEmbed(player.getUsernameFixed() + " has not played dungeons");
+				return errorEmbed(player.getEscapedUsername() + " has not played dungeons");
 			}
 		}
 

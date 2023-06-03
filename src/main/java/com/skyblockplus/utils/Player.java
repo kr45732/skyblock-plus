@@ -382,7 +382,7 @@ public class Player {
 			return username;
 		}
 
-		public String getUsernameFixed() {
+		public String getEscapedUsername() {
 			return escapeUsername(username);
 		}
 
@@ -915,12 +915,12 @@ public class Player {
 				String contents = higherDepth(profileJson(), "inv_armor.data").getAsString();
 				NBTCompound parsedContents = NBTReader.readBase64(contents);
 				Map<Integer, InvItem> oldMap = getGenericInventoryMap(parsedContents);
-				Map<Integer, InvItem> fixedMap = new HashMap<>();
-				fixedMap.put(0, oldMap.getOrDefault(3, null));
-				fixedMap.put(1, oldMap.getOrDefault(2, null));
-				fixedMap.put(2, oldMap.getOrDefault(1, null));
-				fixedMap.put(3, oldMap.getOrDefault(0, null));
-				return fixedMap;
+				Map<Integer, InvItem> orderedMap = new HashMap<>();
+				orderedMap.put(0, oldMap.getOrDefault(3, null));
+				orderedMap.put(1, oldMap.getOrDefault(2, null));
+				orderedMap.put(2, oldMap.getOrDefault(1, null));
+				orderedMap.put(3, oldMap.getOrDefault(0, null));
+				return orderedMap;
 			} catch (Exception ignored) {}
 			return null;
 		}
