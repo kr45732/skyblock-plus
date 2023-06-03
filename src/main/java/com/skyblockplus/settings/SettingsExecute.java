@@ -2203,10 +2203,7 @@ public class SettingsExecute {
 		for (JsonElement blacklisted : currentBlacklist) {
 			paginateBuilder.addItems(
 				"• " +
-				nameMcHyperLink(
-					escapeUsername(higherDepth(blacklisted, "username").getAsString()),
-					higherDepth(blacklisted, "uuid").getAsString()
-				) +
+				nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) +
 				" - " +
 				higherDepth(blacklisted, "reason").getAsString()
 			);
@@ -2312,7 +2309,7 @@ public class SettingsExecute {
 				"Reason: " +
 				higherDepth(referent, "reason").getAsString() +
 				"\nNameMC: " +
-				nameMcHyperLink(escapeUsername(thisUser), higherDepth(referent, "uuid").getAsString()),
+				nameMcHyperLink(thisUser, higherDepth(referent, "uuid").getAsString()),
 				false
 			);
 		}

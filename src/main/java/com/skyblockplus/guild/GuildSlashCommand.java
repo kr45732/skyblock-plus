@@ -225,7 +225,7 @@ public class GuildSlashCommand extends SlashCommand {
 				.map(Map.Entry::getKey)
 				.collect(Collectors.toCollection(ArrayList::new))) {
 				if (member != null) {
-					paginateBuilder.addItems("• [" + escapeUsername(member) + "](" + skyblockStatsLink(member, null) + ")  ");
+					paginateBuilder.addItems("• [" + member + "](" + skyblockStatsLink(member, null) + ")  ");
 				}
 			}
 

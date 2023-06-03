@@ -44,11 +44,11 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 	}
 
 	public String nameMcHyperLink() {
-		return StringUtils.nameMcHyperLink(usernameFixed(), uuid);
+		return StringUtils.nameMcHyperLink(username, uuid);
 	}
 
 	public String usernameFixed() {
-		return escapeUsername(username());
+		return escapeUsername(username);
 	}
 
 	public boolean isRateLimited() {
