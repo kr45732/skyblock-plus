@@ -181,7 +181,7 @@ public class AutomaticGuild {
 			}
 		}
 
-		JsonElement serverSettings = allServerSettings.remove(guildId);
+		JsonElement serverSettings = gson.toJsonTree(allServerSettings.remove(guildId));
 		applyConstructor(event, serverSettings);
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
 		scheduleSbEventFuture(higherDepth(serverSettings, "sbEvent"));
@@ -314,7 +314,7 @@ public class AutomaticGuild {
 					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
 				}
 			} catch (Exception e) {
-				log.error("Apply constructor error - " + event.getGuild().getId(), e);
+				log.error("Apply constructor error - guildId={" + event.getGuild().getId() + "}, name={" + (currentSetting != null ? currentSetting.getGuildName() : "null AutomatedGuild") + "}", e);
 			}
 		}
 	}
@@ -506,7 +506,6 @@ public class AutomaticGuild {
 			long startTime = System.currentTimeMillis();
 
 			Guild guild = jda.getGuildById(guildId);
-
 			if (guild == null) {
 				return;
 			}

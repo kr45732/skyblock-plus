@@ -36,8 +36,8 @@ import com.skyblockplus.utils.database.LeaderboardDatabase;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.InputStreamReader;
-import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -58,9 +58,9 @@ public class ApiHandler {
 		"[\\da-f]{32}|[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}"
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-	public static String ahApiUrl;
-	public static int mojangApiNum = 0;
-	public static boolean allowMojangApi = false;
+	private static String ahApiUrl;
+	private static int mojangApiNum = 0;
+	private static boolean allowMojangApi = false;
 	private static String neuBranch = null;
 
 	public static void initialize() {
@@ -74,7 +74,7 @@ public class ApiHandler {
 			cacheDatabase.initializeAhTracker();
 			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 60, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCaches, 60, 60, TimeUnit.MINUTES);
-			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
+//			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			log.error("Exception when initializing the ApiHandler", e);
 		}
@@ -639,12 +639,7 @@ public class ApiHandler {
 	public static void updateLinkedAccounts() {
 		try {
 			database
-				.getAllLinkedAccounts()
-				.stream()
-				.filter(linkedAccountModel ->
-					Duration.between(Instant.ofEpochMilli(linkedAccountModel.lastUpdated()), Instant.now()).toDays() > 5
-				)
-				.limit(60)
+				.getBeforeLastUpdated(Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli())
 				.forEach(o ->
 					asyncUuidToUsername(o.uuid())
 						.thenApplyAsync(

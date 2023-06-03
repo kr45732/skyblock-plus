@@ -115,15 +115,10 @@ public class Main {
 			"Loaded " + client.getCommands().size() + " prefix commands and " + slashCommandClient.getCommands().size() + " slash commands"
 		);
 
-		allServerSettings =
-			gson
-				.toJsonTree(
-					database
-						.getAllServerSettings()
-						.stream()
-						.collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()))
-				)
-				.getAsJsonObject();
+		allServerSettings = database
+				.getAllServerSettings()
+				.stream()
+				.collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()));
 
 		jda =
 			DefaultShardManagerBuilder

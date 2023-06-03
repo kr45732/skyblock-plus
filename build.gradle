@@ -23,7 +23,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 
     // Spring boot
-    id 'org.springframework.boot' version '3.1.0'
+    id 'org.springframework.boot' version '3.0.7'
     id "io.spring.dependency-management" version "1.1.0"
 
     // Lombok annotations
@@ -33,11 +33,12 @@ plugins {
 version = '0.0.1'
 mainClassName = 'com.skyblockplus.Main'
 
-task stage(dependsOn: ['shadowJar']) {
+tasks.register('stage') {
+    dependsOn['shadowJar']
     dependsOn build
     doLast {
         file("build/libs/SkyblockPlus-0.0.1-all.jar").delete()
-	    delete fileTree(dir: "build/distributions/")
+        delete fileTree(dir: "build/distributions/")
     }
 }
 
@@ -79,13 +80,13 @@ dependencies {
     implementation 'me.nullicorn:Nedit:2.2.0'
 
     // Spring boot and postgresql
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.4'
-    implementation 'org.springframework.boot:spring-boot-starter-security:3.0.4'
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.7'
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.0.7'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.7'
     runtimeOnly 'org.postgresql:postgresql:42.6.0'
 
     // MySQL
-    implementation 'mysql:mysql-connector-java:8.0.32'
+    implementation 'mysql:mysql-connector-java:8.0.33'
 
     // Http Client
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
@@ -97,7 +98,7 @@ dependencies {
     implementation "org.codehaus.groovy:groovy:3.0.17"
 
     // Logging
-    implementation 'ch.qos.logback:logback-classic:1.4.5'
+    implementation 'ch.qos.logback:logback-classic:1.4.7'
 
     // Git
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.5.0.202303070854-r'

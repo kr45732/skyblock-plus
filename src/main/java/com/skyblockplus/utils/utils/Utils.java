@@ -32,6 +32,7 @@ import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.listeners.AutomaticGuild;
@@ -156,7 +157,7 @@ public class Utils {
 	public static CommandClient client;
 	public static SlashCommandClient slashCommandClient;
 	public static OAuthClient oAuthClient;
-	public static JsonObject allServerSettings;
+	public static Map<String, ServerSettingsModel> allServerSettings;
 	public static ConfigurableApplicationContext springContext;
 	public static String selfUserId;
 	/* Miscellaneous */

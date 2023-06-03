@@ -242,27 +242,6 @@ public class Database {
 			String username = linkedAccount.username();
 			String uuid = linkedAccount.uuid();
 
-			//			try (
-			//				Connection connection = getConnection();
-			//				PreparedStatement statement = connection.prepareStatement(
-			//					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?, ?, ?) ON CONFLICT (discord, username, uuid) DO UPDATE SET last_updated = EXCLUDED.last_updated, discord = EXCLUDED.discord, username = EXCLUDED.username, uuid = EXCLUDED.uuid RETURNING discord"
-			//				)
-			//			) {
-			//				statement.setLong(1, lastUpdated);
-			//				statement.setString(2, discord);
-			//				statement.setString(3, username);
-			//				statement.setString(4, uuid);
-			//				try (ResultSet response = statement.executeQuery()) {
-			//					if (response.next() && member != null && verifySettings != null) {
-			//						String discordOld = response.getString("discord");
-			//						if (!discord.equals(discordOld)) {
-			//							UnlinkSlashCommand.unlinkAccount(member, verifySettings);
-			//						}
-			//					}
-			//					return true;
-			//				}
-			//			}
-
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
@@ -328,6 +307,23 @@ public class Database {
 		return null;
 	}
 
+	public List<LinkedAccount> getBeforeLastUpdated(long lastUpdated) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account WHERE last_updated < ? ORDER BY RANDOM() LIMIT 50")
+		) {
+			statement.setLong(1, lastUpdated);
+			try (ResultSet response = statement.executeQuery()) {
+				List<LinkedAccount> linkedAccounts = new ArrayList<>();
+				while (response.next()) {
+					linkedAccounts.add(responseToRecord(response));
+				}
+				return linkedAccounts;
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
 	public boolean deleteByDiscord(String discord) {
 		return deleteBy("discord", discord);
 	}
@@ -343,7 +339,7 @@ public class Database {
 	private LinkedAccount getBy(String type, String value) {
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account where " + type + " = ?")
+			PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account WHERE " + type + " = ?")
 		) {
 			statement.setString(1, value);
 			try (ResultSet response = statement.executeQuery()) {
