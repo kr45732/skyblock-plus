@@ -187,7 +187,7 @@ public class ApplyUser implements Serializable {
 				reactMessage.addReaction(Emoji.fromFormatted(client.getError())).queue();
 			}
 		} catch (Exception e) {
-			AutomaticGuild.getLogger().error(guildId, e);
+			AutomaticGuild.getLog().error(guildId, e);
 			failCause = e.getMessage();
 		}
 	}

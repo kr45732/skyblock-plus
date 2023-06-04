@@ -64,6 +64,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -99,7 +101,9 @@ import org.slf4j.LoggerFactory;
 
 public class AutomaticGuild {
 
+	@Getter
 	private static final Logger log = LoggerFactory.getLogger(AutomaticGuild.class);
+
 	private static final ScheduledFuture<?> logFuture = scheduler.scheduleWithFixedDelay(
 		() -> guildMap.values().forEach(g -> g.logAction(null, null)),
 		5,
@@ -129,31 +133,56 @@ public class AutomaticGuild {
 	public final List<Party> partyList = new ArrayList<>();
 	/* Jacob */
 	public final JacobGuild jacobGuild;
-	public final String guildId;
 	private final Set<String> updatedMembers = new HashSet<>();
 	/* Miscellaneous */
 	private final List<String> botManagerRoles = new ArrayList<>();
 	private final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	private final List<MessageEmbed> logQueue = new ArrayList<>();
+	public final String guildId;
 	/* Verify */
 	public VerifyGuild verifyGuild;
+
 	/* Skyblock event */
+	@Setter
 	public SkyblockEventHandler skyblockEventHandler = null;
+
+	@Setter
 	public List<EventMember> eventMemberList = new ArrayList<>();
+
+	@Setter
 	public Instant eventMemberListLastUpdated = null;
+
+	@Setter
 	public boolean eventCurrentlyUpdating = false;
+
 	public Message lastMayorElectionOpenMessage = null;
 	public Message lastMayorElectedMessage = null;
+
+	@Setter
 	private Role applyGuestRole = null;
+
 	private ScheduledFuture<?> sbEventFuture;
+
 	/* Fetchur */
+	@Setter
 	private TextChannel fetchurChannel = null;
+
+	@Setter
 	private Role fetchurPing = null;
+
 	/* Mayor */
+	@Setter
 	private TextChannel mayorChannel = null;
+
+	@Setter
 	private Role mayorPing = null;
+
+	@Setter
 	private TextChannel logChannel = null;
+
+	@Setter
 	private JsonArray blacklist = new JsonArray();
+
 	private List<String> isUsing = new ArrayList<>();
 
 	/* Constructor */
@@ -258,10 +287,6 @@ public class AutomaticGuild {
 		if (cacheDatabase.partyCaches.containsKey(guildId)) {
 			partyList.addAll(cacheDatabase.partyCaches.get(guildId));
 		}
-	}
-
-	public static Logger getLogger() {
-		return log;
 	}
 
 	/* Apply Methods */
@@ -599,11 +624,28 @@ public class AutomaticGuild {
 					} catch (Exception ignored) {}
 				}
 
-				String key = database.getServerHypixelApiKey(guild.getId());
-				key = checkHypixelKey(key, false) == null ? key : null;
-				int numUpdated = 0;
+				boolean requiresKey = rolesEnabled;
+				// No need to check again if requiresKey is true
+				if (!requiresKey) {
+					String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
+					Matcher verifyMatcher = nicknameTemplatePattern.matcher(nicknameTemplate);
+					while (verifyMatcher.find()) {
+						String category = verifyMatcher.group(1).toUpperCase();
+						if (category.equals("PLAYER") || category.equals("HYPIXEL")) {
+							requiresKey = true;
+							break;
+						}
+					}
+				}
 
-				int updateLimit = rolesEnabled && key != null ? 30 : 120;
+				String key = null;
+				if (requiresKey) {
+					key = database.getServerHypixelApiKey(guild.getId());
+					key = checkHypixelKey(key, false) == null ? key : null;
+				}
+
+				int numUpdated = 0;
+				int updateLimit = requiresKey ? 45 : 150;
 
 				if (inGuildUsers.stream().filter(m -> !updatedMembers.contains(m.getId())).limit(updateLimit).count() < updateLimit) {
 					inGuildUsers.sort(Comparator.comparing(m -> updatedMembers.contains(m.getId())));
@@ -625,12 +667,15 @@ public class AutomaticGuild {
 							toAddRoles.addAll(verifyRolesAdd);
 							toRemoveRoles.addAll(verifyRolesRemove);
 							String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
-							if (nicknameTemplate.contains("[IGN]") && guild.getSelfMember().canInteract(linkedMember)) {
+							if (
+								nicknameTemplate.contains("[IGN]") &&
+								guild.getSelfMember().canInteract(linkedMember) &&
+								(!requiresKey || key != null)
+							) {
 								nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
 
 								Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
 								HypixelPlayer hypixelPlayer = null;
-								boolean updateNick = true;
 								while (matcher.find()) {
 									String category = matcher.group(1).toUpperCase();
 									String type = matcher.group(2).toUpperCase();
@@ -678,6 +723,8 @@ public class AutomaticGuild {
 													} +
 													extra
 												);
+										} else {
+											nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
 										}
 									} else if (
 										category.equals("PLAYER") &&
@@ -690,74 +737,55 @@ public class AutomaticGuild {
 											type.equals("LEVEL")
 										)
 									) {
-										if (key != null) {
-											if (player == null) {
-												HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
-												player =
-													(
-														!response.isValid()
-															? new Player()
-															: new Player(
-																linkedAccount.username(),
-																linkedAccount.uuid(),
-																response.response(),
-																true
-															)
-													).getSelectedProfile();
-											}
+										if (player == null) {
+											HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
+											player =
+												(
+													!response.isValid()
+														? new Player()
+														: new Player(
+															linkedAccount.username(),
+															linkedAccount.uuid(),
+															response.response(),
+															true
+														)
+												).getSelectedProfile();
+										}
 
-											if (player.isValid()) {
-												nicknameTemplate =
-													nicknameTemplate.replace(
-														matcher.group(0),
-														switch (type) {
-															case "SKILLS" -> formatNumber((int) player.getSkillAverage());
-															case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
-															case "WEIGHT" -> formatNumber((int) player.getWeight());
-															case "CLASS" -> player.getSelectedDungeonClass().equals("none")
-																? ""
-																: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
-															case "LEVEL" -> formatNumber((int) player.getLevel());
-															default -> formatNumber((int) player.getCatacombs().getProgressLevel());
-														} +
-														extra
-													);
-											}
-										} else {
-											updateNick = false;
-											break;
+										if (player.isValid()) {
+											nicknameTemplate =
+												nicknameTemplate.replace(
+													matcher.group(0),
+													switch (type) {
+														case "SKILLS" -> formatNumber((int) player.getSkillAverage());
+														case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
+														case "WEIGHT" -> formatNumber((int) player.getWeight());
+														case "CLASS" -> player.getSelectedDungeonClass().equals("none")
+															? ""
+															: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
+														case "LEVEL" -> formatNumber((int) player.getLevel());
+														default -> formatNumber((int) player.getCatacombs().getProgressLevel());
+													} +
+													extra
+												);
 										}
 									} else if (category.equals("HYPIXEL") && type.equals("RANK")) {
-										if (key != null) {
-											if (hypixelPlayer == null) {
-												numUpdated++; // Requires another request
-												HypixelResponse response = playerFromUuid(linkedAccount.uuid());
-												hypixelPlayer =
-													response.isValid()
-														? new HypixelPlayer(
-															linkedAccount.uuid(),
-															linkedAccount.username(),
-															response.response()
-														)
-														: new HypixelPlayer();
-											}
+										if (hypixelPlayer == null) {
+											numUpdated++; // Requires another request
+											HypixelResponse response = playerFromUuid(linkedAccount.uuid());
+											hypixelPlayer =
+												response.isValid()
+													? new HypixelPlayer(linkedAccount.uuid(), linkedAccount.username(), response.response())
+													: new HypixelPlayer();
+										}
 
-											if (hypixelPlayer.isValid()) {
-												nicknameTemplate =
-													nicknameTemplate.replace(matcher.group(0), hypixelPlayer.getRank() + extra);
-											}
-										} else {
-											updateNick = false;
-											break;
+										if (hypixelPlayer.isValid()) {
+											nicknameTemplate = nicknameTemplate.replace(matcher.group(0), hypixelPlayer.getRank() + extra);
 										}
 									}
-
-									nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
 								}
 
-								if (
-									updateNick && (player == null || player.isValid()) && (hypixelPlayer == null || hypixelPlayer.isValid())
-								) {
+								if ((player == null || player.isValid()) && (hypixelPlayer == null || hypixelPlayer.isValid())) {
 									try {
 										linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
 									} catch (PermissionException ignored) {
@@ -816,7 +844,7 @@ public class AutomaticGuild {
 					JsonArray guildMembers = response.get("members").getAsJsonArray();
 					boolean enableGuildRole = Objects.equals(currentSetting.getGuildMemberRoleEnable(), "true");
 					boolean enableGuildRanks = Objects.equals(currentSetting.getGuildRanksEnable(), "true");
-					if (enableGuildRanks || enableGuildRole) {
+					if (enableGuildRole || enableGuildRanks) {
 						Map<String, String> uuidToRankMap = new HashMap<>();
 						for (JsonElement guildMember : guildMembers) {
 							uuidToRankMap.put(
@@ -932,44 +960,7 @@ public class AutomaticGuild {
 		}
 	}
 
-	/* Skyblock Event Methods */
-	public void setEventMemberList(List<EventMember> eventMemberList) {
-		this.eventMemberList = eventMemberList;
-	}
-
-	public void updateSkyblockEvent() {
-		try {
-			JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
-			if (!higherDepth(currentSettings, "eventType", "").isEmpty()) {
-				Instant endingTime = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
-				if (Instant.now().isAfter(endingTime)) {
-					SkyblockEventSlashCommand.EndSubcommand.endSkyblockEvent(jda.getGuildById(guildId), false);
-				}
-			}
-		} catch (Exception ignored) {}
-	}
-
-	public void setEventMemberListLastUpdated(Instant eventMemberListLastUpdated) {
-		this.eventMemberListLastUpdated = eventMemberListLastUpdated;
-	}
-
-	public void setSkyblockEventHandler(SkyblockEventHandler skyblockEventHandler) {
-		this.skyblockEventHandler = skyblockEventHandler;
-	}
-
-	public void setEventCurrentlyUpdating(boolean eventCurrentlyUpdating) {
-		this.eventCurrentlyUpdating = eventCurrentlyUpdating;
-	}
-
 	/* Fetchur */
-	public void setFetchurChannel(TextChannel channel) {
-		this.fetchurChannel = channel;
-	}
-
-	public void setFetchurPing(Role role) {
-		this.fetchurPing = role;
-	}
-
 	public boolean onFetchur(MessageEmbed embed) {
 		try {
 			if (fetchurChannel != null) {
@@ -995,14 +986,6 @@ public class AutomaticGuild {
 	}
 
 	/* Mayor */
-	public void setMayorChannel(TextChannel channel) {
-		this.mayorChannel = channel;
-	}
-
-	public void setMayorPing(Role role) {
-		this.mayorPing = role;
-	}
-
 	public boolean onMayorElection(MessageEmbed embed, File mayorGraphFile, int year) {
 		try {
 			if (mayorChannel != null) {
@@ -1517,14 +1500,6 @@ public class AutomaticGuild {
 		}
 	}
 
-	public void setLogChannel(TextChannel channel) {
-		this.logChannel = channel;
-	}
-
-	public void setApplyGuestRole(Role role) {
-		this.applyGuestRole = role;
-	}
-
 	public void setBotManagerRoles(List<String> botManagerRoles) {
 		this.botManagerRoles.clear();
 		this.botManagerRoles.addAll(botManagerRoles);
@@ -1574,10 +1549,6 @@ public class AutomaticGuild {
 			currentBlacklist.addAll(guildMap.get(g).blacklist);
 		}
 		return currentBlacklist;
-	}
-
-	public void setBlacklist(JsonArray blacklist) {
-		this.blacklist = blacklist;
 	}
 
 	public void onEventNotif(Map<String, MessageEmbed> ebs) {

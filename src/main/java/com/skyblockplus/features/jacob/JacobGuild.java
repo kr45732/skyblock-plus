@@ -67,7 +67,7 @@ public class JacobGuild {
 				}
 			}
 		} catch (Exception e) {
-			AutomaticGuild.getLogger().error(parent.guildId, e);
+			AutomaticGuild.getLog().error(parent.guildId, e);
 		}
 		return false;
 	}
@@ -83,7 +83,7 @@ public class JacobGuild {
 			}
 		} catch (Exception e) {
 			enable = false;
-			AutomaticGuild.getLogger().error(parent.guildId, e);
+			AutomaticGuild.getLog().error(parent.guildId, e);
 		}
 	}
 }

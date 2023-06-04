@@ -78,7 +78,7 @@ public class EventGuild {
 				}
 			}
 		} catch (Exception e) {
-			AutomaticGuild.getLogger().error(parent.guildId, e);
+			AutomaticGuild.getLog().error(parent.guildId, e);
 		}
 	}
 
@@ -91,7 +91,7 @@ public class EventGuild {
 			}
 		} catch (Exception e) {
 			enable = false;
-			AutomaticGuild.getLogger().error(parent.guildId, e);
+			AutomaticGuild.getLog().error(parent.guildId, e);
 		}
 	}
 }

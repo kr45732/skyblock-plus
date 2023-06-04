@@ -58,7 +58,7 @@ public class FlipsSlashCommand extends SlashCommand {
 			.setDescription(
 				"**Next Update:** <t:" +
 				underBinJsonLastUpdated.plusSeconds(60).getEpochSecond() +
-				":R>\nLive Updates: [**Join**](https://discord.gg/GZWZbcxpv4)"
+				":R>\n**Live Updates:** [**Join**](https://discord.gg/GZWZbcxpv4)"
 			);
 		JsonElement avgAuctionJson = getAveragePriceJson();
 

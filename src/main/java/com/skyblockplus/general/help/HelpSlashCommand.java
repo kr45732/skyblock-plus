@@ -489,7 +489,7 @@ public class HelpSlashCommand extends SlashCommand {
 									.addSubcommands(
 										new HelpData(
 											"enable",
-											"Enable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every hour (capped at 120 members per sync)."
+											"Enable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every hour (up to 150 members per sync)."
 										),
 										new HelpData("disable", "Disable verification automatic sync")
 									),
@@ -497,7 +497,7 @@ public class HelpSlashCommand extends SlashCommand {
 									.addSubcommands(
 										new HelpData(
 											"enable",
-											"Enable verification automatic sync. This is will sync skyblock roles every hour (capped at 30 members per sync)."
+											"Enable verification automatic sync. This is will sync skyblock roles every hour (up to 45 members per sync)."
 										),
 										new HelpData("disable", "Disable verification automatic sync")
 									),
