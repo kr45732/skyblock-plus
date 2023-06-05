@@ -287,6 +287,7 @@ public class ServerSettingsService {
 		return null;
 	}
 
+	// Apply
 	public ResponseEntity<HttpStatus> setApplyUsersCache(String serverId, String name, String newApplyCacheJsonString) {
 		AutomatedGuild automatedGuild = getGuildSettingsInt(serverId, name);
 
