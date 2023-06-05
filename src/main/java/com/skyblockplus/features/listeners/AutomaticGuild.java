@@ -370,7 +370,7 @@ public class AutomaticGuild {
 					applyStr.append(client.getSuccess()).append(" `").append(guildName).append("` is disabled\n");
 				}
 			} catch (Exception e) {
-				log.error("Reload apply settings error - guildId={" + guildId + "}, name={" + guildName + "}", e);
+				log.error("Reload apply guild error - guildId={" + guildId + "}, name={" + guildName + "}", e);
 				if (e instanceof PermissionException ex) {
 					applyStr
 						.append(client.getError())
@@ -435,7 +435,7 @@ public class AutomaticGuild {
 				return client.getSuccess() + " Not enabled";
 			}
 		} catch (Exception e) {
-			log.error("Reload verify settings error - guildId={" + guildId + "}", e);
+			log.error("Reload verify guild error - guildId={" + guildId + "}", e);
 			if (e instanceof PermissionException ex) {
 				return client.getError() + " Error reloading - missing permission: " + ex.getPermission().getName();
 			} else {
