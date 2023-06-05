@@ -706,13 +706,12 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				try {
 					guild
 						.getTextChannelById(higherDepth(eventSettings, "announcementId").getAsString())
-						.retrieveMessageById(higherDepth(eventSettings, "announcementMessageId").getAsString())
-						.queue(m ->
-							m
-								.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Event canceled").build())
-								.setComponents()
-								.queue()
-						);
+						.editMessageEmbedsById(
+							higherDepth(eventSettings, "announcementMessageId").getAsString(),
+							defaultEmbed("Skyblock Event").setDescription("Event canceled").build()
+						)
+						.setComponents()
+						.queue();
 				} catch (Exception ignored) {}
 
 				guildMap.get(guild.getId()).setEventMemberListLastUpdated(null);
@@ -734,13 +733,12 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			TextChannel announcementChannel = jda.getTextChannelById(higherDepth(eventSettings, "announcementId").getAsString());
 			try {
 				announcementChannel
-					.retrieveMessageById(higherDepth(eventSettings, "announcementMessageId").getAsString())
-					.queue(m ->
-						m
-							.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Event has ended").build())
-							.setComponents()
-							.queue()
-					);
+					.editMessageEmbedsById(
+						higherDepth(eventSettings, "announcementMessageId").getAsString(),
+						defaultEmbed("Skyblock Event").setDescription("Event has ended").build()
+					)
+					.setComponents()
+					.queue();
 			} catch (Exception ignored) {}
 
 			CustomPaginator.Builder paginateBuilder = defaultPaginator()

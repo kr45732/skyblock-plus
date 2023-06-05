@@ -59,7 +59,6 @@ public class SetupCommandHandler {
 	private String messageId;
 
 	public SetupCommandHandler(InteractionHook hook, String feature) {
-		System.out.println("create: " + this);
 		this.hook = hook;
 		this.featureType = FeatureType.valueOf(feature.toUpperCase());
 
@@ -206,7 +205,6 @@ public class SetupCommandHandler {
 	}
 
 	private void action(GenericInteractionCreateEvent genericEvent) {
-		System.out.println("event: " + this);
 		if (genericEvent instanceof ModalInteractionEvent event) {
 			if (onModalInteraction(event)) {
 				return;
@@ -224,7 +222,6 @@ public class SetupCommandHandler {
 	}
 
 	public boolean onStringSelectInteraction(StringSelectInteractionEvent event) {
-		System.out.println("str: " + this + " | " + event.getComponentId() + " | " + event.getMessageId() + " | " + messageId);
 		switch (featureType) {
 			case VERIFY -> {
 				String selectedOption = event.getSelectedOptions().get(0).getValue();
@@ -236,7 +233,7 @@ public class SetupCommandHandler {
 							event.getHook().editOriginalEmbeds(eb.appendDescription("\n\nPlease try again.").build()).queue();
 						} else {
 							String msg = onVerifyReload(event.getGuild().getId());
-							if (msg.equals("Reloaded")) {
+							if (msg.contains("Reloaded")) {
 								event
 									.getHook()
 									.editOriginalEmbeds(defaultEmbed("Success").setDescription("Enabled automatic verification").build())
@@ -464,7 +461,7 @@ public class SetupCommandHandler {
 						EmbedBuilder eb = getSettings().setApplyEnable(getGuildSettings(), true);
 						if (eb.build().getTitle().equals("Settings")) {
 							String msg = onApplyReload(event.getGuild().getId());
-							if (msg.contains("• Reloaded `" + featureType.guildName + "`")) {
+							if (msg.contains("Reloaded `" + featureType.guildName + "`")) {
 								event
 									.getHook()
 									.editOriginalEmbeds(
@@ -472,13 +469,13 @@ public class SetupCommandHandler {
 									)
 									.queue();
 							} else {
-								if (!msg.contains("• `" + featureType.guildName + "` is disabled")) {
+								if (msg.contains("`" + featureType.guildName + "` is disabled")) {
 									msg = "`" + featureType.guildName + "` is disabled";
 								} else {
 									msg =
-										"Error Reloading for `" +
+										"Error reloading `" +
 										featureType.guildName +
-										msg.split("• Error Reloading for `" + featureType.guildName)[1].split("\n")[0];
+										msg.split("Error reloading `" + featureType.guildName)[1].split("\n")[0];
 								}
 								event.getHook().editOriginalEmbeds(defaultEmbed("Error").setDescription(msg).build()).queue();
 							}

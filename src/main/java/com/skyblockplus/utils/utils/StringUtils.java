@@ -81,6 +81,15 @@ public class StringUtils {
 		return formattedNumber;
 	}
 
+	public static String formatLeaderboardAmount(double amount) {
+		if (amount > 1000000000) {
+			return simplifyNumber(amount);
+		} else if (amount > 100) {
+			amount = (long) amount;
+		}
+		return roundAndFormat(amount);
+	}
+
 	public static String capitalizeString(String str) {
 		return str == null
 			? null

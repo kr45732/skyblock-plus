@@ -123,7 +123,7 @@ public class BingoSlashCommand extends SlashCommand {
 		eb.setDescription(
 			(
 				bingoJson == null
-					? "**No active bingo profile found**"
+					? "**This player has no bingo profiles**"
 					: (
 						"**Goals Completed:** " +
 						(bingoArr.size() + countOccurrencesOf(cardStr.toString(), "C")) +

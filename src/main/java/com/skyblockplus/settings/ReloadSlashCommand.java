@@ -42,7 +42,7 @@ public class ReloadSlashCommand extends SlashCommand {
 	}
 
 	public static EmbedBuilder getReloadEmbed(Guild guild) {
-		return defaultEmbed("Reload Settings for " + guild.getName())
+		return defaultEmbed("Reload Settings For " + guild.getName())
 			.addField("Apply settings reload status", onApplyReload(guild.getId()), false)
 			.addField("Verify settings reload status", onVerifyReload(guild.getId()), false);
 	}

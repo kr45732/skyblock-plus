@@ -26,12 +26,10 @@ import static com.skyblockplus.utils.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.general.LinkSlashCommand;
-import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
@@ -44,34 +42,14 @@ public class VerifyGuild {
 	public JsonElement verifySettings;
 
 	public VerifyGuild(TextChannel messageChannel, Message originalMessage, JsonElement verifySettings) {
+		this.enable = true;
 		this.messageChannel = messageChannel;
 		this.originalMessage = originalMessage;
 		this.verifySettings = verifySettings;
-		this.enable = true;
 	}
 
 	public VerifyGuild() {
 		this.enable = false;
-	}
-
-	public void onGuildMessageReceived(MessageReceivedEvent event) {
-		if (!enable) {
-			return;
-		}
-
-		if (!event.getChannel().getId().equals(messageChannel.getId())) {
-			return;
-		}
-
-		if (event.getMessage().getId().equals(originalMessage.getId())) {
-			return;
-		}
-
-		if (!event.getAuthor().getId().equals(selfUserId) && event.getAuthor().isBot()) {
-			return;
-		}
-
-		event.getMessage().delete().queueAfter(7, TimeUnit.SECONDS, ignore, ignore);
 	}
 
 	public void onButtonClick(ButtonInteractionEvent event) {
@@ -98,7 +76,7 @@ public class VerifyGuild {
 	}
 
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		if (!higherDepth(verifySettings, "enableAutomaticSync", "false").equals("true")) {
+		if (!higherDepth(verifySettings, "enableAutomaticSync", false)) {
 			return;
 		}
 
@@ -115,37 +93,38 @@ public class VerifyGuild {
 		}
 
 		String[] result = LinkSlashCommand.updateLinkedUser(verifySettings, linkedUser, event.getMember(), true);
-
-		if (higherDepth(verifySettings, "dmOnSync", true)) {
+		if (higherDepth(verifySettings, "dmOnSync", false)) {
 			event
 				.getUser()
 				.openPrivateChannel()
-				.queue(privateChannel ->
-					privateChannel
-						.sendMessageEmbeds(
-							defaultEmbed("Member synced")
-								.setDescription(
-									"You have automatically been synced in `" +
-									event.getGuild().getName() +
-									"`" +
-									(
-										!result[1].equals("false")
-											? result[1].equals("true")
-												? "\n• Successfully synced your roles"
-												: "\n• Error syncing your roles"
-											: ""
-									) +
-									(
-										!result[0].equals("false")
-											? result[0].equals("true")
-												? "\n• Successfully synced your nickname"
-												: "\n• Error syncing your nickname"
-											: ""
+				.queue(
+					privateChannel ->
+						privateChannel
+							.sendMessageEmbeds(
+								defaultEmbed("Member synced")
+									.setDescription(
+										"You have automatically been synced in `" +
+										event.getGuild().getName() +
+										"`" +
+										(
+											!result[1].equals("false")
+												? result[1].equals("true")
+													? "\n• Successfully synced your roles"
+													: "\n• Error syncing your roles"
+												: ""
+										) +
+										(
+											!result[0].equals("false")
+												? result[0].equals("true")
+													? "\n• Successfully synced your nickname"
+													: "\n• Error syncing your nickname"
+												: ""
+										)
 									)
-								)
-								.build()
-						)
-						.queue(ignore, ignore)
+									.build()
+							)
+							.queue(ignore, ignore),
+					ignore
 				);
 		}
 	}

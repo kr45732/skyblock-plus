@@ -32,10 +32,7 @@ import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -136,7 +133,7 @@ public class LeaderboardDatabase {
 		return lbType;
 	}
 
-	public Connection getConnection() throws SQLException {
+	private Connection getConnection() throws SQLException {
 		return dataSource.getConnection();
 	}
 
@@ -188,7 +185,7 @@ public class LeaderboardDatabase {
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
 					"INSERT INTO " +
-					gamemode.toCacheType() +
+					gamemode.toLeaderboardName() +
 					"(uuid,username,last_updated," +
 					String.join(",", typesSubList) +
 					") VALUES " +
@@ -198,7 +195,7 @@ public class LeaderboardDatabase {
 						.stream()
 						.map(t ->
 							t.equals("networth") && !updateNetworth
-								? ("networth=" + gamemode.toCacheType() + ".networth")
+								? ("networth=" + gamemode.toLeaderboardName() + ".networth")
 								: (t + "=EXCLUDED." + t)
 						)
 						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
@@ -214,29 +211,40 @@ public class LeaderboardDatabase {
 					statement.setLong(3 + offset, Instant.now().toEpochMilli());
 					for (int i = 0; i < typesSubList.size(); i++) {
 						String type = typesSubList.get(i);
-						statement.setFloat(
-							i + 4 + offset,
-							type.equals("networth") && !updateNetworth
-								? 0
-								: (float) player.getHighestAmount(
-									type +
-									switch (type) {
-										case "catacombs",
-											"alchemy",
-											"combat",
-											"fishing",
-											"farming",
-											"foraging",
-											"carpentry",
-											"mining",
-											"taming",
-											"social",
-											"enchanting" -> "_xp";
-										default -> "";
-									},
-									gamemode
-								)
-						);
+						double value = type.equals("networth") && !updateNetworth
+							? 0
+							: player.getHighestAmount(
+								type +
+								switch (type) {
+									case "catacombs",
+										"alchemy",
+										"combat",
+										"fishing",
+										"farming",
+										"foraging",
+										"carpentry",
+										"mining",
+										"taming",
+										"social",
+										"enchanting" -> "_xp";
+									default -> "";
+								},
+								gamemode
+							);
+
+						if (type.equals("highest_critical_damage") || type.equals("highest_damage")) {
+							if (value < 0) {
+								statement.setNull(i + 4 + offset, Types.DOUBLE);
+							} else {
+								statement.setDouble(i + 4 + offset, value);
+							}
+						} else {
+							if (value < 0) {
+								statement.setNull(i + 4 + offset, Types.FLOAT);
+							} else {
+								statement.setFloat(i + 4 + offset, (float) value);
+							}
+						}
 					}
 
 					LinkedAccount linkedAccount = database.getByUuid(player.getUuid());
@@ -273,7 +281,7 @@ public class LeaderboardDatabase {
 	public void deleteFromLeaderboard(String uuid, Player.Gamemode gamemode) {
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gamemode.toCacheType() + " WHERE uuid = ?")
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gamemode.toLeaderboardName() + " WHERE uuid = ?")
 		) {
 			statement.setObject(1, stringToUuid(uuid));
 			statement.executeUpdate();
@@ -297,10 +305,10 @@ public class LeaderboardDatabase {
 				", ROW_NUMBER() OVER(ORDER BY " +
 				lbType +
 				" DESC) AS rank FROM " +
-				mode.toCacheType() +
+				mode.toLeaderboardName() +
 				" WHERE " +
 				lbType +
-				" >= 0 OFFSET " +
+				" IS NOT NULL OFFSET " +
 				rankStart +
 				" LIMIT " +
 				(rankEnd - rankStart)
@@ -329,10 +337,10 @@ public class LeaderboardDatabase {
 				"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY " +
 				lbType +
 				" DESC) AS rank FROM " +
-				mode.toCacheType() +
+				mode.toLeaderboardName() +
 				" WHERE " +
 				lbType +
-				" >= 0) s WHERE uuid = ?"
+				" IS NOT NULL) s WHERE uuid = ?"
 			)
 		) {
 			int rank = 0;
@@ -359,10 +367,10 @@ public class LeaderboardDatabase {
 				", ROW_NUMBER() OVER(ORDER BY " +
 				lbType +
 				" DESC) AS rank FROM " +
-				mode.toCacheType() +
+				mode.toLeaderboardName() +
 				" WHERE " +
 				lbType +
-				" >= 0) (SELECT * FROM s WHERE " +
+				" IS NOT NULL) (SELECT * FROM s WHERE " +
 				lbType +
 				" > " +
 				amount +
@@ -390,16 +398,6 @@ public class LeaderboardDatabase {
 	}
 
 	public List<DataObject> getCachedPlayers(
-		String lbType,
-		Player.Gamemode mode,
-		List<String> uuids,
-		String hypixelKey,
-		SlashCommandEvent event
-	) {
-		return getCachedPlayers(List.of(lbType), mode, uuids, hypixelKey, event);
-	}
-
-	public List<DataObject> getCachedPlayers(
 		List<String> lbTypes,
 		Player.Gamemode mode,
 		List<String> uuids,
@@ -417,7 +415,7 @@ public class LeaderboardDatabase {
 				"SELECT username, uuid, " +
 				String.join(", ", lbTypes) +
 				" FROM " +
-				mode.toCacheType() +
+				mode.toLeaderboardName() +
 				" WHERE uuid IN (" +
 				paramsStr +
 				")" +
@@ -550,8 +548,8 @@ public class LeaderboardDatabase {
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
 				"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS rank FROM " +
-				gamemode.toCacheType() +
-				") s WHERE uuid=?"
+				gamemode.toLeaderboardName() +
+				" WHERE networth IS NOT NULL) s WHERE uuid = ?"
 			)
 		) {
 			statement.setObject(1, stringToUuid(uuid));
@@ -583,7 +581,7 @@ public class LeaderboardDatabase {
 		return null;
 	}
 
-	public void updateLeaderboard() {
+	private void updateLeaderboard() {
 		try {
 			long start = System.currentTimeMillis();
 
@@ -591,7 +589,9 @@ public class LeaderboardDatabase {
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"SELECT uuid FROM all_lb WHERE last_updated < " + Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli() + " LIMIT 180"
+					"SELECT uuid FROM all_lb WHERE last_updated < " +
+					Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli() +
+					" ORDER BY RANDOM() LIMIT 180"
 				)
 			) {
 				try (ResultSet response = statement.executeQuery()) {
@@ -639,10 +639,10 @@ public class LeaderboardDatabase {
 
 	public void close() {
 		log.info("Closing leaderboard database");
-		dataSource.close();
 		if (leaderboardUpdateTask != null) {
 			leaderboardUpdateTask.cancel(true);
 		}
+		dataSource.close();
 		log.info("Successfully closed leaderboard database");
 	}
 }

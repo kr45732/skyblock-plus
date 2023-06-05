@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.utils.Utils.gson;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirement;
@@ -121,14 +120,6 @@ public class Database {
 
 	public int setApplyCacheSettings(String serverId, String name, String currentSettings) {
 		return settingsService.setApplyUsersCache(serverId, name, currentSettings).getStatusCode().value();
-	}
-
-	public JsonArray getApplyCacheSettings(String serverId, String name) {
-		try {
-			return JsonParser.parseString((String) settingsService.getApplyUsersCache(serverId, name).getBody()).getAsJsonArray();
-		} catch (Exception e) {
-			return new JsonArray();
-		}
 	}
 
 	public int deleteApplyCacheSettings(String serverId, String name) {

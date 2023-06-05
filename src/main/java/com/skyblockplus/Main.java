@@ -120,6 +120,7 @@ public class Main {
 
 		allServerSettings =
 			database.getAllServerSettings().stream().collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()));
+		log.info("Loaded all server settings");
 
 		jda =
 			DefaultShardManagerBuilder
@@ -183,13 +184,12 @@ public class Main {
 
 	@PreDestroy
 	public void onExit() {
-		if (!isMainBot()) {
-			return;
-		}
-
 		log.info("Stopping");
 
-		botStatusWebhook.send(client.getSuccess() + " Restarting for an update");
+		if (isMainBot()) {
+			botStatusWebhook.send(client.getSuccess() + " Restarting for an update");
+		}
+
 		ApiHandler.updateCaches();
 		HttpUtils.closeHttpClient();
 		ApiHandler.leaderboardDatabase.close();

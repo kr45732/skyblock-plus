@@ -384,7 +384,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 		public LeaderboardSubcommand() {
 			this.name = "leaderboard";
-			this.cooldown = GLOBAL_COOLDOWN + 2;
+			this.cooldown = GLOBAL_COOLDOWN + 1;
 		}
 
 		public static EmbedBuilder getLeaderboard(
@@ -431,7 +431,7 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 			hypixelGuildQueue.add(guildId);
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
-				lbType,
+				List.of(lbType),
 				gamemode,
 				streamJsonArray(higherDepth(guildJson, "members"))
 					.map(u -> higherDepth(u, "uuid", ""))
@@ -442,56 +442,56 @@ public class GuildSlashCommand extends SlashCommand {
 			hypixelGuildQueue.remove(guildId);
 
 			String finalLbType = lbType;
-			playerList.sort(Comparator.comparingDouble(cache -> -cache.getDouble(finalLbType)));
+			playerList.sort(Comparator.comparingDouble(cache -> -cache.getDouble(finalLbType, 0)));
 
 			CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
 
-			long total = 0;
+			double total = 0;
 			int guildRank = -1;
-			String amt = "?";
+			String amt = "None";
 			for (int i = 0, guildMemberPlayersListSize = playerList.size(); i < guildMemberPlayersListSize; i++) {
 				DataObject player = playerList.get(i);
-				double amount = player.getDouble(lbType);
-				amount = lbType.equals("networth") ? (long) amount : amount;
-				String formattedAmt = amount == -1 ? "?" : roundAndFormat(amount);
-				String playerUsername = player.getString("username");
+				double amount = player.getDouble(lbType, -1);
+				if (amount < 0) {
+					continue;
+				}
 
-				paginateBuilder.addItems("`" + (i + 1) + ")` " + escapeUsername(playerUsername) + ": " + formattedAmt);
-				total += Math.max(0, amount);
+				String formattedAmt = formatLeaderboardAmount(amount);
 
-				if (username != null && playerUsername.equals(usernameUuidStruct.username())) {
+				paginateBuilder.addItems("`" + (i + 1) + ")` " + escapeUsername(player.getString("username")) + ": " + formattedAmt);
+				total += amount;
+
+				if (usernameUuidStruct != null && player.getString("uuid").equals(usernameUuidStruct.uuid())) {
 					guildRank = i;
 					amt = formattedAmt;
 				}
 			}
 
-			double averageAmt = (double) total / playerList.size();
-			averageAmt = lbType.equals("networth") ? (long) averageAmt : averageAmt;
+			String lbTypeFormatted = capitalizeString(lbType.replace("_", " "));
 
 			String ebStr =
 				"**Total " +
-				capitalizeString(lbType.replace("_", " ")) +
+				lbTypeFormatted +
 				":** " +
-				formatNumber(total) +
+				formatLeaderboardAmount(total) +
 				"\n**Average " +
-				capitalizeString(lbType.replace("_", " ")) +
+				lbTypeFormatted +
 				":** " +
-				formatNumber(averageAmt) +
-				(
-					username != null
-						? "\n**Player:** " +
-						usernameUuidStruct.username() +
-						"\n**Guild Rank:** #" +
-						(guildRank + 1) +
-						"\n**" +
-						capitalizeString(lbType.replace("_", " ")) +
-						":** " +
-						amt
-						: ""
-				);
+				formatLeaderboardAmount(total / playerList.size());
+			if (usernameUuidStruct != null) {
+				ebStr +=
+					"\n**Player:** " +
+					usernameUuidStruct.username() +
+					"\n**Guild Rank:** " +
+					(guildRank == -1 ? "Not on leaderboard" : "#" + guildRank) +
+					"\n**" +
+					lbTypeFormatted +
+					":** " +
+					amt;
+			}
 
 			paginateBuilder.getExtras().setEveryPageTitle(guildName).setEveryPageText(ebStr);
-			event.paginate(paginateBuilder, (guildRank / 20) + 1);
+			event.paginate(paginateBuilder, guildRank == -1 ? 0 : guildRank / 20 + 1);
 
 			return null;
 		}
@@ -531,7 +531,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData(name, "Get a leaderboard for a guild. The API key must be set for this server.")
+			return new SubcommandData(name, "Get a leaderboard for a guild")
 				.addOptions(new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true))
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
@@ -629,7 +629,7 @@ public class GuildSlashCommand extends SlashCommand {
 				hypixelKey,
 				event
 			);
-			playerList.sort(Comparator.comparingDouble(e -> e.getDouble("level")));
+			playerList.sort(Comparator.comparingDouble(e -> e.getDouble("level", 0)));
 			hypixelGuildQueue.remove(guildId);
 
 			CustomPaginator.Builder paginateBuilder = event
@@ -646,7 +646,7 @@ public class GuildSlashCommand extends SlashCommand {
 					for (String reqIndividual : req.split("\\s+")) {
 						// name:value
 						String[] reqInnerSplit = reqIndividual.split(":");
-						double playerValue = Math.max(0, guildMember.getDouble(reqInnerSplit[0]));
+						double playerValue = Math.max(0, guildMember.getDouble(reqInnerSplit[0], 0));
 						double reqAmount = Double.parseDouble(reqInnerSplit[1]);
 						if (reqInnerSplit[0].equals("catacombs")) {
 							reqAmount =
@@ -670,16 +670,16 @@ public class GuildSlashCommand extends SlashCommand {
 				}
 
 				if (!meetsReqsOr) {
-					double slayer = guildMember.getDouble("slayer");
-					double skills = guildMember.getDouble("skills");
+					double slayer = guildMember.getDouble("slayer", 0);
+					double skills = guildMember.getDouble("skills", -1);
 					double catacombs = levelingInfoFromExp(
-						(long) guildMember.getDouble("catacombs"),
+						(long) guildMember.getDouble("catacombs", 0),
 						"catacombs",
 						higherDepth(getLevelingJson(), "leveling_caps.catacombs", 0)
 					)
 						.getProgressLevel();
-					double weight = guildMember.getDouble("weight");
-					double level = guildMember.getDouble("level");
+					double weight = guildMember.getDouble("weight", 0);
+					double level = guildMember.getDouble("level", 0);
 
 					paginateBuilder
 						.getExtras()
@@ -873,19 +873,19 @@ public class GuildSlashCommand extends SlashCommand {
 			if (lbType.equals("position")) {
 				List<DataObject> guildSlayer = playerList
 					.stream()
-					.sorted(Comparator.comparingDouble(o1 -> -o1.getDouble("slayer")))
+					.sorted(Comparator.comparingDouble(o1 -> -o1.getDouble("slayer", 0)))
 					.collect(Collectors.toCollection(ArrayList::new));
 				List<DataObject> guildSkills = playerList
 					.stream()
-					.sorted(Comparator.comparingDouble(o1 -> -o1.getDouble("skills")))
+					.sorted(Comparator.comparingDouble(o1 -> -o1.getDouble("skills", 0)))
 					.collect(Collectors.toCollection(ArrayList::new));
 				List<DataObject> guildCatacombs = playerList
 					.stream()
-					.sorted(Comparator.comparingDouble(o1 -> -o1.getDouble("catacombs")))
+					.sorted(Comparator.comparingDouble(o1 -> -o1.getDouble("catacombs", 0)))
 					.collect(Collectors.toCollection(ArrayList::new));
 				List<DataObject> guildWeight = playerList
 					.stream()
-					.sorted(Comparator.comparingDouble(o1 -> -o1.getDouble("weight")))
+					.sorted(Comparator.comparingDouble(o1 -> -o1.getDouble("weight", 0)))
 					.collect(Collectors.toCollection(ArrayList::new));
 
 				for (String s : uniqueGuildName) {
@@ -1035,7 +1035,7 @@ public class GuildSlashCommand extends SlashCommand {
 							boolean meetsReqAnd = true;
 							for (JsonElement reqAnd : reqOr.getAsJsonArray()) {
 								String type = higherDepth(reqAnd, "type").getAsString();
-								double amount = gMember.getDouble(type);
+								double amount = gMember.getDouble(type, 0);
 
 								double reqAmount = higherDepth(reqAnd, "amount").getAsDouble();
 								if (higherDepth(reqAnd, "convert_from_level", false)) {
@@ -1077,7 +1077,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 							for (JsonElement reqAnd : reqOr.getAsJsonArray()) {
 								String type = higherDepth(reqAnd, "type").getAsString();
-								double amount = gMember.getDouble(type);
+								double amount = gMember.getDouble(type, 0);
 
 								double reqAmount = higherDepth(reqAnd, "amount").getAsDouble();
 								if (higherDepth(reqAnd, "convert_from_level", false)) {
@@ -1239,12 +1239,12 @@ public class GuildSlashCommand extends SlashCommand {
 			String cataStr = getLeaderboardTop(playerList, "catacombs", usernameUuidStruct);
 			String weightStr = getLeaderboardTop(playerList, "weight", usernameUuidStruct);
 
-			double averageLevel = playerList.stream().mapToDouble(m -> m.getDouble("level")).average().orElse(0);
-			double averageNetworth = (long) playerList.stream().mapToDouble(m -> m.getDouble("networth")).average().orElse(0);
-			double averageSlayer = playerList.stream().mapToDouble(m -> m.getDouble("slayer")).average().orElse(0);
-			double averageSkills = playerList.stream().mapToDouble(m -> m.getDouble("skills")).average().orElse(0);
-			double averageCata = playerList.stream().mapToDouble(m -> m.getDouble("catacombs")).average().orElse(0);
-			double averageWeight = playerList.stream().mapToDouble(m -> m.getDouble("weight")).average().orElse(0);
+			double averageLevel = playerList.stream().mapToDouble(m -> m.getDouble("level", 0)).average().orElse(0);
+			double averageNetworth = (long) playerList.stream().mapToDouble(m -> m.getDouble("networth", 0)).average().orElse(0);
+			double averageSlayer = playerList.stream().mapToDouble(m -> m.getDouble("slayer", 0)).average().orElse(0);
+			double averageSkills = playerList.stream().mapToDouble(m -> m.getDouble("skills", 0)).average().orElse(0);
+			double averageCata = playerList.stream().mapToDouble(m -> m.getDouble("catacombs", 0)).average().orElse(0);
+			double averageWeight = playerList.stream().mapToDouble(m -> m.getDouble("weight", 0)).average().orElse(0);
 
 			return defaultEmbed(guildName)
 				.setDescription(
@@ -1275,7 +1275,7 @@ public class GuildSlashCommand extends SlashCommand {
 		private static String getLeaderboardTop(List<DataObject> playerList, String lbType, UsernameUuidStruct usernameUuidStruct) {
 			List<DataObject> lb = playerList
 				.stream()
-				.sorted(Comparator.comparingDouble(m -> -m.getDouble(lbType)))
+				.sorted(Comparator.comparingDouble(m -> -m.getDouble(lbType, 0)))
 				.collect(Collectors.toCollection(ArrayList::new));
 
 			int pos = -1;
@@ -1297,7 +1297,7 @@ public class GuildSlashCommand extends SlashCommand {
 						.append(")` ")
 						.append(escapeUsername(cur.getString("username")))
 						.append(": ")
-						.append(roundAndFormat(cur.getDouble(lbType)))
+						.append(roundAndFormat(cur.getDouble(lbType, 0)))
 						.append("\n");
 					break;
 				}
@@ -1308,7 +1308,7 @@ public class GuildSlashCommand extends SlashCommand {
 					.append(")` ")
 					.append(escapeUsername(cur.getString("username")))
 					.append(": ")
-					.append(roundAndFormat(cur.getDouble(lbType)))
+					.append(roundAndFormat(cur.getDouble(lbType, 0)))
 					.append("\n");
 			}
 			return str.toString();

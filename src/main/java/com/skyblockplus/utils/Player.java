@@ -317,7 +317,7 @@ public class Player {
 			);
 		}
 
-		public String toCacheType() {
+		public String toLeaderboardName() {
 			return (
 				switch (this) {
 					case IRONMAN, STRANDED -> name().toLowerCase();

@@ -54,7 +54,7 @@ public class LeaderboardPaginator {
 	private String player;
 	private int pageFirstRank = 1;
 	private int playerRank = -1;
-	private String playerAmount = "Not on leaderboard";
+	private String playerAmount = "None";
 
 	public LeaderboardPaginator(
 		String lbType,
@@ -70,31 +70,27 @@ public class LeaderboardPaginator {
 		this.event = event;
 		this.message = event.getHook().retrieveOriginal().complete();
 
-		if (rank != -1) {
-			rank = Math.max(1, rank);
-			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, rank - 200, rank + 200));
+		if (rank != -1 || page != -1) {
+			int clampedRank = (rank != -1 ? (rank - 1) / 20 : page - 1) * 20;
+			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, clampedRank - 200, clampedRank + 200));
 		} else if (amount != -1) {
-			amount = Math.max(0, amount);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, amount));
-		} else if (page != -1) {
-			page = Math.max(1, page);
-			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
 		} else if (player != null) {
 			this.player = player.getUsername();
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.getUuid()));
 		} else {
-			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, 0, 201));
+			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, 0, 200));
 		}
 
 		double closestAmt = -1;
 		int idx = 1;
 		for (Map.Entry<Integer, DataObject> entry : leaderboardCache.entrySet()) {
 			int curRank = entry.getKey();
-			double curAmount = entry.getValue().getDouble(lbType, 0.0);
+			double curAmount = entry.getValue().getDouble(lbType);
 
 			if (this.player != null && entry.getValue().getString("username", "").equals(this.player)) {
 				playerRank = curRank;
-				playerAmount = formatAmount(curAmount);
+				playerAmount = formatLeaderboardAmount(curAmount);
 			}
 
 			if (amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)) {
@@ -103,7 +99,7 @@ public class LeaderboardPaginator {
 			}
 		}
 
-		if (this.player != null && player != null && playerAmount.equals("Not on leaderboard")) {
+		if (this.player != null && player != null && playerAmount.equals("None")) {
 			if (lbType.equals("networth")) {
 				if (!player.isInventoryApiEnabled()) {
 					playerAmount = "Inventory API disabled";
@@ -139,7 +135,8 @@ public class LeaderboardPaginator {
 			DataObject curPlayer = leaderboardCache.getOrDefault(i, null);
 			if (curPlayer != null) {
 				double curAmount = curPlayer.getDouble(lbType, 0.0);
-				String out = "`" + i + ")` " + escapeUsername(curPlayer.getString("username", "?")) + ": " + formatAmount(curAmount);
+				String out =
+					"`" + i + ")` " + escapeUsername(curPlayer.getString("username", "?")) + ": " + formatLeaderboardAmount(curAmount);
 
 				if (i < pageFirstRank + 10) {
 					columnOne.append(out).append("\n");
@@ -198,18 +195,16 @@ public class LeaderboardPaginator {
 
 	public void onButtonInteraction(ButtonInteractionEvent event) {
 		if (event.getComponentId().equals("leaderboard_paginator_left_button")) {
-			if (pageFirstRank != -1) {
-				pageFirstRank -= 20;
+			pageFirstRank -= 20;
 
-				if (!leaderboardCache.containsKey(pageFirstRank)) {
-					leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, pageFirstRank - 200, pageFirstRank + 20));
-				}
+			if (!leaderboardCache.containsKey(pageFirstRank) || !leaderboardCache.containsKey(pageFirstRank + 19)) {
+				leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, pageFirstRank - 181, pageFirstRank + 19));
 			}
 		} else if (event.getComponentId().equals("leaderboard_paginator_right_button")) {
 			pageFirstRank += 20; // TODO: check if anymore pages on right?
 
-			if (!leaderboardCache.containsKey(pageFirstRank)) {
-				leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, pageFirstRank - 19, pageFirstRank + 199));
+			if (!leaderboardCache.containsKey(pageFirstRank) || !leaderboardCache.containsKey(pageFirstRank + 19)) {
+				leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, pageFirstRank - 1, pageFirstRank + 199));
 			}
 		} else if (event.getComponentId().equals("leaderboard_paginator_search_button")) {
 			event
@@ -240,34 +235,31 @@ public class LeaderboardPaginator {
 		UsernameUuidStruct player = null;
 
 		try {
-			rank = Integer.parseInt(event.getValue("rank").getAsString());
+			rank = Math.max(1, Integer.parseInt(event.getValue("rank").getAsString()));
 		} catch (Exception ignored) {}
 		try {
-			amount = Double.parseDouble(event.getValue("amount").getAsString());
+			amount = Math.max(0, Double.parseDouble(event.getValue("amount").getAsString()));
 		} catch (Exception ignored) {}
 		try {
-			page = Integer.parseInt(event.getValue("page").getAsString());
+			page = Math.max(1, Integer.parseInt(event.getValue("page").getAsString()));
 		} catch (Exception ignored) {}
 		try {
 			player = usernameToUuid(event.getValue("player").getAsString());
-			player = !player.isValid() ? null : player;
+			player = player.isValid() ? player : null;
 		} catch (Exception ignored) {}
 
-		if (rank != -1) {
-			rank = Math.max(1, rank);
-			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, rank - 200, rank + 200));
+		if (rank != -1 || page != -1) {
+			int clampedRank = (rank != -1 ? (rank - 1) / 20 : page - 1) * 20;
+			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, clampedRank - 200, clampedRank + 200));
 			this.player = null;
 		} else if (amount != -1) {
-			amount = Math.max(0, amount);
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, amount));
-			this.player = null;
-		} else if (page != -1) {
-			page = Math.max(1, page);
-			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, page * 20 - 200, page * 20 + 200));
 			this.player = null;
 		} else if (player != null) {
 			leaderboardCache.putAll(leaderboardDatabase.getLeaderboard(lbType, gamemode, player.uuid()));
 			this.player = player.username();
+			playerRank = -1;
+			playerAmount = "None";
 		}
 
 		double closestAmt = -1;
@@ -278,7 +270,7 @@ public class LeaderboardPaginator {
 
 			if (player != null && entry.getValue().getString("username", "").equals(player.username())) {
 				playerRank = curRank;
-				playerAmount = formatAmount(curAmount);
+				playerAmount = formatLeaderboardAmount(curAmount);
 			}
 
 			if (amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)) {
@@ -308,15 +300,6 @@ public class LeaderboardPaginator {
 			Button.primary("leaderboard_paginator_search_button", "Search").withEmoji(Emoji.fromFormatted("\uD83D\uDD0E")),
 			Button.primary("leaderboard_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 		);
-	}
-
-	private String formatAmount(double amount) {
-		if (amount > 1000000000) {
-			return simplifyNumber(amount);
-		} else if (amount > 100) {
-			amount = (long) amount;
-		}
-		return roundAndFormat(amount);
 	}
 
 	public void waitForEvent() {

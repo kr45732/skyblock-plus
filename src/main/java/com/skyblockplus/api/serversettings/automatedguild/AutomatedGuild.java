@@ -56,6 +56,7 @@ public class AutomatedGuild {
 
 	// Apply
 	private String applyEnable = "false";
+	private String applyClosed = "false";
 	private String applyMessageChannel = "";
 	private String applyStaffChannel = "";
 	private String applyCategory = "";

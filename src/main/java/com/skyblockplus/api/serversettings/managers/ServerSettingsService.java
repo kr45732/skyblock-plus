@@ -287,16 +287,6 @@ public class ServerSettingsService {
 		return null;
 	}
 
-	// Apply
-	public ResponseEntity<String> getApplyUsersCache(String serverId, String name) {
-		AutomatedGuild automatedGuild = getGuildSettingsInt(serverId, name);
-
-		if (automatedGuild != null) {
-			return new ResponseEntity<>(automatedGuild.getApplyUsersCache(), HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
 	public ResponseEntity<HttpStatus> setApplyUsersCache(String serverId, String name, String newApplyCacheJsonString) {
 		AutomatedGuild automatedGuild = getGuildSettingsInt(serverId, name);
 

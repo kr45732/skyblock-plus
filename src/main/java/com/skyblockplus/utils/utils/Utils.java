@@ -712,7 +712,7 @@ public class Utils {
 		log.info("Caching Apply Users");
 		long startTime = System.currentTimeMillis();
 		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
-			List<ApplyGuild> applySettings = automaticGuild.getValue().applyGuild;
+			List<ApplyGuild> applySettings = automaticGuild.getValue().applyGuilds;
 			for (ApplyGuild applySetting : applySettings) {
 				try {
 					String name = higherDepth(applySetting.currentSettings, "guildName").getAsString();
@@ -741,7 +741,7 @@ public class Utils {
 					}
 				} catch (Exception e) {
 					log.error(
-						"guildId={" +
+						"Error cching applyUser - guildId={" +
 						automaticGuild.getKey() +
 						"}, name={" +
 						higherDepth(applySetting.currentSettings, "guildName", "null") +
@@ -752,38 +752,6 @@ public class Utils {
 			}
 		}
 		log.info("Cached apply users in " + roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) + "s");
-	}
-
-	public static List<ApplyUser> getApplyGuildUsersCache(String guildId, String name) {
-		if (!isMainBot()) {
-			return new ArrayList<>();
-		}
-
-		JsonArray applyUsersCache = database.getApplyCacheSettings(guildId, name);
-
-		try {
-			List<ApplyUser> applyUsersCacheList = streamJsonArray(applyUsersCache)
-				.map(u -> gson.fromJson(u, ApplyUser.class))
-				.filter(u -> {
-					try {
-						return jda.getTextChannelById(u.applicationChannelId) != null;
-					} catch (Exception e) {
-						return false;
-					}
-				})
-				.collect(Collectors.toCollection(ArrayList::new));
-
-			if (applyUsersCacheList.size() > 0) {
-				log.info(
-					"Retrieved ApplyUser cache - size={" + applyUsersCacheList.size() + "}, guildId={" + guildId + "}, name={" + name + "}"
-				);
-				return applyUsersCacheList;
-			}
-		} catch (Exception e) {
-			log.error("guildId={" + guildId + "}, name={" + name + "}", e);
-		}
-
-		return new ArrayList<>();
 	}
 
 	public static double getPriceOverride(String itemId) {

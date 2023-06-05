@@ -26,8 +26,11 @@ import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.Player;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -41,29 +44,59 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ApplyGuild {
 
-	public final List<ApplyUser> applyUserList;
-	public final Message reactMessage;
+	public final List<ApplyUser> applyUserList = new ArrayList<>();
+	public final String reactMessageId;
 	public final JsonElement currentSettings;
 	public final boolean enable = true;
 	public TextChannel waitInviteChannel = null;
 
-	public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
-		this.reactMessage = reactMessage;
+	public ApplyGuild(Message reactMessage, JsonElement currentSettings, List<ApplyUser> prevApplyUsers) {
+		this.reactMessageId = reactMessage.getId();
 		this.currentSettings = currentSettings;
-		List<ApplyUser> applyUserList = getApplyGuildUsersCache(
-			reactMessage.getGuild().getId(),
-			higherDepth(currentSettings, "guildName").getAsString()
-		);
-		applyUserList.forEach(a -> a.setParent(this));
-		this.applyUserList = applyUserList;
+
+		if (prevApplyUsers != null) { // Triggered by reload command
+			applyUserList.addAll(prevApplyUsers);
+		} else if (isMainBot()) { // Triggered by initial startup
+			String guildId = reactMessage.getGuild().getId();
+			String guildName = higherDepth(currentSettings, "guildName", null);
+
+			try {
+				JsonArray applyUsersCache;
+				try {
+					applyUsersCache =
+						JsonParser.parseString(higherDepth(currentSettings, "applyUsersCache").getAsString()).getAsJsonArray();
+				} catch (Exception e) {
+					e.printStackTrace();
+					applyUsersCache = new JsonArray();
+				}
+
+				for (JsonElement applyUser : applyUsersCache) {
+					if (reactMessage.getGuild().getTextChannelById(higherDepth(applyUser, "applicationChannelId", null)) != null) {
+						applyUserList.add(gson.fromJson(applyUser, ApplyUser.class).setParent(this));
+					}
+				}
+
+				if (!applyUserList.isEmpty()) {
+					AutomaticGuild
+						.getLog()
+						.info(
+							"Retrieved ApplyUser cache - size={" +
+							applyUserList.size() +
+							"}, guildId={" +
+							guildId +
+							"}, name={" +
+							guildName +
+							"}"
+						);
+				}
+			} catch (Exception e) {
+				AutomaticGuild.getLog().error("guildId={" + guildId + "}, name={" + guildName + "}", e);
+			}
+		}
+
 		try {
 			this.waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 		} catch (Exception ignored) {}
-	}
-
-	public ApplyGuild(Message reactMessage, JsonElement currentSettings, List<ApplyUser> prevApplyUsers) {
-		this(reactMessage, currentSettings);
-		applyUserList.addAll(prevApplyUsers);
 	}
 
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
@@ -107,7 +140,7 @@ public class ApplyGuild {
 	}
 
 	public String onButtonClick_NewApplyUser(ButtonInteractionEvent event) {
-		if (!event.getMessageId().equals(reactMessage.getId())) {
+		if (!event.getMessageId().equals(reactMessageId)) {
 			return null;
 		}
 
@@ -122,7 +155,7 @@ public class ApplyGuild {
 			.orElse(null);
 
 		if (runningApplication != null) {
-			return client.getError() + " There is already an application open in <#" + runningApplication.applicationChannelId + ">";
+			return client.getError() + " You already have an application open in <#" + runningApplication.applicationChannelId + ">";
 		}
 
 		LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());

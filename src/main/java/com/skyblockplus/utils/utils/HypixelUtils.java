@@ -89,12 +89,12 @@ public class HypixelUtils {
 		return vanillaItems.contains(id);
 	}
 
-	public static SkillsStruct levelingInfoFromExp(long skillExp, String skill, int maxLevel) {
-		JsonArray skillsTable =
-			switch (skill) {
+	public static SkillsStruct levelingInfoFromExp(long exp, String name, int maxLevel) {
+		JsonArray xpTable =
+			switch (name) {
 				case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(
 					getLevelingJson(),
-					skill
+					name
 				)
 					.getAsJsonArray();
 				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
@@ -103,43 +103,44 @@ public class HypixelUtils {
 
 		long xpTotal = 0L;
 		int level = 1;
-		for (int i = 0; i < skillsTable.size(); i++) {
+		for (int i = 0; i < xpTable.size(); i++) {
 			if (i == maxLevel) {
 				break;
 			}
 
-			xpTotal += skillsTable.get(i).getAsLong();
+			xpTotal += xpTable.get(i).getAsLong();
 
-			if (xpTotal > skillExp) {
-				xpTotal -= skillsTable.get(i).getAsLong();
+			if (xpTotal > exp) {
+				xpTotal -= xpTable.get(i).getAsLong();
 				break;
 			} else {
 				level = (i + 1);
 			}
 		}
 
-		long xpCurrent = (long) Math.floor(skillExp - xpTotal);
-		long xpForNext = 0;
-		if (level < maxLevel && level < skillsTable.size()) {
-			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
-		}
+		long xpCurrent = (long) Math.floor(exp - xpTotal);
 
-		if (skillExp == 0) {
+		if (exp <= 0) {
 			level = 0;
-			xpForNext = 0;
+			xpCurrent = 0;
 		}
 
-		double progress = xpForNext > 0 ? Math.max(0, Math.min(((double) xpCurrent) / xpForNext, 1)) : 0;
+		long xpForNext = 0;
+		if (level < maxLevel && level < xpTable.size()) {
+			xpForNext = (long) Math.ceil(xpTable.get(level).getAsLong());
+		}
 
-		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
+		double progress = xpForNext > 0 ? Math.max(0, Math.min((double) xpCurrent / xpForNext, 1)) : 0;
+
+		return new SkillsStruct(name, level, maxLevel, exp, xpCurrent, xpForNext, progress);
 	}
 
-	public static SkillsStruct levelingInfoFromLevel(int targetLevel, String skill, int maxLevel) {
+	public static SkillsStruct levelingInfoFromLevel(int targetLevel, String name, int maxLevel) {
 		JsonArray skillsTable =
-			switch (skill) {
+			switch (name) {
 				case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(
 					getLevelingJson(),
-					skill
+					name
 				)
 					.getAsJsonArray();
 				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
@@ -164,7 +165,7 @@ public class HypixelUtils {
 			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
 		}
 
-		return new SkillsStruct(skill, targetLevel, maxLevel, xpTotal, 0, xpForNext, 0);
+		return new SkillsStruct(name, targetLevel, maxLevel, xpTotal, 0, xpForNext, 0);
 	}
 
 	/**

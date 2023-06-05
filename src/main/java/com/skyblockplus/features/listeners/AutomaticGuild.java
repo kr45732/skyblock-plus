@@ -28,8 +28,6 @@ import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
@@ -78,7 +76,6 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -110,7 +107,7 @@ public class AutomaticGuild {
 		5,
 		TimeUnit.MINUTES
 	);
-	private static final ScheduledFuture<?> updateGuildFuture = scheduler.scheduleWithFixedDelay(
+	private static final ScheduledFuture<?> updateGuildFuture = scheduler.scheduleAtFixedRate(
 		() ->
 			guildMap
 				.values()
@@ -126,7 +123,7 @@ public class AutomaticGuild {
 	);
 
 	/* Apply */
-	public final List<ApplyGuild> applyGuild = new ArrayList<>();
+	public final List<ApplyGuild> applyGuilds = new ArrayList<>();
 	/* Event */
 	public final EventGuild eventGuild;
 	/* Party */
@@ -211,8 +208,8 @@ public class AutomaticGuild {
 		}
 
 		JsonElement serverSettings = gson.toJsonTree(allServerSettings.remove(guildId));
-		applyConstructor(event, serverSettings);
-		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
+		reloadVerifyGuild(event.getGuild(), higherDepth(serverSettings, "automatedVerify"));
+		reloadApplyGuilds(event.getGuild(), higherDepth(serverSettings, "automatedGuilds"), true);
 		scheduleSbEventFuture(higherDepth(serverSettings, "sbEvent"));
 		jacobGuild = new JacobGuild(higherDepth(serverSettings, "jacobSettings"), this);
 		eventGuild = new EventGuild(higherDepth(serverSettings, "eventNotif"), this);
@@ -290,246 +287,161 @@ public class AutomaticGuild {
 	}
 
 	/* Apply Methods */
-	public void applyConstructor(GenericGuildEvent event, JsonElement serverSettings) {
-		List<AutomatedGuild> currentSettings;
-		try {
-			currentSettings =
-				gson.fromJson(higherDepth(serverSettings, "automatedGuilds"), new TypeToken<List<AutomatedGuild>>() {}.getType());
-		} catch (Exception e) {
-			return;
-		}
-		if (currentSettings == null) {
-			return;
-		}
-
-		for (AutomatedGuild currentSetting : currentSettings) {
-			try {
-				if (currentSetting.getApplyEnable() == null || currentSetting.getApplyEnable().equalsIgnoreCase("false")) {
-					continue;
-				}
-
-				TextChannel reactChannel = event.getGuild().getTextChannelById(currentSetting.getApplyMessageChannel());
-
-				EmbedBuilder eb = defaultEmbed("Apply For Guild");
-				eb.setDescription(currentSetting.getApplyMessage());
-
-				try {
-					Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getApplyPrevMessage()).complete();
-					reactMessage
-						.editMessageEmbeds(eb.build())
-						.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
-						.queue();
-
-					applyGuild.removeIf(o1 ->
-						higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())
-					);
-					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
-				} catch (Exception e) {
-					Message reactMessage = reactChannel
-						.sendMessageEmbeds(eb.build())
-						.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
-						.complete();
-
-					currentSetting.setApplyPrevMessage(reactMessage.getId());
-					database.setGuildSettings(event.getGuild().getId(), gson.toJsonTree(currentSetting));
-
-					applyGuild.removeIf(o1 ->
-						higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())
-					);
-					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
-				}
-			} catch (Exception e) {
-				log.error(
-					"Apply constructor error - guildId={" +
-					event.getGuild().getId() +
-					"}, name={" +
-					(currentSetting != null ? currentSetting.getGuildName() : "null AutomatedGuild") +
-					"}",
-					e
-				);
-			}
-		}
-	}
-
-	public String reloadApplyConstructor(String guildId) {
+	public String reloadApplyGuilds(String guildId) {
 		Guild guild = jda.getGuildById(guildId);
 		if (guild == null) {
-			return "Invalid guild";
+			return client.getError() + " Invalid guild";
 		}
 
-		List<AutomatedGuild> currentSettings = database.getAllGuildSettings(guildId);
-		currentSettings.removeIf(o1 -> o1 == null || o1.getGuildName() == null);
+		JsonElement currentSettings = gson.toJsonTree(database.getAllGuildSettings(guildId));
+		return reloadApplyGuilds(guild, currentSettings, false);
+	}
 
-		if (currentSettings.size() == 0) {
-			return "No enabled apply settings";
+	public String reloadApplyGuilds(Guild guild, JsonElement applySettings, boolean isStartup) {
+		if (applySettings == null) {
+			return client.getError() + " No apply settings";
 		}
 
 		StringBuilder applyStr = new StringBuilder();
-		for (AutomatedGuild currentSetting : currentSettings) {
+		for (JsonElement currentSettings : applySettings.getAsJsonArray()) {
+			String guildName = higherDepth(currentSettings, "guildName", null);
+			if (guildName == null) {
+				continue;
+			}
+
 			try {
-				if (currentSetting.getApplyEnable().equalsIgnoreCase("true")) {
-					TextChannel reactChannel = guild.getTextChannelById(currentSetting.getApplyMessageChannel());
+				if (higherDepth(currentSettings, "applyEnable", false)) {
+					boolean closed = higherDepth(currentSettings, "applyClosed", false);
+					TextChannel reactChannel = guild.getTextChannelById(higherDepth(currentSettings, "applyMessageChannel").getAsString());
 
 					EmbedBuilder eb = defaultEmbed("Apply For Guild");
-					eb.setDescription(currentSetting.getApplyMessage());
+					eb.setDescription(higherDepth(currentSettings, "applyMessage").getAsString());
 
-					List<ApplyUser> curApplyUsers = new ArrayList<>();
-					for (Iterator<ApplyGuild> iterator = applyGuild.iterator(); iterator.hasNext();) {
-						ApplyGuild applyG = iterator.next();
+					List<ApplyUser> curApplyUsers = null;
+					if (!isStartup) {
+						curApplyUsers = new ArrayList<>();
+						for (Iterator<ApplyGuild> iterator = applyGuilds.iterator(); iterator.hasNext();) {
+							ApplyGuild applyG = iterator.next();
 
-						if (higherDepth(applyG.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())) {
-							curApplyUsers.addAll(applyG.applyUserList);
-							iterator.remove();
-							break;
+							if (higherDepth(applyG.currentSettings, "guildName").getAsString().equals(guildName)) {
+								curApplyUsers.addAll(applyG.applyUserList);
+								iterator.remove();
+								break;
+							}
 						}
 					}
 
 					try {
-						Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getApplyPrevMessage()).complete();
-						reactMessage
-							.editMessageEmbeds(eb.build())
-							.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
-							.queue();
+						Message reactMessage = reactChannel
+							.editMessageEmbedsById(higherDepth(currentSettings, "applyPrevMessage").getAsString(), eb.build())
+							.setActionRow(
+								Button
+									.primary(
+										"create_application_button_" + guildName,
+										closed ? "Applications Closed" : "Create Application"
+									)
+									.withDisabled(closed)
+							)
+							.complete();
 
-						applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting), curApplyUsers));
-						applyStr.append("• Reloaded `").append(currentSetting.getGuildName()).append("`\n");
+						applyGuilds.add(new ApplyGuild(reactMessage, currentSettings, curApplyUsers));
+						applyStr.append(client.getSuccess()).append(" Reloaded `").append(guildName).append("`\n");
 					} catch (Exception e) {
 						Message reactMessage = reactChannel
 							.sendMessageEmbeds(eb.build())
-							.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
+							.setActionRow(
+								Button
+									.primary(
+										"create_application_button_" + guildName,
+										closed ? "Applications Closed" : "Create Application"
+									)
+									.withDisabled(closed)
+							)
 							.complete();
 
-						currentSetting.setApplyPrevMessage(reactMessage.getId());
-						database.setGuildSettings(guild.getId(), gson.toJsonTree(currentSetting));
+						currentSettings.getAsJsonObject().addProperty("applyPrevMessage", reactMessage.getId());
+						database.setGuildSettings(guild.getId(), currentSettings);
 
-						applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting), curApplyUsers));
-						applyStr.append("• Reloaded `").append(currentSetting.getGuildName()).append("`\n");
+						applyGuilds.add(new ApplyGuild(reactMessage, currentSettings, curApplyUsers));
+						applyStr.append(client.getSuccess()).append(" Reloaded `").append(guildName).append("`\n");
 					}
 				} else {
-					applyGuild.removeIf(o1 ->
-						higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())
-					);
-					applyStr.append("• `").append(currentSetting.getGuildName()).append("` is disabled\n");
+					applyGuilds.removeIf(o1 -> higherDepth(o1.currentSettings, "guildName").getAsString().equals(guildName));
+					applyStr.append(client.getSuccess()).append(" `").append(guildName).append("` is disabled\n");
 				}
 			} catch (Exception e) {
-				log.error("Reload apply constructor error - " + guildId, e);
+				log.error("Reload apply settings error - guildId={" + guildId + "}, name={" + guildName + "}", e);
 				if (e instanceof PermissionException ex) {
 					applyStr
-						.append("• Error reloading `")
-						.append(currentSetting.getGuildName())
+						.append(client.getError())
+						.append(" Error reloading `")
+						.append(guildName)
 						.append("` - missing permission: ")
 						.append(ex.getPermission().getName())
 						.append("\n");
 				} else {
-					applyStr.append("• Error Reloading for `").append(currentSetting.getGuildName()).append("`\n");
+					applyStr.append(client.getError()).append(" Error reloading `").append(guildName).append("`\n");
 				}
 			}
 		}
-		return applyStr.length() > 0 ? applyStr.toString() : "• Error reloading";
+
+		return applyStr.isEmpty() ? client.getError() + " No enabled automated applications" : applyStr.toString();
 	}
 
 	/* Verify Methods */
-	public void verifyConstructor(GenericGuildEvent event, JsonElement currentSettings) {
-		verifyGuild = new VerifyGuild();
-		if (currentSettings == null) {
-			return;
-		}
-
-		try {
-			if (!higherDepth(currentSettings, "enable", false)) {
-				return;
-			}
-
-			if (higherDepth(currentSettings, "enable").getAsBoolean()) {
-				TextChannel reactChannel = event
-					.getGuild()
-					.getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
-				try {
-					Message reactMessage = reactChannel
-						.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
-						.complete();
-					if (reactMessage != null) {
-						reactMessage
-							.editMessage(higherDepth(currentSettings, "messageText").getAsString())
-							.setAttachments()
-							.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"))
-							.queue();
-
-						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
-						return;
-					}
-				} catch (Exception ignored) {}
-
-				MessageCreateAction action = reactChannel
-					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-					.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"));
-				Message reactMessage = action.complete();
-
-				JsonObject newSettings = currentSettings.getAsJsonObject();
-				newSettings.addProperty("previousMessageId", reactMessage.getId());
-				database.setVerifySettings(event.getGuild().getId(), newSettings);
-
-				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings);
-			}
-		} catch (Exception e) {
-			log.error("Verify constructor error - " + event.getGuild().getId(), e);
-		}
-	}
-
-	public String reloadVerifyConstructor(String guildId) {
+	public String reloadVerifyGuild(String guildId) {
 		Guild guild = jda.getGuildById(guildId);
 		if (guild == null) {
-			return "Invalid guild";
+			return client.getError() + " Invalid guild";
 		}
 
 		JsonElement currentSettings = database.getVerifySettings(guild.getId());
-		if (currentSettings == null) {
-			return "No settings found";
+		return reloadVerifyGuild(guild, currentSettings);
+	}
+
+	public String reloadVerifyGuild(Guild guild, JsonElement verifySettings) {
+		verifyGuild = new VerifyGuild();
+		if (verifySettings == null) {
+			return client.getError() + " No verify settings";
 		}
 
 		try {
-			if (higherDepth(currentSettings, "enable").getAsBoolean()) {
-				TextChannel reactChannel = guild.getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
+			if (higherDepth(verifySettings, "enable", false)) {
+				TextChannel reactChannel = guild.getTextChannelById(higherDepth(verifySettings, "messageTextChannelId").getAsString());
 				try {
 					Message reactMessage = reactChannel
-						.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
+						.editMessageById(
+							higherDepth(verifySettings, "previousMessageId").getAsString(),
+							higherDepth(verifySettings, "messageText").getAsString()
+						)
+						.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"))
 						.complete();
-					if (reactMessage != null) {
-						reactMessage
-							.editMessage(higherDepth(currentSettings, "messageText").getAsString())
-							.setAttachments()
-							.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"))
-							.queue();
 
-						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
-						return "Reloaded";
-					}
-				} catch (Exception ignored) {}
+					verifyGuild = new VerifyGuild(reactChannel, reactMessage, verifySettings);
+					return client.getSuccess() + " Reloaded";
+				} catch (Exception e) {
+					Message reactMessage = reactChannel
+						.sendMessage(higherDepth(verifySettings, "messageText").getAsString())
+						.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"))
+						.complete();
 
-				verifyGuild = new VerifyGuild(); // Prevent the old settings from deleting the new message
+					verifySettings.getAsJsonObject().addProperty("previousMessageId", reactMessage.getId());
+					database.setVerifySettings(guild.getId(), verifySettings);
 
-				MessageCreateAction action = reactChannel
-					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-					.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"));
-				Message reactMessage = action.complete();
-
-				JsonObject newSettings = currentSettings.getAsJsonObject();
-				newSettings.addProperty("previousMessageId", reactMessage.getId());
-				database.setVerifySettings(guild.getId(), newSettings);
-
-				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings);
-				return "Reloaded";
+					verifyGuild = new VerifyGuild(reactChannel, reactMessage, verifySettings);
+					return client.getSuccess() + " Reloaded";
+				}
 			} else {
-				verifyGuild = new VerifyGuild();
-				return "Not enabled";
+				return client.getSuccess() + " Not enabled";
 			}
 		} catch (Exception e) {
-			log.error("Reload verify constructor error - " + guildId, e);
+			log.error("Reload verify settings error - guildId={" + guildId + "}", e);
 			if (e instanceof PermissionException ex) {
-				return ("Error Reloading\nMissing permission: " + ex.getPermission().getName());
+				return client.getError() + " Error reloading - missing permission: " + ex.getPermission().getName();
+			} else {
+				return client.getError() + " Error reloading";
 			}
 		}
-		return "Error Reloading";
 	}
 
 	/* Automated Guild Methods */
@@ -1074,15 +986,11 @@ public class AutomaticGuild {
 
 	/* Events */
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
-		applyGuild.forEach(o1 -> o1.onMessageReactionAdd(event));
-	}
-
-	public void onGuildMessageReceived(MessageReceivedEvent event) {
-		verifyGuild.onGuildMessageReceived(event);
+		applyGuilds.forEach(o1 -> o1.onMessageReactionAdd(event));
 	}
 
 	public void onTextChannelDelete(ChannelDeleteEvent event) {
-		applyGuild.forEach(o1 -> o1.onTextChannelDelete(event));
+		applyGuilds.forEach(o1 -> o1.onTextChannelDelete(event));
 	}
 
 	public void onModalInteraction(ModalInteractionEvent event) {
@@ -1433,7 +1341,7 @@ public class AutomaticGuild {
 				.deferReply(!event.getComponentId().startsWith("apply_user_") || event.getComponentId().startsWith("apply_user_wait_"))
 				.complete();
 
-			for (ApplyGuild applyG : applyGuild) {
+			for (ApplyGuild applyG : applyGuilds) {
 				String buttonClickReply = applyG.onButtonClick(event);
 				if (buttonClickReply != null) {
 					if (buttonClickReply.startsWith("SBZ_SCAMMER_CHECK_")) {

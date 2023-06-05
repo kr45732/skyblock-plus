@@ -52,17 +52,17 @@ public class MainListener extends ListenerAdapter {
 	private static String lastRepoCommitSha = null;
 
 	public static String onApplyReload(String guildId) {
-		String reloadStatus = "Error reloading";
+		String reloadStatus = client.getError() + " Error reloading";
 		if (guildMap.containsKey(guildId)) {
-			reloadStatus = guildMap.get(guildId).reloadApplyConstructor(guildId);
+			reloadStatus = guildMap.get(guildId).reloadApplyGuilds(guildId);
 		}
 		return reloadStatus;
 	}
 
 	public static String onVerifyReload(String guildId) {
-		String reloadStatus = "Error reloading";
+		String reloadStatus = client.getError() + " Error reloading";
 		if (guildMap.containsKey(guildId)) {
-			reloadStatus = guildMap.get(guildId).reloadVerifyConstructor(guildId);
+			reloadStatus = guildMap.get(guildId).reloadVerifyGuild(guildId);
 		}
 		return reloadStatus;
 	}
@@ -188,13 +188,7 @@ public class MainListener extends ListenerAdapter {
 			return;
 		}
 
-		if (AuctionFlipper.onGuildMessageReceived(event)) {
-			return;
-		}
-
-		if (guildMap.containsKey(event.getGuild().getId())) {
-			guildMap.get(event.getGuild().getId()).onGuildMessageReceived(event);
-		}
+		AuctionFlipper.onGuildMessageReceived(event);
 	}
 
 	@Override

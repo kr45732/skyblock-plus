@@ -72,7 +72,7 @@ public class DevSettingsCommand extends Command {
 						case "verify":
 							if (args[2].equals("disable")) {
 								embed(new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setVerifyEnable(false));
-								guildMap.get(args[3]).reloadVerifyConstructor(args[3]);
+								guildMap.get(args[3]).reloadVerifyGuild(args[3]);
 								return;
 							}
 							break;
@@ -95,7 +95,7 @@ public class DevSettingsCommand extends Command {
 									new SettingsExecute(jda.getGuildById(args[3]), event.getEvent())
 										.setApplyEnable(database.getGuildSettings(args[3], args[4]).getAsJsonObject(), false)
 								);
-								guildMap.get(args[3]).reloadApplyConstructor(args[3]);
+								guildMap.get(args[3]).reloadApplyGuilds(args[3]);
 								return;
 							}
 							break;

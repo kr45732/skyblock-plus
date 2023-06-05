@@ -30,7 +30,6 @@ import com.google.gson.annotations.Expose;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -49,7 +48,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
-public class ApplyUser implements Serializable {
+public class ApplyUser {
 
 	@Expose(serialize = false, deserialize = false)
 	public ApplyGuild parent;
@@ -198,7 +197,6 @@ public class ApplyUser implements Serializable {
 		}
 
 		TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
-		Message reactMessage = applicationChannel.retrieveMessageById(reactMessageId).complete();
 		JsonElement currentSettings = parent.currentSettings;
 
 		if (!event.getUser().getId().equals(applyingUserId) && !guildMap.get(guildId).isAdmin(event.getMember())) {
@@ -219,7 +217,7 @@ public class ApplyUser implements Serializable {
 		}
 
 		if (state == 0) {
-			reactMessage.clearReactions().queue();
+			applicationChannel.clearReactionsById(reactMessageId).queue();
 			if (event.getEmoji().getFormatted().equals(client.getError())) {
 				event.getChannel().sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
 				event
@@ -278,7 +276,6 @@ public class ApplyUser implements Serializable {
 			}
 		}
 
-		Message reactMessage;
 		if (!meetReqsOr) {
 			EmbedBuilder reqEmbed = defaultEmbed("Does not meet requirements");
 			reqEmbed.setDescription(
@@ -308,12 +305,12 @@ public class ApplyUser implements Serializable {
 			playerLilyWeight = roundAndFormat(player.getLilyWeight());
 			playerLevel = roundAndFormat(player.getLevel());
 
-			reactMessage =
+			this.reactMessageId =
 				applicationChannel
 					.sendMessageEmbeds(reqEmbed.build())
 					.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
-					.complete();
-			this.reactMessageId = reactMessage.getId();
+					.complete()
+					.getId();
 			state = 3;
 		} else {
 			try {
@@ -378,14 +375,13 @@ public class ApplyUser implements Serializable {
 			}
 			buttons.add(Button.danger("apply_user_cancel", "Cancel"));
 
-			reactMessage = applicationChannel.sendMessageEmbeds(statsEmbed.build()).setActionRow(buttons).complete();
-			this.reactMessageId = reactMessage.getId();
+			this.reactMessageId = applicationChannel.sendMessageEmbeds(statsEmbed.build()).setActionRow(buttons).complete().getId();
 			state = 1;
 		}
 	}
 
 	public EmbedBuilder defaultPlayerEmbed() {
-		return defaultEmbed(escapeUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUsername, playerProfileName));
+		return defaultEmbed(escapeUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUuid, playerProfileName));
 	}
 
 	public boolean onButtonClick(ButtonInteractionEvent event, ApplyGuild parent, boolean isWaitlist) {
@@ -470,7 +466,7 @@ public class ApplyUser implements Serializable {
 									" - [Last played profile (" +
 									lastPlayedProfile +
 									")](" +
-									skyblockStatsLink(playerUsername, lastPlayedProfile) +
+									skyblockStatsLink(playerUuid, lastPlayedProfile) +
 									")"
 								);
 							} else {
@@ -480,7 +476,7 @@ public class ApplyUser implements Serializable {
 									" - [" +
 									capitalizeString(profileEntry.getValue()) +
 									"](" +
-									skyblockStatsLink(playerUsername, profileEntry.getValue()) +
+									skyblockStatsLink(playerUuid, profileEntry.getValue()) +
 									")"
 								);
 							}
@@ -511,11 +507,9 @@ public class ApplyUser implements Serializable {
 				break;
 			case 2:
 				TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
-				Message reactMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
 				switch (event.getButton().getId()) {
 					case "apply_user_accept":
-						event.getMessage().editMessageComponents().queue();
-						reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+						event.getMessage().editMessageComponents().queue(m -> m.delete().queueAfter(5, TimeUnit.SECONDS, ignore), ignore);
 						try {
 							applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
 						} catch (Exception ignored) {}
@@ -586,7 +580,7 @@ public class ApplyUser implements Serializable {
 													"Invited"
 												),
 												Button.link(nameMcLink(playerUuid), "NameMC"),
-												Button.link(skyblockStatsLink(playerUsername, playerProfileName), "SkyCrypt")
+												Button.link(skyblockStatsLink(playerUuid, playerProfileName), "SkyCrypt")
 											)
 											.complete()
 											.getId(),
@@ -603,8 +597,10 @@ public class ApplyUser implements Serializable {
 							!higherDepth(currentSettings, "applyWaitlistMessage", "").isEmpty() &&
 							!higherDepth(currentSettings, "applyWaitlistMessage", "").equals("none")
 						) {
-							event.getMessage().editMessageComponents().queue();
-							reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+							event
+								.getMessage()
+								.editMessageComponents()
+								.queue(m -> m.delete().queueAfter(5, TimeUnit.SECONDS, ignore), ignore);
 							try {
 								applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
 							} catch (Exception ignored) {}
@@ -691,22 +687,15 @@ public class ApplyUser implements Serializable {
 						}
 						return true;
 					case "apply_user_deny":
-						event.getMessage().editMessageComponents().queue();
-						reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+						event.getMessage().editMessageComponents().queue(m -> m.delete().queueAfter(5, TimeUnit.SECONDS, ignore), ignore);
 						try {
 							applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
 						} catch (Exception ignored) {}
 
-						try {
-							event
-								.getHook()
-								.editOriginal(
-									playerUsername + " (<@" + applyingUserId + ">) was denied by " + event.getUser().getAsMention()
-								)
-								.queue();
-						} catch (Exception e) {
-							event.getHook().editOriginal(playerUsername + " was denied by " + event.getUser().getAsMention()).queue();
-						}
+						event
+							.getHook()
+							.editOriginal(playerUsername + " (<@" + applyingUserId + ">) was denied by " + event.getUser().getAsMention())
+							.queue();
 
 						state = 3;
 						this.reactMessageId =
@@ -759,7 +748,8 @@ public class ApplyUser implements Serializable {
 		return false;
 	}
 
-	public void setParent(ApplyGuild parent) {
+	public ApplyUser setParent(ApplyGuild parent) {
 		this.parent = parent;
+		return this;
 	}
 }

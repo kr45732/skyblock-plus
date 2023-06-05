@@ -74,7 +74,9 @@ public class ApiHandler {
 			cacheDatabase.initializeAhTracker();
 			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 60, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCaches, 60, 60, TimeUnit.MINUTES);
-			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
+			if (isMainBot()) {
+				scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
+			}
 		} catch (Exception e) {
 			log.error("Exception when initializing the ApiHandler", e);
 		}
@@ -367,7 +369,7 @@ public class ApiHandler {
 					String username = uuidToUsernameCache.getIfPresent(uuid);
 					return new HypixelResponse(
 						(username != null ? username : "Player") +
-						" has no Skyblock profiles. Make sure this player has logged on after the recent Skyblock maintenance (<t:1684270848:D>)"
+						" has no Skyblock profiles. Make sure this player has logged on after the past Skyblock maintenance (<t:1684270848:D>)"
 					);
 				}
 
@@ -435,7 +437,7 @@ public class ApiHandler {
 										String username = uuidToUsernameCache.getIfPresent(uuid);
 										return new HypixelResponse(
 											(username != null ? username : "Player") +
-											" has no Skyblock profiles. Make sure this player has logged on after the recent Skyblock maintenance (<t:1684270848:D>)"
+											" has no Skyblock profiles. Make sure this player has logged on after the past Skyblock maintenance (<t:1684270848:D>)"
 										);
 									}
 
