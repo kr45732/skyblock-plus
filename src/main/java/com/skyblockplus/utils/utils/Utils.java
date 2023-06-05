@@ -741,7 +741,7 @@ public class Utils {
 					}
 				} catch (Exception e) {
 					log.error(
-						"Error cching applyUser - guildId={" +
+						"Error caching applyUser - guildId={" +
 						automaticGuild.getKey() +
 						"}, name={" +
 						higherDepth(applySetting.currentSettings, "guildName", "null") +
