@@ -572,8 +572,14 @@ public class HelpSlashCommand extends SlashCommand {
 										new HelpData("disable", "Disable automatic apply.", "settings guild <name> apply disable", true),
 										new HelpData(
 											"close",
-											"Close automatic apply. Disables the button to create a new application. Use `/reload` to re-open applications.",
+											"Close automatic apply. Disables the button to create a new application.",
 											"settings guild <name> apply close",
+											true
+										),
+										new HelpData(
+											"close",
+											"Re-enabled the button to create a new application.",
+											"settings guild <name> apply open",
 											true
 										),
 										new HelpData(
@@ -951,6 +957,7 @@ public class HelpSlashCommand extends SlashCommand {
 		paginateBuilder.addItems(
 			create("settings guild <name> apply <enable|disable>", "Enable or disable automatic apply") +
 			create("settings guild <name> apply close", "Close automatic apply") +
+			create("settings guild <name> apply open", "Open automatic apply") +
 			create("settings guild <name> apply message <message>", "The message that users will see when verifying") +
 			create(
 				"settings guild <name> apply staff_roles add <@role>",
