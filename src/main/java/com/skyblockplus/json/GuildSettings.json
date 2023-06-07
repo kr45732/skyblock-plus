@@ -535,13 +535,13 @@
       "lb_type": "amount",
       "ignored_ranks": [
         "moderator",
-        "junior mod"
+        "inactive"
       ],
       "default_rank": {
         "requirements": [
           [
             {
-              "amount": 150,
+              "amount": 180,
               "type": "level"
             },
             {
@@ -551,19 +551,8 @@
           ],
           [
             {
-              "amount": 150,
+              "amount": 180,
               "type": "level"
-            },
-            {
-              "amount": 28,
-              "type": "catacombs",
-              "convert_from_level": true
-            }
-          ],
-          [
-            {
-              "amount": 1000000000,
-              "type": "networth"
             },
             {
               "amount": 28,
@@ -599,17 +588,6 @@
                 "type": "catacombs",
                 "convert_from_level": true
               }
-            ],
-            [
-              {
-                "amount": 4000000000,
-                "type": "networth"
-              },
-              {
-                "amount": 35,
-                "type": "catacombs",
-                "convert_from_level": true
-              }
             ]
           ],
           "names": [
@@ -632,17 +610,6 @@
               {
                 "amount": 280,
                 "type": "level"
-              },
-              {
-                "amount": 45,
-                "type": "catacombs",
-                "convert_from_level": true
-              }
-            ],
-            [
-              {
-                "amount": 10000000000,
-                "type": "networth"
               },
               {
                 "amount": 45,
