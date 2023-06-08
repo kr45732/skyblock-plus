@@ -19,8 +19,10 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.HttpUtils.okHttpClient;
+import static com.skyblockplus.utils.utils.HypixelUtils.calculateWithTaxes;
 import static com.skyblockplus.utils.utils.HypixelUtils.isVanillaItem;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
@@ -31,12 +33,15 @@ import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.skyblockplus.utils.database.LeaderboardDatabase;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import me.nullicorn.nedit.NBTReader;
+import me.nullicorn.nedit.type.NBTCompound;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class AuctionFlipper {
@@ -44,7 +49,7 @@ public class AuctionFlipper {
 	private static final JDAWebhookClient flipperWebhook = new WebhookClientBuilder(
 		isMainBot()
 			? "https://discord.com/api/webhooks/917160844247334933/WKeMowhugO5-xbLlD8TakRfCskt7D5Sm7giMY8LfN2MzKjxsDUm9Y2yPw61_yzQTgcII"
-			: "https://discord.com/api/webhooks/917959010622255144/ljWuFDr73A_PfyBBUUQWUE17nlFPFhbe3TUP-MxaIzlp_o-jYojrWRAF-hQGYxaxcZfM"
+			: "https://discord.com/api/webhooks/1116395938789998652/5kwXE0t5qLSYXh03NSUMnDRO6Gin6eDMCvyAz9WemDfc8Q9xPjYaubigXcHEcbouh8cF"
 	)
 		.setExecutorService(scheduler)
 		.setHttpClient(okHttpClient)
@@ -64,7 +69,7 @@ public class AuctionFlipper {
 				if (desc.contains(" query auctions into database in ")) {
 					resetQueryItems();
 				}
-				if (enable && isMainBot() && desc.contains("Successfully updated under bins file in ")) {
+				if (enable && desc.contains("Successfully updated under bins file in ")) {
 					flip();
 				}
 				return true;
@@ -139,7 +144,10 @@ public class AuctionFlipper {
 
 		JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
 		if (higherDepth(endedAuctionsJson, "auctions") != null) {
+			Map<UUID, LeaderboardDatabase.AuctionAnalyzer> auctionAnalyzers = new HashMap<>();
+
 			for (JsonElement auction : higherDepth(endedAuctionsJson, "auctions").getAsJsonArray()) {
+				long price = higherDepth(auction, "price").getAsLong();
 				String auctionId = higherDepth(auction, "auction_id").getAsString();
 				FlipItem flipItem = auctionUuidToMessage.getIfPresent(auctionId);
 				if (flipItem != null) {
@@ -147,37 +155,57 @@ public class AuctionFlipper {
 					flipperWebhook.edit(
 						flipItem.messageId(),
 						defaultEmbed(flipItem.name())
-							.setDescription(
-								"Sold for " +
-								formatNumber(higherDepth(auction, "price").getAsLong()) +
-								"\nEstimated profit: " +
-								roundAndFormat(flipItem.profit())
-							)
+							.setDescription("Sold for " + formatNumber(price) + "\nEstimated profit: " + roundAndFormat(flipItem.profit()))
 							.build()
 					);
 				}
+
+				try {
+					if (!higherDepth(auction, "bin", false)) {
+						continue;
+					}
+
+					NBTCompound nbt = NBTReader.readBase64(higherDepth(auction, "item_bytes").getAsString()).getList("i").getCompound(0);
+					if (nbt.getInt("Count", 1) > 1 || !nbt.containsKey("tag.ExtraAttributes.uuid")) {
+						continue;
+					}
+
+					JsonObject attributes = gson.toJsonTree(nbt.getCompound("tag.ExtraAttributes")).getAsJsonObject();
+					UUID uuid = UUID.fromString(attributes.remove("uuid").getAsString());
+
+					long end = higherDepth(auction, "timestamp").getAsLong();
+					if (auctionAnalyzers.containsKey(uuid)) {
+						if (auctionAnalyzers.get(uuid).end() <= end) {
+							auctionAnalyzers.remove(uuid);
+						} else {
+							continue;
+						}
+					}
+
+					attributes.remove("timestamp");
+					attributes.remove("originTag");
+					if (attributes.has("petInfo")) {
+						JsonObject petInfo = JsonParser.parseString(attributes.remove("petInfo").getAsString()).getAsJsonObject();
+						petInfo.remove("hideRightClick");
+						petInfo.remove("hideInfo");
+						petInfo.remove("active");
+						petInfo.remove("uuid");
+						attributes.add("petInfo", petInfo);
+					}
+
+					auctionAnalyzers.put(
+						uuid,
+						new LeaderboardDatabase.AuctionAnalyzer(uuid, flipItem != null, price, attributes.toString(), end)
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (!auctionAnalyzers.isEmpty()) {
+				leaderboardDatabase.insertAuctionAnalyzer(auctionAnalyzers.values());
 			}
 		}
-	}
-
-	public static double calculateWithTaxes(double price) {
-		double tax = 0;
-
-		// 1% for claiming bin over 1m (when buying)
-		if (price >= 1000000) {
-			tax += 0.01;
-		}
-
-		// Tax for starting new bin (when reselling)
-		if (price <= 10000000) {
-			tax += 0.01;
-		} else if (price <= 100000000) {
-			tax += 0.02;
-		} else {
-			tax += 0.025;
-		}
-
-		return price * (1 - tax);
 	}
 
 	private record FlipItem(long messageId, String name, long profit) {}

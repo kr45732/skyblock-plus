@@ -35,10 +35,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -562,6 +559,36 @@ public class LeaderboardDatabase {
 			e.printStackTrace();
 		}
 		return -1;
+	}
+
+	public record AuctionAnalyzer(UUID uuid, boolean isFlip, float price, String attributes, long end) {}
+
+	public void insertAuctionAnalyzer(Collection<AuctionAnalyzer> auctionAnalyzers) {
+		String paramStr = "(?,?,?,?),".repeat(auctionAnalyzers.size());
+		paramStr = paramStr.substring(0, paramStr.length() - 1);
+
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"INSERT INTO auction_analyzer(uuid, is_flip, price_bought, attributes_bought) VALUES " +
+				paramStr +
+				" ON CONFLICT (uuid) DO UPDATE SET price_resold = EXCLUDED.price_bought, attributes_resold = EXCLUDED.attributes_bought WHERE auction_analyzer.price_resold IS NULL"
+			)
+		) {
+			int i = 0;
+			for (AuctionAnalyzer auctionAnalyzer : auctionAnalyzers) {
+				int j = i * 4;
+				statement.setObject(j + 1, auctionAnalyzer.uuid());
+				statement.setBoolean(j + 2, auctionAnalyzer.isFlip());
+				statement.setFloat(j + 3, auctionAnalyzer.price());
+				statement.setString(j + 4, auctionAnalyzer.attributes());
+				i++;
+			}
+
+			statement.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public List<String> getClosestPlayers(String toMatch) {

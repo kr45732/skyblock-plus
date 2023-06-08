@@ -19,6 +19,7 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.AuctionFlipper.*;
+import static com.skyblockplus.utils.utils.HypixelUtils.calculateWithTaxes;
 import static com.skyblockplus.utils.utils.HypixelUtils.isVanillaItem;
 import static com.skyblockplus.utils.utils.JsonUtils.getAveragePriceJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;

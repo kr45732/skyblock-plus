@@ -159,7 +159,7 @@ public class Main {
 
 		ApiHandler.initialize();
 		AuctionTracker.initialize();
-		AuctionFlipper.initialize(true);
+		AuctionFlipper.initialize(isMainBot());
 		ApiController.initialize();
 		FetchurHandler.initialize();
 		scheduler.scheduleWithFixedDelay(MayorHandler::initialize, 1, 5, TimeUnit.MINUTES);

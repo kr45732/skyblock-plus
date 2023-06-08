@@ -386,7 +386,7 @@ public class Utils {
 						InvItem itemInfo = new InvItem();
 						itemInfo.setName(item.getString("tag.display.Name", "None"));
 						itemInfo.setLore(item.getList("tag.display.Lore"));
-						itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
+						itemInfo.setCount(item.getInt("Count", 1));
 						itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
 						itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));
 						itemInfo.setHpbCount(item.getInt("tag.ExtraAttributes.hot_potato_count", 0));
