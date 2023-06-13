@@ -161,17 +161,6 @@ public class ApplyGuild {
 		LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());
 		if (linkedAccount == null) {
 			return client.getError() + " You are not linked to the bot. Please run `/link <player>` and try again.";
-		} else if (!linkedAccount.discord().equals(event.getUser().getId())) {
-			return (
-				client.getError() +
-				" Account " +
-				linkedAccount.username() +
-				" is linked with the Discord tag " +
-				jda.retrieveUserById(linkedAccount.discord()).complete().getAsTag() +
-				"\nYour current Discord tag is " +
-				event.getUser().getAsTag() +
-				".\nPlease relink and try again"
-			);
 		}
 
 		JsonArray currentBlacklist = guildMap.get(event.getGuild().getId()).getBlacklist();

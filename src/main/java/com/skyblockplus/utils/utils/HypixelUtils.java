@@ -50,11 +50,11 @@ public class HypixelUtils {
 				return new DiscordInfoStruct(usernameUuidStruct.username() + " is not linked on Hypixel");
 			}
 
-			String discordTag = response.get("socialMedia.links.DISCORD").getAsString();
+			String discord = response.get("socialMedia.links.DISCORD").getAsString();
 			String minecraftUsername = response.get("displayname").getAsString();
 			String minecraftUuid = response.get("uuid").getAsString();
 
-			return new DiscordInfoStruct(discordTag, minecraftUsername, minecraftUuid);
+			return new DiscordInfoStruct(discord, minecraftUsername, minecraftUuid);
 		} catch (Exception e) {
 			return new DiscordInfoStruct();
 		}

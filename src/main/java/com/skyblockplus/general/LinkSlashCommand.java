@@ -70,17 +70,18 @@ public class LinkSlashCommand extends SlashCommand {
 				: playerInfo.getErrorEmbed();
 		}
 
-		if (!member.getUser().getAsTag().equals(playerInfo.discordTag())) {
+		String discord = member.getUser().getDiscriminator().equals("0000") ? member.getUser().getAsTag() : member.getUser().getName();
+		if (!discord.equals(playerInfo.discord())) {
 			return new MessageEditBuilder()
 				.setEmbeds(
-					defaultEmbed("Discord tag mismatch")
+					defaultEmbed("Error - Discord Mismatch")
 						.setDescription(
 							"**Player Username:** `" +
 							playerInfo.username() +
-							"`\n**In-Game Discord Tag:** `" +
-							playerInfo.discordTag() +
-							"`\n**Your Discord Tag:** `" +
-							member.getUser().getAsTag() +
+							"`\n**In-Game Discord:** `" +
+							playerInfo.discord() +
+							"`\n**Your Discord:** `" +
+							discord +
 							"`"
 						)
 						.build()

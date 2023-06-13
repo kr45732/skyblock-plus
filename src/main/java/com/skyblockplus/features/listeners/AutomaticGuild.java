@@ -1120,6 +1120,9 @@ public class AutomaticGuild {
 		} else if (event.getComponentId().equals("verify_help_button")) {
 			event
 				.replyFiles(FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4")))
+				.setContent(
+					"**Note:** if your Discord username has been migrated, then set your in-game Discord to be your new Discord username (do not provide a discriminator)"
+				)
 				.setEphemeral(true)
 				.queue();
 		} else if (event.getComponentId().startsWith("s_help_")) {
