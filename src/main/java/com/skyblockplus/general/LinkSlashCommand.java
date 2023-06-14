@@ -70,7 +70,7 @@ public class LinkSlashCommand extends SlashCommand {
 				: playerInfo.getErrorEmbed();
 		}
 
-		String discord = member.getUser().getDiscriminator().equals("0000") ? member.getUser().getAsTag() : member.getUser().getName();
+		String discord = member.getUser().getDiscriminator().equals("0000") ? member.getUser().getName() : member.getUser().getAsTag();
 		if (!discord.equals(playerInfo.discord())) {
 			return new MessageEditBuilder()
 				.setEmbeds(

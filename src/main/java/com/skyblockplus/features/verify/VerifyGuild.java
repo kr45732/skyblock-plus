@@ -26,8 +26,6 @@ import static com.skyblockplus.utils.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.general.LinkSlashCommand;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
@@ -37,14 +35,10 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 public class VerifyGuild {
 
 	public final boolean enable;
-	public TextChannel messageChannel;
-	public Message originalMessage;
 	public JsonElement verifySettings;
 
-	public VerifyGuild(TextChannel messageChannel, Message originalMessage, JsonElement verifySettings) {
+	public VerifyGuild(JsonElement verifySettings) {
 		this.enable = true;
-		this.messageChannel = messageChannel;
-		this.originalMessage = originalMessage;
 		this.verifySettings = verifySettings;
 	}
 
@@ -54,14 +48,6 @@ public class VerifyGuild {
 
 	public void onButtonClick(ButtonInteractionEvent event) {
 		if (!enable) {
-			return;
-		}
-
-		if (!event.getChannel().getId().equals(messageChannel.getId())) {
-			return;
-		}
-
-		if (!event.getMessage().getId().equals(originalMessage.getId())) {
 			return;
 		}
 

@@ -104,20 +104,14 @@ public class ApplyGuild {
 			return;
 		}
 
-		onMessageReactionAdd_ExistingApplyUser(event);
-	}
-
-	public void onMessageReactionAdd_ExistingApplyUser(MessageReactionAddEvent event) {
 		ApplyUser findApplyUser = applyUserList
 			.stream()
 			.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId()))
 			.findFirst()
 			.orElse(null);
 
-		if (findApplyUser != null) {
-			if (findApplyUser.onMessageReactionAdd(event)) {
-				applyUserList.remove(findApplyUser);
-			}
+		if (findApplyUser != null && findApplyUser.onMessageReactionAdd(event)) {
+			applyUserList.remove(findApplyUser);
 		}
 	}
 

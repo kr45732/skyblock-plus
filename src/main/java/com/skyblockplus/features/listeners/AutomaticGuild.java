@@ -208,7 +208,7 @@ public class AutomaticGuild {
 		}
 
 		JsonElement serverSettings = gson.toJsonTree(allServerSettings.remove(guildId));
-		reloadVerifyGuild(event.getGuild(), higherDepth(serverSettings, "automatedVerify"));
+		reloadVerifyGuild(event.getGuild(), higherDepth(serverSettings, "automatedVerify"), true);
 		reloadApplyGuilds(event.getGuild(), higherDepth(serverSettings, "automatedGuilds"), true);
 		scheduleSbEventFuture(higherDepth(serverSettings, "sbEvent"));
 		jacobGuild = new JacobGuild(higherDepth(serverSettings, "jacobSettings"), this);
@@ -396,10 +396,10 @@ public class AutomaticGuild {
 		}
 
 		JsonElement currentSettings = database.getVerifySettings(guild.getId());
-		return reloadVerifyGuild(guild, currentSettings);
+		return reloadVerifyGuild(guild, currentSettings, false);
 	}
 
-	public String reloadVerifyGuild(Guild guild, JsonElement verifySettings) {
+	public String reloadVerifyGuild(Guild guild, JsonElement verifySettings, boolean isStartup) {
 		verifyGuild = new VerifyGuild();
 		if (verifySettings == null) {
 			return client.getError() + " No verify settings";
@@ -409,7 +409,7 @@ public class AutomaticGuild {
 			if (higherDepth(verifySettings, "enable", false)) {
 				TextChannel reactChannel = guild.getTextChannelById(higherDepth(verifySettings, "messageTextChannelId").getAsString());
 				try {
-					Message reactMessage = reactChannel
+					reactChannel
 						.editMessageById(
 							higherDepth(verifySettings, "previousMessageId").getAsString(),
 							higherDepth(verifySettings, "messageText").getAsString()
@@ -417,7 +417,7 @@ public class AutomaticGuild {
 						.setActionRow(Button.primary("verify_button", "Verify"), Button.primary("verify_help_button", "Help"))
 						.complete();
 
-					verifyGuild = new VerifyGuild(reactChannel, reactMessage, verifySettings);
+					verifyGuild = new VerifyGuild(verifySettings);
 					return client.getSuccess() + " Reloaded";
 				} catch (Exception e) {
 					Message reactMessage = reactChannel
@@ -428,7 +428,7 @@ public class AutomaticGuild {
 					verifySettings.getAsJsonObject().addProperty("previousMessageId", reactMessage.getId());
 					database.setVerifySettings(guild.getId(), verifySettings);
 
-					verifyGuild = new VerifyGuild(reactChannel, reactMessage, verifySettings);
+					verifyGuild = new VerifyGuild(verifySettings);
 					return client.getSuccess() + " Reloaded";
 				}
 			} else {
