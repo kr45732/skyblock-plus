@@ -29,19 +29,20 @@ import static com.skyblockplus.utils.utils.Utils.getEmoji;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
-import com.skyblockplus.utils.command.Subcommand;
+import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -74,11 +75,20 @@ public class CoinsSlashCommand extends SlashCommand {
 			if (player.isValid()) {
 				double playerBankBalance = player.getBankBalance();
 				double playerPurseCoins = player.getPurseCoins();
+
 				double auctionCoins = 0;
 				HypixelResponse playerAuctions = getAuctionFromPlayer(player.getUuid());
 				if (playerAuctions.isValid()) {
+					List<String> validProfileIds = player
+						.getProfiles()
+						.stream()
+						.map(prof -> higherDepth(prof.getOuterProfileJson(), "profile_id").getAsString())
+						.collect(Collectors.toCollection(ArrayList::new));
 					for (JsonElement currentAuction : playerAuctions.response().getAsJsonArray()) {
-						if (higherDepth(currentAuction, "claimed").getAsBoolean()) {
+						if (
+							higherDepth(currentAuction, "claimed").getAsBoolean() ||
+							!validProfileIds.contains(higherDepth(currentAuction, "profile_id").getAsString())
+						) {
 							continue;
 						}
 						Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());

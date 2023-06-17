@@ -70,8 +70,9 @@ public class LinkSlashCommand extends SlashCommand {
 				: playerInfo.getErrorEmbed();
 		}
 
-		String discord = member.getUser().getDiscriminator().equals("0000") ? member.getUser().getName() : member.getUser().getAsTag();
-		if (!discord.equals(playerInfo.discord())) {
+		boolean migratedUsername = member.getUser().getDiscriminator().equals("0000");
+		String discord = migratedUsername ? member.getUser().getName() : member.getUser().getAsTag();
+		if (!(migratedUsername ? discord.equalsIgnoreCase(playerInfo.discord()) : discord.equals(playerInfo.discord()))) {
 			return new MessageEditBuilder()
 				.setEmbeds(
 					defaultEmbed("Error - Discord Mismatch")

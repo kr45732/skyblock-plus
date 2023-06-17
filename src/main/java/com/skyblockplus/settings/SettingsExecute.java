@@ -1316,7 +1316,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder removeApplyStaffRole(JsonObject guildSettings, String roleMention) {
-		Object eb = checkRole(roleMention);
+		Object eb = checkRole(roleMention, true);
 		if (eb instanceof EmbedBuilder e) {
 			return e;
 		}
@@ -1984,7 +1984,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder removeVerifyRole(String roleMention) {
-		Object eb = checkRole(roleMention);
+		Object eb = checkRole(roleMention, true);
 		if (eb instanceof EmbedBuilder e) {
 			return e;
 		}
@@ -2644,7 +2644,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder removeBotManagerRole(String roleMention) {
-		Object eb = checkRole(roleMention);
+		Object eb = checkRole(roleMention, true);
 		if (eb instanceof EmbedBuilder e) {
 			return e;
 		}
@@ -2764,31 +2764,31 @@ public class SettingsExecute {
 			}
 			if (!currentSettingValue.isEmpty()) {
 				switch (settingName) {
-					case "applyMessageChannel":
-					case "applyWaitingChannel":
-					case "applyStaffChannel":
-					case "messageTextChannelId":
-					case "channel":
-					case "applyCategory":
-					case "guildCounterChannel":
+					case "applyMessageChannel",
+						"applyWaitingChannel",
+						"applyStaffChannel",
+						"messageTextChannelId",
+						"channel",
+						"applyCategory",
+						"guildCounterChannel" -> {
 						return "<#" + currentSettingValue + ">";
-					case "roleId":
-					case "guildMemberRole":
-					case "verifiedRemoveRole":
+					}
+					case "roleId", "guildMemberRole", "verifiedRemoveRole" -> {
 						return "<@&" + currentSettingValue + ">";
-					case "applyEnable":
-					case "enable":
-					case "guildMemberRoleEnable":
-					case "guildRanksEnable":
+					}
+					case "applyEnable", "enable", "guildMemberRoleEnable", "guildRanksEnable" -> {
 						return currentSettingValue.equals("true") ? "• Enabled" : "• Disabled";
-					case "guildId":
+					}
+					case "guildId" -> {
 						try {
 							return getGuildFromId(currentSettingValue).get("name").getAsString();
 						} catch (Exception e) {
 							return ("Error finding Hypixel guild associated with id: `" + currentSettingValue + "`");
 						}
-					case "applyGamemode":
+					}
+					case "applyGamemode" -> {
 						return currentSettingValue.replace("_", ", ");
+					}
 				}
 				return currentSettingValue;
 			}
@@ -2809,6 +2809,10 @@ public class SettingsExecute {
 	}
 
 	public Object checkRole(String roleMention) {
+		return checkRole(roleMention, false);
+	}
+
+	public Object checkRole(String roleMention, boolean isRemove) {
 		Role role;
 		try {
 			role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
@@ -2822,10 +2826,12 @@ public class SettingsExecute {
 
 		if (role == null) {
 			return errorEmbed("The provided role does not exist");
-		} else if (role.isPublicRole()) {
-			return errorEmbed("The role cannot be the everyone role");
-		} else if (role.isManaged()) {
-			return errorEmbed("The role cannot be a managed role");
+		} else if (!isRemove) {
+			if (role.isPublicRole()) {
+				return errorEmbed("The role cannot be the everyone role");
+			} else if (role.isManaged()) {
+				return errorEmbed("The role cannot be a managed role");
+			}
 		}
 
 		return role;
