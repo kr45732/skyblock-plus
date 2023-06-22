@@ -80,7 +80,7 @@ dependencies {
     implementation 'me.nullicorn:Nedit:2.2.0'
 
     // Spring boot and postgresql
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.1.1'
     implementation 'org.springframework.boot:spring-boot-starter-security:3.1.0'
     implementation 'org.springframework.boot:spring-boot-starter-web:3.1.0'
     runtimeOnly 'org.postgresql:postgresql:42.6.0'
