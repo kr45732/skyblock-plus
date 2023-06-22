@@ -31,13 +31,14 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 @Getter
 public class PaginatorExtras {
 
+	private final List<String> strings = new ArrayList<>();
 	private final List<String> titles = new ArrayList<>();
 	private final List<String> titleUrls = new ArrayList<>();
 	private final List<Field> embedFields = new ArrayList<>();
 	private final List<EmbedBuilder> embedPages = new ArrayList<>();
 	private final List<ReactiveButton> reactiveButtons = new ArrayList<>();
 	private final Map<SelectOption, EmbedBuilder> selectPages = new LinkedHashMap<>();
-	private final PaginatorType type;
+	private PaginatorType type;
 	private String everyPageText = null;
 	private String everyPageTitle = null;
 	private String everyPageTitleUrl = null;
@@ -127,6 +128,21 @@ public class PaginatorExtras {
 		return this;
 	}
 
+	public PaginatorExtras addStrings(String... string) {
+		Collections.addAll(this.strings, string);
+		return this;
+	}
+
+	public PaginatorExtras addStrings(List<String> strings) {
+		this.strings.addAll(strings);
+		return this;
+	}
+
+	public PaginatorExtras setStrings(List<String> strings) {
+		this.strings.clear();
+		return addStrings(strings);
+	}
+
 	/**
 	 * Only on one row after arrows
 	 */
@@ -159,6 +175,11 @@ public class PaginatorExtras {
 
 	public PaginatorExtras setEveryPageFirstFieldTitle(String everyPageFirstFieldTitle) {
 		this.everyPageFirstFieldTitle = everyPageFirstFieldTitle;
+		return this;
+	}
+
+	public PaginatorExtras setType(PaginatorType type) {
+		this.type = type;
 		return this;
 	}
 

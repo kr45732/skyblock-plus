@@ -47,12 +47,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MissingSlashCommand extends SlashCommand {
 
-	private static final List<String> unobtainableIronmanTalismans = List.of(
-		"DANTE_TALISMAN",
-		"BLOOD_GOD_CREST",
-		"PARTY_HAT_CRAB",
-		"POTATO_TALISMAN"
-	);
+	private static final List<String> unobtainableIronmanTalismans = List.of("BLOOD_GOD_CREST", "POTATO_TALISMAN");
 	private static final List<String> crabHatColors = List.of(
 		"RED",
 		"AQUA",
@@ -137,8 +132,8 @@ public class MissingSlashCommand extends SlashCommand {
 
 			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
 			paginateBuilder
-				.addItems(missing.getValue())
 				.getExtras()
+				.addStrings(missing.getValue())
 				.setEveryPageText(
 					"**Total Missing:** " +
 					missingTalismans.size() +
@@ -149,10 +144,10 @@ public class MissingSlashCommand extends SlashCommand {
 				.addReactiveButtons(
 					new PaginatorExtras.ReactiveButton(
 						Button.primary("reactive_missing_command_show_highest", "Show Highest Tier"),
-						paginator -> {
-							paginator.setStrings(missingHighest.getValue());
+						paginator ->
 							paginator
 								.getExtras()
+								.setStrings(missingHighest.getValue())
 								.setEveryPageText(
 									"**Total Missing:** " +
 									missingTalismans.size() +
@@ -161,16 +156,15 @@ public class MissingSlashCommand extends SlashCommand {
 									"\n**Note:** Showing highest tiers\n"
 								)
 								.toggleReactiveButton("reactive_missing_command_show_highest", false)
-								.toggleReactiveButton("reactive_missing_command_show_next", true);
-						},
+								.toggleReactiveButton("reactive_missing_command_show_next", true),
 						true
 					),
 					new PaginatorExtras.ReactiveButton(
 						Button.primary("reactive_missing_command_show_next", "Show Next Tier"),
-						paginator -> {
-							paginator.setStrings(missing.getValue());
+						paginator ->
 							paginator
 								.getExtras()
+								.setStrings(missing.getValue())
 								.setEveryPageText(
 									"**Total Missing:** " +
 									missingTalismans.size() +
@@ -179,8 +173,7 @@ public class MissingSlashCommand extends SlashCommand {
 									"\n**Note:** Talismans with a * have higher tiers\n"
 								)
 								.toggleReactiveButton("reactive_missing_command_show_highest", true)
-								.toggleReactiveButton("reactive_missing_command_show_next", false);
-						},
+								.toggleReactiveButton("reactive_missing_command_show_next", false),
 						false
 					)
 				);
@@ -196,24 +189,30 @@ public class MissingSlashCommand extends SlashCommand {
 		Player.Profile player,
 		NetworthExecute calc
 	) {
-		// Only one edition is needed (if both are missing, it means they don't have any edition)
+		// Only one edition is needed (if all are missing, it means they don't have any edition)
 		boolean missing2021 = missingInternalArr.remove("PARTY_HAT_CRAB");
 		boolean missing2022 = missingInternalArr.remove("PARTY_HAT_CRAB_ANIMATED");
-		if (missing2021 && missing2022) {
-			double crabHatCost = -1;
-			String crabHatId = "";
+		boolean missing2023 = missingInternalArr.remove("PARTY_HAT_SLOTH");
+		if (missing2021 && missing2022 && missing2023) {
+			double partyHatCost = -1;
+			String partyHatId = "";
 			for (String color : crabHatColors) {
 				for (String edition : List.of("", "_ANIMATED")) {
 					String id = "PARTY_HAT_CRAB_" + color + edition;
 					double price = calc.getLowestPrice(id);
-					if (price > 0 && (crabHatCost == -1 || price < crabHatCost)) {
-						crabHatCost = price;
-						crabHatId = id;
+					if (price > 0 && (partyHatCost == -1 || price < partyHatCost)) {
+						partyHatCost = price;
+						partyHatId = id;
 					}
 				}
 			}
 
-			missingInternalArr.add(crabHatId);
+			double slothHatCost = calc.getLowestPrice("PARTY_HAT_SLOTH");
+			if (slothHatCost < partyHatCost) {
+				partyHatId = "PARTY_HAT_SLOTH";
+			}
+
+			missingInternalArr.add(partyHatId);
 		}
 
 		missingInternalArr.sort(

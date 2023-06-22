@@ -37,6 +37,10 @@ public class LilySlayerWeight extends SlayerWeight {
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName, int currentSlayerXp) {
+		if (slayerName.equals("vampire")) {
+			return new WeightStruct();
+		}
+
 		double score;
 		double d = currentSlayerXp / 100000.0;
 		if (currentSlayerXp >= 6416) {

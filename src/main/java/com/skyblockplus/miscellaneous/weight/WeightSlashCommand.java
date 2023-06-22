@@ -45,14 +45,14 @@ public class WeightSlashCommand extends SlashCommand {
 	public static EmbedBuilder getPlayerWeight(String username, String profileName, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(3);
-			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES).setItemsPerPage(3);
+			PaginatorExtras extras = paginateBuilder.getExtras();
 
 			SenitherWeight weight = new SenitherWeight(player);
 			EmbedBuilder eb = player.defaultPlayerEmbed(" | Senither Weight");
 			StringBuilder slayerStr = new StringBuilder();
 			for (String slayerName : SLAYER_NAMES) {
-				if (slayerName.equals("blaze")) {
+				if (slayerName.equals("blaze") || slayerName.equals("vampire")) {
 					continue;
 				}
 				slayerStr
@@ -102,6 +102,9 @@ public class WeightSlashCommand extends SlashCommand {
 			EmbedBuilder lilyEb = player.defaultPlayerEmbed(" | Lily Weight");
 			StringBuilder lilySlayerStr = new StringBuilder();
 			for (String slayerName : SLAYER_NAMES) {
+				if (slayerName.equals("vampire")) {
+					continue;
+				}
 				lilySlayerStr
 					.append(SLAYER_EMOJI_MAP.get(slayerName))
 					.append(" ")
@@ -142,7 +145,7 @@ public class WeightSlashCommand extends SlashCommand {
 			);
 			extras.addEmbedPage(lilyEb);
 
-			event.paginate(paginateBuilder.setPaginatorExtras(extras));
+			event.paginate(paginateBuilder);
 			return null;
 		}
 		return player.getErrorEmbed();

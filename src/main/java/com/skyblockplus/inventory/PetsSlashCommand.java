@@ -92,7 +92,7 @@ public class PetsSlashCommand extends SlashCommand {
 			}
 
 			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
-			paginateBuilder.addItems(petItems);
+			paginateBuilder.getExtras().addStrings(petItems);
 
 			if (!missingPetItems.isEmpty()) {
 				paginateBuilder
@@ -100,26 +100,24 @@ public class PetsSlashCommand extends SlashCommand {
 					.addReactiveButtons(
 						new PaginatorExtras.ReactiveButton(
 							Button.primary("reactive_pets_show_missing", "Show Missing"),
-							paginator -> {
-								paginator.setStrings(missingPetItems);
+							paginator ->
 								paginator
 									.getExtras()
+									.setStrings(missingPetItems)
 									.setEveryPageText("**Total Missing:** " + missingPetItems.size())
 									.toggleReactiveButton("reactive_pets_show_missing", false)
-									.toggleReactiveButton("reactive_pets_show_current", true);
-							},
+									.toggleReactiveButton("reactive_pets_show_current", true),
 							true
 						),
 						new PaginatorExtras.ReactiveButton(
 							Button.primary("reactive_pets_show_current", "Show Current"),
-							paginator -> {
-								paginator.setStrings(petItems);
+							paginator ->
 								paginator
 									.getExtras()
+									.setStrings(petItems)
 									.setEveryPageText(null)
 									.toggleReactiveButton("reactive_pets_show_missing", true)
-									.toggleReactiveButton("reactive_pets_show_current", false);
-							},
+									.toggleReactiveButton("reactive_pets_show_current", false),
 							false
 						)
 					);

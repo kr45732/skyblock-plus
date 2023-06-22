@@ -368,7 +368,7 @@ public class RolesSlashCommand extends SlashCommand {
 					default -> {
 						double roleAmount =
 							switch (roleName) {
-								case "sven", "rev", "tara", "enderman", "blaze" -> useHighest
+								case "sven", "rev", "tara", "enderman", "blaze", "vampire" -> useHighest
 									? player.getHighestAmount(roleName)
 									: player.getSlayer(roleName);
 								case "coins" -> {
@@ -428,7 +428,7 @@ public class RolesSlashCommand extends SlashCommand {
 									yield roleAmount;
 								}
 								case "total_slayer" -> useHighest ? player.getHighestAmount(roleName) : player.getTotalSlayer();
-								case "slayer_nine" -> useHighest ? player.getHighestAmount(roleName) : player.getNumLvlNineSlayers();
+								case "maxed_slayers" -> useHighest ? player.getHighestAmount(roleName) : player.getNumMaxedSlayers();
 								case "maxed_collections" -> useHighest
 									? player.getHighestAmount(roleName)
 									: player.getNumMaxedCollections();
@@ -576,11 +576,11 @@ public class RolesSlashCommand extends SlashCommand {
 						);
 						JsonArray guildRanks = higherDepth(guildRoleSettings, "guildRanks").getAsJsonArray();
 						for (JsonElement guildRank : guildRanks) {
-							paginateBuilder.addItems("<@&" + higherDepth(guildRank, "roleId").getAsString() + ">");
+							paginateBuilder.addStrings("<@&" + higherDepth(guildRank, "roleId").getAsString() + ">");
 						}
 					}
 				} else if (isOneLevelRole(currentRoleName)) {
-					paginateBuilder.addItems(
+					paginateBuilder.addStrings(
 						"<@&" + higherDepth(roleSettings, "levels.[0].roleId").getAsString() + "> - " + currentRoleName.replace("_", " ")
 					);
 				} else {
@@ -594,7 +594,7 @@ public class RolesSlashCommand extends SlashCommand {
 								roleValue = formatNumber(Long.parseLong(roleValue));
 							} catch (Exception ignored) {}
 						}
-						paginateBuilder.addItems(
+						paginateBuilder.addStrings(
 							"<@&" +
 							higherDepth(currentLevel, "roleId").getAsString() +
 							">" +
@@ -604,8 +604,7 @@ public class RolesSlashCommand extends SlashCommand {
 				}
 			}
 
-			paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Automatic roles list"));
-
+			paginateBuilder.getExtras().setEveryPageTitle("Automatic roles list");
 			event.paginate(paginateBuilder);
 			return null;
 		}

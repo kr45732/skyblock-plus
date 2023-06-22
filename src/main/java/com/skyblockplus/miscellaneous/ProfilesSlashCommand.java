@@ -28,7 +28,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -93,11 +92,10 @@ public class ProfilesSlashCommand extends SlashCommand {
 					profileStr.append("\n• ").append(escapeUsername(uuidToUsername.get(uuid).get()));
 				} catch (Exception ignored) {}
 			}
-			paginateBuilder.addItems(profileStr.toString());
+			paginateBuilder.addStrings(profileStr.toString());
 		}
 
-		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle(usernameUuid.username()).setTitleUrls(pageTitlesUrls));
-
+		paginateBuilder.getExtras().setEveryPageTitle(usernameUuid.username()).setTitleUrls(pageTitlesUrls);
 		event.paginate(paginateBuilder);
 		return null;
 	}

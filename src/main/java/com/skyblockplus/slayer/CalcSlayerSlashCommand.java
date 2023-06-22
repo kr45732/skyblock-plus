@@ -56,6 +56,9 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 		if (targetXp <= 0 && targetLevel <= 0) {
 			return errorEmbed("Target xp or target level must be provided");
 		}
+		if (slayerType.equals("vampire") && targetLevel > 5) {
+			return errorEmbed("Target level must be between 1 and 5");
+		}
 
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
@@ -76,24 +79,34 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 			for (int i = 0; i < (slayerType.equals("rev") ? 5 : 4); i++) {
 				double xpPerBoss = bossXpArr.get(i).getAsInt();
 				int killsNeeded = (int) Math.ceil(xpNeeded / xpPerBoss);
-				long cost =
-					killsNeeded *
-					(
-						slayerType.equals("blaze")
-							? switch (i) {
-								case 0 -> 10000L;
-								case 1 -> 25000L;
-								case 2 -> 60000L;
-								default -> 150000L;
-							}
-							: switch (i) {
-								case 0 -> 2000L;
-								case 1 -> 7500L;
-								case 2 -> 20000L;
-								case 3 -> 50000L;
-								default -> 100000L;
-							}
-					);
+				long cost = killsNeeded;
+				if (slayerType.equals("blaze")) {
+					cost *=
+						switch (i) {
+							case 0 -> 10000L;
+							case 1 -> 25000L;
+							case 2 -> 60000L;
+							default -> 150000L;
+						};
+				} else if (slayerType.equals("vampire")) {
+					cost *=
+						switch (i) {
+							case 0 -> 2000L;
+							case 1 -> 4000L;
+							case 2 -> 5000L;
+							case 3 -> 7000L;
+							default -> 10000L;
+						};
+				} else {
+					cost *=
+						switch (i) {
+							case 0 -> 2000L;
+							case 1 -> 7500L;
+							case 2 -> 20000L;
+							case 3 -> 50000L;
+							default -> 100000L;
+						};
+				}
 
 				boolean unlockedTier = i == 0 || player.getSlayerBossKills(slayerType, i - 1) > 0;
 
@@ -108,8 +121,9 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 					.append(capitalizeString(slayerType))
 					.append(": ")
 					.append(formatNumber(killsNeeded))
-					.append(" ($")
+					.append(" (")
 					.append(formatNumber(cost))
+					.append(slayerType.equals("vampire") ? " motes" : " coins")
 					.append(")");
 				if (!unlockedTier) {
 					out.append("~~");
@@ -179,7 +193,8 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 					.addChoice("Revenant Horror", "rev")
 					.addChoice("Tarantula Broodfather", "tara")
 					.addChoice("Voidgloom Seraph", "enderman")
-					.addChoice("Inferno Demonlord", "blaze"),
+					.addChoice("Inferno Demonlord", "blaze")
+					.addChoice("Riftstalker Bloodfiend", "vampire"),
 				new OptionData(OptionType.INTEGER, "level", "Target slayer level").setRequiredRange(1, 9),
 				new OptionData(OptionType.INTEGER, "xp", "Target slayer xp").setMinValue(1),
 				new OptionData(OptionType.STRING, "system", "Weight system that should be used")

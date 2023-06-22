@@ -78,57 +78,75 @@ public class SlayerSlashCommand extends SlashCommand {
 		int blazeThreeKills = player.getSlayerBossKills("blaze", 2);
 		int blazeFourKills = player.getSlayerBossKills("blaze", 3);
 
+		int vampireOneKills = player.getSlayerBossKills("vampire", 0);
+		int vampireTwoKills = player.getSlayerBossKills("vampire", 1);
+		int vampireThreeKills = player.getSlayerBossKills("vampire", 2);
+		int vampireFourKills = player.getSlayerBossKills("vampire", 3);
+		int vampireFiveKills = player.getSlayerBossKills("vampire", 4);
+
 		String svenKills =
 			"**Tier 1:** " +
-			svenOneKills +
+			formatNumber(svenOneKills) +
 			"\n**Tier 2:** " +
-			svenTwoKills +
+			formatNumber(svenTwoKills) +
 			"\n**Tier 3:** " +
-			svenThreeKills +
+			formatNumber(svenThreeKills) +
 			"\n**Tier 4:** " +
-			svenFourKills;
+			formatNumber(svenFourKills);
 
 		String revKills =
 			"**Tier 1:** " +
-			revOneKills +
+			formatNumber(revOneKills) +
 			"\n**Tier 2:** " +
-			revTwoKills +
+			formatNumber(revTwoKills) +
 			"\n**Tier 3:** " +
-			revThreeKills +
+			formatNumber(revThreeKills) +
 			"\n**Tier 4:** " +
-			revFourKills +
+			formatNumber(revFourKills) +
 			"\n**Tier 5:** " +
-			revFiveKills;
+			formatNumber(revFiveKills);
 
 		String taraKills =
 			"**Tier 1:** " +
-			taraOneKills +
+			formatNumber(taraOneKills) +
 			"\n**Tier 2:** " +
-			taraTwoKills +
+			formatNumber(taraTwoKills) +
 			"\n**Tier 3:** " +
-			taraThreeKills +
+			formatNumber(taraThreeKills) +
 			"\n**Tier 4:** " +
-			taraFourKills;
+			formatNumber(taraFourKills);
 
 		String endermanKills =
 			"**Tier 1:** " +
-			endermanOneKills +
+			formatNumber(endermanOneKills) +
 			"\n**Tier 2:** " +
-			endermanTwoKills +
+			formatNumber(endermanTwoKills) +
 			"\n**Tier 3:** " +
-			endermanThreeKills +
+			formatNumber(endermanThreeKills) +
 			"\n**Tier 4:** " +
-			endermanFourKills;
+			formatNumber(endermanFourKills);
 
 		String blazeKills =
 			"**Tier 1:** " +
-			blazeOneKills +
+			formatNumber(blazeOneKills) +
 			"\n**Tier 2:** " +
-			blazeTwoKills +
+			formatNumber(blazeTwoKills) +
 			"\n**Tier 3:** " +
-			blazeThreeKills +
+			formatNumber(blazeThreeKills) +
 			"\n**Tier 4:** " +
-			blazeFourKills;
+			formatNumber(blazeFourKills);
+
+		String vampireKills =
+			"**Tier 1:** " +
+			formatNumber(vampireOneKills) +
+			"\n**Tier 2:** " +
+			formatNumber(vampireTwoKills) +
+			"\n**Tier 3:** " +
+			formatNumber(vampireThreeKills) +
+			"\n**Tier 4:** " +
+			formatNumber(vampireFourKills) +
+			"\n**Tier 5:** " +
+			formatNumber(vampireFiveKills);
 
 		long coinsSpentOnSlayers =
 			2000L *
@@ -149,11 +167,25 @@ public class SlayerSlashCommand extends SlashCommand {
 			blazeThreeKills +
 			150000L *
 			blazeFourKills;
+		long motesSpentOnSlayers =
+			2000L *
+			vampireOneKills +
+			4000L *
+			vampireTwoKills +
+			5000L *
+			vampireThreeKills +
+			7000L *
+			vampireFourKills +
+			10000L *
+			vampireFiveKills;
+
 		eb.setDescription(
 			"**Total Slayer:** " +
 			formatNumber(player.getTotalSlayer()) +
 			" XP\n**Total Coins Spent:** " +
-			simplifyNumber(coinsSpentOnSlayers)
+			simplifyNumber(coinsSpentOnSlayers) +
+			"\n**Total Motes Spent:** " +
+			simplifyNumber(motesSpentOnSlayers)
 		);
 		eb.addField(
 			SLAYER_EMOJI_MAP.get("sven") + " Wolf (" + player.getSlayerLevel("sven") + ")",
@@ -185,11 +217,14 @@ public class SlayerSlashCommand extends SlashCommand {
 			simplifyNumber(player.getSlayer("blaze")) + " XP",
 			true
 		);
-		eb.addBlankField(true);
+		eb.addField(
+			SLAYER_EMOJI_MAP.get("vampire") + " Vampire (" + player.getSlayerLevel("vampire") + ")",
+			simplifyNumber(player.getSlayer("vampire")) + " XP",
+			true
+		);
 		eb.addField("Boss Kills", endermanKills, true);
 		eb.addField("Boss Kills", blazeKills, true);
-		eb.addBlankField(true);
-		eb.addBlankField(true);
+		eb.addField("Boss Kills", vampireKills, true);
 
 		return eb;
 	}

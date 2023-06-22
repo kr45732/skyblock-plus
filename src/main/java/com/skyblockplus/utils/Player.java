@@ -493,6 +493,7 @@ public class Player {
 						case "tara":
 						case "enderman":
 						case "blaze":
+						case "vampire":
 							highestAmount = Math.max(highestAmount, profile.getSlayer(type));
 							break;
 						case "alchemy":
@@ -552,8 +553,8 @@ public class Player {
 						case "accessory_count":
 							highestAmount = Math.max(highestAmount, profile.getAccessoryCount());
 							break;
-						case "slayer_nine":
-							highestAmount = Math.max(highestAmount, profile.getNumLvlNineSlayers());
+						case "maxed_slayers":
+							highestAmount = Math.max(highestAmount, profile.getNumMaxedSlayers());
 							break;
 						case "maxed_collections":
 							highestAmount = Math.max(highestAmount, profile.getNumMaxedCollections());
@@ -803,7 +804,10 @@ public class Player {
 
 			Collection<InvItem> itemsMap = new ArrayList<>(invItemMap.values());
 			itemsMap.addAll(new ArrayList<>(getEnderChestMap().values()));
-			itemsMap.addAll(new ArrayList<>(getStorageMap().values()));
+			Map<Integer, InvItem> storageMap = getStorageMap();
+			if (storageMap != null) {
+				itemsMap.addAll(new ArrayList<>(getStorageMap().values()));
+			}
 			Collections.addAll(itemsMap, extras);
 			Set<String> itemsPlayerHas = new HashSet<>();
 
@@ -1561,8 +1565,9 @@ public class Player {
 
 		public CustomPaginator.Builder defaultPlayerPaginator(PaginatorExtras.PaginatorType type, User... users) {
 			return defaultPaginator(users)
-				.setPaginatorExtras(
-					new PaginatorExtras(type)
+				.updateExtras(extra ->
+					extra
+						.setType(type)
 						.setEveryPageTitle(escapeUsername(getUsername()) + getSymbol(" "))
 						.setEveryPageThumbnail(getAvatarUrl())
 						.setEveryPageTitleUrl(skyblockStatsLink())
@@ -1645,13 +1650,14 @@ public class Player {
 			return Gamemode.of(higherDepth(getOuterProfileJson(), "game_mode", "regular"));
 		}
 
-		public int getNumLvlNineSlayers() {
-			int lvlNineSlayers = getSlayer("sven") >= 1000000 ? 1 : 0;
-			lvlNineSlayers = getSlayer("rev") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
-			lvlNineSlayers = getSlayer("tara") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
-			lvlNineSlayers = getSlayer("enderman") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
-			lvlNineSlayers = getSlayer("blaze") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
-			return lvlNineSlayers;
+		public int getNumMaxedSlayers() {
+			int numMaxedSlayers = getSlayer("sven") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayer("rev") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayer("tara") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayer("enderman") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayer("blaze") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayer("vampire") >= 2400 ? 1 : 0;
+			return numMaxedSlayers;
 		}
 
 		public long getCollection(String id) {

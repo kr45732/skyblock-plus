@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.cleanMcCodes;
 import static com.skyblockplus.utils.utils.StringUtils.simplifyNumber;
-import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonArray;
@@ -32,7 +31,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +39,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
@@ -52,162 +49,139 @@ public class CoinsSlashCommand extends SlashCommand {
 		this.name = "coins";
 	}
 
+	public static EmbedBuilder getPlayerBalance(String username, String profileName, SlashCommandEvent event) {
+		Player.Profile player = Player.create(username, profileName);
+		if (player.isValid()) {
+			CustomPaginator.Builder paginateBuilder = player
+				.defaultPlayerPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES, event.getUser())
+				.setItemsPerPage(20);
+
+			double playerBankBalance = player.getBankBalance();
+			double playerPurseCoins = player.getPurseCoins();
+
+			double auctionCoins = 0;
+			HypixelResponse playerAuctions = getAuctionFromPlayer(player.getUuid());
+			if (playerAuctions.isValid()) {
+				List<String> validProfileIds = player
+					.getProfiles()
+					.stream()
+					.map(prof -> higherDepth(prof.getOuterProfileJson(), "profile_id").getAsString().replace("-", ""))
+					.collect(Collectors.toCollection(ArrayList::new));
+				for (JsonElement currentAuction : playerAuctions.response().getAsJsonArray()) {
+					long highestBid = higherDepth(currentAuction, "highest_bid_amount", 0);
+					long startingBid = higherDepth(currentAuction, "starting_bid", 0);
+					if (
+						!higherDepth(currentAuction, "claimed").getAsBoolean() &&
+						validProfileIds.contains(higherDepth(currentAuction, "profile_id").getAsString()) &&
+						higherDepth(currentAuction, "end").getAsLong() <= Instant.now().toEpochMilli() &&
+						highestBid >= startingBid
+					) {
+						auctionCoins += highestBid;
+					}
+				}
+			}
+
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+			eb.setDescription(
+				"**Total Coins:** " +
+				simplifyNumber(playerBankBalance + playerPurseCoins) +
+				" (" +
+				simplifyNumber(playerBankBalance + playerPurseCoins + auctionCoins) +
+				")"
+			);
+			eb.addField(
+				getEmoji("PIGGY_BANK") + " Bank Balance",
+				playerBankBalance == -1 ? "Banking API disabled" : simplifyNumber(playerBankBalance) + " coins",
+				false
+			);
+			eb.addField(getEmoji("ENCHANTED_GOLD") + " Purse Coins", simplifyNumber(playerPurseCoins) + " coins", false);
+			eb.addField(getEmoji("GOLD_BARDING") + " Sold Auctions Value", simplifyNumber(auctionCoins), false);
+			paginateBuilder.getExtras().addEmbedPage(eb);
+
+			JsonArray bankHistoryArray = player.getBankHistory();
+			if (bankHistoryArray == null) {
+				paginateBuilder.addStrings("Player banking API disabled");
+			} else if (bankHistoryArray.isEmpty()) {
+				paginateBuilder.addStrings("Bank history empty");
+			} else {
+				for (int i = bankHistoryArray.size() - 1; i >= 0; i--) {
+					JsonElement currentTransaction = bankHistoryArray.get(i);
+					paginateBuilder.addStrings(
+						"**<t:" +
+						(Instant.ofEpochMilli(higherDepth(currentTransaction, "timestamp").getAsLong()).getEpochSecond()) +
+						":D>:** " +
+						simplifyNumber(higherDepth(currentTransaction, "amount", 0L)) +
+						" " +
+						(higherDepth(currentTransaction, "action").getAsString().equals("DEPOSIT") ? "deposited" : "withdrawn") +
+						" by " +
+						cleanMcCodes(higherDepth(currentTransaction, "initiator_name").getAsString())
+					);
+				}
+				paginateBuilder
+					.getExtras()
+					.setEveryPageText(
+						"**Last Transaction Time:** " +
+						"<t:" +
+						Instant
+							.ofEpochMilli(higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong())
+							.getEpochSecond() +
+						":D>" +
+						"\n"
+					);
+			}
+
+			paginateBuilder
+				.getExtras()
+				.addReactiveButtons(
+					new PaginatorExtras.ReactiveButton(
+						Button.primary("reactive_coins_history", "Show History"),
+						paginator ->
+							paginator
+								.getExtras()
+								.setType(PaginatorExtras.PaginatorType.DEFAULT)
+								.toggleReactiveButton("reactive_coins_history", false)
+								.toggleReactiveButton("reactive_coins_current", true),
+						true
+					),
+					new PaginatorExtras.ReactiveButton(
+						Button.primary("reactive_coins_current", "Show Current"),
+						paginator ->
+							paginator
+								.getExtras()
+								.setType(PaginatorExtras.PaginatorType.EMBED_PAGES)
+								.toggleReactiveButton("reactive_coins_history", true)
+								.toggleReactiveButton("reactive_coins_current", false),
+						false
+					)
+				);
+
+			event.paginate(paginateBuilder);
+			return null;
+		}
+		return player.getErrorEmbed();
+	}
+
 	@Override
-	public SlashCommandData getCommandData() {
-		return Commands.slash(name, "Main coins command");
+	protected void execute(SlashCommandEvent event) {
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(getPlayerBalance(event.player, event.getOptionStr("profile"), event));
+	}
+
+	@Override
+	protected SlashCommandData getCommandData() {
+		return Commands
+			.slash(name, "Get a player's coins and bank history")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(profilesCommandOption);
 	}
 
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
-		}
-	}
-
-	public static class PlayerSubcommand extends Subcommand {
-
-		public PlayerSubcommand() {
-			this.name = "player";
-		}
-
-		public static EmbedBuilder getPlayerBalance(String username, String profileName) {
-			Player.Profile player = Player.create(username, profileName);
-			if (player.isValid()) {
-				double playerBankBalance = player.getBankBalance();
-				double playerPurseCoins = player.getPurseCoins();
-
-				double auctionCoins = 0;
-				HypixelResponse playerAuctions = getAuctionFromPlayer(player.getUuid());
-				if (playerAuctions.isValid()) {
-					List<String> validProfileIds = player
-						.getProfiles()
-						.stream()
-						.map(prof -> higherDepth(prof.getOuterProfileJson(), "profile_id").getAsString())
-						.collect(Collectors.toCollection(ArrayList::new));
-					for (JsonElement currentAuction : playerAuctions.response().getAsJsonArray()) {
-						if (
-							higherDepth(currentAuction, "claimed").getAsBoolean() ||
-							!validProfileIds.contains(higherDepth(currentAuction, "profile_id").getAsString())
-						) {
-							continue;
-						}
-						Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
-						Duration duration = Duration.between(Instant.now(), endingAt);
-						long highestBid = higherDepth(currentAuction, "highest_bid_amount", 0);
-						long startingBid = higherDepth(currentAuction, "starting_bid", 0);
-						if (duration.toMillis() <= 0) {
-							if (highestBid >= startingBid) {
-								auctionCoins += highestBid;
-							}
-						}
-					}
-				}
-
-				EmbedBuilder eb = player.defaultPlayerEmbed();
-				eb.setDescription(
-					"**Total Coins:** " +
-					simplifyNumber(playerBankBalance + playerPurseCoins) +
-					" (" +
-					simplifyNumber(playerBankBalance + playerPurseCoins + auctionCoins) +
-					")"
-				);
-				eb.addField(
-					getEmoji("PIGGY_BANK") + " Bank Balance",
-					playerBankBalance == -1 ? "Banking API disabled" : simplifyNumber(playerBankBalance) + " coins",
-					false
-				);
-				eb.addField(getEmoji("ENCHANTED_GOLD") + " Purse Coins", simplifyNumber(playerPurseCoins) + " coins", false);
-				eb.addField(getEmoji("GOLD_BARDING") + " Sold Auctions Value", simplifyNumber(auctionCoins), false);
-				return eb;
-			}
-			return player.getErrorEmbed();
-		}
-
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			if (event.invalidPlayerOption()) {
-				return;
-			}
-
-			event.embed(getPlayerBalance(event.player, event.getOptionStr("profile")));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData("player", "Get a player's bank and purse coins")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(profilesCommandOption);
-		}
-	}
-
-	public static class HistorySubcommand extends Subcommand {
-
-		public HistorySubcommand() {
-			this.name = "history";
-		}
-
-		public static EmbedBuilder getPlayerBankHistory(String username, String profileName, SlashCommandEvent event) {
-			Player.Profile player = Player.create(username, profileName);
-			if (player.isValid()) {
-				JsonArray bankHistoryArray = player.getBankHistory();
-				if (bankHistoryArray != null) {
-					if (bankHistoryArray.isEmpty()) {
-						return player.defaultPlayerEmbed().setDescription("Bank history empty");
-					}
-					CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(20);
-
-					for (int i = bankHistoryArray.size() - 1; i >= 0; i--) {
-						JsonElement currentTransaction = bankHistoryArray.get(i);
-						String valueString =
-							simplifyNumber(higherDepth(currentTransaction, "amount", 0L)) +
-							" " +
-							(higherDepth(currentTransaction, "action").getAsString().equals("DEPOSIT") ? "deposited" : "withdrawn") +
-							" by " +
-							cleanMcCodes(higherDepth(currentTransaction, "initiator_name").getAsString());
-
-						paginateBuilder.addItems(
-							"**<t:" +
-							Instant.ofEpochMilli(higherDepth(currentTransaction, "timestamp").getAsLong()).getEpochSecond() +
-							":D>:** " +
-							valueString
-						);
-					}
-
-					paginateBuilder
-						.getExtras()
-						.setEveryPageText(
-							"**Last Transaction Time:** " +
-							"<t:" +
-							Instant
-								.ofEpochMilli(higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong())
-								.getEpochSecond() +
-							":D>" +
-							"\n"
-						);
-
-					event.paginate(paginateBuilder);
-					return null;
-				} else {
-					return errorEmbed("Player banking API disabled");
-				}
-			}
-			return player.getErrorEmbed();
-		}
-
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			if (event.invalidPlayerOption()) {
-				return;
-			}
-
-			event.paginate(getPlayerBankHistory(event.player, event.getOptionStr("profile"), event));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData("history", "Get a player's bank transaction history")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(profilesCommandOption);
 		}
 	}
 }

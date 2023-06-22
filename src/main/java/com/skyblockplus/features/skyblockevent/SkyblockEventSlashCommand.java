@@ -221,7 +221,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			} else {
 				ebStr += eventMember.getFailCause();
 			}
-			paginateBuilder.addItems(ebStr);
+			paginateBuilder.addStrings(ebStr);
 		}
 	}
 
@@ -768,7 +768,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				List<String> prizeListKeys = getJsonKeys(higherDepth(eventSettings, "prizeMap"));
 				for (int i = 0; i < prizeListKeys.size(); i++) {
 					try {
-						paginateBuilder.addItems(
+						paginateBuilder.addStrings(
 							"`" +
 							(i + 1) +
 							")` " +

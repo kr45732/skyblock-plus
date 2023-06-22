@@ -21,7 +21,6 @@ package com.skyblockplus.utils.command;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.jagrosh.jdautilities.menu.Menu;
 import java.awt.*;
 import java.time.Instant;
 import java.util.*;
@@ -30,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import lombok.Getter;
-import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -47,7 +45,7 @@ import net.dv8tion.jda.internal.utils.Checks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CustomPaginator extends Menu {
+public class CustomPaginator {
 
 	private static final Logger log = LoggerFactory.getLogger(CustomPaginator.class);
 	private static final Consumer<Throwable> throwableConsumer = e -> {
@@ -57,6 +55,10 @@ public class CustomPaginator extends Menu {
 	};
 	private static final String LEFT = "paginator_left_button";
 	private static final String RIGHT = "paginator_right_button";
+	private final EventWaiter waiter;
+	private final Set<User> users;
+	private final long timeout;
+	private final TimeUnit unit;
 	private final Color color;
 	private final int columns;
 	private final int itemsPerPage;
@@ -69,13 +71,9 @@ public class CustomPaginator extends Menu {
 
 	private int pages;
 
-	@Setter
-	private List<String> strings;
-
 	private CustomPaginator(
 		EventWaiter waiter,
 		Set<User> users,
-		Set<Role> roles,
 		long timeout,
 		TimeUnit unit,
 		Color color,
@@ -83,30 +81,21 @@ public class CustomPaginator extends Menu {
 		int columns,
 		int itemsPerPage,
 		boolean showPageNumbers,
-		List<String> items,
 		boolean wrapPageEnds,
 		PaginatorExtras extras
 	) {
-		super(waiter, users, roles, timeout, unit);
+		this.waiter = waiter;
+		this.users = users;
+		this.timeout = timeout;
+		this.unit = unit;
 		this.color = color;
 		this.columns = columns;
 		this.itemsPerPage = itemsPerPage;
-		this.strings = items;
 		this.extras = extras;
 		this.showPageNumbers = showPageNumbers;
 		this.finalAction = finalAction;
 		this.wrapPageEnds = wrapPageEnds;
 		calculatePages();
-	}
-
-	@Override
-	public void display(MessageChannel channel) {
-		paginate(channel, 1);
-	}
-
-	@Override
-	public void display(Message message) {
-		paginate(message, 1);
 	}
 
 	public void paginate(MessageChannel channel, int pageNum) {
@@ -180,22 +169,14 @@ public class CustomPaginator extends Menu {
 		);
 	}
 
-	@Override
-	protected boolean isValidUser(User user, Guild guild) {
+	private boolean isValidUser(User user, Guild guild) {
 		if (user.isBot()) {
 			return false;
 		}
-		if (users.isEmpty() && roles.isEmpty()) {
+		if (users.isEmpty() || users.contains(user)) {
 			return true;
 		}
-		if (users.contains(user)) {
-			return true;
-		}
-		if (guild == null || !guild.isMember(user)) {
-			return false;
-		}
-
-		return guild.getMember(user).getRoles().stream().anyMatch(roles::contains);
+		return guild != null && guild.isMember(user);
 	}
 
 	private void handleButtonClick(ButtonInteractionEvent event, int pageNum) {
@@ -288,7 +269,7 @@ public class CustomPaginator extends Menu {
 			} catch (Exception ignored) {}
 
 			int start = Math.max(0, (pageNum - 1) * itemsPerPage);
-			int end = Math.min(strings.size(), pageNum * itemsPerPage);
+			int end = Math.min(extras.getStrings().size(), pageNum * itemsPerPage);
 			if (extras.getType() == PaginatorExtras.PaginatorType.EMBED_FIELDS) {
 				end = Math.min(extras.getEmbedFields().size(), pageNum * itemsPerPage);
 				for (int i = start; i < end; i++) {
@@ -297,7 +278,7 @@ public class CustomPaginator extends Menu {
 			} else if (columns == 1) {
 				StringBuilder stringBuilder = new StringBuilder();
 				for (int i = start; i < end; i++) {
-					stringBuilder.append("\n").append(strings.get(i));
+					stringBuilder.append("\n").append(extras.getStrings().get(i));
 				}
 				embedBuilder.appendDescription(stringBuilder.toString());
 			} else {
@@ -306,7 +287,7 @@ public class CustomPaginator extends Menu {
 					StringBuilder stringBuilder = new StringBuilder();
 					for (int i = start + k * per; i < end && i < start + (k + 1) * per; i++) stringBuilder
 						.append("\n")
-						.append(strings.get(i));
+						.append(extras.getStrings().get(i));
 					embedBuilder.addField(
 						(k == 0 && extras.getEveryPageFirstFieldTitle() != null ? extras.getEveryPageFirstFieldTitle() : ""),
 						stringBuilder.toString(),
@@ -327,16 +308,19 @@ public class CustomPaginator extends Menu {
 	private void calculatePages() {
 		this.pages =
 			switch (extras.getType()) {
-				case DEFAULT -> (int) Math.ceil((double) strings.size() / itemsPerPage);
+				case DEFAULT -> (int) Math.ceil((double) extras.getStrings().size() / itemsPerPage);
 				case EMBED_FIELDS -> (int) Math.ceil((double) extras.getEmbedFields().size() / itemsPerPage);
 				case EMBED_PAGES -> extras.getEmbedPages().size();
 			};
 	}
 
-	public static class Builder extends Menu.Builder<CustomPaginator.Builder, CustomPaginator> {
+	public static class Builder {
 
-		private final List<String> strings = new LinkedList<>();
-		private PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.DEFAULT);
+		private EventWaiter waiter;
+		private final Set<User> users = new HashSet<>();
+		private long timeout = 1;
+		private TimeUnit unit = TimeUnit.MINUTES;
+		private final PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.DEFAULT);
 		private Color color = null;
 		private Consumer<Message> finalAction = m -> m.delete().queue(null, throwableConsumer);
 		private int columns = 1;
@@ -344,12 +328,11 @@ public class CustomPaginator extends Menu {
 		private boolean wrapPageEnds = false;
 		private boolean showPageNumbers = true;
 
-		@Override
 		public CustomPaginator build() {
 			Checks.check(waiter != null, "Must set an EventWaiter");
 			switch (extras.getType()) {
 				case DEFAULT -> {
-					if (strings.isEmpty()) {
+					if (extras.getStrings().isEmpty()) {
 						log.error("Paginator type is DEFAULT but no strings were provided");
 					}
 					if (!extras.getEmbedFields().isEmpty()) {
@@ -363,7 +346,7 @@ public class CustomPaginator extends Menu {
 					if (extras.getEmbedFields().isEmpty()) {
 						log.error("Paginator type is EMBED_FIELDS but no embed fields were provided");
 					}
-					if (!strings.isEmpty()) {
+					if (!extras.getStrings().isEmpty()) {
 						log.warn("Paginator type is EMBED_FIELDS but strings were also provided");
 					}
 					if (!extras.getEmbedPages().isEmpty()) {
@@ -374,7 +357,7 @@ public class CustomPaginator extends Menu {
 					if (extras.getEmbedPages().isEmpty()) {
 						log.error("Paginator type is EMBED_PAGES but no embed pages were provided");
 					}
-					if (!strings.isEmpty()) {
+					if (!extras.getStrings().isEmpty()) {
 						log.warn("Paginator type is EMBED_PAGES but strings were also provided");
 					}
 					if (!extras.getEmbedFields().isEmpty()) {
@@ -387,7 +370,6 @@ public class CustomPaginator extends Menu {
 			return new CustomPaginator(
 				waiter,
 				users,
-				roles,
 				timeout,
 				unit,
 				color,
@@ -395,19 +377,30 @@ public class CustomPaginator extends Menu {
 				columns,
 				itemsPerPage,
 				showPageNumbers,
-				strings,
 				wrapPageEnds,
 				extras
 			);
 		}
 
-		public Builder setColor(Color color) {
-			this.color = color;
+		public Builder setEventWaiter(EventWaiter waiter) {
+			this.waiter = waiter;
 			return this;
 		}
 
-		public Builder setPaginatorExtras(PaginatorExtras paginatorExtras) {
-			this.extras = paginatorExtras;
+		public Builder setUsers(User... users) {
+			this.users.clear();
+			this.users.addAll(Arrays.asList(users));
+			return this;
+		}
+
+		public Builder setTimeout(long timeout, TimeUnit unit) {
+			this.timeout = timeout;
+			this.unit = unit;
+			return this;
+		}
+
+		public Builder setColor(Color color) {
+			this.color = color;
 			return this;
 		}
 
@@ -432,13 +425,8 @@ public class CustomPaginator extends Menu {
 			return this;
 		}
 
-		public void addItems(String... items) {
-			addItems(List.of(items));
-		}
-
-		public Builder addItems(Collection<String> items) {
-			strings.addAll(items);
-			return this;
+		public void addStrings(String... items) {
+			extras.addStrings(items);
 		}
 
 		public Builder wrapPageEnds(boolean wrapPageEnds) {
@@ -455,14 +443,14 @@ public class CustomPaginator extends Menu {
 			return extras;
 		}
 
-		public CustomPaginator.Builder updateExtras(Function<PaginatorExtras, PaginatorExtras> extras) {
+		public Builder updateExtras(Function<PaginatorExtras, PaginatorExtras> extras) {
 			extras.apply(this.extras);
 			return this;
 		}
 
 		public int size() {
 			return switch (extras.getType()) {
-				case DEFAULT -> strings.size();
+				case DEFAULT -> extras.getStrings().size();
 				case EMBED_FIELDS -> extras.getEmbedFields().size();
 				case EMBED_PAGES -> extras.getEmbedPages().size();
 			};

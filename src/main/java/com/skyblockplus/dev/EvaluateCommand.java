@@ -48,6 +48,7 @@ public class EvaluateCommand extends Command {
 			"java.lang",
 			"java.math",
 			"java.time",
+			"jav.time.temporal",
 			"java.util",
 			"java.util.concurrent",
 			"java.util.stream",
@@ -77,9 +78,9 @@ public class EvaluateCommand extends Command {
 			"com.skyblockplus.utils.utils.JsonUtils.*",
 			"com.skyblockplus.utils.utils.StringUtils.*",
 			"com.skyblockplus.utils.utils.Utils.*",
-			"com.skyblockplus.Main.*",
 			"com.skyblockplus.utils.ApiHandler.*",
 			"com.skyblockplus.utils.Constants.*",
+			"com.skyblockplus.Main.*",
 		};
 
 		for (String packageImport : packageImports) {
@@ -142,6 +143,7 @@ public class EvaluateCommand extends Command {
 					shell.setProperty("cmdEvent", event);
 					shell.setProperty("message", event.getMessage());
 					shell.setProperty("channel", event.getChannel());
+					shell.setProperty("user", event.getAuthor());
 					shell.setProperty("jda", event.getJDA());
 					shell.setProperty("guilds", guildMap);
 					shell.setProperty("db", database);

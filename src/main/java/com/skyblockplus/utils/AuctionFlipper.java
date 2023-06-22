@@ -19,7 +19,6 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
-import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.HttpUtils.okHttpClient;
 import static com.skyblockplus.utils.utils.HypixelUtils.calculateWithTaxes;
@@ -33,15 +32,12 @@ import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.skyblockplus.utils.database.LeaderboardDatabase;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import me.nullicorn.nedit.NBTReader;
-import me.nullicorn.nedit.type.NBTCompound;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class AuctionFlipper {
@@ -62,7 +58,7 @@ public class AuctionFlipper {
 	public static Instant underBinJsonLastUpdated = null;
 	private static boolean enable = false;
 
-	public static boolean onGuildMessageReceived(MessageReceivedEvent event) {
+	public static void onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
 			if (event.getChannel().getId().equals("958771784004567063") && event.isWebhookMessage()) {
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
@@ -72,10 +68,8 @@ public class AuctionFlipper {
 				if (enable && desc.contains("Successfully updated under bins file in ")) {
 					flip();
 				}
-				return true;
 			}
 		} catch (Exception ignored) {}
-		return false;
 	}
 
 	public static void initialize(boolean enable) {
@@ -144,8 +138,6 @@ public class AuctionFlipper {
 
 		JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
 		if (higherDepth(endedAuctionsJson, "auctions") != null) {
-			Map<UUID, LeaderboardDatabase.AuctionAnalyzer> auctionAnalyzers = new HashMap<>();
-
 			for (JsonElement auction : higherDepth(endedAuctionsJson, "auctions").getAsJsonArray()) {
 				long price = higherDepth(auction, "price").getAsLong();
 				String auctionId = higherDepth(auction, "auction_id").getAsString();
@@ -159,51 +151,6 @@ public class AuctionFlipper {
 							.build()
 					);
 				}
-
-				try {
-					if (!higherDepth(auction, "bin", false)) {
-						continue;
-					}
-
-					NBTCompound nbt = NBTReader.readBase64(higherDepth(auction, "item_bytes").getAsString()).getList("i").getCompound(0);
-					if (nbt.getInt("Count", 1) > 1 || !nbt.containsKey("tag.ExtraAttributes.uuid")) {
-						continue;
-					}
-
-					JsonObject attributes = gson.toJsonTree(nbt.getCompound("tag.ExtraAttributes")).getAsJsonObject();
-					UUID uuid = UUID.fromString(attributes.remove("uuid").getAsString());
-
-					long end = higherDepth(auction, "timestamp").getAsLong();
-					if (auctionAnalyzers.containsKey(uuid)) {
-						if (auctionAnalyzers.get(uuid).end() <= end) {
-							auctionAnalyzers.remove(uuid);
-						} else {
-							continue;
-						}
-					}
-
-					attributes.remove("timestamp");
-					attributes.remove("originTag");
-					if (attributes.has("petInfo")) {
-						JsonObject petInfo = JsonParser.parseString(attributes.remove("petInfo").getAsString()).getAsJsonObject();
-						petInfo.remove("hideRightClick");
-						petInfo.remove("hideInfo");
-						petInfo.remove("active");
-						petInfo.remove("uuid");
-						attributes.add("petInfo", petInfo);
-					}
-
-					auctionAnalyzers.put(
-						uuid,
-						new LeaderboardDatabase.AuctionAnalyzer(uuid, flipItem != null, price, attributes.toString(), end)
-					);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (!auctionAnalyzers.isEmpty()) {
-				leaderboardDatabase.insertAuctionAnalyzer(auctionAnalyzers.values());
 			}
 		}
 	}

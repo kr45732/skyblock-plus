@@ -418,6 +418,11 @@ public class JsonUtils {
 					getNeuBranch() +
 					"/constants/leveling.json"
 				);
+			JsonArray vampire = new JsonArray();
+			for (int i : List.of(20, 75, 240, 840, 2400)) {
+				vampire.add(i);
+			}
+			levelingJson.getAsJsonObject("slayer_xp").add("vampire", vampire);
 		}
 		return levelingJson;
 	}

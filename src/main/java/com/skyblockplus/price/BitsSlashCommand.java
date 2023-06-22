@@ -21,7 +21,6 @@ package com.skyblockplus.price;
 import static com.skyblockplus.utils.utils.JsonUtils.getBitsJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
@@ -56,7 +55,8 @@ public class BitsSlashCommand extends SlashCommand {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser())
+		CustomPaginator.Builder paginateBuilder = event
+			.getPaginator()
 			.setItemsPerPage(20)
 			.updateExtras(e -> e.setEveryPageTitle("Coins Per Bit"));
 		for (Map.Entry<String, Double> entry : values
@@ -64,7 +64,7 @@ public class BitsSlashCommand extends SlashCommand {
 			.stream()
 			.sorted(Comparator.comparingDouble(v -> -v.getValue()))
 			.collect(Collectors.toCollection(ArrayList::new))) {
-			paginateBuilder.addItems(
+			paginateBuilder.addStrings(
 				getEmoji(entry.getKey()) +
 				" " +
 				idToName(entry.getKey()) +

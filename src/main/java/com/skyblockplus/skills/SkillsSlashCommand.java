@@ -53,8 +53,8 @@ public class SkillsSlashCommand extends SlashCommand {
 		Player.Profile player = Player.create(username, profileName);
 
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = event.getPaginator();
-			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			PaginatorExtras extras = paginateBuilder.getExtras();
 
 			EmbedBuilder eb = getPlayerSkillsFirstPage(player);
 			extras.addEmbedPage(eb);
@@ -127,7 +127,7 @@ public class SkillsSlashCommand extends SlashCommand {
 
 			extras.addEmbedPage(eb);
 
-			event.paginate(paginateBuilder.setPaginatorExtras(extras));
+			event.paginate(paginateBuilder);
 			return null;
 		}
 		return player.getErrorEmbed();

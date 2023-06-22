@@ -83,7 +83,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 		List<String> validProfileIds = player
 			.getProfiles()
 			.stream()
-			.map(prof -> higherDepth(prof.getOuterProfileJson(), "profile_id").getAsString())
+			.map(prof -> higherDepth(prof.getOuterProfileJson(), "profile_id").getAsString().replace("-", ""))
 			.collect(Collectors.toCollection(ArrayList::new));
 		Stream<JsonElement> stream = streamJsonArray(auctionsArray)
 			.filter(auc -> validProfileIds.contains(higherDepth(auc, "profile_id").getAsString()));
@@ -111,8 +111,8 @@ public class AuctionsSlashCommand extends SlashCommand {
 			long failedToSell = 0;
 			long auctionTax = 0;
 
-			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(9);
-			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS).setItemsPerPage(9);
+			PaginatorExtras extras = paginateBuilder.getExtras();
 
 			for (JsonElement currentAuction : auctionsArray) {
 				if (!higherDepth(currentAuction, "claimed", false)) {
@@ -200,10 +200,10 @@ public class AuctionsSlashCommand extends SlashCommand {
 				)
 				.addButton(button);
 
-			event.paginate(paginateBuilder.setPaginatorExtras(extras));
+			event.paginate(paginateBuilder);
 		} else {
-			CustomPaginator.Builder paginateBuilder = event.getPaginator();
-			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			PaginatorExtras extras = paginateBuilder.getExtras();
 
 			long totalSoldValue = 0;
 			long totalPendingValue = 0;
@@ -321,7 +321,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 					);
 			}
 
-			event.paginate(paginateBuilder.setPaginatorExtras(extras));
+			event.paginate(paginateBuilder);
 		}
 		return null;
 	}

@@ -70,7 +70,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 					CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(4);
 
 					for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
-						paginateBuilder.addItems(
+						paginateBuilder.addStrings(
 							"**__Slot " +
 							(currentArmour.getKey() + 1) +
 							"__**\n" +

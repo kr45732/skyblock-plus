@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
 import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
-import static com.skyblockplus.utils.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.skyblockplus.miscellaneous.weight.weight.Weight;
@@ -70,10 +69,11 @@ public class CalcRunsSlashCommand extends SlashCommand {
 				.setDescription("**Note:** Calculating with catacombs expert ring");
 
 			event.paginate(
-				defaultPaginator(event.getUser())
+				event
+					.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES)
 					.showPageNumbers(false)
-					.setPaginatorExtras(
-						new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES)
+					.updateExtras(extras ->
+						extras
 							.addEmbedPage(regEmbed)
 							.addReactiveButtons(
 								new PaginatorExtras.ReactiveButton(

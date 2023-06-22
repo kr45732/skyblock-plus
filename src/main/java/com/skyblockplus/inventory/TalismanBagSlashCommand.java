@@ -21,16 +21,12 @@ package com.skyblockplus.inventory;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.PaginatorExtras;
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
-import com.skyblockplus.utils.command.Subcommand;
+import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
@@ -144,7 +140,8 @@ public class TalismanBagSlashCommand extends SlashCommand {
 			if (player.isValid()) {
 				JsonElement tuningJson = higherDepth(player.profileJson(), "accessory_bag_storage");
 				EmbedBuilder eb = player.defaultPlayerEmbed();
-				PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+				CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES);
+				PaginatorExtras extras = paginateBuilder.getExtras();
 
 				Map<Integer, InvItem> accessoryBagMap = player.getTalismanBagMap();
 				List<InvItem> accessoryBag = accessoryBagMap == null
@@ -268,7 +265,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 					}
 				}
 
-				event.paginate(defaultPaginator(event.getUser()).setPaginatorExtras(extras));
+				event.paginate(paginateBuilder);
 				return null;
 			}
 

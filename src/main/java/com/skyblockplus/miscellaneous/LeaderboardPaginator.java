@@ -150,7 +150,9 @@ public class LeaderboardPaginator {
 			columnOne.append("This page is empty");
 		}
 
-		return defaultEmbed("Global Leaderboard | " + capitalizeString(gamemode.toString()))
+		return defaultEmbed(
+			"Global" + (gamemode == Player.Gamemode.ALL ? "" : " " + capitalizeString(gamemode.toString())) + " Leaderboard"
+		)
 			.setDescription(
 				player != null
 					? "**Player:** " +

@@ -115,7 +115,7 @@ public class SacksSlashCommand extends SlashCommand {
 					null
 				);
 
-				paginateBuilder.addItems(
+				paginateBuilder.addStrings(
 					(emoji != null ? emoji + " " : "") +
 					"**" +
 					idToName(entry.getKey()) +

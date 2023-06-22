@@ -68,8 +68,8 @@ public class CalcDragsSlashCommand extends SlashCommand {
 			eyesPlaced
 		);
 
-		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(10);
-		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES).setItemsPerPage(10);
+		PaginatorExtras extras = paginateBuilder.getExtras();
 		for (Map.Entry<String, JsonElement> dragon : getDragonLootJson().getAsJsonObject().entrySet()) {
 			EmbedBuilder eb = defaultEmbed(capitalizeString(dragon.getKey()) + " Dragon Loot");
 			eb.setDescription(
@@ -115,7 +115,7 @@ public class CalcDragsSlashCommand extends SlashCommand {
 			extras.addEmbedPage(eb);
 		}
 
-		event.paginate(paginateBuilder.setPaginatorExtras(extras));
+		event.paginate(paginateBuilder);
 		return null;
 	}
 

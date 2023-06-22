@@ -467,7 +467,9 @@ public class Utils {
 						}
 
 						if (item.containsKey("tag.ExtraAttributes.talisman_enrichment")) {
-							itemInfo.addExtraValue("TALISMAN_ENRICHMENT_" + item.getString("tag.ExtraAttributes.talisman_enrichment"));
+							itemInfo.addExtraValue(
+								"TALISMAN_ENRICHMENT_" + item.getString("tag.ExtraAttributes.talisman_enrichment").toUpperCase()
+							);
 						}
 
 						if (item.containsTag("tag.ExtraAttributes.ability_scroll", TagType.LIST)) {

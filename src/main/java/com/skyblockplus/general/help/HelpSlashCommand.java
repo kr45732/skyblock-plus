@@ -176,11 +176,6 @@ public class HelpSlashCommand extends SlashCommand {
 							DISCORD_SERVER_INVITE_LINK +
 							") to set this up for your guild. Set key to true to force use this server's Hypixel API key for more accurate results.",
 							"ranks <player> [gamemode] [key]"
-						),
-						new HelpData(
-							"api",
-							"Get which Skyblock APIs players have enabled or disabled for a guild. Requires this server's Hypixel API key to be set.",
-							"api [player] [exclude]"
 						)
 					)
 					.setCategory("guild"),
@@ -250,9 +245,7 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("list", "List all claimable roles for this server.")
 					)
 					.setCategory("miscellaneous"),
-				new HelpData("coins", "Get a player's bank and purse coins.", "coins player [player] [profile]")
-					.addSecondData("Get a player's bank transaction history.", "coins history [player] [profile]")
-					.setCategory("miscellaneous"),
+				new HelpData("coins", "Get a player's coins and bank history.", "coins [player] [profile]").setCategory("miscellaneous"),
 				new HelpData(
 					"networth",
 					"Calculate a player's networth. Set verbose to true to get a detailed breakdown of the calculations.",
@@ -729,11 +722,11 @@ public class HelpSlashCommand extends SlashCommand {
 					.setTitleUrls(pageTitleToCategory.values().stream().map(u -> "https://skyblock-plus.ml/commands" + u).toList())
 			);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			"Use the arrow buttons to navigate through the pages" + generatePageMap() + "\n\n<> = required [] = optional"
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("help [command]", "Show the help menu for all commands or a specific command") +
 			create("information", "Show information and statistics about the bot") +
 			create("invite", "Get the invite link and Discord link for the bot") +
@@ -742,7 +735,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("vote", "Upvote the bot")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("slayer [player] [profile]", "Get the slayer data of a player") +
 			create(
 				"calcslayer <type> [player] [profile] [level] [xp] [system]",
@@ -750,14 +743,14 @@ public class HelpSlashCommand extends SlashCommand {
 			)
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("skills [player] [profile]", "Get the skills data of a player") +
 			create("hotm [player] [profile]", "Get a player's heart of the mountain statistics") +
 			create("forge [player] [profile]", "Get a player's forge items & ending times") +
 			create("crimson [player] [profile]", "Get the crimson isle stats of a player")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("dungeons [player] [profile]", "Get the dungeons data of a player") +
 			create("essence upgrade <item>", "Interactive message to find the essence amount to upgrade an item") +
 			create("essence information <item>", "Get the amount of essence to upgrade an item for each level") +
@@ -769,7 +762,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("calcdrops <floor> [item] [luck] [accessory]", "Calculate the drop rate and cost of all chests for a floor or item")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("guild information [player] [guild]", "Get information and statistics about a guild") +
 			create("guild members [player] [guild]", "Get a list of all members in a guild") +
 			create("guild experience [player] [guild]", "Get the experience leaderboard for a guild") +
@@ -782,11 +775,10 @@ public class HelpSlashCommand extends SlashCommand {
 			create(
 				"guild top [player] [guild] [gamemode] [key]",
 				"Get a guild's Skyblock statistics of slayer, skills, catacombs, weight, level, and networth"
-			) +
-			create("guild api [player] [exclude]", "Get which Skyblock APIs players have enabled or disabled for a guild")
+			)
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("auctions [player] [filter] [sort] [verbose]", "Get a player's unclaimed auctions on all profiles") +
 			create("viewauction <uuid>", "Get an auction by its UUID") +
 			create("bin <item>", "Get the lowest bin of an item") +
@@ -799,7 +791,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("flips", "Get current auction flips")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("inventory emoji [player] [profile]", "Get a player's inventory represented in emojis") +
 			create("inventory list [player] [profile] [slot]", "Get a player's inventory with lore") +
 			create("armor emoji [player] [profile] [slot]", "Get a player's equipped armor & equipment represented in emojis") +
@@ -816,12 +808,11 @@ public class HelpSlashCommand extends SlashCommand {
 			create("pets [player] [profile]", "Get a player's pets")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("roles claim [profile]", "Claim your automatic Skyblock roles based on your statistics") +
 			create("roles list", "List all roles that can be claimed through the bot") +
 			create("level [player] [profile]", "Get a player's Skyblock level") +
-			create("coins player [player] [profile]", "Get a player's bank and purse coins") +
-			create("coins history [player] [profile]", "Get a player's bank transaction history") +
+			create("coins [player] [profile]", "Get a player's coins and bank history") +
 			create("networth [player] [profile] [verbose]", "Calculate a player's networth") +
 			create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +
 			create(
@@ -851,7 +842,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("collections [player] [profile]", "Get a player's island collection counts")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("party create", "Interactive message to create a party") +
 			create("party current", "Get information about your current party") +
 			create("party join <username>", "Join a party") +
@@ -861,7 +852,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("party kick <username>", "Kick a member from your party")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("event create", "Interactive message to create a Skyblock event") +
 			create("event current", "Get information about the current event") +
 			create("event join [profile]", "Join the current event") +
@@ -872,7 +863,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("event end [silent]", "Force end or cancel the event")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("settings", "View the current settings for the Discord server") +
 			create("settings general", "View the bot's general settings for this server") +
 			create("setup", "A short walk-through on how to setup the bot") +
@@ -909,7 +900,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings blacklist stop_using <server_id>", "Stop using a shared blacklist from another server")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("settings jacob", "View the current settings for farming event notifications") +
 			create("settings jacob <enable|disable>", "Enable or disable farming event notifications") +
 			create("settings jacob channel <#channel>", "Set the channel where farming event notifications will be sent") +
@@ -917,14 +908,14 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings jacob remove <crop>", "Remove a crop from the tracking list")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("settings event", "View the current settings for event notifications") +
 			create("settings event <enable|disable>", "Enable or disable event notifications") +
 			create("settings event add <event|all> <#channel> [@role]", "Added an event to be notified for") +
 			create("settings event remove <event>", "Remove an event from the notification list")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("settings verify", "Get the current verify settings for the bot") +
 			create("settings verify <enable|disable>", "Enable or disable automatic verify") +
 			create("settings verify message <message>", "The message that users will see when verifying") +
@@ -942,7 +933,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings verify roles_claim <enable|disable>", "Enable or disable SB role sync on join")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("settings guild create <name>", "Create a new automatic guild where name is the guild's name") +
 			create("settings guild remove <name>", "Remove an automatic guild") +
 			create("settings guild <name>", "View the settings for a specific automatic guild") +
@@ -954,7 +945,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings guild <name> counter <enable|disable>", "Enable or disable guild members counter")
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("settings guild <name> apply <enable|disable>", "Enable or disable automatic apply") +
 			create("settings guild <name> apply close", "Close automatic apply") +
 			create("settings guild <name> apply open", "Open automatic apply") +
@@ -998,7 +989,7 @@ public class HelpSlashCommand extends SlashCommand {
 			)
 		);
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			create("settings roles", "Get the current roles settings for the bot") +
 			create("settings roles <enable|disable>", "Enable or disable automatic roles") +
 			create(

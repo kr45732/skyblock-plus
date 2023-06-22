@@ -40,7 +40,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -225,7 +224,7 @@ public class GuildSlashCommand extends SlashCommand {
 				.map(Map.Entry::getKey)
 				.collect(Collectors.toCollection(ArrayList::new))) {
 				if (member != null) {
-					paginateBuilder.addItems("• [" + member + "](" + skyblockStatsLink(member, null) + ")  ");
+					paginateBuilder.addStrings("• [" + member + "](" + skyblockStatsLink(member, null) + ")  ");
 				}
 			}
 
@@ -344,7 +343,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 			for (int i = 0; i < guildExpList.size(); i++) {
 				String[] curG = guildExpList.get(i).split("=:=");
-				paginateBuilder.addItems(
+				paginateBuilder.addStrings(
 					"`" + (i + 1) + ")` " + escapeUsername(curG[0]) + ": " + formatNumber(Integer.parseInt(curG[1])) + " EXP  "
 				);
 			}
@@ -458,7 +457,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 				String formattedAmt = formatLeaderboardAmount(amount);
 
-				paginateBuilder.addItems("`" + (i + 1) + ")` " + escapeUsername(player.getString("username")) + ": " + formattedAmt);
+				paginateBuilder.addStrings("`" + (i + 1) + ")` " + escapeUsername(player.getString("username")) + ": " + formattedAmt);
 				total += amount;
 
 				if (usernameUuidStruct != null && player.getString("uuid").equals(usernameUuidStruct.uuid())) {
@@ -632,10 +631,7 @@ public class GuildSlashCommand extends SlashCommand {
 			playerList.sort(Comparator.comparingDouble(e -> e.getDouble("level", 0)));
 			hypixelGuildQueue.remove(guildId);
 
-			CustomPaginator.Builder paginateBuilder = event
-				.getPaginator()
-				.setItemsPerPage(15)
-				.setPaginatorExtras(new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS));
+			CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS).setItemsPerPage(15);
 
 			for (DataObject guildMember : playerList) {
 				boolean meetsReqsOr = false;
@@ -999,7 +995,7 @@ public class GuildSlashCommand extends SlashCommand {
 								}
 
 								if (!rankNamesList.contains(playerRank.toLowerCase())) {
-									paginateBuilder.addItems(
+									paginateBuilder.addStrings(
 										("- /g setrank " + escapeUsername(playerUsername) + " " + rankNamesList.get(0))
 									);
 									totalChange++;
@@ -1127,12 +1123,10 @@ public class GuildSlashCommand extends SlashCommand {
 					return defaultEmbed("No rank changes");
 				}
 
-				CustomPaginator.Builder paginateBuilder = event
-					.getPaginator()
-					.setItemsPerPage(20)
-					.addItems(pbItems.stream().sorted().collect(Collectors.toCollection(ArrayList::new)));
+				CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
 				paginateBuilder
 					.getExtras()
+					.addStrings(pbItems.stream().sorted().collect(Collectors.toCollection(ArrayList::new)))
 					.setEveryPageTitle("Rank changes for " + guildName)
 					.setEveryPageText("**Total rank changes:** " + totalChange);
 
@@ -1357,149 +1351,6 @@ public class GuildSlashCommand extends SlashCommand {
 						.addChoice("Stranded", "stranded")
 				)
 				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
-		}
-	}
-
-	public static class ApiSubcommand extends Subcommand {
-
-		public ApiSubcommand() {
-			this.name = "api";
-			this.cooldown = GLOBAL_COOLDOWN + 2;
-		}
-
-		public static EmbedBuilder getGuildCheckApi(String username, String exclude, SlashCommandEvent event) {
-			List<String> excludeArr = new ArrayList<>();
-			if (!exclude.isEmpty()) {
-				excludeArr.addAll(List.of(exclude.toLowerCase().split(",")));
-				for (String s : excludeArr) {
-					if (!List.of("inventory", "bank", "collections", "vault", "skills").contains(s)) {
-						return errorEmbed("Invalid exclude type: " + s);
-					}
-				}
-			}
-
-			String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
-
-			EmbedBuilder eb = checkHypixelKey(hypixelKey);
-			if (eb != null) {
-				return eb;
-			}
-
-			UsernameUuidStruct usernameUuid = usernameToUuid(username);
-			if (!usernameUuid.isValid()) {
-				return errorEmbed(usernameUuid.failCause());
-			}
-
-			HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.uuid());
-			if (!guildResponse.isValid()) {
-				return guildResponse.getErrorEmbed();
-			}
-
-			JsonArray guildMembers = guildResponse.get("members").getAsJsonArray();
-			List<CompletableFuture<String>> futuresList = new ArrayList<>();
-			List<Player.Profile> players = new ArrayList<>();
-
-			for (JsonElement guildMember : guildMembers) {
-				String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
-
-				try {
-					if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
-						System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset() + " seconds");
-						TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset());
-					}
-				} catch (Exception ignored) {}
-
-				futuresList.add(
-					asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey)
-						.thenApplyAsync(
-							hypixelResponse -> {
-								UsernameUuidStruct usernameUuidStruct = uuidToUsername(guildMemberUuid);
-								if (hypixelResponse.isValid()) {
-									Player.Profile player = new Player(
-										usernameUuidStruct.username(),
-										guildMemberUuid,
-										hypixelResponse.response(),
-										false
-									)
-										.getSelectedProfile();
-
-									if (player.isValid()) {
-										boolean invEnabled = excludeArr.contains("inventory") || player.isInventoryApiEnabled();
-										boolean bankEnabled = excludeArr.contains("bank") || player.isBankApiEnabled();
-										boolean collectionsEnabled = excludeArr.contains("collections") || player.isCollectionsApiEnabled();
-										boolean vaultEnabled = excludeArr.contains("vault") || player.isVaultApiEnabled();
-										boolean skillsEnabled = excludeArr.contains("skills") || player.isSkillsApiEnabled();
-
-										if (invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) {
-											return client.getSuccess() + " **" + player.getEscapedUsername() + ":** all APIs enabled";
-										} else {
-											String out =
-												(invEnabled ? "" : "Inventory API, ") +
-												(bankEnabled ? "" : "Bank API, ") +
-												(collectionsEnabled ? "" : "Collections API, ") +
-												(vaultEnabled ? "" : "Vault API, ") +
-												(skillsEnabled ? "" : "Skills API, ");
-
-											return (
-												client.getError() +
-												" **" +
-												player.getEscapedUsername() +
-												":** " +
-												out.substring(0, out.length() - 2)
-											);
-										}
-									}
-								}
-								return client.getError() + " **" + usernameUuidStruct.escapeUsername() + ":** unable to get data";
-							},
-							executor
-						)
-				);
-			}
-
-			List<String> out = new ArrayList<>();
-			for (CompletableFuture<String> future : futuresList) {
-				try {
-					out.add(future.get());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			leaderboardDatabase.insertIntoLeaderboard(players);
-
-			out.sort(Comparator.comparing(o -> !o.contains(client.getError())));
-			CustomPaginator.Builder paginator = event.getPaginator().setItemsPerPage(20);
-			paginator.addItems(out);
-			event.paginate(
-				paginator.updateExtras(extra ->
-					extra
-						.setEveryPageTitle(guildResponse.get("name").getAsString())
-						.setEveryPageText(
-							"**API Disabled Count:** " +
-							out.stream().filter(o -> o.contains(client.getError())).count() +
-							"\n" +
-							(!excludeArr.isEmpty() ? "**Excluded APIs:** " + String.join(", ", excludeArr) + "\n" : "")
-						)
-				)
-			);
-			return null;
-		}
-
-		@Override
-		protected void execute(SlashCommandEvent event) {
-			if (event.invalidPlayerOption()) {
-				return;
-			}
-
-			event.paginate(getGuildCheckApi(event.player, event.getOptionStr("exclude", ""), event));
-		}
-
-		@Override
-		protected SubcommandData getCommandData() {
-			return new SubcommandData(name, "Get which Skyblock APIs players have enabled or disabled for a guild")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "exclude", "Exclude certain APIs from being checked (comma separated)", false);
 		}
 	}
 }

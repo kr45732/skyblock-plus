@@ -46,6 +46,7 @@ public class SkyblockProfilesParser {
 		"candy_inventory_contents",
 		"quiver",
 		"autopet",
+		"objectives",
 		// Slayer
 		"claimed_levels",
 		// Dungeons

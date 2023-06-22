@@ -22,12 +22,12 @@ import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.JsonUtils.getCollectionsJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -49,9 +49,10 @@ public class CollectionsSlashCommand extends SlashCommand {
 	public static EmbedBuilder getCollections(String username, String profileName, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
+			CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			PaginatorExtras extras = paginateBuilder.getExtras();
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
-			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 			int maxedCount = player.getNumMaxedCollections();
 			int maxCountType = 0;
 			int totalCountType = 0;
@@ -113,7 +114,7 @@ public class CollectionsSlashCommand extends SlashCommand {
 				totalCountType++;
 			}
 
-			event.paginate(defaultPaginator(event.getUser()).setPaginatorExtras(extras));
+			event.paginate(paginateBuilder);
 			return null;
 		}
 		return player.getErrorEmbed();

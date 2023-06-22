@@ -57,12 +57,12 @@ public class CalcDropsSlashCommand extends SlashCommand {
 			return errorEmbed("Floor or item must be provided");
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setItemsPerPage(4);
+		CustomPaginator.Builder paginateBuilder;
 		String combo = talisman + bossLuck;
 
 		if (floor != -1) {
-			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
-			paginateBuilder.setPaginatorExtras(extras);
+			paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			PaginatorExtras extras = paginateBuilder.getExtras();
 			boolean isMaster = floor > 7;
 
 			JsonObject data = getDungeonLootJson().get("" + floor).getAsJsonObject();
@@ -96,9 +96,9 @@ public class CalcDropsSlashCommand extends SlashCommand {
 		} else {
 			String itemId = getClosestMatchFromIds(item, getDungeonLootItems());
 
-			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
-			paginateBuilder.setPaginatorExtras(extras);
-			extras
+			paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS).setItemsPerPage(4);
+			PaginatorExtras extras = paginateBuilder
+				.getExtras()
 				.setEveryPageTitle(idToName(itemId) + " Dungeon Loot")
 				.setEveryPageTitleUrl("https://wiki.hypixel.net/Dungeon")
 				.setEveryPageText("Drop chances listed as `not S+, S+`")

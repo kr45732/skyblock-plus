@@ -52,8 +52,8 @@ public class SkyblockSlashCommand extends SlashCommand {
 	public static EmbedBuilder getSkyblock(String username, String profileName, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginator = event.getPaginator();
-			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			CustomPaginator.Builder paginator = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			PaginatorExtras extras = paginator.getExtras();
 			SenitherWeight weight = new SenitherWeight(player, true);
 			LilyWeight lilyWeight = new LilyWeight(player, true);
 
@@ -157,7 +157,7 @@ public class SkyblockSlashCommand extends SlashCommand {
 				extras.addEmbedPage(player.defaultPlayerEmbed().setDescription("Player has not played dungeons"));
 			}
 
-			event.paginate(paginator.setPaginatorExtras(extras));
+			event.paginate(paginator);
 			return null;
 		}
 

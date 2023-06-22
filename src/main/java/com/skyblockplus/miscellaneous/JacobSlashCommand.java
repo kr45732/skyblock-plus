@@ -61,7 +61,8 @@ public class JacobSlashCommand extends SlashCommand {
 				.addField("Contests", "None left for this year!", false);
 		}
 
-		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS).setEveryPageTitle("Jacob Contests");
+		CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS).setItemsPerPage(12);
+		PaginatorExtras extras = paginateBuilder.getExtras().setEveryPageTitle("Jacob Contests");
 		String finalCrop = crop;
 		for (JacobContest contest : crop.equals("All")
 			? data.getContests()
@@ -79,8 +80,7 @@ public class JacobSlashCommand extends SlashCommand {
 		for (int i = 0; i < 3 - extras.getEmbedFields().size() % 3; i++) {
 			extras.addBlankField(true);
 		}
-		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(12);
-		event.paginate(paginateBuilder.setPaginatorExtras(extras));
+		event.paginate(paginateBuilder);
 		return null;
 	}
 

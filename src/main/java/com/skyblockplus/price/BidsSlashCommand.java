@@ -57,8 +57,12 @@ public class BidsSlashCommand extends SlashCommand {
 			return defaultEmbed("No bids found for " + usernameUuidStruct.username());
 		}
 
-		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(10);
-		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS).setItemsPerPage(10);
+		PaginatorExtras extras = paginateBuilder
+			.getExtras()
+			.setEveryPageTitle(usernameUuidStruct.username())
+			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.uuid(), null))
+			.setEveryPageThumbnail(usernameUuidStruct.getAvatarUrl());
 
 		for (JsonElement bid : bids) {
 			String auctionDesc;
@@ -96,12 +100,7 @@ public class BidsSlashCommand extends SlashCommand {
 			extras.addEmbedField(itemName, auctionDesc, false);
 		}
 
-		extras
-			.setEveryPageTitle(usernameUuidStruct.username())
-			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.uuid(), null))
-			.setEveryPageThumbnail(usernameUuidStruct.getAvatarUrl());
-
-		event.paginate(paginateBuilder.setPaginatorExtras(extras));
+		event.paginate(paginateBuilder);
 		return null;
 	}
 

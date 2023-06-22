@@ -82,6 +82,8 @@ public class SettingsExecute {
 			null,
 			"enderman",
 			null,
+			"vampire",
+			"**A player's vampire slayer xp**\nExample: `/settings roles add vampire 2400 @vampire 5`\n",
 			"alchemy",
 			null,
 			"combat",
@@ -130,8 +132,8 @@ public class SettingsExecute {
 			"**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `/settings roles set pet_enthusiast @level 100 pet`\n",
 			"total_slayer",
 			"**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n",
-			"slayer_nine",
-			"**The number of level nine slayers a player has**\nExample: `/settings roles add slayer_nine 3 @role`\n",
+			"maxed_slayers",
+			"**The number of maxed slayers a player has**\nExample: `/settings roles add maxed_slayers 6 @maxed all slayers`\n",
 			"skill_average",
 			"**A player's skill average**\nExample: `/settings roles add skill_average 55 @maxed skills`\n",
 			"pet_score",
@@ -161,7 +163,7 @@ public class SettingsExecute {
 		for (String roleName : allAutomatedRoles.keySet()) {
 			String customDescription =
 				switch (roleName) {
-					case "sven", "rev", "tara", "blaze", "enderman" -> "**A player's " +
+					case "sven", "rev", "tara", "enderman", "blaze" -> "**A player's " +
 					roleName +
 					" slayer xp**\nExample: `/settings roles add " +
 					roleName +
@@ -1442,7 +1444,7 @@ public class SettingsExecute {
 		}
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author);
-		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+		PaginatorExtras extras = paginateBuilder.getExtras().setType(PaginatorExtras.PaginatorType.EMBED_PAGES);
 		extras.addEmbedPage(
 			defaultSettingsEmbed("**" + displaySettings(settings, "applyEnable").replace("•", "").trim() + "**")
 				.addField("Button Message Channel", displaySettings(settings, "applyMessageChannel"), true)
@@ -1499,7 +1501,8 @@ public class SettingsExecute {
 			false
 		);
 		extras.addEmbedPage(eb);
-		paginateBuilder.setPaginatorExtras(extras).build().paginate(interactionHook, 0);
+
+		paginateBuilder.build().paginate(interactionHook, 0);
 		return null;
 	}
 
@@ -1533,7 +1536,7 @@ public class SettingsExecute {
 		for (int i = 0; i < roleNames.size(); i++) {
 			pageNumbers.append("\n**Page ").append(i + 2).append(":** ").append(roleNames.get(i));
 		}
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			"**Automated Roles:** " +
 			(higherDepth(rolesSettings, "enable", false) ? "enabled" : "disabled") +
 			"\n**Use highest:** " +
@@ -1610,10 +1613,11 @@ public class SettingsExecute {
 			}
 
 			pageTitles.add(roleDesc.getKey() + (isOneLevelRole(roleDesc.getKey()) ? " (__one level role__)" : ""));
-			paginateBuilder.addItems(ebFieldString.toString());
+			paginateBuilder.addStrings(ebFieldString.toString());
 		}
 
-		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles)).build().paginate(interactionHook, pageNum);
+		paginateBuilder.getExtras().setTitles(pageTitles);
+		paginateBuilder.build().paginate(interactionHook, pageNum);
 		return null;
 	}
 
@@ -2170,7 +2174,7 @@ public class SettingsExecute {
 		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setItemsPerPage(30);
-		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Settings"));
+		paginateBuilder.getExtras().setEveryPageTitle("Settings");
 		String canUse = streamJsonArray(higherDepth(blacklistSettings, "canUse"))
 			.map(g -> jda.getGuildById(g.getAsString()))
 			.filter(Objects::nonNull)
@@ -2182,19 +2186,19 @@ public class SettingsExecute {
 			.map(Guild::getName)
 			.collect(Collectors.joining(", "));
 
-		paginateBuilder.addItems(
+		paginateBuilder.addStrings(
 			"• Shared with: " + (canUse.isEmpty() ? "none" : canUse),
 			"• Using: " + (isUsing.isEmpty() ? "none" : isUsing),
 			"• Blacklist size (this server): " + currentBlacklist.size()
 		);
-		paginateBuilder.addItems(Collections.nCopies(27, "").toArray(new String[0]));
+		paginateBuilder.addStrings(Collections.nCopies(27, "").toArray(new String[0]));
 
 		streamJsonArray(higherDepth(blacklistSettings, "isUsing"))
 			.map(g -> higherDepth(database.getBlacklistSettings(g.getAsString()), "blacklist").getAsJsonArray())
 			.forEach(currentBlacklist::addAll);
 
 		for (JsonElement blacklisted : currentBlacklist) {
-			paginateBuilder.addItems(
+			paginateBuilder.addStrings(
 				"• " +
 				nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) +
 				" - " +

@@ -157,6 +157,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 	public static LevelRecord getCoreTasksEmbed(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Core Tasks");
+		JsonElement taskJson = higherDepth(getSbLevelsJson(), "core_task");
 
 		// Skills
 		int skillsSbXp = 0;
@@ -178,13 +179,17 @@ public class LevelSlashCommand extends SlashCommand {
 		}
 
 		// Fairy souls
-		int fairySoulSbXp = player.getFairySouls() / 5 * 10;
+		int fairySoulSbXp = player.getFairySouls() / 5 * higherDepth(taskJson, "fairy_souls_xp").getAsInt();
 
 		// Accessories
-		int magicPowerSbXp = higherDepth(player.profileJson(), "accessory_bag_storage.highest_magical_power", player.getMagicPower());
+		int magicPowerSbXp =
+			higherDepth(player.profileJson(), "accessory_bag_storage.highest_magical_power", player.getMagicPower()) *
+			higherDepth(taskJson, "accessory_bag_xp").getAsInt();
 
 		// Pets
-		int petScoreSbXp = higherDepth(player.profileJson(), "leveling.highest_pet_score", player.getPetScore()) * 3;
+		int petScoreSbXp =
+			higherDepth(player.profileJson(), "leveling.highest_pet_score", player.getPetScore()) *
+			higherDepth(taskJson, "pet_score_xp").getAsInt();
 
 		// Collections
 		Map<String, Long> collections = new HashMap<>();
@@ -203,7 +208,7 @@ public class LevelSlashCommand extends SlashCommand {
 			if (tiers != null) {
 				for (JsonElement amtRequired : tiers.getAsJsonArray()) {
 					if (collection.getValue() >= amtRequired.getAsLong()) {
-						collectionsSbXp += 4;
+						collectionsSbXp += higherDepth(taskJson, "collections_xp").getAsInt();
 					} else {
 						break;
 					}
@@ -232,30 +237,25 @@ public class LevelSlashCommand extends SlashCommand {
 		if (completedTasks != null) {
 			for (JsonElement task : completedTasks.getAsJsonArray()) {
 				if (task.getAsString().startsWith("BANK_UPGRADE_")) {
-					bankUpgradesSbXp +=
-						switch (task.getAsString().split("BANK_UPGRADE_")[1]) {
-							case "GOLD" -> 10;
-							case "DELUXE" -> 15;
-							case "SUPER_DELUXE" -> 20;
-							case "PREMIER" -> 30;
-							case "LUXURIOUS" -> 40;
-							case "PALATIAL" -> 50;
-							default -> 0;
-						};
+					bankUpgradesSbXp += higherDepth(taskJson, "bank_upgrades_xp." + task.getAsString()).getAsInt();
 				}
 			}
 		}
 
 		// Core tasks total
 		int categoryTotal = skillsSbXp + fairySoulSbXp + collectionsSbXp + minionsSbXp;
-		LevelRecord levelRecord = new LevelRecord(eb, categoryTotal + magicPowerSbXp + petScoreSbXp, categoryTotal, 15430);
-		eb.appendDescription("\n" + getEmoji("DIAMOND_SWORD") + " Skill Level Up: " + formatNumber(skillsSbXp) + " / 7,500");
-		eb.appendDescription("\n" + getEmoji("REVIVE_STONE") + " Fairy Souls: " + formatNumber(fairySoulSbXp) + " / 470");
+		LevelRecord levelRecord = new LevelRecord("core_task", eb, categoryTotal + magicPowerSbXp + petScoreSbXp, categoryTotal);
+		eb.appendDescription("\n" + getEmoji("DIAMOND_SWORD") + " Skill Level Up: " + getFormatted(taskJson, "skill_level_up", skillsSbXp));
+		eb.appendDescription("\n" + getEmoji("REVIVE_STONE") + " Fairy Souls: " + getFormatted(taskJson, "fairy_souls", fairySoulSbXp));
 		eb.appendDescription("\n" + getEmoji("HEGEMONY_ARTIFACT") + " Accessory Bag: " + formatNumber(magicPowerSbXp));
 		eb.appendDescription("\n" + getEmoji("BONE") + " Pet Score: " + formatNumber(petScoreSbXp));
-		eb.appendDescription("\n" + getEmoji("PAINTING") + " Collections: " + formatNumber(collectionsSbXp) + " / 2,452");
-		eb.appendDescription("\n" + getEmoji("COBBLESTONE_GENERATOR_1") + " Craft Minions: " + formatNumber(minionsSbXp) + " / 2,801");
-		eb.appendDescription("\n" + getEmoji("PERSONAL_BANK_ITEM") + " Bank Upgrades: " + formatNumber(bankUpgradesSbXp) + " / 200");
+		eb.appendDescription("\n" + getEmoji("PAINTING") + " Collections: " + getFormatted(taskJson, "collections", collectionsSbXp));
+		eb.appendDescription(
+			"\n" + getEmoji("COBBLESTONE_GENERATOR_1") + " Craft Minions: " + getFormatted(taskJson, "craft_minions", minionsSbXp)
+		);
+		eb.appendDescription(
+			"\n" + getEmoji("PERSONAL_BANK_ITEM") + " Bank Upgrades: " + getFormatted(taskJson, "bank_upgrades", bankUpgradesSbXp)
+		);
 		eb.getDescriptionBuilder().insert(0, getEmoji("NETHER_STAR") + " **Core Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
@@ -263,6 +263,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 	public static LevelRecord getEventTasksEmbed(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Event Tasks");
+		JsonElement taskJson = higherDepth(getSbLevelsJson(), "event_task");
 
 		// Mining fiesta
 		int miningFiestaSbXp = higherDepth(player.profileJson(), "leveling.mining_fiesta_ores_mined", 0) / 5000;
@@ -276,25 +277,22 @@ public class LevelSlashCommand extends SlashCommand {
 		if (completedTasks != null) {
 			for (JsonElement task : completedTasks.getAsJsonArray()) {
 				if (task.getAsString().startsWith("SPOOKY_FESTIVAL_")) {
-					spookyFestivalSbXp +=
-						switch (task.getAsString().split("SPOOKY_FESTIVAL_")[1]) {
-							case "WOOD" -> 10;
-							case "STONE" -> 20;
-							case "IRON" -> 30;
-							case "GOLD" -> 40;
-							case "DIAMOND" -> 50;
-							case "EMERALD" -> 75;
-							default -> 0;
-						};
+					spookyFestivalSbXp += higherDepth(getSbLevelsJson(), "spooky_festival_xp." + task.getAsString()).getAsInt();
 				}
 			}
 		}
 
-		// Core tasks total
-		LevelRecord levelRecord = new LevelRecord(eb, miningFiestaSbXp + fishingFestivalSbXp + spookyFestivalSbXp, 525);
-		eb.appendDescription("\n" + getEmoji("IRON_PICKAXE") + " Mining Fiesta: " + formatNumber(miningFiestaSbXp) + " / 200");
-		eb.appendDescription("\n" + getEmoji("FISHING_ROD") + " Fishing Festival: " + formatNumber(fishingFestivalSbXp) + " / 100");
-		eb.appendDescription("\n" + getEmoji("JACK_O_LANTERN") + " Spooky Festival: " + formatNumber(spookyFestivalSbXp) + " / 225");
+		// Event tasks total
+		LevelRecord levelRecord = new LevelRecord("event_task", eb, miningFiestaSbXp + fishingFestivalSbXp + spookyFestivalSbXp);
+		eb.appendDescription(
+			"\n" + getEmoji("IRON_PICKAXE") + " Mining Fiesta: " + getFormatted(taskJson, "mining_fiesta", miningFiestaSbXp)
+		);
+		eb.appendDescription(
+			"\n" + getEmoji("FISHING_ROD") + " Fishing Festival: " + getFormatted(taskJson, "fishing_festival", fishingFestivalSbXp)
+		);
+		eb.appendDescription(
+			"\n" + getEmoji("JACK_O_LANTERN") + " Spooky Festival: " + getFormatted(taskJson, "spooky_festival", spookyFestivalSbXp)
+		);
 		eb.getDescriptionBuilder().insert(0, getEmoji("WATCH") + " **Event Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
@@ -302,6 +300,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 	public static LevelRecord getDungeonTasks(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Dungeon Tasks");
+		JsonElement taskJson = higherDepth(getSbLevelsJson(), "dungeon_task");
 
 		// Catacombs
 		int catacombsSbXp = 0;
@@ -321,7 +320,7 @@ public class LevelSlashCommand extends SlashCommand {
 		for (String className : DUNGEON_CLASS_NAMES) {
 			SkillsStruct classInfo = player.getDungeonClass(className);
 			if (classInfo != null) {
-				classSbXp += Math.min(classInfo.currentLevel(), 50) * 4;
+				classSbXp += Math.min(classInfo.currentLevel(), 50) * higherDepth(taskJson, "class_xp").getAsInt();
 			}
 		}
 
@@ -331,11 +330,8 @@ public class LevelSlashCommand extends SlashCommand {
 		if (cataTierCompletions != null) {
 			for (Map.Entry<String, JsonElement> completion : cataTierCompletions.getAsJsonObject().entrySet()) {
 				if (completion.getValue().getAsInt() > 0) {
-					if (Integer.parseInt(completion.getKey()) <= 4) {
-						floorCompletionSbXp += 20;
-					} else {
-						floorCompletionSbXp += 30;
-					}
+					floorCompletionSbXp +=
+						higherDepth(taskJson, "complete_catacombs.[" + Integer.parseInt(completion.getKey()) + "]").getAsInt();
 				}
 			}
 		}
@@ -346,15 +342,26 @@ public class LevelSlashCommand extends SlashCommand {
 		if (masterTierCompletions != null) {
 			for (Map.Entry<String, JsonElement> completion : masterTierCompletions.getAsJsonObject().entrySet()) {
 				if (completion.getValue().getAsInt() > 0) {
-					masterFloorCompletionSbXp += 50;
+					masterFloorCompletionSbXp += higherDepth(taskJson, "complete_master_catacombs").getAsInt();
 				}
 			}
 		}
 
 		// Dungeon tasks total
-		LevelRecord levelRecord = new LevelRecord(eb, catacombsSbXp + classSbXp + floorCompletionSbXp + masterFloorCompletionSbXp, 2760);
-		eb.appendDescription("\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Catacombs Level Up: " + formatNumber(catacombsSbXp) + " / 1220");
-		eb.appendDescription("\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Class Level Up: " + formatNumber(classSbXp) + " / 1000");
+		LevelRecord levelRecord = new LevelRecord(
+			"dungeon_task",
+			eb,
+			catacombsSbXp + classSbXp + floorCompletionSbXp + masterFloorCompletionSbXp
+		);
+		eb.appendDescription(
+			"\n" +
+			DUNGEON_EMOJI_MAP.get("catacombs") +
+			" Catacombs Level Up: " +
+			getFormatted(taskJson, "catacombs_level_up", catacombsSbXp)
+		);
+		eb.appendDescription(
+			"\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Class Level Up: " + getFormatted(taskJson, "class_level_up", classSbXp)
+		);
 		eb.appendDescription(
 			"\n" + DUNGEON_EMOJI_MAP.get("catacombs") + " Complete The Catacombs: " + formatNumber(floorCompletionSbXp) + " / 190"
 		);
@@ -374,19 +381,17 @@ public class LevelSlashCommand extends SlashCommand {
 
 	public static LevelRecord getEssenceShopTasks(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Essence Shop Tasks");
+		JsonElement taskJson = higherDepth(getSbLevelsJson(), "essence_shop_task");
 
 		int essenceSbXp = 0;
-		JsonArray essenceSteps = higherDepth(getSbLevelsJson(), "essence_shop_task.essence_shop_xp").getAsJsonArray();
-		JsonElement essencePerks = higherDepth(player.profileJson(), "perks");
-
 		for (Map.Entry<String, JsonElement> essenceShop : getEssenceShopsJson().entrySet()) {
 			int shopSbXp = 0;
 			for (Map.Entry<String, JsonElement> upgrade : essenceShop.getValue().getAsJsonObject().entrySet()) {
-				int upgradeTier = higherDepth(essencePerks, upgrade.getKey(), 0);
+				int upgradeTier = higherDepth(player.profileJson(), "perks." + upgrade.getKey(), 0);
 
 				int upgradeSbXp = 0;
 				for (int i = 0; i < upgradeTier; i++) {
-					upgradeSbXp += essenceSteps.get(i).getAsInt();
+					upgradeSbXp += higherDepth(taskJson, "essence_shop_xp.[" + i + "]").getAsInt();
 				}
 
 				shopSbXp += upgradeSbXp;
@@ -401,14 +406,12 @@ public class LevelSlashCommand extends SlashCommand {
 				" " +
 				capitalizeString(essenceType) +
 				" Essence Shop: " +
-				formatNumber(shopSbXp) +
-				" / " +
-				higherDepth(getSbLevelsJson(), "essence_shop_task." + essenceShop.getKey().toLowerCase() + "_shop").getAsInt()
+				getFormatted(taskJson, essenceShop.getKey().toLowerCase() + "_shop", shopSbXp)
 			);
 		}
 
 		// Essence shop tasks total
-		LevelRecord levelRecord = new LevelRecord(eb, essenceSbXp, 856);
+		LevelRecord levelRecord = new LevelRecord("essence_shop_task", eb, essenceSbXp);
 		eb
 			.getDescriptionBuilder()
 			.insert(0, ESSENCE_EMOJI_MAP.get("wither") + " **Essence Shop Tasks:** " + levelRecord.getFormatted() + "\n");
@@ -418,14 +421,14 @@ public class LevelSlashCommand extends SlashCommand {
 
 	public static LevelRecord getSlayingTasks(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Slaying Tasks");
+		JsonElement taskJson = higherDepth(getSbLevelsJson(), "slaying_task");
 
 		// Slayer level up
 		int slayerLevelUpSbXp = 0;
-		JsonArray slayerLevelUpXp = higherDepth(getSbLevelsJson(), "slaying_task.slayer_level_up_xp").getAsJsonArray();
 		for (String slayer : SLAYER_NAMES) {
 			int slayerLevel = player.getSlayerLevel(slayer);
 			for (int i = 0; i < slayerLevel; i++) {
-				slayerLevelUpSbXp += slayerLevelUpXp.get(i).getAsInt();
+				slayerLevelUpSbXp += higherDepth(taskJson, "slayer_level_up_xp.[" + i + "]").getAsInt();
 			}
 		}
 
@@ -462,7 +465,7 @@ public class LevelSlashCommand extends SlashCommand {
 		// Kuudra
 		int defeatKuudraSbXp = 0;
 
-		JsonArray defeatKuudraXp = higherDepth(getSbLevelsJson(), "slaying_task.defeat_kuudra_xp").getAsJsonArray();
+		JsonArray defeatKuudraXp = higherDepth(taskJson, "defeat_kuudra_xp").getAsJsonArray();
 		JsonElement kuudraTiers = higherDepth(player.profileJson(), "nether_island_player_data.kuudra_completed_tiers");
 		if (kuudraTiers != null) {
 			int kuudraBossCollection = 0;
@@ -517,9 +520,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Slay dragons
 		int dragonSlaySbXp = 0;
-		for (Map.Entry<String, JsonElement> entry : higherDepth(getSbLevelsJson(), "slaying_task.slay_dragons_xp")
-			.getAsJsonObject()
-			.entrySet()) {
+		for (Map.Entry<String, JsonElement> entry : higherDepth(taskJson, "slay_dragons_xp").getAsJsonObject().entrySet()) {
 			if (higherDepth(player.profileJson(), "bestiary.kills_" + entry.getKey() + "_100", 0) > 0) {
 				dragonSlaySbXp += entry.getValue().getAsInt();
 			}
@@ -527,7 +528,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Slayer kills
 		int defeatSlayerSbXp = 0;
-		JsonArray defeatSlayersXp = higherDepth(getSbLevelsJson(), "slaying_task.defeat_slayers_xp").getAsJsonArray();
+		JsonArray defeatSlayersXp = higherDepth(taskJson, "defeat_slayers_xp").getAsJsonArray();
 		for (String slayer : SLAYER_NAMES) {
 			for (int i = 0; i <= 4; i++) {
 				if (player.getSlayerBossKills(slayer, i) > 0) {
@@ -556,7 +557,7 @@ public class LevelSlashCommand extends SlashCommand {
 			defeatSlayerSbXp +
 			defeatKuudraSbXp +
 			defeatedArachneSbXp;
-		LevelRecord levelRecord = new LevelRecord(eb, categorySbXp + bestiarySbXp, categorySbXp, 6125);
+		LevelRecord levelRecord = new LevelRecord("slaying_task", eb, categorySbXp + bestiarySbXp, categorySbXp);
 		eb.appendDescription("\n" + getEmoji("EXP_BOTTLE") + " Slayer Level Up: " + formatNumber(slayerLevelUpSbXp) + " / 3,625");
 		eb.appendDescription(
 			"\n" + getEmoji("DIAMOND_THORN_HEAD") + " Boss Collections: " + formatNumber(bossCollectionsSbXp) + " / 1,015"
@@ -732,8 +733,8 @@ public class LevelSlashCommand extends SlashCommand {
 		fishingStr += "\n" + getEmoji("DOLPHIN;4") + " Dolphin Milestones: " + formatNumber(dolphinPetSbXp) + " / 100";
 		eb.addField("Fishing | " + formatNumber(fishingTotalSbXp), fishingStr, false);
 
-		// Total xp
-		LevelRecord levelRecord = new LevelRecord(eb, miningTotalSbXp + anitaShopUpgradeSbXp + fishingTotalSbXp, 4085);
+		// Skill related task total
+		LevelRecord levelRecord = new LevelRecord("skill_related_task", eb, miningTotalSbXp + anitaShopUpgradeSbXp + fishingTotalSbXp);
 		eb.getDescriptionBuilder().insert(0, getEmoji("DIAMOND_SWORD") + " **Skill Related Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
@@ -837,10 +838,10 @@ public class LevelSlashCommand extends SlashCommand {
 		// Miscellaneous tasks total
 		int categoryTotalSbXp = reaperPepperSbXp + dojoSbXp + harpSbXp + abiphoneSbXp + communityShopSbXp + personalBankSbXp;
 		LevelRecord levelRecord = new LevelRecord(
+			"miscellaneous_task",
 			eb,
 			categoryTotalSbXp + accessoryBagUpgradeSbXp + unlockingPowersSbXp,
-			categoryTotalSbXp,
-			1351
+			categoryTotalSbXp
 		);
 		eb.appendDescription(
 			"\n" + getEmoji("HEGEMONY_ARTIFACT") + " Accessory Bag Upgrades: " + formatNumber(accessoryBagUpgradeSbXp) + " / 396"
@@ -863,26 +864,25 @@ public class LevelSlashCommand extends SlashCommand {
 
 	public static LevelRecord getStoryTasks(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed(" | Story Tasks");
+		JsonElement taskJson = higherDepth(getSbLevelsJson(), "story_task");
 
-		// Objectives/quests
+		// Objectives
 		int objectivesSbXp = 0;
-		JsonArray storyTaskNames = higherDepth(getSbLevelsJson(), "story_task.complete_objectives_names").getAsJsonArray();
-		JsonElement objectives = higherDepth(player.profileJson(), "objectives");
-		if (objectives != null) {
-			for (JsonElement storyTaskName : storyTaskNames) {
-				String storyTaskNameStr = storyTaskName.getAsString();
-				if (objectives.getAsJsonObject().has(storyTaskNameStr)) {
-					JsonObject objective = objectives.getAsJsonObject().getAsJsonObject(storyTaskNameStr);
-					if (objective.has("status") && objective.get("status").getAsString().equals("COMPLETE")) {
-						objectivesSbXp += 5;
-					}
+		JsonElement completedTasks = higherDepth(player.profileJson(), "leveling.completed_tasks");
+		if (completedTasks != null) {
+			for (JsonElement taskEle : higherDepth(taskJson, "complete_objectives_names").getAsJsonArray()) {
+				String taskName = "OBJECTIVE_" + taskEle.getAsString().toUpperCase();
+				if (streamJsonArray(completedTasks).anyMatch(e -> e.getAsString().equals(taskName))) {
+					objectivesSbXp += higherDepth(taskJson, "complete_objectives_xp").getAsInt();
 				}
 			}
 		}
 
 		// Story tasks total
-		LevelRecord levelRecord = new LevelRecord(eb, objectivesSbXp, 125);
-		eb.appendDescription("\n" + getEmoji("BOOK") + " Complete Objectives: " + formatNumber(objectivesSbXp) + " / 125");
+		LevelRecord levelRecord = new LevelRecord("story_task", eb, objectivesSbXp);
+		eb.appendDescription(
+			"\n" + getEmoji("BOOK") + " Complete Objectives: " + getFormatted(taskJson, "complete_objectives", objectivesSbXp)
+		);
 		eb.getDescriptionBuilder().insert(0, getEmoji("BOOK_AND_QUILL") + " **Story Tasks:** " + levelRecord.getFormatted() + "\n");
 
 		return levelRecord;
@@ -898,6 +898,10 @@ public class LevelSlashCommand extends SlashCommand {
 			}
 		}
 		return gain;
+	}
+
+	private static String getFormatted(JsonElement taskJson, String name, int xp) {
+		return formatNumber(xp) + " / " + formatNumber(higherDepth(taskJson, name).getAsInt());
 	}
 
 	@Override
@@ -925,8 +929,12 @@ public class LevelSlashCommand extends SlashCommand {
 	}
 
 	public record LevelRecord(EmbedBuilder eb, int total, int categoryTotal, int max) {
-		public LevelRecord(EmbedBuilder eb, int total, int max) {
-			this(eb, total, total, max);
+		public LevelRecord(String name, EmbedBuilder eb, int total, int categoryTotal) {
+			this(eb, total, categoryTotal, higherDepth(getSbLevelsJson(), "category_xp." + name).getAsInt());
+		}
+
+		public LevelRecord(String name, EmbedBuilder eb, int total) {
+			this(name, eb, total, total);
 		}
 
 		public String getFormatted() {

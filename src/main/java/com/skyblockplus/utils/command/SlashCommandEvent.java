@@ -156,6 +156,10 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	}
 
 	public CustomPaginator.Builder getPaginator() {
-		return defaultPaginator(getUser());
+		return getPaginator(PaginatorExtras.PaginatorType.DEFAULT);
+	}
+
+	public CustomPaginator.Builder getPaginator(PaginatorExtras.PaginatorType type) {
+		return defaultPaginator(getUser()).updateExtras(e -> e.setType(type));
 	}
 }

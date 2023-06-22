@@ -38,12 +38,11 @@ public class SenitherSlayerWeight extends SlayerWeight {
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName, int currentSlayerXp) {
-		JsonArray curWeights;
-		try {
-			curWeights = higherDepth(getWeightJson(), "senither.slayer." + SLAYER_NAMES_MAP.get(slayerName)).getAsJsonArray();
-		} catch (Exception e) {
+		if (slayerName.equals("blaze") || slayerName.equals("vampire")) {
 			return new WeightStruct();
 		}
+
+		JsonArray curWeights = higherDepth(getWeightJson(), "senither.slayer." + SLAYER_NAMES_MAP.get(slayerName)).getAsJsonArray();
 
 		double divider = curWeights.get(0).getAsDouble();
 		double modifier = curWeights.get(1).getAsDouble();

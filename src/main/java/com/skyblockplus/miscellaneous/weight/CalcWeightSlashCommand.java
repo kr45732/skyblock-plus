@@ -182,7 +182,7 @@ public class CalcWeightSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Calculate predicted weight change for a reaching certain skill/slayer/catacombs amount")
+			.slash(name, "Calculate predicted weight change for a reaching certain skill, slayer, or dungeons amount")
 			.addOptions(
 				new OptionData(OptionType.STRING, "type", "Skill, slayer, or dungeon type to see change of", true)
 					.addChoice("Sven", "sven")
