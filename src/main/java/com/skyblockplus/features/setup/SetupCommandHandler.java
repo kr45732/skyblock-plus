@@ -48,7 +48,6 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 public class SetupCommandHandler {
 
@@ -66,25 +65,21 @@ public class SetupCommandHandler {
 		// TODO: add sb event notif setup
 		switch (this.featureType) {
 			case VERIFY -> hook
-				.editOriginal(
-					new MessageEditBuilder()
-						.setEmbeds(
-							defaultEmbed("Setup").setDescription("Use the menu below to configure the verification settings").build()
-						)
-						.setActionRow(
-							StringSelectMenu
-								.create("setup_command_" + featureType)
-								.addOption("Enable", "enable")
-								.addOption("Verification Message", "message")
-								.addOption("Verified Roles", "roles")
-								.addOption("Verification Channel", "channel")
-								.addOption("Nickname Template", "nickname")
-								.addOption("Remove Role", "remove_role")
-								.addOption("Toggle Sync Roles & Name", "sync")
-								.addOption("Toggle DM On Join Sync", "dm_on_join")
-								.addOption("Toggle SB Roles Sync On Join", "roles_claim")
-								.build()
-						)
+				.editOriginalEmbeds(
+					defaultEmbed("Setup").setDescription("Use the menu below to configure the verification settings").build()
+				)
+				.setActionRow(
+					StringSelectMenu
+						.create("setup_command_" + featureType)
+						.addOption("Enable", "enable")
+						.addOption("Verification Message", "message")
+						.addOption("Verified Roles", "roles")
+						.addOption("Verification Channel", "channel")
+						.addOption("Nickname Template", "nickname")
+						.addOption("Remove Role", "remove_role")
+						.addOption("Toggle Sync Roles & Name", "sync")
+						.addOption("Toggle DM On Join Sync", "dm_on_join")
+						.addOption("Toggle SB Roles Sync On Join", "roles_claim")
 						.build()
 				)
 				.queue(m -> waitForEvent(m.getId()));
@@ -100,16 +95,12 @@ public class SetupCommandHandler {
 				}
 				selectOptions.add(SelectOption.of("Create New Automatic Guild", "$new"));
 				hook
-					.editOriginal(
-						new MessageEditBuilder()
-							.setEmbeds(
-								defaultEmbed("Setup")
-									.setDescription("Use the menu below to choose an existing automatic guild or create a new one")
-									.build()
-							)
-							.setActionRow(StringSelectMenu.create("setup_command_" + featureType).addOptions(selectOptions).build())
+					.editOriginalEmbeds(
+						defaultEmbed("Setup")
+							.setDescription("Use the menu below to choose an existing automatic guild or create a new one")
 							.build()
 					)
+					.setActionRow(StringSelectMenu.create("setup_command_" + featureType).addOptions(selectOptions).build())
 					.queue(m -> waitForEvent(m.getId()));
 			}
 			case ROLES -> hook
@@ -117,65 +108,53 @@ public class SetupCommandHandler {
 					defaultEmbed("Setup")
 						.setDescription(
 							"""
-                                                        **__Overview__**
-                                                        1) When a user runs `/roles claim` or when their roles are synced, their stats are fetched
-                                                        2) Based on the roles configuration for this server and the user's stats, the corresponding roles will be given
+							**__Overview__**
+							1) When a user runs `/roles claim` or when their roles are synced, their stats are fetched
+							2) Based on the roles configuration for this server and the user's stats, the corresponding roles will be given
 
-                                                        **__Setup__**
-                                                        - In order to enable automatic roles, there must be at least one role setup:
-                                                        - `/settings roles add <role_name> <value> <@role>` - add a level to a role
-                                                        - `/settings roles set <role_name> <@role>` - set a one level role
+							**__Setup__**
+							- In order to enable automatic roles, there must be at least one role setup:
+							- `/settings roles add <role_name> <value> <@role>` - add a level to a role
+							- `/settings roles set <role_name> <@role>` - set a one level role
 
-                                                        **__Enable__**
-                                                        - Once at least one role is setup, run `/settings roles enable` to enable roles
-                                                        - To view all the roles, their descriptions, and examples, run `/settings roles`
-                                                        - For more help, run `/help settings roles` or follow the example video [__here__](https://streamable.com/wninsw) (outdated)
-                                                        """
+							**__Enable__**
+							- Once at least one role is setup, run `/settings roles enable` to enable roles
+							- To view all the roles, their descriptions, and examples, run `/settings roles`
+							- For more help, run `/help settings roles`
+							"""
 						)
 						.build()
 				)
 				.setComponents()
 				.queue();
 			case FETCHUR -> hook
-				.editOriginal(
-					new MessageEditBuilder()
-						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the fetchur settings").build())
-						.setActionRow(
-							StringSelectMenu
-								.create("setup_command_" + featureType)
-								.addOption("Fetchur Channel", "channel")
-								.addOption("Fetchur Role", "role")
-								.build()
-						)
+				.editOriginalEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the fetchur settings").build())
+				.setActionRow(
+					StringSelectMenu
+						.create("setup_command_" + featureType)
+						.addOption("Fetchur Channel", "channel")
+						.addOption("Fetchur Role", "role")
 						.build()
 				)
 				.queue(m -> waitForEvent(m.getId()));
 			case MAYOR -> hook
-				.editOriginal(
-					new MessageEditBuilder()
-						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the mayor settings").build())
-						.setActionRow(
-							StringSelectMenu
-								.create("setup_command_" + featureType)
-								.addOption("Mayor Channel", "channel")
-								.addOption("Mayor Role", "role")
-								.build()
-						)
+				.editOriginalEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the mayor settings").build())
+				.setActionRow(
+					StringSelectMenu
+						.create("setup_command_" + featureType)
+						.addOption("Mayor Channel", "channel")
+						.addOption("Mayor Role", "role")
 						.build()
 				)
 				.queue(m -> waitForEvent(m.getId()));
 			case JACOB -> hook
-				.editOriginal(
-					new MessageEditBuilder()
-						.setEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the jacob settings").build())
-						.setActionRow(
-							StringSelectMenu
-								.create("setup_command_" + featureType)
-								.addOption("Enable", "enable")
-								.addOption("Jacob Channel", "channel")
-								.addOption("Crops", "crops")
-								.build()
-						)
+				.editOriginalEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the jacob settings").build())
+				.setActionRow(
+					StringSelectMenu
+						.create("setup_command_" + featureType)
+						.addOption("Enable", "enable")
+						.addOption("Jacob Channel", "channel")
+						.addOption("Crops", "crops")
 						.build()
 				)
 				.queue(m -> waitForEvent(m.getId()));
@@ -190,7 +169,7 @@ public class SetupCommandHandler {
 				event.getMessage().getId().equals(messageId) &&
 				event.getUser().getId().equals(hook.getInteraction().getUser().getId())
 			);
-		} else if (genericEvent instanceof GenericSelectMenuInteractionEvent event) {
+		} else if (genericEvent instanceof GenericSelectMenuInteractionEvent<?, ?> event) {
 			if (event.isFromGuild() && event.getUser().getId().equals(hook.getInteraction().getUser().getId())) {
 				if (event.getMessageId().equals(messageId)) {
 					return true;
@@ -387,32 +366,26 @@ public class SetupCommandHandler {
 					FeatureType.valueOf(event.getSelectedOptions().get(0).getValue().toUpperCase()).setGuildName(featureType.guildName);
 				switch (featureType) {
 					case GUILD_APPLY -> event
-						.editMessage(
-							new MessageEditBuilder()
-								.setEmbeds(
-									defaultEmbed("Setup")
-										.setDescription("Use the menu below to configure the guild application settings")
-										.build()
-								)
-								.setActionRow(
-									StringSelectMenu
-										.create("setup_command_" + featureType)
-										.addOption("Enable", "enable")
-										.addOption("Application Message", "message")
-										.addOption("Application Channel", "channel")
-										.addOption("New Application Category", "category")
-										.addOption("Staff Channel", "staff_channel")
-										.addOption("Staff Role", "staff_role")
-										.addOption("Accepted Message", "accept_message")
-										.addOption("Denied Message", "deny_message")
-										.addOption("Waitlisted Message", "waitlist_message")
-										.addOption("Waiting Channel", "waiting_channel")
-										.addOption("Requirements", "requirements")
-										.addOption("Toggle Scammer Check", "scammer_check")
-										.addOption("Required Gamemode", "gamemode")
-										.addOption("Toggle APIs Enabled Check", "check_api")
-										.build()
-								)
+						.editMessageEmbeds(
+							defaultEmbed("Setup").setDescription("Use the menu below to configure the guild application settings").build()
+						)
+						.setActionRow(
+							StringSelectMenu
+								.create("setup_command_" + featureType)
+								.addOption("Enable", "enable")
+								.addOption("Application Message", "message")
+								.addOption("Application Channel", "channel")
+								.addOption("New Application Category", "category")
+								.addOption("Staff Channel", "staff_channel")
+								.addOption("Staff Role", "staff_role")
+								.addOption("Accepted Message", "accept_message")
+								.addOption("Denied Message", "deny_message")
+								.addOption("Waitlisted Message", "waitlist_message")
+								.addOption("Waiting Channel", "waiting_channel")
+								.addOption("Requirements", "requirements")
+								.addOption("Toggle Scammer Check", "scammer_check")
+								.addOption("Required Gamemode", "gamemode")
+								.addOption("Toggle APIs Enabled Check", "check_api")
 								.build()
 						)
 						.queue();
