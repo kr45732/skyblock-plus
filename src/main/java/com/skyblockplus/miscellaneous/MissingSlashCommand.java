@@ -122,7 +122,12 @@ public class MissingSlashCommand extends SlashCommand {
 			Map.Entry<Double, List<String>> missing = getMissingInfo(missingTalismans, player, calc);
 
 			for (int i = 0; i < missingTalismans.size(); i++) {
-				String highestValue = higherDepth(talismanUpgrades, missingTalismans.get(i) + ".[-1]", null);
+				String name = missingTalismans.get(i);
+				if (name.startsWith("PARTY_HAT_CRAB")) {
+					continue;
+				}
+
+				String highestValue = higherDepth(talismanUpgrades, name + ".[-1]", null);
 				if (highestValue != null) {
 					missingTalismans.set(i, highestValue);
 				}
@@ -245,7 +250,7 @@ public class MissingSlashCommand extends SlashCommand {
 				getEmoji(curId) +
 				" " +
 				(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
-				(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
+				(!curId.startsWith("PARTY_HAT_CRAB") && higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
 				costOut
 			);
 		}
