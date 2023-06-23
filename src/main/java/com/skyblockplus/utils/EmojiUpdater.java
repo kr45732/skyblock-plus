@@ -537,7 +537,10 @@ public class EmojiUpdater {
 						.replace("travel_scroll_to_arachnes_sanctuary", "travel_scroll_arachne_sanctuary")
 						.replace("travel_scroll_to_the_smoldering_tomb", "travel_scroll_smoldering_tomb")
 						.replace("travel_scroll_to_the_trappers_den", "travel_scroll_trappers_den")
-						.replace("extreme_bingo_card_extreme_bingo_1", "extreme_bingo_card");
+						.replace("extreme_bingo_card_extreme_bingo_1", "extreme_bingo_card")
+						.replace("travel_scroll_to_the_wizard_tower", "travel_scroll_wizard_tower")
+						.replace("perma_jelled_garlic_flavored_re_heated_gummy_polar_bear", "gummy_polar_bear_accessory");
+
 					name =
 						switch (name = name.startsWith("_") ? name.substring(1) : name) {
 							case "x" -> "xx";
