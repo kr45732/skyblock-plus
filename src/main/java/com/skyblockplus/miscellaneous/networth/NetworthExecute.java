@@ -1062,7 +1062,7 @@ public class NetworthExecute {
 					craftCost = 0;
 					break;
 				}
-				craftCost += itemLowestPrice * Integer.parseInt(idCountSplit[1]);
+				craftCost += itemLowestPrice * Double.parseDouble(idCountSplit[1]);
 			}
 			craftCost /= getRecipeCount(itemId);
 		}
@@ -1113,7 +1113,7 @@ public class NetworthExecute {
 				double partialCraftCost = 0;
 				for (String item : recipe) {
 					String[] idCountSplit = item.split(":");
-					partialCraftCost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
+					partialCraftCost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Double.parseDouble(idCountSplit[1]);
 				}
 				partialCraftCost /= getRecipeCount(itemId);
 

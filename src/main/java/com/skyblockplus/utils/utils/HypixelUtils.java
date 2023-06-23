@@ -170,6 +170,7 @@ public class HypixelUtils {
 
 	/**
 	 * Used only for NetworthExecute
+	 * Note: some npc_buy.cost can be decimals
 	 */
 	public static List<String> getRecipe(String itemId) {
 		JsonElement recipe = higherDepth(getInternalJsonMappings(), itemId + ".recipe");

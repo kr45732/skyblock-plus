@@ -25,6 +25,7 @@ import static com.skyblockplus.utils.utils.HttpUtils.*;
 import static com.skyblockplus.utils.utils.HypixelUtils.getNpcSellPrice;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
+import static org.springframework.util.StringUtils.countOccurrencesOf;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
@@ -904,8 +905,10 @@ public class Utils {
 							JsonArray buyCostArr = higherDepth(recipe, "cost").getAsJsonArray();
 							for (int i = 0; i < buyCostArr.size(); i++) {
 								String buyCostArrItem = buyCostArr.get(i).getAsString();
-								if (!buyCostArrItem.matches(".+:\\d+")) {
+								if (countOccurrencesOf(buyCostArrItem, ":") == 0) {
 									buyCostArr.set(i, new JsonPrimitive(buyCostArrItem + ":1"));
+								} else if (buyCostArrItem.endsWith(":")) {
+									buyCostArr.set(i, new JsonPrimitive(buyCostArrItem + "1"));
 								}
 							}
 							buyCostObj.add("cost", buyCostArr);
