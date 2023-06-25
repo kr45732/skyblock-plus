@@ -39,7 +39,7 @@ public class PlaceholderCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
+		new CommandExecute(event) {
 			@Override
 			protected void execute() {
 				String total = roundAndFormat(Runtime.getRuntime().totalMemory() / 1000000.0) + " MB";
@@ -55,15 +55,17 @@ public class PlaceholderCommand extends Command {
 						" MB";
 				}
 
-				embed(
-					defaultEmbed("Debug")
-						.addField("Total", total, false)
-						.addField("Free", free, false)
-						.addField("Used", used, false)
-						.addField("Max", "" + roundAndFormat(Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false)
-				);
+				getChannel()
+					.sendMessageEmbeds(
+						defaultEmbed("Debug")
+							.addField("Total", total, false)
+							.addField("Free", free, false)
+							.addField("Used", used, false)
+							.addField("Max", roundAndFormat(Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false)
+							.build()
+					)
+					.queue();
 			}
-		}
-			.queue();
+		};
 	}
 }

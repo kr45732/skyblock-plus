@@ -128,7 +128,7 @@ public class LevelSlashCommand extends SlashCommand {
 			);
 
 		Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
-		pages.put(SelectOption.of("Overview", "overview"), eb);
+		pages.put(SelectOption.of("Overview", "overview").withEmoji(Emoji.fromFormatted("<:levels:1067859971221499954>")), eb);
 		pages.put(SelectOption.of("Core Tasks", "core_tasks").withEmoji(getEmojiObj("NETHER_STAR")), coreTasks.eb());
 		pages.put(SelectOption.of("Event Tasks", "event_tasks").withEmoji(getEmojiObj("WATCH")), eventTasks.eb());
 		pages.put(
@@ -277,7 +277,7 @@ public class LevelSlashCommand extends SlashCommand {
 		if (completedTasks != null) {
 			for (JsonElement task : completedTasks.getAsJsonArray()) {
 				if (task.getAsString().startsWith("SPOOKY_FESTIVAL_")) {
-					spookyFestivalSbXp += higherDepth(getSbLevelsJson(), "spooky_festival_xp." + task.getAsString()).getAsInt();
+					spookyFestivalSbXp += higherDepth(taskJson, "spooky_festival_xp." + task.getAsString()).getAsInt();
 				}
 			}
 		}

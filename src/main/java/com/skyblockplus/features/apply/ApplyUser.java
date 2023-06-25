@@ -18,7 +18,6 @@
 
 package com.skyblockplus.features.apply;
 
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
 import static com.skyblockplus.utils.utils.StringUtils.*;
@@ -26,7 +25,6 @@ import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.annotations.Expose;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
@@ -35,66 +33,87 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
 public class ApplyUser {
 
-	@Expose(serialize = false, deserialize = false)
-	public ApplyGuild parent;
-
-	public final Map<String, String> profileEmojiToName = new LinkedHashMap<>();
+	private final List<String> profileNames = new ArrayList<>();
 	public String applyingUserId;
-	public String guildId;
 	public String applicationChannelId;
 	public String reactMessageId;
+	// 0 = waiting for user to select profile
+	// 1 = waiting for user to submit application
+	// 2 = waiting for staff to accept or deny application
+	// 3 = user doesn't meet requirements, or was accepted/waitlisted/denied
 	public int state = 0;
 	public String staffChannelId;
-	public String applySubmitedMessageId;
+	private String applySubmitedMessageId;
 	// Embed
-	public String playerSlayer;
-	public String playerSkills;
-	public String playerCatacombs;
-	public String playerWeight;
-	public String playerLilyWeight;
-	public String playerLevel;
-	public String playerUsername;
-	public String playerUuid = "";
-	public String playerCoins;
-	public String ironmanSymbol = "";
-	public String playerProfileName;
-	public String failCause;
+	public final String playerUsername;
+	private final String playerUuid;
+	private String playerSlayer;
+	private String playerSkills;
+	private String playerCatacombs;
+	private String playerWeight;
+	private String playerLilyWeight;
+	private String playerLevel;
+	private String playerCoins;
+	private String ironmanSymbol = "";
+	private String playerProfileName;
 
-	public ApplyUser(ButtonInteractionEvent event, String playerUsername, ApplyGuild parent) {
+	public ApplyUser(ButtonInteractionEvent event, Player.Profile player, ApplyGuild parent) {
+		logCommand(event.getGuild(), event.getUser(), "apply " + player.getUsername());
+
+		this.applyingUserId = event.getUser().getId();
+		this.playerUsername = player.getUsername();
+		this.playerUuid = player.getUuid();
+		JsonElement currentSettings = parent.currentSettings;
+
+		Category applyCategory = null;
 		try {
-			logCommand(event.getGuild(), event.getUser(), "apply " + playerUsername);
+			applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory", null));
+		} catch (Exception ignored) {}
+		if (applyCategory == null) {
+			event
+				.getHook()
+				.editOriginal(client.getError() + " Invalid application category. Please report this to the server's staff.")
+				.queue();
+			return;
+		}
+		if (applyCategory.getChannels().size() == 50) {
+			event
+				.getHook()
+				.editOriginal(
+					client.getError() +
+					" Unable to create a new application since the application category has reached 50/50 channels. Please report this to the server's staff."
+				)
+				.queue();
+			return;
+		}
 
-			this.applyingUserId = event.getUser().getId();
-			this.guildId = event.getGuild().getId();
-			this.playerUsername = playerUsername;
-			this.parent = parent;
-			JsonElement currentSettings = parent.currentSettings;
+		try {
+			staffChannelId = event.getGuild().getTextChannelById(higherDepth(currentSettings, "applyStaffChannel").getAsString()).getId();
+		} catch (Exception e) {
+			event.getHook().editOriginal(client.getError() + " Invalid staff channel. Please report this to the server's staff.").queue();
+			return;
+		}
 
-			Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
-			if (applyCategory.getChannels().size() == 50) {
-				failCause =
-					"Unable to create a new application since the application category has reached 50/50 channels. Please report this to the server's staff.";
-				return;
-			}
-
-			TextChannel applicationChannel;
-			try {
-				ChannelAction<TextChannel> applicationChannelAction = applyCategory
+		ChannelAction<TextChannel> channelAction;
+		try {
+			channelAction =
+				applyCategory
 					.createTextChannel("apply-" + playerUsername)
 					.syncPermissionOverrides()
 					.addPermissionOverride(
@@ -102,147 +121,142 @@ public class ApplyUser {
 						EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND),
 						null
 					)
-					.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
+					.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND), null)
 					.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
-				try {
-					for (JsonElement staffPingRole : higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray()) {
-						applicationChannelAction =
-							applicationChannelAction.addPermissionOverride(
-								event.getGuild().getRoleById(staffPingRole.getAsString()),
-								EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND),
-								null
-							);
-					}
-				} catch (Exception ignored) {}
-
-				applicationChannel = applicationChannelAction.complete();
-			} catch (PermissionException e) {
-				failCause = "Missing permission: " + e.getPermission().getName();
-				return;
-			} catch (ErrorResponseException e) {
-				failCause = "Error when creating channel: " + e.getMeaning();
-				return;
-			}
-			this.applicationChannelId = applicationChannel.getId();
-
-			Player.Profile player = Player.create(playerUsername);
-			String[] profileNames = player.getAllProfileNames(Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all")));
-			this.playerUuid = player.getUuid();
-
-			if (profileNames.length == 1) {
-				applicationChannel
-					.sendMessage(
-						event.getUser().getAsMention() +
-						" this is your application for " +
-						capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
-					)
-					.complete();
-				caseOne(profileNames[0], currentSettings, applicationChannel);
-			} else {
-				EmbedBuilder welcomeEb =
-					this.defaultPlayerEmbed()
-						.setDescription(
-							"Please react with the emoji that corresponds to the profile you want to apply with or react with " +
-							client.getError() +
-							" to cancel the application.\n"
+			try {
+				for (JsonElement staffPingRole : higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray()) {
+					channelAction =
+						channelAction.addPermissionOverride(
+							event.getGuild().getRoleById(staffPingRole.getAsString()),
+							EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND),
+							null
 						);
+				}
+			} catch (Exception ignored) {}
+		} catch (PermissionException e) {
+			event.getHook().editOriginal(client.getError() + " Missing permission: " + e.getPermission().getName()).queue();
+			return;
+		}
 
-				for (String profileName : profileNames) {
-					String profileEmoji = profileNameToEmoji(profileName);
-					this.profileEmojiToName.put(profileEmoji, profileName);
-					welcomeEb.appendDescription(
-						"\n" +
-						profileEmoji +
-						" - [" +
-						capitalizeString(profileName) +
-						"](" +
-						skyblockStatsLink(player.getUuid(), profileName) +
+		channelAction.queue(
+			applicationChannel -> {
+				try {
+					this.applicationChannelId = applicationChannel.getId();
+
+					List<String> profileNames = player.getMatchingProfileNames(
+						Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all"))
+					);
+
+					if (profileNames.size() == 1) {
+						applicationChannel
+							.sendMessage(
+								event.getUser().getAsMention() +
+								" this is your application for " +
+								capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
+							)
+							.queue(ignored -> stateZero(profileNames.get(0), currentSettings, applicationChannel, null));
+						return;
+					}
+
+					EmbedBuilder eb = this.defaultPlayerEmbed().setDescription("Please select the profile you want to apply with.\n");
+
+					StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("apply_user_profile");
+					eb.appendDescription(
+						"\n↩️ [Last Played Profile (" +
+						player.getProfileName() +
+						")](" +
+						skyblockStatsLink(player.getUuid(), player.getProfileName()) +
 						")"
 					);
-				}
-				welcomeEb.appendDescription(
-					"\n↩️ - [Last played profile (" +
-					player.getProfileName() +
-					")](" +
-					skyblockStatsLink(player.getUuid(), player.getProfileName()) +
-					")"
-				);
-				profileEmojiToName.put("↩️", player.getProfileName());
-
-				Message reactMessage = applicationChannel
-					.sendMessage(
-						event.getUser().getAsMention() +
-						" this is your application for " +
-						capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
-					)
-					.setEmbeds(welcomeEb.build())
-					.complete();
-				this.reactMessageId = reactMessage.getId();
-
-				for (String profileEmoji : profileEmojiToName.keySet()) {
-					reactMessage.addReaction(Emoji.fromFormatted(profileEmoji)).complete();
-				}
-
-				reactMessage.addReaction(Emoji.fromFormatted(client.getError())).queue();
-			}
-		} catch (Exception e) {
-			AutomaticGuild.getLog().error(guildId, e);
-			failCause = e.getMessage();
-		}
-	}
-
-	public boolean onMessageReactionAdd(MessageReactionAddEvent event) {
-		if (!event.getMessageId().equals(reactMessageId)) {
-			return false;
-		}
-
-		TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
-		JsonElement currentSettings = parent.currentSettings;
-
-		if (!event.getUser().getId().equals(applyingUserId) && !guildMap.get(guildId).isAdmin(event.getMember())) {
-			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
-			boolean hasStaffRole = false;
-			if (staffPingRoles.size() != 0) {
-				for (JsonElement staffPingRole : staffPingRoles) {
-					if (event.getMember().getRoles().contains(event.getGuild().getRoleById(staffPingRole.getAsString()))) {
-						hasStaffRole = true;
-						break;
+					menuBuilder.addOption("Last Played Profile", player.getProfileName(), Emoji.fromFormatted("↩️"));
+					this.profileNames.add(player.getProfileName());
+					for (String profileName : profileNames) {
+						String profileEmoji = profileNameToEmoji(profileName);
+						eb.appendDescription(
+							"\n" +
+							profileEmoji +
+							" [" +
+							capitalizeString(profileName) +
+							"](" +
+							skyblockStatsLink(player.getUuid(), profileName) +
+							")"
+						);
+						menuBuilder.addOption(capitalizeString(profileName), profileName, Emoji.fromFormatted(profileEmoji));
+						this.profileNames.add(profileName);
 					}
+					menuBuilder.addOption("Cancel Application", "cancel_application", Emoji.fromFormatted(client.getError()));
+
+					applicationChannel
+						.sendMessage(
+							event.getUser().getAsMention() +
+							" this is your application for " +
+							capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
+						)
+						.setEmbeds(eb.build())
+						.setActionRow(menuBuilder.build())
+						.queue(m -> {
+							reactMessageId = m.getId();
+							parent.applyUserList.add(this);
+							event
+								.getHook()
+								.editOriginal(
+									client.getSuccess() + " A new application was created in " + applicationChannel.getAsMention()
+								)
+								.queue();
+						});
+				} catch (Exception e) {
+					AutomaticGuild.getLog().error(event.getGuild().getId(), e);
+					event.getHook().editOriginal(client.getError() + " " + e.getMessage()).queue();
+				}
+			},
+			e -> {
+				if (e instanceof ErrorResponseException ex) {
+					event.getHook().editOriginal(client.getError() + " Error when creating channel: " + ex.getMeaning()).queue();
+				} else {
+					event.getHook().editOriginal(client.getError() + " " + e.getMessage()).queue();
 				}
 			}
-
-			if (!hasStaffRole) {
-				return false;
-			}
-		}
-
-		if (state == 0) {
-			applicationChannel.clearReactionsById(reactMessageId).queue();
-			if (event.getEmoji().getFormatted().equals(client.getError())) {
-				event.getChannel().sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
-				event
-					.getGuild()
-					.getTextChannelById(event.getChannel().getId())
-					.delete()
-					.reason("Application canceled")
-					.queueAfter(10, TimeUnit.SECONDS);
-				return true;
-			} else if (profileEmojiToName.containsKey(event.getEmoji().getFormatted())) {
-				caseOne(profileEmojiToName.get(event.getEmoji().getFormatted()), currentSettings, applicationChannel);
-			}
-		}
-
-		return false;
+		);
 	}
 
-	public void caseOne(String profile, JsonElement currentSettings, TextChannel applicationChannel) {
-		Player.Profile player = Player.create(playerUsername, profile);
+	public void onStringSelectInteraction(StringSelectInteractionEvent event, ApplyGuild parent) {
+		if (!event.getMessageId().equals(reactMessageId)) {
+			return;
+		}
 
+		if (state != 0) {
+			return;
+		}
+
+		if (!event.getUser().getId().equals(applyingUserId) && !parent.isApplyAdmin(event.getMember())) {
+			return;
+		}
+
+		// Edit original message
+		event.getMessage().editMessageComponents().queue();
+
+		String selectedOption = event.getSelectedOptions().get(0).getValue();
+		if (selectedOption.equals("cancel_application")) {
+			parent.applyUserList.remove(this);
+			event
+				.replyEmbeds(defaultEmbed("Closing Channel").build())
+				.queue(m -> {
+					m.editOriginalComponents().queue();
+					event.getGuildChannel().delete().reason("Application canceled").queueAfter(10, TimeUnit.SECONDS);
+				});
+		} else {
+			event.deferReply().queue(hook -> stateZero(selectedOption, parent.currentSettings, null, hook));
+		}
+	}
+
+	private void stateZero(String profile, JsonElement currentSettings, TextChannel applicationChannel, InteractionHook hook) {
+		Player.Profile player = Player.create(playerUsername, profile);
 		JsonArray currentReqs = higherDepth(currentSettings, "applyReqs").getAsJsonArray();
-		boolean meetReqsOr = currentReqs.isEmpty();
-		StringBuilder missingReqsStr = new StringBuilder();
 
 		if (!currentReqs.isEmpty()) {
+			boolean meetReqsOr = currentReqs.isEmpty();
+			StringBuilder missingReqsStr = new StringBuilder();
+
 			for (JsonElement req : currentReqs) {
 				boolean meetsReqAnd = true;
 				List<String> reqsMissingFmt = new ArrayList<>();
@@ -274,455 +288,384 @@ public class ApplyUser {
 					missingReqsStr.append("• ").append(String.join(" | ", reqsMissingFmt)).append("\n");
 				}
 			}
-		}
 
-		if (!meetReqsOr) {
-			EmbedBuilder reqEmbed = defaultEmbed("Does not meet requirements");
-			reqEmbed.setDescription(
-				"**Your statistics:**\n• Slayer - " +
-				formatNumber(player.getTotalSlayer()) +
-				" | Skill Average - " +
-				(player.isSkillsApiEnabled() ? roundAndFormat((long) player.getSkillAverage()) : "API disabled") +
-				" | Catacombs - " +
-				roundAndFormat((long) player.getCatacombs().getProgressLevel()) +
-				" | Weight - " +
-				roundAndFormat((long) player.getWeight()) +
-				" | Lily Weight - " +
-				roundAndFormat((long) player.getLilyWeight()) +
-				" | Level - " +
-				roundAndFormat((long) player.getLevel()) +
-				" | Networth - " +
-				roundAndFormat((long) player.getNetworth())
-			);
-			reqEmbed.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr);
-			reqEmbed.appendDescription("\nIf any of these value seem incorrect, then make sure all your APIs are enabled");
+			if (!meetReqsOr) {
+				EmbedBuilder eb = defaultEmbed("Does not meet requirements")
+					.setDescription(
+						"**Your statistics:**\n• Slayer - " +
+						formatNumber(player.getTotalSlayer()) +
+						" | Skill Average - " +
+						(player.isSkillsApiEnabled() ? roundAndFormat((long) player.getSkillAverage()) : "API disabled") +
+						" | Catacombs - " +
+						roundAndFormat((long) player.getCatacombs().getProgressLevel()) +
+						" | Weight - " +
+						roundAndFormat((long) player.getWeight()) +
+						" | Lily Weight - " +
+						roundAndFormat((long) player.getLilyWeight()) +
+						" | Level - " +
+						roundAndFormat((long) player.getLevel()) +
+						" | Networth - " +
+						roundAndFormat((long) player.getNetworth())
+					)
+					.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr)
+					.appendDescription("\nIf any of these value seem incorrect, then make sure all your APIs are enabled");
 
-			playerSlayer = formatNumber(player.getTotalSlayer());
-			playerSkills = roundAndFormat(player.getSkillAverage());
-			playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
-			playerCatacombs = roundAndFormat(player.getCatacombs().getProgressLevel());
-			playerWeight = roundAndFormat(player.getWeight());
-			playerLilyWeight = roundAndFormat(player.getLilyWeight());
-			playerLevel = roundAndFormat(player.getLevel());
-
-			this.reactMessageId =
-				applicationChannel
-					.sendMessageEmbeds(reqEmbed.build())
-					.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
-					.complete()
-					.getId();
-			state = 3;
-		} else {
-			try {
-				playerSlayer = formatNumber(player.getTotalSlayer());
-			} catch (Exception e) {
-				playerSlayer = "0";
-			}
-
-			try {
-				playerSkills = roundAndFormat(player.getSkillAverage());
-			} catch (Exception e) {
-				playerSkills = "API disabled";
-			}
-
-			playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
-
-			try {
-				playerCatacombs = roundAndFormat(player.getCatacombs().getProgressLevel());
-			} catch (Exception e) {
-				playerCatacombs = "0";
-			}
-
-			try {
-				playerWeight = roundAndFormat(player.getWeight());
-			} catch (Exception e) {
-				playerWeight = "API disabled";
-			}
-
-			try {
-				playerLilyWeight = roundAndFormat(player.getLilyWeight());
-			} catch (Exception e) {
-				playerLilyWeight = "API disabled";
-			}
-
-			try {
-				playerLevel = roundAndFormat(player.getLevel());
-			} catch (Exception e) {
-				playerLevel = "API disabled";
-			}
-
-			playerUsername = player.getUsername();
-
-			ironmanSymbol = player.getSymbol(" ");
-			playerProfileName = player.getProfileName();
-			double bankCoins = player.getBankBalance();
-			playerCoins = (bankCoins != -1 ? simplifyNumber(bankCoins) : "API disabled") + " + " + simplifyNumber(player.getPurseCoins());
-
-			EmbedBuilder statsEmbed = player
-				.defaultPlayerEmbed()
-				.addField("Total Slayer", playerSlayer, true)
-				.addField("Skills", playerSkills, true)
-				.addField("Catacombs", playerCatacombs, true)
-				.addField("Weight", playerWeight, true)
-				.addField("Lily Weight", playerLilyWeight, true)
-				.addField("Skyblock Level", playerLevel, true)
-				.addField("Bank & Purse", playerCoins, true);
-
-			List<Button> buttons = new ArrayList<>();
-			buttons.add(Button.success("apply_user_submit", "Submit"));
-			if (!profileEmojiToName.isEmpty()) {
-				buttons.add(Button.primary("apply_user_retry", "Retry"));
-			}
-			buttons.add(Button.danger("apply_user_cancel", "Cancel"));
-
-			this.reactMessageId = applicationChannel.sendMessageEmbeds(statsEmbed.build()).setActionRow(buttons).complete().getId();
-			state = 1;
-		}
-	}
-
-	public EmbedBuilder defaultPlayerEmbed() {
-		return defaultEmbed(escapeUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUuid, playerProfileName));
-	}
-
-	public boolean onButtonClick(ButtonInteractionEvent event, ApplyGuild parent, boolean isWaitlist) {
-		JsonElement currentSettings = parent.currentSettings;
-		if (!event.getUser().getId().equals(applyingUserId) && !guildMap.get(guildId).isAdmin(event.getMember())) {
-			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
-			boolean hasStaffRole = false;
-			if (staffPingRoles.size() != 0) {
-				for (JsonElement staffPingRole : staffPingRoles) {
-					if (event.getMember().getRoles().contains(event.getGuild().getRoleById(staffPingRole.getAsString()))) {
-						hasStaffRole = true;
-						break;
-					}
+				if (applicationChannel != null) {
+					applicationChannel
+						.sendMessageEmbeds(eb.build())
+						.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
+						.queue(m -> {
+							reactMessageId = m.getId();
+							state = 3;
+						});
+				} else {
+					hook
+						.editOriginalEmbeds(eb.build())
+						.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
+						.queue(m -> {
+							reactMessageId = m.getId();
+							state = 3;
+						});
 				}
+				return;
 			}
+		}
 
-			if (!hasStaffRole) {
-				return false;
-			}
+		try {
+			playerSlayer = formatNumber(player.getTotalSlayer());
+		} catch (Exception e) {
+			playerSlayer = "0";
+		}
+
+		try {
+			playerSkills = roundAndFormat(player.getSkillAverage());
+		} catch (Exception e) {
+			playerSkills = "API disabled";
+		}
+		playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
+
+		try {
+			playerCatacombs = roundAndFormat(player.getCatacombs().getProgressLevel());
+		} catch (Exception e) {
+			playerCatacombs = "0";
+		}
+
+		try {
+			playerWeight = roundAndFormat(player.getWeight());
+		} catch (Exception e) {
+			playerWeight = "API disabled";
+		}
+
+		try {
+			playerLilyWeight = roundAndFormat(player.getLilyWeight());
+		} catch (Exception e) {
+			playerLilyWeight = "API disabled";
+		}
+
+		try {
+			playerLevel = roundAndFormat(player.getLevel());
+		} catch (Exception e) {
+			playerLevel = "API disabled";
+		}
+
+		double bankCoins = player.getBankBalance();
+		playerCoins = (bankCoins != -1 ? simplifyNumber(bankCoins) : "API disabled") + " + " + simplifyNumber(player.getPurseCoins());
+		ironmanSymbol = player.getSymbol(" ");
+		playerProfileName = player.getProfileName();
+
+		EmbedBuilder eb = player
+			.defaultPlayerEmbed()
+			.addField("Total Slayer", playerSlayer, true)
+			.addField("Skills", playerSkills, true)
+			.addField("Catacombs", playerCatacombs, true)
+			.addField("Weight", playerWeight, true)
+			.addField("Lily Weight", playerLilyWeight, true)
+			.addField("Skyblock Level", playerLevel, true)
+			.addField("Bank & Purse", playerCoins, true);
+
+		List<Button> buttons = new ArrayList<>();
+		buttons.add(Button.success("apply_user_submit", "Submit"));
+		if (!profileNames.isEmpty()) {
+			buttons.add(Button.primary("apply_user_retry", "Retry"));
+		}
+		buttons.add(Button.danger("apply_user_cancel", "Cancel"));
+
+		if (applicationChannel != null) {
+			applicationChannel
+				.sendMessageEmbeds(eb.build())
+				.setActionRow(buttons)
+				.queue(m -> {
+					reactMessageId = m.getId();
+					state = 1;
+				});
+		} else {
+			hook
+				.editOriginalEmbeds(eb.build())
+				.setActionRow(buttons)
+				.queue(m -> {
+					reactMessageId = m.getId();
+					state = 1;
+				});
+		}
+	}
+
+	public void onButtonClick(ButtonInteractionEvent event, ApplyGuild parent) {
+		JsonElement currentSettings = parent.currentSettings;
+		if (!event.getUser().getId().equals(applyingUserId) && !parent.isApplyAdmin(event.getMember())) {
+			return;
 		}
 
 		switch (state) {
-			case 1:
-				switch (event.getButton().getId()) {
+			case 1 -> {
+				switch (event.getComponentId()) {
 					case "apply_user_submit" -> {
+						// Edit original message
 						event.getMessage().editMessageComponents().queue();
-						EmbedBuilder finishApplyEmbed = defaultEmbed("Application Sent");
-						finishApplyEmbed.setDescription("You will be notified once staff review your application");
+
+						// Edit deferred message
 						event
 							.getHook()
-							.editOriginalEmbeds(finishApplyEmbed.build())
+							.editOriginalEmbeds(
+								defaultEmbed("Application Sent")
+									.setDescription("You will be notified once staff review your application")
+									.build()
+							)
 							.setActionRow(Button.danger("apply_user_cancel", "Cancel Application"))
 							.queue(m -> applySubmitedMessageId = m.getId());
-						TextChannel staffChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyStaffChannel").getAsString());
-						staffChannelId = staffChannel.getId();
-						EmbedBuilder applyPlayerStats = defaultPlayerEmbed();
-						applyPlayerStats.addField("Total Slayer", playerSlayer, true);
-						applyPlayerStats.addField("Skills", playerSkills, true);
-						applyPlayerStats.addField("Catacombs", playerCatacombs, true);
-						applyPlayerStats.addField("Weight", playerWeight, true);
-						applyPlayerStats.addField("Lily Weight", playerLilyWeight, true);
-						applyPlayerStats.addField("Skyblock Level", playerLevel, true);
-						applyPlayerStats.addField("Bank & Purse", playerCoins, true);
-						double playerNetworth = NetworthExecute.getNetworth(playerUsername, playerProfileName);
-						applyPlayerStats.addField(
-							"Networth",
-							playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
-							true
-						);
-						applyPlayerStats.setThumbnail(getAvatarUrl(playerUuid));
-						String waitlistMsg = higherDepth(currentSettings, "applyWaitlistMessage", null);
-						List<Button> row = new ArrayList<>();
-						row.add(Button.success("apply_user_accept", "Accept"));
-						if (waitlistMsg != null && waitlistMsg.length() > 0 && !waitlistMsg.equals("none")) {
-							row.add(Button.primary("apply_user_waitlist", "Waitlist"));
-						}
-						row.add(Button.danger("apply_user_deny", "Deny"));
+
+						String waitlistMessage = higherDepth(currentSettings, "applyWaitlistMessage", null);
 						String staffPingMentions = streamJsonArray(higherDepth(currentSettings, "applyStaffRoles"))
 							.map(r -> "<@&" + r.getAsString() + ">")
 							.collect(Collectors.joining(" "));
-						Message reactMessage = staffPingMentions.isEmpty()
-							? staffChannel.sendMessageEmbeds(applyPlayerStats.build()).setActionRow(row).complete()
-							: staffChannel.sendMessage(staffPingMentions).setEmbeds(applyPlayerStats.build()).setActionRow(row).complete();
-						reactMessageId = reactMessage.getId();
-						state = 2;
-						return true;
+						double playerNetworth = NetworthExecute.getNetworth(playerUuid, playerProfileName);
+
+						EmbedBuilder applyPlayerStats = defaultPlayerEmbed()
+							.addField("Total Slayer", playerSlayer, true)
+							.addField("Skills", playerSkills, true)
+							.addField("Catacombs", playerCatacombs, true)
+							.addField("Weight", playerWeight, true)
+							.addField("Lily Weight", playerLilyWeight, true)
+							.addField("Skyblock Level", playerLevel, true)
+							.addField("Bank & Purse", playerCoins, true)
+							.addField("Networth", playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth), true);
+
+						List<Button> actionRow = new ArrayList<>();
+						actionRow.add(Button.success("apply_user_accept", "Accept"));
+						if (waitlistMessage != null && !waitlistMessage.isEmpty() && !waitlistMessage.equals("none")) {
+							actionRow.add(Button.primary("apply_user_waitlist", "Waitlist"));
+						}
+						actionRow.add(Button.danger("apply_user_deny", "Deny"));
+
+						MessageCreateAction messageAction = jda
+							.getTextChannelById(staffChannelId)
+							.sendMessageEmbeds(applyPlayerStats.build())
+							.setActionRow(actionRow);
+						if (!staffPingMentions.isEmpty()) {
+							messageAction.setContent(staffPingMentions);
+						}
+
+						messageAction.queue(m -> {
+							reactMessageId = m.getId();
+							state = 2;
+						});
 					}
 					case "apply_user_retry" -> {
-						EmbedBuilder retryEmbed = defaultPlayerEmbed();
-						retryEmbed.setDescription(
-							"Please react with the emoji that corresponds to the profile you want to apply with or react with " +
-							client.getError() +
-							" to cancel the application."
-						);
-						for (Map.Entry<String, String> profileEntry : profileEmojiToName.entrySet()) {
-							String profileEmoji = profileEntry.getKey();
-							if (profileEntry.getKey().equals("↩️")) {
-								String lastPlayedProfile = profileEmojiToName.get("↩️");
+						// Edit original message
+						event.getMessage().editMessageComponents().queue();
+
+						EmbedBuilder retryEmbed = defaultPlayerEmbed()
+							.setDescription("Please select the profile you want to apply with.\n");
+
+						StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("apply_user_profile");
+						for (int i = 0; i < profileNames.size(); i++) {
+							String profileName = profileNames.get(i);
+							if (i == 0) {
 								retryEmbed.appendDescription(
-									"\n" +
-									profileEmoji +
-									" - [Last played profile (" +
-									lastPlayedProfile +
+									"\n↩️ [Last Played Profile (" +
+									capitalizeString(profileName) +
 									")](" +
-									skyblockStatsLink(playerUuid, lastPlayedProfile) +
+									skyblockStatsLink(playerUuid, profileName) +
 									")"
 								);
+								menuBuilder.addOption("Last Played Profile", profileName, Emoji.fromFormatted("↩️"));
 							} else {
+								String profileEmoji = profileNameToEmoji(profileName);
 								retryEmbed.appendDescription(
 									"\n" +
 									profileEmoji +
-									" - [" +
-									capitalizeString(profileEntry.getValue()) +
+									" [" +
+									capitalizeString(profileName) +
 									"](" +
-									skyblockStatsLink(playerUuid, profileEntry.getValue()) +
+									skyblockStatsLink(playerUuid, profileName) +
 									")"
 								);
+								menuBuilder.addOption(capitalizeString(profileName), profileName, Emoji.fromFormatted(profileEmoji));
 							}
 						}
-						event.getMessage().editMessageComponents().complete();
-						Message reactMessage = event.getHook().editOriginalEmbeds(retryEmbed.build()).complete();
-						this.reactMessageId = reactMessage.getId();
-						for (String profileEmoji : profileEmojiToName.keySet()) {
-							reactMessage.addReaction(Emoji.fromFormatted(profileEmoji)).complete();
-						}
-						reactMessage.addReaction(Emoji.fromFormatted(client.getError())).queue();
-						state = 0;
-						return true;
+						menuBuilder.addOption("Cancel Application", "cancel_application", Emoji.fromFormatted(client.getError()));
+
+						// Edit deferred message
+						event
+							.getHook()
+							.editOriginalEmbeds(retryEmbed.build())
+							.setActionRow(menuBuilder.build())
+							.queue(m -> {
+								reactMessageId = m.getId();
+								state = 0;
+							});
 					}
 					case "apply_user_cancel" -> {
+						// Edit original message
 						event.getMessage().editMessageComponents().queue();
-						event.getHook().editOriginalEmbeds(defaultEmbed("Canceling application & closing channel").build()).complete();
+
+						// Edit deferred message
 						event
-							.getGuild()
-							.getTextChannelById(event.getChannel().getId())
-							.delete()
-							.reason("Application canceled")
-							.queueAfter(10, TimeUnit.SECONDS);
+							.getHook()
+							.editOriginalEmbeds(defaultEmbed("Canceling Application").build())
+							.queue(ignored ->
+								event.getGuildChannel().delete().reason("Application canceled").queueAfter(10, TimeUnit.SECONDS)
+							);
+
 						parent.applyUserList.remove(this);
-						return true;
 					}
 				}
-				break;
-			case 2:
+			}
+			case 2 -> {
 				TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
-				switch (event.getButton().getId()) {
-					case "apply_user_accept":
-						event.getMessage().editMessageComponents().queue(m -> m.delete().queueAfter(5, TimeUnit.SECONDS, ignore), ignore);
-						try {
-							applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
-						} catch (Exception ignored) {}
+				if (
+					event.getComponentId().equals("apply_user_accept") ||
+					event.getComponentId().equals("apply_user_waitlist") ||
+					event.getComponentId().equals("apply_user_deny")
+				) {
+					if (event.getComponentId().equals("apply_user_waitlist")) {
+						String waitlistMessage = higherDepth(currentSettings, "applyWaitlistMessage", "");
+						if (waitlistMessage.isEmpty() || waitlistMessage.equals("none")) {
+							return;
+						}
+					}
 
-						event
-							.getHook()
-							.editOriginal(
-								escapeUsername(playerUsername) +
-								" (<@" +
-								applyingUserId +
-								">) was accepted by " +
-								event.getUser().getAsMention()
-							)
-							.queue();
+					// Edit application message (remove cancel button)
+					try {
+						applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
+					} catch (Exception ignored) {}
 
-						TextChannel waitInviteChannel = null;
-						try {
-							waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
-						} catch (Exception ignored) {}
+					// Edit staff message
+					event
+						.getHook()
+						.editOriginal(
+							escapeUsername(playerUsername) +
+							" (<@" +
+							applyingUserId +
+							">) was " +
+							switch (event.getComponentId()) {
+								case "apply_user_accept" -> "accepted";
+								case "apply_user_waitlist" -> "waitlisted";
+								default -> "denied";
+							} +
+							" by " +
+							event.getUser().getAsMention()
+						)
+						.setComponents()
+						.setEmbeds()
+						.queue();
 
-						MessageCreateAction action = applicationChannel
+					if (event.getComponentId().equals("apply_user_deny")) {
+						applicationChannel
 							.sendMessage("<@" + applyingUserId + ">")
 							.setEmbeds(
-								defaultEmbed("Application Accepted")
-									.setDescription(higherDepth(currentSettings, "applyAcceptMessage").getAsString())
+								defaultEmbed("Application Not Accepted")
+									.setDescription(higherDepth(currentSettings, "applyDenyMessage").getAsString())
 									.build()
-							);
-						if (waitInviteChannel == null) {
-							action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
-							try {
-								event
-									.getGuild()
-									.addRoleToMember(
-										UserSnowflake.fromId(applyingUserId),
-										jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
-									)
-									.queue();
-							} catch (Exception ignored) {}
-						} else {
-							action =
-								action.setActionRow(
-									Button.danger(
-										"apply_user_cancel_" +
-										waitInviteChannel.getId() +
-										"_" +
-										waitInviteChannel
-											.sendMessageEmbeds(
-												defaultEmbed("Waiting for invite")
-													.setDescription(
-														"**Player:** " +
-														escapeUsername(playerUsername) +
-														"\n**Discord:** <@" +
-														applyingUserId +
-														">"
-													)
-													.build()
-											)
-											.setActionRow(
-												Button.success(
-													"apply_user_wait_" +
-													higherDepth(currentSettings, "guildName").getAsString() +
-													"_" +
-													applicationChannelId +
-													"_" +
-													applyingUserId +
-													"_" +
-													higherDepth(currentSettings, "guildMemberRole", "null"),
-													"Invited"
-												),
-												Button.link(nameMcLink(playerUuid), "NameMC"),
-												Button.link(skyblockStatsLink(playerUuid, playerProfileName), "SkyCrypt")
-											)
-											.complete()
-											.getId(),
-										"Cancel Application"
-									)
-								);
-						}
+							)
+							.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
+							.queue(m -> {
+								reactMessageId = m.getId();
+								state = 3;
+							});
+						return;
+					}
 
-						state = 3;
-						this.reactMessageId = action.complete().getId();
-						return true;
-					case "apply_user_waitlist":
-						if (
-							!higherDepth(currentSettings, "applyWaitlistMessage", "").isEmpty() &&
-							!higherDepth(currentSettings, "applyWaitlistMessage", "").equals("none")
-						) {
-							event
-								.getMessage()
-								.editMessageComponents()
-								.queue(m -> m.delete().queueAfter(5, TimeUnit.SECONDS, ignore), ignore);
-							try {
-								applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
-							} catch (Exception ignored) {}
+					boolean isAccept = event.getComponentId().equals("apply_user_accept");
+					MessageCreateAction action = applicationChannel
+						.sendMessage("<@" + applyingUserId + ">")
+						.setEmbeds(
+							defaultEmbed("Application " + (isAccept ? "Accepted" : "Waitlisted"))
+								.setDescription(
+									higherDepth(currentSettings, isAccept ? "applyAcceptMessage" : "applyWaitlistMessage").getAsString()
+								)
+								.build()
+						);
 
+					TextChannel waitInviteChannel = null;
+					try {
+						waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
+					} catch (Exception ignored) {}
+					if (waitInviteChannel == null) {
+						action
+							.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
+							.queue(m -> {
+								reactMessageId = m.getId();
+								state = 3;
+							});
+						try {
 							event
-								.getHook()
-								.editOriginal(
-									escapeUsername(playerUsername) +
-									" (<@" +
-									applyingUserId +
-									">) was waitlisted by " +
-									event.getUser().getAsMention()
+								.getGuild()
+								.addRoleToMember(
+									UserSnowflake.fromId(applyingUserId),
+									jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
 								)
 								.queue();
-
-							waitInviteChannel = null;
-							try {
-								waitInviteChannel =
-									jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
-							} catch (Exception ignored) {}
-
-							action =
-								applicationChannel
-									.sendMessage("<@" + applyingUserId + ">")
-									.setEmbeds(
-										defaultEmbed("Application Waitlisted")
-											.setDescription(higherDepth(currentSettings, "applyWaitlistMessage").getAsString())
-											.build()
-									);
-							if (waitInviteChannel == null) {
-								action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
-								try {
-									event
-										.getGuild()
-										.addRoleToMember(
-											UserSnowflake.fromId(applyingUserId),
-											jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
-										)
-										.queue();
-								} catch (Exception ignored) {}
-							} else {
-								action =
-									action.setActionRow(
+						} catch (Exception ignored) {}
+					} else {
+						waitInviteChannel
+							.sendMessageEmbeds(
+								defaultEmbed("Waiting for invite")
+									.setDescription(
+										"**Player:** " + escapeUsername(playerUsername) + "\n**Discord:** <@" + applyingUserId + ">"
+									)
+									.build()
+							)
+							.setActionRow(
+								Button.success(
+									"apply_user_wait_" +
+									higherDepth(currentSettings, "guildName").getAsString() +
+									"_" +
+									applicationChannelId +
+									"_" +
+									applyingUserId +
+									"_" +
+									higherDepth(currentSettings, "guildMemberRole", "null"),
+									"Invited"
+								),
+								Button.link(nameMcLink(playerUuid), "NameMC"),
+								Button.link(skyblockStatsLink(playerUuid, playerProfileName), "SkyCrypt")
+							)
+							.queue(waitingForInviteMessage ->
+								action
+									.setActionRow(
 										Button.danger(
 											"apply_user_cancel_" +
-											waitInviteChannel.getId() +
+											higherDepth(currentSettings, "applyWaitingChannel").getAsString() +
 											"_" +
-											waitInviteChannel
-												.sendMessageEmbeds(
-													defaultEmbed("Waiting for invite")
-														.setDescription(
-															"**Player:** " +
-															escapeUsername(playerUsername) +
-															"\n**Discord:** <@" +
-															applyingUserId +
-															">"
-														)
-														.build()
-												)
-												.setActionRow(
-													Button.success(
-														"apply_user_wait_" +
-														higherDepth(currentSettings, "guildName").getAsString() +
-														"_" +
-														applicationChannelId +
-														"_" +
-														applyingUserId +
-														"_" +
-														higherDepth(currentSettings, "guildMemberRole", "null"),
-														"Invited"
-													),
-													Button.link(nameMcLink(playerUuid), "NameMC"),
-													Button.link(skyblockStatsLink(playerUsername, playerProfileName), "SkyCrypt")
-												)
-												.complete()
-												.getId(),
+											waitingForInviteMessage.getId(),
 											"Cancel Application"
 										)
-									);
-							}
-
-							state = 3;
-							this.reactMessageId = action.complete().getId();
-						}
-						return true;
-					case "apply_user_deny":
-						event.getMessage().editMessageComponents().queue(m -> m.delete().queueAfter(5, TimeUnit.SECONDS, ignore), ignore);
-						try {
-							applicationChannel.editMessageComponentsById(applySubmitedMessageId).queue();
-						} catch (Exception ignored) {}
-
-						event
-							.getHook()
-							.editOriginal(playerUsername + " (<@" + applyingUserId + ">) was denied by " + event.getUser().getAsMention())
-							.queue();
-
-						state = 3;
-						this.reactMessageId =
-							applicationChannel
-								.sendMessage("<@" + applyingUserId + ">")
-								.setEmbeds(
-									defaultEmbed("Application Not Accepted")
-										.setDescription(higherDepth(currentSettings, "applyDenyMessage").getAsString())
-										.build()
-								)
-								.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
-								.complete()
-								.getId();
-						return true;
+									)
+									.queue(m -> {
+										reactMessageId = m.getId();
+										state = 3;
+									})
+							);
+					}
 				}
-				break;
-			case 3:
+			}
+			case 3 -> {
+				parent.applyUserList.remove(this);
+				event.getMessage().editMessageComponents().queue();
+
 				if (event.getComponentId().startsWith("apply_user_cancel_")) {
-					parent.applyUserList.remove(this);
-					event.getMessage().editMessageComponents().queue();
-					event.getHook().editOriginalEmbeds(defaultEmbed("Canceling application & closing channel").build()).queue();
-					event
-						.getGuild()
-						.getTextChannelById(event.getChannel().getId())
-						.delete()
-						.reason("Application canceled")
-						.queueAfter(10, TimeUnit.SECONDS, ignore, ignore);
+					event.getHook().editOriginalEmbeds(defaultEmbed("Canceling Application").build()).queue();
+					event.getGuildChannel().delete().reason("Application canceled").queueAfter(10, TimeUnit.SECONDS, ignore, ignore);
 
 					String[] channelMessageSplit = event.getComponentId().split("apply_user_cancel_")[1].split("_");
 					event
@@ -730,26 +673,16 @@ public class ApplyUser {
 						.getTextChannelById(channelMessageSplit[0])
 						.deleteMessageById(channelMessageSplit[1])
 						.queue(ignore, ignore);
-					return true;
-				}
-
-				TextChannel appChannel = jda.getTextChannelById(applicationChannelId);
-				if (!isWaitlist) {
-					event.getMessage().editMessageComponents().queue();
-					event.getHook().editOriginalEmbeds(defaultEmbed("Closing Channel").build()).complete();
 				} else {
-					appChannel.sendMessageEmbeds(defaultEmbed("Closing Channel").build()).complete();
+					event.getHook().editOriginalEmbeds(defaultEmbed("Closing Channel").build()).queue();
+					event.getGuildChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
 				}
-				appChannel.delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
-				parent.applyUserList.remove(this);
-				return true;
+			}
 		}
-
-		return false;
 	}
 
-	public ApplyUser setParent(ApplyGuild parent) {
-		this.parent = parent;
-		return this;
+	private EmbedBuilder defaultPlayerEmbed() {
+		return defaultEmbed(escapeUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUuid, playerProfileName))
+			.setThumbnail(getAvatarUrl(playerUuid));
 	}
 }

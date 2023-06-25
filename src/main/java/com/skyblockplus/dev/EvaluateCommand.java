@@ -98,76 +98,76 @@ public class EvaluateCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event, false) {
+		new CommandExecute(event, 2) {
 			@Override
 			protected void execute() {
-				setArgs(2, true);
-
 				if (args.length < 2) {
 					event.getChannel().sendMessage("Invalid Input").queue();
 					return;
 				}
 
-				ebMessage = event.getChannel().sendMessage("Loading").complete();
+				event
+					.getChannel()
+					.sendMessage("Loading")
+					.queue(m -> {
+						try {
+							switch (args[1]) {
+								case "start_session()" -> {
+									inSession = true;
+									shell = new GroovyShell();
+									m.editMessage("Session started with " + shell).queue();
+									return;
+								}
+								case "end_session()" -> {
+									inSession = false;
+									m.editMessage("Session ended with " + shell).queue();
+									shell = new GroovyShell();
+									return;
+								}
+								case "get_session()" -> {
+									m.editMessage(inSession ? "Session running with " + shell : "No session running").queue();
+									return;
+								}
+							}
 
-				switch (args[1]) {
-					case "start_session()" -> {
-						inSession = true;
-						shell = new GroovyShell();
-						ebMessage.editMessage("Session started with " + shell).queue();
-						return;
-					}
-					case "end_session()" -> {
-						inSession = false;
-						shell = new GroovyShell();
-						ebMessage.editMessage("Session ended with " + shell).queue();
-						return;
-					}
-					case "get_session()" -> {
-						ebMessage.editMessage(inSession ? "Session running with " + shell : "No session running").queue();
-						return;
-					}
-				}
+							if (!inSession) {
+								shell = new GroovyShell();
+							}
 
-				if (!inSession) {
-					shell = new GroovyShell();
-				}
+							String arg = args[1].trim();
+							if (arg.startsWith("```") && arg.endsWith("```")) {
+								arg = arg.replaceAll("```(.*)\n", "").replaceAll("\n?```", "");
+							}
 
-				String arg = args[1].trim();
-				if (arg.startsWith("```") && arg.endsWith("```")) {
-					arg = arg.replaceAll("```(.*)\n", "").replaceAll("\n?```", "");
-				}
+							shell.setProperty("event", event.getEvent());
+							shell.setProperty("cmdEvent", event);
+							shell.setProperty("message", event.getMessage());
+							shell.setProperty("channel", event.getChannel());
+							shell.setProperty("user", event.getAuthor());
+							shell.setProperty("jda", event.getJDA());
+							shell.setProperty("guilds", guildMap);
+							shell.setProperty("db", database);
+							if (event.isFromType(ChannelType.TEXT)) {
+								shell.setProperty("guild", event.getGuild());
+								shell.setProperty("member", event.getMember());
+							}
 
-				try {
-					shell.setProperty("event", event.getEvent());
-					shell.setProperty("cmdEvent", event);
-					shell.setProperty("message", event.getMessage());
-					shell.setProperty("channel", event.getChannel());
-					shell.setProperty("user", event.getAuthor());
-					shell.setProperty("jda", event.getJDA());
-					shell.setProperty("guilds", guildMap);
-					shell.setProperty("db", database);
-					if (event.isFromType(ChannelType.TEXT)) {
-						shell.setProperty("guild", event.getGuild());
-						shell.setProperty("member", event.getMember());
-					}
+							String script = importString + arg;
+							Object out = shell.evaluate(script);
 
-					String script = importString + arg;
-					Object out = shell.evaluate(script);
-
-					if (out == null) {
-						ebMessage.editMessage("Success (null output)").queue();
-					} else if (out.toString().length() >= 2000) {
-						ebMessage.editMessage(makeHastePost(out.toString())).queue();
-					} else {
-						ebMessage.editMessage(out.toString()).queue();
-					}
-				} catch (Exception e) {
-					String msg = e.getMessage() != null ? e.getMessage() : Arrays.toString(e.getStackTrace());
-					ebMessage.editMessage("" + (msg.length() >= 2000 ? makeHastePost(msg) : msg)).queue();
-				}
+							if (out == null) {
+								m.editMessage("Success (null output)").queue();
+							} else if (out.toString().length() >= 2000) {
+								m.editMessage(makeHastePost(out.toString())).queue();
+							} else {
+								m.editMessage(out.toString()).queue();
+							}
+						} catch (Exception e) {
+							String msg = e.getMessage() != null ? e.getMessage() : Arrays.toString(e.getStackTrace());
+							m.editMessage(msg.length() >= 2000 ? makeHastePost(msg) : msg).queue();
+						}
+					});
 			}
-		}
-			.queue();
+		};
 	}
 }

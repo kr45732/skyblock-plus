@@ -35,10 +35,10 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 public class InventoryEmojiPaginator {
 
 	private final List<String[]> inventoryPages;
-	private final Message pagePart1;
-	private final Message pagePart2;
 	private final User user;
 	private final int maxPageNumber;
+	private Message pagePart1;
+	private Message pagePart2;
 	private int pageNumber = 0;
 	private Instant lastEdit;
 
@@ -48,23 +48,29 @@ public class InventoryEmojiPaginator {
 		this.maxPageNumber = inventoryPages.size() - 1;
 		this.lastEdit = Instant.now();
 
-		pagePart1 = event.getHook().editOriginal(inventoryPages.get(0)[0]).setEmbeds().complete();
-		pagePart2 =
-			event
-				.getChannel()
-				.sendMessage(inventoryPages.get(0)[1])
-				.setActionRow(
-					Button
-						.primary("inv_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))
-						.withDisabled(pageNumber == 0),
-					Button
-						.primary("inv_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
-						.withDisabled(pageNumber == (maxPageNumber)),
-					Button.link(player.skyblockStatsLink(), player.getUsername() + "'s " + type + " • Page 1/" + (maxPageNumber + 1))
-				)
-				.complete();
-
-		waitForEvent();
+		event
+			.getHook()
+			.editOriginal(inventoryPages.get(0)[0])
+			.setEmbeds()
+			.queue(m1 -> {
+				pagePart1 = m1;
+				event
+					.getChannel()
+					.sendMessage(inventoryPages.get(0)[1])
+					.setActionRow(
+						Button
+							.primary("inv_paginator_left_button", Emoji.fromFormatted("<:left_button_arrow:885628386435821578>"))
+							.withDisabled(pageNumber == 0),
+						Button
+							.primary("inv_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
+							.withDisabled(pageNumber == (maxPageNumber)),
+						Button.link(player.skyblockStatsLink(), player.getUsername() + "'s " + type + " • Page 1/" + (maxPageNumber + 1))
+					)
+					.queue(m2 -> {
+						pagePart2 = m2;
+						waitForEvent();
+					});
+			});
 	}
 
 	private boolean condition(ButtonInteractionEvent event) {

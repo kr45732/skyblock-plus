@@ -557,30 +557,30 @@ public class SetupCommandHandler {
 								.build()
 						)
 						.queue();
-					case "scammer_check" -> {
-						event.deferReply(true).complete();
-						JsonObject guildSettings = getGuildSettings();
-						event
-							.getHook()
-							.editOriginalEmbeds(
-								getSettings()
-									.setApplyScammerCheck(guildSettings, !higherDepth(guildSettings, "applyScammerCheck", false))
-									.build()
-							)
-							.queue();
-					}
-					case "check_api" -> {
-						event.deferReply(true).complete();
-						JsonObject guildSettings = getGuildSettings();
-						event
-							.getHook()
-							.editOriginalEmbeds(
-								getSettings()
-									.setApplyCheckApiEnable(guildSettings, !higherDepth(guildSettings, "applyCheckApi", false))
-									.build()
-							)
-							.queue();
-					}
+					case "scammer_check" -> event
+						.deferReply(true)
+						.queue(hook -> {
+							JsonObject guildSettings = getGuildSettings();
+							hook
+								.editOriginalEmbeds(
+									getSettings()
+										.setApplyScammerCheck(guildSettings, !higherDepth(guildSettings, "applyScammerCheck", false))
+										.build()
+								)
+								.queue();
+						});
+					case "check_api" -> event
+						.deferReply(true)
+						.queue(hook -> {
+							JsonObject guildSettings = getGuildSettings();
+							hook
+								.editOriginalEmbeds(
+									getSettings()
+										.setApplyCheckApiEnable(guildSettings, !higherDepth(guildSettings, "applyCheckApi", false))
+										.build()
+								)
+								.queue();
+						});
 				}
 			}
 			case FETCHUR -> {

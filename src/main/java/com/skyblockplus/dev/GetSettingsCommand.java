@@ -39,7 +39,7 @@ public class GetSettingsCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event, false) {
+		new CommandExecute(event) {
 			@Override
 			protected void execute() {
 				if (args.length == 1) {
@@ -52,8 +52,7 @@ public class GetSettingsCommand extends Command {
 					}
 				}
 			}
-		}
-			.queue();
+		};
 	}
 
 	private String getAllServerSettings() {

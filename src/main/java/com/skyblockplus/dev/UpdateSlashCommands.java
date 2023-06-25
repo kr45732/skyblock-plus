@@ -40,7 +40,7 @@ public class UpdateSlashCommands extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event, false) {
+		new CommandExecute(event) {
 			@Override
 			protected void execute() {
 				if (args.length == 1) {
@@ -72,8 +72,7 @@ public class UpdateSlashCommands extends Command {
 					}
 				}
 			}
-		}
-			.queue();
+		};
 	}
 
 	private List<SlashCommandData> generateSlashCommands() {

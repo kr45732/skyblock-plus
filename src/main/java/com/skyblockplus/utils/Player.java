@@ -422,18 +422,18 @@ public class Player {
 			return profileJson;
 		}
 
-		public String[] getAllProfileNames(Gamemode gamemode) {
-			List<String> profileNameList = new ArrayList<>();
+		public List<String> getMatchingProfileNames(Gamemode gamemode) {
+			List<String> profileNames = new ArrayList<>();
 
 			for (Profile profile : profiles) {
 				try {
 					if (gamemode.isGamemode(profile.getGamemode())) {
-						profileNameList.add(profile.getProfileName().toLowerCase());
+						profileNames.add(profile.getProfileName().toLowerCase());
 					}
 				} catch (Exception ignored) {}
 			}
 
-			return profileNameList.toArray(new String[0]);
+			return profileNames;
 		}
 
 		public String itemToEmoji(String itemName) {
@@ -631,19 +631,6 @@ public class Player {
 		}
 
 		/* Skills */
-		public int getTotalSkillsXp() {
-			int totalSkillXp = 0;
-			for (String skill : SKILL_NAMES) {
-				SkillsStruct skillInfo = getSkill(skill);
-				if (skillInfo != null) {
-					totalSkillXp += skillInfo.totalExp();
-				} else {
-					return -1;
-				}
-			}
-			return totalSkillXp;
-		}
-
 		public int getFarmingCapUpgrade() {
 			return higherDepth(profileJson(), "jacob2.perks.farming_level_cap", 0);
 		}

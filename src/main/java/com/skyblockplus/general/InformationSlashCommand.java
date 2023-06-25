@@ -40,73 +40,90 @@ public class InformationSlashCommand extends SlashCommand {
 		this.name = "information";
 	}
 
-	public static MessageEditBuilder getInformation() {
-		return new MessageEditBuilder()
-			.setEmbeds(
-				defaultEmbed("Skyblock Plus")
-					.setDescription(
-						"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
+	public static void getInformation(SlashCommandEvent event) {
+		event
+			.getJDA()
+			.getRestPing()
+			.queue(ping ->
+				event
+					.getHook()
+					.editOriginal(
+						new MessageEditBuilder()
+							.setEmbeds(
+								defaultEmbed("Skyblock Plus")
+									.setDescription(
+										"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
+									)
+									.addField(
+										"Statistics",
+										"**Servers:** " +
+										formatNumber(jda.getGuildCache().size()) +
+										"\n**Users:** " +
+										formatNumber(getUserCount()) +
+										"\n**Ping:** " +
+										formatNumber(ping) +
+										"ms\n**Websocket:** " +
+										formatNumber((long) jda.getAverageGatewayPing()) +
+										"ms",
+										true
+									)
+									.addField(
+										"Shards",
+										jda
+											.getShardCache()
+											.stream()
+											.sorted(Comparator.comparingInt(s -> s.getShardInfo().getShardId()))
+											.map(s ->
+												"**Shard " +
+												(s.getShardInfo().getShardId() + 1) +
+												":** " +
+												s.getGuildCache().size() +
+												" servers"
+											)
+											.collect(Collectors.joining("\n")),
+										true
+									)
+									.addField(
+										"Usage",
+										"**Memory:** " +
+										roundAndFormat(
+											100.0 *
+											(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) /
+											(Runtime.getRuntime().maxMemory())
+										) +
+										"%",
+										true
+									)
+									.setThumbnail(
+										"https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif"
+									)
+									.setFooter("dsc.gg/sb+ • Last restart")
+									.setTimestamp(client.getStartTime())
+									.build()
+							)
+							.setComponents(
+								ActionRow.of(
+									Button.link(BOT_INVITE_LINK, "Invite Link"),
+									Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
+									Button.link(FORUM_POST_LINK, "Forum Post"),
+									Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
+								),
+								ActionRow.of(
+									Button.link("https://skyblock-plus.ml", "Website"),
+									Button.link("https://skyblock-plus.ml/tos", "Terms of Service"),
+									Button.link("https://skyblock-plus.ml/privacy-policy", "Privacy Policy"),
+									Button.link("https://stats.uptimerobot.com/z4On2FGnOo", "Uptime")
+								)
+							)
+							.build()
 					)
-					.addField(
-						"Statistics",
-						"**Servers:** " +
-						formatNumber(jda.getGuildCache().size()) +
-						"\n**Users:** " +
-						formatNumber(getUserCount()) +
-						"\n**Ping:** " +
-						formatNumber(
-							(long) jda.getShardCache().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
-						) +
-						"ms\n**Websocket:** " +
-						formatNumber((long) jda.getAverageGatewayPing()) +
-						"ms",
-						true
-					)
-					.addField(
-						"Shards",
-						jda
-							.getShardCache()
-							.stream()
-							.sorted(Comparator.comparingInt(s -> s.getShardInfo().getShardId()))
-							.map(s -> "**Shard " + (s.getShardInfo().getShardId() + 1) + ":** " + s.getGuildCache().size() + " servers")
-							.collect(Collectors.joining("\n")),
-						true
-					)
-					.addField(
-						"Usage",
-						"**Memory:** " +
-						roundAndFormat(
-							100.0 *
-							(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) /
-							(Runtime.getRuntime().maxMemory())
-						) +
-						"%",
-						true
-					)
-					.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif")
-					.setFooter("dsc.gg/sb+ • Last restart")
-					.setTimestamp(client.getStartTime())
-					.build()
-			)
-			.setComponents(
-				ActionRow.of(
-					Button.link(BOT_INVITE_LINK, "Invite Link"),
-					Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
-					Button.link(FORUM_POST_LINK, "Forum Post"),
-					Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
-				),
-				ActionRow.of(
-					Button.link("https://skyblock-plus.ml", "Website"),
-					Button.link("https://skyblock-plus.ml/tos", "Terms of Service"),
-					Button.link("https://skyblock-plus.ml/privacy-policy", "Privacy Policy"),
-					Button.link("https://stats.uptimerobot.com/z4On2FGnOo", "Uptime")
-				)
+					.queue()
 			);
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
-		event.embed(getInformation());
+		getInformation(event);
 	}
 
 	@Override

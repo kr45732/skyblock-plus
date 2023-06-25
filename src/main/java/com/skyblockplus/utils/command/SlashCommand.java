@@ -34,7 +34,7 @@ public abstract class SlashCommand extends AbstractSlashCommand {
 			if (subcommand != null) {
 				subcommand.run(event);
 			} else {
-				event.embed(event.invalidCommandMessage());
+				event.replyEmbeds(event.invalidCommandMessage().build()).setEphemeral(true).queue();
 			}
 			return;
 		}

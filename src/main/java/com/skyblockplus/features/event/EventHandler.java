@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class EventHandler {
 
@@ -52,21 +51,26 @@ public class EventHandler {
 				return;
 			}
 
-			TextChannel timesChannel = jda.getGuildById("796790757947867156").getTextChannelById("959829695686381658");
-			String[] times = timesChannel.retrieveMessageById(messageId).complete().getContentRaw().split("\n");
+			jda
+				.getGuildById("796790757947867156")
+				.getTextChannelById("959829695686381658")
+				.retrieveMessageById(messageId)
+				.queue(m -> {
+					String[] times = m.getContentRaw().split("\n");
 
-			ZonedDateTime nowDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
-			Map<String, MessageEmbed> ebs = new HashMap<>();
-			ebs.putAll(getEventEmbeds(times, nowDateTime, 0));
-			ebs.putAll(getEventEmbeds(times, nowDateTime, 5));
+					ZonedDateTime nowDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
+					Map<String, MessageEmbed> ebs = new HashMap<>();
+					ebs.putAll(getEventEmbeds(times, nowDateTime, 0));
+					ebs.putAll(getEventEmbeds(times, nowDateTime, 5));
 
-			if (!ebs.isEmpty()) {
-				for (AutomaticGuild guild : guildMap.values()) {
-					guild.onEventNotif(ebs);
-				}
+					if (!ebs.isEmpty()) {
+						for (AutomaticGuild guild : guildMap.values()) {
+							guild.onEventNotif(ebs);
+						}
 
-				timesChannel.editMessageById(messageId, String.join("\n", times)).queue();
-			}
+						m.editMessage(String.join("\n", times)).queue();
+					}
+				});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

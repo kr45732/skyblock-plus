@@ -38,24 +38,26 @@ public class PurgeMessagesCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event, false) {
+		new CommandExecute(event) {
 			@Override
 			protected void execute() {
 				if (args.length == 2) {
 					try {
-						int messageCount = Math.min(Integer.parseInt(args[1]) + 1, 100);
-						event.getChannel().purgeMessages(event.getChannel().getHistory().retrievePast(messageCount).complete());
-
+						int messageCount = Math.min(Integer.parseInt(args[1]), 100);
 						event
 							.getChannel()
-							.sendMessageEmbeds(defaultEmbed("Purged messages").build())
-							.complete()
-							.delete()
-							.queueAfter(3, TimeUnit.SECONDS);
+							.getHistory()
+							.retrievePast(messageCount)
+							.queue(messages -> {
+								event.getChannel().purgeMessages(messages);
+								event
+									.getChannel()
+									.sendMessageEmbeds(defaultEmbed("Purged " + messageCount + " messages").build())
+									.queue(m -> m.delete().queueAfter(3, TimeUnit.SECONDS));
+							});
 					} catch (Exception ignored) {}
 				}
 			}
-		}
-			.queue();
+		};
 	}
 }

@@ -35,9 +35,9 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 public class PartyHandler {
 
 	private final SlashCommandEvent slashCommandEvent;
-	private final Message message;
 	private final String username;
 	private final List<String> classes = new ArrayList<>(List.of("any", "any", "any", "any"));
+	private Message message;
 	private String menuId;
 	private int classIndex = 0;
 	private String floor;
@@ -48,15 +48,16 @@ public class PartyHandler {
 
 		StringSelectMenu menu = getMainSelectionMenu();
 		this.menuId = menu.getId();
-		this.message =
-			slashCommandEvent
-				.getHook()
-				.editOriginalEmbeds(
-					defaultEmbed("Party Finder Creator").setDescription("Choose an option from the menu below to get started!").build()
-				)
-				.setActionRow(menu)
-				.complete();
-		scheduleWaiter();
+		slashCommandEvent
+			.getHook()
+			.editOriginalEmbeds(
+				defaultEmbed("Party Finder Creator").setDescription("Choose an option from the menu below to get started!").build()
+			)
+			.setActionRow(menu)
+			.queue(m -> {
+				this.message = m;
+				waitForEvent();
+			});
 	}
 
 	private boolean condition(StringSelectInteractionEvent event) {
@@ -69,134 +70,136 @@ public class PartyHandler {
 	}
 
 	private void action(StringSelectInteractionEvent event) {
-		event.deferEdit().complete();
-
-		switch (menuId) {
-			case "party_finder_create_main":
-				switch (event.getSelectedOptions().get(0).getValue()) {
-					case "floor" -> {
-						StringSelectMenu floorMenu = StringSelectMenu
-							.create("party_finder_create_floor")
-							.addOption("Entrance", "entrance")
-							.addOption("Floor 1", "floor_1")
-							.addOption("Floor 2", "floor_2")
-							.addOption("Floor 3", "floor_3")
-							.addOption("Floor 4", "floor_4")
-							.addOption("Floor 5", "floor_5")
-							.addOption("Floor 6", "floor_6")
-							.addOption("Floor 7", "floor_7")
-							.addOption("Master floor 1", "master_floor_1")
-							.addOption("Master floor 2", "master_floor_2")
-							.addOption("Master floor 3", "master_floor_3")
-							.addOption("Master floor 4", "master_floor_4")
-							.addOption("Master floor 5", "master_floor_5")
-							.addOption("Master floor 6", "master_floor_6")
-							.addOption("Master floor 7", "master_floor_7")
-							.build();
-						menuId = floorMenu.getId();
-						event
-							.getHook()
-							.editOriginalEmbeds(getCreationEmbed().setDescription("Choose a floor from the menu below").build())
-							.setActionRow(floorMenu)
-							.queue();
-					}
-					case "class" -> {
-						classes.clear();
-						classIndex = 0;
-						StringSelectMenu classMenu = getClassSelectionMenu("healer");
-						menuId = classMenu.getId();
-						event
-							.getHook()
-							.editOriginalEmbeds(getCreationEmbed().setDescription("Choose the number of healers").build())
-							.setActionRow(classMenu)
-							.queue();
-					}
-					case "create" -> {
-						if (floor == null) {
-							event
-								.getHook()
-								.editOriginalEmbeds(
-									getCreationEmbed().setDescription("You must set the floor number before creating the party").build()
-								)
-								.queue();
-							break;
-						}
-						guildMap
-							.get(event.getGuild().getId())
-							.partyList.add(new Party(username, event.getUser().getId(), floor, classes, event.getChannel().getId()));
-						event
-							.getHook()
-							.editOriginalEmbeds(
-								defaultEmbed("Party Finder Creator")
-									.setDescription(
-										"Successfully created the party which can be joined using `/party join " + username + "`"
+		event
+			.deferEdit()
+			.queue(hook -> {
+				switch (menuId) {
+					case "party_finder_create_main" -> {
+						switch (event.getSelectedOptions().get(0).getValue()) {
+							case "floor" -> {
+								StringSelectMenu floorMenu = StringSelectMenu
+									.create("party_finder_create_floor")
+									.addOption("Entrance", "entrance")
+									.addOption("Floor 1", "floor_1")
+									.addOption("Floor 2", "floor_2")
+									.addOption("Floor 3", "floor_3")
+									.addOption("Floor 4", "floor_4")
+									.addOption("Floor 5", "floor_5")
+									.addOption("Floor 6", "floor_6")
+									.addOption("Floor 7", "floor_7")
+									.addOption("Master floor 1", "master_floor_1")
+									.addOption("Master floor 2", "master_floor_2")
+									.addOption("Master floor 3", "master_floor_3")
+									.addOption("Master floor 4", "master_floor_4")
+									.addOption("Master floor 5", "master_floor_5")
+									.addOption("Master floor 6", "master_floor_6")
+									.addOption("Master floor 7", "master_floor_7")
+									.build();
+								menuId = floorMenu.getId();
+								hook
+									.editOriginalEmbeds(getCreationEmbed().setDescription("Choose a floor from the menu below").build())
+									.setActionRow(floorMenu)
+									.queue();
+							}
+							case "class" -> {
+								classes.clear();
+								classIndex = 0;
+								StringSelectMenu classMenu = getClassSelectionMenu("healer");
+								menuId = classMenu.getId();
+								hook
+									.editOriginalEmbeds(getCreationEmbed().setDescription("Choose the number of healers").build())
+									.setActionRow(classMenu)
+									.queue();
+							}
+							case "create" -> {
+								if (floor == null) {
+									hook
+										.editOriginalEmbeds(
+											getCreationEmbed()
+												.setDescription("You must set the floor number before creating the party")
+												.build()
+										)
+										.queue();
+									break;
+								}
+								guildMap
+									.get(event.getGuild().getId())
+									.partyList.add(
+										new Party(username, event.getUser().getId(), floor, classes, event.getChannel().getId())
+									);
+								hook
+									.editOriginalEmbeds(
+										defaultEmbed("Party Finder Creator")
+											.setDescription(
+												"Successfully created the party which can be joined using `/party join " + username + "`"
+											)
+											.build()
 									)
-									.build()
-							)
-							.setComponents()
-							.queue();
-						return;
-					}
-					case "cancel" -> {
-						event
-							.getHook()
-							.editOriginalEmbeds(
-								defaultEmbed("Party Finder Creator").setDescription("Canceled the creation process").build()
-							)
-							.setComponents()
-							.queue();
-						return;
-					}
-				}
-				break;
-			case "party_finder_create_floor":
-				floor = event.getSelectedOptions().get(0).getValue();
-				StringSelectMenu mainMenu = getMainSelectionMenu();
-				menuId = mainMenu.getId();
-				event.getHook().editOriginalEmbeds(getCreationEmbed().build()).setActionRow(mainMenu).queue();
-				break;
-			default:
-				if (menuId.startsWith("party_finder_create_class_")) {
-					String className = menuId.split("party_finder_create_class_")[1];
-					for (int i = 0; i < Integer.parseInt(event.getSelectedOptions().get(0).getValue()); i++) {
-						classes.add(className);
-					}
-
-					if (classIndex + 1 == DUNGEON_CLASS_NAMES.size()) {
-						int classesSize = classes.size();
-						for (int i = 0; i < 4 - classesSize; i++) {
-							classes.add("any");
+									.setComponents()
+									.queue();
+								return;
+							}
+							case "cancel" -> {
+								hook
+									.editOriginalEmbeds(
+										defaultEmbed("Party Finder Creator").setDescription("Canceled the creation process").build()
+									)
+									.setComponents()
+									.queue();
+								return;
+							}
 						}
-						StringSelectMenu defaultMenu = getMainSelectionMenu();
-						menuId = defaultMenu.getId();
-						event.getHook().editOriginalEmbeds(getCreationEmbed().build()).setActionRow(defaultMenu).queue();
-						break;
 					}
-
-					String nextClassName = DUNGEON_CLASS_NAMES.get(++classIndex);
-					StringSelectMenu nextClassMenu = getClassSelectionMenu(nextClassName);
-
-					if (nextClassMenu == null) {
-						StringSelectMenu defaultMenu = getMainSelectionMenu();
-						menuId = defaultMenu.getId();
-						event.getHook().editOriginalEmbeds(getCreationEmbed().build()).setActionRow(defaultMenu).queue();
-						break;
+					case "party_finder_create_floor" -> {
+						floor = event.getSelectedOptions().get(0).getValue();
+						StringSelectMenu mainMenu = getMainSelectionMenu();
+						menuId = mainMenu.getId();
+						hook.editOriginalEmbeds(getCreationEmbed().build()).setActionRow(mainMenu).queue();
 					}
+					default -> {
+						if (menuId.startsWith("party_finder_create_class_")) {
+							String className = menuId.split("party_finder_create_class_")[1];
+							for (int i = 0; i < Integer.parseInt(event.getSelectedOptions().get(0).getValue()); i++) {
+								classes.add(className);
+							}
 
-					menuId = nextClassMenu.getId();
-					event
-						.getHook()
-						.editOriginalEmbeds(getCreationEmbed().setDescription("Choose the number of " + nextClassName + "s").build())
-						.setActionRow(nextClassMenu)
-						.queue();
+							if (classIndex + 1 == DUNGEON_CLASS_NAMES.size()) {
+								int classesSize = classes.size();
+								for (int i = 0; i < 4 - classesSize; i++) {
+									classes.add("any");
+								}
+								StringSelectMenu defaultMenu = getMainSelectionMenu();
+								menuId = defaultMenu.getId();
+								hook.editOriginalEmbeds(getCreationEmbed().build()).setActionRow(defaultMenu).queue();
+								break;
+							}
+
+							String nextClassName = DUNGEON_CLASS_NAMES.get(++classIndex);
+							StringSelectMenu nextClassMenu = getClassSelectionMenu(nextClassName);
+
+							if (nextClassMenu == null) {
+								StringSelectMenu defaultMenu = getMainSelectionMenu();
+								menuId = defaultMenu.getId();
+								hook.editOriginalEmbeds(getCreationEmbed().build()).setActionRow(defaultMenu).queue();
+								break;
+							}
+
+							menuId = nextClassMenu.getId();
+							hook
+								.editOriginalEmbeds(
+									getCreationEmbed().setDescription("Choose the number of " + nextClassName + "s").build()
+								)
+								.setActionRow(nextClassMenu)
+								.queue();
+						}
+					}
 				}
-				break;
-		}
 
-		scheduleWaiter();
+				waitForEvent();
+			});
 	}
 
-	private void scheduleWaiter() {
+	private void waitForEvent() {
 		waiter.waitForEvent(
 			StringSelectInteractionEvent.class,
 			this::condition,
@@ -227,30 +230,31 @@ public class PartyHandler {
 	private StringSelectMenu getClassSelectionMenu(String className) {
 		StringSelectMenu.Builder classMenu = StringSelectMenu.create("party_finder_create_class_" + className);
 		switch (classes.size()) {
-			case 0:
+			case 0 -> {
 				classMenu.addOption("Zero", "0");
 				classMenu.addOption("One", "1");
 				classMenu.addOption("Two", "2");
 				classMenu.addOption("Three", "3");
 				classMenu.addOption("Four", "4");
-				break;
-			case 1:
+			}
+			case 1 -> {
 				classMenu.addOption("Zero", "0");
 				classMenu.addOption("One", "1");
 				classMenu.addOption("Two", "2");
 				classMenu.addOption("Three", "3");
-				break;
-			case 2:
+			}
+			case 2 -> {
 				classMenu.addOption("Zero", "0");
 				classMenu.addOption("One", "1");
 				classMenu.addOption("Two", "2");
-				break;
-			case 3:
+			}
+			case 3 -> {
 				classMenu.addOption("Zero", "0");
 				classMenu.addOption("One", "1");
-				break;
-			case 4:
+			}
+			case 4 -> {
 				return null;
+			}
 		}
 
 		return classMenu.build();

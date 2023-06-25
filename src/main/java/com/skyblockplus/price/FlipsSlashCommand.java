@@ -47,22 +47,17 @@ public class FlipsSlashCommand extends SlashCommand {
 	}
 
 	public static EmbedBuilder getFlips() {
+		EmbedBuilder eb = defaultEmbed("Flips");
+		if (underBinJsonLastUpdated != null) {
+			eb.appendDescription("**Next Update:** <t:" + underBinJsonLastUpdated.plusSeconds(60).getEpochSecond() + ":R>");
+		}
+		eb.appendDescription("\n**Live Updates:** [**Join**](https://discord.gg/GZWZbcxpv4)");
+
 		if (underBinJson == null || underBinJson.getAsJsonObject().isEmpty()) {
-			String ebStr = "No auction flips found at the moment";
-			if (underBinJsonLastUpdated != null) {
-				ebStr = "**Next Update:** <t:" + underBinJsonLastUpdated.plusSeconds(60).getEpochSecond() + ":R>\n\n" + ebStr;
-			}
-			return errorEmbed(ebStr);
+			return eb.appendDescription("\n\nNo auction flips found at the moment");
 		}
 
-		EmbedBuilder eb = defaultEmbed("Flips")
-			.setDescription(
-				"**Next Update:** <t:" +
-				underBinJsonLastUpdated.plusSeconds(60).getEpochSecond() +
-				":R>\n**Live Updates:** [**Join**](https://discord.gg/GZWZbcxpv4)"
-			);
 		JsonElement avgAuctionJson = getAveragePriceJson();
-
 		for (JsonElement auction : underBinJson
 			.getAsJsonObject()
 			.entrySet()
@@ -110,6 +105,10 @@ public class FlipsSlashCommand extends SlashCommand {
 				"`",
 				false
 			);
+		}
+
+		if (eb.getFields().isEmpty()) {
+			return eb.appendDescription("\n\nNo auction flips found at the moment");
 		}
 
 		return eb;

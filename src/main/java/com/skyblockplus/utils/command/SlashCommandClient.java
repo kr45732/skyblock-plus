@@ -76,20 +76,11 @@ public class SlashCommandClient extends ListenerAdapter {
 	@Override
 	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
 		if (!event.isFromGuild()) {
-			event.replyEmbeds(errorEmbed("This command cannot be used in direct messages").build()).queue();
+			event.replyEmbeds(errorEmbed("This command cannot be used in direct messages").build()).setEphemeral(true).queue();
 			return;
 		}
-		if (event.getChannelType() == ChannelType.PRIVATE) {
-			event.replyEmbeds(errorEmbed("This command can only be used in text channels or threads").build()).queue();
-			return;
-		}
-
-		try {
-			event.deferReply().complete();
-		} catch (ErrorResponseException e) {
-			if (e.getErrorCode() != ErrorResponse.UNKNOWN_INTERACTION.getCode()) {
-				throw e;
-			}
+		if (event.getChannelType() != ChannelType.TEXT && !event.getChannelType().isThread()) {
+			event.replyEmbeds(errorEmbed("This command can only be used in text channels or threads").build()).setEphemeral(true).queue();
 			return;
 		}
 
@@ -101,7 +92,7 @@ public class SlashCommandClient extends ListenerAdapter {
 			}
 		}
 
-		slashCommandEvent.getHook().editOriginalEmbeds(slashCommandEvent.invalidCommandMessage().build()).queue();
+		event.replyEmbeds(slashCommandEvent.invalidCommandMessage().build()).setEphemeral(true).queue();
 	}
 
 	@Override

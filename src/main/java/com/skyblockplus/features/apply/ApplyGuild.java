@@ -33,14 +33,15 @@ import com.skyblockplus.utils.Player;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 
 public class ApplyGuild {
 
@@ -72,7 +73,7 @@ public class ApplyGuild {
 
 				for (JsonElement applyUser : applyUsersCache) {
 					if (reactMessage.getGuild().getTextChannelById(higherDepth(applyUser, "applicationChannelId", null)) != null) {
-						applyUserList.add(gson.fromJson(applyUser, ApplyUser.class).setParent(this));
+						applyUserList.add(gson.fromJson(applyUser, ApplyUser.class));
 					}
 				}
 
@@ -99,20 +100,19 @@ public class ApplyGuild {
 		} catch (Exception ignored) {}
 	}
 
-	public void onMessageReactionAdd(MessageReactionAddEvent event) {
+	public boolean onStringSelectInteraction(StringSelectInteractionEvent event) {
 		if (!enable) {
-			return;
+			return false;
 		}
 
-		ApplyUser findApplyUser = applyUserList
-			.stream()
-			.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId()))
-			.findFirst()
-			.orElse(null);
+		Optional<ApplyUser> applyUser = applyUserList.stream().filter(e -> e.reactMessageId.equals(event.getMessageId())).findAny();
 
-		if (findApplyUser != null && findApplyUser.onMessageReactionAdd(event)) {
-			applyUserList.remove(findApplyUser);
+		if (applyUser.isPresent()) {
+			applyUser.get().onStringSelectInteraction(event, this);
+			return true;
 		}
+
+		return false;
 	}
 
 	public void onTextChannelDelete(ChannelDeleteEvent event) {
@@ -133,13 +133,111 @@ public class ApplyGuild {
 		}
 	}
 
-	public String onButtonClick_NewApplyUser(ButtonInteractionEvent event) {
-		if (!event.getMessageId().equals(reactMessageId)) {
-			return null;
+	public boolean onButtonClick(ButtonInteractionEvent event) {
+		if (onButtonClick_CurrentApplyUser(event)) {
+			return true;
 		}
 
-		if (!event.getButton().getId().equals("create_application_button_" + higherDepth(currentSettings, "guildName").getAsString())) {
-			return null;
+		if (onButtonClick_WaitingForInviteApplyUser(event)) {
+			return true;
+		}
+
+		return onButtonClick_NewApplyUser(event);
+	}
+
+	public boolean onButtonClick_CurrentApplyUser(ButtonInteractionEvent event) {
+		for (ApplyUser applyUser : applyUserList) {
+			if (applyUser.reactMessageId.equals(event.getMessageId())) {
+				applyUser.onButtonClick(event, this);
+				return true;
+			}
+
+			if (
+				// reactMessageId is message waiting for staff to accept or deny
+				event.getComponentId().equals("apply_user_cancel") &&
+				applyUser.applicationChannelId.equals(event.getChannel().getId()) &&
+				applyUser.state == 2
+			) {
+				applyUserList.remove(applyUser);
+
+				// Edit original message
+				event.getMessage().editMessageComponents().queue();
+
+				// Edit deferred message
+				event
+					.getHook()
+					.editOriginalEmbeds(defaultEmbed("Canceling Application").build())
+					.queue(ignored -> event.getGuildChannel().delete().reason("Application canceled").queueAfter(10, TimeUnit.SECONDS));
+
+				// Staff channel message
+				event
+					.getGuild()
+					.getTextChannelById(applyUser.staffChannelId)
+					.editMessageById(
+						applyUser.reactMessageId,
+						applyUser.playerUsername + " (<@" + applyUser.applyingUserId + ">) canceled their application"
+					)
+					.setEmbeds()
+					.setComponents()
+					.queue();
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public boolean onButtonClick_WaitingForInviteApplyUser(ButtonInteractionEvent event) {
+		if (waitInviteChannel == null) {
+			return false;
+		}
+
+		if (!event.getChannel().getId().equals(waitInviteChannel.getId())) {
+			return false;
+		}
+
+		if (!event.getComponentId().startsWith("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString())) {
+			return false;
+		}
+
+		if (!isApplyAdmin(event.getMember())) {
+			event
+				.getHook()
+				.editOriginal(client.getError() + " You are missing the required permissions in this guild to use that!")
+				.queue();
+			return true;
+		}
+
+		try {
+			// 0 = channel, 1 = user, 2 = role
+			String[] channelRoleSplit = event
+				.getComponentId()
+				.split("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString() + "_")[1].split("_");
+			try {
+				event
+					.getGuild()
+					.addRoleToMember(UserSnowflake.fromId(channelRoleSplit[1]), event.getGuild().getRoleById(channelRoleSplit[2]))
+					.queue(ignore, ignore);
+			} catch (Exception ignored) {}
+			TextChannel applicationChannel = event.getGuild().getTextChannelById(channelRoleSplit[0]);
+			applyUserList.removeIf(applyUser -> applyUser.applicationChannelId.equals(applicationChannel.getId()));
+			applicationChannel
+				.sendMessageEmbeds(defaultEmbed("Closing Channel").build())
+				.queue(ignored -> applicationChannel.delete().reason("Player invited").queueAfter(10, TimeUnit.SECONDS, ignore), ignore);
+		} catch (Exception ignored) {}
+
+		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS, ignore, ignore);
+		event.getHook().editOriginal(client.getSuccess() + " Player was invited").queue();
+		return true;
+	}
+
+	public boolean onButtonClick_NewApplyUser(ButtonInteractionEvent event) {
+		if (!event.getMessageId().equals(reactMessageId)) {
+			return false;
+		}
+
+		if (!event.getComponentId().equals("apply_user_create_" + higherDepth(currentSettings, "guildName").getAsString())) {
+			return false;
 		}
 
 		ApplyUser runningApplication = applyUserList
@@ -149,12 +247,22 @@ public class ApplyGuild {
 			.orElse(null);
 
 		if (runningApplication != null) {
-			return client.getError() + " You already have an application open in <#" + runningApplication.applicationChannelId + ">";
+			event
+				.getHook()
+				.editOriginal(
+					client.getError() + " You already have an application open in <#" + runningApplication.applicationChannelId + ">"
+				)
+				.queue();
+			return true;
 		}
 
 		LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());
 		if (linkedAccount == null) {
-			return client.getError() + " You are not linked to the bot. Please run `/link <player>` and try again.";
+			event
+				.getHook()
+				.editOriginal(client.getError() + " You are not linked to the bot. Please run `/link <player>` and try again.")
+				.queue();
+			return true;
 		}
 
 		JsonArray currentBlacklist = guildMap.get(event.getGuild().getId()).getBlacklist();
@@ -163,24 +271,44 @@ public class ApplyGuild {
 			.findFirst()
 			.orElse(null);
 		if (blacklisted != null) {
-			return client.getError() + " You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`";
+			event
+				.getHook()
+				.editOriginal(
+					client.getError() + " You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`"
+				)
+				.queue();
+			return true;
 		}
 
 		if (higherDepth(currentSettings, "applyScammerCheck", false)) {
 			JsonElement scammerJson = getScammerJson(linkedAccount.uuid());
 			String scammerReason = scammerJson != null ? higherDepth(scammerJson, "details.reason", "No reason provided") : null;
 			if (scammerReason != null) {
-				return "SBZ_SCAMMER_CHECK_" + scammerReason;
+				event
+					.getHook()
+					.editOriginalEmbeds(
+						defaultEmbed("Error")
+							.setDescription("You have been marked as a scammer with reason `" + scammerReason + "`")
+							.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)")
+							.build()
+					)
+					.queue();
+				return true;
 			}
 		}
 
 		Player.Profile player = Player.create(linkedAccount.username());
 		if (!player.isValid()) {
-			return client.getError() + " Failed to fetch player data: `" + player.getFailCause() + "`";
+			event.getHook().editOriginal(client.getError() + " Failed to fetch player data: `" + player.getFailCause() + "`").queue();
+			return true;
 		} else {
 			Player.Gamemode gamemode = Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all"));
-			if (player.getAllProfileNames(gamemode).length == 0) {
-				return client.getError() + " You have no " + gamemode.toString().toLowerCase() + " profiles created";
+			if (player.getMatchingProfileNames(gamemode).size() == 0) {
+				event
+					.getHook()
+					.editOriginal(client.getError() + " You have no " + gamemode.toString().toLowerCase() + " profiles created")
+					.queue();
+				return true;
 			}
 		}
 
@@ -200,130 +328,34 @@ public class ApplyGuild {
 					(skillsEnabled ? "" : "skills, ");
 				out = capitalizeString(out.substring(0, out.length() - 2));
 
-				return client.getError() + " " + out + " API" + (out.contains(",") ? "s" : "") + " not enabled";
+				event
+					.getHook()
+					.editOriginal(client.getError() + " " + out + " API" + (out.contains(",") ? "s" : "") + " not enabled")
+					.queue();
+				return true;
 			}
 		}
 
-		ApplyUser toAdd = new ApplyUser(event, linkedAccount.username(), this);
-		if (toAdd.failCause != null) {
-			return client.getError() + " " + toAdd.failCause;
-		}
-
-		applyUserList.add(toAdd);
-
-		return (
-			client.getSuccess() +
-			" A new application was created in " +
-			event.getGuild().getTextChannelById(toAdd.applicationChannelId).getAsMention()
-		);
+		new ApplyUser(event, player, this);
+		return true;
 	}
 
-	public String onButtonClick(ButtonInteractionEvent event) {
-		String waitingForInvite = onButtonClick_WaitingForInviteApplyUser(event);
-		if (waitingForInvite != null) {
-			return waitingForInvite;
+	public boolean isApplyAdmin(Member member) {
+		if (guildMap.get(member.getGuild().getId()).isAdmin(member)) {
+			return true;
 		}
 
-		if (onButtonClick_CurrentApplyUser(event)) {
-			return "IGNORE_INTERNAL";
+		JsonArray applyStaffRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
+		if (applyStaffRoles.isEmpty()) {
+			return false;
 		}
 
-		return onButtonClick_NewApplyUser(event);
-	}
-
-	public boolean onButtonClick_CurrentApplyUser(ButtonInteractionEvent event) {
-		for (ApplyUser applyUser : applyUserList) {
-			if (applyUser.reactMessageId.equals(event.getMessageId())) {
-				return applyUser.onButtonClick(event, this, false);
-			} else if (
-				event.getComponentId().equals("apply_user_cancel") &&
-				applyUser.applicationChannelId.equals(event.getChannel().getId()) &&
-				applyUser.state == 2
-			) {
-				applyUserList.remove(applyUser);
-				event.getMessage().editMessageComponents().queue();
-				event.getHook().editOriginalEmbeds(defaultEmbed("Canceling application & closing channel").build()).complete();
-				event
-					.getGuild()
-					.getTextChannelById(applyUser.staffChannelId)
-					.editMessageById(
-						applyUser.reactMessageId,
-						applyUser.playerUsername + " (<@" + applyUser.applyingUserId + ">) canceled their application"
-					)
-					.setEmbeds()
-					.setComponents()
-					.queue();
-				event
-					.getGuild()
-					.getTextChannelById(event.getChannel().getId())
-					.delete()
-					.reason("Application canceled")
-					.queueAfter(10, TimeUnit.SECONDS);
+		for (JsonElement staffPingRole : applyStaffRoles) {
+			if (member.getRoles().stream().anyMatch(e -> e.getId().equals(staffPingRole.getAsString()))) {
 				return true;
 			}
 		}
 
 		return false;
-	}
-
-	public String onButtonClick_WaitingForInviteApplyUser(ButtonInteractionEvent event) {
-		if (waitInviteChannel == null) {
-			return null;
-		}
-
-		if (!event.getChannel().getId().equals(waitInviteChannel.getId())) {
-			return null;
-		}
-
-		if (!event.getComponentId().startsWith("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString())) {
-			return null;
-		}
-
-		if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
-			boolean hasStaffRole = false;
-			if (staffPingRoles.size() != 0) {
-				for (JsonElement staffPingRole : staffPingRoles) {
-					if (event.getMember().getRoles().contains(event.getGuild().getRoleById(staffPingRole.getAsString()))) {
-						hasStaffRole = true;
-						break;
-					}
-				}
-			}
-
-			if (!hasStaffRole) {
-				return client.getError() + " You are missing the required permissions in this guild to use that!";
-			}
-		}
-
-		try {
-			String[] channelRoleSplit = event
-				.getComponentId()
-				.split("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString() + "_")[1].split("_");
-			TextChannel toCloseChannel = event.getGuild().getTextChannelById(channelRoleSplit[0]);
-			try {
-				event
-					.getGuild()
-					.addRoleToMember(UserSnowflake.fromId(channelRoleSplit[1]), event.getGuild().getRoleById(channelRoleSplit[2]))
-					.queue(ignore, ignore);
-			} catch (Exception ignored) {}
-			applyUserList
-				.stream()
-				.filter(applyUser -> applyUser.applicationChannelId.equals(toCloseChannel.getId()))
-				.findFirst()
-				.ifPresentOrElse(
-					applyUser -> applyUser.onButtonClick(event, this, true),
-					() ->
-						toCloseChannel
-							.sendMessageEmbeds(defaultEmbed("Closing Channel").build())
-							.queue(
-								m -> m.getGuildChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS, ignore),
-								ignore
-							)
-				);
-		} catch (Exception ignored) {}
-
-		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS, ignore, ignore);
-		return client.getSuccess() + " Player was invited";
 	}
 }

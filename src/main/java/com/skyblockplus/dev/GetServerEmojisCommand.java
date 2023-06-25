@@ -40,7 +40,7 @@ public class GetServerEmojisCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event, false) {
+		new CommandExecute(event) {
 			@Override
 			protected void execute() {
 				JsonObject toAdd = new JsonObject();
@@ -49,7 +49,6 @@ public class GetServerEmojisCommand extends Command {
 				}
 				event.reply(makeHastePost(toAdd.toString()));
 			}
-		}
-			.queue();
+		};
 	}
 }
