@@ -40,8 +40,8 @@ public class EssenceHandler {
 	private final String itemId;
 	private final String itemName;
 	private final JsonElement itemJson;
-	private final Message reactMessage;
 	private final SlashCommandEvent event;
+	private Message message;
 	private int startingLevel;
 
 	public EssenceHandler(String itemId, SlashCommandEvent event) {
@@ -53,7 +53,6 @@ public class EssenceHandler {
 		this.itemName = idToName(itemId);
 		this.itemJson = higherDepth(getEssenceCostsJson(), itemId);
 		this.event = event;
-		this.reactMessage = event.getHook().retrieveOriginal().complete();
 
 		int max = 0;
 		for (int i = 1; i <= 10; i++) {
@@ -79,22 +78,23 @@ public class EssenceHandler {
 					.build()
 			)
 			.setActionRow(menuBuilder.build())
-			.queue();
-
-		waiter.waitForEvent(
-			StringSelectInteractionEvent.class,
-			this::condition,
-			this::actionOne,
-			1,
-			TimeUnit.MINUTES,
-			() -> reactMessage.editMessageComponents().queue()
-		);
+			.queue(m -> {
+				this.message = m;
+				waiter.waitForEvent(
+					StringSelectInteractionEvent.class,
+					this::condition,
+					this::actionOne,
+					1,
+					TimeUnit.MINUTES,
+					() -> message.editMessageComponents().queue()
+				);
+			});
 	}
 
 	private boolean condition(StringSelectInteractionEvent event) {
 		return (
 			event.isFromGuild() &&
-			event.getMessageId().equals(reactMessage.getId()) &&
+			event.getMessageId().equals(message.getId()) &&
 			event.getUser().getId().equals(this.event.getUser().getId())
 		);
 	}
@@ -126,7 +126,7 @@ public class EssenceHandler {
 			this::actionTwo,
 			1,
 			TimeUnit.MINUTES,
-			() -> reactMessage.editMessageComponents().queue()
+			() -> message.editMessageComponents().queue()
 		);
 	}
 

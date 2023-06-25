@@ -76,7 +76,7 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -90,6 +90,7 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
+import net.dv8tion.jda.api.requests.restaction.interactions.InteractionCallbackAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
@@ -188,20 +189,14 @@ public class AutomaticGuild {
 
 		if (isMainBot() && guildId.equals("796790757947867156")) {
 			try {
-				long seconds = Duration
-					.between(
-						((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
-							.retrievePast(1)
-							.complete()
-							.get(0)
-							.getTimeCreated()
-							.toInstant(),
-						Instant.now()
-					)
-					.toSeconds();
-				if (seconds < 900) {
-					botStatusWebhook.send(client.getSuccess() + " Restarted in " + seconds + " seconds");
-				}
+				((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
+					.retrievePast(1)
+					.queue(m -> {
+						long seconds = Duration.between(m.get(0).getTimeCreated().toInstant(), Instant.now()).toSeconds();
+						if (seconds < 900) {
+							botStatusWebhook.send(client.getSuccess() + " Restarted in " + seconds + " seconds");
+						}
+					});
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -336,10 +331,7 @@ public class AutomaticGuild {
 							.editMessageEmbedsById(higherDepth(currentSettings, "applyPrevMessage").getAsString(), eb.build())
 							.setActionRow(
 								Button
-									.primary(
-										"create_application_button_" + guildName,
-										closed ? "Applications Closed" : "Create Application"
-									)
+									.primary("apply_user_create_" + guildName, closed ? "Applications Closed" : "Create Application")
 									.withDisabled(closed)
 							)
 							.complete();
@@ -351,10 +343,7 @@ public class AutomaticGuild {
 							.sendMessageEmbeds(eb.build())
 							.setActionRow(
 								Button
-									.primary(
-										"create_application_button_" + guildName,
-										closed ? "Applications Closed" : "Create Application"
-									)
+									.primary("apply_user_create_" + guildName, closed ? "Applications Closed" : "Create Application")
 									.withDisabled(closed)
 							)
 							.complete();
@@ -985,8 +974,8 @@ public class AutomaticGuild {
 	}
 
 	/* Events */
-	public void onMessageReactionAdd(MessageReactionAddEvent event) {
-		applyGuilds.forEach(o1 -> o1.onMessageReactionAdd(event));
+	public boolean onStringSelectInteraction(StringSelectInteractionEvent event) {
+		return applyGuilds.stream().anyMatch(e -> e.onStringSelectInteraction(event));
 	}
 
 	public void onTextChannelDelete(ChannelDeleteEvent event) {
@@ -995,17 +984,20 @@ public class AutomaticGuild {
 
 	public void onModalInteraction(ModalInteractionEvent event) {
 		if (event.getModalId().equalsIgnoreCase("verify_modal")) {
-			try {
-				event.deferReply(true).complete();
-			} catch (ErrorResponseException ignored) {
-				return;
-			}
-			Object ebOrMb = LinkSlashCommand.linkAccount(event.getValues().get(0).getAsString(), event.getMember(), event.getGuild());
-			if (ebOrMb instanceof EmbedBuilder eb) {
-				event.getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
-			} else if (ebOrMb instanceof MessageEditBuilder mb) {
-				event.getHook().editOriginal(mb.build()).queue(ignore, ignore);
-			}
+			event
+				.deferReply(true)
+				.queue(hook -> {
+					Object ebOrMb = LinkSlashCommand.linkAccount(
+						event.getValues().get(0).getAsString(),
+						event.getMember(),
+						event.getGuild()
+					);
+					if (ebOrMb instanceof EmbedBuilder eb) {
+						hook.editOriginalEmbeds(eb.build()).queue(ignore, ignore);
+					} else if (ebOrMb instanceof MessageEditBuilder mb) {
+						hook.editOriginal(mb.build()).queue(ignore, ignore);
+					}
+				});
 		} else if (event.getModalId().startsWith("nw_reply_")) {
 			if (event.getUser().getId().equals(client.getOwnerId())) {
 				event
@@ -1051,66 +1043,68 @@ public class AutomaticGuild {
 					);
 			}
 		} else if (event.getModalId().startsWith("nw_")) {
-			event.deferReply(true).complete();
-
-			// 0 = uuid, 1 = profile name, 2 = last action, 3 = optional verbose json link
-			String[] split = event.getModalId().split("nw_")[1].split("_");
-			if (split.length < 4) {
-				NetworthExecute calc = new NetworthExecute().setVerbose(true);
-				calc.getPlayerNetworth(split[0], split[1], null);
-				split =
-					new String[] {
-						split[0],
-						split[1],
-						split[2],
-						makeHastePost(formattedGson.toJson(calc.getVerboseJson())).split(getHasteUrl())[1],
-					};
-			}
-			split[2] = "" + Instant.now().toEpochMilli();
-
-			List<ActionRow> newRows = new ArrayList<>();
-			for (ActionRow actionRow : event.getMessage().getActionRows()) {
-				List<ItemComponent> newComponents = new ArrayList<>();
-				for (ItemComponent component : actionRow) {
-					if (component instanceof Button button && button.getId() != null && button.getId().startsWith("nw_")) {
-						component = button.withId("nw_" + String.join("_", split));
+			event
+				.deferReply(true)
+				.queue(hook -> {
+					// 0 = uuid, 1 = profile name, 2 = last action, 3 = optional verbose json link
+					String[] split = event.getModalId().split("nw_")[1].split("_");
+					if (split.length < 4) {
+						NetworthExecute calc = new NetworthExecute().setVerbose(true);
+						calc.getPlayerNetworth(split[0], split[1], null);
+						split =
+							new String[] {
+								split[0],
+								split[1],
+								split[2],
+								makeHastePost(formattedGson.toJson(calc.getVerboseJson())).split(getHasteUrl())[1],
+							};
 					}
-					newComponents.add(component);
-				}
-				newRows.add(ActionRow.of(newComponents));
-			}
-			event.getMessage().editMessageComponents(newRows).queue();
+					split[2] = "" + Instant.now().toEpochMilli();
 
-			String[] finalSplit = split;
-			getNetworthBugReportChannel()
-				.sendMessageEmbeds(
-					defaultEmbed("Networth Bug Report")
-						.addField(
-							"Information",
-							"**User:** " +
-							event.getUser().getAsMention() +
-							"\n**Username:** [" +
-							uuidToUsername(split[0]).username() +
-							"](" +
-							skyblockStatsLink(split[0], split[1]) +
-							")\n**Profile name:** " +
-							split[1],
-							false
+					List<ActionRow> newRows = new ArrayList<>();
+					for (ActionRow actionRow : event.getMessage().getActionRows()) {
+						List<ItemComponent> newComponents = new ArrayList<>();
+						for (ItemComponent component : actionRow) {
+							if (component instanceof Button button && button.getId() != null && button.getId().startsWith("nw_")) {
+								component = button.withId("nw_" + String.join("_", split));
+							}
+							newComponents.add(component);
+						}
+						newRows.add(ActionRow.of(newComponents));
+					}
+					event.getMessage().editMessageComponents(newRows).queue();
+
+					String[] finalSplit = split;
+					getNetworthBugReportChannel()
+						.sendMessageEmbeds(
+							defaultEmbed("Networth Bug Report")
+								.addField(
+									"Information",
+									"**User:** " +
+									event.getUser().getAsMention() +
+									"\n**Username:** [" +
+									uuidToUsername(split[0]).username() +
+									"](" +
+									skyblockStatsLink(split[0], split[1]) +
+									")\n**Profile name:** " +
+									split[1],
+									false
+								)
+								.setDescription(event.getValue("items").getAsString() + "\n\n" + event.getValue("prices").getAsString())
+								.build()
 						)
-						.setDescription(event.getValue("items").getAsString() + "\n\n" + event.getValue("prices").getAsString())
-						.build()
-				)
-				.setComponents(
-					ActionRow.of(
-						Button.link(getHasteUrl() + finalSplit[3], "Verbose Link"),
-						Button.primary("nw_run_" + finalSplit[0] + "_" + finalSplit[1], "Run Networth"),
-						Button.success("nw_resolved_" + event.getUser().getId(), "Resolved"),
-						Button.success("nw_reply_" + event.getUser().getId(), "Reply")
-					)
-				)
-				.queue();
+						.setComponents(
+							ActionRow.of(
+								Button.link(getHasteUrl() + finalSplit[3], "Verbose Link"),
+								Button.primary("nw_run_" + finalSplit[0] + "_" + finalSplit[1], "Run Networth"),
+								Button.success("nw_resolved_" + event.getUser().getId(), "Resolved"),
+								Button.success("nw_reply_" + event.getUser().getId(), "Reply")
+							)
+						)
+						.queue();
 
-			event.getHook().editOriginal(client.getSuccess() + " Bug report sent").queue();
+					hook.editOriginal(client.getSuccess() + " Bug report sent").queue();
+				});
 		}
 	}
 
@@ -1200,13 +1194,16 @@ public class AutomaticGuild {
 					);
 			}
 		} else if (event.getComponentId().startsWith("nw_run_")) {
-			event.deferReply(true).complete();
-			// 0 = uuid, 1 = profile name
-			String[] split = event.getComponentId().split("nw_run_")[1].split("_");
-			EmbedBuilder eb = new NetworthExecute().setVerbose(true).getPlayerNetworth(split[0], split[1], event);
-			if (eb != null) {
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
+			event
+				.deferReply(true)
+				.queue(hook -> {
+					// 0 = uuid, 1 = profile name
+					String[] split = event.getComponentId().split("nw_run_")[1].split("_");
+					EmbedBuilder eb = new NetworthExecute().setVerbose(true).getPlayerNetworth(split[0], split[1], event);
+					if (eb != null) {
+						hook.editOriginalEmbeds(eb.build()).queue();
+					}
+				});
 		} else if (event.getComponentId().startsWith("nw_")) {
 			long seconds = Duration
 				.between(Instant.now(), Instant.ofEpochMilli(Long.parseLong(event.getComponentId().split("nw_")[1].split("_")[2])))
@@ -1332,41 +1329,29 @@ public class AutomaticGuild {
 			} else {
 				event.reply(client.getError() + " Only the party leader can archive the thread").setEphemeral(true).queue();
 			}
-		} else if (
-			!event.getComponentId().startsWith("paginator_") &&
-			!event.getComponentId().startsWith("reactive_") &&
-			!event.getComponentId().startsWith("inv_paginator_") &&
-			!event.getComponentId().startsWith("inv_list_paginator_") &&
-			!event.getComponentId().startsWith("leaderboard_paginator_") &&
-			!event.getComponentId().startsWith("craft_command_")
-		) {
-			event
-				.deferReply(!event.getComponentId().startsWith("apply_user_") || event.getComponentId().startsWith("apply_user_wait_"))
-				.complete();
-
-			for (ApplyGuild applyG : applyGuilds) {
-				String buttonClickReply = applyG.onButtonClick(event);
-				if (buttonClickReply != null) {
-					if (buttonClickReply.startsWith("SBZ_SCAMMER_CHECK_")) {
-						event
-							.getHook()
-							.editOriginalEmbeds(
-								defaultEmbed("Error")
-									.setDescription(
-										"You have been marked as a scammer with reason `" +
-										buttonClickReply.split("SBZ_SCAMMER_CHECK_")[1] +
-										"`"
-									)
-									.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)")
-									.build()
-							)
-							.queue();
-					} else if (!buttonClickReply.equals("IGNORE_INTERNAL")) {
-						event.getHook().editOriginal(buttonClickReply).queue();
-					}
-					return;
-				}
+		} else if (event.getComponentId().startsWith("apply_user_")) {
+			InteractionCallbackAction<?> action;
+			if (
+				event.getComponentId().equals("apply_user_accept") ||
+				event.getComponentId().equals("apply_user_waitlist") ||
+				event.getComponentId().equals("apply_user_deny")
+			) {
+				// Edit the staff message which had the accept/waitlist/deny buttons
+				action = event.deferEdit();
+			} else {
+				action =
+					event.deferReply(
+						event.getComponentId().startsWith("apply_user_create_") || event.getComponentId().startsWith("apply_user_wait_")
+					);
 			}
+
+			action.queue(ignored -> {
+				for (ApplyGuild applyGuild : applyGuilds) {
+					if (applyGuild.onButtonClick(event)) {
+						return;
+					}
+				}
+			});
 		}
 	}
 

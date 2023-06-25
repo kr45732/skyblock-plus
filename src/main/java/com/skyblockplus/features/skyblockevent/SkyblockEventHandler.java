@@ -141,16 +141,14 @@ public class SkyblockEventHandler {
 							)
 							.queue();
 					}
-					case "collections" -> {
-						event
-							.replyModal(
-								Modal
-									.create("skyblock_event_type_collections", "Skyblock Event")
-									.addActionRow(TextInput.create("value", "Collection Type", TextInputStyle.SHORT).build())
-									.build()
-							)
-							.queue();
-					}
+					case "collections" -> event
+						.replyModal(
+							Modal
+								.create("skyblock_event_type_collections", "Skyblock Event")
+								.addActionRow(TextInput.create("value", "Collection Type", TextInputStyle.SHORT).build())
+								.build()
+						)
+						.queue();
 				}
 			}
 			case TYPE_WEIGHT -> {
@@ -208,93 +206,90 @@ public class SkyblockEventHandler {
 							waitForEvent();
 							return;
 						}
-						event.deferEdit().complete();
 
-						String eventTypeFormatted = getEventTypeFormatted(eventSettings.getEventType());
+						event
+							.deferEdit()
+							.queue(hook -> {
+								EmbedBuilder announcementEb = defaultEmbed("Skyblock Event")
+									.setDescription("A new Skyblock event has been created!")
+									.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 
-						EmbedBuilder announcementEb = defaultEmbed("Skyblock Event")
-							.setDescription("A new Skyblock event has been created!")
-							.addField("Event Type", eventTypeFormatted, false);
-						if (guildName != null) {
-							announcementEb.addField("Guild", guildName, false);
-						}
-						announcementEb.addField("End Date", "Ends <t:" + eventSettings.getTimeEndingSeconds() + ":R>", false);
+								if (guildName != null) {
+									announcementEb.addField("Guild", guildName, false);
+								}
 
-						StringBuilder ebString = new StringBuilder();
-						for (Map.Entry<Integer, String> prize : eventSettings.getPrizeMap().entrySet()) {
-							ebString.append("`").append(prize.getKey()).append(")` ").append(prize.getValue()).append("\n");
-						}
-						announcementEb
-							.addField("Prizes", ebString.isEmpty() ? "None" : ebString.toString(), false)
-							.addField(
-								"Join the event",
-								"Click the join button below or run `/event join` to join" +
-								(eventSettings.getEventGuildId().isEmpty() ? "." : " and in the guild."),
-								false
-							)
-							.addField(
-								"Leaderboard",
-								"Click the leaderboard button below or run `/event leaderboard` to view the leaderboard",
-								false
-							);
+								announcementEb.addField("End Date", "Ends <t:" + eventSettings.getTimeEndingSeconds() + ":R>", false);
 
-						Message announcementMessage = announcementChannel
-							.sendMessageEmbeds(announcementEb.build())
-							.setActionRow(
-								Button.success("event_message_join", "Join Event"),
-								Button.primary("event_message_leaderboard", "Event Leaderboard")
-							)
-							.complete();
-						eventSettings.setAnnouncementMessageId(announcementMessage.getId());
-						if (setSkyblockEventInDatabase()) {
-							event
-								.getHook()
-								.editOriginalEmbeds(
-									defaultEmbed("Skyblock Event")
-										.setDescription("Event successfully started in " + announcementChannel.getAsMention())
-										.build()
-								)
-								.setComponents()
-								.queue();
-							guildMap
-								.get(event.getGuild().getId())
-								.scheduleSbEventFuture(database.getSkyblockEventSettings(event.getGuild().getId()));
-						} else {
-							announcementMessage.delete().queue(ignore, ignore);
-							event
-								.getHook()
-								.editOriginalEmbeds(defaultEmbed("Skyblock Event").setDescription("Error starting event").build())
-								.setComponents()
-								.queue();
-						}
-						guildMap.get(event.getGuild().getId()).setSkyblockEventHandler(null);
+								StringBuilder ebString = new StringBuilder();
+								for (Map.Entry<Integer, String> prize : eventSettings.getPrizeMap().entrySet()) {
+									ebString.append("`").append(prize.getKey()).append(")` ").append(prize.getValue()).append("\n");
+								}
+								announcementEb
+									.addField("Prizes", ebString.isEmpty() ? "None" : ebString.toString(), false)
+									.addField(
+										"Join the event",
+										"Click the join button below or run `/event join` to join" +
+										(eventSettings.getEventGuildId().isEmpty() ? "." : " and in the guild."),
+										false
+									)
+									.addField(
+										"Leaderboard",
+										"Click the leaderboard button below or run `/event leaderboard` to view the leaderboard",
+										false
+									);
+
+								announcementChannel
+									.sendMessageEmbeds(announcementEb.build())
+									.setActionRow(
+										Button.success("event_message_join", "Join Event"),
+										Button.primary("event_message_leaderboard", "Event Leaderboard")
+									)
+									.queue(m -> {
+										eventSettings.setAnnouncementMessageId(m.getId());
+										if (setSkyblockEventInDatabase()) {
+											hook
+												.editOriginalEmbeds(
+													defaultEmbed("Skyblock Event")
+														.setDescription(
+															"Event successfully started in " + announcementChannel.getAsMention()
+														)
+														.build()
+												)
+												.setComponents()
+												.queue();
+											guildMap.get(event.getGuild().getId()).scheduleSbEventFuture(gson.toJsonTree(eventSettings));
+										} else {
+											m.delete().queue(ignore, ignore);
+											hook
+												.editOriginalEmbeds(
+													defaultEmbed("Skyblock Event").setDescription("Error starting event").build()
+												)
+												.setComponents()
+												.queue();
+										}
+										guildMap.get(event.getGuild().getId()).setSkyblockEventHandler(null);
+									});
+							});
 						return;
 					}
-					case "guild" -> {
-						event
-							.replyModal(
-								Modal
-									.create("skyblock_event_config_guild", "Skyblock Event")
-									.addActionRow(TextInput.create("value", "Guild Name", TextInputStyle.SHORT).build())
-									.build()
-							)
-							.queue();
-					}
-					case "duration" -> {
-						event
-							.replyModal(
-								Modal
-									.create("skyblock_event_config_duration", "Skyblock Event")
-									.addActionRow(
-										TextInput
-											.create("value", "Duration", TextInputStyle.SHORT)
-											.setPlaceholder("Duration in hours")
-											.build()
-									)
-									.build()
-							)
-							.queue();
-					}
+					case "guild" -> event
+						.replyModal(
+							Modal
+								.create("skyblock_event_config_guild", "Skyblock Event")
+								.addActionRow(TextInput.create("value", "Guild Name", TextInputStyle.SHORT).build())
+								.build()
+						)
+						.queue();
+					case "duration" -> event
+						.replyModal(
+							Modal
+								.create("skyblock_event_config_duration", "Skyblock Event")
+								.addActionRow(
+									TextInput.create("value", "Duration", TextInputStyle.SHORT).setPlaceholder("Duration in hours").build()
+								)
+								.build()
+						)
+						.queue();
 					case "channel" -> event
 						.replyModal(
 							Modal
@@ -303,21 +298,19 @@ public class SkyblockEventHandler {
 								.build()
 						)
 						.queue();
-					case "prizes" -> {
-						event
-							.replyModal(
-								Modal
-									.create("skyblock_event_config_prizes", "Skyblock Event")
-									.addActionRow(
-										TextInput
-											.create("value", "Prizes", TextInputStyle.PARAGRAPH)
-											.setPlaceholder("Use the format position:prize, separating each prize with a new line")
-											.build()
-									)
-									.build()
-							)
-							.queue();
-					}
+					case "prizes" -> event
+						.replyModal(
+							Modal
+								.create("skyblock_event_config_prizes", "Skyblock Event")
+								.addActionRow(
+									TextInput
+										.create("value", "Prizes", TextInputStyle.PARAGRAPH)
+										.setPlaceholder("Use the format position:prize, separating each prize with a new line")
+										.build()
+								)
+								.build()
+						)
+						.queue();
 					case "minimum_amount" -> event
 						.replyModal(
 							Modal
@@ -326,16 +319,14 @@ public class SkyblockEventHandler {
 								.build()
 						)
 						.queue();
-					case "maximum_amount" -> {
-						event
-							.replyModal(
-								Modal
-									.create("skyblock_event_config_maximum_amount", "Skyblock Event")
-									.addActionRow(TextInput.create("value", "Maximum Amount", TextInputStyle.SHORT).build())
-									.build()
-							)
-							.queue();
-					}
+					case "maximum_amount" -> event
+						.replyModal(
+							Modal
+								.create("skyblock_event_config_maximum_amount", "Skyblock Event")
+								.addActionRow(TextInput.create("value", "Maximum Amount", TextInputStyle.SHORT).build())
+								.build()
+						)
+						.queue();
 					case "whitelist_role" -> event
 						.replyModal(
 							Modal

@@ -46,6 +46,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -252,9 +253,11 @@ public class LinkSlashCommand extends SlashCommand {
 					nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
 				}
 
-				member.modifyNickname(nicknameTemplate).complete();
+				member.modifyNickname(nicknameTemplate).queue();
 				updatedNickname = "true";
 			}
+		} catch (PermissionException e) {
+			updatedNickname = "error: missing permissions";
 		} catch (Exception e) {
 			updatedNickname = "error";
 		}
@@ -300,12 +303,17 @@ public class LinkSlashCommand extends SlashCommand {
 							updatedRoles = "error";
 						}
 					}
-					updatedRoles = updatedRoles.equals("error") ? updatedRoles : "true";
+
+					if (!updatedRoles.equals("error")) {
+						updatedRoles = "true";
+					}
 				} else {
-					member.getGuild().modifyMemberRoles(member, toAdd, toRemove).complete();
+					member.getGuild().modifyMemberRoles(member, toAdd, toRemove).queue();
 					updatedRoles = "true";
 				}
 			}
+		} catch (PermissionException e) {
+			updatedRoles = "error: missing permissions";
 		} catch (Exception e) {
 			updatedRoles = "error";
 		}

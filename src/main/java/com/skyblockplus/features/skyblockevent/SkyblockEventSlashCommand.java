@@ -754,7 +754,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				} else {
 					announcementChannel
 						.sendMessageEmbeds(defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build())
-						.complete();
+						.queue();
 				}
 			} catch (Exception ignored) {}
 

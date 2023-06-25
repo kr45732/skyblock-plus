@@ -43,7 +43,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
@@ -95,7 +95,7 @@ public class RolesSlashCommand extends SlashCommand {
 			Object[] outArr = ((Object[]) out);
 			try {
 				member.getGuild().modifyMemberRoles(member, (List<Role>) outArr[1], (List<Role>) outArr[2]).queue();
-			} catch (InsufficientPermissionException e) {
+			} catch (PermissionException e) {
 				return errorEmbed("Missing permission: " + e.getPermission().getName());
 			}
 			return (EmbedBuilder) outArr[0];

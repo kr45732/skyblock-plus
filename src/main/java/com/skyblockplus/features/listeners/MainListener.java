@@ -41,7 +41,6 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
@@ -140,30 +139,17 @@ public class MainListener extends ListenerAdapter {
 				}
 			} catch (Exception ignored) {}
 
-			logCommand(
-				event.getGuild(),
-				"Joined guild | #" +
-				jda.getGuilds().size() +
-				" | Users: " +
-				event.getGuild().retrieveMetaData().complete().getApproximateMembers()
-			);
+			event
+				.getGuild()
+				.retrieveMetaData()
+				.queue(metaData ->
+					logCommand(
+						event.getGuild(),
+						"Joined guild | #" + jda.getGuilds().size() + " | Users: " + metaData.getApproximateMembers()
+					)
+				);
 
 			guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
-		}
-	}
-
-	@Override
-	public void onMessageReactionAdd(MessageReactionAddEvent event) {
-		if (!event.isFromGuild()) {
-			return;
-		}
-
-		if (event.getUser() != null && event.getUser().isBot()) {
-			return;
-		}
-
-		if (guildMap.containsKey(event.getGuild().getId())) {
-			guildMap.get(event.getGuild().getId()).onMessageReactionAdd(event);
 		}
 	}
 
@@ -235,9 +221,18 @@ public class MainListener extends ListenerAdapter {
 			return;
 		}
 
-		if (guildMap.get(event.getGuild().getId()).isAdmin(event.getMember()) && event.getComponentId().equals("thank_you_setup")) {
-			event.deferReply().complete();
-			new SetupCommandHandler(event.getHook(), event.getSelectedOptions().get(0).getValue());
+		if (guildMap.containsKey(event.getGuild().getId())) {
+			AutomaticGuild automaticGuild = guildMap.get(event.getGuild().getId());
+			if (guildMap.get(event.getGuild().getId()).onStringSelectInteraction(event)) {
+				return;
+			}
+
+			if (event.getComponentId().equals("thank_you_setup") && automaticGuild.isAdmin(event.getMember())) {
+				executor.submit(() -> {
+					event.deferReply().complete();
+					new SetupCommandHandler(event.getHook(), event.getSelectedOptions().get(0).getValue());
+				});
+			}
 		}
 	}
 }

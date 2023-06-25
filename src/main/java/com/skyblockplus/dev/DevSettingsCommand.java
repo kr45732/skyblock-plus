@@ -26,6 +26,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import com.skyblockplus.settings.SettingsExecute;
 import com.skyblockplus.utils.command.CommandExecute;
+import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,72 +40,53 @@ public class DevSettingsCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
+		new CommandExecute(event) {
 			@Override
 			protected void execute() {
-				setArgs(4);
+				EmbedBuilder eb = errorEmbed("Invalid input");
 
-				if (args.length == 4) {
+				if (args.length >= 4) {
 					switch (args[1]) {
-						case "delete":
+						case "delete" -> {
 							switch (args[2]) {
-								case "server" -> {
-									embed(defaultEmbed("API returned response code " + database.deleteServerSettings(args[3])));
-									return;
-								}
-								case "apply_cache" -> {
-									setArgs(5);
-									embed(
-										defaultEmbed("API returned response code " + database.deleteApplyCacheSettings(args[3], args[4]))
+								case "server" -> eb = defaultEmbed("API returned response code " + database.deleteServerSettings(args[3]));
+								case "apply_cache" -> eb =
+									defaultEmbed("API returned response code " + database.deleteApplyCacheSettings(args[3], args[4]));
+								case "skyblock_event" -> eb =
+									defaultEmbed(
+										"API returned response code " + database.setSkyblockEventSettings(args[3], new EventSettings())
 									);
-									return;
-								}
-								case "skyblock_event" -> {
-									embed(
-										defaultEmbed(
-											"API returned response code " + database.setSkyblockEventSettings(args[3], new EventSettings())
-										)
-									);
-									return;
-								}
 							}
-							break;
-						case "verify":
+						}
+						case "verify" -> {
 							if (args[2].equals("disable")) {
-								embed(new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setVerifyEnable(false));
+								eb = new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setVerifyEnable(false);
 								guildMap.get(args[3]).reloadVerifyGuild(args[3]);
-								return;
 							}
-							break;
-						case "jacob":
+						}
+						case "jacob" -> {
 							if (args[2].equals("disable")) {
-								embed(new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setJacobEnable(false));
-								return;
+								eb = new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setJacobEnable(false);
 							}
-							break;
-						case "mayor":
+						}
+						case "mayor" -> {
 							if (args[2].equals("disable")) {
-								embed(new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setMayorChannel("none"));
-								return;
+								eb = new SettingsExecute(jda.getGuildById(args[3]), event.getEvent()).setMayorChannel("none");
 							}
-							break;
-						case "apply":
+						}
+						case "apply" -> {
 							if (args[2].equals("disable")) {
-								setArgs(5);
-								embed(
+								eb =
 									new SettingsExecute(jda.getGuildById(args[3]), event.getEvent())
-										.setApplyEnable(database.getGuildSettings(args[3], args[4]).getAsJsonObject(), false)
-								);
+										.setApplyEnable(database.getGuildSettings(args[3], args[4]).getAsJsonObject(), false);
 								guildMap.get(args[3]).reloadApplyGuilds(args[3]);
-								return;
 							}
-							break;
+						}
 					}
 				}
 
-				embed(errorEmbed("Invalid input"));
+				getChannel().sendMessageEmbeds(eb.build()).queue();
 			}
-		}
-			.queue();
+		};
 	}
 }

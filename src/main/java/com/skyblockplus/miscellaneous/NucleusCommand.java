@@ -20,13 +20,13 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
-import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
-import static com.skyblockplus.utils.utils.Utils.defaultPerms;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
+import com.skyblockplus.utils.utils.Utils;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,18 +87,18 @@ public class NucleusCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
+		new CommandExecute(event) {
 			@Override
 			protected void execute() {
-				logCommand();
+				Utils.logCommand(getGuild(), getAuthor(), getMessage().getContentRaw());
 
-				if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-					return;
+				EmbedBuilder eb = getMentionedUsername(args.length == 1 ? -1 : 1);
+				if (eb != null) {
+					getChannel().sendMessageEmbeds(eb.build()).queue();
+				} else {
+					getChannel().sendMessageEmbeds(getNuc(player).build()).queue();
 				}
-
-				embed(getNuc(player));
 			}
-		}
-			.queue();
+		};
 	}
 }

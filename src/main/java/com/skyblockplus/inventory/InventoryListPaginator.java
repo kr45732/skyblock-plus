@@ -55,23 +55,22 @@ public class InventoryListPaginator {
 	private static final File loreRenderDir = new File("src/main/java/com/skyblockplus/json/renders");
 	private final String key;
 	private final Map<Integer, InvItem> items;
-	private final SlashCommandEvent event;
+	private final SlashCommandEvent slashCommandEvent;
 	private final Map<String, String> renderedCache;
 	private final Player.Profile player;
-	private final Message message;
 	private final int maxPageNumber;
 	private Instant lastEdit = Instant.now();
+	private Message message;
 	private int pageNumber;
 
-	public InventoryListPaginator(Player.Profile player, Map<Integer, InvItem> items, int slot, SlashCommandEvent event) {
+	public InventoryListPaginator(Player.Profile player, Map<Integer, InvItem> items, int slot, SlashCommandEvent slashCommandEvent) {
 		this.items = items;
-		this.event = event;
+		this.slashCommandEvent = slashCommandEvent;
 		this.renderedCache = new HashMap<>();
 		this.key = "inv_list_paginator_" + Instant.now().toEpochMilli() + "_" + player.getUuid() + "_";
 		this.player = player;
 		this.maxPageNumber = items.size() - 1;
 		this.pageNumber = Math.min(Math.max(0, slot - 1), maxPageNumber);
-		this.message = event.getHook().retrieveOriginal().complete();
 
 		WebhookMessageEditAction<Message> action;
 		EmbedBuilder eb = player
@@ -81,7 +80,7 @@ public class InventoryListPaginator {
 		InvItem item = items.get(pageNumber);
 		if (item == null) {
 			eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
-			action = event.getHook().editOriginalEmbeds(eb.build());
+			action = slashCommandEvent.getHook().editOriginalEmbeds(eb.build());
 		} else {
 			eb
 				.setDescription(
@@ -95,7 +94,11 @@ public class InventoryListPaginator {
 				)
 				.setThumbnail(getItemThumbnail(item.getId()))
 				.setImage("attachment://lore.png");
-			action = event.getHook().editOriginalEmbeds(eb.build()).setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
+			action =
+				slashCommandEvent
+					.getHook()
+					.editOriginalEmbeds(eb.build())
+					.setFiles(FileUpload.fromData(new File(getRenderedLore()), "lore.png"));
 		}
 
 		action
@@ -108,20 +111,26 @@ public class InventoryListPaginator {
 					.primary("inv_list_paginator_right_button", Emoji.fromFormatted("<:right_button_arrow:885628386578423908>"))
 					.withDisabled(pageNumber == maxPageNumber)
 			)
-			.queue(ignored -> waitForEvent(), ignore);
+			.queue(
+				m -> {
+					this.message = m;
+					waitForEvent();
+				},
+				ignore
+			);
 	}
 
 	private boolean condition(GenericInteractionCreateEvent genericEvent) {
 		if (genericEvent instanceof ButtonInteractionEvent event) {
 			return (
 				event.isFromGuild() &&
-				event.getUser().getId().equals(this.event.getUser().getId()) &&
+				event.getUser().getId().equals(this.slashCommandEvent.getUser().getId()) &&
 				event.getMessageId().equals(message.getId())
 			);
 		} else if (genericEvent instanceof ModalInteractionEvent event) {
 			return (
 				event.isFromGuild() &&
-				event.getUser().getId().equals(this.event.getUser().getId()) &&
+				event.getUser().getId().equals(this.slashCommandEvent.getUser().getId()) &&
 				event.getModalId().equals("inv_list_search_modal_" + message.getId())
 			);
 		}
@@ -203,11 +212,10 @@ public class InventoryListPaginator {
 
 	private void onModalInteraction(ModalInteractionEvent event) {
 		lastEdit = Instant.now();
-		String itemSearch = event.getValue("item").getAsString();
 		pageNumber =
 			FuzzySearch
 				.extractOne(
-					itemSearch,
+					event.getValue("item").getAsString(),
 					items.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toCollection(ArrayList::new)),
 					i -> i.getValue().getName()
 				)

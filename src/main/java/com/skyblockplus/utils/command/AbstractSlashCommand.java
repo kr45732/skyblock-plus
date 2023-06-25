@@ -38,65 +38,66 @@ public abstract class AbstractSlashCommand {
 	protected void run(SlashCommandEvent event) {
 		slashCommandClient.getCommandUses().compute(getFullName(), (k, v) -> (v != null ? v : 0) + 1);
 
-		int remainingCooldown = getRemainingCooldown(event);
-		if (remainingCooldown > 0) {
-			replyCooldown(event, remainingCooldown);
-			return;
+		if (!event.isOwner()) {
+			int remainingCooldown = getRemainingCooldown(event);
+			if (remainingCooldown > 0) {
+				event
+					.replyEmbeds(
+						errorEmbed(
+							"That command is on cooldown for " + remainingCooldown + " more second" + (remainingCooldown == 1 ? "" : "s")
+						)
+							.build()
+					)
+					.setEphemeral(true)
+					.queue();
+				return;
+			}
 		}
 
 		for (Permission p : botPermissions) {
 			if (p.isChannel()) {
 				if (!event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), p)) {
-					if (p == Permission.MESSAGE_SEND) {
-						event
-							.getUser()
-							.openPrivateChannel()
-							.queue(dm ->
-								dm
-									.sendMessageEmbeds(
-										errorEmbed(
-											"I need the " + p.getName() + " permission in " + event.getGuildChannel().getAsMention() + "!"
-										)
-											.build()
-									)
-									.queue(ignore, ignore)
-							);
-					} else {
-						event.embed(errorEmbed("I need the " + p.getName() + " permission in this channel!"));
-					}
+					event
+						.replyEmbeds(errorEmbed("I need the " + p.getName() + " permission in this channel!").build())
+						.setEphemeral(true)
+						.queue();
 					return;
 				}
-			} else {
-				if (!event.getGuild().getSelfMember().hasPermission(p)) {
-					event.embed(errorEmbed("I need the " + p.getName() + " permission in this server!"));
-					return;
-				}
+			} else if (!event.getGuild().getSelfMember().hasPermission(p)) {
+				event
+					.replyEmbeds(errorEmbed("I need the " + p.getName() + " permission in this server!").build())
+					.setEphemeral(true)
+					.queue();
+				return;
 			}
 		}
 
 		if (!event.isOwner()) {
 			for (Permission p : userPermissions) {
-				if (event.getMember() == null) {
-					continue;
-				}
-
 				if (p.isChannel()) {
 					if (!event.getMember().hasPermission(event.getGuildChannel(), p)) {
-						event.embed(errorEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
+						event
+							.replyEmbeds(
+								errorEmbed("You must have the " + p.getName() + " permission in this channel to use that!").build()
+							)
+							.setEphemeral(true)
+							.queue();
 						return;
 					}
-				} else {
-					if (p == Permission.ADMINISTRATOR) {
-						if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
-							event.embed(errorEmbed("You are missing the required permissions or roles to use this command"));
-							return;
-						}
-					} else {
-						if (!event.getMember().hasPermission(p)) {
-							event.embed(errorEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
-							return;
-						}
+				} else if (p == Permission.ADMINISTRATOR) {
+					if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
+						event
+							.replyEmbeds(errorEmbed("You are missing the required permissions or roles to use this command").build())
+							.setEphemeral(true)
+							.queue();
+						return;
 					}
+				} else if (!event.getMember().hasPermission(p)) {
+					event
+						.replyEmbeds(errorEmbed("You must have the " + p.getName() + " permission in this server to use that!").build())
+						.setEphemeral(true)
+						.queue();
+					return;
 				}
 			}
 		}
@@ -105,7 +106,10 @@ public abstract class AbstractSlashCommand {
 			event.logCommand();
 		}
 
-		execute(event);
+		executor.submit(() -> {
+			event.deferReply().complete();
+			execute(event);
+		});
 	}
 
 	protected String getName() {
@@ -113,27 +117,14 @@ public abstract class AbstractSlashCommand {
 	}
 
 	private int getRemainingCooldown(SlashCommandEvent event) {
-		if (!event.isOwner()) {
-			String key = getFullName() + "|" + String.format("U:%d", event.getUser().getIdLong());
-			int remaining = client.getRemainingCooldown(key);
-			if (remaining > 0) {
-				return remaining;
-			}
-
+		String key = getFullName() + "|" + String.format("U:%d", event.getUser().getIdLong());
+		int remaining = client.getRemainingCooldown(key);
+		if (remaining > 0) {
+			return remaining;
+		} else {
 			client.applyCooldown(key, cooldown);
+			return 0;
 		}
-
-		return 0;
-	}
-
-	private void replyCooldown(SlashCommandEvent event, int remainingCooldown) {
-		event
-			.getHook()
-			.editOriginalEmbeds(
-				errorEmbed("That command is on cooldown for " + remainingCooldown + " more second" + (remainingCooldown == 1 ? "" : "s"))
-					.build()
-			)
-			.queue();
 	}
 
 	protected abstract SerializableData getCommandData();

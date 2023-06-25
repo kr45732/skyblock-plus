@@ -43,7 +43,7 @@ public class LinkedRolesMetadataCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event, false) {
+		new CommandExecute(event) {
 			@Override
 			protected void execute() {
 				List<RoleConnectionMetadata> metadataList = new ArrayList<>();
@@ -67,7 +67,6 @@ public class LinkedRolesMetadataCommand extends Command {
 						event.getChannel().sendMessageEmbeds(defaultEmbed("Success - added " + s.size() + " linked roles").build()).queue()
 					);
 			}
-		}
-			.queue();
+		};
 	}
 }
