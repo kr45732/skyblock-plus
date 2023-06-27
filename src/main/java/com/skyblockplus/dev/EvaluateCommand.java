@@ -48,7 +48,7 @@ public class EvaluateCommand extends Command {
 			"java.lang",
 			"java.math",
 			"java.time",
-			"jav.time.temporal",
+			"java.time.temporal",
 			"java.util",
 			"java.util.concurrent",
 			"java.util.stream",

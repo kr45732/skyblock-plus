@@ -303,7 +303,7 @@ public class ApplyGuild {
 			return true;
 		} else {
 			Player.Gamemode gamemode = Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all"));
-			if (player.getMatchingProfileNames(gamemode).size() == 0) {
+			if (player.getMatchingProfileNames(gamemode).isEmpty()) {
 				event
 					.getHook()
 					.editOriginal(client.getError() + " You have no " + gamemode.toString().toLowerCase() + " profiles created")

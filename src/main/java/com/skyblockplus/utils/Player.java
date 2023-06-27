@@ -428,7 +428,7 @@ public class Player {
 			for (Profile profile : profiles) {
 				try {
 					if (gamemode.isGamemode(profile.getGamemode())) {
-						profileNames.add(profile.getProfileName().toLowerCase());
+						profileNames.add(profile.getProfileName());
 					}
 				} catch (Exception ignored) {}
 			}

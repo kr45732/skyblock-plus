@@ -300,6 +300,6 @@ public class StringUtils {
 	}
 
 	public static String profileNameToEmoji(String profileName) {
-		return profileNameToEmoji.getOrDefault(profileName, null);
+		return profileNameToEmoji.getOrDefault(profileName.toLowerCase(), null);
 	}
 }

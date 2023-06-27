@@ -19,6 +19,7 @@
 package com.skyblockplus.utils.structs;
 
 import com.skyblockplus.utils.utils.StringUtils;
+import java.util.Objects;
 
 public record UsernameUuidStruct(String username, String uuid, String failCause) {
 	public UsernameUuidStruct(String username, String uuid) {
@@ -50,6 +51,6 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 	}
 
 	public boolean isRateLimited() {
-		return !isValid() && failCause != null && failCause.equals("Mojang has rate limited this request.");
+		return !isValid() && Objects.equals(failCause, "Mojang has rate limited this request.");
 	}
 }

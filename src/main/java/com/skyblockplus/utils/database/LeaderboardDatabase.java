@@ -565,7 +565,7 @@ public class LeaderboardDatabase {
 	public List<String> getClosestPlayers(String toMatch) {
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT username FROM all_lb ORDER BY username <-> ? LIMIT 25")
+			PreparedStatement statement = connection.prepareStatement("SELECT username FROM stranded_lb ORDER BY username <-> ? LIMIT 25")
 		) {
 			statement.setString(1, toMatch);
 			try (ResultSet response = statement.executeQuery()) {
@@ -587,7 +587,7 @@ public class LeaderboardDatabase {
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"SELECT uuid FROM all_lb WHERE last_updated < " +
+					"SELECT uuid FROM stranded_lb WHERE last_updated < " +
 					Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli() +
 					" ORDER BY RANDOM() LIMIT 180"
 				)

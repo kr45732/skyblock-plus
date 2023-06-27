@@ -60,7 +60,6 @@ public class ApiHandler {
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	private static String ahApiUrl;
 	private static int mojangApiNum = 0;
-	private static int asyncMojangApiNum = 0;
 	private static boolean allowMojangApi = false;
 	private static String neuBranch = null;
 
@@ -225,23 +224,15 @@ public class ApiHandler {
 						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 						return usernameUuidStruct;
 					} catch (Exception e) {
-						return new UsernameUuidStruct(higherDepth(usernameJson, "message").getAsString());
+						String message = higherDepth(usernameJson, "message").getAsString();
+						return new UsernameUuidStruct(
+							allowMojangApi && message.equals("Mojang API lookup failed.")
+								? "Mojang has rate limited this request."
+								: message
+						);
 					}
 				}
 				case 2 -> {
-					JsonElement usernameJson = getJson("https://mc-heads.net/minecraft/profile/" + username);
-					try {
-						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-							higherDepth(usernameJson, "name").getAsString(),
-							higherDepth(usernameJson, "id").getAsString()
-						);
-						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
-						return usernameUuidStruct;
-					} catch (Exception e) {
-						return new UsernameUuidStruct(higherDepth(usernameJson, "errorMessage").getAsString());
-					}
-				}
-				case 3 -> {
 					JsonElement usernameJson = getJson("https://api.minetools.eu/uuid/" + username);
 					try {
 						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
@@ -286,8 +277,7 @@ public class ApiHandler {
 				(
 					switch (mojangApiNum) {
 						case 1 -> "https://playerdb.co/api/player/minecraft/";
-						case 2 -> "https://mc-heads.net/minecraft/profile/";
-						case 3 -> "https://api.minetools.eu/uuid/";
+						case 2 -> "https://api.minetools.eu/uuid/";
 						default -> "https://api.ashcon.app/mojang/v2/user/";
 					}
 				) +
@@ -642,7 +632,7 @@ public class ApiHandler {
 	public static void updateLinkedAccounts() {
 		try {
 			for (LinkedAccount o : database.getBeforeLastUpdated(Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli())) {
-				UsernameUuidStruct uuidStruct = usernameToUuid(o.uuid());
+				UsernameUuidStruct uuidStruct = uuidToUsername(o.uuid());
 				if (uuidStruct.isValid()) {
 					database.insertLinkedAccount(
 						new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), uuidStruct.username()),

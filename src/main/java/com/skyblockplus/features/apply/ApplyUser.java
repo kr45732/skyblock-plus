@@ -176,15 +176,9 @@ public class ApplyUser {
 					for (String profileName : profileNames) {
 						String profileEmoji = profileNameToEmoji(profileName);
 						eb.appendDescription(
-							"\n" +
-							profileEmoji +
-							" [" +
-							capitalizeString(profileName) +
-							"](" +
-							skyblockStatsLink(player.getUuid(), profileName) +
-							")"
+							"\n" + profileEmoji + " [" + profileName + "](" + skyblockStatsLink(player.getUuid(), profileName) + ")"
 						);
-						menuBuilder.addOption(capitalizeString(profileName), profileName, Emoji.fromFormatted(profileEmoji));
+						menuBuilder.addOption(profileName, profileName, Emoji.fromFormatted(profileEmoji));
 						this.profileNames.add(profileName);
 					}
 					menuBuilder.addOption("Cancel Application", "cancel_application", Emoji.fromFormatted(client.getError()));
@@ -484,25 +478,15 @@ public class ApplyUser {
 							String profileName = profileNames.get(i);
 							if (i == 0) {
 								retryEmbed.appendDescription(
-									"\n↩️ [Last Played Profile (" +
-									capitalizeString(profileName) +
-									")](" +
-									skyblockStatsLink(playerUuid, profileName) +
-									")"
+									"\n↩️ [Last Played Profile (" + profileName + ")](" + skyblockStatsLink(playerUuid, profileName) + ")"
 								);
 								menuBuilder.addOption("Last Played Profile", profileName, Emoji.fromFormatted("↩️"));
 							} else {
 								String profileEmoji = profileNameToEmoji(profileName);
 								retryEmbed.appendDescription(
-									"\n" +
-									profileEmoji +
-									" [" +
-									capitalizeString(profileName) +
-									"](" +
-									skyblockStatsLink(playerUuid, profileName) +
-									")"
+									"\n" + profileEmoji + " [" + profileName + "](" + skyblockStatsLink(playerUuid, profileName) + ")"
 								);
-								menuBuilder.addOption(capitalizeString(profileName), profileName, Emoji.fromFormatted(profileEmoji));
+								menuBuilder.addOption(profileName, profileName, Emoji.fromFormatted(profileEmoji));
 							}
 						}
 						menuBuilder.addOption("Cancel Application", "cancel_application", Emoji.fromFormatted(client.getError()));

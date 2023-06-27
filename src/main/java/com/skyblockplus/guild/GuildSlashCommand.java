@@ -192,7 +192,6 @@ public class GuildSlashCommand extends SlashCommand {
 
 			JsonArray membersArr = higherDepth(guildJson, "members").getAsJsonArray();
 			Map<CompletableFuture<String>, Integer> futures = new HashMap<>();
-			Map<String, Integer> guildMembers = new HashMap<>();
 			Map<String, Integer> ranksMap = streamJsonArray(higherDepth(guildJson, "ranks"))
 				.collect(Collectors.toMap(m -> higherDepth(m, "name").getAsString(), m -> higherDepth(m, "priority", 0)));
 			for (JsonElement member : membersArr) {
@@ -203,6 +202,7 @@ public class GuildSlashCommand extends SlashCommand {
 				);
 			}
 
+			Map<String, Integer> guildMembers = new HashMap<>();
 			for (Map.Entry<CompletableFuture<String>, Integer> future : futures.entrySet()) {
 				try {
 					guildMembers.put(future.getKey().get(), future.getValue());
@@ -210,7 +210,6 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 
 			CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(3).setItemsPerPage(33);
-
 			paginateBuilder
 				.getExtras()
 				.setEveryPageText("**Size:** " + membersArr.size())
@@ -283,73 +282,61 @@ public class GuildSlashCommand extends SlashCommand {
 				return hypixelResponse.getErrorEmbed();
 			}
 
-			JsonElement members = hypixelResponse.get("members");
-			JsonArray membersArr = members.getAsJsonArray();
-			List<String> guildExpList = new ArrayList<>();
-			List<CompletableFuture<String>> futures = new ArrayList<>();
-			for (int i = 0; i < membersArr.size(); i++) {
-				int finalI = i;
-				futures.add(
-					asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString())
-						.thenApplyAsync(
-							currentUsername ->
-								currentUsername +
-								"=:=" +
-								higherDepth(membersArr.get(finalI), "expHistory")
-									.getAsJsonObject()
-									.entrySet()
-									.stream()
-									.mapToInt(e -> e.getValue().getAsInt())
-									.sum(),
-							executor
-						)
+			Map<CompletableFuture<String>, Integer> futures = new HashMap<>();
+			for (JsonElement member : hypixelResponse.get("members").getAsJsonArray()) {
+				futures.put(
+					asyncUuidToUsername(higherDepth(member, "uuid").getAsString()),
+					higherDepth(member, "expHistory").getAsJsonObject().entrySet().stream().mapToInt(e -> e.getValue().getAsInt()).sum()
 				);
 			}
 
-			for (CompletableFuture<String> future : futures) {
+			Map<String, Integer> usernameToGxp = new HashMap<>();
+			for (Map.Entry<CompletableFuture<String>, Integer> entry : futures.entrySet()) {
 				try {
-					String futureResponse = future.get();
-					if (futureResponse != null) {
-						guildExpList.add(futureResponse);
+					String memberUsername = entry.getKey().get();
+					if (memberUsername != null) {
+						usernameToGxp.put(memberUsername, entry.getValue());
 					}
 				} catch (Exception ignored) {}
 			}
-
-			guildExpList.sort(Comparator.comparingInt(o1 -> -Integer.parseInt(o1.split("=:=")[1])));
+			List<Map.Entry<String, Integer>> usernameToGxpList = usernameToGxp
+				.entrySet()
+				.stream()
+				.sorted(Comparator.comparingInt(e -> -e.getValue()))
+				.toList();
 
 			CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
 			PaginatorExtras extras = paginateBuilder.getExtras().setEveryPageTitle(hypixelResponse.get("name").getAsString());
 
 			if (usernameUuid != null) {
-				int guildRank = -2;
+				int guildRank = -1;
 				int guildExp = -1;
-				for (int i = 0; i < guildExpList.size(); i++) {
-					String[] curGuildRank = guildExpList.get(i).split("=:=");
-					if (curGuildRank[0].equals(usernameUuid.username())) {
-						guildRank = i;
-						guildExp = Integer.parseInt(curGuildRank[1]);
+
+				for (int i = 0; i < usernameToGxpList.size(); i++) {
+					Map.Entry<String, Integer> entry = usernameToGxpList.get(i);
+					if (entry.getKey().equals(usernameUuid.username())) {
+						guildRank = i + 1;
+						guildExp = entry.getValue();
 						break;
 					}
 				}
+
 				extras.setEveryPageText(
 					"**Player:** " +
 					usernameUuid.username() +
-					"\n**Guild Rank:** #" +
-					(guildRank + 1) +
-					"\n**Exp:** " +
-					formatNumber(guildExp)
+					"\n**Guild Rank:** " +
+					(guildRank == -1 ? "Not on leaderboard" : "#" + guildRank + "\n**Exp:** " + formatNumber(guildExp))
 				);
 			}
 
-			for (int i = 0; i < guildExpList.size(); i++) {
-				String[] curG = guildExpList.get(i).split("=:=");
+			for (int i = 0; i < usernameToGxpList.size(); i++) {
+				Map.Entry<String, Integer> entry = usernameToGxpList.get(i);
 				paginateBuilder.addStrings(
-					"`" + (i + 1) + ")` " + escapeUsername(curG[0]) + ": " + formatNumber(Integer.parseInt(curG[1])) + " EXP  "
+					"`" + (i + 1) + ")` " + escapeUsername(entry.getKey()) + ": " + formatNumber(entry.getValue()) + " EXP  "
 				);
 			}
 
 			event.paginate(paginateBuilder);
-
 			return null;
 		}
 
