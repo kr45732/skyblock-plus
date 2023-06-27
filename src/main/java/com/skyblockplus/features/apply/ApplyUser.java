@@ -155,8 +155,14 @@ public class ApplyUser {
 								capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
 							)
 							.queue(ignored -> {
-								parent.applyUserList.add(this);
 								stateZero(profileNames.get(0), currentSettings, applicationChannel, null);
+								parent.applyUserList.add(this);
+								event
+									.getHook()
+									.editOriginal(
+										client.getSuccess() + " A new application was created in " + applicationChannel.getAsMention()
+									)
+									.queue();
 							});
 						return;
 					}
