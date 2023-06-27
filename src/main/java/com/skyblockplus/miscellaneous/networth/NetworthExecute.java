@@ -1023,6 +1023,13 @@ public class NetworthExecute {
 	}
 
 	public double getLowestPrice(String itemId, boolean ignoreAh, boolean onlyFullCraft, StringBuilder source) {
+		if (!itemId.equals("NEW_YEAR_CAKE_BAG") && itemId.startsWith("NEW_YEAR_CAKE_")) {
+			if (source != null) {
+				source.append("price override");
+			}
+			return 0;
+		}
+
 		double priceOverride = getPriceOverride(itemId);
 		if (priceOverride != -1) {
 			if (source != null) {

@@ -48,6 +48,20 @@ import org.springframework.stereotype.Component;
 public class MissingSlashCommand extends SlashCommand {
 
 	private static final List<String> unobtainableIronmanTalismans = List.of("BLOOD_GOD_CREST", "POTATO_TALISMAN");
+	private static final List<String> riftOnlyTalismans = List.of(
+		"GARLIC_FLAVORED_GUMMY_BEAR",
+		"PUNCHCARD_ARTIFACT",
+		"RING_OF_BROKEN_LOVE",
+		"DEFECTIVE_MONITOR",
+		"WARDING_TRINKET",
+		"HARMONIOUS_SURGERY_TOOLKIT",
+		"CRUX_TALISMAN_1",
+		"CRUX_TALISMAN_2",
+		"CRUX_TALISMAN_3",
+		"CRUX_TALISMAN_4",
+		"CRUX_TALISMAN_5",
+		"CRUX_TALISMAN_6"
+	);
 	private static final List<String> crabHatColors = List.of(
 		"RED",
 		"AQUA",
@@ -98,6 +112,8 @@ public class MissingSlashCommand extends SlashCommand {
 			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
 			List<String> missingTalismans = new ArrayList<>(ALL_TALISMANS);
 
+			missingTalismans.removeAll(riftOnlyTalismans);
+
 			for (String playerItem : playerItems) {
 				if (playerItem.startsWith("PARTY_HAT_CRAB_")) {
 					missingTalismans.remove(playerItem.endsWith("_ANIMATED") ? "PARTY_HAT_CRAB_ANIMATED" : "PARTY_HAT_CRAB");
@@ -106,6 +122,7 @@ public class MissingSlashCommand extends SlashCommand {
 				} else {
 					missingTalismans.remove(playerItem);
 				}
+
 				for (Map.Entry<String, JsonElement> talismanUpgradesElement : talismanUpgrades.entrySet()) {
 					JsonArray upgrades = talismanUpgradesElement.getValue().getAsJsonArray();
 					for (int j = 0; j < upgrades.size(); j++) {
@@ -235,10 +252,10 @@ public class MissingSlashCommand extends SlashCommand {
 		}
 
 		missingInternalArr.sort(
-			Comparator.comparingDouble(o1 ->
-				SOULBOUND_ITEMS.contains(o1) || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
+			Comparator.comparingDouble(e ->
+				SOULBOUND_ITEMS.contains(e) || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(e))
 					? Double.MAX_VALUE
-					: calc.getLowestPrice(o1)
+					: calc.getLowestPrice(e)
 			)
 		);
 
@@ -256,7 +273,7 @@ public class MissingSlashCommand extends SlashCommand {
 			} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
 				costOut = " (Unobtainable)";
 			} else {
-				costOut = " ➜ " + roundAndFormat(cost);
+				costOut = " ➜ " + (cost > 0 ? roundAndFormat(cost) : "Unknown");
 			}
 
 			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
