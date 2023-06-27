@@ -410,6 +410,10 @@ public class Utils {
 							);
 						}
 
+						if (itemInfo.getId().equals("PARTY_HAT_SLOTH")) {
+							itemInfo.setId("PARTY_HAT_SLOTH_" + item.getString("tag.ExtraAttributes.party_hat_emoji").toUpperCase());
+						}
+
 						if (itemInfo.getId().equals("NEW_YEAR_CAKE") && item.containsKey("tag.ExtraAttributes.new_years_cake")) {
 							itemInfo.setId(itemInfo.getId() + "_" + item.get("tag.ExtraAttributes.new_years_cake"));
 						}

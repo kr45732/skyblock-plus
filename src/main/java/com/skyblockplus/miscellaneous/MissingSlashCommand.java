@@ -59,6 +59,18 @@ public class MissingSlashCommand extends SlashCommand {
 		"PURPLE",
 		"YELLOW"
 	);
+	private static final List<String> slothHatEmojis = List.of(
+		"FLUSHED",
+		"HAPPY",
+		"CHEEKY",
+		"COOL",
+		"CUTE",
+		"DERP",
+		"GRUMPY",
+		"REGULAR",
+		"SHOCK",
+		"TEARS"
+	);
 
 	public MissingSlashCommand() {
 		this.name = "missing";
@@ -88,11 +100,9 @@ public class MissingSlashCommand extends SlashCommand {
 
 			for (String playerItem : playerItems) {
 				if (playerItem.startsWith("PARTY_HAT_CRAB_")) {
-					if (playerItem.endsWith("_ANIMATED")) {
-						missingTalismans.remove("PARTY_HAT_CRAB_ANIMATED");
-					} else {
-						missingTalismans.remove("PARTY_HAT_CRAB");
-					}
+					missingTalismans.remove(playerItem.endsWith("_ANIMATED") ? "PARTY_HAT_CRAB_ANIMATED" : "PARTY_HAT_CRAB");
+				} else if (playerItem.startsWith("PARTY_HAT_SLOTH_")) {
+					missingTalismans.remove("PARTY_HAT_SLOTH");
 				} else {
 					missingTalismans.remove(playerItem);
 				}
@@ -123,7 +133,7 @@ public class MissingSlashCommand extends SlashCommand {
 
 			for (int i = 0; i < missingTalismans.size(); i++) {
 				String name = missingTalismans.get(i);
-				if (name.startsWith("PARTY_HAT_CRAB")) {
+				if (name.startsWith("PARTY_HAT_")) {
 					continue;
 				}
 
@@ -212,9 +222,13 @@ public class MissingSlashCommand extends SlashCommand {
 				}
 			}
 
-			double slothHatCost = calc.getLowestPrice("PARTY_HAT_SLOTH");
-			if (slothHatCost < partyHatCost) {
-				partyHatId = "PARTY_HAT_SLOTH";
+			for (String slothHatEmoji : slothHatEmojis) {
+				String id = "PARTY_HAT_SLOTH_" + slothHatEmoji;
+				double price = calc.getLowestPrice("id");
+				if (price > 0 && (partyHatCost == -1 || price < partyHatCost)) {
+					partyHatCost = price;
+					partyHatId = id;
+				}
 			}
 
 			missingInternalArr.add(partyHatId);
@@ -250,7 +264,7 @@ public class MissingSlashCommand extends SlashCommand {
 				getEmoji(curId) +
 				" " +
 				(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
-				(!curId.startsWith("PARTY_HAT_CRAB") && higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
+				(!curId.startsWith("PARTY_HAT_") && higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
 				costOut
 			);
 		}
