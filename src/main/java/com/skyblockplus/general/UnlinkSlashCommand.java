@@ -51,24 +51,26 @@ public class UnlinkSlashCommand extends SlashCommand {
 		}
 
 		if (verifySettings != null && !verifySettings.isJsonNull()) {
-			List<Role> toAdd = new ArrayList<>();
 			try {
-				toAdd.add(member.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
-			} catch (Exception ignored) {}
-			List<Role> toRemove = streamJsonArray(higherDepth(verifySettings, "verifiedRoles"))
-				.map(r -> {
-					try {
-						return member.getGuild().getRoleById(r.getAsString());
-					} catch (Exception e) {
-						return null;
-					}
-				})
-				.filter(Objects::nonNull)
-				.collect(Collectors.toCollection(ArrayList::new));
+				List<Role> toAdd = new ArrayList<>();
+				try {
+					toAdd.add(member.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
+				} catch (Exception ignored) {}
+				List<Role> toRemove = streamJsonArray(higherDepth(verifySettings, "verifiedRoles"))
+					.map(r -> {
+						try {
+							return member.getGuild().getRoleById(r.getAsString());
+						} catch (Exception e) {
+							return null;
+						}
+					})
+					.filter(Objects::nonNull)
+					.collect(Collectors.toCollection(ArrayList::new));
 
-			if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
-				member.getGuild().modifyMemberRoles(member, toAdd, toRemove).queue();
-			}
+				if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
+					member.getGuild().modifyMemberRoles(member, toAdd, toRemove).queue();
+				}
+			} catch (Exception ignored) {}
 		}
 
 		return defaultEmbed("Success").setDescription("You were unlinked");

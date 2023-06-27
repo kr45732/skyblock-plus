@@ -293,8 +293,8 @@ public class AutomaticGuild {
 	}
 
 	public String reloadApplyGuilds(Guild guild, JsonElement applySettings, boolean isStartup) {
-		if (applySettings == null) {
-			return client.getError() + " No apply settings";
+		if (applySettings == null || applySettings.isJsonNull()) {
+			return client.getError() + " No enabled automated applications";
 		}
 
 		StringBuilder applyStr = new StringBuilder();

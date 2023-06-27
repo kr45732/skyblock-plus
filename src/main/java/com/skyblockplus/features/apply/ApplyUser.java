@@ -154,7 +154,10 @@ public class ApplyUser {
 								" this is your application for " +
 								capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
 							)
-							.queue(ignored -> stateZero(profileNames.get(0), currentSettings, applicationChannel, null));
+							.queue(ignored -> {
+								parent.applyUserList.add(this);
+								stateZero(profileNames.get(0), currentSettings, applicationChannel, null);
+							});
 						return;
 					}
 

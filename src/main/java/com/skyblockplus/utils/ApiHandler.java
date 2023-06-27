@@ -60,6 +60,7 @@ public class ApiHandler {
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	private static String ahApiUrl;
 	private static int mojangApiNum = 0;
+	private static int asyncMojangApiNum = 0;
 	private static boolean allowMojangApi = false;
 	private static String neuBranch = null;
 
@@ -316,7 +317,7 @@ public class ApiHandler {
 
 	private static UsernameUuidStruct uuidUsernameMojang(String username) {
 		try {
-			// true ? uuid to username : second is username to uuid
+			// true ? uuid to username : else username to uuid
 			JsonElement usernameJson = getJson(
 				(
 					!isValidMinecraftUsername(username) && isValidMinecraftUuid(username)

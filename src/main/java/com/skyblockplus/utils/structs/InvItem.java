@@ -138,12 +138,7 @@ public class InvItem {
 	}
 
 	public boolean isTierBoosted() {
-		String petItem = getPetItem();
-		return (
-			id.equals("PET") &&
-			petItem != null &&
-			(petItem.equals("PET_ITEM_TIER_BOOST") || petItem.equals("PET_ITEM_VAMPIRE_FANG") || petItem.equals("PET_ITEM_TOY_JERRY"))
-		);
+		return id.equals("PET") && Objects.equals(getPetItem(), "PET_ITEM_TIER_BOOST");
 	}
 
 	public String getPetItem() {
