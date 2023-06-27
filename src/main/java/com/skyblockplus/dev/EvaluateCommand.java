@@ -26,6 +26,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import groovy.lang.GroovyShell;
 import java.util.Arrays;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import org.springframework.stereotype.Component;
 
@@ -106,67 +107,64 @@ public class EvaluateCommand extends Command {
 					return;
 				}
 
-				event
-					.getChannel()
-					.sendMessage("Loading")
-					.queue(m -> {
-						try {
-							switch (args[1]) {
-								case "start_session()" -> {
-									inSession = true;
-									shell = new GroovyShell();
-									m.editMessage("Session started with " + shell).queue();
-									return;
-								}
-								case "end_session()" -> {
-									inSession = false;
-									m.editMessage("Session ended with " + shell).queue();
-									shell = new GroovyShell();
-									return;
-								}
-								case "get_session()" -> {
-									m.editMessage(inSession ? "Session running with " + shell : "No session running").queue();
-									return;
-								}
-							}
+				Message m = event.getChannel().sendMessage("Loading").complete();
 
-							if (!inSession) {
-								shell = new GroovyShell();
-							}
-
-							String arg = args[1].trim();
-							if (arg.startsWith("```") && arg.endsWith("```")) {
-								arg = arg.replaceAll("```(.*)\n", "").replaceAll("\n?```", "");
-							}
-
-							shell.setProperty("event", event.getEvent());
-							shell.setProperty("cmdEvent", event);
-							shell.setProperty("message", event.getMessage());
-							shell.setProperty("channel", event.getChannel());
-							shell.setProperty("user", event.getAuthor());
-							shell.setProperty("jda", event.getJDA());
-							shell.setProperty("guilds", guildMap);
-							shell.setProperty("db", database);
-							if (event.isFromType(ChannelType.TEXT)) {
-								shell.setProperty("guild", event.getGuild());
-								shell.setProperty("member", event.getMember());
-							}
-
-							String script = importString + arg;
-							Object out = shell.evaluate(script);
-
-							if (out == null) {
-								m.editMessage("Success (null output)").queue();
-							} else if (out.toString().length() >= 2000) {
-								m.editMessage(makeHastePost(out.toString())).queue();
-							} else {
-								m.editMessage(out.toString()).queue();
-							}
-						} catch (Exception e) {
-							String msg = e.getMessage() != null ? e.getMessage() : Arrays.toString(e.getStackTrace());
-							m.editMessage(msg.length() >= 2000 ? makeHastePost(msg) : msg).queue();
+				try {
+					switch (args[1]) {
+						case "start_session()" -> {
+							inSession = true;
+							shell = new GroovyShell();
+							m.editMessage("Session started with " + shell).queue();
+							return;
 						}
-					});
+						case "end_session()" -> {
+							inSession = false;
+							m.editMessage("Session ended with " + shell).queue();
+							shell = new GroovyShell();
+							return;
+						}
+						case "get_session()" -> {
+							m.editMessage(inSession ? "Session running with " + shell : "No session running").queue();
+							return;
+						}
+					}
+
+					if (!inSession) {
+						shell = new GroovyShell();
+					}
+
+					String arg = args[1].trim();
+					if (arg.startsWith("```") && arg.endsWith("```")) {
+						arg = arg.replaceAll("```(.*)\n", "").replaceAll("\n?```", "");
+					}
+
+					shell.setProperty("event", event.getEvent());
+					shell.setProperty("cmdEvent", event);
+					shell.setProperty("message", event.getMessage());
+					shell.setProperty("channel", event.getChannel());
+					shell.setProperty("user", event.getAuthor());
+					shell.setProperty("jda", event.getJDA());
+					shell.setProperty("guilds", guildMap);
+					shell.setProperty("db", database);
+					if (event.isFromType(ChannelType.TEXT)) {
+						shell.setProperty("guild", event.getGuild());
+						shell.setProperty("member", event.getMember());
+					}
+
+					String script = importString + arg;
+					Object out = shell.evaluate(script);
+
+					if (out == null) {
+						m.editMessage("Success (null output)").queue();
+					} else if (out.toString().length() >= 2000) {
+						m.editMessage(makeHastePost(out.toString())).queue();
+					} else {
+						m.editMessage(out.toString()).queue();
+					}
+				} catch (Exception e) {
+					String msg = e.getMessage() != null ? e.getMessage() : Arrays.toString(e.getStackTrace());
+					m.editMessage(msg.length() >= 2000 ? makeHastePost(msg) : msg).queue();
+				}
 			}
 		};
 	}
