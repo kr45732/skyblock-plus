@@ -162,24 +162,28 @@ public class ApplyUser {
 					}
 
 					EmbedBuilder eb = this.defaultPlayerEmbed().setDescription("Please select the profile you want to apply with.\n");
-
 					StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("apply_user_profile");
-					eb.appendDescription(
-						"\n↩️ [Last Played Profile (" +
-						player.getProfileName() +
-						")](" +
-						skyblockStatsLink(player.getUuid(), player.getProfileName()) +
-						")"
-					);
-					menuBuilder.addOption("Last Played Profile", player.getProfileName(), Emoji.fromFormatted("↩️"));
-					this.profileNames.add(player.getProfileName());
+
 					for (String profileName : profileNames) {
+						boolean isLastProfile = profileName.equals(player.getProfileName());
 						String profileEmoji = profileNameToEmoji(profileName);
+
 						eb.appendDescription(
-							"\n" + profileEmoji + " [" + profileName + "](" + skyblockStatsLink(player.getUuid(), profileName) + ")"
+							"\n" +
+							profileEmoji +
+							" [" +
+							profileName +
+							(isLastProfile ? " (Last Played)" : "") +
+							"](" +
+							skyblockStatsLink(player.getUuid(), profileName) +
+							")"
 						);
-						menuBuilder.addOption(profileName, profileName, Emoji.fromFormatted(profileEmoji));
-						this.profileNames.add(profileName);
+						menuBuilder.addOption(
+							profileName + (isLastProfile ? " (Last Played)" : ""),
+							profileName,
+							Emoji.fromFormatted(profileEmoji)
+						);
+						this.profileNames.add((isLastProfile ? "*" : "") + profileName);
 					}
 					menuBuilder.addOption("Cancel Application", "cancel_application", Emoji.fromFormatted(client.getError()));
 
@@ -476,18 +480,27 @@ public class ApplyUser {
 						StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("apply_user_profile");
 						for (int i = 0; i < profileNames.size(); i++) {
 							String profileName = profileNames.get(i);
-							if (i == 0) {
-								retryEmbed.appendDescription(
-									"\n↩️ [Last Played Profile (" + profileName + ")](" + skyblockStatsLink(playerUuid, profileName) + ")"
-								);
-								menuBuilder.addOption("Last Played Profile", profileName, Emoji.fromFormatted("↩️"));
-							} else {
-								String profileEmoji = profileNameToEmoji(profileName);
-								retryEmbed.appendDescription(
-									"\n" + profileEmoji + " [" + profileName + "](" + skyblockStatsLink(playerUuid, profileName) + ")"
-								);
-								menuBuilder.addOption(profileName, profileName, Emoji.fromFormatted(profileEmoji));
+							boolean isLastPlayed = profileName.startsWith("*");
+							if (isLastPlayed) {
+								profileName = profileName.substring(1);
 							}
+							String profileEmoji = profileNameToEmoji(profileName);
+
+							retryEmbed.appendDescription(
+								"\n" +
+								profileEmoji +
+								" [" +
+								profileName +
+								(isLastPlayed ? " (Last Played)" : "") +
+								"](" +
+								skyblockStatsLink(playerUuid, profileName) +
+								")"
+							);
+							menuBuilder.addOption(
+								profileName + (isLastPlayed ? " (Last Played)" : ""),
+								profileName,
+								Emoji.fromFormatted(profileEmoji)
+							);
 						}
 						menuBuilder.addOption("Cancel Application", "cancel_application", Emoji.fromFormatted(client.getError()));
 
