@@ -21,7 +21,8 @@ package com.skyblockplus.dungeons;
 import static com.skyblockplus.utils.Constants.dungeonLootChestToEmoji;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

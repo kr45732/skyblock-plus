@@ -20,7 +20,8 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
-import static com.skyblockplus.utils.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
+import static com.skyblockplus.utils.utils.Utils.defaultPerms;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

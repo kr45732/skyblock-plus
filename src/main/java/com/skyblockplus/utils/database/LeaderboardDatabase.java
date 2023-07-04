@@ -18,7 +18,8 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
+import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
 import static com.skyblockplus.utils.Constants.collectionNameToId;
 import static com.skyblockplus.utils.Constants.skyblockStats;
 import static com.skyblockplus.utils.utils.StringUtils.*;
@@ -35,7 +36,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -338,7 +342,7 @@ public class LeaderboardDatabase {
 				mode.toLeaderboardName() +
 				" WHERE " +
 				lbType +
-				" IS NOT NULL) s WHERE uuid = ?"
+				" IS NOT NULL) s WHERE uuid = ? LIMIT 1"
 			)
 		) {
 			int rank = 0;
@@ -496,7 +500,7 @@ public class LeaderboardDatabase {
 			PreparedStatement statement = connection.prepareStatement(
 				"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS rank FROM " +
 				gamemode.toLeaderboardName() +
-				" WHERE networth IS NOT NULL) s WHERE uuid = ?"
+				" WHERE networth IS NOT NULL) s WHERE uuid = ? LIMIT 1"
 			)
 		) {
 			statement.setObject(1, stringToUuid(uuid));

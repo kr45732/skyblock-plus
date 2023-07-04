@@ -18,14 +18,16 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.AuctionFlipper.*;
+import static com.skyblockplus.utils.AuctionFlipper.underBinJson;
+import static com.skyblockplus.utils.AuctionFlipper.underBinJsonLastUpdated;
 import static com.skyblockplus.utils.utils.HypixelUtils.calculateWithTaxes;
 import static com.skyblockplus.utils.utils.HypixelUtils.isVanillaItem;
 import static com.skyblockplus.utils.utils.JsonUtils.getAveragePriceJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
 import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
-import static com.skyblockplus.utils.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
