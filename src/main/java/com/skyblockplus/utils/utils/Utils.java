@@ -98,8 +98,8 @@ public class Utils {
 	);
 	public static final ScheduledExecutorService scheduler = new ExceptionScheduler(7);
 	public static final ExceptionExecutor playerRequestExecutor = new ExceptionExecutor(
-		3,
-		3,
+		2,
+		2,
 		45L,
 		TimeUnit.SECONDS,
 		new LinkedBlockingQueue<>()

@@ -1384,7 +1384,7 @@ public class GuildSlashCommand extends SlashCommand {
 		return new PaginatorExtras.ReactiveButton(
 			Button.primary("reactive_update_guild", "Update Guild"),
 			action -> {
-				if (hypixelGuildFetchQueue.size() >= 5) {
+				if (hypixelGuildFetchQueue.size() >= 3) {
 					action
 						.event()
 						.replyEmbeds(errorEmbed("The guild update queue is full, please try again in a few seconds").build())

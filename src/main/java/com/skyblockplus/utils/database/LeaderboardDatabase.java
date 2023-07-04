@@ -408,7 +408,7 @@ public class LeaderboardDatabase {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"SELECT username, uuid, last_updated, " +
+				"SELECT username, uuid, " +
 				String.join(", ", lbTypes) +
 				" FROM " +
 				mode.toLeaderboardName() +
