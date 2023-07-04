@@ -40,11 +40,6 @@ public class HypixelPlayer {
 	private boolean validPlayer = false;
 	private String failCause = "Unknown fail cause";
 
-	/* Constructor */
-	public HypixelPlayer() {
-		failCause = "No Args Constructor";
-	}
-
 	public HypixelPlayer(String username) {
 		if (usernameToUuid(username)) {
 			return;
@@ -58,23 +53,6 @@ public class HypixelPlayer {
 			}
 
 			this.playerJson = response.response().getAsJsonObject();
-		} catch (Exception e) {
-			return;
-		}
-
-		this.validPlayer = true;
-	}
-
-	public HypixelPlayer(String uuid, String username, JsonElement playerJson) {
-		this.uuid = uuid;
-		this.username = username;
-
-		try {
-			if (playerJson == null) {
-				return;
-			}
-
-			this.playerJson = playerJson.getAsJsonObject();
 		} catch (Exception e) {
 			return;
 		}

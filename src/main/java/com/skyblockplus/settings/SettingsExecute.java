@@ -294,7 +294,6 @@ public class SettingsExecute {
 					.addField("Guild Settings", "Use `/settings guild` to see the current settings", false)
 					.addField("Roles Settings", "Use `/settings roles` to see the current settings", false);
 		} else if (args.length == 2 && args[1].equals("general")) {
-			String hypixelKey = database.getServerHypixelApiKey(guild.getId());
 			String fetchurChannel = higherDepth(serverSettings, "fetchurChannel", "none");
 			String fetchurRole = higherDepth(serverSettings, "fetchurRole", "none");
 			String mayorChannel = higherDepth(serverSettings, "mayorChannel", "none");
@@ -306,7 +305,6 @@ public class SettingsExecute {
 
 			eb =
 				defaultSettingsEmbed()
-					.addField("Hypixel API Key", hypixelKey != null && !hypixelKey.isEmpty() ? "Hidden" : "Not set", false)
 					.addField(
 						"Fetchur Notifications Channel",
 						fetchurChannel.equals("none") || fetchurChannel.isEmpty() ? "None" : "<#" + fetchurChannel + ">",
@@ -1952,18 +1950,15 @@ public class SettingsExecute {
 				}
 				nickname = nickname.replace(matcher.group(0), "");
 			} else if (
+				category.equals("PLAYER") &&
 				(
-					category.equals("PLAYER") &&
-					(
-						type.equals("SKILLS") ||
-						type.equals("CATACOMBS") ||
-						type.equals("SLAYER") ||
-						type.equals("WEIGHT") ||
-						type.equals("CLASS") ||
-						type.equals("LEVEL")
-					)
-				) ||
-				(category.equals("HYPIXEL") && type.equals("RANK"))
+					type.equals("SKILLS") ||
+					type.equals("CATACOMBS") ||
+					type.equals("SLAYER") ||
+					type.equals("WEIGHT") ||
+					type.equals("CLASS") ||
+					type.equals("LEVEL")
+				)
 			) {
 				EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
 				if (eb != null) {

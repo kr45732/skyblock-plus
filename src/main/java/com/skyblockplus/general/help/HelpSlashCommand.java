@@ -469,7 +469,7 @@ public class HelpSlashCommand extends SlashCommand {
 								),
 								new HelpData(
 									"nickname",
-									"The nickname template that a user will be renamed to on verifying. Can be set to none. Add .{text} for text that should only be added if the previous template was met. See example [here](https://discord.com/channels/796790757947867156/802749920679165994/937099157200580618)\n\nYou can use the following templates:\n• [HYPIXEL.RANK]\n• [GUILD.NAME]\n• [GUILD.TAG]\n• [GUILD.RANK]\n• [PLAYER.SKILLS]\n• [PLAYER.CATACOMBS]\n• [PLAYER.SLAYER]\n• [PLAYER.WEIGHT]\n• [PLAYER.CLASS]\n• [PLAYER.LEVEL]",
+									"The nickname template that a user will be renamed to on verifying. Can be set to none. Add .{text} for text that should only be added if the previous template was met. See example [here](https://discord.com/channels/796790757947867156/802749920679165994/937099157200580618)\n\nYou can use the following templates:\n• [GUILD.NAME]\n• [GUILD.TAG]\n• [GUILD.RANK]\n• [PLAYER.SKILLS]\n• [PLAYER.CATACOMBS]\n• [PLAYER.SLAYER]\n• [PLAYER.WEIGHT]\n• [PLAYER.CLASS]\n• [PLAYER.LEVEL]",
 									"nickname [prefix] [IGN] [postfix]"
 								)
 									.addExamples("nickname Verified | [IGN]", "nickname [[GUILD.RANK]] [IGN]"),

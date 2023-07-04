@@ -532,7 +532,7 @@ public class AutomaticGuild {
 					Matcher verifyMatcher = nicknameTemplatePattern.matcher(nicknameTemplate);
 					while (verifyMatcher.find()) {
 						String category = verifyMatcher.group(1).toUpperCase();
-						if (category.equals("PLAYER") || category.equals("HYPIXEL")) {
+						if (category.equals("PLAYER")) {
 							requiresKey = true;
 							break;
 						}
@@ -576,7 +576,6 @@ public class AutomaticGuild {
 								nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
 
 								Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
-								HypixelPlayer hypixelPlayer = null;
 								while (matcher.find()) {
 									String category = matcher.group(1).toUpperCase();
 									String type = matcher.group(2).toUpperCase();
@@ -670,23 +669,10 @@ public class AutomaticGuild {
 													extra
 												);
 										}
-									} else if (category.equals("HYPIXEL") && type.equals("RANK")) {
-										if (hypixelPlayer == null) {
-											numUpdated++; // Requires another request
-											HypixelResponse response = playerFromUuid(linkedAccount.uuid());
-											hypixelPlayer =
-												response.isValid()
-													? new HypixelPlayer(linkedAccount.uuid(), linkedAccount.username(), response.response())
-													: new HypixelPlayer();
-										}
-
-										if (hypixelPlayer.isValid()) {
-											nicknameTemplate = nicknameTemplate.replace(matcher.group(0), hypixelPlayer.getRank() + extra);
-										}
 									}
 								}
 
-								if ((player == null || player.isValid()) && (hypixelPlayer == null || hypixelPlayer.isValid())) {
+								if (player == null || player.isValid()) {
 									try {
 										linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
 									} catch (PermissionException ignored) {

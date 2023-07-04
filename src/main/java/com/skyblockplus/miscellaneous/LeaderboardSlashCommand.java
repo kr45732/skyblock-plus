@@ -86,7 +86,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Get the global leaderboard. Player's on leaderboard are only added or updated when commands are run")
+			.slash(name, "Get the global leaderboard")
 			.addOptions(new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true))
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOptions(

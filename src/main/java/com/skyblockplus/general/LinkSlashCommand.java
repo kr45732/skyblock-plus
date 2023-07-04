@@ -144,7 +144,6 @@ public class LinkSlashCommand extends SlashCommand {
 		String updatedRoles = "false";
 
 		Player.Profile player = null;
-		HypixelPlayer hypixelPlayer = null;
 		String key = database.getServerHypixelApiKey(member.getGuild().getId());
 
 		try {
@@ -232,20 +231,6 @@ public class LinkSlashCommand extends SlashCommand {
 										} +
 										extra
 									);
-							}
-						}
-					} else if (category.equals("HYPIXEL") && type.equals("RANK")) {
-						if (key != null) {
-							if (hypixelPlayer == null) {
-								HypixelResponse response = playerFromUuid(linkedAccount.uuid());
-								hypixelPlayer =
-									response.isValid()
-										? new HypixelPlayer(linkedAccount.uuid(), linkedAccount.username(), response.response())
-										: new HypixelPlayer();
-							}
-
-							if (hypixelPlayer.isValid()) {
-								nicknameTemplate = nicknameTemplate.replace(matcher.group(0), hypixelPlayer.getRank() + extra);
 							}
 						}
 					}
