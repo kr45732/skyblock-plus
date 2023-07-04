@@ -26,7 +26,6 @@ import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
@@ -47,6 +46,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -72,129 +72,97 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		this.name = "event";
 	}
 
-	public static List<EventMember> getEventLeaderboardList(JsonElement runningSettings, String guildId) {
-		List<EventMember> eventLeaderboardList = new ArrayList<>();
-		List<CompletableFuture<EventMember>> futuresList = new ArrayList<>();
-		List<Player.Profile> players = new ArrayList<>();
-		JsonArray membersArr = higherDepth(runningSettings, "membersList").getAsJsonArray();
-		String eventType = higherDepth(runningSettings, "eventType").getAsString();
-
-		String key = database.getServerHypixelApiKey(guildId);
-		key = checkHypixelKey(key) == null ? key : null; // Set key to null if invalid
-		if (membersArr.size() > 40 && key == null) {
-			return null;
-		}
-		key = key != null ? key : HYPIXEL_API_KEY;
-
+	public static Future<List<EventMember>> fetchEventMembers(JsonElement runningSettings, String guildId) {
 		guildMap.get(guildId).setEventCurrentlyUpdating(true);
-		for (JsonElement eventMember : membersArr) {
-			String uuid = higherDepth(eventMember, "uuid").getAsString();
-			String profileName = higherDepth(eventMember, "profileName").getAsString();
+		return executor.submit(() -> {
+			List<EventMember> eventMembers = new ArrayList<>();
+			List<CompletableFuture<EventMember>> futuresList = new ArrayList<>();
+			List<Player.Profile> players = new ArrayList<>();
+			String eventType = higherDepth(runningSettings, "eventType").getAsString();
 
-			try {
-				if (keyCooldownMap.get(key).isRateLimited()) {
-					long timeTillReset = keyCooldownMap.get(key).getTimeTillReset();
-					System.out.println("Sleeping for " + timeTillReset + " seconds (" + isMainHypixelKey(key) + ")");
-					TimeUnit.SECONDS.sleep(timeTillReset);
-				}
-			} catch (Exception ignored) {}
-
-			futuresList.add(
-				asyncSkyblockProfilesFromUuid(uuid, key)
-					.thenApplyAsync(
-						hypixelResponse -> {
+			for (JsonElement eventMember : higherDepth(runningSettings, "membersList").getAsJsonArray()) {
+				futuresList.add(
+					CompletableFuture.supplyAsync(
+						() -> {
 							String failCause = null;
 							String username = higherDepth(eventMember, "username").getAsString();
 							double curChange = -1;
 
-							if (hypixelResponse.isValid()) {
-								Player.Profile player = new Player(
-									uuidToUsername(uuid).username(),
-									uuid,
-									profileName,
-									hypixelResponse.response(),
-									false
-								)
-									.getSelectedProfile();
+							String uuid = higherDepth(eventMember, "uuid").getAsString();
+							String profileName = higherDepth(eventMember, "profileName").getAsString();
 
-								if (player.isValid()) {
-									players.add(player);
+							Player.Profile player = new Player(uuid, profileName, false).getSelectedProfile();
+							if (player.isValid()) {
+								players.add(player);
 
-									username = player.getUsername();
-									double startingAmount = higherDepth(eventMember, "startingAmount").getAsDouble();
-									curChange =
-										switch (eventType) {
-											case "slayer" -> player.getTotalSlayer() - startingAmount;
-											case "catacombs" -> player.getCatacombs().totalExp() - startingAmount;
-											default -> {
-												if (eventType.startsWith("collection.")) {
-													if (player.isCollectionsApiEnabled()) {
-														yield higherDepth(player.profileJson(), eventType.split("-")[0], 0.0) -
-														startingAmount;
-													} else {
-														failCause = "Collections API disabled";
-													}
-												} else if (eventType.startsWith("skills.")) {
-													if (player.isSkillsApiEnabled()) {
-														double skillsXp = 0;
-
-														String[] skillTypes = eventType.split("skills.")[1].split("-");
-														for (String skillType : skillTypes) {
-															skillsXp += Math.max(player.getSkillXp(skillType), 0);
-														}
-
-														yield skillsXp - startingAmount;
-													} else {
-														failCause = "Skills API disabled";
-													}
-												} else if (eventType.startsWith("weight.")) {
-													if (player.isSkillsApiEnabled()) {
-														String[] weightTypes = eventType.split("weight.")[1].split("-");
-														yield player.getWeight(weightTypes) - startingAmount;
-													} else {
-														failCause = "Skills API disabled";
-													}
+								username = player.getUsername();
+								double startingAmount = higherDepth(eventMember, "startingAmount").getAsDouble();
+								curChange =
+									switch (eventType) {
+										case "slayer" -> player.getTotalSlayer() - startingAmount;
+										case "catacombs" -> player.getCatacombs().totalExp() - startingAmount;
+										default -> {
+											if (eventType.startsWith("collection.")) {
+												if (player.isCollectionsApiEnabled()) {
+													yield higherDepth(player.profileJson(), eventType.split("-")[0], 0.0) - startingAmount;
 												} else {
-													throw new IllegalStateException("Unexpected value: " + eventType);
+													failCause = "Collections API disabled";
 												}
+											} else if (eventType.startsWith("skills.")) {
+												if (player.isSkillsApiEnabled()) {
+													double skillsXp = 0;
 
-												yield -1;
+													String[] skillTypes = eventType.split("skills.")[1].split("-");
+													for (String skillType : skillTypes) {
+														skillsXp += Math.max(player.getSkillXp(skillType), 0);
+													}
+
+													yield skillsXp - startingAmount;
+												} else {
+													failCause = "Skills API disabled";
+												}
+											} else if (eventType.startsWith("weight.")) {
+												if (player.isSkillsApiEnabled()) {
+													String[] weightTypes = eventType.split("weight.")[1].split("-");
+													yield player.getWeight(weightTypes) - startingAmount;
+												} else {
+													failCause = "Skills API disabled";
+												}
+											} else {
+												throw new IllegalStateException("Unexpected value: " + eventType);
 											}
-										};
-								} else {
-									failCause = player.getFailCause();
-								}
+
+											yield -1;
+										}
+									};
 							} else {
-								failCause = hypixelResponse.failCause();
+								failCause = player.getFailCause();
 							}
 
-							return new EventMember(
-								failCause,
-								username,
-								uuid,
-								"" + curChange,
-								higherDepth(eventMember, "profileName").getAsString()
-							);
+							return new EventMember(failCause, username, uuid, "" + curChange, profileName);
 						},
-						executor
+						playerRequestExecutor
 					)
-			);
-		}
-
-		for (CompletableFuture<EventMember> future : futuresList) {
-			try {
-				eventLeaderboardList.add(future.get());
-			} catch (Exception e) {
-				e.printStackTrace();
+				);
 			}
-		}
 
-		leaderboardDatabase.insertIntoLeaderboard(players);
+			for (CompletableFuture<EventMember> future : futuresList) {
+				try {
+					eventMembers.add(future.get());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
-		eventLeaderboardList.sort(Comparator.comparingDouble(o1 -> -o1.parseStartingAmount()));
+			leaderboardDatabase.insertIntoLeaderboard(players);
 
-		guildMap.get(guildId).setEventCurrentlyUpdating(false);
-		return eventLeaderboardList;
+			eventMembers.sort(Comparator.comparingDouble(e -> -e.parseStartingAmount()));
+			guildMap.get(guildId).setEventMembers(eventMembers);
+			guildMap.get(guildId).setEventLastUpdated(Instant.now());
+			guildMap.get(guildId).setEventCurrentlyUpdating(false);
+
+			return eventMembers;
+		});
 	}
 
 	public static String getEventTypeFormatted(String eventType) {
@@ -617,54 +585,35 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 			JsonElement runningSettings = database.getSkyblockEventSettings(guildId);
 			if (higherDepth(runningSettings, "eventType", "").isEmpty()) {
-				return defaultEmbed("No event running");
+				return errorEmbed("No event running");
+			}
+
+			if (higherDepth(runningSettings, "membersList").getAsJsonArray().isEmpty()) {
+				return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
 			}
 
 			AutomaticGuild currentGuild = guildMap.get(guildId);
 
-			if (currentGuild.eventCurrentlyUpdating) {
-				return errorEmbed("The leaderboard is currently updating, please try again in a few seconds");
+			if (currentGuild.eventLastUpdated == null || Duration.between(currentGuild.eventLastUpdated, Instant.now()).toMinutes() >= 15) {
+				fetchEventMembers(runningSettings, guildId);
 			}
 
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(user)
-				.setItemsPerPage(25)
-				.updateExtras(e -> e.setEveryPageTitle("Event Leaderboard"));
-
-			if (
-				(currentGuild.eventMemberList != null) &&
-				(currentGuild.eventMemberListLastUpdated != null) &&
-				(Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes() < 15)
-			) {
-				if (currentGuild.eventMemberList.isEmpty()) {
-					return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
-				}
-
-				getLeaderboardFormatted(currentGuild.eventMemberList, paginateBuilder);
-
-				paginateBuilder.updateExtras(e ->
-					e.setEveryPageText("**Last Updated <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>**\n")
-				);
-
-				if (slashCommandEvent != null) {
-					slashCommandEvent.paginate(paginateBuilder);
-				} else {
-					paginateBuilder.build().paginate(buttonEvent.getHook(), 0);
-				}
-				return null;
+			if (currentGuild.eventLastUpdated == null) {
+				return defaultEmbed("Event Leaderboard").setDescription("Event data not loaded, please try again in a few seconds");
 			}
 
-			List<EventMember> eventLeaderboardList = getEventLeaderboardList(runningSettings, guildId);
-			if (eventLeaderboardList == null) {
-				return errorEmbed("A Hypixel API key must be set for events with over 45 members");
-			}
-			if (eventLeaderboardList.isEmpty()) {
-				return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
-			}
-
-			getLeaderboardFormatted(eventLeaderboardList, paginateBuilder);
-
-			guildMap.get(guildId).setEventMemberList(eventLeaderboardList);
-			guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(user).setItemsPerPage(25);
+			paginateBuilder
+				.getExtras()
+				.setEveryPageText(
+					"**Last Updated:** <t:" +
+					currentGuild.eventLastUpdated.getEpochSecond() +
+					":R>" +
+					(currentGuild.eventCurrentlyUpdating ? " (currently updating)" : "") +
+					"\n"
+				)
+				.setEveryPageTitle("Event Leaderboard");
+			getLeaderboardFormatted(currentGuild.eventMembers, paginateBuilder);
 
 			if (slashCommandEvent != null) {
 				slashCommandEvent.paginate(paginateBuilder);
@@ -697,12 +646,10 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 			JsonElement eventSettings = database.getSkyblockEventSettings(guildId);
 			if (higherDepth(eventSettings, "eventType", "").isEmpty()) {
-				return defaultEmbed("No event running");
+				return errorEmbed("No event running");
 			}
 
 			if (silent) {
-				log.info("Skyblock event canceled: " + guild.getId() + " | " + eventSettings);
-
 				try {
 					guild
 						.getTextChannelById(higherDepth(eventSettings, "announcementId").getAsString())
@@ -714,20 +661,20 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 						.queue();
 				} catch (Exception ignored) {}
 
-				guildMap.get(guild.getId()).setEventMemberListLastUpdated(null);
-				guildMap.get(guildId).cancelSbEventFuture();
+				guildMap.get(guildId).cancelEvent();
 				int code = database.setSkyblockEventSettings(guildId, new EventSettings());
 				if (code == 200) {
 					return defaultEmbed("Event canceled");
 				} else {
-					return defaultEmbed("API returned code " + code);
+					return errorEmbed("API returned code " + code);
 				}
 			}
 
-			guildMap.get(guildId).setEventMemberListLastUpdated(null);
-			List<EventMember> eventLeaderboardList = getEventLeaderboardList(eventSettings, guildId);
-			if (eventLeaderboardList == null) {
-				return errorEmbed("A Hypixel API key must be set for events over 45 members so the leaderboard can be calculated");
+			List<EventMember> eventLeaderboardList;
+			try {
+				eventLeaderboardList = fetchEventMembers(eventSettings, guildId).get();
+			} catch (Exception e) {
+				return errorEmbed("Error fetching event leaderboard, please try again in a few seconds");
 			}
 
 			TextChannel announcementChannel = jda.getTextChannelById(higherDepth(eventSettings, "announcementId").getAsString());
@@ -745,7 +692,6 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				.setItemsPerPage(25)
 				.updateExtras(extra -> extra.setEveryPageTitle("Event Leaderboard"))
 				.setTimeout(24, TimeUnit.HOURS);
-
 			getLeaderboardFormatted(eventLeaderboardList, paginateBuilder);
 
 			try {
@@ -786,8 +732,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 			log.info("Skyblock event ended: " + guild.getId() + " | " + eventSettings);
 
-			guildMap.get(guild.getId()).setEventMemberListLastUpdated(null);
-			guildMap.get(guildId).cancelSbEventFuture();
+			guildMap.get(guildId).cancelEvent();
 			int code = database.setSkyblockEventSettings(guildId, new EventSettings());
 			if (code == 200) {
 				return defaultEmbed("Ended Skyblock event");

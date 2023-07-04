@@ -451,12 +451,11 @@ public class LeaderboardDatabase {
 	}
 
 	public List<DataObject> fetchPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids) {
-		List<DataObject> out = new ArrayList<>();
-
 		if (uuids.isEmpty()) {
-			return out;
+			return new ArrayList<>();
 		}
 
+		List<DataObject> out = new ArrayList<>();
 		List<Player.Profile> players = new ArrayList<>();
 		List<CompletableFuture<DataObject>> futuresList = new ArrayList<>();
 		for (String uuid : uuids) {

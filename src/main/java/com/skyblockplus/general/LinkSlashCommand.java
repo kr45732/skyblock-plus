@@ -29,7 +29,6 @@ import static com.skyblockplus.utils.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.miscellaneous.RolesSlashCommand;
-import com.skyblockplus.utils.HypixelPlayer;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;

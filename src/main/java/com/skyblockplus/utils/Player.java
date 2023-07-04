@@ -96,6 +96,10 @@ public class Player {
 	}
 
 	public Player(String username, String profileName) {
+		this(username, profileName, true);
+	}
+
+	public Player(String username, String profileName, boolean updateLb) {
 		if (checkUsername(username)) {
 			return;
 		}
@@ -119,7 +123,9 @@ public class Player {
 		}
 
 		this.valid = true;
-		leaderboardDatabase.insertIntoLeaderboard(getSelectedProfile());
+		if (updateLb) {
+			leaderboardDatabase.insertIntoLeaderboard(getSelectedProfile());
+		}
 	}
 
 	public Player(String username, String uuid, JsonElement profileArray, boolean updateLb) {

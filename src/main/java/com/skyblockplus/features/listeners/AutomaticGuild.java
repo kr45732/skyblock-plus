@@ -47,7 +47,6 @@ import com.skyblockplus.miscellaneous.MayorSlashCommand;
 import com.skyblockplus.miscellaneous.RolesSlashCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.price.AuctionTracker;
-import com.skyblockplus.utils.HypixelPlayer;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.RoleModifyRecord;
@@ -145,10 +144,10 @@ public class AutomaticGuild {
 	public SkyblockEventHandler skyblockEventHandler = null;
 
 	@Setter
-	public List<EventMember> eventMemberList = new ArrayList<>();
+	public List<EventMember> eventMembers = new ArrayList<>();
 
 	@Setter
-	public Instant eventMemberListLastUpdated = null;
+	public Instant eventLastUpdated = null;
 
 	@Setter
 	public boolean eventCurrentlyUpdating = false;
@@ -1375,11 +1374,15 @@ public class AutomaticGuild {
 		}
 	}
 
-	public void cancelSbEventFuture() {
+	public void cancelEvent() {
 		if (sbEventFuture != null) {
 			scheduledFutures.remove(sbEventFuture);
 			sbEventFuture.cancel(true);
 		}
+
+		eventMembers = null;
+		eventLastUpdated = null;
+		eventCurrentlyUpdating = false;
 	}
 
 	public void setBotManagerRoles(List<String> botManagerRoles) {
