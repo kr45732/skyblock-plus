@@ -264,9 +264,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 					false
 				);
 
-				Instant eventInstantEnding = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
-
-				eb.addField("End Date", "Ends " + getRelativeTimestamp(eventInstantEnding), false);
+				eb.addField("End Date", "Ends <t:" + higherDepth(currentSettings, "timeEndingSeconds").getAsLong() + ":R>", false);
 
 				StringBuilder ebString = new StringBuilder();
 				for (Map.Entry<String, JsonElement> prize : higherDepth(currentSettings, "prizeMap").getAsJsonObject().entrySet()) {
