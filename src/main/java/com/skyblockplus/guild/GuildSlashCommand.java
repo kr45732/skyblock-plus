@@ -1437,7 +1437,7 @@ public class GuildSlashCommand extends SlashCommand {
 								members.size() +
 								" players. You are #" +
 								(hypixelGuildFetchQueue.indexOf(guildId) + 1) +
-								" in the queue. This message will be updated once complete."
+								" in the queue. This may take some time depending on the guild size."
 							)
 							.build()
 					)

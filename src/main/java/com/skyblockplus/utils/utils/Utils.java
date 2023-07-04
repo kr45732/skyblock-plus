@@ -235,10 +235,6 @@ public class Utils {
 		return defaultEmbed("Error").setDescription(failCause);
 	}
 
-	public static EmbedBuilder loadingEmbed() {
-		return defaultEmbed(null).setImage("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
-	}
-
 	public static CustomPaginator.Builder defaultPaginator(User... eventAuthor) {
 		return new CustomPaginator.Builder()
 			.setEventWaiter(waiter)
