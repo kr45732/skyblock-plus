@@ -440,7 +440,9 @@ public class LeaderboardDatabase {
 		}
 
 		if (!uuids.isEmpty()) {
-			event.embed(defaultEmbed("Loading").setDescription("Retrieving an additional " + uuids.size() + " players. This may take some time."));
+			event.embed(
+				defaultEmbed("Loading").setDescription("Retrieving an additional " + uuids.size() + " players. This may take some time.")
+			);
 
 			out.addAll(fetchPlayers(lbTypes, mode, uuids));
 		}
