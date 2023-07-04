@@ -1415,7 +1415,7 @@ public class AutomaticGuild {
 
 	public void logAction(EmbedBuilder eb, Member member) {
 		try {
-			if (logChannel == null) {
+			if (logChannel == null || !logChannel.canTalk()) {
 				return;
 			}
 
