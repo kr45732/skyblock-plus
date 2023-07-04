@@ -113,8 +113,18 @@ public class Utils {
 		new LinkedBlockingQueue<>()
 	)
 		.setAllowCoreThreadTimeOut(true);
+	public static final ExceptionExecutor guildRequestExecutor = new ExceptionExecutor(
+		1,
+		1,
+		45L,
+		TimeUnit.SECONDS,
+		new LinkedBlockingQueue<>()
+	)
+		.setAllowCoreThreadTimeOut(true);
 	public static final ConcurrentHashMap<String, HypixelKeyRecord> keyCooldownMap = new ConcurrentHashMap<>();
-	public static final List<String> hypixelGuildQueue = Collections.synchronizedList(new ArrayList<>());
+	public static final List<String> hypixelGuildRequestQueue = Collections.synchronizedList(new ArrayList<>());
+	public static final List<String> hypixelGuildFetchQueue = Collections.synchronizedList(new ArrayList<>());
+
 	public static final Gson gson = new GsonBuilder()
 		.addSerializationExclusionStrategy(new ExposeExclusionStrategy(true))
 		.addDeserializationExclusionStrategy(new ExposeExclusionStrategy(false))

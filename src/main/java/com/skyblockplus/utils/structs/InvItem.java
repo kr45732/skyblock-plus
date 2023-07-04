@@ -68,10 +68,22 @@ public class InvItem {
 		}
 	}
 
+	public void setModifier(String modifier) {
+		// Fix Hypixel still showing hyper as warped reforge
+		if (getName().startsWith("Hyper ") && modifier.equals("warped")) {
+			this.modifier = "hyper";
+		} else {
+			this.modifier = modifier;
+		}
+	}
+
 	public void setShensAuctionPrice(long shensAuctionPrice) {
 		this.shensAuctionPrice = shensAuctionPrice;
 	}
 
+	/**
+	 * @return item name with color codes stripped off
+	 */
 	public String getName() {
 		return getName(true);
 	}

@@ -100,8 +100,7 @@ public class SelectMenuPaginator {
 			.filter(b -> b.isReacting() && event.getComponentId().equals(b.getId()))
 			.map(PaginatorExtras.ReactiveButton::getAction)
 			.findFirst()
-			.orElse(ignored -> {})
-			.accept(null);
+			.ifPresent(o -> o.apply(null));
 
 		List<LayoutComponent> actionRows = new ArrayList<>();
 		if (!extras.getButtons().isEmpty()) {

@@ -176,8 +176,9 @@ public class MissingSlashCommand extends SlashCommand {
 				.addReactiveButtons(
 					new PaginatorExtras.ReactiveButton(
 						Button.primary("reactive_missing_command_show_highest", "Show Highest Tier"),
-						paginator ->
-							paginator
+						action -> {
+							action
+								.paginator()
 								.getExtras()
 								.setStrings(missingHighest.getValue())
 								.setEveryPageText(
@@ -188,13 +189,15 @@ public class MissingSlashCommand extends SlashCommand {
 									"\n**Note:** Showing highest tiers\n"
 								)
 								.toggleReactiveButton("reactive_missing_command_show_highest", false)
-								.toggleReactiveButton("reactive_missing_command_show_next", true),
+								.toggleReactiveButton("reactive_missing_command_show_next", true);
+						},
 						true
 					),
 					new PaginatorExtras.ReactiveButton(
 						Button.primary("reactive_missing_command_show_next", "Show Next Tier"),
-						paginator ->
-							paginator
+						action -> {
+							action
+								.paginator()
 								.getExtras()
 								.setStrings(missing.getValue())
 								.setEveryPageText(
@@ -205,7 +208,8 @@ public class MissingSlashCommand extends SlashCommand {
 									"\n**Note:** Talismans with a * have higher tiers\n"
 								)
 								.toggleReactiveButton("reactive_missing_command_show_highest", true)
-								.toggleReactiveButton("reactive_missing_command_show_next", false),
+								.toggleReactiveButton("reactive_missing_command_show_next", false);
+						},
 						false
 					)
 				);

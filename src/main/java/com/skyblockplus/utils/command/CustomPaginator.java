@@ -105,11 +105,11 @@ public class CustomPaginator {
 		initialize(channel.sendMessage(msg), pageNum);
 	}
 
-	public void paginate(InteractionHook channel, int pageNum) {
+	public void paginate(InteractionHook hook, int pageNum) {
 		pageNum = Math.min(Math.max(pageNum, 1), pages);
 
 		MessageEditData msg = new MessageEditBuilder().setEmbeds(getEmbedRender(pageNum)).build();
-		initialize(channel.editOriginal(msg), pageNum);
+		initialize(hook.editOriginal(msg), pageNum);
 	}
 
 	public void paginate(Message message, int pageNum) {
@@ -140,6 +140,10 @@ public class CustomPaginator {
 		} else {
 			((RestAction<?>) action).queue(m -> pagination((Message) m, pageNum), throwableConsumer);
 		}
+	}
+
+	public void pagination(PaginatorExtras.ReactiveButton.ReactiveAction action) {
+		pagination(action.event().getMessage(), action.page());
 	}
 
 	private void pagination(Message message, int pageNum) {
@@ -180,11 +184,7 @@ public class CustomPaginator {
 	}
 
 	private void handleButtonClick(ButtonInteractionEvent event, int pageNum) {
-		if (event.getButton().getId() == null) {
-			return;
-		}
-
-		switch (event.getButton().getId()) {
+		switch (event.getComponentId()) {
 			case LEFT -> {
 				if (pageNum == 1 && wrapPageEnds) {
 					pageNum = pages + 1;
@@ -201,14 +201,17 @@ public class CustomPaginator {
 					pageNum++;
 				}
 			}
-			default -> extras
-				.getReactiveButtons()
-				.stream()
-				.filter(b -> b.isReacting() && event.getComponentId().equals(b.getId()))
-				.map(PaginatorExtras.ReactiveButton::getAction)
-				.findFirst()
-				.orElse(ignored -> {})
-				.accept(this);
+			default -> {
+				PaginatorExtras.ReactiveButton button = extras
+					.getReactiveButtons()
+					.stream()
+					.filter(b -> b.isReacting() && event.getComponentId().equals(b.getId()))
+					.findFirst()
+					.get();
+				if (button.getAction().apply(new PaginatorExtras.ReactiveButton.ReactiveAction(this, event, pageNum))) {
+					return;
+				}
+			}
 		}
 		calculatePages();
 		pageNum = Math.min(pageNum, pages);

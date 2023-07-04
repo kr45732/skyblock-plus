@@ -260,20 +260,22 @@ public class NetworthExecute {
 			.addReactiveButtons(
 				new PaginatorExtras.ReactiveButton(
 					Button.primary("reactive_nw_ignore_soulbound", "Hide Soulbound"),
-					paginator ->
+					ignored -> {
 						extras
 							.setSelectPages(soulboundIgnoredPages)
 							.toggleReactiveButton("reactive_nw_ignore_soulbound", false)
-							.toggleReactiveButton("reactive_nw_show_soulbound", true),
+							.toggleReactiveButton("reactive_nw_show_soulbound", true);
+					},
 					true
 				),
 				new PaginatorExtras.ReactiveButton(
 					Button.primary("reactive_nw_show_soulbound", "Show Soulbound"),
-					paginator ->
+					ignored -> {
 						extras
 							.setSelectPages(pages)
 							.toggleReactiveButton("reactive_nw_ignore_soulbound", true)
-							.toggleReactiveButton("reactive_nw_show_soulbound", false),
+							.toggleReactiveButton("reactive_nw_show_soulbound", false);
+					},
 					false
 				)
 			);

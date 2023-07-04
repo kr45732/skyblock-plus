@@ -38,15 +38,19 @@ import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.FileReader;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.stereotype.Component;
 
@@ -378,19 +382,8 @@ public class GuildSlashCommand extends SlashCommand {
 			String username,
 			String guildName,
 			Player.Gamemode gamemode,
-			boolean useKey,
 			SlashCommandEvent event
 		) {
-			String hypixelKey = null;
-			if (useKey) {
-				hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
-
-				EmbedBuilder eb = checkHypixelKey(hypixelKey);
-				if (eb != null) {
-					return eb;
-				}
-			}
-
 			lbType = getType(lbType);
 
 			UsernameUuidStruct usernameUuidStruct = null;
@@ -409,28 +402,38 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 
 			JsonElement guildJson = guildResponse.response();
-			guildName = higherDepth(guildJson, "name").getAsString();
 			String guildId = higherDepth(guildJson, "_id").getAsString();
 
-			if (hypixelGuildQueue.contains(guildId)) {
+			if (hypixelGuildRequestQueue.contains(guildId)) {
 				return errorEmbed("This guild is currently updating, please try again in a few seconds");
 			}
-			hypixelGuildQueue.add(guildId);
+			hypixelGuildRequestQueue.add(guildId);
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
 				List.of(lbType),
 				gamemode,
 				streamJsonArray(higherDepth(guildJson, "members"))
-					.map(u -> higherDepth(u, "uuid", ""))
+					.map(u -> higherDepth(u, "uuid", null))
+					.filter(Objects::nonNull)
 					.collect(Collectors.toCollection(ArrayList::new)),
-				hypixelKey,
 				event
 			);
-			hypixelGuildQueue.remove(guildId);
+			hypixelGuildRequestQueue.remove(guildId);
 
-			String finalLbType = lbType;
-			playerList.sort(Comparator.comparingDouble(cache -> -cache.getDouble(finalLbType, 0)));
+			paginateLeaderboard(lbType, usernameUuidStruct, guildJson, gamemode, playerList, event.getHook());
+			return null;
+		}
 
-			CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
+		private static void paginateLeaderboard(
+			String lbType,
+			UsernameUuidStruct usernameUuidStruct,
+			JsonElement guildJson,
+			Player.Gamemode gamemode,
+			List<DataObject> playerList,
+			InteractionHook hook
+		) {
+			playerList.sort(Comparator.comparingDouble(cache -> -cache.getDouble(lbType, 0)));
+
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(hook.getInteraction().getUser()).setColumns(2).setItemsPerPage(20);
 
 			double total = 0;
 			int guildRank = -1;
@@ -443,7 +446,6 @@ public class GuildSlashCommand extends SlashCommand {
 				}
 
 				String formattedAmt = formatLeaderboardAmount(amount);
-
 				paginateBuilder.addStrings("`" + (i + 1) + ")` " + escapeUsername(player.getString("username")) + ": " + formattedAmt);
 				total += amount;
 
@@ -454,6 +456,8 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 
 			String lbTypeFormatted = capitalizeString(lbType.replace("_", " "));
+			String guildId = higherDepth(guildJson, "_id").getAsString();
+			Instant lastUpdated = cacheDatabase.getGuildCacheRequestTime(guildId);
 
 			String ebStr =
 				"**Total " +
@@ -463,7 +467,8 @@ public class GuildSlashCommand extends SlashCommand {
 				"\n**Average " +
 				lbTypeFormatted +
 				":** " +
-				formatLeaderboardAmount(total / playerList.size());
+				formatLeaderboardAmount(total / paginateBuilder.size()) +
+				(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "");
 			if (usernameUuidStruct != null) {
 				ebStr +=
 					"\n**Player:** " +
@@ -476,10 +481,22 @@ public class GuildSlashCommand extends SlashCommand {
 					amt;
 			}
 
-			paginateBuilder.getExtras().setEveryPageTitle(guildName).setEveryPageText(ebStr);
-			event.paginate(paginateBuilder, guildRank == -1 ? 0 : guildRank / 20 + 1);
+			if (lastUpdated == null || Duration.between(lastUpdated, Instant.now()).toDays() >= 1) {
+				paginateBuilder
+					.getExtras()
+					.addReactiveButtons(
+						getUpdateGuildButton(
+							List.of(lbType),
+							gamemode,
+							guildJson,
+							(action, out) ->
+								paginateLeaderboard(lbType, usernameUuidStruct, guildJson, gamemode, out, action.event().getHook())
+						)
+					);
+			}
 
-			return null;
+			paginateBuilder.getExtras().setEveryPageTitle(higherDepth(guildJson, "name").getAsString()).setEveryPageText(ebStr);
+			paginateBuilder.build().paginate(hook, guildRank == -1 ? 0 : guildRank / 20 + 1);
 		}
 
 		@Override
@@ -492,7 +509,6 @@ public class GuildSlashCommand extends SlashCommand {
 						null,
 						guild,
 						Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-						event.getOptionBoolean("key", false),
 						event
 					)
 				);
@@ -509,7 +525,6 @@ public class GuildSlashCommand extends SlashCommand {
 					event.player,
 					null,
 					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-					event.getOptionBoolean("key", false),
 					event
 				)
 			);
@@ -526,8 +541,7 @@ public class GuildSlashCommand extends SlashCommand {
 						.addChoice("All", "all")
 						.addChoice("Ironman", "ironman")
 						.addChoice("Stranded", "stranded")
-				)
-				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
+				);
 		}
 	}
 
@@ -543,7 +557,6 @@ public class GuildSlashCommand extends SlashCommand {
 			String guildName,
 			String reqs,
 			Player.Gamemode gamemode,
-			boolean useKey,
 			SlashCommandEvent event
 		) {
 			String[] reqsArr = reqs.split("] \\[");
@@ -575,16 +588,6 @@ public class GuildSlashCommand extends SlashCommand {
 				reqsArr[i] = reqsArr[i].replace("[", "").replace("]", "");
 			}
 
-			String hypixelKey = null;
-			if (useKey) {
-				hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
-
-				EmbedBuilder eb = checkHypixelKey(hypixelKey);
-				if (eb != null) {
-					return eb;
-				}
-			}
-
 			HypixelResponse guildResponse;
 			if (username != null) {
 				UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
@@ -602,23 +605,36 @@ public class GuildSlashCommand extends SlashCommand {
 			JsonElement guildJson = guildResponse.response();
 			String guildId = higherDepth(guildJson, "_id").getAsString();
 
-			if (hypixelGuildQueue.contains(guildId)) {
+			if (hypixelGuildRequestQueue.contains(guildId)) {
 				return errorEmbed("This guild is currently updating, please try again in a few seconds");
 			}
-			hypixelGuildQueue.add(guildId);
+			hypixelGuildRequestQueue.add(guildId);
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
 				reqTypes,
 				gamemode,
 				streamJsonArray(higherDepth(guildJson, "members"))
-					.map(u -> higherDepth(u, "uuid", ""))
+					.map(u -> higherDepth(u, "uuid", null))
 					.collect(Collectors.toCollection(ArrayList::new)),
-				hypixelKey,
 				event
 			);
 			playerList.sort(Comparator.comparingDouble(e -> e.getDouble("level", 0)));
-			hypixelGuildQueue.remove(guildId);
+			hypixelGuildRequestQueue.remove(guildId);
 
-			CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS).setItemsPerPage(15);
+			paginateGuildKicker(reqTypes, reqsArr, guildJson, gamemode, playerList, event.getHook());
+			return null;
+		}
+
+		private static void paginateGuildKicker(
+			List<String> lbTypes,
+			String[] reqsArr,
+			JsonElement guildJson,
+			Player.Gamemode gamemode,
+			List<DataObject> playerList,
+			InteractionHook hook
+		) {
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(hook.getInteraction().getUser())
+				.updateExtras(e -> e.setType(PaginatorExtras.PaginatorType.EMBED_FIELDS))
+				.setItemsPerPage(15);
 
 			for (DataObject guildMember : playerList) {
 				boolean meetsReqsOr = false;
@@ -683,13 +699,30 @@ public class GuildSlashCommand extends SlashCommand {
 				}
 			}
 
+			Instant lastUpdated = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
 			paginateBuilder
 				.getExtras()
 				.setEveryPageTitle("Guild Kick Helper")
-				.setEveryPageText("**Total Missing Requirements:** " + paginateBuilder.size());
+				.setEveryPageText(
+					"**Total Missing Requirements:** " +
+					paginateBuilder.size() +
+					(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
+				);
 
-			event.paginate(paginateBuilder);
-			return null;
+			if (lastUpdated == null || Duration.between(lastUpdated, Instant.now()).toDays() >= 1) {
+				paginateBuilder
+					.getExtras()
+					.addReactiveButtons(
+						getUpdateGuildButton(
+							lbTypes,
+							gamemode,
+							guildJson,
+							(action, out) -> paginateGuildKicker(lbTypes, reqsArr, guildJson, gamemode, out, action.event().getHook())
+						)
+					);
+			}
+
+			paginateBuilder.build().paginate(hook, 1);
 		}
 
 		@Override
@@ -702,7 +735,6 @@ public class GuildSlashCommand extends SlashCommand {
 						guild,
 						event.getOptionStr("requirements"),
 						Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-						event.getOptionBoolean("key", false),
 						event
 					)
 				);
@@ -719,7 +751,6 @@ public class GuildSlashCommand extends SlashCommand {
 					null,
 					event.getOptionStr("requirements"),
 					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-					event.getOptionBoolean("key", false),
 					event
 				)
 			);
@@ -736,8 +767,7 @@ public class GuildSlashCommand extends SlashCommand {
 						.addChoice("All", "all")
 						.addChoice("Ironman", "ironman")
 						.addChoice("Stranded", "stranded")
-				)
-				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
+				);
 		}
 	}
 
@@ -748,17 +778,7 @@ public class GuildSlashCommand extends SlashCommand {
 			this.cooldown = GLOBAL_COOLDOWN + 2;
 		}
 
-		public static EmbedBuilder getRanks(String username, Player.Gamemode gamemode, boolean useKey, SlashCommandEvent event) {
-			String hypixelKey = null;
-			if (useKey) {
-				hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
-
-				EmbedBuilder eb = checkHypixelKey(hypixelKey);
-				if (eb != null) {
-					return eb;
-				}
-			}
-
+		public static EmbedBuilder getRanks(String username, Player.Gamemode gamemode, SlashCommandEvent event) {
 			UsernameUuidStruct usernameUuid = usernameToUuid(username);
 			if (!usernameUuid.isValid()) {
 				return errorEmbed(usernameUuid.failCause());
@@ -772,7 +792,6 @@ public class GuildSlashCommand extends SlashCommand {
 			JsonElement guildJson = guildResponse.response();
 			String guildId = higherDepth(guildJson, "_id").getAsString();
 			String guildName = higherDepth(guildJson, "name").getAsString();
-			JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
 
 			JsonElement lbSettings;
 			try {
@@ -791,6 +810,37 @@ public class GuildSlashCommand extends SlashCommand {
 				);
 			}
 
+			List<String> lbTypes = List.of("slayer", "skills", "catacombs", "weight", "networth", "level");
+
+			if (hypixelGuildRequestQueue.contains(guildId)) {
+				return errorEmbed("This guild is currently updating, please try again in a few seconds");
+			}
+			hypixelGuildRequestQueue.add(guildId);
+			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
+				lbTypes,
+				gamemode,
+				streamJsonArray(higherDepth(guildJson, "members"))
+					.map(u -> higherDepth(u, "uuid", null))
+					.collect(Collectors.toCollection(ArrayList::new)),
+				event
+			);
+			hypixelGuildRequestQueue.remove(guildId);
+
+			paginateGuildRanks(lbTypes, lbSettings, guildJson, gamemode, playerList, event.getHook());
+			return null;
+		}
+
+		private static void paginateGuildRanks(
+			List<String> lbTypes,
+			JsonElement lbSettings,
+			JsonElement guildJson,
+			Player.Gamemode gamemode,
+			List<DataObject> playerList,
+			InteractionHook hook
+		) {
+			String guildName = higherDepth(guildJson, "name").getAsString();
+			JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
+
 			String lbType = higherDepth(lbSettings, "lb_type").getAsString();
 			List<String> ignoredRanks = streamJsonArray(higherDepth(lbSettings, "ignored_ranks"))
 				.map(e -> e.getAsString().toLowerCase())
@@ -802,19 +852,6 @@ public class GuildSlashCommand extends SlashCommand {
 					rankTypes.add(i.getAsString().toLowerCase());
 				}
 			}
-
-			if (hypixelGuildQueue.contains(guildId)) {
-				return errorEmbed("This guild is currently updating, please try again in a few seconds");
-			}
-			hypixelGuildQueue.add(guildId);
-			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
-				List.of("slayer", "skills", "catacombs", "weight", "networth", "level"),
-				gamemode,
-				streamJsonArray(guildMembers).map(u -> higherDepth(u, "uuid", "")).collect(Collectors.toCollection(ArrayList::new)),
-				hypixelKey,
-				event
-			);
-			hypixelGuildQueue.remove(guildId);
 
 			List<String> uniqueGuildName = new ArrayList<>();
 			for (int i = playerList.size() - 1; i >= 0; i--) {
@@ -852,6 +889,9 @@ public class GuildSlashCommand extends SlashCommand {
 					uniqueGuildName.add(gMemUsername);
 				}
 			}
+
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(hook.getInteraction().getUser()).setItemsPerPage(20);
+			int totalChange = 0;
 
 			if (lbType.equals("position")) {
 				List<DataObject> guildSlayer = playerList
@@ -957,8 +997,6 @@ public class GuildSlashCommand extends SlashCommand {
 
 				JsonArray ranksArr = higherDepth(lbSettings, "ranks").getAsJsonArray();
 
-				CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
-				int totalChange = 0;
 				for (List<DataObject> currentLeaderboard : guildLeaderboards) {
 					for (int i = 0; i < currentLeaderboard.size(); i++) {
 						DataObject currentPlayer = currentLeaderboard.get(i);
@@ -992,19 +1030,8 @@ public class GuildSlashCommand extends SlashCommand {
 						}
 					}
 				}
-
-				if (paginateBuilder.size() == 0) {
-					return defaultEmbed("No rank changes");
-				}
-
-				paginateBuilder
-					.getExtras()
-					.setEveryPageTitle("Rank changes for " + guildName)
-					.setEveryPageText("**Total rank changes:** " + totalChange);
-				event.paginate(paginateBuilder);
 			} else {
 				List<String> pbItems = new ArrayList<>();
-				int totalChange = 0;
 				JsonObject defaultRankObj = higherDepth(lbSettings, "default_rank").getAsJsonObject();
 				List<String> defaultRank = streamJsonArray(higherDepth(defaultRankObj, "names"))
 					.map(JsonElement::getAsString)
@@ -1106,21 +1133,33 @@ public class GuildSlashCommand extends SlashCommand {
 					}
 				}
 
-				if (pbItems.isEmpty()) {
-					return defaultEmbed("No rank changes");
-				}
-
-				CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
-				paginateBuilder
-					.getExtras()
-					.addStrings(pbItems.stream().sorted().collect(Collectors.toCollection(ArrayList::new)))
-					.setEveryPageTitle("Rank changes for " + guildName)
-					.setEveryPageText("**Total rank changes:** " + totalChange);
-
-				event.paginate(paginateBuilder);
+				paginateBuilder.getExtras().addStrings(pbItems.stream().sorted().collect(Collectors.toCollection(ArrayList::new)));
 			}
 
-			return null;
+			Instant lastUpdated = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+			paginateBuilder
+				.getExtras()
+				.setEveryPageTitle("Rank changes for " + guildName)
+				.setEveryPageText(
+					"**Total rank changes:** " +
+					totalChange +
+					(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
+				);
+
+			if (lastUpdated == null || Duration.between(lastUpdated, Instant.now()).toDays() >= 1) {
+				paginateBuilder
+					.getExtras()
+					.addReactiveButtons(
+						getUpdateGuildButton(
+							lbTypes,
+							gamemode,
+							guildJson,
+							(action, out) -> paginateGuildRanks(lbTypes, lbSettings, guildJson, gamemode, out, action.event().getHook())
+						)
+					);
+			}
+
+			paginateBuilder.build().paginate(hook, 1);
 		}
 
 		@Override
@@ -1129,14 +1168,7 @@ public class GuildSlashCommand extends SlashCommand {
 				return;
 			}
 
-			event.paginate(
-				getRanks(
-					event.player,
-					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-					event.getOptionBoolean("key", false),
-					event
-				)
-			);
+			event.paginate(getRanks(event.player, Player.Gamemode.of(event.getOptionStr("gamemode", "all")), event));
 		}
 
 		@Override
@@ -1148,35 +1180,18 @@ public class GuildSlashCommand extends SlashCommand {
 						.addChoice("All", "all")
 						.addChoice("Ironman", "ironman")
 						.addChoice("Stranded", "stranded")
-				)
-				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more accurate results");
+				);
 		}
 	}
 
-	public static class StatisticsSubcommand extends Subcommand {
+	public static class TopSubcommand extends Subcommand {
 
-		public StatisticsSubcommand() {
+		public TopSubcommand() {
 			this.name = "top";
 			this.cooldown = GLOBAL_COOLDOWN + 2;
 		}
 
-		public static EmbedBuilder getStatistics(
-			String username,
-			String guildName,
-			boolean useKey,
-			Player.Gamemode gamemode,
-			SlashCommandEvent event
-		) {
-			String hypixelKey = null;
-			if (useKey) {
-				hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
-
-				EmbedBuilder eb = checkHypixelKey(hypixelKey);
-				if (eb != null) {
-					return eb;
-				}
-			}
-
+		public static EmbedBuilder getTop(String username, String guildName, Player.Gamemode gamemode, SlashCommandEvent event) {
 			HypixelResponse guildResponse;
 			UsernameUuidStruct usernameUuidStruct = null;
 			if (username != null) {
@@ -1194,25 +1209,37 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 
 			JsonElement guildJson = guildResponse.response();
-			guildName = higherDepth(guildJson, "name").getAsString();
 			String guildId = higherDepth(guildJson, "_id").getAsString();
 
-			if (hypixelGuildQueue.contains(guildId)) {
+			if (hypixelGuildRequestQueue.contains(guildId)) {
 				return errorEmbed("This guild is currently updating, please try again in a few seconds");
 			}
 
-			hypixelGuildQueue.add(guildId);
+			List<String> lbTypes = List.of("networth", "level", "slayer", "skills", "catacombs", "weight");
+
+			hypixelGuildRequestQueue.add(guildId);
 			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
-				List.of("networth", "level", "slayer", "skills", "catacombs", "weight"),
+				lbTypes,
 				gamemode,
 				streamJsonArray(higherDepth(guildJson, "members"))
-					.map(u -> higherDepth(u, "uuid", ""))
+					.map(u -> higherDepth(u, "uuid", null))
 					.collect(Collectors.toCollection(ArrayList::new)),
-				hypixelKey,
 				event
 			);
-			hypixelGuildQueue.remove(guildId);
+			hypixelGuildRequestQueue.remove(guildId);
 
+			paginateTop(lbTypes, usernameUuidStruct, guildJson, gamemode, playerList, event.getHook());
+			return null;
+		}
+
+		private static void paginateTop(
+			List<String> lbTypes,
+			UsernameUuidStruct usernameUuidStruct,
+			JsonElement guildJson,
+			Player.Gamemode gamemode,
+			List<DataObject> playerList,
+			InteractionHook hook
+		) {
 			String levelStr = getLeaderboardTop(playerList, "level", usernameUuidStruct);
 			String networthStr = getLeaderboardTop(playerList, "networth", usernameUuidStruct);
 			String slayerStr = getLeaderboardTop(playerList, "slayer", usernameUuidStruct);
@@ -1227,30 +1254,54 @@ public class GuildSlashCommand extends SlashCommand {
 			double averageCata = playerList.stream().mapToDouble(m -> m.getDouble("catacombs", 0)).average().orElse(0);
 			double averageWeight = playerList.stream().mapToDouble(m -> m.getDouble("weight", 0)).average().orElse(0);
 
-			return defaultEmbed(guildName)
-				.setDescription(
-					"**Average Skyblock Level:** " +
-					roundAndFormat(averageLevel) +
-					"\n**Average Networth** " +
-					roundAndFormat(averageNetworth) +
-					"\n**Average Slayer XP:** " +
-					roundAndFormat(averageSlayer) +
-					"\n**Average Skills Level:** " +
-					roundAndFormat(averageSkills) +
-					"\n**Average Catacombs XP:** " +
-					roundAndFormat(averageCata) +
-					"\n**Average Weight:** " +
-					roundAndFormat(averageWeight)
-				)
-				.addField("Top 5 Skyblock Level", levelStr, true)
-				.addField("Top 5 Networth", networthStr, true)
-				.addBlankField(true)
-				.addField("Top 5 Slayer", slayerStr, true)
-				.addField("Top 5 Skills", skillsStr, true)
-				.addBlankField(true)
-				.addField("Top 5 Catacombs", cataStr, true)
-				.addField("Top 5 Weight", weightStr, true)
-				.addBlankField(true);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(hook.getInteraction().getUser()).showPageNumbers(false);
+			Instant lastUpdated = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+
+			paginateBuilder
+				.getExtras()
+				.setType(PaginatorExtras.PaginatorType.EMBED_PAGES)
+				.addEmbedPage(
+					defaultEmbed(higherDepth(guildJson, "name").getAsString())
+						.setDescription(
+							"**Average Skyblock Level:** " +
+							roundAndFormat(averageLevel) +
+							"\n**Average Networth** " +
+							roundAndFormat(averageNetworth) +
+							"\n**Average Slayer XP:** " +
+							roundAndFormat(averageSlayer) +
+							"\n**Average Skills Level:** " +
+							roundAndFormat(averageSkills) +
+							"\n**Average Catacombs XP:** " +
+							roundAndFormat(averageCata) +
+							"\n**Average Weight:** " +
+							roundAndFormat(averageWeight) +
+							(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
+						)
+						.addField("Top 5 Skyblock Level", levelStr, true)
+						.addField("Top 5 Networth", networthStr, true)
+						.addBlankField(true)
+						.addField("Top 5 Slayer", slayerStr, true)
+						.addField("Top 5 Skills", skillsStr, true)
+						.addBlankField(true)
+						.addField("Top 5 Catacombs", cataStr, true)
+						.addField("Top 5 Weight", weightStr, true)
+						.addBlankField(true)
+				);
+
+			if (lastUpdated == null || Duration.between(lastUpdated, Instant.now()).toDays() >= 1) {
+				paginateBuilder
+					.getExtras()
+					.addReactiveButtons(
+						getUpdateGuildButton(
+							lbTypes,
+							gamemode,
+							guildJson,
+							(action, out) -> paginateTop(lbTypes, usernameUuidStruct, guildJson, gamemode, out, action.event().getHook())
+						)
+					);
+			}
+
+			paginateBuilder.build().paginate(hook, 1);
 		}
 
 		private static String getLeaderboardTop(List<DataObject> playerList, String lbType, UsernameUuidStruct usernameUuidStruct) {
@@ -1299,15 +1350,7 @@ public class GuildSlashCommand extends SlashCommand {
 		protected void execute(SlashCommandEvent event) {
 			String guild = event.getOptionStr("guild");
 			if (guild != null) {
-				event.embed(
-					getStatistics(
-						null,
-						guild,
-						event.getOptionBoolean("key", false),
-						Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-						event
-					)
-				);
+				event.paginate(getTop(null, guild, Player.Gamemode.of(event.getOptionStr("gamemode", "all")), event));
 				return;
 			}
 
@@ -1315,20 +1358,12 @@ public class GuildSlashCommand extends SlashCommand {
 				return;
 			}
 
-			event.embed(
-				getStatistics(
-					event.player,
-					null,
-					event.getOptionBoolean("key", false),
-					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-					event
-				)
-			);
+			event.paginate(getTop(event.player, null, Player.Gamemode.of(event.getOptionStr("gamemode", "all")), event));
 		}
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData(name, "Get a guild's Skyblock statistics of slayer, skills, catacombs, and weight")
+			return new SubcommandData(name, "Get a guild's top leaderboards for various Skyblock statistics")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
 				.addOptions(
@@ -1336,8 +1371,100 @@ public class GuildSlashCommand extends SlashCommand {
 						.addChoice("All", "all")
 						.addChoice("Ironman", "ironman")
 						.addChoice("Stranded", "stranded")
-				)
-				.addOption(OptionType.BOOLEAN, "key", "If the API key for this server should be used for more updated results");
+				);
 		}
+	}
+
+	private static PaginatorExtras.ReactiveButton getUpdateGuildButton(
+		List<String> lbTypes,
+		Player.Gamemode gamemode,
+		JsonElement guildJson,
+		BiConsumer<PaginatorExtras.ReactiveButton.ReactiveAction, List<DataObject>> callback
+	) {
+		return new PaginatorExtras.ReactiveButton(
+			Button.primary("reactive_update_guild", "Update Guild"),
+			action -> {
+				if (hypixelGuildFetchQueue.size() >= 5) {
+					action
+						.event()
+						.replyEmbeds(errorEmbed("The guild update queue is full, please try again in a few seconds").build())
+						.setEphemeral(true)
+						.queue();
+					action.pagination();
+					return true;
+				}
+
+				String guildId = higherDepth(guildJson, "_id").getAsString();
+				if (hypixelGuildFetchQueue.stream().anyMatch(o -> o.equals(guildId))) {
+					action
+						.event()
+						.replyEmbeds(errorEmbed("This guild is currently updating, please try again in a few seconds").build())
+						.setEphemeral(true)
+						.queue();
+					action.pagination();
+					return true;
+				}
+
+				Instant lastUserRequest = cacheDatabase.getGuildCacheLastRequest(action.event().getUser().getId());
+				if (lastUserRequest != null && Duration.between(lastUserRequest, Instant.now()).toMinutes() < 15) {
+					action
+						.event()
+						.replyEmbeds(
+							errorEmbed(
+								"You can request another guild update <t:" +
+								lastUserRequest.plus(15, ChronoUnit.MINUTES).getEpochSecond() +
+								":R>"
+							)
+								.build()
+						)
+						.setEphemeral(true)
+						.queue();
+					action.pagination();
+					return true;
+				}
+
+				hypixelGuildFetchQueue.add(guildId);
+				List<String> members = streamJsonArray(higherDepth(guildJson, "members"))
+					.map(u -> higherDepth(u, "uuid", null))
+					.collect(Collectors.toCollection(ArrayList::new));
+
+				action
+					.event()
+					.editMessageEmbeds(
+						defaultEmbed("Loading")
+							.setDescription(
+								"Retrieving " +
+								members.size() +
+								" players. You are #" +
+								(hypixelGuildFetchQueue.indexOf(guildId) + 1) +
+								" in the queue. This message will be updated once complete."
+							)
+							.build()
+					)
+					.setComponents()
+					.queue(m -> {
+						List<DataObject> out = cacheDatabase.fetchGuild(
+							guildId,
+							members,
+							action.event().getUser().getId(),
+							lbTypes,
+							gamemode
+						);
+
+						if (out == null) {
+							m
+								.editOriginalEmbeds(
+									errorEmbed("There was an error while updating the guild, please try again in a few seconds").build()
+								)
+								.queue();
+						} else {
+							callback.accept(action, out);
+						}
+					});
+
+				return true;
+			},
+			true
+		);
 	}
 }

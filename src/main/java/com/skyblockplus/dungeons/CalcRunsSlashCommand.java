@@ -78,22 +78,26 @@ public class CalcRunsSlashCommand extends SlashCommand {
 							.addReactiveButtons(
 								new PaginatorExtras.ReactiveButton(
 									Button.primary("reactive_calc_runs_ring", "Calculate With Catacombs Expert Ring"),
-									paginator ->
-										paginator
+									action -> {
+										action
+											.paginator()
 											.getExtras()
 											.setEmbedPages(ringEmbed)
 											.toggleReactiveButton("reactive_calc_runs_ring", false)
-											.toggleReactiveButton("reactive_calc_runs_reg", true),
+											.toggleReactiveButton("reactive_calc_runs_reg", true);
+									},
 									true
 								),
 								new PaginatorExtras.ReactiveButton(
 									Button.primary("reactive_calc_runs_reg", "Calculate Without Catacombs Expert Ring"),
-									paginator ->
-										paginator
+									action -> {
+										action
+											.paginator()
 											.getExtras()
 											.setEmbedPages(regEmbed)
 											.toggleReactiveButton("reactive_calc_runs_ring", true)
-											.toggleReactiveButton("reactive_calc_runs_reg", false),
+											.toggleReactiveButton("reactive_calc_runs_reg", false);
+									},
 									false
 								)
 							)

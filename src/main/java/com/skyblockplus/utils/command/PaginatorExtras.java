@@ -20,11 +20,13 @@ package com.skyblockplus.utils.command;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 
@@ -192,19 +194,33 @@ public class PaginatorExtras {
 	@Data
 	public static class ReactiveButton {
 
-		private final Consumer<CustomPaginator> action;
+		/**
+		 * Return true if the action acknowledges the event (will not update the embed)
+		 */
+		private final Function<ReactiveAction, Boolean> action;
 		private final Button button;
 		private final boolean reactive;
 		private boolean visible;
 
 		public ReactiveButton(Button button) {
-			this.action = event -> {};
+			this.action = ignored -> false;
 			this.button = button;
 			this.reactive = false;
 			this.visible = true;
 		}
 
-		public ReactiveButton(Button button, Consumer<CustomPaginator> action, boolean visible) {
+		public ReactiveButton(Button button, Consumer<ReactiveAction> action, boolean visible) {
+			this(
+				button,
+				actionRecord -> {
+					action.accept(actionRecord);
+					return false;
+				},
+				visible
+			);
+		}
+
+		public ReactiveButton(Button button, Function<ReactiveAction, Boolean> action, boolean visible) {
 			this.action = action;
 			this.button = button;
 			this.reactive = true;
@@ -220,6 +236,15 @@ public class PaginatorExtras {
 		 */
 		public boolean isReacting() {
 			return visible && reactive;
+		}
+
+		public record ReactiveAction(CustomPaginator paginator, ButtonInteractionEvent event, int page) {
+			/**
+			 * Continue listening for pagination
+			 */
+			public void pagination() {
+				paginator.pagination(this);
+			}
 		}
 	}
 }

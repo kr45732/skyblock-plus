@@ -395,13 +395,7 @@ public class LeaderboardDatabase {
 		}
 	}
 
-	public List<DataObject> getCachedPlayers(
-		List<String> lbTypes,
-		Player.Gamemode mode,
-		List<String> uuids,
-		String hypixelKey,
-		SlashCommandEvent event
-	) {
+	public List<DataObject> getCachedPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids, SlashCommandEvent event) {
 		List<DataObject> out = new ArrayList<>();
 
 		String paramsStr = "?,".repeat(uuids.size());
@@ -410,14 +404,13 @@ public class LeaderboardDatabase {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"SELECT username, uuid, " +
+				"SELECT username, uuid, last_updated, " +
 				String.join(", ", lbTypes) +
 				" FROM " +
 				mode.toLeaderboardName() +
 				" WHERE uuid IN (" +
 				paramsStr +
-				")" +
-				(hypixelKey != null ? " AND last_updated > " + Instant.now().minus(15, ChronoUnit.MINUTES).toEpochMilli() : "")
+				")"
 			)
 		) {
 			for (int i = 0; i < uuids.size(); i++) {
@@ -443,100 +436,56 @@ public class LeaderboardDatabase {
 		}
 
 		if (!uuids.isEmpty()) {
-			List<Player.Profile> players = new ArrayList<>();
-			List<CompletableFuture<DataObject>> futuresList = new ArrayList<>();
+			event.embed(loadingEmbed().setDescription("Retrieving an additional " + uuids.size() + " players. This may take some time."));
 
-			if (hypixelKey != null) {
-				event.embed(
-					loadingEmbed().setDescription("Retrieving an additional " + uuids.size() + " players. This may take some time.")
-				);
-
-				for (String uuid : uuids) {
-					try {
-						if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
-							long timeTillReset = keyCooldownMap.get(hypixelKey).getTimeTillReset();
-							System.out.println("Sleeping for " + timeTillReset + " seconds");
-							TimeUnit.SECONDS.sleep(timeTillReset);
-						}
-					} catch (Exception ignored) {}
-
-					futuresList.add(
-						asyncSkyblockProfilesFromUuid(uuid, hypixelKey)
-							.thenApplyAsync(
-								hypixelResponse -> {
-									if (hypixelResponse.isValid()) {
-										Player.Profile player = new Player(
-											uuidToUsername(uuid).username(),
-											uuid,
-											hypixelResponse.response(),
-											false
-										)
-											.getSelectedProfile();
-
-										if (player.isValid()) {
-											players.add(player);
-
-											DataObject playerObj = DataObject
-												.empty()
-												.put("username", player.getUsername())
-												.put("uuid", uuid);
-											for (String lbType : lbTypes) {
-												playerObj.put(lbType, player.getHighestAmount(lbType, mode));
-											}
-											return playerObj;
-										}
-									}
-									return null;
-								},
-								executor
-							)
-					);
-				}
-			} else {
-				event.embed(
-					loadingEmbed()
-						.setDescription(
-							"Retrieving an additional " +
-							uuids.size() +
-							" players. This may take some time. Running this command with key set to true will yield more updated results."
-						)
-				);
-
-				for (String uuid : uuids) {
-					futuresList.add(
-						CompletableFuture.supplyAsync(
-							() -> {
-								Player.Profile player = new Player(uuid, false).getSelectedProfile();
-								if (player.isValid()) {
-									players.add(player);
-
-									DataObject playerObj = DataObject.empty().put("username", player.getUsername()).put("uuid", uuid);
-									for (String lbType : lbTypes) {
-										playerObj.put(lbType, player.getHighestAmount(lbType, mode));
-									}
-									return playerObj;
-								}
-								return null;
-							},
-							playerRequestExecutor
-						)
-					);
-				}
-			}
-
-			for (CompletableFuture<DataObject> future : futuresList) {
-				try {
-					DataObject getFuture = future.get();
-					if (getFuture != null) {
-						out.add(getFuture);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			insertIntoLeaderboard(players);
+			out.addAll(fetchPlayers(lbTypes, mode, uuids));
 		}
+
+		return out;
+	}
+
+	public List<DataObject> fetchPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids) {
+		List<DataObject> out = new ArrayList<>();
+
+		if (uuids.isEmpty()) {
+			return out;
+		}
+
+		List<Player.Profile> players = new ArrayList<>();
+		List<CompletableFuture<DataObject>> futuresList = new ArrayList<>();
+		for (String uuid : uuids) {
+			futuresList.add(
+				CompletableFuture.supplyAsync(
+					() -> {
+						Player.Profile player = new Player(uuid, false).getSelectedProfile();
+						if (player.isValid()) {
+							players.add(player);
+
+							DataObject playerObj = DataObject.empty().put("username", player.getUsername()).put("uuid", uuid);
+							for (String lbType : lbTypes) {
+								playerObj.put(lbType, player.getHighestAmount(lbType, mode));
+							}
+							return playerObj;
+						}
+						return null;
+					},
+					playerRequestExecutor
+				)
+			);
+		}
+
+		for (CompletableFuture<DataObject> future : futuresList) {
+			try {
+				DataObject getFuture = future.get();
+				if (getFuture != null) {
+					out.add(getFuture);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		insertIntoLeaderboard(players);
 
 		return out;
 	}

@@ -20,10 +20,12 @@ package com.skyblockplus.utils.database;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
 import static com.skyblockplus.utils.utils.Utils.*;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -33,6 +35,7 @@ import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.price.AuctionTracker;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.oauth.TokenData;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
@@ -44,14 +47,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CacheDatabase {
 
 	private static final Logger log = LoggerFactory.getLogger(CacheDatabase.class);
-	public final Map<String, List<Party>> partyCaches = new HashMap<>();
 	private final HikariDataSource dataSource;
+	public final Map<String, List<Party>> partyCaches = new HashMap<>();
 	private final Map<CacheId, Long> cacheIdToExpiry = new ConcurrentHashMap<>();
 
 	public CacheDatabase() {
@@ -373,6 +377,90 @@ public class CacheDatabase {
 		public boolean matches(CacheType cacheType, String id) {
 			return this.cacheType == cacheType && this.ids.contains(id.toLowerCase());
 		}
+	}
+
+	/**
+	 * @return timestamp of when guild was last cached or null if not present
+	 */
+	public Instant getGuildCacheRequestTime(String guildId) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT request_time FROM guild WHERE guild_id = ?")
+		) {
+			statement.setObject(1, guildId);
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					return Instant.ofEpochMilli(response.getLong("request_time"));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return timestamp of last guild update made by user or null if not present
+	 */
+	public Instant getGuildCacheLastRequest(String discordId) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT request_time FROM guild WHERE request_discord = ? ORDER BY request_time DESC LIMIT 1"
+			)
+		) {
+			statement.setObject(1, discordId);
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					return Instant.ofEpochMilli(response.getLong("request_time"));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public void cacheGuild(String guildId, JsonArray members, String discordId) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"INSERT INTO guild VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE request_time = VALUES(request_time), members = VALUES(members), request_discord = VALUES(request_discord)"
+			)
+		) {
+			statement.setString(1, guildId);
+			statement.setLong(2, Instant.now().toEpochMilli());
+			statement.setString(3, members.toString());
+			statement.setString(4, discordId);
+			statement.executeUpdate();
+		} catch (Exception ignored) {}
+	}
+
+	public List<DataObject> fetchGuild(
+		String guildId,
+		List<String> members,
+		String discordId,
+		List<String> lbTypes,
+		Player.Gamemode gamemode
+	) {
+		if (!hypixelGuildFetchQueue.contains(guildId)) {
+			hypixelGuildFetchQueue.add(guildId);
+		}
+
+		List<DataObject> out = null;
+		try {
+			out = guildRequestExecutor.submit(() -> leaderboardDatabase.fetchPlayers(lbTypes, gamemode, members)).get();
+		} catch (Exception ignored) {}
+
+		hypixelGuildFetchQueue.remove(guildId);
+
+		if (out != null) {
+			cacheGuild(guildId, gson.toJsonTree(members).getAsJsonArray(), discordId);
+		}
+
+		return out;
 	}
 
 	public enum CacheType {

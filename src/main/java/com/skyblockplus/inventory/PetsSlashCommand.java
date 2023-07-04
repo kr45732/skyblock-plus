@@ -100,24 +100,28 @@ public class PetsSlashCommand extends SlashCommand {
 					.addReactiveButtons(
 						new PaginatorExtras.ReactiveButton(
 							Button.primary("reactive_pets_show_missing", "Show Missing"),
-							paginator ->
-								paginator
+							action -> {
+								action
+									.paginator()
 									.getExtras()
 									.setStrings(missingPetItems)
 									.setEveryPageText("**Total Missing:** " + missingPetItems.size())
 									.toggleReactiveButton("reactive_pets_show_missing", false)
-									.toggleReactiveButton("reactive_pets_show_current", true),
+									.toggleReactiveButton("reactive_pets_show_current", true);
+							},
 							true
 						),
 						new PaginatorExtras.ReactiveButton(
 							Button.primary("reactive_pets_show_current", "Show Current"),
-							paginator ->
-								paginator
+							action -> {
+								action
+									.paginator()
 									.getExtras()
 									.setStrings(petItems)
 									.setEveryPageText(null)
 									.toggleReactiveButton("reactive_pets_show_missing", true)
-									.toggleReactiveButton("reactive_pets_show_current", false),
+									.toggleReactiveButton("reactive_pets_show_current", false);
+							},
 							false
 						)
 					);

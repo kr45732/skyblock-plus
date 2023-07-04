@@ -135,22 +135,26 @@ public class CoinsSlashCommand extends SlashCommand {
 				.addReactiveButtons(
 					new PaginatorExtras.ReactiveButton(
 						Button.primary("reactive_coins_history", "Show History"),
-						paginator ->
-							paginator
+						action -> {
+							action
+								.paginator()
 								.getExtras()
 								.setType(PaginatorExtras.PaginatorType.DEFAULT)
 								.toggleReactiveButton("reactive_coins_history", false)
-								.toggleReactiveButton("reactive_coins_current", true),
+								.toggleReactiveButton("reactive_coins_current", true);
+						},
 						true
 					),
 					new PaginatorExtras.ReactiveButton(
 						Button.primary("reactive_coins_current", "Show Current"),
-						paginator ->
-							paginator
+						action -> {
+							action
+								.paginator()
 								.getExtras()
 								.setType(PaginatorExtras.PaginatorType.EMBED_PAGES)
 								.toggleReactiveButton("reactive_coins_history", true)
-								.toggleReactiveButton("reactive_coins_current", false),
+								.toggleReactiveButton("reactive_coins_current", false);
+						},
 						false
 					)
 				);
