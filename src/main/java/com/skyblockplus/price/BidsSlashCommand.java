@@ -79,7 +79,7 @@ public class BidsSlashCommand extends SlashCommand {
 			long highestBid = higherDepth(bidsArr, "[" + (bidsArr.size() - 1) + "].amount").getAsLong();
 			if (duration.toMillis() > 0) {
 				auctionDesc = "Current bid: " + simplifyNumber(highestBid);
-				auctionDesc += " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
+				auctionDesc += " | Ending " + getRelativeTimestamp(endingAt);
 				auctionDesc +=
 					"\nHighest bidder: " + uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username();
 				for (int i = bidsArr.size() - 1; i >= 0; i--) {

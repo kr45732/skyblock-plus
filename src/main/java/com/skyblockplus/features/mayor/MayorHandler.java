@@ -127,11 +127,7 @@ public class MayorHandler {
 				}
 			}
 			eb.addField("Losing Mayors", ebStr.toString(), false);
-			eb.addField(
-				"Next Election",
-				"Opens <t:" + Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 217200000).getEpochSecond() + ":R>",
-				false
-			);
+			eb.addField("Next Election", "Opens " + getRelativeTimestamp(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 217200000), false);
 
 			embed = eb.build();
 			if (currentMayor.equals("Jerry")) {
@@ -205,11 +201,10 @@ public class MayorHandler {
 				year +
 				"\n**Total Votes:** " +
 				formatNumber(totalVotes) +
-				"\n**Closes:** <t:" +
-				Instant
-					.ofEpochMilli(YEAR_0 + 446400000L * (year == getSkyblockYear() ? getSkyblockYear() : getSkyblockYear() - 1) + 105600000)
-					.getEpochSecond() +
-				":R>"
+				"\n**Closes:** " +
+				getRelativeTimestamp(
+					YEAR_0 + 446400000L * (year == getSkyblockYear() ? getSkyblockYear() : getSkyblockYear() - 1) + 105600000
+				)
 			);
 			for (JsonElement curMayor : curMayors) {
 				StringBuilder perksStr = new StringBuilder();

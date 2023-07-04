@@ -20,6 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.features.mayor.MayorHandler.currentJerryMayor;
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
+import static com.skyblockplus.utils.utils.StringUtils.getRelativeTimestamp;
 import static com.skyblockplus.utils.utils.StringUtils.padStart;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.utils.Utils.getEmoji;
@@ -111,7 +112,7 @@ public class CalendarSlashCommand extends SlashCommand {
 		}
 		eb.addField(
 			"\uD83C\uDFB2 Bingo" + (bingoStart.isBefore(instantNow) ? " (Active)" : ""),
-			"**Start:** <t:" + bingoStart.getEpochSecond() + ":R>" + "\n**End:** <t:" + bingoEnd.getEpochSecond() + ":R>",
+			"**Start:** " + getRelativeTimestamp(bingoStart) + "\n**End:** " + getRelativeTimestamp(bingoEnd),
 			false
 		);
 
@@ -144,11 +145,10 @@ public class CalendarSlashCommand extends SlashCommand {
 			getEmoji(pets[summerZooStart.isBefore(winterZooStart) ? index : (index + 1)]) +
 			" Traveling Zoo" +
 			((summerZooStart.isBefore(winterZooStart) ? summerZooStart : winterZooStart).isBefore(instantNow) ? " (Active)" : ""),
-			"**Open:** <t:" +
-			(summerZooStart.isBefore(winterZooStart) ? summerZooStart : winterZooStart).getEpochSecond() +
-			":R>\n**Close:** <t:" +
-			(summerZooStart.isBefore(winterZooStart) ? summerZooEnd : winterZooEnd).getEpochSecond() +
-			":R>",
+			"**Open:** " +
+			getRelativeTimestamp(summerZooStart.isBefore(winterZooStart) ? summerZooStart : winterZooStart) +
+			"\n**Close:** " +
+			getRelativeTimestamp(summerZooStart.isBefore(winterZooStart) ? summerZooEnd : winterZooEnd),
 			false
 		);
 
@@ -156,7 +156,7 @@ public class CalendarSlashCommand extends SlashCommand {
 		Instant winterClose = Instant.ofEpochMilli(YEAR_0 + getSkyblockYear() * YEAR_MS);
 		eb.addField(
 			"❄️ Winter Island" + (winterOpen.isBefore(instantNow) ? " (Active)" : ""),
-			"\n**Open:** <t:" + winterOpen.getEpochSecond() + ":R>" + "\n**Close:** <t:" + winterClose.getEpochSecond() + ":R>",
+			"\n**Open:** " + getRelativeTimestamp(winterOpen) + "\n**Close:** " + getRelativeTimestamp(winterClose),
 			false
 		);
 
@@ -168,7 +168,7 @@ public class CalendarSlashCommand extends SlashCommand {
 		}
 		eb.addField(
 			"<:jerry:940083649318125578> Defend Jerry's Workshop" + (jerryOpen.isBefore(instantNow) ? " (Active)" : ""),
-			"\n**Start:** <t:" + jerryOpen.getEpochSecond() + ":R>" + "\n**End:** <t:" + jerryClose.getEpochSecond() + ":R>",
+			"\n**Start:** " + getRelativeTimestamp(jerryOpen) + "\n**End:** " + getRelativeTimestamp(jerryClose),
 			false
 		);
 
@@ -183,7 +183,7 @@ public class CalendarSlashCommand extends SlashCommand {
 		}
 		eb.addField(
 			"\uD83D\uDC20 Spooky Fishing" + (spookyFishingStart.isBefore(instantNow) ? " (Active)" : ""),
-			"\n**Start:** <t:" + spookyFishingStart.getEpochSecond() + ":R>" + "\n**End:** <t:" + spookyFishingEnd.getEpochSecond() + ":R>",
+			"\n**Start:** " + getRelativeTimestamp(spookyFishingStart) + "\n**End:** " + getRelativeTimestamp(spookyFishingEnd),
 			false
 		);
 
@@ -195,7 +195,7 @@ public class CalendarSlashCommand extends SlashCommand {
 		}
 		eb.addField(
 			"\uD83C\uDF83 Spooky Festival" + (spookyStart.isBefore(instantNow) ? " (Active)" : ""),
-			"\n**Start:** <t:" + spookyStart.getEpochSecond() + ":R>" + "\n**End:** <t:" + spookyEnd.getEpochSecond() + ":R>",
+			"\n**Start:** " + getRelativeTimestamp(spookyStart) + "\n**End:** " + getRelativeTimestamp(spookyEnd),
 			false
 		);
 
@@ -207,7 +207,7 @@ public class CalendarSlashCommand extends SlashCommand {
 		}
 		eb.addField(
 			"\uD83C\uDF70 New Year Celebration" + (newYearStart.isBefore(instantNow) ? " (Active)" : ""),
-			"**Start:** <t:" + newYearStart.getEpochSecond() + ":R>" + "" + "\n**End:** <t:" + newYearEnd.getEpochSecond() + ":R>",
+			"**Start:** " + getRelativeTimestamp(newYearStart) + "\n**End:** " + getRelativeTimestamp(newYearEnd),
 			false
 		);
 
@@ -234,7 +234,7 @@ public class CalendarSlashCommand extends SlashCommand {
 
 			eb.addField(
 				"\uD83C\uDFA3 Fishing Festival" + (fishingStart.isBefore(instantNow) ? " (Active)" : ""),
-				"**Start:** <t:" + fishingStart.getEpochSecond() + ":R>" + "\n**End:** <t:" + fishingEnd.getEpochSecond() + ":R>",
+				"**Start:** " + getRelativeTimestamp(fishingStart) + "\n**End:** " + getRelativeTimestamp(fishingEnd),
 				false
 			);
 		}
@@ -287,19 +287,16 @@ public class CalendarSlashCommand extends SlashCommand {
 
 		eb.addField(
 			"Miscellaneous",
-			"\uD83D\uDD75️ **Dark Auction:** <t:" +
-			(
+			"\uD83D\uDD75️ **Dark Auction:** " +
+			getRelativeTimestamp(
 				nowDateTime.withMinute(55).toInstant().isBefore(instantNow)
-					? nowDateTime.withMinute(55).plusHours(1).toInstant().getEpochSecond()
-					: nowDateTime.withMinute(55).toInstant().getEpochSecond()
+					? nowDateTime.withMinute(55).plusHours(1).toInstant()
+					: nowDateTime.withMinute(55).toInstant()
 			) +
-			":R>" +
-			"\n⭐ **Cult Of Fallen Star:** <t:" +
-			cultStart.getEpochSecond() +
-			":R>" +
-			"\n\uD83E\uDE99 **Bank Interest:** <t:" +
-			bankStart.getEpochSecond() +
-			":R>",
+			"\n⭐ **Cult Of Fallen Star:** " +
+			getRelativeTimestamp(cultStart) +
+			"\n\uD83E\uDE99 **Bank Interest:** " +
+			getRelativeTimestamp(bankStart),
 			false
 		);
 

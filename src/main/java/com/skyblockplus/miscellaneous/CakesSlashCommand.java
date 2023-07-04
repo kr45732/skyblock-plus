@@ -21,6 +21,7 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.StringUtils.getRelativeTimestamp;
 import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
 import com.google.gson.JsonElement;
@@ -73,9 +74,9 @@ public class CakesSlashCommand extends SlashCommand {
 							.append(getEmoji(cakeNameToId.get(cakeName)))
 							.append(" ")
 							.append(capitalizeString(cakeName.split("cake_")[1].replace("_", " ")))
-							.append(": expires <t:")
-							.append(Instant.ofEpochMilli(higherDepth(cake, "expire_at").getAsLong()).getEpochSecond())
-							.append(":R>\n");
+							.append(": expires ")
+							.append(getRelativeTimestamp(higherDepth(cake, "expire_at").getAsLong()))
+							.append("\n");
 						cakeNameToId.remove(cakeName);
 					}
 				}

@@ -120,9 +120,8 @@ public class PriceSlashCommand extends SlashCommand {
 				":** `/viewauction " +
 				higherDepth(auction, "uuid").getAsString() +
 				"`" +
-				"\n**Ends:** <t:" +
-				Instant.ofEpochMilli(higherDepth(auction, "end_t").getAsLong()).getEpochSecond() +
-				":R>";
+				"\n**Ends:** " +
+				getRelativeTimestamp(higherDepth(auction, "end_t").getAsLong());
 
 			eb.addField(
 				getEmoji(higherDepth(auction, "item_id").getAsString()) +

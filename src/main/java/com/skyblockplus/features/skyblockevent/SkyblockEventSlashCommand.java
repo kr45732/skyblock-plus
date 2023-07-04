@@ -266,7 +266,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 				Instant eventInstantEnding = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 
-				eb.addField("End Date", "Ends <t:" + eventInstantEnding.getEpochSecond() + ":R>", false);
+				eb.addField("End Date", "Ends " + getRelativeTimestamp(eventInstantEnding), false);
 
 				StringBuilder ebString = new StringBuilder();
 				for (Map.Entry<String, JsonElement> prize : higherDepth(currentSettings, "prizeMap").getAsJsonObject().entrySet()) {
@@ -606,9 +606,8 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			paginateBuilder
 				.getExtras()
 				.setEveryPageText(
-					"**Last Updated:** <t:" +
-					currentGuild.eventLastUpdated.getEpochSecond() +
-					":R>" +
+					"**Last Updated:** " +
+					getRelativeTimestamp(currentGuild.eventLastUpdated) +
 					(currentGuild.eventCurrentlyUpdating ? " (currently updating)" : "") +
 					"\n"
 				)

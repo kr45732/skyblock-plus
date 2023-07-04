@@ -21,6 +21,7 @@ package com.skyblockplus.features.jacob;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.miscellaneous.CalendarSlashCommand.YEAR_0;
 import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
+import static com.skyblockplus.utils.utils.StringUtils.getRelativeTimestamp;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;
@@ -74,7 +75,7 @@ public class JacobHandler {
 						try {
 							MessageEmbed embed = defaultEmbed("Jacob's Contest")
 								.setDescription(
-									"The next farming contest is starting <t:" + nextContest.getTimeInstant().getEpochSecond() + ":R>\n"
+									"The next farming contest is starting " + getRelativeTimestamp(nextContest.getTimeInstant()) + "\n"
 								)
 								.addField("Crops", nextContest.getCropsFormatted(), false)
 								.build();

@@ -24,8 +24,7 @@ import static com.skyblockplus.utils.utils.HypixelUtils.calculateWithTaxes;
 import static com.skyblockplus.utils.utils.HypixelUtils.isVanillaItem;
 import static com.skyblockplus.utils.utils.JsonUtils.getAveragePriceJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
-import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
-import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
@@ -51,7 +50,7 @@ public class FlipsSlashCommand extends SlashCommand {
 	public static EmbedBuilder getFlips() {
 		EmbedBuilder eb = defaultEmbed("Flips");
 		if (underBinJsonLastUpdated != null) {
-			eb.appendDescription("**Next Update:** <t:" + underBinJsonLastUpdated.plusSeconds(60).getEpochSecond() + ":R>");
+			eb.appendDescription("**Next Update:** " + getRelativeTimestamp(underBinJsonLastUpdated.plusSeconds(60)));
 		}
 		eb.appendDescription("\n**Live Updates:** [**Join**](https://discord.gg/GZWZbcxpv4)");
 

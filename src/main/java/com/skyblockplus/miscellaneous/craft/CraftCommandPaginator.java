@@ -83,9 +83,9 @@ public class CraftCommandPaginator {
 				roundProgress(score / maxScore) +
 				"\n**Price:** " +
 				roundAndFormat(Math.max(startingBid, highestBid)) +
-				"\n**Ends:** <t:" +
-				Instant.ofEpochMilli(higherDepth(item, "end_t").getAsLong()).getEpochSecond() +
-				":R>\n**" +
+				"\n**Ends:** " +
+				getRelativeTimestamp(higherDepth(item, "end_t").getAsLong()) +
+				"\n**" +
 				(isBin ? "Bin" : "Auction") +
 				":** `/viewauction " +
 				higherDepth(item, "uuid").getAsString() +
@@ -159,9 +159,9 @@ public class CraftCommandPaginator {
 					roundProgress(higherDepth(item, "score").getAsDouble() / maxScore) +
 					"\n**Price:** " +
 					roundAndFormat(Math.max(startingBid, highestBid)) +
-					"\n**Ends:** <t:" +
-					Instant.ofEpochMilli(higherDepth(item, "end_t").getAsLong()).getEpochSecond() +
-					":R>\n**" +
+					"\n**Ends:** " +
+					getRelativeTimestamp(higherDepth(item, "end_t").getAsLong()) +
+					"\n**" +
 					(isBin ? "Bin" : "Auction") +
 					":** `/viewauction " +
 					higherDepth(item, "uuid").getAsString() +

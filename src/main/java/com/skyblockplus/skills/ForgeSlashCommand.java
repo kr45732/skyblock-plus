@@ -21,8 +21,7 @@ package com.skyblockplus.skills;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.JsonUtils.getInternalJsonMappings;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
-import static com.skyblockplus.utils.utils.StringUtils.idToName;
-import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
@@ -81,21 +80,21 @@ public class ForgeSlashCommand extends SlashCommand {
 					getEmoji(itemId) + " " + idToName(itemId),
 					"Slot: " +
 					higherDepth(forgeItem, "slot", 0) +
-					"\nEnd: <t:" +
-					Instant
-						.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong())
-						.plusSeconds(
-							(long) (
-								(
-									itemId.equals("AMMONITE;4")
-										? 1036800
-										: higherDepth(getInternalJsonMappings(), itemId + ".forge").getAsLong()
-								) *
-								bonus
+					"\nEnd: " +
+					getRelativeTimestamp(
+						Instant
+							.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong())
+							.plusSeconds(
+								(long) (
+									(
+										itemId.equals("AMMONITE;4")
+											? 1036800
+											: higherDepth(getInternalJsonMappings(), itemId + ".forge").getAsLong()
+									) *
+									bonus
+								)
 							)
-						)
-						.getEpochSecond() +
-					":R>",
+					),
 					false
 				);
 			}

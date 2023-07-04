@@ -468,7 +468,7 @@ public class GuildSlashCommand extends SlashCommand {
 				lbTypeFormatted +
 				":** " +
 				formatLeaderboardAmount(total / paginateBuilder.size()) +
-				(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "");
+				(lastUpdated != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdated) : "");
 			if (usernameUuidStruct != null) {
 				ebStr +=
 					"\n**Player:** " +
@@ -706,7 +706,7 @@ public class GuildSlashCommand extends SlashCommand {
 				.setEveryPageText(
 					"**Total Missing Requirements:** " +
 					paginateBuilder.size() +
-					(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
+					(lastUpdated != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdated) : "")
 				);
 
 			if (lastUpdated == null || Duration.between(lastUpdated, Instant.now()).toDays() >= 1) {
@@ -1143,7 +1143,7 @@ public class GuildSlashCommand extends SlashCommand {
 				.setEveryPageText(
 					"**Total rank changes:** " +
 					totalChange +
-					(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
+					(lastUpdated != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdated) : "")
 				);
 
 			if (lastUpdated == null || Duration.between(lastUpdated, Instant.now()).toDays() >= 1) {
@@ -1275,7 +1275,7 @@ public class GuildSlashCommand extends SlashCommand {
 							roundAndFormat(averageCata) +
 							"\n**Average Weight:** " +
 							roundAndFormat(averageWeight) +
-							(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
+							(lastUpdated != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdated) : "")
 						)
 						.addField("Top 5 Skyblock Level", levelStr, true)
 						.addField("Top 5 Networth", networthStr, true)
@@ -1411,9 +1411,7 @@ public class GuildSlashCommand extends SlashCommand {
 						.event()
 						.replyEmbeds(
 							errorEmbed(
-								"You can request another guild update <t:" +
-								lastUserRequest.plus(15, ChronoUnit.MINUTES).getEpochSecond() +
-								":R>"
+								"You can request another guild update " + getRelativeTimestamp(lastUserRequest.plus(15, ChronoUnit.MINUTES))
 							)
 								.build()
 						)

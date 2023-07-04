@@ -150,7 +150,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 							desc = "Current bid: " + simplifyNumber(highestBid);
 							totalPendingValue += highestBid;
 						}
-						desc += " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
+						desc += " | Ending " + getRelativeTimestamp(endingAt);
 					} else {
 						if (highestBid >= startingBid) {
 							desc = "Auction sold for " + simplifyNumber(highestBid) + " coins";
@@ -244,7 +244,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 							auction = "Current bid: " + simplifyNumber(highestBid) + " coins";
 							totalPendingValue += highestBid;
 						}
-						auction += " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
+						auction += " | Ending " + getRelativeTimestamp(endingAt);
 						eb.addField("Status", auction, false);
 						eb.addField("Command", "`/viewauction " + higherDepth(currentAuction, "uuid").getAsString() + "`", false);
 					} else {

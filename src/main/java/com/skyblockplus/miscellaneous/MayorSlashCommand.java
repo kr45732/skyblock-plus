@@ -20,6 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Constants.mayorNameToEmoji;
+import static com.skyblockplus.utils.utils.StringUtils.getRelativeTimestamp;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;
@@ -84,15 +85,10 @@ public class MayorSlashCommand extends SlashCommand {
 			}
 			eb.addField(
 				mayorNameToEmoji.get(mayorNames[mayorIndex].toUpperCase()) + " " + mayorNames[mayorIndex],
-				"Election Opens: <t:" +
-				Instant
-					.ofEpochMilli((CalendarSlashCommand.YEAR_0 + CalendarSlashCommand.YEAR_MS * (i - 1)) + newYearToElectionOpen)
-					.getEpochSecond() +
-				":R>\nElection Closes: <t:" +
-				Instant
-					.ofEpochMilli((CalendarSlashCommand.YEAR_0 + CalendarSlashCommand.YEAR_MS * (i)) + newYearToElectionClose)
-					.getEpochSecond() +
-				":R>",
+				"Election Opens: " +
+				getRelativeTimestamp((CalendarSlashCommand.YEAR_0 + CalendarSlashCommand.YEAR_MS * (i - 1)) + newYearToElectionOpen) +
+				"\nElection Closes: " +
+				getRelativeTimestamp((CalendarSlashCommand.YEAR_0 + CalendarSlashCommand.YEAR_MS * (i)) + newYearToElectionClose),
 				false
 			);
 		}

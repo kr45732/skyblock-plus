@@ -409,9 +409,9 @@ public class SkyblockEventHandler {
 						eb.setDescription("The event must be at least an hour and at most 4 weeks (672 hours). Please try again.");
 						event.editMessageEmbeds(eb.build()).queue();
 					} else {
-						long endingTimeSeconds = Instant.now().plus(eventDuration, ChronoUnit.HOURS).getEpochSecond();
-						eventSettings.setTimeEndingSeconds("" + endingTimeSeconds);
-						eb.addField("End Date", "Ends <t:" + endingTimeSeconds + ":R>", false);
+						Instant endingTime = Instant.now().plus(eventDuration, ChronoUnit.HOURS);
+						eventSettings.setTimeEndingSeconds("" + endingTime.getEpochSecond());
+						eb.addField("End Date", "Ends " + getRelativeTimestamp(endingTime), false);
 						event.editMessage(getGenericConfigMessage()).queue();
 					}
 				} catch (Exception e) {

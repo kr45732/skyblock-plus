@@ -20,6 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.cropNameToEmoji;
 import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.StringUtils.getRelativeTimestamp;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
@@ -71,11 +72,7 @@ public class JacobSlashCommand extends SlashCommand {
 				.stream()
 				.filter(c -> c.getCrops().stream().anyMatch(thisCrop -> thisCrop.equals(finalCrop)))
 				.collect(Collectors.toCollection(ArrayList::new))) {
-			extras.addEmbedField(
-				"Contest",
-				"<t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n" + contest.getCropsFormatted(),
-				true
-			);
+			extras.addEmbedField("Contest", getRelativeTimestamp(contest.getTimeInstant()) + "\n" + contest.getCropsFormatted(), true);
 		}
 		for (int i = 0; i < 3 - extras.getEmbedFields().size() % 3; i++) {
 			extras.addBlankField(true);

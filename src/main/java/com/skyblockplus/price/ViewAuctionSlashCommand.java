@@ -86,9 +86,9 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 
 		if (duration.toMillis() > 0) {
 			if (bin) {
-				ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending <t:" + endingAt.getEpochSecond() + ":R>";
+				ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending " + getRelativeTimestamp(endingAt);
 			} else {
-				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
+				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending " + getRelativeTimestamp(endingAt);
 				ebStr +=
 					bidsArr.size() > 0
 						? "\n**Highest bidder:** " +

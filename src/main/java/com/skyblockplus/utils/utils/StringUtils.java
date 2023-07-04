@@ -26,6 +26,7 @@ import com.google.gson.JsonElement;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -301,5 +302,13 @@ public class StringUtils {
 
 	public static String profileNameToEmoji(String profileName) {
 		return profileNameToEmoji.getOrDefault(profileName.toLowerCase(), null);
+	}
+
+	public static String getRelativeTimestamp(Instant instant) {
+		return "<t:" + instant.getEpochSecond() + ":R>";
+	}
+
+	public static String getRelativeTimestamp(long epochMilli) {
+		return getRelativeTimestamp(Instant.ofEpochMilli(epochMilli));
 	}
 }

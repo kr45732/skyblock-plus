@@ -122,9 +122,8 @@ public class AuctionTracker {
 																		finalItemName +
 																		"\n**Sold for:** " +
 																		soldFor +
-																		"\n**Ended:** <t:" +
-																		endedAt +
-																		":R>"
+																		"\n**Ended:** " +
+																		getRelativeTimestamp(endedAt)
 																	)
 																	.build()
 															)
