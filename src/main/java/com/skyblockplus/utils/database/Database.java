@@ -158,8 +158,7 @@ public class Database {
 	}
 
 	public String getServerHypixelApiKey(String serverId) {
-		Object response = settingsService.getServerHypixelApiKey(serverId).getBody();
-		return response != null ? (String) response : null;
+		return settingsService.getServerHypixelApiKey(serverId).getBody();
 	}
 
 	public int setServerHypixelApiKey(String serverId, String newKey) {
@@ -332,7 +331,7 @@ public class Database {
 	private LinkedAccount getBy(String type, String value) {
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account WHERE " + type + " = ?")
+			PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account WHERE " + type + " = ? LIMIT 1")
 		) {
 			statement.setString(1, value);
 			try (ResultSet response = statement.executeQuery()) {

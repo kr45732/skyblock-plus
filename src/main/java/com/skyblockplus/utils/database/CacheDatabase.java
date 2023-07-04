@@ -98,7 +98,7 @@ public class CacheDatabase {
 		if (cacheEntry != null && cacheEntry.getValue() > Instant.now().toEpochMilli()) {
 			try (
 				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement("SELECT data FROM cache WHERE id = ?")
+				PreparedStatement statement = connection.prepareStatement("SELECT data FROM cache WHERE id = ? LIMIT 1")
 			) {
 				statement.setString(1, cacheEntry.getKey().getGeneratedId());
 				try (ResultSet response = statement.executeQuery()) {
@@ -241,7 +241,10 @@ public class CacheDatabase {
 			return;
 		}
 
-		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM ah_track")) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT data FROM ah_track LIMIT 1")
+		) {
 			try (ResultSet response = statement.executeQuery()) {
 				response.next();
 				JsonObject data = JsonParser.parseString(response.getString("data")).getAsJsonObject();
@@ -266,7 +269,10 @@ public class CacheDatabase {
 			return;
 		}
 
-		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM commands")) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT data FROM commands LIMIT 1")
+		) {
 			try (ResultSet response = statement.executeQuery()) {
 				response.next();
 				Map<String, Integer> commandUsage = gson.fromJson(
@@ -286,7 +292,10 @@ public class CacheDatabase {
 			return;
 		}
 
-		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM jacob")) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT data FROM jacob LIMIT 1")
+		) {
 			try (ResultSet response = statement.executeQuery()) {
 				response.next();
 				JacobHandler.setJacobData(gson.fromJson(response.getString("data"), JacobData.class));
@@ -302,7 +311,10 @@ public class CacheDatabase {
 			return;
 		}
 
-		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM tokens")) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT data FROM tokens LIMIT 1")
+		) {
 			try (ResultSet response = statement.executeQuery()) {
 				response.next();
 				oAuthClient
@@ -321,7 +333,10 @@ public class CacheDatabase {
 		}
 
 		List<String> toDeleteIds = new ArrayList<>();
-		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM party")) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT guild_id, data FROM party")
+		) {
 			try (ResultSet response = statement.executeQuery()) {
 				Type partyListType = new TypeToken<List<Party>>() {}.getType();
 				while (response.next()) {
@@ -385,7 +400,7 @@ public class CacheDatabase {
 	public Instant getGuildCacheRequestTime(String guildId) {
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT request_time FROM guild WHERE guild_id = ?")
+			PreparedStatement statement = connection.prepareStatement("SELECT request_time FROM guild WHERE guild_id = ? LIMIT 1")
 		) {
 			statement.setObject(1, guildId);
 			try (ResultSet response = statement.executeQuery()) {
