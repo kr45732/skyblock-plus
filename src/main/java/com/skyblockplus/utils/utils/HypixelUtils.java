@@ -22,7 +22,7 @@ import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Constants.GUILD_EXP_TO_LEVEL;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
-import static com.skyblockplus.utils.utils.StringUtils.escapeUsername;
+import static com.skyblockplus.utils.utils.StringUtils.escapeText;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -48,7 +48,7 @@ public class HypixelUtils {
 			}
 
 			if (response.get("socialMedia.links.DISCORD") == null) {
-				return new DiscordInfoStruct(escapeUsername(usernameUuidStruct.username()) + " is not linked on Hypixel");
+				return new DiscordInfoStruct(escapeText(usernameUuidStruct.username()) + " is not linked on Hypixel");
 			}
 
 			String discord = response.get("socialMedia.links.DISCORD").getAsString();

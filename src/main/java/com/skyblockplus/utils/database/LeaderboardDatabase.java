@@ -400,8 +400,33 @@ public class LeaderboardDatabase {
 	}
 
 	public List<DataObject> getCachedPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids, SlashCommandEvent event) {
-		List<DataObject> out = new ArrayList<>();
+		if (uuids.isEmpty()) {
+			return new ArrayList<>();
+		}
 
+		List<DataObject> out = loadCachedPlayers(lbTypes, mode, uuids);
+
+		if (out.size() != uuids.size()) {
+			List<String> loadedUuids = out.stream().map(e -> e.getString("uuid")).toList();
+			List<String> remainingUuids = uuids.stream().filter(e -> !loadedUuids.contains(e)).toList();
+
+			event.embed(
+				defaultEmbed("Loading")
+					.setDescription("Retrieving an additional " + remainingUuids.size() + " players. This may take some time.")
+			);
+
+			out.addAll(fetchPlayers(lbTypes, mode, remainingUuids));
+		}
+
+		return out;
+	}
+
+	public List<DataObject> loadCachedPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids) {
+		if (uuids.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		List<DataObject> out = new ArrayList<>();
 		String paramsStr = "?,".repeat(uuids.size());
 		paramsStr = paramsStr.endsWith(",") ? paramsStr.substring(0, paramsStr.length() - 1) : paramsStr;
 
@@ -431,20 +456,10 @@ public class LeaderboardDatabase {
 					}
 
 					out.add(playerObj);
-					uuids.remove(uuid);
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		}
-
-		if (!uuids.isEmpty()) {
-			event.embed(
-				defaultEmbed("Loading").setDescription("Retrieving an additional " + uuids.size() + " players. This may take some time.")
-			);
-
-			out.addAll(fetchPlayers(lbTypes, mode, uuids));
 		}
 
 		return out;

@@ -183,7 +183,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		for (int i = 0; i < eventMembers.size(); i++) {
 			EventMember eventMember = eventMembers.get(i);
 
-			String ebStr = "`" + (i + 1) + ")` " + escapeUsername(eventMember.getUsername()) + " | ";
+			String ebStr = "`" + (i + 1) + ")` " + escapeText(eventMember.getUsername()) + " | ";
 			if (eventMember.getFailCause() == null) {
 				ebStr += "+" + formatNumber(eventMember.parseStartingAmount());
 			} else {
@@ -717,7 +717,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 							")` " +
 							higherDepth(eventSettings, "prizeMap." + prizeListKeys.get(i)).getAsString() +
 							" - " +
-							(i < eventLeaderboardList.size() ? escapeUsername(eventLeaderboardList.get(i).getUsername()) : " None")
+							(i < eventLeaderboardList.size() ? escapeText(eventLeaderboardList.get(i).getUsername()) : " None")
 						);
 					} catch (Exception ignored) {}
 				}

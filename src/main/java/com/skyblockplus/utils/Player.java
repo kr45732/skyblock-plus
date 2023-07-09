@@ -389,7 +389,7 @@ public class Player {
 		}
 
 		public String getEscapedUsername() {
-			return escapeUsername(username);
+			return escapeText(username);
 		}
 
 		public String getUuid() {
@@ -1549,7 +1549,7 @@ public class Player {
 		}
 
 		public EmbedBuilder defaultPlayerEmbed(String extra) {
-			return defaultEmbed(escapeUsername(getUsername()) + getSymbol(" ") + extra, skyblockStatsLink()).setThumbnail(getAvatarUrl());
+			return defaultEmbed(escapeText(getUsername()) + getSymbol(" ") + extra, skyblockStatsLink()).setThumbnail(getAvatarUrl());
 		}
 
 		public CustomPaginator.Builder defaultPlayerPaginator(User... users) {
@@ -1561,7 +1561,7 @@ public class Player {
 				.updateExtras(extra ->
 					extra
 						.setType(type)
-						.setEveryPageTitle(escapeUsername(getUsername()) + getSymbol(" "))
+						.setEveryPageTitle(escapeText(getUsername()) + getSymbol(" "))
 						.setEveryPageThumbnail(getAvatarUrl())
 						.setEveryPageTitleUrl(skyblockStatsLink())
 				);

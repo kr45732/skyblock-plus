@@ -105,7 +105,7 @@ public class StringUtils {
 		return mcColorPattern.matcher(str.replace("\u00A7ka", "")).replaceAll("");
 	}
 
-	public static String escapeUsername(String username) {
+	public static String escapeText(String username) {
 		return username.replace("_", "\\_");
 	}
 

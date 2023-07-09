@@ -562,7 +562,7 @@ public class ApplyUser {
 					event
 						.getHook()
 						.editOriginal(
-							escapeUsername(playerUsername) +
+							escapeText(playerUsername) +
 							" (<@" +
 							applyingUserId +
 							">) was " +
@@ -630,7 +630,7 @@ public class ApplyUser {
 							.sendMessageEmbeds(
 								defaultEmbed("Waiting for invite")
 									.setDescription(
-										"**Player:** " + escapeUsername(playerUsername) + "\n**Discord:** <@" + applyingUserId + ">"
+										"**Player:** " + escapeText(playerUsername) + "\n**Discord:** <@" + applyingUserId + ">"
 									)
 									.build()
 							)
@@ -691,7 +691,7 @@ public class ApplyUser {
 	}
 
 	private EmbedBuilder defaultPlayerEmbed() {
-		return defaultEmbed(escapeUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUuid, playerProfileName))
+		return defaultEmbed(escapeText(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUuid, playerProfileName))
 			.setThumbnail(getAvatarUrl(playerUuid));
 	}
 }

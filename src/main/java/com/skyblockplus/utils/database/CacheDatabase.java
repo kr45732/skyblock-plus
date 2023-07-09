@@ -438,23 +438,25 @@ public class CacheDatabase {
 		return null;
 	}
 
-	public void cacheGuild(String guildId, JsonArray members, String discordId) {
+	public void cacheGuild(String guildId, String guildName, JsonArray members, String discordId) {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"INSERT INTO guild VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE request_time = VALUES(request_time), members = VALUES(members), request_discord = VALUES(request_discord)"
+				"INSERT INTO guild VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE guild_name = VALUES(guild_name), request_time = VALUES(request_time), members = VALUES(members), request_discord = VALUES(request_discord)"
 			)
 		) {
 			statement.setString(1, guildId);
-			statement.setLong(2, Instant.now().toEpochMilli());
-			statement.setString(3, members.toString());
-			statement.setString(4, discordId);
+			statement.setString(2, guildName);
+			statement.setLong(3, Instant.now().toEpochMilli());
+			statement.setString(4, members.toString());
+			statement.setString(5, discordId);
 			statement.executeUpdate();
 		} catch (Exception ignored) {}
 	}
 
 	public List<DataObject> fetchGuild(
 		String guildId,
+		String guildName,
 		List<String> members,
 		String discordId,
 		List<String> lbTypes,
@@ -472,7 +474,29 @@ public class CacheDatabase {
 		hypixelGuildFetchQueue.remove(guildId);
 
 		if (out != null) {
-			cacheGuild(guildId, gson.toJsonTree(members).getAsJsonArray(), discordId);
+			cacheGuild(guildId, guildName, gson.toJsonTree(members).getAsJsonArray(), discordId);
+		}
+
+		return out;
+	}
+
+	public Map<String, List<String>> getGuildCaches() {
+		Map<String, List<String>> out = new HashMap<>();
+
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT guild_name, members FROM guild")
+		) {
+			try (ResultSet response = statement.executeQuery()) {
+				while (response.next()) {
+					out.put(
+						response.getString("guild_name"),
+						gson.fromJson(response.getString("members"), new TypeToken<List<String>>() {}.getType())
+					);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return out;

@@ -47,7 +47,7 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 	}
 
 	public String escapeUsername() {
-		return StringUtils.escapeUsername(username);
+		return StringUtils.escapeText(username);
 	}
 
 	public boolean isRateLimited() {
