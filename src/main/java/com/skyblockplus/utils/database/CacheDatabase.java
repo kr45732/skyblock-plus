@@ -442,7 +442,7 @@ public class CacheDatabase {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"INSERT INTO guild VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE guild_name = VALUES(guild_name), request_time = VALUES(request_time), members = VALUES(members), request_discord = VALUES(request_discord)"
+				"INSERT INTO guild (guild_id, guild_name, request_time, members, request_discord) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE guild_name = VALUES(guild_name), request_time = VALUES(request_time), members = VALUES(members), request_discord = VALUES(request_discord)"
 			)
 		) {
 			statement.setString(1, guildId);
