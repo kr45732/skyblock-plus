@@ -71,6 +71,10 @@ public class Database {
 		return settingsService.getAllServerSettings();
 	}
 
+	public ServerSettingsModel getServerSettingsModel(String serverId) {
+		return settingsService.getServerSettingsById(serverId).getBody();
+	}
+
 	public JsonElement getServerSettings(String serverId) {
 		return gson.toJsonTree(settingsService.getServerSettingsById(serverId).getBody());
 	}

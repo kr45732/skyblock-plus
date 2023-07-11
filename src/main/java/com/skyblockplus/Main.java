@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -75,7 +76,6 @@ public class Main {
 
 	public static void main(String[] args) throws IllegalArgumentException {
 		globalExceptionHandler = new GlobalExceptionHandler();
-		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
 		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
 		Message.suppressContentIntentWarning();
 
@@ -119,7 +119,11 @@ public class Main {
 		);
 
 		allServerSettings =
-			database.getAllServerSettings().stream().collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()));
+			isMainBot()
+				? database.getAllServerSettings().stream().collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()))
+				: Stream
+					.of("796790757947867156", "782154976243089429", "869217817680044042")
+					.collect(Collectors.toMap(Function.identity(), e -> database.getServerSettingsModel(e), (e1, e2) -> e1));
 		log.info("Loaded all server settings");
 
 		jda =
@@ -148,6 +152,7 @@ public class Main {
 		}
 
 		File loreRendersDir = new File("src/main/java/com/skyblockplus/json/renders/");
+
 		if (!loreRendersDir.exists()) {
 			log.info((loreRendersDir.mkdirs() ? "Successfully created" : "Failed to create") + " lore render directory");
 		} else {
@@ -156,8 +161,8 @@ public class Main {
 				Arrays.stream(loreRendersDirFiles).forEach(File::delete);
 			}
 		}
-
 		ApiHandler.initialize();
+
 		AuctionTracker.initialize();
 		AuctionFlipper.initialize(isMainBot());
 		ApiController.initialize();
@@ -165,7 +170,6 @@ public class Main {
 		scheduler.scheduleWithFixedDelay(MayorHandler::initialize, 1, 5, TimeUnit.MINUTES);
 		JacobHandler.initialize();
 		EventHandler.initialize();
-
 		if (isMainBot()) {
 			scheduler.scheduleWithFixedDelay(
 				() -> {
@@ -179,6 +183,7 @@ public class Main {
 			); // Sorry for the war crimes
 		}
 
+		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
 		log.info("Bot ready with " + jda.getShardsTotal() + " shards and " + jda.getGuilds().size() + " guilds");
 	}
 
