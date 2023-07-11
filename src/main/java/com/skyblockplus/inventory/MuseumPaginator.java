@@ -148,16 +148,6 @@ public class MuseumPaginator {
 	}
 
 	private MessageEditData getPageRender() {
-		Map<String, String> categoryToEmoji = Maps.of(
-			"weapons",
-			"DIAMOND_SWORD",
-			"armor_sets",
-			"DIAMOND_CHESTPLATE",
-			"rarities",
-			"JADERALD",
-			"special_items",
-			"CAKE"
-		);
 		return new MessageEditBuilder()
 			.setFiles(FileUpload.fromData(new File(getRenderedPage())))
 			.setComponents(
@@ -209,64 +199,40 @@ public class MuseumPaginator {
 
 	private String computeRenderedPage() {
 		try {
-			int scale = 3;
-			int itemSize = 16 * scale;
-
-			Map<String, String> categoryToEmoji = Maps.of(
-				"weapons",
-				"DIAMOND_SWORD",
-				"armor_sets",
-				"DIAMOND_CHESTPLATE",
-				"rarities",
-				"JADERALD",
-				"special_items",
-				"CAKE"
-			);
-
-			BufferedImage glass = getItemImage("STAINED_GLASS_PANE:15", itemSize);
-			BufferedImage grayDye = getItemImage("INK_SACK:8", itemSize);
-			BufferedImage limeDye = getItemImage("INK_SACK:10", itemSize);
-			BufferedImage categoryIcon = getItemImage(categoryToEmoji.get(category), itemSize);
-			BufferedImage arrow = getItemImage("ARROW", itemSize);
-			BufferedImage barrier = getItemImage("BARRIER", itemSize);
-
-			JsonArray categoryItems = getMuseumCategoriesJson().getAsJsonArray(category);
-
-			List<Image> slots = new ArrayList<>();
+			int itemSize = 16 * CHEST_SCALE;
 			int idx = pageNumber * 28;
+			JsonArray categoryItems = getMuseumCategoriesJson().getAsJsonArray(category);
+			List<Image> slots = new ArrayList<>();
 
 			for (int j = 0; j < CHEST_ROWS; j++) {
 				for (int i = 0; i < CHEST_COLUMNS; i++) {
-					BufferedImage image;
+					String itemId = null;
 					if (i == 4 && j == 0) {
-						image = categoryIcon; // Weapons page icon
+						itemId = categoryToEmoji.get(category);
 					} else if (j == 5 && ((pageNumber > 0 && i == 0) || (i == 3) || (pageNumber < maxPageNumber - 1 && i == 8))) {
-						image = arrow; // Left, go back, right arrows
+						itemId = "ARROW"; // Left, go back, right arrows
 					} else if (i == 4 && j == 5) {
-						image = barrier; // Close
+						itemId = "BARRIER"; // Close
 					} else if (i == 0 || i == CHEST_COLUMNS - 1 || j == 0 || j == CHEST_ROWS - 1) {
-						image = glass; // Boundary
+						itemId = "STAINED_GLASS_PANE:15"; // Boundary
 					} else {
 						if (idx < categoryItems.size()) {
-							String itemId = categoryItems.get(idx).getAsString();
+							itemId = categoryItems.get(idx).getAsString();
 							if (items.contains(itemId)) {
-								image = getItemImage(higherDepth(getMuseumCategoriesJson(), "armor_to_id." + itemId, itemId), itemSize);
+								itemId = higherDepth(getMuseumCategoriesJson(), "armor_to_id." + itemId, itemId);
 							} else if (bypassedItems.contains(itemId)) {
-								image = limeDye;
+								itemId = "INK_SACK:10";
 							} else {
-								image = grayDye;
+								itemId = "INK_SACK:8";
 							}
-						} else {
-							image = null;
 						}
 						idx++;
 					}
-
-					slots.add(image);
+					slots.add(itemId == null ? null : getItemImage(itemId, itemSize));
 				}
 			}
 
-			BufferedImage chestRender = renderChest(slots, scale);
+			BufferedImage chestRender = renderChest(slots);
 			File file = new File(loreRenderDir + "/" + key + "_" + category + "_" + pageNumber + ".png");
 			ImageIO.write(chestRender, "png", file);
 
