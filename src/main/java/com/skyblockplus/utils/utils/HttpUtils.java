@@ -124,7 +124,7 @@ public class HttpUtils {
 					JsonReader jsonIn = new JsonReader(in)
 				) {
 					JsonElement json = httpGet.getURI().getPath().equals("/skyblock/profiles")
-						? SkyblockProfilesParser.parse(jsonIn)
+						? SkyblockProfilesParser.parse(jsonIn, httpGet.getURI().getQuery().split("uuid=")[1])
 						: JsonParser.parseReader(jsonIn);
 
 					if (jsonUrl.contains("api.hypixel.net") && higherDepth(json, "throttle", false) && higherDepth(json, "global", false)) {

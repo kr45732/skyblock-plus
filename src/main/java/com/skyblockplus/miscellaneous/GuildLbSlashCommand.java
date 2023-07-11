@@ -62,13 +62,13 @@ public class GuildLbSlashCommand extends SlashCommand {
 		Map<String, Double> guildLbCaches = new HashMap<>();
 		for (Map.Entry<String, List<String>> entry : guildCaches.entrySet()) {
 			DoubleStream stream = entry.getValue().stream().filter(cachedPlayers::containsKey).mapToDouble(cachedPlayers::get);
-			guildLbCaches.put(
-				entry.getKey(),
-				switch (comparisonMethod) {
-					case "sum" -> stream.sum();
-					default -> stream.average().orElse(0);
-				}
-			);
+			double value;
+			if (comparisonMethod.equals("sum")) {
+				value = stream.sum();
+			} else {
+				value = stream.average().orElse(0);
+			}
+			guildLbCaches.put(entry.getKey(), value);
 		}
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
@@ -111,7 +111,7 @@ public class GuildLbSlashCommand extends SlashCommand {
 			getGuildLb(
 				event.getOptionStr("type"),
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-				event.getOptionStr("comparison", "sum"),
+				event.getOptionStr("comparison", "average"),
 				event
 			)
 		);
@@ -127,7 +127,7 @@ public class GuildLbSlashCommand extends SlashCommand {
 					.addChoice("All", "all")
 					.addChoice("Ironman", "ironman")
 					.addChoice("Stranded", "stranded"),
-				new OptionData(OptionType.STRING, "comparison", "Comparison method").addChoice("Sum", "sum").addChoice("Average", "average")
+				new OptionData(OptionType.STRING, "comparison", "Comparison method").addChoice("Average", "average").addChoice("Sum", "sum")
 			);
 	}
 

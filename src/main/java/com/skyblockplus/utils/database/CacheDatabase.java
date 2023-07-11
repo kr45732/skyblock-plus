@@ -506,5 +506,6 @@ public class CacheDatabase {
 		SKYBLOCK_PROFILES,
 		GUILD,
 		PLAYER,
+		SKYBLOCK_MUSEUM,
 	}
 }

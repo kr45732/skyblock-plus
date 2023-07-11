@@ -30,7 +30,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -161,11 +160,19 @@ public class CustomPaginator {
 	}
 
 	private boolean checkButtonClick(ButtonInteractionEvent event, String messageId) {
+		if (!event.isFromGuild()) {
+			return false;
+		}
+
+		if (event.getUser().isBot()) {
+			return false;
+		}
+
 		if (!event.getMessageId().equals(messageId)) {
 			return false;
 		}
 
-		if (!isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null)) {
+		if (!users.isEmpty() && !users.contains(event.getUser())) {
 			return false;
 		}
 
@@ -174,16 +181,6 @@ public class CustomPaginator {
 			event.getComponentId().equals(RIGHT) ||
 			extras.getReactiveButtons().stream().anyMatch(b -> b.isReacting() && event.getComponentId().equals(b.getId()))
 		);
-	}
-
-	private boolean isValidUser(User user, Guild guild) {
-		if (user.isBot()) {
-			return false;
-		}
-		if (users.isEmpty() || users.contains(user)) {
-			return true;
-		}
-		return guild != null && guild.isMember(user);
 	}
 
 	private void handleButtonClick(ButtonInteractionEvent event, int pageNum) {

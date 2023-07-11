@@ -81,6 +81,7 @@ public class JsonUtils {
 	private static JsonObject weightJson;
 	private static JsonObject sbLevelsJson;
 	private static JsonObject essenceShopsJson;
+	private static JsonObject museumCategoriesJson;
 
 	public static JsonObject getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
@@ -339,6 +340,17 @@ public class JsonUtils {
 		return essenceShopsJson;
 	}
 
+	public static JsonObject getMuseumCategoriesJson() {
+		if (museumCategoriesJson == null) {
+			try {
+				museumCategoriesJson =
+					getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/MuseumCategories.json");
+			} catch (Exception ignored) {}
+		}
+
+		return museumCategoriesJson;
+	}
+
 	public static JsonObject getBitsJson() {
 		if (bitsJson == null) {
 			bitsJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/BitPrices.json");
@@ -384,6 +396,9 @@ public class JsonUtils {
 				getJsonObject(
 					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + getNeuBranch() + "/constants/parents.json"
 				);
+			for (Map.Entry<String, JsonElement> entry : getConstant("EXTRA_PARENTS").getAsJsonObject().entrySet()) {
+				parentsJson.add(entry.getKey(), entry.getValue());
+			}
 		}
 		return parentsJson;
 	}

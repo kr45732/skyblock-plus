@@ -58,6 +58,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.val;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -712,6 +713,14 @@ public class Utils {
 	public static InvItem nbtToItem(String rawContents) {
 		try {
 			return getGenericInventoryMap(NBTReader.readBase64(rawContents)).get(0);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static Collection<InvItem> nbtToItems(String rawContents) {
+		try {
+			return getGenericInventoryMap(NBTReader.readBase64(rawContents)).values();
 		} catch (Exception e) {
 			return null;
 		}

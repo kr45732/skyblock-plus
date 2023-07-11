@@ -96,10 +96,6 @@ public class SkyblockProfilesParser {
 		}
 	}
 
-	public static JsonElement parse(JsonReader in) {
-		return parse(in, null);
-	}
-
 	public static JsonElement parse(JsonReader in, String uuid) {
 		try {
 			// Either JsonArray or JsonObject
@@ -113,26 +109,32 @@ public class SkyblockProfilesParser {
 
 			Deque<JsonElement> stack = new ArrayDeque<>();
 
+			boolean skipProfile = false;
 			while (true) {
 				while (in.hasNext()) {
 					String name = null;
-					// Name is only used for JSON object members
 					if (current instanceof JsonObject) {
 						name = in.nextName();
-					}
 
-					if (
-						name != null &&
-						(
-							IGNORED_SB_PROFILE.contains(name) ||
-							(
-								uuid != null &&
-								(IGNORED_SB_PROFILE_LB.contains(name) || (!name.equals(uuid) && in.getPath().endsWith("].members." + name)))
-							)
-						)
-					) {
-						in.skipValue();
-						continue;
+						if (in.getPath().contains("].members.")) {
+							if (in.getPath().endsWith("].members." + name)) {
+								skipProfile = !name.equals(uuid);
+							} else if (skipProfile) {
+								if (
+									!in.getPath().contains(".deletion_notice") &&
+									!in.getPath().contains(".collection") &&
+									!in.getPath().contains(".crafted_generators")
+								) {
+									in.skipValue();
+									continue;
+								}
+							}
+
+							if (IGNORED_SB_PROFILE.contains(name)) {
+								in.skipValue();
+								continue;
+							}
+						}
 					}
 
 					peeked = in.peek();

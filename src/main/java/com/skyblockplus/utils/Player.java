@@ -1783,6 +1783,10 @@ public class Player {
 			return belt;
 		}
 
+		public HypixelResponse getMuseum() {
+			return skyblockMuseumFromProfileId(higherDepth(getOuterProfileJson(), "profile_id").getAsString());
+		}
+
 		@Override
 		public String toString() {
 			return (

@@ -96,7 +96,7 @@ public class AuctionTracker {
 					} catch (Exception ignored) {}
 					String finalItemName = itemName;
 					String soldFor = formatNumber(higherDepth(endedAuction, "price").getAsLong());
-					long endedAt = higherDepth(endedAuction, "timestamp").getAsLong() / 1000;
+					long endedAt = higherDepth(endedAuction, "timestamp").getAsLong();
 
 					commandAuthorToTrackingUser
 						.entrySet()

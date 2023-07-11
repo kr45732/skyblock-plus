@@ -446,6 +446,33 @@ public class ApiHandler {
 		}
 	}
 
+	public static HypixelResponse skyblockMuseumFromProfileId(String profileId) {
+		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_MUSEUM, profileId);
+		if (cachedResponse != null) {
+			return new HypixelResponse(cachedResponse);
+		}
+
+		try {
+			JsonElement museumJson = getJson(
+				getHypixelApiUrl("/skyblock/museum", HYPIXEL_API_KEY).addParameter("profile", profileId).toString()
+			);
+
+			try {
+				if (higherDepth(museumJson, "members").getAsJsonObject().isEmpty()) {
+					return new HypixelResponse("Player's museum API is disabled");
+				}
+
+				JsonObject membersObject = higherDepth(museumJson, "members").getAsJsonObject();
+				cacheDatabase.cacheJson(new CacheDatabase.CacheId(CacheDatabase.CacheType.SKYBLOCK_MUSEUM, profileId), membersObject);
+				return new HypixelResponse(membersObject);
+			} catch (Exception e) {
+				return new HypixelResponse(higherDepth(museumJson, "cause").getAsString());
+			}
+		} catch (Exception e) {
+			return new HypixelResponse(e.getMessage());
+		}
+	}
+
 	public static HypixelResponse playerFromUuid(String uuid) {
 		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.PLAYER, uuid);
 		if (cachedResponse != null) {
@@ -507,12 +534,16 @@ public class ApiHandler {
 
 			try {
 				if (higherDepth(guildResponse, "guild").isJsonNull()) {
-					if (param.equals("player")) {
-						return new HypixelResponse("Player is not in a guild");
-					} else if (param.equals("id")) {
-						return new HypixelResponse("Invalid guild id");
-					} else if (param.equals("name")) {
-						return new HypixelResponse("Invalid guild name");
+					switch (param) {
+						case "player" -> {
+							return new HypixelResponse("Player is not in a guild");
+						}
+						case "id" -> {
+							return new HypixelResponse("Invalid guild id");
+						}
+						case "name" -> {
+							return new HypixelResponse("Invalid guild name");
+						}
 					}
 				}
 
