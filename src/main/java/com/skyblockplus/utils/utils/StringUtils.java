@@ -82,7 +82,7 @@ public class StringUtils {
 		return formattedNumber;
 	}
 
-	public static String formatLeaderboardAmount(double amount) {
+	public static String formatOrSimplify(double amount) {
 		if (amount > 1000000000) {
 			return simplifyNumber(amount);
 		} else if (amount > 100) {

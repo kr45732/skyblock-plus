@@ -396,9 +396,6 @@ public class JsonUtils {
 				getJsonObject(
 					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + getNeuBranch() + "/constants/parents.json"
 				);
-			for (Map.Entry<String, JsonElement> entry : getConstant("EXTRA_PARENTS").getAsJsonObject().entrySet()) {
-				parentsJson.add(entry.getKey(), entry.getValue());
-			}
 		}
 		return parentsJson;
 	}

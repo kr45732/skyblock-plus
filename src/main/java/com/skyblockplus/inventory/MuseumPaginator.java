@@ -199,7 +199,6 @@ public class MuseumPaginator {
 
 	private String computeRenderedPage() {
 		try {
-			int itemSize = 16 * CHEST_SCALE;
 			int idx = pageNumber * 28;
 			JsonArray categoryItems = getMuseumCategoriesJson().getAsJsonArray(category);
 			List<Image> slots = new ArrayList<>();
@@ -228,7 +227,7 @@ public class MuseumPaginator {
 						}
 						idx++;
 					}
-					slots.add(itemId == null ? null : getItemImage(itemId, itemSize));
+					slots.add(itemId == null ? null : getItemImage(itemId));
 				}
 			}
 

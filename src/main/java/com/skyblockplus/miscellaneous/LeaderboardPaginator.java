@@ -89,7 +89,7 @@ public class LeaderboardPaginator {
 
 			if (this.player != null && entry.getValue().getString("username", "").equals(this.player)) {
 				playerRank = curRank;
-				playerAmount = formatLeaderboardAmount(curAmount);
+				playerAmount = formatOrSimplify(curAmount);
 			}
 
 			if (amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)) {
@@ -144,7 +144,7 @@ public class LeaderboardPaginator {
 			DataObject curPlayer = leaderboardCache.getOrDefault(i, null);
 			if (curPlayer != null) {
 				double curAmount = curPlayer.getDouble(lbType, 0.0);
-				String out = "`" + i + ")` " + escapeText(curPlayer.getString("username", "?")) + ": " + formatLeaderboardAmount(curAmount);
+				String out = "`" + i + ")` " + escapeText(curPlayer.getString("username", "?")) + ": " + formatOrSimplify(curAmount);
 
 				if (i < pageFirstRank + 10) {
 					columnOne.append(out).append("\n");
@@ -281,7 +281,7 @@ public class LeaderboardPaginator {
 
 					if (player != null && entry.getValue().getString("username", "").equals(player.username())) {
 						playerRank = curRank;
-						playerAmount = formatLeaderboardAmount(curAmount);
+						playerAmount = formatOrSimplify(curAmount);
 					}
 
 					if (amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)) {

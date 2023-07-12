@@ -84,9 +84,9 @@ public class GuildLbSlashCommand extends SlashCommand {
 				capitalizeString(comparisonMethod) +
 				")" +
 				"\n**Sum:** " +
-				formatLeaderboardAmount(guildLbCaches.values().stream().mapToDouble(e -> e).sum()) +
+				formatOrSimplify(guildLbCaches.values().stream().mapToDouble(e -> e).sum()) +
 				"\n**Average:** " +
-				formatLeaderboardAmount(guildLbCaches.values().stream().mapToDouble(e -> e).average().orElse(0))
+				formatOrSimplify(guildLbCaches.values().stream().mapToDouble(e -> e).average().orElse(0))
 			);
 
 		List<Map.Entry<String, Double>> guildLbEntries = guildLbCaches
@@ -96,9 +96,7 @@ public class GuildLbSlashCommand extends SlashCommand {
 			.toList();
 		for (int i = 0; i < guildLbEntries.size(); i++) {
 			Map.Entry<String, Double> entry = guildLbEntries.get(i);
-			paginateBuilder.addStrings(
-				"`" + (i + 1) + ")` " + escapeText(entry.getKey()) + ": " + formatLeaderboardAmount(entry.getValue())
-			);
+			paginateBuilder.addStrings("`" + (i + 1) + ")` " + escapeText(entry.getKey()) + ": " + formatOrSimplify(entry.getValue()));
 		}
 
 		event.paginate(paginateBuilder);

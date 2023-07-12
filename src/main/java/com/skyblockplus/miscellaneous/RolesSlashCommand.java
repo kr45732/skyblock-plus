@@ -546,7 +546,7 @@ public class RolesSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
+			return new SubcommandData(name, "Claim automatic Skyblock roles. The player must be linked to the bot")
 				.addOptions(profilesCommandOption);
 		}
 	}
@@ -619,7 +619,7 @@ public class RolesSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("list", "List all roles that can be claimed through the bot");
+			return new SubcommandData(name, "List all roles that can be claimed through the bot");
 		}
 	}
 }

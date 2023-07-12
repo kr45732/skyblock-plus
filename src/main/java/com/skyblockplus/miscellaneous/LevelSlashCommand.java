@@ -558,7 +558,7 @@ public class LevelSlashCommand extends SlashCommand {
 			defeatKuudraSbXp +
 			defeatedArachneSbXp;
 		LevelRecord levelRecord = new LevelRecord("slaying_task", eb, categorySbXp + bestiarySbXp, categorySbXp);
-		eb.appendDescription("\n" + getEmoji("EXP_BOTTLE") + " Slayer Level Up: " + formatNumber(slayerLevelUpSbXp) + " / 3,625");
+		eb.appendDescription("\n" + getEmoji("EXP_BOTTLE") + " Slayer Level Up: " + formatNumber(slayerLevelUpSbXp) + " / 3,825");
 		eb.appendDescription(
 			"\n" + getEmoji("DIAMOND_THORN_HEAD") + " Boss Collections: " + formatNumber(bossCollectionsSbXp) + " / 1,015"
 		);
@@ -567,7 +567,7 @@ public class LevelSlashCommand extends SlashCommand {
 			"\n" + getEmoji("BEASTMASTER_CREST_LEGENDARY") + " Mythological Kills: " + formatNumber(mythologicalKillsSbXp) + " / 100"
 		);
 		eb.appendDescription("\n" + getEmoji("DRAGON_EGG") + " Slay Dragon: " + formatNumber(dragonSlaySbXp) + " / 200");
-		eb.appendDescription("\n" + getEmoji("AATROX_BATPHONE") + " Defeat Slayers: " + formatNumber(defeatSlayerSbXp) + " / 825");
+		eb.appendDescription("\n" + getEmoji("AATROX_BATPHONE") + " Defeat Slayers: " + formatNumber(defeatSlayerSbXp) + " / 1,050");
 		eb.appendDescription("\n" + getEmoji("KUUDRA_TIER_KEY") + " Defeat Kuudra: " + formatNumber(defeatKuudraSbXp) + " / 300");
 		eb.appendDescription("\n" + getEmoji("ARACHNE_CRYSTAL") + " Defeat Arachne: " + formatNumber(defeatedArachneSbXp) + " / 60");
 		eb.getDescriptionBuilder().insert(0, getEmoji("GOLD_SWORD") + " **Slaying Tasks:** " + levelRecord.getFormatted() + "\n");

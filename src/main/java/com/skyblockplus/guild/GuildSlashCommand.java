@@ -163,7 +163,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("information", "Get information and statistics about a guild")
+			return new SubcommandData(name, "Get information and statistics about a guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false);
 		}
@@ -252,7 +252,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("members", "Get a list of all members in a player's guild")
+			return new SubcommandData(name, "Get a list of all members in a player's guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false);
 		}
@@ -363,7 +363,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
+			return new SubcommandData(name, "Get the experience leaderboard for a player's guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
 				.addOptions(new OptionData(OptionType.INTEGER, "days", "Number of days").setRequiredRange(1, 7));
@@ -445,7 +445,7 @@ public class GuildSlashCommand extends SlashCommand {
 					continue;
 				}
 
-				String formattedAmt = formatLeaderboardAmount(amount);
+				String formattedAmt = formatOrSimplify(amount);
 				paginateBuilder.addStrings("`" + (i + 1) + ")` " + escapeText(player.getString("username")) + ": " + formattedAmt);
 				total += amount;
 
@@ -463,11 +463,11 @@ public class GuildSlashCommand extends SlashCommand {
 				"**Total " +
 				lbTypeFormatted +
 				":** " +
-				formatLeaderboardAmount(total) +
+				formatOrSimplify(total) +
 				"\n**Average " +
 				lbTypeFormatted +
 				":** " +
-				formatLeaderboardAmount(total / paginateBuilder.size()) +
+				formatOrSimplify(total / paginateBuilder.size()) +
 				(lastUpdated != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdated) : "");
 			if (usernameUuidStruct != null) {
 				ebStr +=

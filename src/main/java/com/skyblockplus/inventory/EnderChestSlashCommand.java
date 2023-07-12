@@ -84,7 +84,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("list", "Get a list of the player's ender chest with lore")
+			return new SubcommandData(name, "Get a list of the player's ender chest with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");
@@ -121,7 +121,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("emoji", "Get a player's ender chest represented in emojis")
+			return new SubcommandData(name, "Get a player's ender chest represented in emojis")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption);
 		}

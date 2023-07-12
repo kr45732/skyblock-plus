@@ -79,7 +79,7 @@ public class EssenceSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("upgrade", "Interactive message to find the essence amount to upgrade an item")
+			return new SubcommandData(name, "Interactive message to find the essence amount to upgrade an item")
 				.addOption(OptionType.STRING, "item", "Item name", true, true);
 		}
 	}
@@ -147,7 +147,7 @@ public class EssenceSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("information", "Get the amount of essence to upgrade an item for each level")
+			return new SubcommandData(name, "Get the amount of essence to upgrade an item for each level")
 				.addOption(OptionType.STRING, "item", "Item name", true, true);
 		}
 	}
@@ -220,7 +220,7 @@ public class EssenceSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("player", "Get the amount of each essence a player has")
+			return new SubcommandData(name, "Get the amount of each essence a player has")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption);
 		}

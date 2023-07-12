@@ -235,7 +235,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("create", "Interactive message to create a Skyblock event");
+			return new SubcommandData(name, "Interactive message to create a Skyblock event");
 		}
 	}
 
@@ -291,7 +291,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("current", "Get information about the current event");
+			return new SubcommandData(name, "Get information about the current event");
 		}
 	}
 
@@ -463,7 +463,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("join", "Join the current event").addOptions(profilesCommandOption);
+			return new SubcommandData(name, "Join the current event").addOptions(profilesCommandOption);
 		}
 	}
 
@@ -488,7 +488,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("add", "Force add a player to the current event")
+			return new SubcommandData(name, "Force add a player to the current event")
 				.addOption(OptionType.STRING, "player", "Player username or mention", true, true)
 				.addOptions(profilesCommandOption);
 		}
@@ -526,7 +526,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("leave", "Leave the current event");
+			return new SubcommandData(name, "Leave the current event");
 		}
 	}
 
@@ -561,7 +561,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("remove", "Force remove a player from the current event")
+			return new SubcommandData(name, "Force remove a player from the current event")
 				.addOption(OptionType.STRING, "player", "Player username or mention", true, true);
 		}
 	}
@@ -627,7 +627,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("leaderboard", "Get the leaderboard for current event");
+			return new SubcommandData(name, "Get the leaderboard for current event");
 		}
 	}
 
@@ -745,7 +745,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("end", "Force end the event")
+			return new SubcommandData(name, "Force end the event")
 				.addOption(OptionType.BOOLEAN, "silent", "If the event should silently be canceled");
 		}
 	}

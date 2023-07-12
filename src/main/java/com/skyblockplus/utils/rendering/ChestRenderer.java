@@ -33,7 +33,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 public class ChestRenderer {
 
 	private static final Map<String, BufferedImage> CACHED_IMAGES = new HashMap<>();
-	public static final int CHEST_SCALE = 3;
+	private static final int CHEST_SCALE = 3;
 	public static final int CHEST_ROWS = 6;
 	public static final int CHEST_COLUMNS = 9;
 
@@ -45,6 +45,7 @@ public class ChestRenderer {
 
 		BufferedImage chestRender = ImageIO.read(new File("src/main/java/com/skyblockplus/json/chestrenderer/background_image.png"));
 		Graphics2D graphics = chestRender.createGraphics();
+		graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
 		for (int row = 0; row < CHEST_ROWS; row++) {
 			for (int column = 0; column < CHEST_COLUMNS; column++) {
@@ -53,7 +54,7 @@ public class ChestRenderer {
 				if (image != null) {
 					int x = marginLeft + column * itemSpacing;
 					int y = marginTop + row * itemSpacing;
-					graphics.drawImage(slots.get(slotIndex), x, y, null);
+					graphics.drawImage(slots.get(slotIndex), x, y, itemSize, itemSize, null);
 				}
 			}
 		}
@@ -62,7 +63,7 @@ public class ChestRenderer {
 		return chestRender;
 	}
 
-	public static BufferedImage getItemImage(String id, int size) throws IOException {
+	public static BufferedImage getItemImage(String id) throws IOException {
 		if (CACHED_IMAGES.containsKey(id)) {
 			return CACHED_IMAGES.get(id);
 		}
@@ -72,8 +73,7 @@ public class ChestRenderer {
 			image = ImageIO.read(new File("src/main/java/com/skyblockplus/json/chestrenderer/imagecache/" + id + ".png"));
 		} catch (Exception e) {
 			String emojiId = Emoji.fromFormatted(getEmoji(id)).asCustom().getId();
-
-			image = ImageIO.read(new URL("https://cdn.discordapp.com/emojis/" + emojiId + ".png?size=" + size + "&quality=lossless"));
+			image = ImageIO.read(new URL("https://cdn.discordapp.com/emojis/" + emojiId + ".png?quality=lossless"));
 			File outputfile = new File("src/main/java/com/skyblockplus/json/chestrenderer/imagecache/" + id + ".png");
 			ImageIO.write(image, "png", outputfile);
 		}

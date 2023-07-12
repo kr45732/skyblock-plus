@@ -86,7 +86,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("list", "Get a list of the player's talisman bag with lore")
+			return new SubcommandData(name, "Get a list of the player's talisman bag with lore")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption)
 				.addOption(OptionType.INTEGER, "slot", "Slot number");
@@ -123,7 +123,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("emoji", "Get a player's talisman bag represented in emojis")
+			return new SubcommandData(name, "Get a player's talisman bag represented in emojis")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption);
 		}
@@ -283,7 +283,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData("tuning", "Get a player's power stone stats and tuning stats")
+			return new SubcommandData(name, "Get a player's power stone stats and tuning stats")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption);
 		}
