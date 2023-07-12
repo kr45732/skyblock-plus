@@ -214,7 +214,6 @@ public class MuseumSlashCommand extends SlashCommand {
 								};
 
 							double cost = 0;
-							System.out.println(itemId + " " + setName);
 							for (String setItemId : setPieces) {
 								cost += calc.getLowestPrice(setItemId);
 							}
