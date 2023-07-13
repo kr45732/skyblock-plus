@@ -33,6 +33,7 @@ import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import groovy.lang.Tuple2;
 import java.sql.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -602,6 +603,41 @@ public class LeaderboardDatabase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public Tuple2<List<Float>, List<Float>> getBiStatistics(Player.Gamemode gamemode, String xStat, String yStat) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT DISTINCT " +
+				xStat +
+				", " +
+				yStat +
+				" FROM " +
+				gamemode.toLeaderboardName() +
+				" WHERE " +
+				xStat +
+				" > 0 AND " +
+				yStat +
+				" > 0 ORDER BY " +
+				xStat +
+				", " +
+				yStat
+			)
+		) {
+			List<Float> xList = new ArrayList<>();
+			List<Float> yList = new ArrayList<>();
+
+			try (ResultSet response = statement.executeQuery()) {
+				while (response.next()) {
+					xList.add(response.getFloat(xStat));
+					yList.add(response.getFloat(yStat));
+				}
+			}
+
+			return new Tuple2<>(xList, yList);
+		} catch (Exception ignored) {}
+		return null;
 	}
 
 	public void close() {

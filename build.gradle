@@ -108,4 +108,7 @@ dependencies {
 
     // Fuzzy Searching
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
+
+    // Graphs
+    implementation 'org.knowm.xchart:xchart:3.8.4'
 }

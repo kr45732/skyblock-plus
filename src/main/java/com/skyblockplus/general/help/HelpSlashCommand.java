@@ -228,6 +228,12 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("tuning", "Get a player's power stone stats and tuning stats", "list [player] [profile]")
 					)
 					.setCategory("inventory"),
+				new HelpData("museum", "Main museum command.")
+					.addSubcommands(
+						new HelpData("emoji", "View a player's museum items.", "view [player] [profile]"),
+						new HelpData("list", "Get the cheapest items to donate for a player's museum.", "cheapest [player] [profile]")
+					)
+					.setCategory("inventory"),
 				new HelpData(
 					"sacks",
 					"Get a player's sacks content bag represented in a list and sorted by descending price. Costs can be calculated from (source) bazaar only, npc only, or npc and bazaar.",
