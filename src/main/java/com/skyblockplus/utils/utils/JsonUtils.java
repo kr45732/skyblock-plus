@@ -122,6 +122,7 @@ public class JsonUtils {
 			averagePriceJsonLastUpdated = Instant.now();
 
 			URIBuilder uriBuilder = getQueryApiUrl("average");
+			uriBuilder.addParameter("center", "modified_median");
 			if (!currentMayor.equals("Derpy")) {
 				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli()).addParameter("step", "60");
 			}
@@ -141,6 +142,7 @@ public class JsonUtils {
 			averageAuctionJsonLastUpdated = Instant.now();
 
 			URIBuilder uriBuilder = getQueryApiUrl("average_auction");
+			uriBuilder.addParameter("center", "modified_median");
 			if (!currentMayor.equals("Derpy")) {
 				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli()).addParameter("step", "60");
 			}
@@ -160,6 +162,7 @@ public class JsonUtils {
 			averageBinJsonLastUpdated = Instant.now();
 
 			URIBuilder uriBuilder = getQueryApiUrl("average_bin");
+			uriBuilder.addParameter("center", "modified_median");
 			if (!currentMayor.equals("Derpy")) {
 				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli()).addParameter("step", "60");
 			}
