@@ -290,8 +290,8 @@ public class EmojiUpdater {
 				.stream(
 					new File("src/main/java/com/skyblockplus/json/neu/items")
 						.listFiles(f -> {
-							try {
-								JsonElement json = JsonParser.parseReader(new FileReader(f));
+							try (FileReader fr = new FileReader(f)) {
+								JsonElement json = JsonParser.parseReader(fr);
 								String id = higherDepth(json, "internalname").getAsString();
 								return (
 									higherDepth(json, "nbttag").getAsString().startsWith("{ench:[") &&
