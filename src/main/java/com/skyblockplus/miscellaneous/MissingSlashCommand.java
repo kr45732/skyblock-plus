@@ -21,8 +21,7 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.errorEmbed;
-import static com.skyblockplus.utils.utils.Utils.getEmoji;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -90,11 +89,11 @@ public class MissingSlashCommand extends SlashCommand {
 		this.name = "missing";
 	}
 
-	public static EmbedBuilder getMissingTalismans(String username, String profileName, SlashCommandEvent event) {
+	public static Object getMissingTalismans(String username, String profileName, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
 			if (!player.isInventoryApiEnabled()) {
-				return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
+				return withApiHelpButton(errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
 			}
 
 			Map<Integer, InvItem> talismanBag = player.getTalismanBagMap();

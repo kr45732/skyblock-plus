@@ -30,7 +30,7 @@ public record ExceptionEventListener(EventListener listener) implements EventLis
 		try {
 			listener.onEvent(event);
 		} catch (Exception e) {
-			globalExceptionHandler.uncaughtException(null, e);
+			globalExceptionHandler.uncaughtException(Thread.currentThread(), e);
 		}
 	}
 }

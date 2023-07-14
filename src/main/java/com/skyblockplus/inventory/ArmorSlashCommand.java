@@ -19,8 +19,7 @@
 package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.utils.Utils.errorEmbed;
-import static com.skyblockplus.utils.utils.Utils.getEmoji;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -104,38 +103,39 @@ public class ArmorSlashCommand extends SlashCommand {
 			this.name = "emoji";
 		}
 
-		public static EmbedBuilder getPlayerArmor(String username, String profileName, SlashCommandEvent event) {
+		public static Object getPlayerArmor(String username, String profileName, SlashCommandEvent event) {
 			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				Map<Integer, InvItem> playerArmor = player.getArmorMap();
 				Map<Integer, InvItem> playerEquipment = player.getEquipmentMap();
-				if (playerArmor != null || playerEquipment != null) {
-					StringBuilder out = new StringBuilder();
-					for (int i = 0; i < 8; i++) {
-						if (i % 2 == 0) {
-							try {
-								out.append(getEmoji(playerEquipment.get(i / 2).getId(), "❓"));
-							} catch (Exception e) {
-								out.append(getEmoji("EMPTY"));
-							}
-						} else {
-							try {
-								out.append(getEmoji(playerArmor.get((i - 1) / 2).getId(), "❓")).append("\n");
-							} catch (Exception e) {
-								out.append(getEmoji("EMPTY")).append("\n");
-							}
+				if (playerArmor == null && playerEquipment == null) {
+					return withApiHelpButton(errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
+				}
+
+				StringBuilder out = new StringBuilder();
+				for (int i = 0; i < 8; i++) {
+					if (i % 2 == 0) {
+						try {
+							out.append(getEmoji(playerEquipment.get(i / 2).getId(), "❓"));
+						} catch (Exception e) {
+							out.append(getEmoji("EMPTY"));
+						}
+					} else {
+						try {
+							out.append(getEmoji(playerArmor.get((i - 1) / 2).getId(), "❓")).append("\n");
+						} catch (Exception e) {
+							out.append(getEmoji("EMPTY")).append("\n");
 						}
 					}
-
-					event
-						.getHook()
-						.editOriginal(out.toString())
-						.setEmbeds()
-						.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Armor & Equipment"))
-						.queue();
-					return null;
 				}
-				return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
+
+				event
+					.getHook()
+					.editOriginal(out.toString())
+					.setEmbeds()
+					.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Armor & Equipment"))
+					.queue();
+				return null;
 			}
 			return player.getErrorEmbed();
 		}

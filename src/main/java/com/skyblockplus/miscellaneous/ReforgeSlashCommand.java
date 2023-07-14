@@ -18,7 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Constants.reforgeStatToEmoji;
+import static com.skyblockplus.utils.Constants.statToEmoji;
 import static com.skyblockplus.utils.utils.JsonUtils.getReforgeStonesJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
@@ -91,10 +91,18 @@ public class ReforgeSlashCommand extends SlashCommand {
 					.entrySet()
 					.stream()
 					.map(e ->
-						reforgeStatToEmoji.get(e.getKey().toUpperCase()) +
+						statToEmoji.get(
+							switch (e.getKey()) {
+								case "crit_chance" -> "critical_chance";
+								case "crit_damage" -> "critical_damage";
+								case "bonus_attack_speed" -> "attack_speed";
+								case "speed" -> "walk_speed";
+								default -> e.getKey();
+							}
+						) +
 						" " +
 						capitalizeString(e.getKey().replace("_", " ")) +
-						" ➜ " +
+						": " +
 						e.getValue().getAsInt()
 					)
 					.collect(Collectors.joining("\n")),

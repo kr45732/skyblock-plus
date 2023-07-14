@@ -40,6 +40,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.apache.groovy.util.Maps;
 
 public class NetworthExecute {
@@ -134,19 +135,19 @@ public class NetworthExecute {
 		return this;
 	}
 
-	public EmbedBuilder getPlayerNetworth(String username, String profileName, GenericInteractionCreateEvent event) {
+	public MessageEditBuilder getPlayerNetworth(String username, String profileName, GenericInteractionCreateEvent event) {
 		return getPlayerNetworth(Player.create(username, profileName), event);
 	}
 
-	public EmbedBuilder getPlayerNetworth(Player.Profile player, GenericInteractionCreateEvent event) {
+	public MessageEditBuilder getPlayerNetworth(Player.Profile player, GenericInteractionCreateEvent event) {
 		if (!player.isValid()) {
-			return player.getErrorEmbed();
+			return new MessageEditBuilder().setEmbeds(player.getErrorEmbed().build());
 		}
 
 		Map<Integer, InvItem> playerInventory = player.getInventoryMap();
 		if (playerInventory == null) {
 			addTotal("inventory", -1.0);
-			return defaultEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
+			return withApiHelpButton(defaultEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
 		}
 
 		initPrices();
@@ -229,7 +230,7 @@ public class NetworthExecute {
 		calculatePetPrices();
 
 		if (event == null) {
-			return errorEmbed("Was not triggered by command");
+			return new MessageEditBuilder().setEmbeds(errorEmbed("Not triggered by command").build());
 		}
 
 		player.getProfileToNetworth().put(player.getProfileIndex(), getNetworth());

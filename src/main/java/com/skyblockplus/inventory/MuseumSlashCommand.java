@@ -21,8 +21,7 @@ package com.skyblockplus.inventory;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.getEmoji;
-import static com.skyblockplus.utils.utils.Utils.nbtToItems;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
@@ -35,7 +34,6 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -76,7 +74,7 @@ public class MuseumSlashCommand extends SlashCommand {
 			event.paginate(getPlayerMuseum(event.player, event.getOptionStr("profile"), event));
 		}
 
-		public static EmbedBuilder getPlayerMuseum(String username, String profileName, SlashCommandEvent event) {
+		public static Object getPlayerMuseum(String username, String profileName, SlashCommandEvent event) {
 			Player.Profile player = Player.create(username, profileName);
 			if (!player.isValid()) {
 				return player.getErrorEmbed();
@@ -84,7 +82,11 @@ public class MuseumSlashCommand extends SlashCommand {
 
 			HypixelResponse hypixelResponse = player.getMuseum();
 			if (!hypixelResponse.isValid()) {
-				return hypixelResponse.getErrorEmbed();
+				if (hypixelResponse.failCause().equals("Player's museum API is disabled")) {
+					return withApiHelpButton(hypixelResponse.getErrorEmbed());
+				} else {
+					return hypixelResponse.getErrorEmbed();
+				}
 			}
 
 			JsonElement museumJson = hypixelResponse.get(player.getUuid());
@@ -140,7 +142,7 @@ public class MuseumSlashCommand extends SlashCommand {
 			event.paginate(getCheapestMuseum(event.player, event.getOptionStr("profile"), event));
 		}
 
-		public static EmbedBuilder getCheapestMuseum(String username, String profileName, SlashCommandEvent event) {
+		public static Object getCheapestMuseum(String username, String profileName, SlashCommandEvent event) {
 			Player.Profile player = Player.create(username, profileName);
 			if (!player.isValid()) {
 				return player.getErrorEmbed();
@@ -148,7 +150,11 @@ public class MuseumSlashCommand extends SlashCommand {
 
 			HypixelResponse hypixelResponse = player.getMuseum();
 			if (!hypixelResponse.isValid()) {
-				return hypixelResponse.getErrorEmbed();
+				if (hypixelResponse.failCause().equals("Player's museum API is disabled")) {
+					return withApiHelpButton(hypixelResponse.getErrorEmbed());
+				} else {
+					return hypixelResponse.getErrorEmbed();
+				}
 			}
 
 			JsonElement museumJson = hypixelResponse.get(player.getUuid());

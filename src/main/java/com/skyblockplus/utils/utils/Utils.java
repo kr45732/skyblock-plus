@@ -58,7 +58,6 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import lombok.val;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -74,6 +73,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.sharding.ShardManager;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -90,7 +90,7 @@ public class Utils {
 	public static final String BOT_INVITE_LINK =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395541081169&scope=bot+applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
-	public static final ExecutorService executor = new ExceptionExecutor(
+	public static final ExceptionExecutor executor = new ExceptionExecutor(
 		10,
 		Integer.MAX_VALUE,
 		15L,
@@ -1103,5 +1103,16 @@ public class Utils {
 		finalOutput.add("manual", higherDepth(currentPriceOverrides, "manual"));
 		finalOutput.add("automatic", outputObject);
 		return finalOutput;
+	}
+
+	public static MessageEditBuilder withApiHelpButton(EmbedBuilder eb) {
+		return new MessageEditBuilder().setEmbeds(eb.build()).setActionRow(Button.primary("enable_api_help_button", "Help Enabling APIs"));
+	}
+
+	public static String getStackTrace(Throwable e) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw, true);
+		e.printStackTrace(pw);
+		return sw.getBuffer().toString();
 	}
 }

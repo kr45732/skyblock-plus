@@ -52,7 +52,7 @@ public class ExceptionExecutor extends ThreadPoolExecutor {
 		}
 
 		if (t != null) {
-			globalExceptionHandler.uncaughtException(null, t);
+			globalExceptionHandler.uncaughtException(Thread.currentThread(), t);
 		}
 	}
 }

@@ -1098,10 +1098,12 @@ public class AutomaticGuild {
 			verifyGuild.onButtonClick(event);
 		} else if (event.getComponentId().equals("verify_help_button")) {
 			event
-				.replyFiles(FileUpload.fromData(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4")))
-				.setContent(
-					"**Note:** if your Discord username has been migrated, then set your in-game Discord to be your new Discord username (do not provide a discriminator)"
-				)
+				.replyFiles(FileUpload.fromData(new File("src/main/java/com/skyblockplus/json/media/link_discord.mp4")))
+				.setEphemeral(true)
+				.queue();
+		} else if (event.getComponentId().startsWith("enable_api_help_button")) {
+			event
+				.replyFiles(FileUpload.fromData(new File("src/main/java/com/skyblockplus/json/media/enable_api.mp4")))
 				.setEphemeral(true)
 				.queue();
 		} else if (event.getComponentId().startsWith("s_help_")) {
@@ -1184,9 +1186,9 @@ public class AutomaticGuild {
 				.queue(hook -> {
 					// 0 = uuid, 1 = profile name
 					String[] split = event.getComponentId().split("nw_run_")[1].split("_");
-					EmbedBuilder eb = new NetworthExecute().setVerbose(true).getPlayerNetworth(split[0], split[1], event);
-					if (eb != null) {
-						hook.editOriginalEmbeds(eb.build()).queue();
+					MessageEditBuilder mb = new NetworthExecute().setVerbose(true).getPlayerNetworth(split[0], split[1], event);
+					if (mb != null) {
+						hook.editOriginal(mb.build()).queue();
 					}
 				});
 		} else if (event.getComponentId().startsWith("nw_")) {

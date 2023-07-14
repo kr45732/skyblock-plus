@@ -457,7 +457,11 @@ public class ApplyUser {
 							.addField("Lily Weight", playerLilyWeight, true)
 							.addField("Skyblock Level", playerLevel, true)
 							.addField("Bank & Purse", playerCoins, true)
-							.addField("Networth", playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth), true);
+							.addField(
+								"Networth",
+								playerNetworth == -1 ? "Inventory API is disabled" : roundAndFormat(playerNetworth),
+								true
+							);
 
 						List<Button> actionRow = new ArrayList<>();
 						actionRow.add(Button.success("apply_user_accept", "Accept"));

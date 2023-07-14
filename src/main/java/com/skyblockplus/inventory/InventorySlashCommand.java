@@ -20,6 +20,7 @@ package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.withApiHelpButton;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -97,20 +98,21 @@ public class InventorySlashCommand extends SlashCommand {
 			this.name = "emoji";
 		}
 
-		public static EmbedBuilder getPlayerInventory(String username, String profileName, SlashCommandEvent event) {
+		public static Object getPlayerInventory(String username, String profileName, SlashCommandEvent event) {
 			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				String[] playerInventory = player.getInventory();
-				if (playerInventory != null) {
-					event.getHook().editOriginal(playerInventory[0]).setEmbeds().queue();
-					event
-						.getChannel()
-						.sendMessage(playerInventory[1])
-						.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Inventory"))
-						.queue();
-					return null;
+				if (playerInventory == null) {
+					return withApiHelpButton(errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
 				}
-				return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
+
+				event.getHook().editOriginal(playerInventory[0]).setEmbeds().queue();
+				event
+					.getChannel()
+					.sendMessage(playerInventory[1])
+					.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Inventory"))
+					.queue();
+				return null;
 			}
 			return player.getErrorEmbed();
 		}

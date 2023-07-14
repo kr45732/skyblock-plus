@@ -288,7 +288,7 @@ public class RolesSlashCommand extends SlashCommand {
 						Set<String> itemsPlayerHas = player.getItemsPlayerHas(items);
 
 						if (itemsPlayerHas == null) {
-							disabledAPI.append(roleChangeString("Inventory API disabled"));
+							disabledAPI.append(roleChangeString("Inventory API is disabled"));
 							continue;
 						}
 

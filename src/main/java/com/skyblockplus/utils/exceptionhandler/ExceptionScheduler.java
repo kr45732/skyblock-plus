@@ -48,7 +48,7 @@ public class ExceptionScheduler extends ScheduledThreadPoolExecutor {
 		}
 
 		if (t != null) {
-			globalExceptionHandler.uncaughtException(null, t);
+			globalExceptionHandler.uncaughtException(Thread.currentThread(), t);
 		}
 	}
 }

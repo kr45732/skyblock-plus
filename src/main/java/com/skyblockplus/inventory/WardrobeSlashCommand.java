@@ -20,6 +20,7 @@ package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.withApiHelpButton;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -115,15 +116,16 @@ public class WardrobeSlashCommand extends SlashCommand {
 			this.name = "emoji";
 		}
 
-		public static EmbedBuilder getPlayerWardrobe(String username, String profileName, SlashCommandEvent event) {
+		public static Object getPlayerWardrobe(String username, String profileName, SlashCommandEvent event) {
 			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				List<String[]> wardrobe = player.getWardrobe();
-				if (wardrobe != null) {
-					new InventoryEmojiPaginator(wardrobe, "Wardrobe", player, event);
-					return null;
+				if (wardrobe == null) {
+					return withApiHelpButton(errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
 				}
-				return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
+
+				new InventoryEmojiPaginator(wardrobe, "Wardrobe", player, event);
+				return null;
 			}
 			return player.getErrorEmbed();
 		}

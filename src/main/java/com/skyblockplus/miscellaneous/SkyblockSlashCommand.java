@@ -68,7 +68,7 @@ public class SkyblockSlashCommand extends SlashCommand {
 			double playerNetworth = player.getNetworth();
 			eb.addField(
 				getEmoji("ENCHANTED_GOLD") + " Networth",
-				playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
+				playerNetworth == -1 ? "Inventory API is disabled" : roundAndFormat(playerNetworth),
 				true
 			);
 			eb.addField(

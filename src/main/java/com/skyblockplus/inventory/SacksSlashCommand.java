@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.utils.HypixelUtils.getNpcSellPrice;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.withApiHelpButton;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -46,7 +47,7 @@ public class SacksSlashCommand extends SlashCommand {
 		this.name = "sacks";
 	}
 
-	public static EmbedBuilder getPlayerSacks(String username, String profileName, String source, SlashCommandEvent event) {
+	public static Object getPlayerSacks(String username, String profileName, String source, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (!player.isValid()) {
 			return player.getErrorEmbed();
@@ -54,7 +55,7 @@ public class SacksSlashCommand extends SlashCommand {
 
 		Map<String, Integer> sacksMap = player.getPlayerSacks();
 		if (sacksMap == null) {
-			return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
+			return withApiHelpButton(errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
 		}
 		if (sacksMap.isEmpty()) {
 			return errorEmbed(player.getEscapedUsername() + "'s sacks are empty");

@@ -108,11 +108,21 @@ public abstract class AbstractSlashCommand {
 
 		executor.submit(() -> {
 			event.deferReply().complete();
-			execute(event);
+			try {
+				execute(event);
+			} catch (Exception e) {
+				String logMessageId = globalExceptionHandler.uncaughtException(event, e);
+				event
+					.getHook()
+					.editOriginalEmbeds(
+						defaultEmbed("Command Error").setDescription("Please report to this to developer with id: " + logMessageId).build()
+					)
+					.queue();
+			}
 		});
 	}
 
-	protected String getName() {
+	public String getName() {
 		return name;
 	}
 

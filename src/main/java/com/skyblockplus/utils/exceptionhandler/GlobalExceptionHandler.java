@@ -22,17 +22,15 @@ import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-	private final Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
-
-	public GlobalExceptionHandler() {
-		this.uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
-	}
 
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
@@ -41,64 +39,77 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 				errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
 			}
 
-			StringBuilder outputStr = new StringBuilder("```java\n" + e.toString() + ": " + e.getMessage() + "\n");
-			for (StackTraceElement s : e.getStackTrace()) {
-				outputStr.append(s.toString()).append("\n");
-			}
-			outputStr.append("\n```");
+			String stackTrace = getStackTrace(e);
+			String formattedStackTrace = "```java\n" + stackTrace + "\n```";
 
 			errorLogChannel
 				.sendMessageEmbeds(
 					defaultEmbed("Error | " + t)
 						.setDescription(
-							outputStr.length() >= 4000
-								? "Output is too large: " + makeHastePost(outputStr.toString())
-								: outputStr.toString()
+							formattedStackTrace.length() > MessageEmbed.DESCRIPTION_MAX_LENGTH
+								? "Stack Trace: " + makeHastePost(stackTrace)
+								: formattedStackTrace
 						)
 						.build()
 				)
 				.queue();
 		} catch (Exception ignored) {}
 
-		if (t != null) {
-			uncaughtExceptionHandler.uncaughtException(t, e);
-		} else {
-			log.error(e.getMessage(), e);
+		log.error(e.getMessage(), e);
+	}
+
+	public String uncaughtException(SlashCommandEvent event, Throwable e) {
+		if (errorLogChannel == null) {
+			errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
 		}
+
+		String description = "**Guild:** " + event.getGuild().getName() + " (" + event.getGuild().getId() + ")";
+		description += "\n**User:** " + event.getUser().getAsMention() + " (" + event.getUser().getId() + ")";
+		description += "\n**Channel:** " + event.getChannel().getAsMention() + " (" + event.getChannel().getId() + ")";
+		description += "\n**Command:** `" + event.getCommandFormatted() + "`";
+
+		String stackTrace = getStackTrace(e);
+		String formattedStackTrace = "```java\n" + stackTrace + "\n```";
+		boolean stackTraceTooLarge = formattedStackTrace.length() > MessageEmbed.DESCRIPTION_MAX_LENGTH;
+
+		if (stackTraceTooLarge) {
+			description += "\n**Stack Trace:** " + makeHastePost(stackTrace);
+		}
+
+		MessageCreateAction action = errorLogChannel.sendMessageEmbeds(
+			defaultEmbed("Command error | " + event.getFullCommandName()).setDescription(description).build()
+		);
+		if (!stackTraceTooLarge) {
+			action.addEmbeds(defaultEmbed(null).setDescription(formattedStackTrace).build());
+		}
+		String logMessageId = action.complete().getId();
+
+		log.error("Command error | " + event.getFullCommandName() + " | " + logMessageId, e);
+
+		return logMessageId;
 	}
 
 	public void uncaughtException(CommandEvent event, Command command, Throwable e) {
-		try {
-			if (errorLogChannel == null) {
-				errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
-			}
+		if (errorLogChannel == null) {
+			errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
+		}
 
-			StringBuilder outputStr = new StringBuilder("```java\n" + e.toString() + ": " + e.getMessage() + "\n");
-			for (StackTraceElement s : e.getStackTrace()) {
-				outputStr.append(s.toString()).append("\n");
-			}
-			outputStr.append("\n```");
-			errorLogChannel
-				.sendMessageEmbeds(
-					defaultEmbed(
-						"Error | " +
-						(command != null ? command.getName() : "null") +
-						" | " +
-						(event != null ? event.getGuild().getId() : "null")
+		String stackTrace = getStackTrace(e);
+		String formattedStackTrace = "```java\n" + stackTrace + "\n```";
+
+		String logMessageId = errorLogChannel
+			.sendMessageEmbeds(
+				defaultEmbed("Error | " + command.getName() + " | " + event.getGuild().getId())
+					.setDescription(
+						formattedStackTrace.length() > MessageEmbed.DESCRIPTION_MAX_LENGTH
+							? "Stack Trace: " + makeHastePost(stackTrace)
+							: formattedStackTrace
 					)
-						.setDescription(
-							outputStr.length() >= 4000
-								? "Output is too large: " + makeHastePost(outputStr.toString())
-								: outputStr.toString()
-						)
-						.build()
-				)
-				.queue();
-		} catch (Exception ignored) {}
+					.build()
+			)
+			.complete()
+			.getId();
 
-		log.error(
-			"Error | " + (command != null ? command.getName() : "null") + " | " + (event != null ? event.getGuild().getId() : "null"),
-			e
-		);
+		log.error("Error | " + command.getName() + " | " + logMessageId, e);
 	}
 }

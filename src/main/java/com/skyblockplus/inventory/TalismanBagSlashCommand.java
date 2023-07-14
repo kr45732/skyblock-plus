@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.withApiHelpButton;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -99,15 +100,16 @@ public class TalismanBagSlashCommand extends SlashCommand {
 			this.name = "emoji";
 		}
 
-		public static EmbedBuilder getPlayerTalismansEmoji(String username, String profileName, SlashCommandEvent event) {
+		public static Object getPlayerTalismansEmoji(String username, String profileName, SlashCommandEvent event) {
 			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				List<String[]> talismanBag = player.getTalismanBag();
-				if (talismanBag != null) {
-					new InventoryEmojiPaginator(talismanBag, "Talisman Bag", player, event);
-					return null;
+				if (talismanBag == null) {
+					return withApiHelpButton(errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
 				}
-				return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
+
+				new InventoryEmojiPaginator(talismanBag, "Talisman Bag", player, event);
+				return null;
 			}
 			return player.getErrorEmbed();
 		}
@@ -204,7 +206,11 @@ public class TalismanBagSlashCommand extends SlashCommand {
 					"\n**Unlocked Tuning Slots:** " +
 					higherDepth(tuningJson, "tuning").getAsJsonObject().keySet().stream().filter(j -> j.startsWith("slot_")).count()
 				);
-				eb.addField("Accessory Counts", player.isInventoryApiEnabled() ? accessoryStr.toString() : "Inventory API disabled", false);
+				eb.addField(
+					"Accessory Counts",
+					player.isInventoryApiEnabled() ? accessoryStr.toString() : "Inventory API is disabled",
+					false
+				);
 				if (higherDepth(tuningJson, "unlocked_powers") != null) {
 					JsonArray unlockedPowers = higherDepth(tuningJson, "unlocked_powers").getAsJsonArray();
 					eb.appendDescription("\n**Unlocked Power Stones:** " + unlockedPowers.size());
@@ -223,7 +229,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 						.entrySet()) {
 						powerStoneStr
 							.append("\n")
-							.append(tuningStatToEmoji.get(entry.getKey()))
+							.append(statToEmoji.get(entry.getKey()))
 							.append(" ")
 							.append(capitalizeString(entry.getKey().replace("_", " ")))
 							.append(": ")
@@ -247,7 +253,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 							tuningPointsSpent += amountSpent;
 							statStr
 								.append("\n")
-								.append(tuningStatToEmoji.get(stat.getKey()))
+								.append(statToEmoji.get(stat.getKey()))
 								.append(" ")
 								.append(capitalizeString(stat.getKey().replace("_", " ")))
 								.append(": ")

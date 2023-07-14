@@ -39,7 +39,7 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 		this.slashCommandClient = slashCommandClient;
 	}
 
-	public void logCommand() {
+	public String getCommandFormatted() {
 		StringBuilder builder = new StringBuilder("/" + getName());
 		if (getSubcommandGroup() != null) {
 			builder.append(" ").append(getSubcommandGroup());
@@ -50,7 +50,11 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 		for (OptionMapping o : getOptions()) {
 			builder.append(" ").append(o.getName()).append(":").append(o.getAsString());
 		}
-		Utils.logCommand(getGuild(), getUser(), builder.toString());
+		return builder.toString();
+	}
+
+	public void logCommand() {
+		Utils.logCommand(getGuild(), getUser(), getCommandFormatted());
 	}
 
 	public String getOptionStr(String name) {

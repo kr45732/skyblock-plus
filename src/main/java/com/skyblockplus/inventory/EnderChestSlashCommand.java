@@ -20,6 +20,7 @@ package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.withApiHelpButton;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -97,15 +98,16 @@ public class EnderChestSlashCommand extends SlashCommand {
 			this.name = "emoji";
 		}
 
-		public static EmbedBuilder getPlayerEnderChest(String username, String profileName, SlashCommandEvent event) {
+		public static Object getPlayerEnderChest(String username, String profileName, SlashCommandEvent event) {
 			Player.Profile player = Player.create(username, profileName);
 			if (player.isValid()) {
 				List<String[]> enderChestPages = player.getEnderChest();
-				if (enderChestPages != null) {
-					new InventoryEmojiPaginator(enderChestPages, "Ender Chest", player, event);
-					return null;
+				if (enderChestPages == null) {
+					return withApiHelpButton(errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
 				}
-				return errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled");
+
+				new InventoryEmojiPaginator(enderChestPages, "Ender Chest", player, event);
+				return null;
 			}
 			return player.getErrorEmbed();
 		}

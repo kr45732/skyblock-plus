@@ -76,7 +76,7 @@ public class Main {
 
 	public static void main(String[] args) throws IllegalArgumentException {
 		globalExceptionHandler = new GlobalExceptionHandler();
-		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
+		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(Thread.currentThread(), e));
 		Message.suppressContentIntentWarning();
 
 		Utils.initialize();
