@@ -450,7 +450,7 @@ public class GuildSlashCommand extends SlashCommand {
 				total += amount;
 
 				if (usernameUuidStruct != null && player.getString("uuid").equals(usernameUuidStruct.uuid())) {
-					guildRank = i;
+					guildRank = i + 1;
 					amt = formattedAmt;
 				}
 			}
