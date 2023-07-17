@@ -477,8 +477,13 @@ public class Player {
 
 		public double getAmount(Profile profile, String type) {
 			return switch (type) {
+				case "selected_class" -> {
+					String selectedClass = profile.getSelectedDungeonClass();
+					yield selectedClass.equals("none") ? -1 : DUNGEON_CLASS_NAMES.indexOf(selectedClass);
+				}
 				case "slayer", "total_slayer" -> profile.getTotalSlayer();
 				case "skills" -> profile.getSkillAverage();
+				case "skills_xp" -> profile.getTotalSkillsXp();
 				case "catacombs" -> profile.getCatacombs().getProgressLevel();
 				case "catacombs_xp" -> profile.getCatacombs().totalExp();
 				case "healer", "mage", "berserk", "archer", "tank" -> profile.getDungeonClass(type).getProgressLevel();
@@ -622,6 +627,18 @@ public class Player {
 
 		public double getSkillAverage() {
 			return getSkillAverage("", 0);
+		}
+
+		public long getTotalSkillsXp() {
+			long totalXp = 0;
+			for (String skill : SKILL_NAMES) {
+				try {
+					totalXp += getSkill(skill).totalExp();
+				} catch (Exception e) {
+					return -1;
+				}
+			}
+			return totalXp;
 		}
 
 		public double getSkillAverage(String skillName, int overrideAmount) {

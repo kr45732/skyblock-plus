@@ -61,6 +61,7 @@ public class LeaderboardDatabase {
 			"uuid",
 			"slayer",
 			"skills",
+			"skills_xp",
 			"catacombs_xp",
 			"weight",
 			"wolf",
@@ -96,7 +97,8 @@ public class LeaderboardDatabase {
 			"archer_xp",
 			"tank_xp",
 			"mage_reputation",
-			"barbarian_reputation"
+			"barbarian_reputation",
+			"selected_class"
 		)
 	);
 	private static final List<String> typesSubList = new ArrayList<>();

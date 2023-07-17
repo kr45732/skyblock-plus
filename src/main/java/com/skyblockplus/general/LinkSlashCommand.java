@@ -20,6 +20,7 @@ package com.skyblockplus.general;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
 import static com.skyblockplus.utils.utils.HypixelUtils.getPlayerDiscordInfo;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
@@ -266,9 +267,10 @@ public class LinkSlashCommand extends SlashCommand {
 									switch (type) {
 										case "SKILLS", "WEIGHT", "CATACOMBS", "LEVEL" -> formatNumber((int) player.getDouble(type));
 										case "SLAYER" -> simplifyNumber((long) player.getDouble("slayer"));
-										case "CLASS" -> player.getString("selected_class", null) == null
+										case "CLASS" -> player.getDouble("selected_class") == -1
 											? ""
-											: "" + player.getString("selected_class").toUpperCase().charAt(0);
+											: "" +
+											DUNGEON_CLASS_NAMES.get((int) player.getDouble("selected_class")).toUpperCase().charAt(0);
 										default -> throw new IllegalStateException("Unexpected value: " + type);
 									} +
 									extra
