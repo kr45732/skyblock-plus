@@ -307,12 +307,19 @@ public class NetworthExecute {
 		StringBuilder talismanStr = getSectionString(getItems("talisman"), ignoreSoulbound);
 
 		double totalNetworth = getNetworth(ignoreSoulbound);
-		String ebDesc = "**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + roundAndFormat(totalNetworth) + ")\n**" +
-						(
-							Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
-								? capitalizeString(player.getGamemode().toString()) + " "
-								: ""
-						)+"Leaderboard Position:** " + (networthPosition != -1 ? formatNumber(networthPosition) : "Not on leaderboard");
+		String ebDesc =
+			"**Total Networth:** " +
+			simplifyNumber(totalNetworth) +
+			" (" +
+			roundAndFormat(totalNetworth) +
+			")\n**" +
+			(
+				Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
+					? capitalizeString(player.getGamemode().toString()) + " "
+					: ""
+			) +
+			"Leaderboard Position:** " +
+			(networthPosition != -1 ? formatNumber(networthPosition) : "Not on leaderboard");
 		EmbedBuilder eb = player.defaultPlayerEmbed().setDescription(ebDesc);
 		eb.addField(
 			"Purse & Bank",

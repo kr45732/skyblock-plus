@@ -509,12 +509,12 @@ public class LeaderboardDatabase {
 	public Future<Integer> getNetworthPosition(Player.Gamemode gamemode, String uuid) {
 		return executor.submit(() -> {
 			try (
-					Connection connection = getConnection();
-					PreparedStatement statement = connection.prepareStatement(
-							"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS rank FROM " +
-									gamemode.toLeaderboardName() +
-									" WHERE networth IS NOT NULL) s WHERE uuid = ? LIMIT 1"
-					)
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+					"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS rank FROM " +
+					gamemode.toLeaderboardName() +
+					" WHERE networth IS NOT NULL) s WHERE uuid = ? LIMIT 1"
+				)
 			) {
 				statement.setObject(1, stringToUuid(uuid));
 				try (ResultSet response = statement.executeQuery()) {

@@ -425,7 +425,9 @@ public class Player {
 			return profileIndex;
 		}
 
-		public boolean isSelected() { return profileIndex == selectedProfileIndex;}
+		public boolean isSelected() {
+			return profileIndex == selectedProfileIndex;
+		}
 
 		public JsonElement getOuterProfileJson() {
 			return profileJson;
