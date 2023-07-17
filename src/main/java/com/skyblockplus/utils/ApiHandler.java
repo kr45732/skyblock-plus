@@ -407,8 +407,7 @@ public class ApiHandler {
 								}
 
 								try {
-									updateHypixelKey(
-										hypixelApiKey,
+									hypixelRateLimiter.update(
 										Integer.parseInt(httpResponse.headers().firstValue("RateLimit-Remaining").get()),
 										Integer.parseInt(httpResponse.headers().firstValue("RateLimit-Reset").get())
 									);

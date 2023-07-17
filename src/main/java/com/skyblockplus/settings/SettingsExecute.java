@@ -222,7 +222,6 @@ public class SettingsExecute {
 		if (args.length >= 4 && args[1].equals("set")) {
 			eb =
 				switch (args[2]) {
-					case "hypixel_key" -> setHypixelKey(args[3]);
 					case "guest_role" -> setApplyGuestRole(args[3]);
 					case "fetchur_channel" -> setFetchurChannel(args[3]);
 					case "fetchur_ping" -> setFetchurPing(args[3]);
@@ -237,7 +236,6 @@ public class SettingsExecute {
 					case "all" -> database.deleteServerSettings(guild.getId()) == 200
 						? defaultEmbed("Success").setDescription("Server settings deleted")
 						: errorEmbed("Error deleting server settings");
-					case "hypixel_key" -> deleteHypixelKey();
 					default -> getHelpEmbed("settings delete");
 				};
 		} else if (args.length >= 2 && args[1].equals("blacklist")) {
@@ -1904,12 +1902,6 @@ public class SettingsExecute {
 					type.equals("LEVEL")
 				)
 			) {
-				EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
-				if (eb != null) {
-					return errorEmbed(
-						"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to use the PLAYER template options"
-					);
-				}
 				nickname = nickname.replace(matcher.group(0), "");
 			}
 		}
@@ -2052,13 +2044,6 @@ public class SettingsExecute {
 			if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
 				return errorEmbed("Automatic roles must be enabled");
 			}
-
-			EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
-			if (eb != null) {
-				return errorEmbed(
-					"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to enable automatic roles sync"
-				);
-			}
 		}
 
 		int responseCode = updateVerifySettings("enableAutomaticRolesSync", "" + enable);
@@ -2082,13 +2067,6 @@ public class SettingsExecute {
 		if (enable) {
 			if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
 				return errorEmbed("Automatic roles must be enabled");
-			}
-
-			EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
-			if (eb != null) {
-				return errorEmbed(
-					"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to enable automatic roles claim"
-				);
 			}
 		}
 
@@ -2374,30 +2352,6 @@ public class SettingsExecute {
 
 	public JsonObject getBlacklistSettings() {
 		return higherDepth(serverSettings, "blacklist").getAsJsonObject();
-	}
-
-	public EmbedBuilder setHypixelKey(String newKey) {
-		try {
-			newKey = higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey, newKey), "record.key").getAsString();
-		} catch (Exception e) {
-			return errorEmbed("Provided Hypixel API key is invalid.");
-		}
-
-		int responseCode = database.setServerHypixelApiKey(guild.getId(), newKey);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Set the Hypixel API key. For privacy reasons, they key cannot be viewed again.");
-	}
-
-	public EmbedBuilder deleteHypixelKey() {
-		int responseCode = database.setServerHypixelApiKey(guild.getId(), "");
-		if (responseCode != 200) {
-			apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Deleted the server's Hypixel API key.");
 	}
 
 	public EmbedBuilder setFetchurChannel(String channelMention) {

@@ -284,6 +284,12 @@ public class LeaderboardDatabase {
 
 	private double getDouble(ResultSet row, String lbType) throws SQLException {
 		double value = row.getDouble(lbType);
+		boolean isNull = row.wasNull();
+
+		if (lbType.equals("selected_class") && isNull) {
+			return -1;
+		}
+
 		return switch (lbType) {
 			case "alchemy",
 				"combat",

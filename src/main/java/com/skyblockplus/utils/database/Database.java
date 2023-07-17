@@ -161,14 +161,6 @@ public class Database {
 		return settingsService.setVerifyRolesSettings(serverId, gson.fromJson(newSettings, String[].class)).getStatusCode().value();
 	}
 
-	public String getServerHypixelApiKey(String serverId) {
-		return settingsService.getServerHypixelApiKey(serverId).getBody();
-	}
-
-	public int setServerHypixelApiKey(String serverId, String newKey) {
-		return settingsService.setServerHypixelApiKey(serverId, newKey).getStatusCode().value();
-	}
-
 	public JsonElement getBlacklistSettings(String serverId) {
 		return gson.toJsonTree(settingsService.getBlacklistSettings(serverId).getBody());
 	}

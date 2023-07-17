@@ -82,9 +82,9 @@ public class HttpUtils {
 
 	public static JsonElement getJson(String jsonUrl, String hypixelApiKey) {
 		try {
-			if (jsonUrl.contains(hypixelApiKey) && keyCooldownMap.get(hypixelApiKey).isRateLimited()) {
-				long timeTillReset = keyCooldownMap.get(hypixelApiKey).getTimeTillReset();
-				log.info("Sleeping for " + timeTillReset + " seconds (" + isMainHypixelKey(hypixelApiKey) + ")");
+			if (jsonUrl.contains(hypixelApiKey) && hypixelRateLimiter.isRateLimited()) {
+				long timeTillReset = hypixelRateLimiter.getTimeTillReset();
+				log.info("Sleeping for " + timeTillReset + " seconds");
 				TimeUnit.SECONDS.sleep(timeTillReset);
 			}
 		} catch (Exception ignored) {}
@@ -100,8 +100,7 @@ public class HttpUtils {
 				if (jsonUrl.contains("api.hypixel.net")) {
 					if (jsonUrl.contains(hypixelApiKey)) {
 						try {
-							updateHypixelKey(
-								hypixelApiKey,
+							hypixelRateLimiter.update(
 								Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue()),
 								Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue())
 							);

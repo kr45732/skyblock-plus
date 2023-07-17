@@ -74,8 +74,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -122,7 +120,6 @@ public class Utils {
 		new LinkedBlockingQueue<>()
 	)
 		.setAllowCoreThreadTimeOut(true);
-	public static final ConcurrentHashMap<String, HypixelKeyRecord> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final List<String> hypixelGuildRequestQueue = Collections.synchronizedList(new ArrayList<>());
 	public static final List<String> hypixelGuildFetchQueue = Collections.synchronizedList(new ArrayList<>());
 
@@ -161,6 +158,7 @@ public class Utils {
 	public static String LEADERBOARD_DB_URL = "";
 	public static String CLIENT_SECRET = "";
 	public static String BASE_URL = "";
+	public static HypixelKeyRecord hypixelRateLimiter = null;
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
@@ -293,7 +291,7 @@ public class Utils {
 			BASE_URL = System.getenv("BASE_URL");
 		}
 
-		keyCooldownMap.put(HYPIXEL_API_KEY, new HypixelKeyRecord(240, 0));
+		hypixelRateLimiter = new HypixelKeyRecord(240, 0);
 	}
 
 	public static String getEmojiWithName(String id, String name) {
@@ -346,40 +344,6 @@ public class Utils {
 	public static JsonElement getScammerJson(String uuid) {
 		JsonElement scammerJson = getJson("https://jerry.robothanzo.dev/v1/scammers/" + stringToUuid(uuid) + "?key=" + SBZ_SCAMMER_DB_KEY);
 		return higherDepth(scammerJson, "scammer", false) ? scammerJson : null;
-	}
-
-	public static EmbedBuilder checkHypixelKey(String hypixelKey) {
-		return checkHypixelKey(hypixelKey, true);
-	}
-
-	public static EmbedBuilder checkHypixelKey(String hypixelKey, boolean checkRatelimit) {
-		if (hypixelKey == null) {
-			return errorEmbed("You must set a valid Hypixel API key to use this feature or command");
-		}
-
-		try {
-			HttpGet httpGet = new HttpGet("https://api.hypixel.net/key?key=" + hypixelKey);
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				int remainingLimit = Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue());
-				int timeTillReset = Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue());
-				if (checkRatelimit && remainingLimit < 10) {
-					return errorEmbed(
-						"That command is on cooldown for " + timeTillReset + " more second" + (timeTillReset == 1 ? "" : "s")
-					);
-				}
-
-				try (InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent())) {
-					higherDepth(JsonParser.parseReader(in), "record.key").getAsString();
-				}
-
-				updateHypixelKey(hypixelKey, remainingLimit, timeTillReset);
-			}
-		} catch (Exception e) {
-			return errorEmbed("You must set a valid Hypixel API key to use this feature or command");
-		}
-		return null;
 	}
 
 	public static Map<Integer, InvItem> getGenericInventoryMap(NBTCompound parsedContents) {
@@ -799,18 +763,6 @@ public class Utils {
 
 	public static boolean isMainBot() {
 		return DEFAULT_PREFIX.equals("+");
-	}
-
-	public static boolean isMainHypixelKey(String key) {
-		return key.equals(HYPIXEL_API_KEY);
-	}
-
-	public static void updateHypixelKey(String key, int remainingLimit, int timeTillReset) {
-		if (!keyCooldownMap.containsKey(key)) {
-			keyCooldownMap.put(key, new HypixelKeyRecord(remainingLimit, timeTillReset));
-		} else {
-			keyCooldownMap.get(key).update(remainingLimit, timeTillReset);
-		}
 	}
 
 	public static Map<String, Integer> getCommandUses() {
