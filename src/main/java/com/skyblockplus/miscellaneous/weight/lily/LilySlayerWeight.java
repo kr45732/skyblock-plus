@@ -18,7 +18,6 @@
 
 package com.skyblockplus.miscellaneous.weight.lily;
 
-import static com.skyblockplus.utils.Constants.SLAYER_NAMES_MAP;
 import static com.skyblockplus.utils.utils.JsonUtils.getWeightJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 
@@ -52,17 +51,16 @@ public class LilySlayerWeight extends SlayerWeight {
 			score = Math.sqrt(4.0 / 3) * Math.cos(Math.acos(d * Math.pow(3, 5.0 / 2)) / 3) - 1;
 		}
 
-		double scaleFactor = higherDepth(getWeightJson(), "lily.slayer.deprecation_scaling." + SLAYER_NAMES_MAP.get(slayerName))
-			.getAsDouble();
+		double scaleFactor = higherDepth(getWeightJson(), "lily.slayer.deprecation_scaling." + slayerName).getAsDouble();
 		int intScore = (int) score;
 		double distance = currentSlayerXp - actualInt(intScore);
 		double effectiveDistance = distance * Math.pow(scaleFactor, intScore);
 		double effectiveScore = effectiveInt(intScore, scaleFactor) + effectiveDistance;
 		double weight =
 			switch (slayerName) {
-				case "rev" -> (effectiveScore / 9250) + (currentSlayerXp / 1000000.0);
-				case "tara" -> (effectiveScore / 7019.57) + ((currentSlayerXp * 1.6) / 1000000);
-				case "sven" -> (effectiveScore / 2982.06) + ((currentSlayerXp * 3.6) / 1000000);
+				case "zombie" -> (effectiveScore / 9250) + (currentSlayerXp / 1000000.0);
+				case "spider" -> (effectiveScore / 7019.57) + ((currentSlayerXp * 1.6) / 1000000);
+				case "wolf" -> (effectiveScore / 2982.06) + ((currentSlayerXp * 3.6) / 1000000);
 				case "enderman" -> (effectiveScore / 996.3003) + ((currentSlayerXp * 10.0) / 1000000);
 				case "blaze" -> (effectiveScore / 935.0455) + ((currentSlayerXp * 10.0) / 1000000);
 				default -> throw new IllegalStateException("Unexpected value: " + slayerName);

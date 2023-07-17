@@ -45,6 +45,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import javax.xml.crypto.Data;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,9 +62,9 @@ public class LeaderboardDatabase {
 			"skills",
 			"catacombs",
 			"weight",
-			"sven",
-			"rev",
-			"tara",
+			"wolf",
+			"zombie",
+			"spider",
 			"enderman",
 			"alchemy",
 			"combat",
@@ -82,7 +83,19 @@ public class LeaderboardDatabase {
 			"coins",
 			"lily_slayer_weight",
 			"level",
-			"hotm"
+			"hotm",
+			"pet_score",
+			"fairy_souls",
+			"minion_slots",
+			"maxed_slayers",
+			"maxed_collections",
+			"healer",
+			"mage",
+			"berserk",
+			"archer",
+			"tank",
+			"mage_reputation",
+			"barbarian_reputation"
 		)
 	);
 	private static final List<String> typesSubList = new ArrayList<>();
@@ -123,9 +136,6 @@ public class LeaderboardDatabase {
 		lbType =
 			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
 				case "nw" -> "networth";
-				case "wolf" -> "sven";
-				case "spider" -> "tara";
-				case "zombie" -> "rev";
 				case "eman" -> "enderman";
 				default -> lbType;
 			};
@@ -459,6 +469,11 @@ public class LeaderboardDatabase {
 		}
 
 		return out;
+	}
+
+	public DataObject getCachedPlayer(List<String> lbTypes, Player.Gamemode mode, String uuid) {
+		List<DataObject> cachedPlayers = getCachedPlayers(lbTypes, mode, List.of(uuid));
+		return cachedPlayers.isEmpty() ? null : cachedPlayers.get(0);
 	}
 
 	public List<DataObject> fetchPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids) {

@@ -65,8 +65,7 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 			int curXp = player.getSlayer(slayerType);
 			targetXp =
 				targetLevel != -1
-					? higherDepth(getLevelingJson(), "slayer_xp." + SLAYER_NAMES_MAP.get(slayerType) + ".[" + (targetLevel - 1) + "]")
-						.getAsLong()
+					? higherDepth(getLevelingJson(), "slayer_xp." + slayerType + ".[" + (targetLevel - 1) + "]").getAsLong()
 					: targetXp;
 
 			if (curXp >= targetXp) {
@@ -189,9 +188,9 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 			.slash(name, "Calculate the number of slayer bosses needed to reach a certain level or xp amount")
 			.addOptions(
 				new OptionData(OptionType.STRING, "type", "Slayer type", true)
-					.addChoice("Sven Packmaster", "sven")
-					.addChoice("Revenant Horror", "rev")
-					.addChoice("Tarantula Broodfather", "tara")
+					.addChoice("Sven Packmaster", "wolf")
+					.addChoice("Revenant Horror", "zombie")
+					.addChoice("Tarantula Broodfather", "spider")
 					.addChoice("Voidgloom Seraph", "enderman")
 					.addChoice("Inferno Demonlord", "blaze")
 					.addChoice("Riftstalker Bloodfiend", "vampire"),

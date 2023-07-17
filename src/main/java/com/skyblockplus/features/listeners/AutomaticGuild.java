@@ -50,6 +50,7 @@ import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.RoleModifyRecord;
+import groovy.lang.Tuple3;
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
@@ -693,14 +694,15 @@ public class AutomaticGuild {
 
 							if (player.isValid()) {
 								try {
-									Object[] out = (Object[]) RolesSlashCommand.ClaimSubcommand.updateRoles(
+									Tuple3<EmbedBuilder, List<Role>, List<Role>> out = RolesSlashCommand.ClaimSubcommand.updateRoles(
 										player,
+										null,
 										linkedMember,
 										rolesSettings,
 										true
 									);
-									toAddRoles.addAll((List<Role>) out[1]);
-									toRemoveRoles.addAll((List<Role>) out[2]);
+									toAddRoles.addAll(out.getV2());
+									toRemoveRoles.addAll(out.getV3());
 								} catch (Exception ignored) {}
 							}
 						}

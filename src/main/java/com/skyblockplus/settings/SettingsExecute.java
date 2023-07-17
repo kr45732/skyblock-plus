@@ -72,11 +72,11 @@ public class SettingsExecute {
 
 	private static final Map<String, String> allAutomatedRoles = new LinkedHashMap<>(
 		Maps.of(
-			"sven",
+			"wolf",
 			null,
-			"rev",
+			"zombie",
 			null,
-			"tara",
+			"spider",
 			null,
 			"blaze",
 			null,
@@ -126,8 +126,8 @@ public class SettingsExecute {
 			"**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n",
 			"fairy_souls",
 			"**Amount of collected fairy souls**\nExample: `/settings roles add fairy_souls 50 @50 souls collected`\n",
-			"slot_collector",
-			"**Number of minion slots excluding upgrades**\nExample: `/settings roles add slot_collector 24 @maxed minion slots`\n",
+			"minion_slots",
+			"**Number of minion slots excluding upgrades**\nExample: `/settings roles add minion_slots 24 @maxed minion slots`\n",
 			"total_slayer",
 			"**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n",
 			"maxed_slayers",
@@ -138,8 +138,6 @@ public class SettingsExecute {
 			"**A player's pet score**\nExample: `/settings roles add pet_score 100 @100 pet score`\n",
 			"dungeon_secrets",
 			"**A player's dungeon secrets count**\nExample: `/settings roles add dungeon_secrets 25000 @secrets sweat`\n",
-			"accessory_count",
-			"**A player's dungeon unique accessory count**\nExample: `/settings roles add accessory_count 75 @accessory collector`\n",
 			"networth",
 			"**A player's networth**\nExample: `/settings roles add networth 1000000000 @billionaire`\n",
 			"gamemode",
@@ -148,10 +146,10 @@ public class SettingsExecute {
 			"**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n",
 			"player_items",
 			"**Items that a player has**\nExample: `/settings roles add player_items hyperion @mage gamer`\n",
-			"mage_rep",
-			"**A player's mage reputation**\nExample: `/settings roles add mage_rep 1000 @1k mage rep`\n",
-			"barbarian_rep",
-			"**A player's barbarian reputation**\nExample: `/settings roles add barbarian_rep 1000 @1k barbarian rep`\n",
+			"mage_reputation",
+			"**A player's mage reputation**\nExample: `/settings roles add mage_reputation 1000 @1k mage rep`\n",
+			"barbarian_reputation",
+			"**A player's barbarian reputation**\nExample: `/settings roles add barbarian_reputation 1000 @1k barbarian rep`\n",
 			"level",
 			"**A player's Skyblock level**\nExample: `/settings roles add level 500 @maxed level`\n"
 		)
@@ -161,7 +159,7 @@ public class SettingsExecute {
 		for (String roleName : allAutomatedRoles.keySet()) {
 			String customDescription =
 				switch (roleName) {
-					case "sven", "rev", "tara", "enderman", "blaze" -> "**A player's " +
+					case "wolf", "zombie", "spider", "enderman", "blaze" -> "**A player's " +
 					roleName +
 					" slayer xp**\nExample: `/settings roles add " +
 					roleName +

@@ -20,7 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.utils.HypixelUtils.petLevelFromXp;
+import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
 import static com.skyblockplus.utils.utils.StringUtils.idToName;
@@ -36,6 +36,7 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.command.Subcommand;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
+import groovy.lang.Tuple3;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -49,6 +50,7 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -77,7 +79,7 @@ public class RolesSlashCommand extends SlashCommand {
 			this.cooldown = GLOBAL_COOLDOWN + 2;
 		}
 
-		public static EmbedBuilder updateRoles(String profile, Member member) {
+		public static EmbedBuilder getRolesClaimEmbed(String profile, Member member) {
 			LinkedAccount linkedInfo = database.getByDiscord(member.getId());
 			if (linkedInfo == null) {
 				return defaultEmbed("You must be linked to run this command. Use `/link <player>` to link");
@@ -89,31 +91,42 @@ public class RolesSlashCommand extends SlashCommand {
 				return player.getErrorEmbed();
 			}
 
-			Object out = updateRoles(player, member);
-			if (out instanceof EmbedBuilder eb1) {
-				return eb1;
+			Tuple3<EmbedBuilder, List<Role>, List<Role>> out = updateRoles(player, null, member, false);
+			if (out.getV2() == null) {
+				return out.getV1();
 			}
 
-			Object[] outArr = ((Object[]) out);
 			try {
-				member.getGuild().modifyMemberRoles(member, (List<Role>) outArr[1], (List<Role>) outArr[2]).queue();
+				member.getGuild().modifyMemberRoles(member, out.getV2(), out.getV3()).queue();
 			} catch (PermissionException e) {
 				return errorEmbed("Missing permission: " + e.getPermission().getName());
 			}
-			return (EmbedBuilder) outArr[0];
+
+			return out.getV1();
 		}
 
-		public static Object updateRoles(Player.Profile player, Member member) {
-			return updateRoles(player, member, database.getRolesSettings(member.getGuild().getId()), false);
+		public static Tuple3<EmbedBuilder, List<Role>, List<Role>> updateRoles(
+			Player.Profile player,
+			DataObject cachedData,
+			Member member,
+			boolean skipRoles
+		) {
+			return updateRoles(player, cachedData, member, database.getRolesSettings(member.getGuild().getId()), skipRoles);
 		}
 
 		/**
-		 * @param skipRoles Whether to skip roles that require extra API requests (guild roles, guild ranks, dungeon secrets)
+		 * @param skipRoles Whether to skip certain roles: (guild roles, guild ranks, dungeon secrets, player items)
 		 * @return eb or [eb, toAdd, toRemove]
 		 */
-		public static Object updateRoles(Player.Profile player, Member member, JsonElement rolesSettings, boolean skipRoles) {
+		public static Tuple3<EmbedBuilder, List<Role>, List<Role>> updateRoles(
+			Player.Profile player,
+			DataObject cachedData,
+			Member member,
+			JsonElement rolesSettings,
+			boolean skipRoles
+		) {
 			if (!higherDepth(rolesSettings, "enable", false)) {
-				return errorEmbed("Automatic roles not setup or enabled for this server");
+				return new Tuple3<>(errorEmbed("Automatic roles not setup or enabled for this server"), null, null);
 			}
 
 			Guild guild = member.getGuild();
@@ -137,7 +150,14 @@ public class RolesSlashCommand extends SlashCommand {
 				String roleName = higherDepth(roleSettings, "name").getAsString();
 
 				if (
-					skipRoles && (roleName.equals("guild_member") || roleName.equals("guild_ranks") || roleName.equals("dungeon_secrets"))
+					skipRoles &&
+					(
+						roleName.equals("guild_member") ||
+						roleName.equals("guild_ranks") ||
+						roleName.equals("dungeon_secrets") ||
+						roleName.equals("player_items") ||
+						roleName.equals("gamemode")
+					)
 				) {
 					continue;
 				}
@@ -247,38 +267,6 @@ public class RolesSlashCommand extends SlashCommand {
 							}
 						}
 					}
-					case "gamemode" -> {
-						JsonArray levelsArray = higherDepth(roleSettings, "levels").getAsJsonArray();
-						for (int i = levelsArray.size() - 1; i >= 0; i--) {
-							JsonElement currentLevel = levelsArray.get(i);
-							String mode = higherDepth(currentLevel, "value").getAsString();
-							Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
-							if (currentLevelRole == null) {
-								errorRoles.append(roleDeletedString(higherDepth(currentLevel, "roleId").getAsString()));
-								continue;
-							}
-
-							if (player.isGamemode(Player.Gamemode.of(mode))) {
-								if (!member.getRoles().contains(currentLevelRole)) {
-									if (botRole.canInteract(currentLevelRole)) {
-										toAdd.add(currentLevelRole);
-										addedRoles.append(roleChangeString(currentLevelRole.getName()));
-									} else {
-										errorRoles.append(roleChangeString(currentLevelRole.getName()));
-									}
-								}
-							} else {
-								if (member.getRoles().contains(currentLevelRole)) {
-									if (botRole.canInteract(currentLevelRole)) {
-										toRemove.add(currentLevelRole);
-										removedRoles.append(roleChangeString(currentLevelRole.getName()));
-									} else {
-										errorRoles.append(roleChangeString(currentLevelRole.getName()));
-									}
-								}
-							}
-						}
-					}
 					case "player_items" -> {
 						JsonArray levelsArray = higherDepth(roleSettings, "levels").getAsJsonArray();
 						List<String> items = streamJsonArray(levelsArray)
@@ -321,80 +309,135 @@ public class RolesSlashCommand extends SlashCommand {
 							}
 						}
 					}
-					default -> {
-						double roleAmount =
-							switch (roleName) {
-								case "sven", "rev", "tara", "enderman", "blaze", "vampire" -> useHighest
-									? player.getHighestAmount(roleName)
-									: player.getSlayer(roleName);
-								case "coins" -> {
-									roleAmount = useHighest ? player.getHighestAmount("bank") : player.getBankBalance();
-									if (roleAmount == -1 && !disabledAPI.toString().contains("Banking")) {
-										disabledAPI.append(roleChangeString("Banking API disabled"));
+					case "gamemode" -> {
+						JsonArray levelsArray = higherDepth(roleSettings, "levels").getAsJsonArray();
+						for (int i = levelsArray.size() - 1; i >= 0; i--) {
+							JsonElement currentLevel = levelsArray.get(i);
+							String mode = higherDepth(currentLevel, "value").getAsString();
+							Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+							if (currentLevelRole == null) {
+								errorRoles.append(roleDeletedString(higherDepth(currentLevel, "roleId").getAsString()));
+								continue;
+							}
+
+							if (player.isGamemode(Player.Gamemode.of(mode))) {
+								if (!member.getRoles().contains(currentLevelRole)) {
+									if (botRole.canInteract(currentLevelRole)) {
+										toAdd.add(currentLevelRole);
+										addedRoles.append(roleChangeString(currentLevelRole.getName()));
 									} else {
-										roleAmount += useHighest ? player.getHighestAmount("purse") : player.getPurseCoins();
+										errorRoles.append(roleChangeString(currentLevelRole.getName()));
 									}
-									yield roleAmount;
 								}
-								case "skill_average" -> {
-									roleAmount = useHighest ? player.getHighestAmount("skills") : player.getSkillAverage();
-									if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
-										disabledAPI.append(roleChangeString("Skills API disabled"));
+							} else {
+								if (member.getRoles().contains(currentLevelRole)) {
+									if (botRole.canInteract(currentLevelRole)) {
+										toRemove.add(currentLevelRole);
+										removedRoles.append(roleChangeString(currentLevelRole.getName()));
+									} else {
+										errorRoles.append(roleChangeString(currentLevelRole.getName()));
 									}
-									yield roleAmount;
 								}
-								case "level" -> useHighest ? player.getHighestAmount(roleName) : player.getLevel();
-								case "pet_score" -> useHighest ? player.getHighestAmount(roleName) : player.getPetScore();
-								case "alchemy",
-									"combat",
-									"fishing",
-									"farming",
-									"foraging",
-									"carpentry",
-									"mining",
-									"taming",
-									"enchanting",
-									"social" -> {
-									roleAmount =
-										useHighest
-											? player.getHighestAmount(roleName)
-											: (player.getSkill(roleName) != null ? player.getSkill(roleName).getProgressLevel() : -1);
-									if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
-										disabledAPI.append(roleChangeString("Skills API disabled"));
+							}
+						}
+					}
+					default -> {
+						double roleAmount;
+						if (player != null) {
+							roleAmount =
+								switch (roleName) {
+									case "wolf",
+										"zombie",
+										"spider",
+										"enderman",
+										"blaze",
+										"vampire",
+										"level",
+										"pet_score",
+										"networth",
+										"catacombs",
+										"fairy_souls",
+										"minion_slots",
+										"dungeon_secrets",
+										"total_slayer",
+										"maxed_slayers",
+										"healer",
+										"mage",
+										"berserk",
+										"archer",
+										"tank",
+										"mage_reputation",
+										"barbarian_rep",
+										"maxed_collections" -> player.getAmount(roleName, useHighest);
+									case "coins" -> {
+										roleAmount = player.getAmount("bank", useHighest);
+										if (roleAmount == -1 && !disabledAPI.toString().contains("Banking")) {
+											disabledAPI.append(roleChangeString("Banking API disabled"));
+										} else {
+											roleAmount += player.getAmount("purse", useHighest);
+										}
+										yield roleAmount;
 									}
-									yield roleAmount;
-								}
-								case "networth" -> useHighest ? player.getHighestAmount(roleName) : player.getNetworth();
-								case "catacombs" -> useHighest
-									? player.getHighestAmount(roleName)
-									: player.getCatacombs().getProgressLevel();
-								case "fairy_souls" -> useHighest ? player.getHighestAmount(roleName) : player.getFairySouls();
-								case "slot_collector" -> useHighest ? player.getHighestAmount(roleName) : player.getNumberMinionSlots();
-								case "dungeon_secrets" -> useHighest ? player.getHighestAmount(roleName) : player.getDungeonSecrets();
-								case "accessory_count" -> useHighest ? player.getHighestAmount(roleName) : player.getAccessoryCount();
-								case "weight" -> {
-									if (
-										!useHighest &&
-										!player.isSkillsApiEnabled() &&
-										!disabledAPI.toString().contains("Skills (for weight)")
-									) {
-										disabledAPI.append(roleChangeString("Skills (for weight) API disabled"));
+									case "skill_average" -> {
+										roleAmount = player.getAmount("skills", useHighest);
+										if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
+											disabledAPI.append(roleChangeString("Skills API disabled"));
+										}
+										yield roleAmount;
 									}
-									roleAmount = useHighest ? player.getHighestAmount(roleName) : player.getWeight();
-									yield roleAmount;
-								}
-								case "total_slayer" -> useHighest ? player.getHighestAmount(roleName) : player.getTotalSlayer();
-								case "maxed_slayers" -> useHighest ? player.getHighestAmount(roleName) : player.getNumMaxedSlayers();
-								case "maxed_collections" -> useHighest
-									? player.getHighestAmount(roleName)
-									: player.getNumMaxedCollections();
-								case "healer", "mage", "berserk", "archer", "tank" -> useHighest
-									? player.getHighestAmount(roleName)
-									: player.getDungeonClass(roleName).getProgressLevel();
-								case "mage_rep" -> useHighest ? player.getHighestAmount(roleName) : player.getMageRep();
-								case "barbarian_rep" -> useHighest ? player.getHighestAmount(roleName) : player.getBarbarianRep();
-								default -> -1;
-							};
+									case "alchemy",
+										"combat",
+										"fishing",
+										"farming",
+										"foraging",
+										"carpentry",
+										"mining",
+										"taming",
+										"enchanting",
+										"social" -> {
+										roleAmount = player.getAmount(roleName, useHighest);
+										if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
+											disabledAPI.append(roleChangeString("Skills API disabled"));
+										}
+										yield roleAmount;
+									}
+									case "weight" -> {
+										if (
+											!useHighest &&
+											!player.isSkillsApiEnabled() &&
+											!disabledAPI.toString().contains("Skills (for weight)")
+										) {
+											disabledAPI.append(roleChangeString("Skills (for weight) API disabled"));
+										}
+										roleAmount = useHighest ? player.getHighestAmount(roleName) : player.getWeight();
+										yield roleAmount;
+									}
+									default -> -1;
+								};
+						} else {
+							roleAmount =
+								switch (roleName) {
+									case "skill_average" -> cachedData.getDouble("skills", -1);
+									case "farming" -> levelingInfoFromExp((long) cachedData.getDouble("catacombs"), "catacombs", 60)
+										.getProgressLevel();
+									case "alchemy",
+										"combat",
+										"fishing",
+										"foraging",
+										"carpentry",
+										"mining",
+										"taming",
+										"enchanting",
+										"social",
+										"healer",
+										"mage",
+										"berserk",
+										"archer",
+										"tank" -> levelingInfoFromExp((long) cachedData.getDouble(roleName), roleName).getProgressLevel();
+									case "total_slayer" -> cachedData.getDouble("slayer", -1);
+									default -> cachedData.getDouble(roleName, -1);
+								};
+						}
 
 						if (roleAmount == -1) {
 							continue;
@@ -460,19 +503,23 @@ public class RolesSlashCommand extends SlashCommand {
 				}
 			}
 
-			EmbedBuilder eb = player
-				.defaultPlayerEmbed()
-				.setDescription(
-					(useHighest ? "**NOTE: Using highest values across all profiles**\n\n" : "") +
-					"**Added Roles (" +
-					toAdd.size() +
-					")**\n" +
-					(addedRoles.length() > 0 ? addedRoles.toString() : "• None\n") +
-					"\n**Removed Roles (" +
-					toRemove.size() +
-					")**\n" +
-					(removedRoles.length() > 0 ? removedRoles.toString() : "• None")
-				);
+			EmbedBuilder eb = null;
+			if (player != null) {
+				eb =
+					player
+						.defaultPlayerEmbed()
+						.setDescription(
+							(useHighest ? "**NOTE: Using highest values across all profiles**\n\n" : "") +
+							"**Added Roles (" +
+							toAdd.size() +
+							")**\n" +
+							(addedRoles.length() > 0 ? addedRoles.toString() : "• None\n") +
+							"\n**Removed Roles (" +
+							toRemove.size() +
+							")**\n" +
+							(removedRoles.length() > 0 ? removedRoles.toString() : "• None")
+						);
+			}
 			if (disabledAPI.length() > 0) {
 				eb.addField("Disabled APIs:", disabledAPI.toString(), false);
 			}
@@ -481,7 +528,7 @@ public class RolesSlashCommand extends SlashCommand {
 				eb.addField("Error roles:", errorRoles.toString(), false);
 			}
 
-			return new Object[] { eb, toAdd, toRemove };
+			return new Tuple3<>(eb, toAdd, toRemove);
 		}
 
 		private static String roleChangeString(String name) {
@@ -494,7 +541,7 @@ public class RolesSlashCommand extends SlashCommand {
 
 		@Override
 		protected void execute(SlashCommandEvent event) {
-			event.embed(updateRoles(event.getOptionStr("profile"), event.getMember()));
+			event.embed(getRolesClaimEmbed(event.getOptionStr("profile"), event.getMember()));
 		}
 
 		@Override

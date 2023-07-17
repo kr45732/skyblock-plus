@@ -21,6 +21,7 @@ package com.skyblockplus.general;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.utils.HypixelUtils.getPlayerDiscordInfo;
+import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
 import static com.skyblockplus.utils.utils.StringUtils.*;
@@ -35,6 +36,7 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.oauth.TokenData;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
+import groovy.lang.Tuple3;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +52,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
 
@@ -142,8 +145,8 @@ public class LinkSlashCommand extends SlashCommand {
 		String updatedNickname = "false";
 		String updatedRoles = "false";
 
-		Player.Profile player = null;
-		String key = database.getServerHypixelApiKey(member.getGuild().getId());
+		DataObject player = null;
+		boolean playerRequested = false;
 
 		try {
 			String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname", "none");
@@ -203,34 +206,30 @@ public class LinkSlashCommand extends SlashCommand {
 							type.equals("LEVEL")
 						)
 					) {
-						if (key != null) {
-							if (player == null) {
-								HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
-								player =
-									(
-										response.isValid()
-											? new Player(linkedAccount.username(), linkedAccount.uuid(), response.response(), true)
-											: new Player()
-									).getSelectedProfile();
-							}
+						if (!playerRequested) {
+							player = leaderboardDatabase.getCachedPlayer(List.of(""), Player.Gamemode.SELECTED, linkedAccount.uuid());
+							playerRequested = true;
+						}
 
-							if (player.isValid()) {
-								nicknameTemplate =
-									nicknameTemplate.replace(
-										matcher.group(0),
-										switch (type) {
-											case "SKILLS" -> formatNumber((int) player.getSkillAverage());
-											case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
-											case "WEIGHT" -> formatNumber((int) player.getWeight());
-											case "CLASS" -> player.getSelectedDungeonClass().equals("none")
-												? ""
-												: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
-											case "LEVEL" -> formatNumber((int) player.getLevel());
-											default -> formatNumber((int) player.getCatacombs().getProgressLevel());
-										} +
-										extra
-									);
-							}
+						if (player != null) {
+							nicknameTemplate =
+								nicknameTemplate.replace(
+									matcher.group(0),
+									switch (type) {
+										case "SKILLS" -> formatNumber((int) player.getDouble("skills"));
+										case "SLAYER" -> simplifyNumber((long) player.getDouble("slayer"));
+										case "WEIGHT" -> formatNumber((int) player.getDouble("weight"));
+										case "CLASS" -> player.getString("selected_class", null) == null
+											? ""
+											: "" + player.getString("selected_class").toUpperCase().charAt(0);
+										case "LEVEL" -> formatNumber((int) player.getDouble("level"));
+										case "CATACOMBS" -> formatNumber(
+											levelingInfoFromExp((long) player.getDouble("catacombs"), "catacombs").currentLevel()
+										);
+										default -> throw new IllegalStateException("Unexpected value: " + type);
+									} +
+									extra
+								);
 						}
 					}
 
@@ -257,22 +256,19 @@ public class LinkSlashCommand extends SlashCommand {
 
 			if (higherDepth(verifySettings, "enableRolesClaim", false)) {
 				try {
-					if (key != null) {
-						if (player == null) {
-							HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
-							player =
-								(
-									!response.isValid()
-										? new Player()
-										: new Player(linkedAccount.username(), linkedAccount.uuid(), response.response(), true)
-								).getSelectedProfile();
-						}
+					if (!playerRequested) {
+						player = leaderboardDatabase.getCachedPlayer(List.of(""), Player.Gamemode.SELECTED, linkedAccount.uuid());
+					}
 
-						if (player.isValid()) {
-							Object[] out = (Object[]) RolesSlashCommand.ClaimSubcommand.updateRoles(player, member);
-							toAdd.addAll((List<Role>) out[1]);
-							toRemove.addAll((List<Role>) out[2]);
-						}
+					if (player != null) {
+						Tuple3<EmbedBuilder, List<Role>, List<Role>> out = RolesSlashCommand.ClaimSubcommand.updateRoles(
+							null,
+							player,
+							member,
+							true
+						);
+						toAdd.addAll(out.getV2());
+						toRemove.addAll(out.getV3());
 					}
 				} catch (Exception ignored) {}
 			}

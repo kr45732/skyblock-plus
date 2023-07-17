@@ -52,21 +52,21 @@ public class SlayerSlashCommand extends SlashCommand {
 	public static EmbedBuilder getPlayerSlayer(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed();
 
-		int svenOneKills = player.getSlayerBossKills("wolf", 0);
-		int svenTwoKills = player.getSlayerBossKills("wolf", 1);
-		int svenThreeKills = player.getSlayerBossKills("wolf", 2);
-		int svenFourKills = player.getSlayerBossKills("wolf", 3);
+		int wolfOneKills = player.getSlayerBossKills("wolf", 0);
+		int wolfTwoKills = player.getSlayerBossKills("wolf", 1);
+		int wolfThreeKills = player.getSlayerBossKills("wolf", 2);
+		int wolfFourKills = player.getSlayerBossKills("wolf", 3);
 
-		int revOneKills = player.getSlayerBossKills("zombie", 0);
-		int revTwoKills = player.getSlayerBossKills("zombie", 1);
-		int revThreeKills = player.getSlayerBossKills("zombie", 2);
-		int revFourKills = player.getSlayerBossKills("zombie", 3);
-		int revFiveKills = player.getSlayerBossKills("zombie", 4);
+		int zombieOneKills = player.getSlayerBossKills("zombie", 0);
+		int zombieTwoKills = player.getSlayerBossKills("zombie", 1);
+		int zombieThreeKills = player.getSlayerBossKills("zombie", 2);
+		int zombieFourKills = player.getSlayerBossKills("zombie", 3);
+		int zombieFiveKills = player.getSlayerBossKills("zombie", 4);
 
-		int taraOneKills = player.getSlayerBossKills("spider", 0);
-		int taraTwoKills = player.getSlayerBossKills("spider", 1);
-		int taraThreeKills = player.getSlayerBossKills("spider", 2);
-		int taraFourKills = player.getSlayerBossKills("spider", 3);
+		int spiderOneKills = player.getSlayerBossKills("spider", 0);
+		int spiderTwoKills = player.getSlayerBossKills("spider", 1);
+		int spiderThreeKills = player.getSlayerBossKills("spider", 2);
+		int spiderFourKills = player.getSlayerBossKills("spider", 3);
 
 		int endermanOneKills = player.getSlayerBossKills("enderman", 0);
 		int endermanTwoKills = player.getSlayerBossKills("enderman", 1);
@@ -84,37 +84,37 @@ public class SlayerSlashCommand extends SlashCommand {
 		int vampireFourKills = player.getSlayerBossKills("vampire", 3);
 		int vampireFiveKills = player.getSlayerBossKills("vampire", 4);
 
-		String svenKills =
+		String wolfKills =
 			"**Tier 1:** " +
-			formatNumber(svenOneKills) +
+			formatNumber(wolfOneKills) +
 			"\n**Tier 2:** " +
-			formatNumber(svenTwoKills) +
+			formatNumber(wolfTwoKills) +
 			"\n**Tier 3:** " +
-			formatNumber(svenThreeKills) +
+			formatNumber(wolfThreeKills) +
 			"\n**Tier 4:** " +
-			formatNumber(svenFourKills);
+			formatNumber(wolfFourKills);
 
-		String revKills =
+		String zombieKills =
 			"**Tier 1:** " +
-			formatNumber(revOneKills) +
+			formatNumber(zombieOneKills) +
 			"\n**Tier 2:** " +
-			formatNumber(revTwoKills) +
+			formatNumber(zombieTwoKills) +
 			"\n**Tier 3:** " +
-			formatNumber(revThreeKills) +
+			formatNumber(zombieThreeKills) +
 			"\n**Tier 4:** " +
-			formatNumber(revFourKills) +
+			formatNumber(zombieFourKills) +
 			"\n**Tier 5:** " +
-			formatNumber(revFiveKills);
+			formatNumber(zombieFiveKills);
 
-		String taraKills =
+		String spiderKills =
 			"**Tier 1:** " +
-			formatNumber(taraOneKills) +
+			formatNumber(spiderOneKills) +
 			"\n**Tier 2:** " +
-			formatNumber(taraTwoKills) +
+			formatNumber(spiderTwoKills) +
 			"\n**Tier 3:** " +
-			formatNumber(taraThreeKills) +
+			formatNumber(spiderThreeKills) +
 			"\n**Tier 4:** " +
-			formatNumber(taraFourKills);
+			formatNumber(spiderFourKills);
 
 		String endermanKills =
 			"**Tier 1:** " +
@@ -150,15 +150,15 @@ public class SlayerSlashCommand extends SlashCommand {
 
 		long coinsSpentOnSlayers =
 			2000L *
-			(svenOneKills + revOneKills + taraOneKills + endermanOneKills) +
+			(wolfOneKills + zombieOneKills + spiderOneKills + endermanOneKills) +
 			7500L *
-			(svenTwoKills + revTwoKills + taraTwoKills + endermanTwoKills) +
+			(wolfTwoKills + zombieTwoKills + spiderTwoKills + endermanTwoKills) +
 			20000L *
-			(svenThreeKills + revThreeKills + taraThreeKills + endermanThreeKills) +
+			(wolfThreeKills + zombieThreeKills + spiderThreeKills + endermanThreeKills) +
 			50000L *
-			(svenFourKills + revFourKills + taraFourKills + endermanFourKills) +
+			(wolfFourKills + zombieFourKills + spiderFourKills + endermanFourKills) +
 			100000L *
-			revFiveKills +
+			zombieFiveKills +
 			10000L *
 			blazeOneKills +
 			25000L *
@@ -188,24 +188,24 @@ public class SlayerSlashCommand extends SlashCommand {
 			simplifyNumber(motesSpentOnSlayers)
 		);
 		eb.addField(
-			SLAYER_EMOJI_MAP.get("sven") + " Wolf (" + player.getSlayerLevel("sven") + ")",
-			simplifyNumber(player.getSlayer("sven")) + " XP",
+			SLAYER_EMOJI_MAP.get("wolf") + " Wolf (" + player.getSlayerLevel("wolf") + ")",
+			simplifyNumber(player.getSlayer("wolf")) + " XP",
 			true
 		);
 		eb.addField(
-			SLAYER_EMOJI_MAP.get("rev") + " Zombie (" + player.getSlayerLevel("rev") + ")",
-			simplifyNumber(player.getSlayer("rev")) + " XP",
+			SLAYER_EMOJI_MAP.get("zombie") + " Zombie (" + player.getSlayerLevel("zombie") + ")",
+			simplifyNumber(player.getSlayer("zombie")) + " XP",
 			true
 		);
 		eb.addField(
-			SLAYER_EMOJI_MAP.get("tara") + " Spider (" + player.getSlayerLevel("tara") + ")",
-			simplifyNumber(player.getSlayer("tara")) + " XP",
+			SLAYER_EMOJI_MAP.get("spider") + " Spider (" + player.getSlayerLevel("spider") + ")",
+			simplifyNumber(player.getSlayer("spider")) + " XP",
 			true
 		);
 
-		eb.addField("Boss Kills", svenKills, true);
-		eb.addField("Boss Kills", revKills, true);
-		eb.addField("Boss Kills", taraKills, true);
+		eb.addField("Boss Kills", wolfKills, true);
+		eb.addField("Boss Kills", zombieKills, true);
+		eb.addField("Boss Kills", spiderKills, true);
 
 		eb.addField(
 			SLAYER_EMOJI_MAP.get("enderman") + " Enderman (" + player.getSlayerLevel("enderman") + ")",

@@ -90,6 +90,10 @@ public class HypixelUtils {
 		return vanillaItems.contains(id);
 	}
 
+	public static SkillsStruct levelingInfoFromExp(long exp, String name) {
+		return levelingInfoFromExp(exp, name, higherDepth(getLevelingJson(), "leveling_caps." + name.toLowerCase(), 50));
+	}
+
 	public static SkillsStruct levelingInfoFromExp(long exp, String name, int maxLevel) {
 		JsonArray xpTable =
 			switch (name) {
