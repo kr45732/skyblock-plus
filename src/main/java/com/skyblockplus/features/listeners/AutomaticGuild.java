@@ -92,6 +92,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.InteractionCallbackAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.slf4j.Logger;
@@ -525,28 +526,8 @@ public class AutomaticGuild {
 					} catch (Exception ignored) {}
 				}
 
-				boolean requiresKey = rolesEnabled;
-				// No need to check again if requiresKey is true
-				if (!requiresKey) {
-					String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
-					Matcher verifyMatcher = nicknameTemplatePattern.matcher(nicknameTemplate);
-					while (verifyMatcher.find()) {
-						String category = verifyMatcher.group(1).toUpperCase();
-						if (category.equals("PLAYER")) {
-							requiresKey = true;
-							break;
-						}
-					}
-				}
-
-				String key = null;
-				if (requiresKey) {
-					key = database.getServerHypixelApiKey(guild.getId());
-					key = checkHypixelKey(key, false) == null ? key : null;
-				}
-
 				int numUpdated = 0;
-				int updateLimit = requiresKey ? 45 : 150;
+				int updateLimit = rolesEnabled ? 45 : 135;
 
 				if (inGuildUsers.stream().filter(m -> !updatedMembers.contains(m.getId())).limit(updateLimit).count() < updateLimit) {
 					inGuildUsers.sort(Comparator.comparing(m -> updatedMembers.contains(m.getId())));
@@ -562,17 +543,14 @@ public class AutomaticGuild {
 
 						List<Role> toAddRoles = new ArrayList<>();
 						List<Role> toRemoveRoles = new ArrayList<>();
-						Player.Profile player = null;
+						DataObject player = null;
+						boolean playerRequested = false;
 
 						if (verifyEnabled) {
 							toAddRoles.addAll(verifyRolesAdd);
 							toRemoveRoles.addAll(verifyRolesRemove);
 							String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
-							if (
-								nicknameTemplate.contains("[IGN]") &&
-								guild.getSelfMember().canInteract(linkedMember) &&
-								(!requiresKey || key != null)
-							) {
+							if (nicknameTemplate.contains("[IGN]") && guild.getSelfMember().canInteract(linkedMember)) {
 								nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
 
 								Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
@@ -637,34 +615,29 @@ public class AutomaticGuild {
 											type.equals("LEVEL")
 										)
 									) {
-										if (player == null) {
-											HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
+										if (!playerRequested) {
 											player =
-												(
-													!response.isValid()
-														? new Player()
-														: new Player(
-															linkedAccount.username(),
-															linkedAccount.uuid(),
-															response.response(),
-															true
-														)
-												).getSelectedProfile();
+												leaderboardDatabase.getCachedPlayer(
+													LinkSlashCommand.getLbTypes(rolesEnabled),
+													Player.Gamemode.SELECTED,
+													linkedAccount.uuid()
+												);
+											playerRequested = true;
 										}
 
-										if (player.isValid()) {
+										if (player != null) {
 											nicknameTemplate =
 												nicknameTemplate.replace(
 													matcher.group(0),
 													switch (type) {
-														case "SKILLS" -> formatNumber((int) player.getSkillAverage());
-														case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
-														case "WEIGHT" -> formatNumber((int) player.getWeight());
-														case "CLASS" -> player.getSelectedDungeonClass().equals("none")
+														case "SKILLS", "WEIGHT", "CATACOMBS", "LEVEL" -> formatNumber(
+															(int) player.getDouble(type)
+														);
+														case "SLAYER" -> simplifyNumber((long) player.getDouble("slayer"));
+														case "CLASS" -> player.getString("selected_class", null) == null
 															? ""
-															: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
-														case "LEVEL" -> formatNumber((int) player.getLevel());
-														default -> formatNumber((int) player.getCatacombs().getProgressLevel());
+															: "" + player.getString("selected_class").toUpperCase().charAt(0);
+														default -> throw new IllegalStateException("Unexpected value: " + type);
 													} +
 													extra
 												);
@@ -672,7 +645,7 @@ public class AutomaticGuild {
 									}
 								}
 
-								if (player == null || player.isValid()) {
+								if (!playerRequested || player != null) {
 									try {
 										linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
 									} catch (PermissionException ignored) {
@@ -682,21 +655,21 @@ public class AutomaticGuild {
 							}
 						}
 
-						if (rolesEnabled && key != null) {
-							if (player == null) {
-								HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
+						if (rolesEnabled) {
+							if (!playerRequested) {
 								player =
-									!response.isValid()
-										? new Player().getSelectedProfile()
-										: new Player(linkedAccount.username(), linkedAccount.uuid(), response.response(), true)
-											.getSelectedProfile();
+									leaderboardDatabase.getCachedPlayer(
+										LinkSlashCommand.getLbTypes(rolesEnabled),
+										Player.Gamemode.SELECTED,
+										linkedAccount.uuid()
+									);
 							}
 
-							if (player.isValid()) {
+							if (player != null) {
 								try {
 									Tuple3<EmbedBuilder, List<Role>, List<Role>> out = RolesSlashCommand.ClaimSubcommand.updateRoles(
-										player,
 										null,
+										player,
 										linkedMember,
 										rolesSettings,
 										true

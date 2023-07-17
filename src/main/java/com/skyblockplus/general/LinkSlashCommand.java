@@ -95,6 +95,11 @@ public class LinkSlashCommand extends SlashCommand {
 		"social",
 		"weight"
 	);
+	private static final List<String> nicknameLbTypes = List.of("skills", "catacombs", "slayer", "weight", "selected_class", "level");
+
+	public static List<String> getLbTypes(boolean rolesClaimEnabled) {
+		return rolesClaimEnabled ? rolesClaimLbTypes : nicknameLbTypes;
+	}
 
 	public LinkSlashCommand() {
 		this.name = "link";
@@ -247,9 +252,7 @@ public class LinkSlashCommand extends SlashCommand {
 						if (!playerRequested) {
 							player =
 								leaderboardDatabase.getCachedPlayer(
-									rolesClaimOnLink
-										? rolesClaimLbTypes
-										: List.of("skills_average", "catacombs", "slayer", "weight", "selected_class", "level"),
+									getLbTypes(rolesClaimOnLink),
 									Player.Gamemode.SELECTED,
 									linkedAccount.uuid()
 								);
@@ -261,14 +264,11 @@ public class LinkSlashCommand extends SlashCommand {
 								nicknameTemplate.replace(
 									matcher.group(0),
 									switch (type) {
-										case "SKILLS" -> formatNumber((int) player.getDouble("skills"));
+										case "SKILLS", "WEIGHT", "CATACOMBS", "LEVEL" -> formatNumber((int) player.getDouble(type));
 										case "SLAYER" -> simplifyNumber((long) player.getDouble("slayer"));
-										case "WEIGHT" -> formatNumber((int) player.getDouble("weight"));
 										case "CLASS" -> player.getString("selected_class", null) == null
 											? ""
 											: "" + player.getString("selected_class").toUpperCase().charAt(0);
-										case "LEVEL" -> formatNumber((int) player.getDouble("level"));
-										case "CATACOMBS" -> formatNumber((int) player.getDouble("catacombs"));
 										default -> throw new IllegalStateException("Unexpected value: " + type);
 									} +
 									extra
@@ -300,7 +300,12 @@ public class LinkSlashCommand extends SlashCommand {
 			if (rolesClaimOnLink) {
 				try {
 					if (!playerRequested) {
-						player = leaderboardDatabase.getCachedPlayer(rolesClaimLbTypes, Player.Gamemode.SELECTED, linkedAccount.uuid());
+						player =
+							leaderboardDatabase.getCachedPlayer(
+								getLbTypes(rolesClaimOnLink),
+								Player.Gamemode.SELECTED,
+								linkedAccount.uuid()
+							);
 					}
 
 					if (player != null) {
