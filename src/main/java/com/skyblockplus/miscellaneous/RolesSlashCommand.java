@@ -20,7 +20,6 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
 import static com.skyblockplus.utils.utils.StringUtils.idToName;
@@ -367,7 +366,7 @@ public class RolesSlashCommand extends SlashCommand {
 										"archer",
 										"tank",
 										"mage_reputation",
-										"barbarian_rep",
+										"barbarian_reputation",
 										"maxed_collections" -> player.getAmount(roleName, useHighest);
 									case "coins" -> {
 										roleAmount = player.getAmount("bank", useHighest);
@@ -418,22 +417,6 @@ public class RolesSlashCommand extends SlashCommand {
 							roleAmount =
 								switch (roleName) {
 									case "skill_average" -> cachedData.getDouble("skills", -1);
-									case "farming" -> levelingInfoFromExp((long) cachedData.getDouble("catacombs"), "catacombs", 60)
-										.getProgressLevel();
-									case "alchemy",
-										"combat",
-										"fishing",
-										"foraging",
-										"carpentry",
-										"mining",
-										"taming",
-										"enchanting",
-										"social",
-										"healer",
-										"mage",
-										"berserk",
-										"archer",
-										"tank" -> levelingInfoFromExp((long) cachedData.getDouble(roleName), roleName).getProgressLevel();
 									case "total_slayer" -> cachedData.getDouble("slayer", -1);
 									default -> cachedData.getDouble(roleName, -1);
 								};

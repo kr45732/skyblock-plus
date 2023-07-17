@@ -21,7 +21,6 @@ package com.skyblockplus.general;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.utils.HypixelUtils.getPlayerDiscordInfo;
-import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
 import static com.skyblockplus.utils.utils.StringUtils.*;
@@ -58,6 +57,44 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LinkSlashCommand extends SlashCommand {
+
+	private static final List<String> rolesClaimLbTypes = List.of(
+		"wolf",
+		"zombie",
+		"spider",
+		"enderman",
+		"blaze",
+		"vampire",
+		"level",
+		"pet_score",
+		"networth",
+		"catacombs",
+		"fairy_souls",
+		"minion_slots",
+		"total_slayer",
+		"maxed_slayers",
+		"healer",
+		"mage",
+		"berserk",
+		"archer",
+		"tank",
+		"mage_reputation",
+		"barbarian_reputation",
+		"maxed_collections",
+		"coins",
+		"skills",
+		"alchemy",
+		"combat",
+		"fishing",
+		"farming",
+		"foraging",
+		"carpentry",
+		"mining",
+		"taming",
+		"enchanting",
+		"social",
+		"weight"
+	);
 
 	public LinkSlashCommand() {
 		this.name = "link";
@@ -145,6 +182,7 @@ public class LinkSlashCommand extends SlashCommand {
 		String updatedNickname = "false";
 		String updatedRoles = "false";
 
+		boolean rolesClaimOnLink = higherDepth(verifySettings, "enableRolesClaim", false);
 		DataObject player = null;
 		boolean playerRequested = false;
 
@@ -207,7 +245,14 @@ public class LinkSlashCommand extends SlashCommand {
 						)
 					) {
 						if (!playerRequested) {
-							player = leaderboardDatabase.getCachedPlayer(List.of(""), Player.Gamemode.SELECTED, linkedAccount.uuid());
+							player =
+								leaderboardDatabase.getCachedPlayer(
+									rolesClaimOnLink
+										? rolesClaimLbTypes
+										: List.of("skills_average", "catacombs", "slayer", "weight", "selected_class", "level"),
+									Player.Gamemode.SELECTED,
+									linkedAccount.uuid()
+								);
 							playerRequested = true;
 						}
 
@@ -223,9 +268,7 @@ public class LinkSlashCommand extends SlashCommand {
 											? ""
 											: "" + player.getString("selected_class").toUpperCase().charAt(0);
 										case "LEVEL" -> formatNumber((int) player.getDouble("level"));
-										case "CATACOMBS" -> formatNumber(
-											levelingInfoFromExp((long) player.getDouble("catacombs"), "catacombs").currentLevel()
-										);
+										case "CATACOMBS" -> formatNumber((int) player.getDouble("catacombs"));
 										default -> throw new IllegalStateException("Unexpected value: " + type);
 									} +
 									extra
@@ -254,10 +297,10 @@ public class LinkSlashCommand extends SlashCommand {
 				toRemove.add(member.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
 			} catch (Exception ignored) {}
 
-			if (higherDepth(verifySettings, "enableRolesClaim", false)) {
+			if (rolesClaimOnLink) {
 				try {
 					if (!playerRequested) {
-						player = leaderboardDatabase.getCachedPlayer(List.of(""), Player.Gamemode.SELECTED, linkedAccount.uuid());
+						player = leaderboardDatabase.getCachedPlayer(rolesClaimLbTypes, Player.Gamemode.SELECTED, linkedAccount.uuid());
 					}
 
 					if (player != null) {

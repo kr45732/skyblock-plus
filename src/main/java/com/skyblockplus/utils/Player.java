@@ -498,6 +498,7 @@ public class Player {
 					"taming_xp",
 					"enchanting_xp",
 					"social_xp" -> profile.getSkillXp(type.split("_xp")[0]);
+				case "healer_xp", "mage_xp", "berserk_xp", "archer_xp", "tank_xp" -> profile.getDungeonClass(type).totalExp();
 				case "hotm" -> profile.getHOTM() != null ? profile.getHOTM().totalExp() : -1;
 				case "bank" -> profile.getBankBalance();
 				case "purse" -> profile.getPurseCoins();

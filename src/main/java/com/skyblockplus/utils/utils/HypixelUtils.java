@@ -91,7 +91,11 @@ public class HypixelUtils {
 	}
 
 	public static SkillsStruct levelingInfoFromExp(long exp, String name) {
-		return levelingInfoFromExp(exp, name, higherDepth(getLevelingJson(), "leveling_caps." + name.toLowerCase(), 50));
+		return levelingInfoFromExp(
+			exp,
+			name,
+			name.equalsIgnoreCase("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + name.toLowerCase(), 50)
+		);
 	}
 
 	public static SkillsStruct levelingInfoFromExp(long exp, String name, int maxLevel) {

@@ -671,12 +671,7 @@ public class GuildSlashCommand extends SlashCommand {
 				if (!meetsReqsOr) {
 					double slayer = guildMember.getDouble("slayer", 0);
 					double skills = guildMember.getDouble("skills", -1);
-					double catacombs = levelingInfoFromExp(
-						(long) guildMember.getDouble("catacombs", 0),
-						"catacombs",
-						higherDepth(getLevelingJson(), "leveling_caps.catacombs", 0)
-					)
-						.getProgressLevel();
+					double catacombs = levelingInfoFromExp((long) guildMember.getDouble("catacombs", 0), "catacombs").getProgressLevel();
 					double weight = guildMember.getDouble("weight", 0);
 					double level = guildMember.getDouble("level", 0);
 
