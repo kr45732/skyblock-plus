@@ -18,7 +18,6 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.settings.SettingsExecute.isOneLevelRole;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.HypixelUtils.petLevelFromXp;
@@ -259,7 +258,7 @@ public class RolesSlashCommand extends SlashCommand {
 								continue;
 							}
 
-							if (useHighest ? player.getHighestAmount(mode) == 1 : player.isGamemode(Player.Gamemode.of(mode))) {
+							if (player.isGamemode(Player.Gamemode.of(mode))) {
 								if (!member.getRoles().contains(currentLevelRole)) {
 									if (botRole.canInteract(currentLevelRole)) {
 										toAdd.add(currentLevelRole);
@@ -319,52 +318,6 @@ public class RolesSlashCommand extends SlashCommand {
 										errorRoles.append(roleChangeString(currentLevelRole.getName()));
 									}
 								}
-							}
-						}
-					}
-					case "pet_enthusiast" -> {
-						JsonArray playerPets = player.getPets();
-						ArrayList<String> excludedPets = new ArrayList<>(List.of("guardian", "jellyfish", "parrot", "sheep"));
-
-						Role petEnthusiastRole = guild.getRoleById(higherDepth(roleSettings, "levels.[0].roleId").getAsString());
-						if (petEnthusiastRole == null) {
-							errorRoles.append(roleDeletedString(higherDepth(roleSettings, "levels.[0].roleId").getAsString()));
-							continue;
-						}
-						boolean isPetEnthusiast = false;
-
-						for (JsonElement currentPet : playerPets) {
-							String currentPetRarity = higherDepth(currentPet, "tier").getAsString().toLowerCase();
-							if (currentPetRarity.equals("epic") || currentPetRarity.equals("legendary")) {
-								if (!excludedPets.contains(higherDepth(currentPet, "type").getAsString().toLowerCase())) {
-									if (
-										petLevelFromXp(
-											higherDepth(currentPet, "exp", 0L),
-											currentPetRarity,
-											higherDepth(currentPet, "type").getAsString()
-										) ==
-										100
-									) {
-										isPetEnthusiast = true;
-										if (!member.getRoles().contains(petEnthusiastRole)) {
-											if (botRole.canInteract(petEnthusiastRole)) {
-												toAdd.add(petEnthusiastRole);
-												addedRoles.append(roleChangeString(petEnthusiastRole.getName()));
-											} else {
-												errorRoles.append(roleChangeString(petEnthusiastRole.getName()));
-											}
-											break;
-										}
-									}
-								}
-							}
-						}
-						if (member.getRoles().contains(petEnthusiastRole) && !isPetEnthusiast) {
-							if (botRole.canInteract(petEnthusiastRole)) {
-								removedRoles.append(roleChangeString(petEnthusiastRole.getName()));
-								toRemove.add(petEnthusiastRole);
-							} else {
-								errorRoles.append(roleChangeString(petEnthusiastRole.getName()));
 							}
 						}
 					}
@@ -582,10 +535,6 @@ public class RolesSlashCommand extends SlashCommand {
 							paginateBuilder.addStrings("<@&" + higherDepth(guildRank, "roleId").getAsString() + ">");
 						}
 					}
-				} else if (isOneLevelRole(currentRoleName)) {
-					paginateBuilder.addStrings(
-						"<@&" + higherDepth(roleSettings, "levels.[0].roleId").getAsString() + "> - " + currentRoleName.replace("_", " ")
-					);
 				} else {
 					JsonArray levelsArray = higherDepth(roleSettings, "levels").getAsJsonArray();
 					for (JsonElement currentLevel : levelsArray) {

@@ -310,7 +310,8 @@ public class Player {
 		REGULAR,
 		STRANDED,
 		IRONMAN,
-		IRONMAN_STRANDED;
+		IRONMAN_STRANDED,
+		SELECTED;
 
 		public static Gamemode of(String gamemode) {
 			return valueOf(
@@ -326,7 +327,7 @@ public class Player {
 		public String toLeaderboardName() {
 			return (
 				switch (this) {
-					case IRONMAN, STRANDED -> name().toLowerCase();
+					case IRONMAN, STRANDED, SELECTED -> name().toLowerCase();
 					default -> "all";
 				} +
 				"_lb"
@@ -424,6 +425,8 @@ public class Player {
 			return profileIndex;
 		}
 
+		public boolean isSelected() { return profileIndex == selectedProfileIndex;}
+
 		public JsonElement getOuterProfileJson() {
 			return profileJson;
 		}
@@ -474,7 +477,7 @@ public class Player {
 			double highestAmount = -1.0;
 
 			for (Profile profile : profiles) {
-				if (profile.isGamemode(gamemode)) {
+				if (gamemode == Gamemode.SELECTED ? isSelected() : profile.isGamemode(gamemode)) {
 					switch (type) {
 						case "slayer":
 						case "total_slayer":
@@ -570,10 +573,6 @@ public class Player {
 							break;
 						case "barbarian_rep":
 							highestAmount = Math.max(highestAmount, profile.getBarbarianRep());
-							break;
-						case "ironman":
-						case "stranded":
-							highestAmount = Math.max(highestAmount, profile.isGamemode(Gamemode.of(type)) ? 1 : -1);
 							break;
 						case "lily_weight":
 							highestAmount = Math.max(highestAmount, profile.getLilyWeight());

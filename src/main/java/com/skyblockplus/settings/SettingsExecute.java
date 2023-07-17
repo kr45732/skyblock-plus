@@ -128,8 +128,6 @@ public class SettingsExecute {
 			"**Amount of collected fairy souls**\nExample: `/settings roles add fairy_souls 50 @50 souls collected`\n",
 			"slot_collector",
 			"**Number of minion slots excluding upgrades**\nExample: `/settings roles add slot_collector 24 @maxed minion slots`\n",
-			"pet_enthusiast",
-			"**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `/settings roles set pet_enthusiast @level 100 pet`\n",
 			"total_slayer",
 			"**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n",
 			"maxed_slayers",
@@ -218,10 +216,6 @@ public class SettingsExecute {
 			database.newServerSettings(guild.getId(), new ServerSettingsModel(guild.getName(), guild.getId()));
 		}
 		this.serverSettings = database.getServerSettings(guild.getId()).getAsJsonObject();
-	}
-
-	public static boolean isOneLevelRole(String roleName) {
-		return roleName.equals("pet_enthusiast");
 	}
 
 	public Object getSettingsEmbed(String content, String[] args) {
@@ -389,8 +383,6 @@ public class SettingsExecute {
 			} else if (args.length == 5) {
 				if (args[2].equals("remove")) {
 					eb = removeRoleLevel(args[3], args[4]);
-				} else if (args[2].equals("set")) {
-					eb = setOneLevelRole(args[3], args[4]);
 				} else if (args[2].equals("add") && args[3].equals("guild_ranks")) {
 					eb = addRoleLevel(args[3], args[4], null);
 				}
@@ -1564,12 +1556,6 @@ public class SettingsExecute {
 							.append("`)");
 					}
 				}
-			} else if (isOneLevelRole(roleDesc.getKey())) {
-				ebFieldString.append(
-					higherDepth(roleSettings, "levels.[0]") != null
-						? "\n• <@&" + higherDepth(roleSettings, "levels.[0].roleId").getAsString() + ">"
-						: "\n• No role set"
-				);
 			} else {
 				if (higherDepth(roleSettings, "levels.[0]") == null) {
 					ebFieldString.append("\n• No ranks added");
@@ -1610,7 +1596,7 @@ public class SettingsExecute {
 				}
 			}
 
-			pageTitles.add(roleDesc.getKey() + (isOneLevelRole(roleDesc.getKey()) ? " (__one level role__)" : ""));
+			pageTitles.add(roleDesc.getKey());
 			paginateBuilder.addStrings(ebFieldString.toString());
 		}
 
@@ -1675,8 +1661,6 @@ public class SettingsExecute {
 			}
 			roleValue = guildJson.get("_id").getAsString();
 			guildName = guildJson.get("name").getAsString();
-		} else if (isOneLevelRole(roleName)) {
-			return errorEmbed("This role does not support multiple values. Use `/settings roles set <role_name> <@role>` instead");
 		} else if (roleName.equals("gamemode")) {
 			if (!roleValue.equals("ironman") && !roleValue.equals("stranded")) {
 				return errorEmbed("Mode must be ironman or stranded");
@@ -1751,10 +1735,6 @@ public class SettingsExecute {
 			return errorEmbed("Invalid role name. Refer to `/settings roles` for a list of all role names");
 		}
 
-		if (isOneLevelRole(roleName)) {
-			return defaultEmbed("This role does not multiple values. Use `/settings roles set <role_name> none` instead");
-		}
-
 		RoleModel roleSettings = database.getRoleSettings(guild.getId(), roleName);
 
 		for (Iterator<RoleObject> iter = roleSettings.getLevels().iterator(); iter.hasNext();) {
@@ -1794,40 +1774,6 @@ public class SettingsExecute {
 			}
 		}
 		return errorEmbed("Invalid role value");
-	}
-
-	public EmbedBuilder setOneLevelRole(String roleName, String roleMention) {
-		if (!isOneLevelRole(roleName)) {
-			return errorEmbed("This role is not a one level role. Use `/settings roles add <role_name> <value> <@role>` instead");
-		}
-
-		if (roleMention.equalsIgnoreCase("none")) {
-			int responseCode = database.removeRoleSettings(guild.getId(), roleName);
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
-
-			return defaultSettingsEmbed("Removed " + roleName);
-		}
-
-		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder e) {
-			return e;
-		}
-		Role role = ((Role) eb);
-
-		RoleModel roleSettings = database.getRoleSettings(guild.getId(), roleName);
-		if (roleSettings == null) {
-			roleSettings = new RoleModel(roleName);
-		}
-		roleSettings.addLevel("default", role.getId());
-
-		int responseCode = database.setRoleSettings(guild.getId(), roleSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed(roleName + " set to " + role.getAsMention());
 	}
 
 	public boolean allowRolesEnable() {

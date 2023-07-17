@@ -19,6 +19,7 @@
 package com.skyblockplus.miscellaneous.networth;
 
 import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.HypixelUtils.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
@@ -34,6 +35,7 @@ import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -150,6 +152,11 @@ public class NetworthExecute {
 			return withApiHelpButton(defaultEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
 		}
 
+		Future<Integer> networthPositionFuture = null;
+		if (event != null) {
+			networthPositionFuture = leaderboardDatabase.getNetworthPosition(player.getGamemode(), player.getUuid());
+		}
+
 		initPrices();
 
 		addTotal("bank", player.getBankBalance());
@@ -229,15 +236,20 @@ public class NetworthExecute {
 
 		calculatePetPrices();
 
+		player.getProfileToNetworth().put(player.getProfileIndex(), getNetworth());
+
 		if (event == null) {
 			return new MessageEditBuilder().setEmbeds(errorEmbed("Not triggered by command").build());
 		}
 
-		player.getProfileToNetworth().put(player.getProfileIndex(), getNetworth());
+		int networthPosition = -1;
+		try {
+			networthPosition = networthPositionFuture.get();
+		} catch (Exception ignored) {}
 
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
-		Map<SelectOption, EmbedBuilder> pages = getPages(player, false);
-		Map<SelectOption, EmbedBuilder> soulboundIgnoredPages = getPages(player, true);
+		Map<SelectOption, EmbedBuilder> pages = getPages(player, false, networthPosition);
+		Map<SelectOption, EmbedBuilder> soulboundIgnoredPages = getPages(player, true, networthPosition);
 
 		String verboseLink = null;
 		if (verbose) {
@@ -284,7 +296,7 @@ public class NetworthExecute {
 		return null;
 	}
 
-	private Map<SelectOption, EmbedBuilder> getPages(Player.Profile player, boolean ignoreSoulbound) {
+	private Map<SelectOption, EmbedBuilder> getPages(Player.Profile player, boolean ignoreSoulbound, int networthPosition) {
 		StringBuilder echestStr = getSectionString(getItems("enderchest"), ignoreSoulbound);
 		StringBuilder sacksStr = getSectionString(getItems("sacks"), ignoreSoulbound);
 		StringBuilder personalVaultStr = getSectionString(getItems("personal_vault"), ignoreSoulbound);
@@ -295,14 +307,12 @@ public class NetworthExecute {
 		StringBuilder talismanStr = getSectionString(getItems("talisman"), ignoreSoulbound);
 
 		double totalNetworth = getNetworth(ignoreSoulbound);
-		//			int position = leaderboardDatabase.getNetworthPosition(player.getGamemode(), player.getUuid());
-		String ebDesc = "**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + roundAndFormat(totalNetworth) + ")";
-		//			\n**" +
-		//				(
-		//					Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
-		//						? capitalizeString(player.getGamemode().toString()) + " "
-		//						: ""
-		//				)+"Leaderboard Position:** " + (position != -1 ? formatNumber(position) : "Not on leaderboard");
+		String ebDesc = "**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + roundAndFormat(totalNetworth) + ")\n**" +
+						(
+							Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
+								? capitalizeString(player.getGamemode().toString()) + " "
+								: ""
+						)+"Leaderboard Position:** " + (networthPosition != -1 ? formatNumber(networthPosition) : "Not on leaderboard");
 		EmbedBuilder eb = player.defaultPlayerEmbed().setDescription(ebDesc);
 		eb.addField(
 			"Purse & Bank",

@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -101,7 +102,8 @@ public class LeaderboardDatabase {
 	private final List<Player.Gamemode> leaderboardGamemodes = List.of(
 		Player.Gamemode.ALL,
 		Player.Gamemode.IRONMAN,
-		Player.Gamemode.STRANDED
+		Player.Gamemode.STRANDED,
+		Player.Gamemode.SELECTED
 	);
 	private ScheduledFuture<?> leaderboardUpdateTask;
 
@@ -141,12 +143,10 @@ public class LeaderboardDatabase {
 
 	public void insertIntoLeaderboard(Player.Profile player) {
 		if (player.isValid()) {
-			leaderboardDbInsertQueue.submit(() -> {
-				List<Player.Profile> players = List.of(player);
-				for (Player.Gamemode gamemode : leaderboardGamemodes) {
-					insertIntoLeaderboard(players, gamemode);
-				}
-			});
+			List<Player.Profile> players = List.of(player);
+			for (Player.Gamemode gamemode : leaderboardGamemodes) {
+				leaderboardDbInsertQueue.submit(() -> insertIntoLeaderboard(players, 0, gamemode));
+			}
 		}
 	}
 
@@ -158,17 +158,11 @@ public class LeaderboardDatabase {
 		if (!players.isEmpty()) {
 			for (int i = 0; i < players.size(); i += MAX_INSERT_COUNT) {
 				int finalI = i;
-				leaderboardDbInsertQueue.submit(() -> {
-					for (Player.Gamemode gamemode : leaderboardGamemodes) {
-						insertIntoLeaderboard(players, finalI, gamemode);
-					}
-				});
+				for (Player.Gamemode gamemode : leaderboardGamemodes) {
+					leaderboardDbInsertQueue.submit(() -> insertIntoLeaderboard(players, finalI, gamemode));
+				}
 			}
 		}
-	}
-
-	private void insertIntoLeaderboard(List<Player.Profile> players, Player.Gamemode gamemode) {
-		insertIntoLeaderboard(players, 0, gamemode);
 	}
 
 	private void insertIntoLeaderboard(List<Player.Profile> players, int startingIndex, Player.Gamemode gamemode) {
@@ -249,9 +243,11 @@ public class LeaderboardDatabase {
 						}
 					}
 
-					LinkedAccount linkedAccount = database.getByUuid(player.getUuid());
-					if (linkedAccount != null) {
-						TokenData.updateLinkedRolesMetadata(linkedAccount.discord(), linkedAccount, player, true);
+					if (gamemode == Player.Gamemode.ALL) {
+						LinkedAccount linkedAccount = database.getByUuid(player.getUuid());
+						if (linkedAccount != null) {
+							TokenData.updateLinkedRolesMetadata(linkedAccount.discord(), linkedAccount, player, true);
+						}
 					}
 				}
 				statement.executeUpdate();
@@ -270,11 +266,11 @@ public class LeaderboardDatabase {
 		}
 
 		List<Player.Profile> players = List.of(player);
-		insertIntoLeaderboard(players, requestedGamemode);
+		insertIntoLeaderboard(players, 0, requestedGamemode);
 		leaderboardDbInsertQueue.submit(() -> {
 			for (Player.Gamemode gamemode : leaderboardGamemodes) {
 				if (gamemode != requestedGamemode) {
-					insertIntoLeaderboard(players, gamemode);
+					insertIntoLeaderboard(players, 0, gamemode);
 				}
 			}
 		});
@@ -399,12 +395,12 @@ public class LeaderboardDatabase {
 		}
 	}
 
-	public List<DataObject> getCachedPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids, SlashCommandEvent event) {
+	public List<DataObject> getPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids, SlashCommandEvent event) {
 		if (uuids.isEmpty()) {
 			return new ArrayList<>();
 		}
 
-		List<DataObject> out = loadCachedPlayers(lbTypes, mode, uuids);
+		List<DataObject> out = getCachedPlayers(lbTypes, mode, uuids);
 
 		if (out.size() != uuids.size()) {
 			List<String> loadedUuids = out.stream().map(e -> e.getString("uuid")).toList();
@@ -421,7 +417,7 @@ public class LeaderboardDatabase {
 		return out;
 	}
 
-	public List<DataObject> loadCachedPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids) {
+	public List<DataObject> getCachedPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids) {
 		if (uuids.isEmpty()) {
 			return new ArrayList<>();
 		}
@@ -510,25 +506,27 @@ public class LeaderboardDatabase {
 		return out;
 	}
 
-	public int getNetworthPosition(Player.Gamemode gamemode, String uuid) {
-		try (
-			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement(
-				"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS rank FROM " +
-				gamemode.toLeaderboardName() +
-				" WHERE networth IS NOT NULL) s WHERE uuid = ? LIMIT 1"
-			)
-		) {
-			statement.setObject(1, stringToUuid(uuid));
-			try (ResultSet response = statement.executeQuery()) {
-				if (response.next()) {
-					return response.getInt("rank");
+	public Future<Integer> getNetworthPosition(Player.Gamemode gamemode, String uuid) {
+		return executor.submit(() -> {
+			try (
+					Connection connection = getConnection();
+					PreparedStatement statement = connection.prepareStatement(
+							"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS rank FROM " +
+									gamemode.toLeaderboardName() +
+									" WHERE networth IS NOT NULL) s WHERE uuid = ? LIMIT 1"
+					)
+			) {
+				statement.setObject(1, stringToUuid(uuid));
+				try (ResultSet response = statement.executeQuery()) {
+					if (response.next()) {
+						return response.getInt("rank");
+					}
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return -1;
+			return -1;
+		});
 	}
 
 	public List<String> getClosestPlayers(String toMatch) {

@@ -408,7 +408,7 @@ public class GuildSlashCommand extends SlashCommand {
 				return errorEmbed("This guild is currently updating, please try again in a few seconds");
 			}
 			hypixelGuildRequestQueue.add(guildId);
-			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
+			List<DataObject> playerList = leaderboardDatabase.getPlayers(
 				List.of(lbType),
 				gamemode,
 				streamJsonArray(higherDepth(guildJson, "members"))
@@ -609,7 +609,7 @@ public class GuildSlashCommand extends SlashCommand {
 				return errorEmbed("This guild is currently updating, please try again in a few seconds");
 			}
 			hypixelGuildRequestQueue.add(guildId);
-			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
+			List<DataObject> playerList = leaderboardDatabase.getPlayers(
 				reqTypes,
 				gamemode,
 				streamJsonArray(higherDepth(guildJson, "members"))
@@ -816,7 +816,7 @@ public class GuildSlashCommand extends SlashCommand {
 				return errorEmbed("This guild is currently updating, please try again in a few seconds");
 			}
 			hypixelGuildRequestQueue.add(guildId);
-			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
+			List<DataObject> playerList = leaderboardDatabase.getPlayers(
 				lbTypes,
 				gamemode,
 				streamJsonArray(higherDepth(guildJson, "members"))
@@ -1216,7 +1216,7 @@ public class GuildSlashCommand extends SlashCommand {
 			List<String> lbTypes = List.of("networth", "level", "slayer", "skills", "catacombs", "weight");
 
 			hypixelGuildRequestQueue.add(guildId);
-			List<DataObject> playerList = leaderboardDatabase.getCachedPlayers(
+			List<DataObject> playerList = leaderboardDatabase.getPlayers(
 				lbTypes,
 				gamemode,
 				streamJsonArray(higherDepth(guildJson, "members"))

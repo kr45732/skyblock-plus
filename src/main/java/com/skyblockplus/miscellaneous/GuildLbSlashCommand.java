@@ -55,7 +55,7 @@ public class GuildLbSlashCommand extends SlashCommand {
 		List<String> allGuildMembers = guildCaches.values().stream().flatMap(Collection::stream).toList();
 
 		Map<String, Double> cachedPlayers = leaderboardDatabase
-			.loadCachedPlayers(List.of(lbType), gamemode, allGuildMembers)
+			.getCachedPlayers(List.of(lbType), gamemode, allGuildMembers)
 			.stream()
 			.collect(Collectors.toMap(e -> e.getString("uuid"), e -> e.getDouble(lbType), (e1, e2) -> e1));
 

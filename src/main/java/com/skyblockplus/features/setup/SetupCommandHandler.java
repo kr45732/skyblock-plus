@@ -115,7 +115,6 @@ public class SetupCommandHandler {
 							**__Setup__**
 							- In order to enable automatic roles, there must be at least one role setup:
 							- `/settings roles add <role_name> <value> <@role>` - add a level to a role
-							- `/settings roles set <role_name> <@role>` - set a one level role
 
 							**__Enable__**
 							- Once at least one role is setup, run `/settings roles enable` to enable roles

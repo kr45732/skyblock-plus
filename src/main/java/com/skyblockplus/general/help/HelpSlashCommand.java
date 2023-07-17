@@ -524,8 +524,6 @@ public class HelpSlashCommand extends SlashCommand {
 									.addExamples("add sven 400000 @sven 8", "add alchemy 50 @alchemy 50"),
 								new HelpData("remove", "Remove a role level for a role.", "remove <role_name> <value>")
 									.addExamples("remove sven 400000", "remove alchemy 50"),
-								new HelpData("set", "Set the Discord role for a one level role.", "set <role_name> <@role>")
-									.addExamples("set pet_enthusiast @pet lover"),
 								new HelpData(
 									"use_highest",
 									"Enable or disable using the highest values across all profile. Default is false",
@@ -997,8 +995,7 @@ public class HelpSlashCommand extends SlashCommand {
 				"Enable or disable using the highest values or last played on profile. Default is false"
 			) +
 			create("settings roles add <role_name> <value> <@role>", "Add a new level to a role with its corresponding Discord role") +
-			create("settings roles remove <role_name> <value>", "Remove a role level for a role") +
-			create("settings roles set <role_name> <@role>", "Set a one level role's role")
+			create("settings roles remove <role_name> <value>", "Remove a role level for a role")
 		);
 
 		event.paginate(paginateBuilder, startingPage);
