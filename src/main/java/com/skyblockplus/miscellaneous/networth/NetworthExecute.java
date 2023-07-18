@@ -149,7 +149,6 @@ public class NetworthExecute {
 		Map<Integer, InvItem> playerInventory = player.getInventoryMap();
 		if (playerInventory == null) {
 			addTotal("inventory", -1.0);
-			player.getProfileToNetworth().put(player.getProfileIndex(), getNetworth());
 			return withApiHelpButton(defaultEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
 		}
 
@@ -237,11 +236,11 @@ public class NetworthExecute {
 
 		calculatePetPrices();
 
-		player.getProfileToNetworth().put(player.getProfileIndex(), getNetworth());
-
 		if (event == null) {
 			return new MessageEditBuilder().setEmbeds(errorEmbed("Not triggered by command").build());
 		}
+
+		player.getProfileToNetworth().put(player.getProfileIndex(), getNetworth());
 
 		int networthPosition = -1;
 		try {

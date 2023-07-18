@@ -1643,10 +1643,7 @@ public class Player {
 		}
 
 		public double getNetworth() {
-			if (!profileToNetworth.containsKey(profileIndex)) {
-				NetworthExecute.getNetworth(this);
-			}
-			return profileToNetworth.get(profileIndex);
+			return profileToNetworth.computeIfAbsent(profileIndex, k -> NetworthExecute.getNetworth(this));
 		}
 
 		public int getMageRep() {
