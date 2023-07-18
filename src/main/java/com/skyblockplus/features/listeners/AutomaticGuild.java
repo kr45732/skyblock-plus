@@ -632,7 +632,7 @@ public class AutomaticGuild {
 													matcher.group(0),
 													switch (type) {
 														case "SKILLS", "WEIGHT", "CATACOMBS", "LEVEL" -> formatNumber(
-															(int) player.getDouble(type)
+															(int) player.getDouble(type.toLowerCase())
 														);
 														case "SLAYER" -> simplifyNumber((long) player.getDouble("slayer"));
 														case "CLASS" -> player.getDouble("selected_class") == -1

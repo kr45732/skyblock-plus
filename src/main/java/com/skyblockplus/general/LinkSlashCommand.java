@@ -265,7 +265,9 @@ public class LinkSlashCommand extends SlashCommand {
 								nicknameTemplate.replace(
 									matcher.group(0),
 									switch (type) {
-										case "SKILLS", "WEIGHT", "CATACOMBS", "LEVEL" -> formatNumber((int) player.getDouble(type));
+										case "SKILLS", "WEIGHT", "CATACOMBS", "LEVEL" -> formatNumber(
+											(int) player.getDouble(type.toLowerCase())
+										);
 										case "SLAYER" -> simplifyNumber((long) player.getDouble("slayer"));
 										case "CLASS" -> player.getDouble("selected_class") == -1
 											? ""
