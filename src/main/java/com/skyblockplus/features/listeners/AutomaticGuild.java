@@ -454,7 +454,7 @@ public class AutomaticGuild {
 			}
 
 			boolean verifyEnabled = higherDepth(serverSettings, "automatedVerify.enableAutomaticSync", false);
-			boolean rolesEnabled = higherDepth(serverSettings, "automatedVerify.enableAutomaticRolesSync", false);
+			boolean rolesEnabled = higherDepth(serverSettings, "automatedRoles.enableAutomaticSync", false);
 
 			JsonElement rolesSettings = higherDepth(serverSettings, "automatedRoles");
 			guildSettings.removeIf(g -> g == null || g.getGuildName() == null);

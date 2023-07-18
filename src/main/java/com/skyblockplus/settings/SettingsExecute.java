@@ -1527,6 +1527,8 @@ public class SettingsExecute {
 			(higherDepth(rolesSettings, "enable", false) ? "enabled" : "disabled") +
 			"\n**Use highest:** " +
 			higherDepth(rolesSettings, "useHighest", false) +
+			"\n**Automatic Sync enabled:** " +
+			higherDepth(rolesSettings, "enableAutomaticSync", false) +
 			"\n" +
 			pageNumbers
 		);
@@ -1810,9 +1812,8 @@ public class SettingsExecute {
 		ebFieldString += "\n• **Verified Remove Role:** " + displaySettings(verifySettings, "verifiedRemoveRole");
 		ebFieldString += "\n• **Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
 		ebFieldString += "\n• **Automatic Sync:** " + displaySettings(verifySettings, "enableAutomaticSync");
-		ebFieldString += "\n• **Automatic Roles Sync:** " + displaySettings(verifySettings, "enableAutomaticRolesSync");
-		if (higherDepth(verifySettings, "enableAutomaticSync", false) || higherDepth(verifySettings, "enableAutomaticRolesSync", false)) {
-			ebFieldString += "\n• **DM On Automatic Sync:** " + displaySettings(verifySettings, "dmOnSync");
+		if (higherDepth(verifySettings, "enableAutomaticSync", false)) {
+			ebFieldString += "\n• **DM On Join Sync:** " + displaySettings(verifySettings, "dmOnSync");
 		}
 		ebFieldString += "\n• **Automatic SB Roles Claim On Join:** " + displaySettings(verifySettings, "enableRolesClaim");
 		return ebFieldString;

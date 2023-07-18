@@ -201,7 +201,7 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("bids", "Get a player's auction house bids", "bids [player]").setCategory("price"),
 				new HelpData(
 					"price",
-					"Query the auction house for the lowest price of an item. Allows for more specific queries than bin or average command. Defaults to searching auctions and bins.",
+					"Query the auction house for the lowest prices of an item. Allows for more specific queries than bin or average command. Defaults to searching auctions and bins.",
 					"price <item> [type]"
 				)
 					.addExamples("price Necron's Chestplate ✪✪✪✪✪")
@@ -210,17 +210,29 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("copper", "Get the coins to copper ratio for items in the SkyMart shop.", "copper").setCategory("price"),
 				new HelpData("flips", "Get current auction flips (**experimental**).", "flips").setCategory("price"),
 				// Inventory
-				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory emoji [player] [profile]")
-					.addSecondData("Get a player's inventory with lore.", "inventory list [player] [profile] [slot]")
+				new HelpData("inventory", "Main inventory command.")
+					.addSubcommands(
+						new HelpData("emoji", "Get a player's inventory represented in emojis.", "emoji [player] [profile]"),
+						new HelpData("list", "Get a player's inventory with lore.", "list [player] [profile] [slot]")
+					)
 					.setCategory("inventory"),
-				new HelpData("museum", "View a player's museum items.", "museum view [player] [profile]")
-					.addSecondData("Get the cheapest items to donate to a player's museum.", "museum cheapest [player] [profile]")
+				new HelpData("museum", "Main museum command.")
+					.addSubcommands(
+						new HelpData("view", "View a player's museum items.", "view [player] [profile]"),
+						new HelpData("cheapest", "Get the cheapest items to donate to a player's museum.", "cheapest [player] [profile]")
+					)
 					.setCategory("inventory"),
-				new HelpData("armor", "Get a player's armor and equipment represented in emojis.", "armor emoji [player] [profile]")
-					.addSecondData("Get a player's armor and equipment with lore.", "armor list [player] [profile] [slot]")
+				new HelpData("armor", "Main armor command.")
+					.addSubcommands(
+						new HelpData("emoji", "Get a player's armor and equipment represented in emojis.", "emoji [player] [profile]"),
+						new HelpData("list", "Get a player's armor and equipment with lore.", "list [player] [profile] [slot]")
+					)
 					.setCategory("inventory"),
-				new HelpData("enderchest", "Get a player's enderchest represented in emojis.", "enderchest emoji [player] [profile]")
-					.addSecondData("Get a player's enderchest with lore.", "enderchest list [player] [profile] [slot]")
+				new HelpData("enderchest", "Main enderchest command.")
+					.addSubcommands(
+						new HelpData("emoji", "Get a player's enderchest represented in emojis.", "emoji [player] [profile]"),
+						new HelpData("list", "Get a player's enderchest with lore.", "list [player] [profile] [slot]")
+					)
 					.setCategory("inventory"),
 				new HelpData("storage", "Get a player's storage represented in emojis.", "storage [player] [profile]")
 					.setCategory("inventory"),
@@ -237,8 +249,11 @@ public class HelpSlashCommand extends SlashCommand {
 					"sacks [player] [profile] [source]"
 				)
 					.setCategory("inventory"),
-				new HelpData("wardrobe", "Get a player's wardrobe armors represented in emojis.", "wardrobe emoji [player] [profile]")
-					.addSecondData("Get a player's wardrobe armors represented in a list.", "wardrobe list [player] [profile]")
+				new HelpData("wardrobe", "Main wardrobe command.")
+					.addSubcommands(
+						new HelpData("emoji", "Get a player's wardrobe represented in emojis.", "emoji [player] [profile]"),
+						new HelpData("list", "Get a player's wardrobe with lore.", "list [player] [profile] [slot]")
+					)
 					.setCategory("inventory"),
 				new HelpData("pets", "Get a player's pets and missing pets.", "pets [player] [profile]").setCategory("inventory"),
 				// Misc
@@ -483,30 +498,21 @@ public class HelpSlashCommand extends SlashCommand {
 									"Set the role that will be removed on verifying and re-added when un-verifying.",
 									"remove_role <@role>"
 								),
-								new HelpData("sync", "Enable or disable verify automatic sync")
-									.addSubcommands(
-										new HelpData(
-											"enable",
-											"Enable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every hour (up to 150 members per sync)."
-										),
-										new HelpData("disable", "Disable verification automatic sync")
-									),
-								new HelpData("dm_on_join", "Enable or disable verify DM on join automatic sync")
-									.addSubcommands(
-										new HelpData(
-											"enable",
-											"Enable verification automatic DM on join sync. This will toggle if a user should be DMd when their roles are synced on joining the server."
-										),
-										new HelpData("disable", "Disable verification automatic DM on join sync")
-									),
-								new HelpData("roles_claim", "Enable or disable SB roles sync on join")
-									.addSubcommands(
-										new HelpData(
-											"enable",
-											"Enable automatic roles sync. This is the same as running the roles claim command on joining/linking/verifying"
-										),
-										new HelpData("disable", "Disable automatic roles sync")
-									)
+								new HelpData(
+									"sync",
+									"Enable or disable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every hour (up to 135 members per sync).",
+									"sync <enable|disable>"
+								),
+								new HelpData(
+									"dm_on_join",
+									"Enable or disable verification automatic DM on join sync. This will toggle if a user should be messaged when their roles are synced on joining the server.",
+									"dm_on_join <enable|disable>"
+								),
+								new HelpData(
+									"roles_claim",
+									"Enable or disable automatic roles claim sync. This is the same as running the roles claim command on joining/linking/verifying.",
+									"roles_claim <enable|disable>"
+								)
 							),
 						new HelpData("roles", "Main command for automatic roles settings.")
 							.addSecondData("Get the current roles settings for the bot.", "roles")
@@ -526,14 +532,10 @@ public class HelpSlashCommand extends SlashCommand {
 									"Enable or disable using the highest values across all profile. Default is false",
 									"use_highest <enable|disable>"
 								),
-								new HelpData("sync", "Enable or disable automatic roles claim sync")
-									.addSubcommands(
-										new HelpData(
-											"enable",
-											"Enable automatic roles claim sync. This is the same as running `/roles claim` automatically every hour (up to 45 members will be updated per sync)."
-										),
-										new HelpData("disable", "Disable automatic roles claim sync")
-									)
+								new HelpData(
+									"sync",
+									"Enable or disable automatic roles claim sync. This is the same as running `/roles claim` automatically every hour (up to 45 members will be updated per sync)."
+								)
 							),
 						new HelpData("guild", "Main command for automatic guild (application and guild role/ranks).")
 							.addSecondData("List all setup automatic guilds.", "guild")
@@ -554,14 +556,12 @@ public class HelpSlashCommand extends SlashCommand {
 										new HelpData("add", "Add a guild rank.", "add <rank> <@role>"),
 										new HelpData("remove", "Remove a guild rank.", "remove <rank>")
 									),
-								new HelpData("counter", "Automatic guild member counter.", "settings guild <name> counter", true)
-									.addSubcommands(
-										new HelpData(
-											"enable",
-											"Enable and create the voice channel for the automatic guild member counter."
-										),
-										new HelpData("disable", "Disable automatic guild member counter.")
-									),
+								new HelpData(
+									"counter",
+									"Enable or disable the guild member counter. This will create the voice channel to display the current guild member count and updates every hour.",
+									"settings guild <name> counter",
+									true
+								),
 								new HelpData("apply", "Automatic application system for this guild.", "settings guild <name> apply", true)
 									.addSubcommands(
 										new HelpData("enable", "Enable automatic apply.", "settings guild <name> apply enable", true),
