@@ -503,7 +503,9 @@ public class Player {
 					"taming_xp",
 					"enchanting_xp",
 					"social_xp" -> profile.getSkillXp(type.split("_xp")[0]);
-				case "healer_xp", "mage_xp", "berserk_xp", "archer_xp", "tank_xp" -> profile.getDungeonClass(type).totalExp();
+				case "healer_xp", "mage_xp", "berserk_xp", "archer_xp", "tank_xp" -> profile
+					.getDungeonClass(type.split("_xp")[0])
+					.totalExp();
 				case "hotm" -> profile.getHOTM() != null ? profile.getHOTM().totalExp() : -1;
 				case "bank" -> profile.getBankBalance();
 				case "purse" -> profile.getPurseCoins();
@@ -592,7 +594,7 @@ public class Player {
 				return 60;
 			}
 
-			int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName, 0);
+			int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName, 50);
 
 			if (skillName.equals("farming")) {
 				maxLevel = weightType == WeightType.SENITHER ? 60 : maxLevel + getFarmingCapUpgrade();
@@ -739,7 +741,7 @@ public class Player {
 			return higherDepth(profileJson(), "dungeons.dungeon_types.catacombs.highest_tier_completed", -1);
 		}
 
-		public Set<String> getItemsPlayerHas(List<String> items, InvItem... extras) {
+		public Set<String> getItemsPlayerHas(List<String> items) {
 			Map<Integer, InvItem> invItemMap = getInventoryMap();
 			if (invItemMap == null) {
 				return null;
@@ -751,7 +753,6 @@ public class Player {
 			if (storageMap != null) {
 				itemsMap.addAll(new ArrayList<>(getStorageMap().values()));
 			}
-			Collections.addAll(itemsMap, extras);
 			Set<String> itemsPlayerHas = new HashSet<>();
 
 			for (InvItem item : itemsMap) {
@@ -774,7 +775,7 @@ public class Player {
 		}
 
 		public SkillsStruct getDungeonClass(String className) {
-			return skillInfoFromExp(higherDepth(profileJson(), "dungeons.player_classes." + className + ".experience", 0L), "catacombs");
+			return skillInfoFromExp(higherDepth(profileJson(), "dungeons.player_classes." + className + ".experience", 0L), className);
 		}
 
 		public SkillsStruct getCatacombs() {
@@ -1641,12 +1642,11 @@ public class Player {
 			return numMaxedColl;
 		}
 
-		public int getAccessoryCount() {
-			return getItemsPlayerHas(new ArrayList<>(ALL_TALISMANS), getTalismanBagMap().values().toArray(new InvItem[0])).size();
-		}
-
 		public double getNetworth() {
-			return profileToNetworth.computeIfAbsent(profileIndex, k -> NetworthExecute.getNetworth(this));
+			if (!profileToNetworth.containsKey(profileIndex)) {
+				NetworthExecute.getNetworth(this);
+			}
+			return profileToNetworth.get(profileIndex);
 		}
 
 		public int getMageRep() {

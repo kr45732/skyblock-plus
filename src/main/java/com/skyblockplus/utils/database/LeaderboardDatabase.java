@@ -282,13 +282,6 @@ public class LeaderboardDatabase {
 	}
 
 	private double getDouble(ResultSet row, String lbType) throws SQLException {
-		double value = row.getDouble(lbType);
-		boolean isNull = row.wasNull();
-
-		if (lbType.equals("selected_class") && isNull) {
-			return -1;
-		}
-
 		return switch (lbType) {
 			case "alchemy",
 				"combat",
@@ -304,8 +297,14 @@ public class LeaderboardDatabase {
 				"mage",
 				"berserk",
 				"archer",
-				"tank" -> levelingInfoFromExp((long) value, lbType).getProgressLevel();
-			default -> value;
+				"tank",
+				"catacombs" -> levelingInfoFromExp((long) row.getDouble(lbType + "_xp"), lbType).getProgressLevel();
+			case "selected_class" -> {
+				double value = row.getDouble(lbType);
+				boolean isNull = row.wasNull();
+				yield isNull ? -1 : value;
+			}
+			default -> row.getDouble(lbType);
 		};
 	}
 
@@ -451,7 +450,30 @@ public class LeaderboardDatabase {
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
 				"SELECT username, uuid, " +
-				String.join(", ", lbTypes) +
+				lbTypes
+					.stream()
+					.map(e ->
+						switch (e) {
+							case "alchemy",
+								"combat",
+								"fishing",
+								"farming",
+								"foraging",
+								"carpentry",
+								"mining",
+								"taming",
+								"enchanting",
+								"social",
+								"healer",
+								"mage",
+								"berserk",
+								"archer",
+								"tank",
+								"catacombs" -> e + "_xp";
+							default -> e;
+						}
+					)
+					.collect(Collectors.joining(", ")) +
 				" FROM " +
 				mode.toLeaderboardName() +
 				" WHERE uuid IN (" +

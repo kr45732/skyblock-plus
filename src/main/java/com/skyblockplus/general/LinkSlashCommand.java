@@ -72,7 +72,7 @@ public class LinkSlashCommand extends SlashCommand {
 		"catacombs",
 		"fairy_souls",
 		"minion_slots",
-		"total_slayer",
+		"slayer",
 		"maxed_slayers",
 		"healer",
 		"mage",

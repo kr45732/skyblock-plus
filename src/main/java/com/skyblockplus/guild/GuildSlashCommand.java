@@ -652,7 +652,7 @@ public class GuildSlashCommand extends SlashCommand {
 								levelingInfoFromLevel(
 									(int) reqAmount,
 									"catacombs",
-									higherDepth(getLevelingJson(), "leveling_caps.catacombs", 0)
+									higherDepth(getLevelingJson(), "leveling_caps.catacombs", 50)
 								)
 									.totalExp();
 						}
@@ -1046,7 +1046,7 @@ public class GuildSlashCommand extends SlashCommand {
 										levelingInfoFromLevel(
 											(int) reqAmount,
 											type,
-											type.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + type, 0)
+											type.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + type, 50)
 										)
 											.totalExp();
 								}
