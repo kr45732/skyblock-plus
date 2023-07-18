@@ -159,16 +159,6 @@ public class MuseumSlashCommand extends SlashCommand {
 
 			JsonElement museumJson = hypixelResponse.get(player.getUuid());
 			Set<String> items = new HashSet<>(higherDepth(museumJson, "items").getAsJsonObject().keySet());
-			JsonElement specialItems = higherDepth(museumJson, "special");
-			if (specialItems != null) {
-				streamJsonArray(specialItems)
-					.map(e -> nbtToItems(higherDepth(e, "items.data", null)))
-					.filter(Objects::nonNull)
-					.flatMap(Collection::stream)
-					.filter(Objects::nonNull)
-					.map(InvItem::getId)
-					.forEach(items::add);
-			}
 			for (Map.Entry<String, JsonElement> entry : getConstant("MUSEUM_PARENTS").getAsJsonObject().entrySet()) {
 				List<String> value = streamJsonArray(entry.getValue()).map(JsonElement::getAsString).toList();
 				for (int i = value.size() - 1; i >= 0; i--) {
@@ -272,7 +262,7 @@ public class MuseumSlashCommand extends SlashCommand {
 
 		@Override
 		protected SubcommandData getCommandData() {
-			return new SubcommandData(name, "Get the cheapest items to donate to your museum")
+			return new SubcommandData(name, "Get the cheapest items to donate to a player's museum")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOptions(profilesCommandOption);
 		}

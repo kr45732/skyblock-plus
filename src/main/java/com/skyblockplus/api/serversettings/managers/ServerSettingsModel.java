@@ -92,25 +92,6 @@ public class ServerSettingsModel {
 		this.serverId = serverId;
 	}
 
-	public ServerSettingsModel copy() {
-		ServerSettingsModel copy = new ServerSettingsModel(serverName, serverId);
-		copy.setAutomatedVerify(automatedVerify);
-		copy.setAutomatedGuilds(automatedGuilds);
-		copy.setBlacklist(blacklist);
-		copy.setAutomatedRoles(automatedRoles);
-		copy.setSbEvent(sbEvent);
-		copy.setJacobSettings(jacobSettings);
-		copy.setApplyGuestRole(applyGuestRole);
-		copy.setFetchurChannel(fetchurChannel);
-		copy.setFetchurRole(fetchurRole);
-		copy.setMayorChannel(mayorChannel);
-		copy.setMayorRole(mayorRole);
-		copy.setBotManagerRoles(botManagerRoles);
-		copy.setLogChannel(logChannel);
-		copy.setEventNotif(eventNotif);
-		return copy;
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

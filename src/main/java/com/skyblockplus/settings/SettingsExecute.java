@@ -375,6 +375,12 @@ public class SettingsExecute {
 					} else if (args[3].equals("disable")) {
 						eb = setRolesUseHighest(false);
 					}
+				} else if (args[2].equals("sync")) {
+					if (args[3].equals("enable")) {
+						eb = setRolesAutomaticSyncEnable(true);
+					} else if (args[3].equals("disable")) {
+						eb = setRolesAutomaticSyncEnable(false);
+					}
 				}
 			} else if (args.length == 5) {
 				if (args[2].equals("remove")) {
@@ -418,12 +424,6 @@ public class SettingsExecute {
 						switch (args[3]) {
 							case "enable" -> setVerifySyncEnable(true);
 							case "disable" -> setVerifySyncEnable(false);
-							default -> null;
-						};
-					case "roles_sync" -> eb =
-						switch (args[3]) {
-							case "enable" -> setVerifyRolesSyncEnable(true);
-							case "disable" -> setVerifyRolesSyncEnable(false);
 							default -> null;
 						};
 					case "dm_on_join" -> eb =
@@ -1627,6 +1627,28 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("**Use highest amount:** " + enable);
 	}
 
+	public EmbedBuilder setRolesAutomaticSyncEnable(boolean enable) {
+		JsonObject newRolesJson = database.getRolesSettings(guild.getId()).getAsJsonObject();
+
+		if (enable) {
+			if (!author.getId().equals(client.getOwnerId())) {
+				return errorEmbed("This can only be enabled by the developer");
+			}
+
+			if (!higherDepth(newRolesJson, "enable", false)) {
+				return errorEmbed("Automatic roles must be enabled");
+			}
+		}
+
+		newRolesJson.addProperty("enableAutomaticSync", enable);
+		int responseCode = database.setRolesSettings(guild.getId(), newRolesJson);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Automatic roles sync " + (enable ? "enabled" : "disabled"));
+	}
+
 	public EmbedBuilder addRoleLevel(String roleName, String roleValue, String roleMention) {
 		if (!allAutomatedRoles.containsKey(roleName)) {
 			return errorEmbed("Invalid role name. Refer to `/settings roles` for a list of all role names");
@@ -2033,25 +2055,6 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Automatic sync " + (enable ? "enabled" : "disabled"));
-	}
-
-	public EmbedBuilder setVerifyRolesSyncEnable(boolean enable) {
-		if (enable) {
-			if (!author.getId().equals(client.getOwnerId())) {
-				return errorEmbed("This can only be enabled by the developer");
-			}
-
-			if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
-				return errorEmbed("Automatic roles must be enabled");
-			}
-		}
-
-		int responseCode = updateVerifySettings("enableAutomaticRolesSync", "" + enable);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Automatic roles sync " + (enable ? "enabled" : "disabled"));
 	}
 
 	public EmbedBuilder setVerifyDmOnSync(boolean enable) {

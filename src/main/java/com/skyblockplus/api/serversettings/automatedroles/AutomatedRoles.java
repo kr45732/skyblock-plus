@@ -38,6 +38,7 @@ public class AutomatedRoles {
 
 	private String enable = "false";
 	private String useHighest = "false";
+	private String enableAutomaticSync = "false";
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "serverSettings", orphanRemoval = true)
 	private List<RoleModel> roles = new ArrayList<>();

@@ -213,6 +213,9 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory emoji [player] [profile]")
 					.addSecondData("Get a player's inventory with lore.", "inventory list [player] [profile] [slot]")
 					.setCategory("inventory"),
+				new HelpData("museum", "View a player's museum items.", "museum view [player] [profile]")
+					.addSecondData("Get the cheapest items to donate to a player's museum.", "museum cheapest [player] [profile]")
+					.setCategory("inventory"),
 				new HelpData("armor", "Get a player's armor and equipment represented in emojis.", "armor emoji [player] [profile]")
 					.addSecondData("Get a player's armor and equipment with lore.", "armor list [player] [profile] [slot]")
 					.setCategory("inventory"),
@@ -289,13 +292,15 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("collections", "Get a player's collections.", "collections [player] [profile]").setCategory("miscellaneous"),
 				new HelpData("jacob [crop]", "Get the upcoming contests and their crops.").setCategory("miscellaneous"),
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
-				new HelpData("leaderboard", "Get a global leaderboard.", "leaderboard <type> [player] [mode] [page] [rank] [amount]")
+				new HelpData("leaderboard", "Get a global leaderboard.", "leaderboard <type>").setCategory("miscellaneous"),
+				new HelpData("guildlb", "Get a global guild leaderboard.", "guildlb <type> [mode] [comparison]")
 					.setCategory("miscellaneous"),
 				new HelpData("skyblock", "Get an overview of a player's Skyblock statistics", "skyblock [player] [profile]")
 					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
 					.setCategory("miscellaneous"),
 				new HelpData("recipe", "Get the crafting recipe of an item.", "recipe <item>").setCategory("miscellaneous"),
+				new HelpData("craft", "Calculate the cost of an item and added upgrades.", "craft <item>").setCategory("miscellaneous"),
 				new HelpData("calendar", "Get the current Skyblock datetime and running or upcoming events").setCategory("miscellaneous"),
 				new HelpData(
 					"scammer",
@@ -486,14 +491,6 @@ public class HelpSlashCommand extends SlashCommand {
 										),
 										new HelpData("disable", "Disable verification automatic sync")
 									),
-								new HelpData("roles_sync", "Enable or disable verify automatic roles sync")
-									.addSubcommands(
-										new HelpData(
-											"enable",
-											"Enable verification automatic sync. This is will sync skyblock roles every hour (up to 45 members per sync)."
-										),
-										new HelpData("disable", "Disable verification automatic sync")
-									),
 								new HelpData("dm_on_join", "Enable or disable verify DM on join automatic sync")
 									.addSubcommands(
 										new HelpData(
@@ -528,7 +525,15 @@ public class HelpSlashCommand extends SlashCommand {
 									"use_highest",
 									"Enable or disable using the highest values across all profile. Default is false",
 									"use_highest <enable|disable>"
-								)
+								),
+								new HelpData("sync", "Enable or disable automatic roles claim sync")
+									.addSubcommands(
+										new HelpData(
+											"enable",
+											"Enable automatic roles claim sync. This is the same as running `/roles claim` automatically every hour (up to 45 members will be updated per sync)."
+										),
+										new HelpData("disable", "Disable automatic roles claim sync")
+									)
 							),
 						new HelpData("guild", "Main command for automatic guild (application and guild role/ranks).")
 							.addSecondData("List all setup automatic guilds.", "guild")
@@ -568,7 +573,7 @@ public class HelpSlashCommand extends SlashCommand {
 											true
 										),
 										new HelpData(
-											"close",
+											"open",
 											"Re-enabled the button to create a new application.",
 											"settings guild <name> apply open",
 											true
@@ -792,6 +797,8 @@ public class HelpSlashCommand extends SlashCommand {
 		paginateBuilder.addStrings(
 			create("inventory emoji [player] [profile]", "Get a player's inventory represented in emojis") +
 			create("inventory list [player] [profile] [slot]", "Get a player's inventory with lore") +
+			create("museum view [player] [profile]", "View a player's museum items") +
+			create("museum cheapest [player] [profile]", "Get the cheapest items to donate to a player's museum") +
 			create("armor emoji [player] [profile] [slot]", "Get a player's equipped armor & equipment represented in emojis") +
 			create("armor list [player] [profile]", "Get a player's equipped armor & equipment with lore") +
 			create("enderchest emoji [player] [profile]", "Get a player's ender chest represented in emojis") +
@@ -832,8 +839,10 @@ public class HelpSlashCommand extends SlashCommand {
 			create("mayor", "Get information about the current mayor or the running election") +
 			create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
 			create("leaderboard <type> [player] [gamemode] [page] [rank] [amount]", "Get a global leaderboard") +
+			create("guildlb <type> [mode] [comparison]", "Get a global guild leaderboard") +
 			create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
 			create("recipe <item>", "Get the crafting recipe of an item") +
+			create("craft <item>", "Calculate the cost of an item and added upgrades") +
 			create("checkapi [player]", "Check which Skyblock APIs a player has enabled or disabled") +
 			create("calcdrags [position] [ratio] [eyes]", "Calculate loot quality and loot from dragons in the end") +
 			create("reforge <stone>", "Get the reforge stone stats for each rarity") +
@@ -926,7 +935,6 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none") +
 			create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
 			create("settings verify sync <enable|disable>", "Enable or disable automatic verify role and nickname syncing") +
-			create("settings verify roles_sync <enable|disable>", "Enable or disable automatic roles syncing") +
 			create("settings verify dm_on_join <enable|disable>", "Enable or disable DMing the user on join sync") +
 			create("settings verify roles_claim <enable|disable>", "Enable or disable SB role sync on join")
 		);
@@ -994,6 +1002,7 @@ public class HelpSlashCommand extends SlashCommand {
 				"settings roles use_highest <enable|disable>",
 				"Enable or disable using the highest values or last played on profile. Default is false"
 			) +
+			create("settings roles sync <enable|disable>", "Enable or disable automatic roles claim sync") +
 			create("settings roles add <role_name> <value> <@role>", "Add a new level to a role with its corresponding Discord role") +
 			create("settings roles remove <role_name> <value>", "Remove a role level for a role")
 		);
