@@ -19,6 +19,7 @@
 package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.gamemodeCommandOption;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 import static com.skyblockplus.utils.utils.HypixelUtils.*;
@@ -536,12 +537,7 @@ public class GuildSlashCommand extends SlashCommand {
 				.addOptions(new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true))
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
-				.addOptions(
-					new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
-						.addChoice("All", "all")
-						.addChoice("Ironman", "ironman")
-						.addChoice("Stranded", "stranded")
-				);
+				.addOptions(gamemodeCommandOption);
 		}
 	}
 
@@ -757,12 +753,7 @@ public class GuildSlashCommand extends SlashCommand {
 				.addOption(OptionType.STRING, "requirements", "The requirements a player must meet", true)
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
-				.addOptions(
-					new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
-						.addChoice("All", "all")
-						.addChoice("Ironman", "ironman")
-						.addChoice("Stranded", "stranded")
-				);
+				.addOptions(gamemodeCommandOption);
 		}
 	}
 
@@ -1168,12 +1159,7 @@ public class GuildSlashCommand extends SlashCommand {
 		protected SubcommandData getCommandData() {
 			return new SubcommandData(name, "Get helper which shows who to promote or demote in your guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(
-					new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
-						.addChoice("All", "all")
-						.addChoice("Ironman", "ironman")
-						.addChoice("Stranded", "stranded")
-				);
+				.addOptions(gamemodeCommandOption);
 		}
 	}
 
@@ -1359,12 +1345,7 @@ public class GuildSlashCommand extends SlashCommand {
 			return new SubcommandData(name, "Get a guild's top leaderboards for various Skyblock statistics")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 				.addOption(OptionType.STRING, "guild", "Guild name", false)
-				.addOptions(
-					new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
-						.addChoice("All", "all")
-						.addChoice("Ironman", "ironman")
-						.addChoice("Stranded", "stranded")
-				);
+				.addOptions(gamemodeCommandOption);
 		}
 	}
 

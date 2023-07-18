@@ -1472,6 +1472,10 @@ public class Constants {
 				.map(i -> new Command.Choice(capitalizeString(i), i))
 				.collect(Collectors.toCollection(ArrayList::new))
 		);
+	public static final OptionData gamemodeCommandOption = new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
+		.addChoice("All", "all")
+		.addChoice("Ironman", "ironman")
+		.addChoice("Stranded", "stranded");
 	/* Constants JSON file */
 	public static JsonObject CONSTANTS;
 

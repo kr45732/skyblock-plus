@@ -20,6 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
+import static com.skyblockplus.utils.Constants.gamemodeCommandOption;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 import static com.skyblockplus.utils.utils.StringUtils.*;
@@ -121,10 +122,7 @@ public class GuildLbSlashCommand extends SlashCommand {
 			.slash(name, "Get the global guild leaderboard")
 			.addOption(OptionType.STRING, "type", "Leaderboard type", true, true)
 			.addOptions(
-				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
-					.addChoice("All", "all")
-					.addChoice("Ironman", "ironman")
-					.addChoice("Stranded", "stranded"),
+				gamemodeCommandOption,
 				new OptionData(OptionType.STRING, "comparison", "Comparison method").addChoice("Average", "average").addChoice("Sum", "sum")
 			);
 	}

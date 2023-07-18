@@ -1527,7 +1527,7 @@ public class SettingsExecute {
 			(higherDepth(rolesSettings, "enable", false) ? "enabled" : "disabled") +
 			"\n**Use highest:** " +
 			higherDepth(rolesSettings, "useHighest", false) +
-			"\n**Automatic Sync enabled:** " +
+			"\n**Automatic sync enabled:** " +
 			higherDepth(rolesSettings, "enableAutomaticSync", false) +
 			"\n" +
 			pageNumbers
@@ -1633,10 +1633,6 @@ public class SettingsExecute {
 		JsonObject newRolesJson = database.getRolesSettings(guild.getId()).getAsJsonObject();
 
 		if (enable) {
-			if (!author.getId().equals(client.getOwnerId())) {
-				return errorEmbed("This can only be enabled by the developer");
-			}
-
 			if (!higherDepth(newRolesJson, "enable", false)) {
 				return errorEmbed("Automatic roles must be enabled");
 			}

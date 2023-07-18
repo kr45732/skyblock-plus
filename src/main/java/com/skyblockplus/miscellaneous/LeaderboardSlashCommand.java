@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Constants.gamemodeCommandOption;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
@@ -90,10 +91,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 			.addOptions(new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true))
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOptions(
-				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
-					.addChoice("All", "all")
-					.addChoice("Ironman", "ironman")
-					.addChoice("Stranded", "stranded"),
+				gamemodeCommandOption,
 				new OptionData(OptionType.INTEGER, "page", "Page number").setMinValue(1),
 				new OptionData(OptionType.INTEGER, "rank", "Rank number").setMinValue(1),
 				new OptionData(OptionType.NUMBER, "amount", "Amount value").setMinValue(0)

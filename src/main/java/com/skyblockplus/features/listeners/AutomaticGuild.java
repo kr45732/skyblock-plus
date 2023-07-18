@@ -514,12 +514,10 @@ public class AutomaticGuild {
 				List<Role> verifyRolesAdd = new ArrayList<>();
 				List<Role> verifyRolesRemove = new ArrayList<>();
 				if (verifyEnabled) {
-					verifyRolesAdd.addAll(
-						streamJsonArray(higherDepth(serverSettings, "automatedVerify.verifiedRoles"))
-							.map(e -> guild.getRoleById(e.getAsString()))
-							.filter(Objects::nonNull)
-							.collect(Collectors.toCollection(ArrayList::new))
-					);
+					streamJsonArray(higherDepth(serverSettings, "automatedVerify.verifiedRoles"))
+						.map(e -> guild.getRoleById(e.getAsString()))
+						.filter(Objects::nonNull)
+						.forEach(verifyRolesAdd::add);
 					try {
 						verifyRolesRemove.add(
 							guild.getRoleById(higherDepth(serverSettings, "automatedVerify.verifiedRemoveRole").getAsString())
@@ -535,21 +533,60 @@ public class AutomaticGuild {
 					updatedMembers.clear();
 				}
 
+				boolean checkVerify = false;
+				if (verifyEnabled) {
+					String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
+					if (nicknameTemplate.contains("[IGN]")) {
+						Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
+						while (matcher.find()) {
+							String category = matcher.group(1).toUpperCase();
+							String type = matcher.group(2).toUpperCase();
+
+							if (
+								category.equals("PLAYER") &&
+								(
+									type.equals("SKILLS") ||
+									type.equals("CATACOMBS") ||
+									type.equals("SLAYER") ||
+									type.equals("WEIGHT") ||
+									type.equals("CLASS") ||
+									type.equals("LEVEL")
+								)
+							) {
+								checkVerify = true;
+								break;
+							}
+						}
+					}
+				}
+				List<String> uuidsToRequest = new ArrayList<>();
+				for (Member linkedMember : inGuildUsers) {
+					if (numUpdated < updateLimit && !updatedMembers.contains(linkedMember.getId())) {
+						LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
+						if ((checkVerify && guild.getSelfMember().canInteract(linkedMember)) || rolesEnabled) {
+							uuidsToRequest.add(linkedAccount.uuid());
+						}
+						numUpdated++;
+					}
+				}
+				numUpdated = 0;
+				Map<String, DataObject> uuidToPlayer = leaderboardDatabase
+					.getCachedPlayers(LinkSlashCommand.getLbTypes(rolesEnabled), Player.Gamemode.SELECTED, uuidsToRequest)
+					.stream()
+					.collect(Collectors.toMap(e -> e.getString("uuid"), e -> e));
+
 				for (Member linkedMember : inGuildUsers) {
 					// updatedMembers.add returns true if ele not in set
 					if (numUpdated < updateLimit && updatedMembers.add(linkedMember.getId())) {
 						LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
-
-						numUpdated++;
-
 						List<Role> toAddRoles = new ArrayList<>();
 						List<Role> toRemoveRoles = new ArrayList<>();
-						DataObject player = null;
-						boolean playerRequested = false;
+						DataObject player = uuidToPlayer.getOrDefault(linkedAccount.uuid(), null);
 
 						if (verifyEnabled) {
 							toAddRoles.addAll(verifyRolesAdd);
 							toRemoveRoles.addAll(verifyRolesRemove);
+
 							String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
 							if (nicknameTemplate.contains("[IGN]") && guild.getSelfMember().canInteract(linkedMember)) {
 								nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
@@ -616,16 +653,6 @@ public class AutomaticGuild {
 											type.equals("LEVEL")
 										)
 									) {
-										if (!playerRequested) {
-											player =
-												leaderboardDatabase.getCachedPlayer(
-													LinkSlashCommand.getLbTypes(rolesEnabled),
-													Player.Gamemode.SELECTED,
-													linkedAccount.uuid()
-												);
-											playerRequested = true;
-										}
-
 										if (player != null) {
 											nicknameTemplate =
 												nicknameTemplate.replace(
@@ -650,7 +677,7 @@ public class AutomaticGuild {
 									}
 								}
 
-								if (!playerRequested || player != null) {
+								if (!uuidsToRequest.contains(linkedAccount.uuid()) || uuidToPlayer.containsKey(linkedAccount.uuid())) {
 									try {
 										linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
 									} catch (PermissionException ignored) {
@@ -661,15 +688,6 @@ public class AutomaticGuild {
 						}
 
 						if (rolesEnabled) {
-							if (!playerRequested) {
-								player =
-									leaderboardDatabase.getCachedPlayer(
-										LinkSlashCommand.getLbTypes(rolesEnabled),
-										Player.Gamemode.SELECTED,
-										linkedAccount.uuid()
-									);
-							}
-
 							if (player != null) {
 								try {
 									Tuple3<EmbedBuilder, List<Role>, List<Role>> out = RolesSlashCommand.ClaimSubcommand.updateRoles(
@@ -693,6 +711,8 @@ public class AutomaticGuild {
 									.update(toAddRoles, toRemoveRoles, guild.getSelfMember())
 							);
 						}
+
+						numUpdated++;
 					}
 				}
 			}
