@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
 import static com.skyblockplus.utils.Constants.collectionNameToId;
 import static com.skyblockplus.utils.Constants.skyblockStats;
+import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 
@@ -59,22 +60,23 @@ public class LeaderboardDatabase {
 			"uuid",
 			"slayer",
 			"skills",
-			"catacombs",
+			"skills_xp",
+			"catacombs_xp",
 			"weight",
-			"sven",
-			"rev",
-			"tara",
+			"wolf",
+			"zombie",
+			"spider",
 			"enderman",
-			"alchemy",
-			"combat",
-			"fishing",
-			"farming",
-			"foraging",
-			"carpentry",
-			"mining",
-			"taming",
-			"social",
-			"enchanting",
+			"alchemy_xp",
+			"combat_xp",
+			"fishing_xp",
+			"farming_xp",
+			"foraging_xp",
+			"carpentry_xp",
+			"mining_xp",
+			"taming_xp",
+			"social_xp",
+			"enchanting_xp",
 			"networth",
 			"blaze",
 			"vampire",
@@ -82,7 +84,20 @@ public class LeaderboardDatabase {
 			"coins",
 			"lily_slayer_weight",
 			"level",
-			"hotm"
+			"hotm",
+			"pet_score",
+			"fairy_souls",
+			"minion_slots",
+			"maxed_slayers",
+			"maxed_collections",
+			"healer_xp",
+			"mage_xp",
+			"berserk_xp",
+			"archer_xp",
+			"tank_xp",
+			"mage_reputation",
+			"barbarian_reputation",
+			"selected_class"
 		)
 	);
 	private static final List<String> typesSubList = new ArrayList<>();
@@ -123,9 +138,6 @@ public class LeaderboardDatabase {
 		lbType =
 			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
 				case "nw" -> "networth";
-				case "wolf" -> "sven";
-				case "spider" -> "tara";
-				case "zombie" -> "rev";
 				case "eman" -> "enderman";
 				default -> lbType;
 			};
@@ -207,26 +219,7 @@ public class LeaderboardDatabase {
 					statement.setLong(3 + offset, Instant.now().toEpochMilli());
 					for (int i = 0; i < typesSubList.size(); i++) {
 						String type = typesSubList.get(i);
-						double value = type.equals("networth") && !updateNetworth
-							? 0
-							: player.getHighestAmount(
-								type +
-								switch (type) {
-									case "catacombs",
-										"alchemy",
-										"combat",
-										"fishing",
-										"farming",
-										"foraging",
-										"carpentry",
-										"mining",
-										"taming",
-										"social",
-										"enchanting" -> "_xp";
-									default -> "";
-								},
-								gamemode
-							);
+						double value = type.equals("networth") && !updateNetworth ? 0 : player.getHighestAmount(type, gamemode);
 
 						if (type.equals("highest_critical_damage") || type.equals("highest_damage")) {
 							if (value < 0) {
@@ -288,6 +281,33 @@ public class LeaderboardDatabase {
 		}
 	}
 
+	private double getDouble(ResultSet row, String lbType) throws SQLException {
+		return switch (lbType) {
+			case "alchemy",
+				"combat",
+				"fishing",
+				"farming",
+				"foraging",
+				"carpentry",
+				"mining",
+				"taming",
+				"enchanting",
+				"social",
+				"healer",
+				"mage",
+				"berserk",
+				"archer",
+				"tank",
+				"catacombs" -> levelingInfoFromExp((long) row.getDouble(lbType + "_xp"), lbType).getProgressLevel();
+			case "selected_class" -> {
+				double value = row.getDouble(lbType);
+				boolean isNull = row.wasNull();
+				yield isNull ? -1 : value;
+			}
+			default -> row.getDouble(lbType);
+		};
+	}
+
 	/**
 	 * @param rankStart Exclusive
 	 * @param rankEnd   Inclusive
@@ -317,7 +337,7 @@ public class LeaderboardDatabase {
 				while (response.next()) {
 					out.put(
 						response.getInt("rank"),
-						DataObject.empty().put("username", response.getString("username")).put(lbType, response.getDouble(lbType))
+						DataObject.empty().put("username", response.getString("username")).put(lbType, getDouble(response, lbType))
 					);
 				}
 			}
@@ -384,7 +404,7 @@ public class LeaderboardDatabase {
 				while (response.next()) {
 					out.put(
 						response.getInt("rank"),
-						DataObject.empty().put("username", response.getString("username")).put(lbType, response.getDouble(lbType))
+						DataObject.empty().put("username", response.getString("username")).put(lbType, getDouble(response, lbType))
 					);
 				}
 				return out;
@@ -430,7 +450,30 @@ public class LeaderboardDatabase {
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
 				"SELECT username, uuid, " +
-				String.join(", ", lbTypes) +
+				lbTypes
+					.stream()
+					.map(e ->
+						switch (e) {
+							case "alchemy",
+								"combat",
+								"fishing",
+								"farming",
+								"foraging",
+								"carpentry",
+								"mining",
+								"taming",
+								"enchanting",
+								"social",
+								"healer",
+								"mage",
+								"berserk",
+								"archer",
+								"tank",
+								"catacombs" -> e + "_xp";
+							default -> e;
+						}
+					)
+					.collect(Collectors.joining(", ")) +
 				" FROM " +
 				mode.toLeaderboardName() +
 				" WHERE uuid IN (" +
@@ -448,7 +491,7 @@ public class LeaderboardDatabase {
 
 					DataObject playerObj = DataObject.empty().put("username", response.getString("username")).put("uuid", uuid);
 					for (String lbType : lbTypes) {
-						playerObj.put(lbType, response.getDouble(lbType));
+						playerObj.put(lbType, getDouble(response, lbType));
 					}
 
 					out.add(playerObj);
@@ -459,6 +502,11 @@ public class LeaderboardDatabase {
 		}
 
 		return out;
+	}
+
+	public DataObject getCachedPlayer(List<String> lbTypes, Player.Gamemode mode, String uuid) {
+		List<DataObject> cachedPlayers = getCachedPlayers(lbTypes, mode, List.of(uuid));
+		return cachedPlayers.isEmpty() ? null : cachedPlayers.get(0);
 	}
 
 	public List<DataObject> fetchPlayers(List<String> lbTypes, Player.Gamemode mode, List<String> uuids) {

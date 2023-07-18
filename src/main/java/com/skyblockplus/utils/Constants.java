@@ -1492,7 +1492,6 @@ public class Constants {
 	public static Map<String, String> HOTM_PERK_ID_TO_NAME;
 	public static Map<String, Integer> HOTM_PERK_MAX_LEVEL;
 	public static Map<String, String> SLAYER_EMOJI_MAP;
-	public static Map<String, String> SLAYER_NAMES_MAP;
 	public static Map<String, String> ESSENCE_EMOJI_MAP;
 	public static Map<String, Integer> IGNORED_ENCHANTS;
 	public static Map<String, String> MAYOR_NAME_TO_SKIN;
@@ -1567,9 +1566,6 @@ public class Constants {
 
 			/* SLAYER_EMOJI_MAP */
 			SLAYER_EMOJI_MAP = gson.fromJson(higherDepth(CONSTANTS, "SLAYER_EMOJI_MAP"), mapStringString);
-
-			/* SLAYER_NAMES_MAP */
-			SLAYER_NAMES_MAP = gson.fromJson(higherDepth(CONSTANTS, "SLAYER_NAMES_MAP"), mapStringString);
 
 			/* ESSENCE_EMOJI_MAP */
 			ESSENCE_EMOJI_MAP = gson.fromJson(higherDepth(CONSTANTS, "ESSENCE_EMOJI_MAP"), mapStringString);

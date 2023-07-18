@@ -471,6 +471,69 @@ public class Player {
 			return crystalNucleusAchievement;
 		}
 
+		public double getAmount(String type, boolean useHighest) {
+			return useHighest ? getHighestAmount(type, Gamemode.ALL) : getAmount(getSelectedProfile(), type);
+		}
+
+		public double getAmount(Profile profile, String type) {
+			return switch (type) {
+				case "selected_class" -> {
+					String selectedClass = profile.getSelectedDungeonClass();
+					yield selectedClass.equals("none") ? -1 : DUNGEON_CLASS_NAMES.indexOf(selectedClass);
+				}
+				case "slayer", "total_slayer" -> profile.getTotalSlayer();
+				case "skills" -> profile.getSkillAverage();
+				case "skills_xp" -> profile.getTotalSkillsXp();
+				case "catacombs" -> profile.getCatacombs().getProgressLevel();
+				case "catacombs_xp" -> profile.getCatacombs().totalExp();
+				case "healer", "mage", "berserk", "archer", "tank" -> profile.getDungeonClass(type).getProgressLevel();
+				case "weight" -> profile.getWeight();
+				case "wolf", "zombie", "spider", "enderman", "blaze", "vampire" -> profile.getSlayer(type);
+				case "alchemy", "combat", "fishing", "farming", "foraging", "carpentry", "mining", "taming", "enchanting", "social" -> {
+					SkillsStruct skillsStruct = profile.getSkill(type);
+					yield skillsStruct != null ? skillsStruct.getProgressLevel() : -1;
+				}
+				case "alchemy_xp",
+					"combat_xp",
+					"fishing_xp",
+					"farming_xp",
+					"foraging_xp",
+					"carpentry_xp",
+					"mining_xp",
+					"taming_xp",
+					"enchanting_xp",
+					"social_xp" -> profile.getSkillXp(type.split("_xp")[0]);
+				case "healer_xp", "mage_xp", "berserk_xp", "archer_xp", "tank_xp" -> profile
+					.getDungeonClass(type.split("_xp")[0])
+					.totalExp();
+				case "hotm" -> profile.getHOTM() != null ? profile.getHOTM().totalExp() : -1;
+				case "bank" -> profile.getBankBalance();
+				case "purse" -> profile.getPurseCoins();
+				case "coins" -> Math.max(0, profile.getBankBalance()) + profile.getPurseCoins();
+				case "pet_score" -> profile.getPetScore();
+				case "networth" -> profile.getNetworth();
+				case "fairy_souls" -> profile.getFairySouls();
+				case "minion_slots" -> profile.getNumberMinionSlots();
+				case "dungeon_secrets" -> getDungeonSecrets();
+				case "maxed_slayers" -> profile.getNumMaxedSlayers();
+				case "maxed_collections" -> profile.getNumMaxedCollections();
+				case "mage_reputation" -> profile.getMageRep();
+				case "barbarian_reputation" -> profile.getBarbarianRep();
+				case "lily_weight" -> profile.getLilyWeight();
+				case "lily_slayer_weight" -> new LilyWeight(profile, true).getSlayerWeight().getWeightStruct().getRaw();
+				case "level" -> profile.getLevel();
+				default -> {
+					if (collectionNameToId.containsKey(type)) {
+						yield profile.getCollection(collectionNameToId.get(type));
+					} else if (skyblockStats.contains(type)) {
+						yield profile.getStat(type);
+					} else {
+						yield -1;
+					}
+				}
+			};
+		}
+
 		public double getHighestAmount(String type) {
 			return getHighestAmount(type, Gamemode.ALL);
 		}
@@ -480,123 +543,7 @@ public class Player {
 
 			for (Profile profile : profiles) {
 				if (gamemode == Gamemode.SELECTED ? isSelected() : profile.isGamemode(gamemode)) {
-					switch (type) {
-						case "slayer":
-						case "total_slayer":
-							highestAmount = Math.max(highestAmount, profile.getTotalSlayer());
-						case "skills":
-							highestAmount = Math.max(highestAmount, profile.getSkillAverage());
-							break;
-						case "catacombs":
-							highestAmount = Math.max(highestAmount, profile.getCatacombs().getProgressLevel());
-							break;
-						case "catacombs_xp":
-							highestAmount = Math.max(highestAmount, profile.getCatacombs().totalExp());
-							break;
-						case "healer", "mage", "berserk", "archer", "tank":
-							highestAmount = Math.max(highestAmount, profile.getDungeonClass(type).getProgressLevel());
-							break;
-						case "weight":
-							highestAmount = Math.max(highestAmount, profile.getWeight());
-							break;
-						case "sven":
-						case "rev":
-						case "tara":
-						case "enderman":
-						case "blaze":
-						case "vampire":
-							highestAmount = Math.max(highestAmount, profile.getSlayer(type));
-							break;
-						case "alchemy":
-						case "combat":
-						case "fishing":
-						case "farming":
-						case "foraging":
-						case "carpentry":
-						case "mining":
-						case "taming":
-						case "enchanting":
-						case "social":
-							SkillsStruct skillsStruct = profile.getSkill(type);
-							highestAmount = Math.max(highestAmount, skillsStruct != null ? skillsStruct.getProgressLevel() : -1);
-							break;
-						case "alchemy_xp":
-						case "combat_xp":
-						case "fishing_xp":
-						case "farming_xp":
-						case "foraging_xp":
-						case "carpentry_xp":
-						case "mining_xp":
-						case "taming_xp":
-						case "enchanting_xp":
-						case "social_xp":
-							SkillsStruct skillsXpStruct = profile.getSkill(type.split("_xp")[0]);
-							highestAmount = Math.max(highestAmount, skillsXpStruct != null ? skillsXpStruct.totalExp() : -1);
-							break;
-						case "hotm":
-							SkillsStruct hotmStruct = profile.getHOTM();
-							highestAmount = Math.max(highestAmount, hotmStruct != null ? hotmStruct.totalExp() : -1);
-							break;
-						case "bank":
-							highestAmount = Math.max(highestAmount, profile.getBankBalance());
-							break;
-						case "purse":
-							highestAmount = Math.max(highestAmount, profile.getPurseCoins());
-							break;
-						case "coins":
-							highestAmount = Math.max(highestAmount, Math.max(0, profile.getBankBalance()) + profile.getPurseCoins());
-							break;
-						case "pet_score":
-							highestAmount = Math.max(highestAmount, profile.getPetScore());
-							break;
-						case "networth":
-							highestAmount = Math.max(highestAmount, profile.getNetworth());
-							break;
-						case "fairy_souls":
-							highestAmount = Math.max(highestAmount, profile.getFairySouls());
-							break;
-						case "slot_collector":
-							highestAmount = Math.max(highestAmount, profile.getNumberMinionSlots());
-							break;
-						case "dungeon_secrets":
-							highestAmount = Math.max(highestAmount, getDungeonSecrets());
-							break;
-						case "accessory_count":
-							highestAmount = Math.max(highestAmount, profile.getAccessoryCount());
-							break;
-						case "maxed_slayers":
-							highestAmount = Math.max(highestAmount, profile.getNumMaxedSlayers());
-							break;
-						case "maxed_collections":
-							highestAmount = Math.max(highestAmount, profile.getNumMaxedCollections());
-							break;
-						case "mage_rep":
-							highestAmount = Math.max(highestAmount, profile.getMageRep());
-							break;
-						case "barbarian_rep":
-							highestAmount = Math.max(highestAmount, profile.getBarbarianRep());
-							break;
-						case "lily_weight":
-							highestAmount = Math.max(highestAmount, profile.getLilyWeight());
-							break;
-						case "lily_slayer_weight":
-							highestAmount =
-								Math.max(highestAmount, new LilyWeight(profile, true).getSlayerWeight().getWeightStruct().getRaw());
-							break;
-						case "level":
-							highestAmount = Math.max(highestAmount, profile.getLevel());
-							break;
-						default:
-							if (collectionNameToId.containsKey(type)) {
-								highestAmount = Math.max(highestAmount, profile.getCollection(collectionNameToId.get(type)));
-								break;
-							} else if (skyblockStats.contains(type)) {
-								highestAmount = Math.max(highestAmount, profile.getStat(type));
-								break;
-							} else {
-								return -1;
-							}
-					}
+					highestAmount = Math.max(getAmount(profile, type), highestAmount);
 				}
 			}
 
@@ -647,7 +594,7 @@ public class Player {
 				return 60;
 			}
 
-			int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName, 0);
+			int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName, 50);
 
 			if (skillName.equals("farming")) {
 				maxLevel = weightType == WeightType.SENITHER ? 60 : maxLevel + getFarmingCapUpgrade();
@@ -682,6 +629,18 @@ public class Player {
 
 		public double getSkillAverage() {
 			return getSkillAverage("", 0);
+		}
+
+		public long getTotalSkillsXp() {
+			long totalXp = 0;
+			for (String skill : SKILL_NAMES) {
+				try {
+					totalXp += getSkill(skill).totalExp();
+				} catch (Exception e) {
+					return -1;
+				}
+			}
+			return totalXp;
 		}
 
 		public double getSkillAverage(String skillName, int overrideAmount) {
@@ -740,18 +699,11 @@ public class Player {
 		}
 
 		public int getSlayerBossKills(String slayerName, int tier) {
-			return higherDepth(
-				profileJson(),
-				"slayer_bosses." + SLAYER_NAMES_MAP.getOrDefault(slayerName, slayerName) + ".boss_kills_tier_" + tier,
-				0
-			);
+			return higherDepth(profileJson(), "slayer_bosses." + slayerName + ".boss_kills_tier_" + tier, 0);
 		}
 
-		/**
-		 * @param slayerName sven, rev, tara, enderman
-		 */
 		public int getSlayer(String slayerName) {
-			return higherDepth(profileJson(), "slayer_bosses." + SLAYER_NAMES_MAP.getOrDefault(slayerName, slayerName) + ".xp", 0);
+			return higherDepth(profileJson(), "slayer_bosses." + slayerName + ".xp", 0);
 		}
 
 		public int getSlayerLevel(String slayerName) {
@@ -759,8 +711,7 @@ public class Player {
 		}
 
 		public int getSlayerLevel(String slayerName, int xp) {
-			JsonArray levelArray = higherDepth(getLevelingJson(), "slayer_xp." + SLAYER_NAMES_MAP.getOrDefault(slayerName, slayerName))
-				.getAsJsonArray();
+			JsonArray levelArray = higherDepth(getLevelingJson(), "slayer_xp." + slayerName).getAsJsonArray();
 			int level = 0;
 			for (int i = 0; i < levelArray.size(); i++) {
 				if (xp >= levelArray.get(i).getAsInt()) {
@@ -790,7 +741,7 @@ public class Player {
 			return higherDepth(profileJson(), "dungeons.dungeon_types.catacombs.highest_tier_completed", -1);
 		}
 
-		public Set<String> getItemsPlayerHas(List<String> items, InvItem... extras) {
+		public Set<String> getItemsPlayerHas(List<String> items) {
 			Map<Integer, InvItem> invItemMap = getInventoryMap();
 			if (invItemMap == null) {
 				return null;
@@ -802,7 +753,6 @@ public class Player {
 			if (storageMap != null) {
 				itemsMap.addAll(new ArrayList<>(getStorageMap().values()));
 			}
-			Collections.addAll(itemsMap, extras);
 			Set<String> itemsPlayerHas = new HashSet<>();
 
 			for (InvItem item : itemsMap) {
@@ -825,7 +775,7 @@ public class Player {
 		}
 
 		public SkillsStruct getDungeonClass(String className) {
-			return skillInfoFromExp(higherDepth(profileJson(), "dungeons.player_classes." + className + ".experience", 0L), "catacombs");
+			return skillInfoFromExp(higherDepth(profileJson(), "dungeons.player_classes." + className + ".experience", 0L), className);
 		}
 
 		public SkillsStruct getCatacombs() {
@@ -1645,9 +1595,9 @@ public class Player {
 		}
 
 		public int getNumMaxedSlayers() {
-			int numMaxedSlayers = getSlayer("sven") >= 1000000 ? 1 : 0;
-			numMaxedSlayers += getSlayer("rev") >= 1000000 ? 1 : 0;
-			numMaxedSlayers += getSlayer("tara") >= 1000000 ? 1 : 0;
+			int numMaxedSlayers = getSlayer("wolf") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayer("zombie") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayer("spider") >= 1000000 ? 1 : 0;
 			numMaxedSlayers += getSlayer("enderman") >= 1000000 ? 1 : 0;
 			numMaxedSlayers += getSlayer("blaze") >= 1000000 ? 1 : 0;
 			numMaxedSlayers += getSlayer("vampire") >= 2400 ? 1 : 0;
@@ -1692,12 +1642,11 @@ public class Player {
 			return numMaxedColl;
 		}
 
-		public int getAccessoryCount() {
-			return getItemsPlayerHas(new ArrayList<>(ALL_TALISMANS), getTalismanBagMap().values().toArray(new InvItem[0])).size();
-		}
-
 		public double getNetworth() {
-			return profileToNetworth.computeIfAbsent(profileIndex, k -> NetworthExecute.getNetworth(this));
+			if (!profileToNetworth.containsKey(profileIndex)) {
+				NetworthExecute.getNetworth(this);
+			}
+			return profileToNetworth.get(profileIndex);
 		}
 
 		public int getMageRep() {

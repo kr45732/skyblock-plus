@@ -90,13 +90,20 @@ public class HypixelUtils {
 		return vanillaItems.contains(id);
 	}
 
+	public static SkillsStruct levelingInfoFromExp(long exp, String name) {
+		return levelingInfoFromExp(
+			exp,
+			name,
+			name.equalsIgnoreCase("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + name.toLowerCase(), 50)
+		);
+	}
+
 	public static SkillsStruct levelingInfoFromExp(long exp, String name, int maxLevel) {
 		JsonArray xpTable =
 			switch (name) {
-				case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(
-					getLevelingJson(),
-					name
-				)
+				case "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(getLevelingJson(), name)
+					.getAsJsonArray();
+				case "catacombs", "healer", "mage", "berserk", "archer", "tank" -> higherDepth(getLevelingJson(), "catacombs")
 					.getAsJsonArray();
 				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
 				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();

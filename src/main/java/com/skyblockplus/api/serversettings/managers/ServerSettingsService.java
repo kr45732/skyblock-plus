@@ -49,17 +49,14 @@ public class ServerSettingsService {
 
 	// General
 	public List<ServerSettingsModel> getAllServerSettings() {
-		List<ServerSettingsModel> serverSettingsModels = new ArrayList<>();
-		settingsRepository.findAll().forEach(o1 -> serverSettingsModels.add(o1.copy(true)));
-
-		return serverSettingsModels;
+		return settingsRepository.findAll();
 	}
 
 	public ResponseEntity<ServerSettingsModel> getServerSettingsById(String serverId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			return new ResponseEntity<>(currentServerSettings.copy(true), HttpStatus.OK);
+			return new ResponseEntity<>(currentServerSettings, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
@@ -400,26 +397,6 @@ public class ServerSettingsService {
 	}
 
 	// Misc
-	public ResponseEntity<String> getServerHypixelApiKey(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			return new ResponseEntity<>(currentServerSettings.getHypixelApiKeyInternal(), HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	public ResponseEntity<HttpStatus> setServerHypixelApiKey(String serverId, String newKey) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			currentServerSettings.setHypixelApiKey(newKey);
-			settingsRepository.save(currentServerSettings);
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
 	public ResponseEntity<HttpStatus> setApplyGuestRole(String serverId, String newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 

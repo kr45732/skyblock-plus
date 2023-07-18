@@ -652,7 +652,7 @@ public class GuildSlashCommand extends SlashCommand {
 								levelingInfoFromLevel(
 									(int) reqAmount,
 									"catacombs",
-									higherDepth(getLevelingJson(), "leveling_caps.catacombs", 0)
+									higherDepth(getLevelingJson(), "leveling_caps.catacombs", 50)
 								)
 									.totalExp();
 						}
@@ -671,12 +671,7 @@ public class GuildSlashCommand extends SlashCommand {
 				if (!meetsReqsOr) {
 					double slayer = guildMember.getDouble("slayer", 0);
 					double skills = guildMember.getDouble("skills", -1);
-					double catacombs = levelingInfoFromExp(
-						(long) guildMember.getDouble("catacombs", 0),
-						"catacombs",
-						higherDepth(getLevelingJson(), "leveling_caps.catacombs", 0)
-					)
-						.getProgressLevel();
+					double catacombs = guildMember.getDouble("catacombs", 0);
 					double weight = guildMember.getDouble("weight", 0);
 					double level = guildMember.getDouble("level", 0);
 
@@ -1051,7 +1046,7 @@ public class GuildSlashCommand extends SlashCommand {
 										levelingInfoFromLevel(
 											(int) reqAmount,
 											type,
-											type.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + type, 0)
+											type.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + type, 50)
 										)
 											.totalExp();
 								}

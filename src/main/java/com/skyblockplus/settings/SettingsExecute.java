@@ -72,11 +72,11 @@ public class SettingsExecute {
 
 	private static final Map<String, String> allAutomatedRoles = new LinkedHashMap<>(
 		Maps.of(
-			"sven",
+			"wolf",
 			null,
-			"rev",
+			"zombie",
 			null,
-			"tara",
+			"spider",
 			null,
 			"blaze",
 			null,
@@ -126,8 +126,8 @@ public class SettingsExecute {
 			"**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n",
 			"fairy_souls",
 			"**Amount of collected fairy souls**\nExample: `/settings roles add fairy_souls 50 @50 souls collected`\n",
-			"slot_collector",
-			"**Number of minion slots excluding upgrades**\nExample: `/settings roles add slot_collector 24 @maxed minion slots`\n",
+			"minion_slots",
+			"**Number of minion slots excluding upgrades**\nExample: `/settings roles add minion_slots 24 @maxed minion slots`\n",
 			"total_slayer",
 			"**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n",
 			"maxed_slayers",
@@ -138,8 +138,6 @@ public class SettingsExecute {
 			"**A player's pet score**\nExample: `/settings roles add pet_score 100 @100 pet score`\n",
 			"dungeon_secrets",
 			"**A player's dungeon secrets count**\nExample: `/settings roles add dungeon_secrets 25000 @secrets sweat`\n",
-			"accessory_count",
-			"**A player's dungeon unique accessory count**\nExample: `/settings roles add accessory_count 75 @accessory collector`\n",
 			"networth",
 			"**A player's networth**\nExample: `/settings roles add networth 1000000000 @billionaire`\n",
 			"gamemode",
@@ -148,10 +146,10 @@ public class SettingsExecute {
 			"**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n",
 			"player_items",
 			"**Items that a player has**\nExample: `/settings roles add player_items hyperion @mage gamer`\n",
-			"mage_rep",
-			"**A player's mage reputation**\nExample: `/settings roles add mage_rep 1000 @1k mage rep`\n",
-			"barbarian_rep",
-			"**A player's barbarian reputation**\nExample: `/settings roles add barbarian_rep 1000 @1k barbarian rep`\n",
+			"mage_reputation",
+			"**A player's mage reputation**\nExample: `/settings roles add mage_reputation 1000 @1k mage rep`\n",
+			"barbarian_reputation",
+			"**A player's barbarian reputation**\nExample: `/settings roles add barbarian_reputation 1000 @1k barbarian rep`\n",
 			"level",
 			"**A player's Skyblock level**\nExample: `/settings roles add level 500 @maxed level`\n"
 		)
@@ -161,7 +159,7 @@ public class SettingsExecute {
 		for (String roleName : allAutomatedRoles.keySet()) {
 			String customDescription =
 				switch (roleName) {
-					case "sven", "rev", "tara", "enderman", "blaze" -> "**A player's " +
+					case "wolf", "zombie", "spider", "enderman", "blaze" -> "**A player's " +
 					roleName +
 					" slayer xp**\nExample: `/settings roles add " +
 					roleName +
@@ -224,7 +222,6 @@ public class SettingsExecute {
 		if (args.length >= 4 && args[1].equals("set")) {
 			eb =
 				switch (args[2]) {
-					case "hypixel_key" -> setHypixelKey(args[3]);
 					case "guest_role" -> setApplyGuestRole(args[3]);
 					case "fetchur_channel" -> setFetchurChannel(args[3]);
 					case "fetchur_ping" -> setFetchurPing(args[3]);
@@ -239,7 +236,6 @@ public class SettingsExecute {
 					case "all" -> database.deleteServerSettings(guild.getId()) == 200
 						? defaultEmbed("Success").setDescription("Server settings deleted")
 						: errorEmbed("Error deleting server settings");
-					case "hypixel_key" -> deleteHypixelKey();
 					default -> getHelpEmbed("settings delete");
 				};
 		} else if (args.length >= 2 && args[1].equals("blacklist")) {
@@ -1906,12 +1902,6 @@ public class SettingsExecute {
 					type.equals("LEVEL")
 				)
 			) {
-				EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
-				if (eb != null) {
-					return errorEmbed(
-						"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to use the PLAYER template options"
-					);
-				}
 				nickname = nickname.replace(matcher.group(0), "");
 			}
 		}
@@ -2054,13 +2044,6 @@ public class SettingsExecute {
 			if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
 				return errorEmbed("Automatic roles must be enabled");
 			}
-
-			EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
-			if (eb != null) {
-				return errorEmbed(
-					"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to enable automatic roles sync"
-				);
-			}
 		}
 
 		int responseCode = updateVerifySettings("enableAutomaticRolesSync", "" + enable);
@@ -2084,13 +2067,6 @@ public class SettingsExecute {
 		if (enable) {
 			if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
 				return errorEmbed("Automatic roles must be enabled");
-			}
-
-			EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
-			if (eb != null) {
-				return errorEmbed(
-					"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to enable automatic roles claim"
-				);
 			}
 		}
 
@@ -2376,30 +2352,6 @@ public class SettingsExecute {
 
 	public JsonObject getBlacklistSettings() {
 		return higherDepth(serverSettings, "blacklist").getAsJsonObject();
-	}
-
-	public EmbedBuilder setHypixelKey(String newKey) {
-		try {
-			newKey = higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey, newKey), "record.key").getAsString();
-		} catch (Exception e) {
-			return errorEmbed("Provided Hypixel API key is invalid.");
-		}
-
-		int responseCode = database.setServerHypixelApiKey(guild.getId(), newKey);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Set the Hypixel API key. For privacy reasons, they key cannot be viewed again.");
-	}
-
-	public EmbedBuilder deleteHypixelKey() {
-		int responseCode = database.setServerHypixelApiKey(guild.getId(), "");
-		if (responseCode != 200) {
-			apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Deleted the server's Hypixel API key.");
 	}
 
 	public EmbedBuilder setFetchurChannel(String channelMention) {

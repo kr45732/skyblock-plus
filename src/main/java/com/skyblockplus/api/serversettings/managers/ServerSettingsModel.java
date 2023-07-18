@@ -70,8 +70,6 @@ public class ServerSettingsModel {
 	@Embedded
 	private JacobSettings jacobSettings = new JacobSettings();
 
-	private String hypixelApiKey = "";
-
 	private String applyGuestRole = "";
 
 	private String fetchurChannel = "";
@@ -94,15 +92,7 @@ public class ServerSettingsModel {
 		this.serverId = serverId;
 	}
 
-	public String getHypixelApiKey() {
-		return null;
-	}
-
-	public String getHypixelApiKeyInternal() {
-		return hypixelApiKey;
-	}
-
-	public ServerSettingsModel copy(boolean nullHypixelApiKey) {
+	public ServerSettingsModel copy() {
 		ServerSettingsModel copy = new ServerSettingsModel(serverName, serverId);
 		copy.setAutomatedVerify(automatedVerify);
 		copy.setAutomatedGuilds(automatedGuilds);
@@ -110,7 +100,6 @@ public class ServerSettingsModel {
 		copy.setAutomatedRoles(automatedRoles);
 		copy.setSbEvent(sbEvent);
 		copy.setJacobSettings(jacobSettings);
-		copy.setHypixelApiKey(nullHypixelApiKey ? null : hypixelApiKey);
 		copy.setApplyGuestRole(applyGuestRole);
 		copy.setFetchurChannel(fetchurChannel);
 		copy.setFetchurRole(fetchurRole);

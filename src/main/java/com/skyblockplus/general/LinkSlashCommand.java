@@ -20,6 +20,7 @@ package com.skyblockplus.general;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
 import static com.skyblockplus.utils.utils.HypixelUtils.getPlayerDiscordInfo;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
@@ -35,6 +36,7 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.oauth.TokenData;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
+import groovy.lang.Tuple3;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,11 +52,55 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
 public class LinkSlashCommand extends SlashCommand {
+
+	private static final List<String> rolesClaimLbTypes = List.of(
+		"wolf",
+		"zombie",
+		"spider",
+		"enderman",
+		"blaze",
+		"vampire",
+		"level",
+		"pet_score",
+		"networth",
+		"catacombs",
+		"fairy_souls",
+		"minion_slots",
+		"slayer",
+		"maxed_slayers",
+		"healer",
+		"mage",
+		"berserk",
+		"archer",
+		"tank",
+		"mage_reputation",
+		"barbarian_reputation",
+		"maxed_collections",
+		"coins",
+		"skills",
+		"alchemy",
+		"combat",
+		"fishing",
+		"farming",
+		"foraging",
+		"carpentry",
+		"mining",
+		"taming",
+		"enchanting",
+		"social",
+		"weight"
+	);
+	private static final List<String> nicknameLbTypes = List.of("skills", "catacombs", "slayer", "weight", "selected_class", "level");
+
+	public static List<String> getLbTypes(boolean rolesClaimEnabled) {
+		return rolesClaimEnabled ? rolesClaimLbTypes : nicknameLbTypes;
+	}
 
 	public LinkSlashCommand() {
 		this.name = "link";
@@ -142,8 +188,9 @@ public class LinkSlashCommand extends SlashCommand {
 		String updatedNickname = "false";
 		String updatedRoles = "false";
 
-		Player.Profile player = null;
-		String key = database.getServerHypixelApiKey(member.getGuild().getId());
+		boolean rolesClaimOnLink = higherDepth(verifySettings, "enableRolesClaim", false);
+		DataObject player = null;
+		boolean playerRequested = false;
 
 		try {
 			String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname", "none");
@@ -203,34 +250,33 @@ public class LinkSlashCommand extends SlashCommand {
 							type.equals("LEVEL")
 						)
 					) {
-						if (key != null) {
-							if (player == null) {
-								HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
-								player =
-									(
-										response.isValid()
-											? new Player(linkedAccount.username(), linkedAccount.uuid(), response.response(), true)
-											: new Player()
-									).getSelectedProfile();
-							}
+						if (!playerRequested) {
+							player =
+								leaderboardDatabase.getCachedPlayer(
+									getLbTypes(rolesClaimOnLink),
+									Player.Gamemode.SELECTED,
+									linkedAccount.uuid()
+								);
+							playerRequested = true;
+						}
 
-							if (player.isValid()) {
-								nicknameTemplate =
-									nicknameTemplate.replace(
-										matcher.group(0),
-										switch (type) {
-											case "SKILLS" -> formatNumber((int) player.getSkillAverage());
-											case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
-											case "WEIGHT" -> formatNumber((int) player.getWeight());
-											case "CLASS" -> player.getSelectedDungeonClass().equals("none")
-												? ""
-												: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
-											case "LEVEL" -> formatNumber((int) player.getLevel());
-											default -> formatNumber((int) player.getCatacombs().getProgressLevel());
-										} +
-										extra
-									);
-							}
+						if (player != null) {
+							nicknameTemplate =
+								nicknameTemplate.replace(
+									matcher.group(0),
+									switch (type) {
+										case "SKILLS", "WEIGHT", "CATACOMBS", "LEVEL" -> formatNumber(
+											(int) player.getDouble(type.toLowerCase())
+										);
+										case "SLAYER" -> simplifyNumber((long) player.getDouble("slayer"));
+										case "CLASS" -> player.getDouble("selected_class") == -1
+											? ""
+											: "" +
+											DUNGEON_CLASS_NAMES.get((int) player.getDouble("selected_class")).toUpperCase().charAt(0);
+										default -> throw new IllegalStateException("Unexpected value: " + type);
+									} +
+									extra
+								);
 						}
 					}
 
@@ -255,24 +301,26 @@ public class LinkSlashCommand extends SlashCommand {
 				toRemove.add(member.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
 			} catch (Exception ignored) {}
 
-			if (higherDepth(verifySettings, "enableRolesClaim", false)) {
+			if (rolesClaimOnLink) {
 				try {
-					if (key != null) {
-						if (player == null) {
-							HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
-							player =
-								(
-									!response.isValid()
-										? new Player()
-										: new Player(linkedAccount.username(), linkedAccount.uuid(), response.response(), true)
-								).getSelectedProfile();
-						}
+					if (!playerRequested) {
+						player =
+							leaderboardDatabase.getCachedPlayer(
+								getLbTypes(rolesClaimOnLink),
+								Player.Gamemode.SELECTED,
+								linkedAccount.uuid()
+							);
+					}
 
-						if (player.isValid()) {
-							Object[] out = (Object[]) RolesSlashCommand.ClaimSubcommand.updateRoles(player, member);
-							toAdd.addAll((List<Role>) out[1]);
-							toRemove.addAll((List<Role>) out[2]);
-						}
+					if (player != null) {
+						Tuple3<EmbedBuilder, List<Role>, List<Role>> out = RolesSlashCommand.ClaimSubcommand.updateRoles(
+							null,
+							player,
+							member,
+							true
+						);
+						toAdd.addAll(out.getV2());
+						toRemove.addAll(out.getV3());
 					}
 				} catch (Exception ignored) {}
 			}
