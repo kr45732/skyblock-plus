@@ -122,7 +122,7 @@ public class Utils {
 		.setAllowCoreThreadTimeOut(true);
 	public static final List<String> hypixelGuildRequestQueue = Collections.synchronizedList(new ArrayList<>());
 	public static final List<String> hypixelGuildFetchQueue = Collections.synchronizedList(new ArrayList<>());
-
+	public static final HypixelKeyRecord hypixelRateLimiter = new HypixelKeyRecord(600, 0);
 	public static final Gson gson = new GsonBuilder()
 		.addSerializationExclusionStrategy(new ExposeExclusionStrategy(true))
 		.addDeserializationExclusionStrategy(new ExposeExclusionStrategy(false))
@@ -158,7 +158,6 @@ public class Utils {
 	public static String LEADERBOARD_DB_URL = "";
 	public static String CLIENT_SECRET = "";
 	public static String BASE_URL = "";
-	public static HypixelKeyRecord hypixelRateLimiter = null;
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
@@ -290,8 +289,6 @@ public class Utils {
 			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
 			BASE_URL = System.getenv("BASE_URL");
 		}
-
-		hypixelRateLimiter = new HypixelKeyRecord(240, 0);
 	}
 
 	public static String getEmojiWithName(String id, String name) {
