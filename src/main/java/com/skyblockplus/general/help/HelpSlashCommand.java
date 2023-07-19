@@ -574,7 +574,7 @@ public class HelpSlashCommand extends SlashCommand {
 										),
 										new HelpData(
 											"open",
-											"Re-enabled the button to create a new application.",
+											"Re-enable the button to create a new application.",
 											"settings guild <name> apply open",
 											true
 										),
