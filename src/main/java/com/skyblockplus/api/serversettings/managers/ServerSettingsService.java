@@ -156,6 +156,7 @@ public class ServerSettingsService {
 			AutomatedRoles automatedRoles = currentServerSettings.getAutomatedRoles();
 			automatedRoles.setEnable(newRoleSettings.getEnable());
 			automatedRoles.setUseHighest(newRoleSettings.getUseHighest());
+			automatedRoles.setEnableAutomaticSync(newRoleSettings.getEnableAutomaticSync());
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}

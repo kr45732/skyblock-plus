@@ -104,7 +104,7 @@ public class Database {
 	}
 
 	/**
-	 * Only updates enable and use_highest
+	 * Only updates enable, useHighest, enableAutomaticSync
 	 */
 	public int setRolesSettings(String serverId, JsonElement newRoleSettings) {
 		return settingsService.setRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCode().value();
