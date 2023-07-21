@@ -62,11 +62,8 @@ public class ApiHandler {
 	private static String ahApiUrl;
 	private static int mojangApiNum = 0;
 	private static boolean allowMojangApi = false;
-
-	@Getter
 	private static String neuBranch = null;
 
-	@Getter
 	private static String hasteUrl = null;
 
 	public static void initialize() {
@@ -106,6 +103,14 @@ public class ApiHandler {
 		allowMojangApi = higherDepth(settings, "allowMojangApi", false);
 		hasteUrl = higherDepth(settings, "hasteUrl").getAsString();
 		neuBranch = higherDepth(settings, "neuBranch").getAsString();
+	}
+
+	public static String getNeuBranch() {
+		return neuBranch;
+	}
+
+	public static String getHasteUrl() {
+		return hasteUrl;
 	}
 
 	public static void updateBotStatistics() {
