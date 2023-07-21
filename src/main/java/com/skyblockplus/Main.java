@@ -80,6 +80,7 @@ public class Main {
 		Message.suppressContentIntentWarning();
 
 		Utils.initialize();
+		ApiHandler.initializeConstants();
 		Constants.initialize();
 		selfUserId = isMainBot() ? "796791167366594592" : "799042642092228658";
 

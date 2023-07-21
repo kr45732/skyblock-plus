@@ -18,8 +18,7 @@
 
 package com.skyblockplus.miscellaneous.networth;
 
-import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
-import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.HypixelUtils.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;

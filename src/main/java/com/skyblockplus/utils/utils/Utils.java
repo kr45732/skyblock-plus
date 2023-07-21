@@ -19,6 +19,7 @@
 package com.skyblockplus.utils.utils;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.getHasteUrl;
 import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.HttpUtils.*;
@@ -305,10 +306,6 @@ public class Utils {
 
 	public static Emoji getEmojiObj(String id) {
 		return Emoji.fromFormatted(getEmoji(id, null));
-	}
-
-	public static String getHasteUrl() {
-		return "https://haste.skyblock-plus.ml/api/";
 	}
 
 	public static String makeHastePost(Object body) {

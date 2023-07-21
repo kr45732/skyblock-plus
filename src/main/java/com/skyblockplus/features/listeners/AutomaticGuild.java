@@ -21,6 +21,7 @@ package com.skyblockplus.features.listeners;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.jerryEmbed;
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.ApiHandler.getHasteUrl;
 import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;

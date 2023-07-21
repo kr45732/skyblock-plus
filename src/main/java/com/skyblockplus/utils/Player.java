@@ -1731,7 +1731,7 @@ public class Player {
 		}
 
 		public HypixelResponse getMuseum() {
-			return skyblockMuseumFromProfileId(higherDepth(getOuterProfileJson(), "profile_id").getAsString());
+			return skyblockMuseumFromProfileId(higherDepth(getOuterProfileJson(), "profile_id").getAsString(), uuid);
 		}
 
 		@Override

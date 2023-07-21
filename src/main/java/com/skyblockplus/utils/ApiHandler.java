@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import lombok.Getter;
 import net.dv8tion.jda.api.entities.Activity;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicHeader;
@@ -61,11 +62,15 @@ public class ApiHandler {
 	private static String ahApiUrl;
 	private static int mojangApiNum = 0;
 	private static boolean allowMojangApi = false;
+
+	@Getter
 	private static String neuBranch = null;
+
+	@Getter
+	private static String hasteUrl = null;
 
 	public static void initialize() {
 		try {
-			reloadSettingsJson();
 			cacheDatabase.initializeParties();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 90, 3 * 60 * 60, TimeUnit.SECONDS);
 			cacheDatabase.initializeCommandUses();
@@ -94,19 +99,13 @@ public class ApiHandler {
 		}
 	}
 
-	public static void reloadSettingsJson() {
+	public static void initializeConstants() {
 		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Settings.json");
 		ahApiUrl = higherDepth(settings, "ahApiUrl").getAsString();
 		mojangApiNum = higherDepth(settings, "mojangApiNum", 0);
 		allowMojangApi = higherDepth(settings, "allowMojangApi", false);
-	}
-
-	public static String getNeuBranch() {
-		if (neuBranch == null) {
-			JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Settings.json");
-			neuBranch = higherDepth(settings, "neuBranch").getAsString();
-		}
-		return neuBranch;
+		hasteUrl = higherDepth(settings, "hasteUrl").getAsString();
+		neuBranch = higherDepth(settings, "neuBranch").getAsString();
 	}
 
 	public static void updateBotStatistics() {
@@ -445,7 +444,7 @@ public class ApiHandler {
 		}
 	}
 
-	public static HypixelResponse skyblockMuseumFromProfileId(String profileId) {
+	public static HypixelResponse skyblockMuseumFromProfileId(String profileId, String uuid) {
 		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_MUSEUM, profileId);
 		if (cachedResponse != null) {
 			return new HypixelResponse(cachedResponse);
@@ -457,8 +456,9 @@ public class ApiHandler {
 			);
 
 			try {
-				if (higherDepth(museumJson, "members").getAsJsonObject().isEmpty()) {
-					return new HypixelResponse("Player's museum API is disabled");
+				if (higherDepth(museumJson, "members." + uuid) == null) {
+					String username = uuidToUsernameCache.getIfPresent(uuid);
+					return new HypixelResponse((username != null ? username : "Player") + "'s museum API is disabled");
 				}
 
 				JsonObject membersObject = higherDepth(museumJson, "members").getAsJsonObject();
