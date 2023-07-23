@@ -840,6 +840,47 @@ public class Player {
 			return null;
 		}
 
+		public Map<Integer, InvItem> getMuseumMap() {
+			try {
+				Map<Integer, InvItem> museumMap = new HashMap<>();
+				int counter = 0;
+
+				HypixelResponse museumResponse = getMuseum();
+				JsonElement museumJson = museumResponse.get(uuid);
+
+				JsonElement items = higherDepth(museumJson, "items");
+				if (items != null) {
+					for (Map.Entry<String, JsonElement> entry : items.getAsJsonObject().entrySet()) {
+						if (!higherDepth(entry.getValue(), "borrowing", false)) {
+							String contents = higherDepth(entry.getValue(), "items.data").getAsString();
+							NBTCompound parsedContents = NBTReader.readBase64(contents);
+							for (Map.Entry<Integer, InvItem> parsedItem : getGenericInventoryMap(parsedContents).entrySet()) {
+								museumMap.put(counter, parsedItem.getValue());
+								counter++;
+							}
+						}
+					}
+				}
+
+				JsonElement special = higherDepth(museumJson, "special");
+				if (special != null) {
+					for (JsonElement item : special.getAsJsonArray()) {
+						String contents = higherDepth(item, "items.data").getAsString();
+						NBTCompound parsedContents = NBTReader.readBase64(contents);
+						for (Map.Entry<Integer, InvItem> parsedItem : getGenericInventoryMap(parsedContents).entrySet()) {
+							museumMap.put(counter, parsedItem.getValue());
+							counter++;
+						}
+					}
+				}
+
+				return museumMap;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
 		public Map<Integer, InvItem> getTalismanBagMap() {
 			try {
 				String contents = higherDepth(profileJson(), "talisman_bag.data").getAsString();

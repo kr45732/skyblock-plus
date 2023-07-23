@@ -98,7 +98,7 @@ public class ApiHandler {
 
 	public static void initializeConstants() {
 		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Settings.json");
-		ahApiUrl = higherDepth(settings, "ahApiUrl").getAsString();
+		ahApiUrl = "https://vague-darkviolet-springtail.gigalixirapp.com/"; //higherDepth(settings, "ahApiUrl").getAsString();
 		mojangApiNum = higherDepth(settings, "mojangApiNum", 0);
 		allowMojangApi = higherDepth(settings, "allowMojangApi", false);
 		hasteUrl = higherDepth(settings, "hasteUrl").getAsString();

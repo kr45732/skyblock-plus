@@ -90,10 +90,11 @@ public class NetworthExecute {
 		"enderchest",
 		"equipment",
 		"personal_vault",
-		"storage"
+		"storage",
+		"museum"
 	);
 	//	private final Set<String> tempSet = new HashSet<>();
-	private final Map<String, List<InvItem>> pets = new HashMap<>();
+	private final List<InvItem> pets = new ArrayList<>();
 	private final Map<String, List<NetworthItem>> items = new HashMap<>();
 	private final Map<String, Double> totals = new HashMap<>();
 	private final Map<String, Double> soulboundIgnoredTotals = new HashMap<>();
@@ -147,7 +148,7 @@ public class NetworthExecute {
 
 		Map<Integer, InvItem> playerInventory = player.getInventoryMap();
 		if (playerInventory == null) {
-			addTotal("inventory", -1.0);
+			addTotal("items", -1.0);
 			return withApiHelpButton(defaultEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
 		}
 
@@ -180,6 +181,7 @@ public class NetworthExecute {
 					case "enderchest" -> player.getEnderChestMap();
 					case "personal_vault" -> player.getPersonalVaultMap();
 					case "storage" -> player.getStorageMap();
+					case "museum" -> player.getMuseumMap();
 					default -> throw new IllegalStateException("Unexpected value: " + location);
 				};
 
@@ -188,7 +190,7 @@ public class NetworthExecute {
 					if (item != null) {
 						double itemPrice = calculateItemPrice(item, location);
 						if (itemPrice >= 0) { // -1 if pet
-							// If event is null, no need to update the soulbound fields even if soulbound
+							// No need to update the soulbound values if event is null
 							addTotal(location, itemPrice, event != null && item.isSoulbound());
 							if (event != null) {
 								addItem(location, addItemStr(item), itemPrice, item.isSoulbound());
@@ -296,14 +298,12 @@ public class NetworthExecute {
 	}
 
 	private Map<SelectOption, EmbedBuilder> getPages(Player.Profile player, boolean ignoreSoulbound, int networthPosition) {
-		StringBuilder echestStr = getSectionString(getItems("enderchest"), ignoreSoulbound);
-		StringBuilder sacksStr = getSectionString(getItems("sacks"), ignoreSoulbound);
-		StringBuilder personalVaultStr = getSectionString(getItems("personal_vault"), ignoreSoulbound);
-		StringBuilder storageStr = getSectionString(getItems("storage"), ignoreSoulbound);
-		StringBuilder invStr = getSectionString(getItems("inventory"), ignoreSoulbound);
-		StringBuilder armorStr = getSectionString(getItems("armor"), ignoreSoulbound);
-		StringBuilder petsStr = getSectionString(getItems("pets"), ignoreSoulbound);
-		StringBuilder talismanStr = getSectionString(getItems("talisman"), ignoreSoulbound);
+		StringBuilder sacksStr = getSectionString("sacks", ignoreSoulbound);
+		StringBuilder itemsStr = getSectionString("items", ignoreSoulbound);
+		StringBuilder armorStr = getSectionString("armor", ignoreSoulbound);
+		StringBuilder petsStr = getSectionString("pets", ignoreSoulbound);
+		StringBuilder talismanStr = getSectionString("talisman", ignoreSoulbound);
+		StringBuilder museumStr = getSectionString("museum", ignoreSoulbound);
 
 		double totalNetworth = getNetworth(ignoreSoulbound);
 		String ebDesc =
@@ -329,21 +329,18 @@ public class NetworthExecute {
 		);
 		eb.addField("Sacks", simplifyNumber(getTotal("sacks", ignoreSoulbound)), true);
 		eb.addField("Essence", simplifyNumber(getTotal("essence", ignoreSoulbound)), true);
-		if (!echestStr.isEmpty()) {
-			eb.addField(
-				"Ender Chest | " + simplifyNumber(getTotal("enderchest", ignoreSoulbound)),
-				echestStr.toString().split("\n\n")[0],
-				false
-			);
-		}
-		if (!storageStr.isEmpty()) {
-			eb.addField("Storage | " + simplifyNumber(getTotal("storage", ignoreSoulbound)), storageStr.toString().split("\n\n")[0], false);
-		}
-		if (!invStr.isEmpty()) {
-			eb.addField("Inventory | " + simplifyNumber(getTotal("inventory", ignoreSoulbound)), invStr.toString().split("\n\n")[0], false);
+		if (!itemsStr.isEmpty()) {
+			eb.addField("Items | " + simplifyNumber(getTotal("items", ignoreSoulbound)), itemsStr.toString().split("\n\n")[0], false);
 		}
 		if (!armorStr.isEmpty()) {
 			eb.addField("Armor | " + simplifyNumber(getTotal("armor", ignoreSoulbound)), armorStr.toString().split("\n\n")[0], false);
+		}
+		if (!museumStr.isEmpty()) {
+			eb.addField("Museum | " + simplifyNumber(getTotal("museum", ignoreSoulbound)), museumStr.toString().split("\n\n")[0], false);
+		} else if (!player.getMuseum().isValid()) {
+			eb.addField("Museum", "Museum API is disabled ([**help enabling**](https://i.imgur.com/h2ybRgU.mp4))", false);
+		} else {
+			eb.addField("Museum", "Museum empty or all items are being borrowed", false);
 		}
 		if (!petsStr.isEmpty()) {
 			eb.addField("Pets | " + simplifyNumber(getTotal("pets", ignoreSoulbound)), petsStr.toString().split("\n\n")[0], false);
@@ -355,56 +352,21 @@ public class NetworthExecute {
 				false
 			);
 		}
-		if (!personalVaultStr.isEmpty()) {
-			eb.addField(
-				"Personal Vault | " + simplifyNumber(getTotal("personal_vault", ignoreSoulbound)),
-				personalVaultStr.toString().split("\n\n")[0],
-				false
-			);
-		}
 
 		Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 		pages.put(SelectOption.of("Overview", "overview").withEmoji(getEmojiObj("SKYBLOCK_MENU")), eb);
 
-		if (!echestStr.isEmpty()) {
+		if (!itemsStr.isEmpty()) {
 			pages.put(
-				SelectOption.of("Ender Chest", "ender_chest").withEmoji(getEmojiObj("ENDER_CHEST")),
+				SelectOption.of("Items", "items").withEmoji(getEmojiObj("CHEST")),
 				player
-					.defaultPlayerEmbed(" | Ender Chest")
+					.defaultPlayerEmbed(" | Items")
 					.setDescription(
 						ebDesc +
-						"\n**Ender Chest:** " +
-						simplifyNumber(getTotal("enderchest", ignoreSoulbound)) +
+						"\n**Items:** " +
+						simplifyNumber(getTotal("items", ignoreSoulbound)) +
 						"\n\n" +
-						echestStr.toString().replace("\n\n", "\n")
-					)
-			);
-		}
-		if (!storageStr.isEmpty()) {
-			pages.put(
-				SelectOption.of("Storage", "storage").withEmoji(getEmojiObj("SMALL_BACKPACK")),
-				player
-					.defaultPlayerEmbed(" | Storage")
-					.setDescription(
-						ebDesc +
-						"\n**Storage:** " +
-						simplifyNumber(getTotal("storage", ignoreSoulbound)) +
-						"\n\n" +
-						storageStr.toString().replace("\n\n", "\n")
-					)
-			);
-		}
-		if (!invStr.isEmpty()) {
-			pages.put(
-				SelectOption.of("Inventory", "inventory").withEmoji(getEmojiObj("CHEST")),
-				player
-					.defaultPlayerEmbed(" | Inventory")
-					.setDescription(
-						ebDesc +
-						"\n**Inventory:** " +
-						simplifyNumber(getTotal("inventory", ignoreSoulbound)) +
-						"\n\n" +
-						invStr.toString().replace("\n\n", "\n")
+						itemsStr.toString().replace("\n\n", "\n")
 					)
 			);
 		}
@@ -419,6 +381,20 @@ public class NetworthExecute {
 						simplifyNumber(getTotal("armor", ignoreSoulbound)) +
 						"\n\n" +
 						armorStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
+		if (!museumStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Museum", "museum").withEmoji(getEmojiObj("MUSEUM_PORTAL")),
+				player
+					.defaultPlayerEmbed(" | Museum")
+					.setDescription(
+						ebDesc +
+						"\n**Museum:** " +
+						simplifyNumber(getTotal("museum", ignoreSoulbound)) +
+						"\n\n" +
+						museumStr.toString().replace("\n\n", "\n")
 					)
 			);
 		}
@@ -450,20 +426,6 @@ public class NetworthExecute {
 					)
 			);
 		}
-		if (!personalVaultStr.isEmpty()) {
-			pages.put(
-				SelectOption.of("Personal Vault", "personal_vault").withEmoji(getEmojiObj("IRON_CHEST")),
-				player
-					.defaultPlayerEmbed(" | Personal Vault")
-					.setDescription(
-						ebDesc +
-						"\n**Personal Vault:** " +
-						simplifyNumber(getTotal("personal_vault", ignoreSoulbound)) +
-						"\n\n" +
-						personalVaultStr.toString().replace("\n\n", "\n")
-					)
-			);
-		}
 		if (!sacksStr.isEmpty()) {
 			pages.put(
 				SelectOption.of("Sacks", "sacks").withEmoji(getEmojiObj("RUNE_SACK")),
@@ -482,7 +444,12 @@ public class NetworthExecute {
 		return pages;
 	}
 
-	public StringBuilder getSectionString(List<NetworthItem> items, boolean ignoreSoulbound) {
+	public StringBuilder getSectionString(String location, boolean ignoreSoulbound) {
+		List<NetworthItem> items = getItems(location);
+		if (items.isEmpty()) {
+			return new StringBuilder();
+		}
+
 		items.sort(Comparator.comparingDouble(item -> -item.price()));
 		StringBuilder str = new StringBuilder();
 
@@ -513,15 +480,13 @@ public class NetworthExecute {
 	}
 
 	public double getNetworth(boolean ignoreSoulbound) {
-		return totals.getOrDefault("inventory", -1.0) == -1
+		return totals.getOrDefault("items", -1.0) == -1
 			? -1
 			: (ignoreSoulbound ? soulboundIgnoredTotals : totals).values().stream().mapToDouble(i -> i).sum();
 	}
 
-	public void calculatePetPrice(String location, String auctionName, double auctionPrice) {
-		List<InvItem> petsList = pets.getOrDefault(location, new ArrayList<>());
-
-		for (Iterator<InvItem> iterator = petsList.iterator(); iterator.hasNext();) {
+	public void calculatePetPrice(String auctionName, double auctionPrice) {
+		for (Iterator<InvItem> iterator = pets.iterator(); iterator.hasNext();) {
 			InvItem item = iterator.next();
 			if (item.getPetApiName().equals(auctionName)) {
 				StringBuilder miscStr = new StringBuilder("[");
@@ -549,8 +514,8 @@ public class NetworthExecute {
 				miscStr.append("]");
 
 				double totalPrice = auctionPrice + miscExtras;
-				addItem(location, addItemStr(item), totalPrice);
-				addTotal(location, totalPrice);
+				addItem("pets", addItemStr(item), totalPrice);
+				addTotal("pets", totalPrice);
 
 				if (verbose) {
 					calcItemsJsonStr
@@ -574,10 +539,8 @@ public class NetworthExecute {
 		}
 	}
 
-	public void calculateDefaultPetPrices(String location) {
-		List<InvItem> petsList = pets.getOrDefault(location, new ArrayList<>());
-
-		for (InvItem item : petsList) {
+	public void calculateDefaultPetPrices() {
+		for (InvItem item : pets) {
 			double auctionPrice = getMinBinAvg(
 				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity())
 			);
@@ -603,8 +566,8 @@ public class NetworthExecute {
 				miscStr.append("]");
 
 				double itemPrice = auctionPrice + miscExtras;
-				addItem(location, addItemStr(item), itemPrice);
-				addTotal(location, itemPrice);
+				addItem("pets", addItemStr(item), itemPrice);
+				addTotal("pets", itemPrice);
 
 				if (verbose) {
 					calcItemsJsonStr
@@ -627,8 +590,7 @@ public class NetworthExecute {
 	}
 
 	public void calculatePetPrices() {
-		String queryStr = pets.values().stream().flatMap(Collection::stream).map(InvItem::getPetApiName).collect(Collectors.joining(","));
-
+		String queryStr = pets.stream().map(InvItem::getPetApiName).distinct().collect(Collectors.joining(","));
 		if (queryStr.isEmpty()) {
 			return;
 		}
@@ -638,16 +600,11 @@ public class NetworthExecute {
 			for (JsonElement auction : ahQuery) {
 				String auctionName = higherDepth(auction, "name").getAsString();
 				double auctionPrice = higherDepth(auction, "price").getAsDouble();
-
-				for (String location : locations) {
-					calculatePetPrice(location, auctionName, auctionPrice);
-				}
+				calculatePetPrice(auctionName, auctionPrice);
 			}
 		}
 
-		for (String location : locations) {
-			calculateDefaultPetPrices(location);
-		}
+		calculateDefaultPetPrices();
 	}
 
 	public double getMinBinAvg(String id) {
@@ -711,13 +668,7 @@ public class NetworthExecute {
 		try {
 			if (item.getId().equals("PET") && location != null) {
 				if (!item.getName().startsWith("Mystery ") && !item.getName().equals("Unknown Pet")) {
-					pets.compute(
-						location,
-						(k, v) -> {
-							(v = (v == null ? new ArrayList<>() : v)).add(item);
-							return v;
-						}
-					);
+					pets.add(item);
 				}
 				return -1;
 			} else {
@@ -1219,7 +1170,12 @@ public class NetworthExecute {
 	}
 
 	public void addTotal(String location, double total, boolean isSoulbound) {
-		location = location.equals("equipment") || location.equals("wardrobe") ? "armor" : location;
+		location =
+			switch (location) {
+				case "equipment", "wardrobe" -> "armor";
+				case "inventory", "enderchest", "personal_vault", "storage" -> "items";
+				default -> location;
+			};
 		totals.compute(location, (k, v) -> (v == null ? 0 : v) + total);
 		if (!isSoulbound) {
 			soulboundIgnoredTotals.compute(location, (k, v) -> (v == null ? 0 : v) + total);
@@ -1231,7 +1187,12 @@ public class NetworthExecute {
 	}
 
 	public void addItem(String location, String item, double price, boolean isSoulbound) {
-		location = location.equals("equipment") || location.equals("wardrobe") ? "armor" : location;
+		location =
+			switch (location) {
+				case "equipment", "wardrobe" -> "armor";
+				case "inventory", "enderchest", "personal_vault", "storage" -> "items";
+				default -> location;
+			};
 		items.compute(
 			location,
 			(k, v) -> {

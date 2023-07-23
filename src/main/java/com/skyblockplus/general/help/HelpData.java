@@ -18,6 +18,7 @@
 
 package com.skyblockplus.general.help;
 
+import static com.skyblockplus.utils.utils.Utils.WEBSITE_LINK;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class HelpData {
 
 		EmbedBuilder eb = defaultEmbed(
 			getCategory() + " | " + getName(),
-			"https://skyblock-plus.ml/commands?command=" + getName().replace(" ", "+")
+			WEBSITE_LINK + "/commands?command=" + getName().replace(" ", "+")
 		);
 		eb.addField("Description", getDescription(), false);
 		eb.addField("Usage", getUsageFormatted(), false);

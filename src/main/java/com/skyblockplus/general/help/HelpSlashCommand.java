@@ -18,8 +18,7 @@
 
 package com.skyblockplus.general.help;
 
-import static com.skyblockplus.utils.utils.Utils.DISCORD_SERVER_INVITE_LINK;
-import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -722,7 +721,7 @@ public class HelpSlashCommand extends SlashCommand {
 			.updateExtras(extra ->
 				extra
 					.setTitles(pageTitleToCategory.keySet().stream().toList())
-					.setTitleUrls(pageTitleToCategory.values().stream().map(u -> "https://skyblock-plus.ml/commands" + u).toList())
+					.setTitleUrls(pageTitleToCategory.values().stream().map(u -> WEBSITE_LINK + "/commands" + u).toList())
 			);
 
 		paginateBuilder.addStrings(
@@ -1022,7 +1021,9 @@ public class HelpSlashCommand extends SlashCommand {
 					.append(":** ")
 					.append("[")
 					.append(entry.getKey())
-					.append("](https://skyblock-plus.ml/commands")
+					.append("](")
+					.append(WEBSITE_LINK)
+					.append("/commands")
 					.append(entry.getValue())
 					.append(")");
 				i++;

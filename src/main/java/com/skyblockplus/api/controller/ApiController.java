@@ -59,13 +59,13 @@ public class ApiController {
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
-	@CrossOrigin({ "https://skyblock-plus.vercel.app", "https://skyblock-plus.ml" })
+	@CrossOrigin({ "https://skyblock-plus.vercel.app", WEBSITE_LINK })
 	@GetMapping("/commands")
 	public ResponseEntity<?> getAllCommands() {
 		return new ResponseEntity<>(apiCommandList, HttpStatus.OK);
 	}
 
-	@CrossOrigin({ "https://skyblock-plus.vercel.app", "https://skyblock-plus.ml" })
+	@CrossOrigin({ "https://skyblock-plus.vercel.app", WEBSITE_LINK })
 	@GetMapping("/stats")
 	public ResponseEntity<?> getStats() {
 		Map<String, Integer> commandUses = getCommandUses();

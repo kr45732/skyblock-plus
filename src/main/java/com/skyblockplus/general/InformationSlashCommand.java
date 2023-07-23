@@ -109,9 +109,9 @@ public class InformationSlashCommand extends SlashCommand {
 									Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
 								),
 								ActionRow.of(
-									Button.link("https://skyblock-plus.ml", "Website"),
-									Button.link("https://skyblock-plus.ml/tos", "Terms of Service"),
-									Button.link("https://skyblock-plus.ml/privacy-policy", "Privacy Policy"),
+									Button.link(WEBSITE_LINK, "Website"),
+									Button.link(WEBSITE_LINK + "/tos", "Terms of Service"),
+									Button.link(WEBSITE_LINK + "/privacy-policy", "Privacy Policy"),
 									Button.link("https://stats.uptimerobot.com/z4On2FGnOo", "Uptime")
 								)
 							)

@@ -2778,7 +2778,7 @@ public class SettingsExecute {
 
 	public MessageEditBuilder getHelpEmbed(String name) {
 		return new MessageEditBuilder()
-			.setEmbeds(defaultEmbed("Invalid input. Run `/help " + name + "` or press the button below for help").build())
+			.setEmbeds(errorEmbed("Invalid input. Run `/help " + name + "` or press the button below for help").build())
 			.setActionRow(Button.primary("s_help_" + name, "Help"));
 	}
 }
