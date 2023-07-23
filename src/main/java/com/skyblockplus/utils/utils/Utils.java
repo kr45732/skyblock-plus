@@ -89,7 +89,7 @@ public class Utils {
 	public static final String BOT_INVITE_LINK =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395541081169&scope=bot+applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
-	public static final String WEBSITE_LINK = "https://skyblock-plus.ml";
+	public static final String WEBSITE_LINK = "https://skyblock-plus.vercel.app/"; // "https://skyblock-plus.ml";
 	public static final ExceptionExecutor executor = new ExceptionExecutor(
 		10,
 		Integer.MAX_VALUE,
