@@ -58,6 +58,10 @@ public class LeaderboardDatabase {
 		List.of(
 			"username",
 			"uuid",
+			"networth",
+			"museum",
+			"museum_hypixel",
+			"level",
 			"slayer",
 			"skills",
 			"skills_xp",
@@ -67,6 +71,8 @@ public class LeaderboardDatabase {
 			"zombie",
 			"spider",
 			"enderman",
+			"blaze",
+			"vampire",
 			"alchemy_xp",
 			"combat_xp",
 			"fishing_xp",
@@ -77,13 +83,8 @@ public class LeaderboardDatabase {
 			"taming_xp",
 			"social_xp",
 			"enchanting_xp",
-			"networth",
-			"blaze",
-			"vampire",
 			"lily_weight",
 			"coins",
-			"lily_slayer_weight",
-			"level",
 			"hotm",
 			"pet_score",
 			"fairy_souls",
@@ -97,9 +98,8 @@ public class LeaderboardDatabase {
 			"tank_xp",
 			"mage_reputation",
 			"barbarian_reputation",
-			"selected_class",
-			"museum",
-			"museum_hypixel"
+			"lily_slayer_weight",
+			"selected_class"
 		)
 	);
 	private static final List<String> typesSubList = new ArrayList<>();
