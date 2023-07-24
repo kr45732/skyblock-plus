@@ -97,7 +97,9 @@ public class LeaderboardDatabase {
 			"tank_xp",
 			"mage_reputation",
 			"barbarian_reputation",
-			"selected_class"
+			"selected_class",
+			"museum",
+			"museum_hypixel"
 		)
 	);
 	private static final List<String> typesSubList = new ArrayList<>();

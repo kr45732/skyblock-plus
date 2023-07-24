@@ -52,6 +52,7 @@ import org.apache.groovy.util.Maps;
 public class Player {
 
 	public final Map<Integer, Double> profileToNetworth = new ConcurrentHashMap<>();
+	public final Map<Integer, Double> profileToMuseum = new ConcurrentHashMap<>();
 	private final List<Profile> profiles = new ArrayList<>();
 	private String uuid;
 	private String username;
@@ -369,6 +370,7 @@ public class Player {
 		private final int profileIndex;
 		private final JsonElement profileJson;
 		private final String profileName;
+		private HypixelResponse museumResponse;
 
 		public Profile(int profileIndex, JsonElement profileJson) {
 			this.profileJson = profileJson;
@@ -512,6 +514,8 @@ public class Player {
 				case "coins" -> Math.max(0, profile.getBankBalance()) + profile.getPurseCoins();
 				case "pet_score" -> profile.getPetScore();
 				case "networth" -> profile.getNetworth();
+				case "museum" -> profile.getMuseumWorth();
+				case "museum_hypixel" -> profile.getHypixelMuseumWorth();
 				case "fairy_souls" -> profile.getFairySouls();
 				case "minion_slots" -> profile.getNumberMinionSlots();
 				case "dungeon_secrets" -> getDungeonSecrets();
@@ -1684,7 +1688,21 @@ public class Player {
 		}
 
 		public double getNetworth() {
-			return profileToNetworth.computeIfAbsent(profileIndex, k -> NetworthExecute.getNetworth(this));
+			if (!profileToNetworth.containsKey(profileIndex)) {
+				NetworthExecute calc = new NetworthExecute();
+				calc.getPlayerNetworth(this, null);
+				profileToNetworth.put(profileIndex, calc.getNetworth());
+				profileToMuseum.put(profileIndex, museumResponse != null && museumResponse.isValid() ? calc.getTotal("museum", false) : -1);
+			}
+			return profileToNetworth.get(profileIndex);
+		}
+
+		public double getMuseumWorth() {
+			return profileToMuseum.getOrDefault(profileIndex, -1.0);
+		}
+
+		public double getHypixelMuseumWorth() {
+			return museumResponse != null && museumResponse.isValid() ? higherDepth(museumResponse.response(), uuid + ".value", -1.0) : -1;
 		}
 
 		public int getMageRep() {
@@ -1772,7 +1790,10 @@ public class Player {
 		}
 
 		public HypixelResponse getMuseum() {
-			return skyblockMuseumFromProfileId(higherDepth(getOuterProfileJson(), "profile_id").getAsString(), uuid);
+			if (museumResponse == null) {
+				museumResponse = skyblockMuseumFromProfileId(higherDepth(getOuterProfileJson(), "profile_id").getAsString(), uuid);
+			}
+			return museumResponse;
 		}
 
 		@Override

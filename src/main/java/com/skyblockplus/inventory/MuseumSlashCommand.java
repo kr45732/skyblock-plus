@@ -82,7 +82,7 @@ public class MuseumSlashCommand extends SlashCommand {
 
 			HypixelResponse hypixelResponse = player.getMuseum();
 			if (!hypixelResponse.isValid()) {
-				if (hypixelResponse.failCause().equals("Player's museum API is disabled")) {
+				if (hypixelResponse.failCause().endsWith("museum API is disabled")) {
 					return withApiHelpButton(hypixelResponse.getErrorEmbed());
 				} else {
 					return hypixelResponse.getErrorEmbed();
@@ -150,7 +150,7 @@ public class MuseumSlashCommand extends SlashCommand {
 
 			HypixelResponse hypixelResponse = player.getMuseum();
 			if (!hypixelResponse.isValid()) {
-				if (hypixelResponse.failCause().equals("Player's museum API is disabled")) {
+				if (hypixelResponse.failCause().endsWith("museum API is disabled")) {
 					return withApiHelpButton(hypixelResponse.getErrorEmbed());
 				} else {
 					return hypixelResponse.getErrorEmbed();

@@ -114,12 +114,6 @@ public class NetworthExecute {
 		return calc.getNetworth();
 	}
 
-	public static double getNetworth(Player.Profile player) {
-		NetworthExecute calc = new NetworthExecute();
-		calc.getPlayerNetworth(player, null);
-		return calc.getNetworth();
-	}
-
 	public NetworthExecute setVerbose(boolean verbose) {
 		this.verbose = verbose;
 		return this;
@@ -319,28 +313,30 @@ public class NetworthExecute {
 			) +
 			"Leaderboard Position:** " +
 			(networthPosition != -1 ? formatNumber(networthPosition) : "Not on leaderboard");
-		EmbedBuilder eb = player.defaultPlayerEmbed().setDescription(ebDesc);
-		eb.addField(
-			"Purse & Bank",
-			simplifyNumber(getTotal("purse", ignoreSoulbound)) +
-			" & " +
-			(getTotal("bank", ignoreSoulbound) == -1 ? "Private" : simplifyNumber(getTotal("bank", ignoreSoulbound))),
-			true
-		);
-		eb.addField("Sacks", simplifyNumber(getTotal("sacks", ignoreSoulbound)), true);
-		eb.addField("Essence", simplifyNumber(getTotal("essence", ignoreSoulbound)), true);
-		if (!itemsStr.isEmpty()) {
-			eb.addField("Items | " + simplifyNumber(getTotal("items", ignoreSoulbound)), itemsStr.toString().split("\n\n")[0], false);
-		}
-		if (!armorStr.isEmpty()) {
-			eb.addField("Armor | " + simplifyNumber(getTotal("armor", ignoreSoulbound)), armorStr.toString().split("\n\n")[0], false);
-		}
+		EmbedBuilder eb = player
+			.defaultPlayerEmbed()
+			.setDescription(ebDesc)
+			.addField(
+				"Purse & Bank",
+				simplifyNumber(getTotal("purse", ignoreSoulbound)) +
+				" & " +
+				(getTotal("bank", ignoreSoulbound) == -1 ? "Private" : simplifyNumber(getTotal("bank", ignoreSoulbound))),
+				true
+			)
+			.addField("Sacks", simplifyNumber(getTotal("sacks", ignoreSoulbound)), true)
+			.addField("Essence", simplifyNumber(getTotal("essence", ignoreSoulbound)), true);
 		if (!museumStr.isEmpty()) {
 			eb.addField("Museum | " + simplifyNumber(getTotal("museum", ignoreSoulbound)), museumStr.toString().split("\n\n")[0], false);
 		} else if (!player.getMuseum().isValid()) {
 			eb.addField("Museum", "Museum API is disabled ([**help enabling**](https://i.imgur.com/h2ybRgU.mp4))", false);
 		} else {
 			eb.addField("Museum", "Museum empty or all items are being borrowed", false);
+		}
+		if (!itemsStr.isEmpty()) {
+			eb.addField("Items | " + simplifyNumber(getTotal("items", ignoreSoulbound)), itemsStr.toString().split("\n\n")[0], false);
+		}
+		if (!armorStr.isEmpty()) {
+			eb.addField("Armor | " + simplifyNumber(getTotal("armor", ignoreSoulbound)), armorStr.toString().split("\n\n")[0], false);
 		}
 		if (!petsStr.isEmpty()) {
 			eb.addField("Pets | " + simplifyNumber(getTotal("pets", ignoreSoulbound)), petsStr.toString().split("\n\n")[0], false);
@@ -355,7 +351,20 @@ public class NetworthExecute {
 
 		Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 		pages.put(SelectOption.of("Overview", "overview").withEmoji(getEmojiObj("SKYBLOCK_MENU")), eb);
-
+		if (!museumStr.isEmpty()) {
+			pages.put(
+				SelectOption.of("Museum", "museum").withEmoji(getEmojiObj("MUSEUM_PORTAL")),
+				player
+					.defaultPlayerEmbed(" | Museum")
+					.setDescription(
+						ebDesc +
+						"\n**Museum:** " +
+						simplifyNumber(getTotal("museum", ignoreSoulbound)) +
+						"\n\n" +
+						museumStr.toString().replace("\n\n", "\n")
+					)
+			);
+		}
 		if (!itemsStr.isEmpty()) {
 			pages.put(
 				SelectOption.of("Items", "items").withEmoji(getEmojiObj("CHEST")),
@@ -381,20 +390,6 @@ public class NetworthExecute {
 						simplifyNumber(getTotal("armor", ignoreSoulbound)) +
 						"\n\n" +
 						armorStr.toString().replace("\n\n", "\n")
-					)
-			);
-		}
-		if (!museumStr.isEmpty()) {
-			pages.put(
-				SelectOption.of("Museum", "museum").withEmoji(getEmojiObj("MUSEUM_PORTAL")),
-				player
-					.defaultPlayerEmbed(" | Museum")
-					.setDescription(
-						ebDesc +
-						"\n**Museum:** " +
-						simplifyNumber(getTotal("museum", ignoreSoulbound)) +
-						"\n\n" +
-						museumStr.toString().replace("\n\n", "\n")
 					)
 			);
 		}
