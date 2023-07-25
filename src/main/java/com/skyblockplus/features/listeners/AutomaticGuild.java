@@ -672,20 +672,18 @@ public class AutomaticGuild {
 						}
 					}
 
-					if (rolesEnabled) {
-						if (player != null) {
-							try {
-								Tuple3<EmbedBuilder, List<Role>, List<Role>> out = RolesSlashCommand.ClaimSubcommand.updateRoles(
-									null,
-									player,
-									linkedMember,
-									rolesSettings,
-									true
-								);
-								toAddRoles.addAll(out.getV2());
-								toRemoveRoles.addAll(out.getV3());
-							} catch (Exception ignored) {}
-						}
+					if (rolesEnabled && player != null) {
+						try {
+							Tuple3<EmbedBuilder, List<Role>, List<Role>> out = RolesSlashCommand.ClaimSubcommand.updateRoles(
+								null,
+								player,
+								linkedMember,
+								rolesSettings,
+								true
+							);
+							toAddRoles.addAll(out.getV2());
+							toRemoveRoles.addAll(out.getV3());
+						} catch (Exception ignored) {}
 					}
 
 					if (!toAddRoles.isEmpty() || !toRemoveRoles.isEmpty() || nickname != null) {
