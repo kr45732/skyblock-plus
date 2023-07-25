@@ -19,8 +19,10 @@
 package com.skyblockplus.utils.database;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
 import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
+import static com.skyblockplus.utils.utils.JsonUtils.getJacobDataJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
 import static com.skyblockplus.utils.utils.Utils.*;
@@ -288,21 +290,25 @@ public class CacheDatabase {
 	}
 
 	public void initializeJacobData() {
-		if (!isMainBot()) {
-			return;
-		}
-
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement("SELECT data FROM jacob LIMIT 1")
 		) {
 			try (ResultSet response = statement.executeQuery()) {
 				response.next();
-				JacobHandler.setJacobData(gson.fromJson(response.getString("data"), JacobData.class));
-				log.info("Retrieved jacob data");
+				JacobData jacobData = gson.fromJson(response.getString("data"), JacobData.class);
+				if (jacobData.getYear() == getSkyblockYear()) {
+					JacobHandler.setJacobData(jacobData);
+					log.info("Retrieved jacob data");
+				}
 			}
 		} catch (Exception e) {
 			log.error("", e);
+		}
+
+		if (JacobHandler.getJacobData() == null) {
+			JacobHandler.setJacobData(gson.fromJson(getJacobDataJson(), JacobData.class));
+			log.info("Fetched jacob data");
 		}
 	}
 

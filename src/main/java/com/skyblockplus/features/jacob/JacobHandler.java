@@ -19,13 +19,10 @@
 package com.skyblockplus.features.jacob;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.miscellaneous.CalendarSlashCommand.YEAR_0;
-import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
 import static com.skyblockplus.utils.utils.StringUtils.getRelativeTimestamp;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;
-import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -34,22 +31,6 @@ public class JacobHandler {
 
 	public static ScheduledFuture<?> jacobFuture;
 	private static JacobData jacobData = null;
-
-	public static void initialize() {
-		scheduler.scheduleAtFixedRate(
-			() -> {
-				try {
-					jda
-						.getTextChannelById("937894945564545035")
-						.sendMessage("<@497789163555389441> <@728098698143465472> Gib jacob data please :D")
-						.queue();
-				} catch (Exception ignored) {}
-			},
-			YEAR_0 + 446400000L * getSkyblockYear() + 600000 - Instant.now().toEpochMilli(),
-			446400000L,
-			TimeUnit.MILLISECONDS
-		);
-	}
 
 	public static JacobData getJacobData() {
 		return jacobData;

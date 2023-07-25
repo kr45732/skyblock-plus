@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-import lombok.Getter;
 import net.dv8tion.jda.api.entities.Activity;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicHeader;

@@ -55,7 +55,6 @@ public class JacobSlashCommand extends SlashCommand {
 		}
 
 		JacobData data = JacobHandler.getJacobData();
-
 		if (data.getContests().isEmpty()) {
 			return defaultEmbed("Jacob Contests")
 				.setDescription("**Year:** " + data.getYear())
@@ -63,7 +62,10 @@ public class JacobSlashCommand extends SlashCommand {
 		}
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS).setItemsPerPage(12);
-		PaginatorExtras extras = paginateBuilder.getExtras().setEveryPageTitle("Jacob Contests");
+		PaginatorExtras extras = paginateBuilder
+			.getExtras()
+			.setEveryPageTitle("Jacob Contests")
+			.setEveryPageText("**Year:** " + data.getYear());
 		String finalCrop = crop;
 		for (JacobContest contest : crop.equals("All")
 			? data.getContests()

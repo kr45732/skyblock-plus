@@ -19,6 +19,7 @@
 package com.skyblockplus.utils.utils;
 
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
+import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
 import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.Constants.getConstant;
@@ -82,6 +83,7 @@ public class JsonUtils {
 	private static JsonObject sbLevelsJson;
 	private static JsonObject essenceShopsJson;
 	private static JsonObject museumCategoriesJson;
+	private static JsonObject jacobDataJson;
 
 	public static JsonObject getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
@@ -352,6 +354,32 @@ public class JsonUtils {
 		}
 
 		return museumCategoriesJson;
+	}
+
+	public static JsonObject getJacobDataJson() {
+		if (jacobDataJson == null) {
+			try {
+				JsonObject rawJacobData = getJsonObject("https://api.elitebot.dev/Contests/at/" + getSkyblockYear());
+				rawJacobData.add(
+					"contests",
+					collectJsonArray(
+						rawJacobData
+							.getAsJsonObject("contests")
+							.entrySet()
+							.stream()
+							.map(e -> {
+								JsonObject contest = new JsonObject();
+								contest.addProperty("time", Long.parseLong(e.getKey()) * 1000);
+								contest.add("crops", e.getValue());
+								return contest;
+							})
+					)
+				);
+				jacobDataJson = rawJacobData;
+			} catch (Exception ignored) {}
+		}
+
+		return jacobDataJson;
 	}
 
 	public static JsonObject getBitsJson() {
