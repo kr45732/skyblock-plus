@@ -499,7 +499,7 @@ public class HelpSlashCommand extends SlashCommand {
 								),
 								new HelpData(
 									"sync",
-									"Enable or disable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every hour (up to 135 members per sync).",
+									"Enable or disable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every hour (up to 160 members per sync).",
 									"sync <enable|disable>"
 								),
 								new HelpData(

@@ -527,8 +527,9 @@ public class AutomaticGuild {
 				}
 
 				int numUpdated = 0;
-				int updateLimit = rolesEnabled ? 45 : 135;
+				int updateLimit = rolesEnabled ? 45 : 160;
 
+				// There are less users left in the update sync than max update count
 				if (inGuildUsers.stream().filter(m -> !updatedMembers.contains(m.getId())).limit(updateLimit).count() < updateLimit) {
 					inGuildUsers.sort(Comparator.comparing(m -> updatedMembers.contains(m.getId())));
 					updatedMembers.clear();
