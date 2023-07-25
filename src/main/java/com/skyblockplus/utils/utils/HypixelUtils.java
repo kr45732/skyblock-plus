@@ -38,13 +38,13 @@ import java.util.stream.Collectors;
 
 public class HypixelUtils {
 
-	public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
+	public static DiscordInfoStruct getPlayerDiscordInfo(String username, boolean useCache) {
 		try {
 			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 			if (!usernameUuidStruct.isValid()) {
 				return new DiscordInfoStruct(usernameUuidStruct.failCause());
 			}
-			HypixelResponse response = playerFromUuid(usernameUuidStruct.uuid());
+			HypixelResponse response = playerFromUuid(usernameUuidStruct.uuid(), useCache);
 			if (!response.isValid()) {
 				return new DiscordInfoStruct(response.failCause());
 			}
