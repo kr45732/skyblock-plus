@@ -123,6 +123,14 @@ public class Utils {
 		new LinkedBlockingQueue<>()
 	)
 		.setAllowCoreThreadTimeOut(true);
+	public static final ExceptionExecutor updateGuildExecutor = new ExceptionExecutor(
+		1,
+		1,
+		45L,
+		TimeUnit.SECONDS,
+		new LinkedBlockingQueue<>()
+	)
+		.setAllowCoreThreadTimeOut(true);
 	public static final List<String> hypixelGuildRequestQueue = Collections.synchronizedList(new ArrayList<>());
 	public static final List<String> hypixelGuildFetchQueue = Collections.synchronizedList(new ArrayList<>());
 	public static final HypixelKeyRecord hypixelRateLimiter = new HypixelKeyRecord(600, 0);

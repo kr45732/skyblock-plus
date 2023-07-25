@@ -19,6 +19,7 @@
 package com.skyblockplus.utils.structs;
 
 import static com.skyblockplus.utils.utils.Utils.ignore;
+import static com.skyblockplus.utils.utils.Utils.updateGuildExecutor;
 
 import java.util.*;
 import net.dv8tion.jda.api.entities.Member;
@@ -71,21 +72,21 @@ public final class ModifyMemberRecord {
 			updatedRoles.removeAll(remove);
 
 			if (!SetUtils.isEqualSet(currentRoles, updatedRoles)) {
-				try {
-					member.getGuild().modifyMemberRoles(member, updatedRoles).queue(ignore, ignore);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				updateGuildExecutor.submit(() -> {
+					try {
+						member.getGuild().modifyMemberRoles(member, updatedRoles).complete();
+					} catch (Exception ignored) {}
+				});
 				queued = true;
 			}
 		}
 
 		if (nickname != null && !nickname.equals(member.getNickname())) {
-			try {
-				member.modifyNickname(nickname).queue(ignore, ignore);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			updateGuildExecutor.submit(() -> {
+				try {
+					member.modifyNickname(nickname).complete();
+				} catch (Exception e) {}
+			});
 			queued = true;
 		}
 
