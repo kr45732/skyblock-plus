@@ -1890,6 +1890,10 @@ public class SettingsExecute {
 			return defaultSettingsEmbed("**Verify nickname disabled**");
 		}
 
+		if (!guild.getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
+			return errorEmbed("Missing permission to modify nicknames");
+		}
+
 		if (!nickname.contains("[IGN]")) {
 			return errorEmbed("Nickname template must contain [IGN]");
 		}
