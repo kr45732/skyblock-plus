@@ -307,8 +307,12 @@ public class CacheDatabase {
 		}
 
 		if (JacobHandler.getJacobData() == null) {
-			JacobHandler.setJacobData(gson.fromJson(getJacobDataJson(), JacobData.class));
-			log.info("Fetched jacob data");
+			try {
+				JacobHandler.setJacobData(gson.fromJson(getJacobDataJson(), JacobData.class));
+				log.info("Fetched jacob data");
+			} catch (Exception e) {
+				log.error("", e);
+			}
 		}
 	}
 
