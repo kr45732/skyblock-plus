@@ -107,7 +107,7 @@ public class LinkSlashCommand extends SlashCommand {
 	}
 
 	public static Object linkAccount(String username, Member member, Guild guild) {
-		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
+		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username, false);
 		if (!playerInfo.isValid()) {
 			return playerInfo.failCause().endsWith(" is not linked on Hypixel")
 				? new MessageEditBuilder()

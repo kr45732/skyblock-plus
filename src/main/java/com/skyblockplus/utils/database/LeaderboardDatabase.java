@@ -58,6 +58,7 @@ public class LeaderboardDatabase {
 		List.of(
 			"username",
 			"uuid",
+			"catacombs_xp",
 			"networth",
 			"museum",
 			"museum_hypixel",
@@ -65,7 +66,6 @@ public class LeaderboardDatabase {
 			"slayer",
 			"skills",
 			"skills_xp",
-			"catacombs_xp",
 			"weight",
 			"wolf",
 			"zombie",
@@ -123,6 +123,7 @@ public class LeaderboardDatabase {
 		Player.Gamemode.SELECTED
 	);
 	private ScheduledFuture<?> leaderboardUpdateTask;
+	private int numLeaderboardUpdates = 0;
 
 	public LeaderboardDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -646,7 +647,11 @@ public class LeaderboardDatabase {
 			}
 
 			insertIntoLeaderboard(players);
-			//	System.out.println("Updated " + count + " users in " + (System.currentTimeMillis() - start) + "ms");
+			numLeaderboardUpdates++;
+
+			if (numLeaderboardUpdates % 10 == 0) {
+				System.out.println("Update Leaderboard | Time (" + (System.currentTimeMillis() - start) + "ms) | Users (" + count + ")");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

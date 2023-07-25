@@ -24,6 +24,7 @@ import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.HttpUtils.*;
 import static com.skyblockplus.utils.utils.HypixelUtils.getNpcSellPrice;
+import static com.skyblockplus.utils.utils.HypixelUtils.isCrimsonArmor;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static org.springframework.util.StringUtils.countOccurrencesOf;
@@ -146,6 +147,9 @@ public class Utils {
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	private static final Color BOT_COLOR = new Color(223, 5, 5);
 	public static final Pattern neuTexturePattern = Pattern.compile("Properties:\\{textures:\\[0:\\{Value:\"(.*)\"}]}");
+	public static final Pattern crimsonArmorRegex = Pattern.compile(
+		"(|HOT_|BURNING_|FIERY_|INFERNAL_)(CRIMSON|FERVOR|HOLLOW|TERROR|AURORA)_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
+	);
 	/* Environment */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -393,7 +397,6 @@ public class Utils {
 						}
 
 						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
-							List<String> enchantsList = new ArrayList<>();
 							for (Map.Entry<String, Object> enchant : item.getCompound("tag.ExtraAttributes.enchantments").entrySet()) {
 								if (
 									enchant.getKey().equals("efficiency") &&
@@ -405,25 +408,21 @@ public class Utils {
 										"SIL_EX"
 									);
 								}
-								enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
+								itemInfo.getEnchantsFormatted().add(enchant.getKey().toUpperCase() + ";" + enchant.getValue());
 							}
-							itemInfo.setEnchantsFormatted(enchantsList);
 						}
 
 						if (item.containsTag("tag.ExtraAttributes.runes", TagType.COMPOUND)) {
-							List<String> runesList = new ArrayList<>();
 							for (Map.Entry<String, Object> rune : item.getCompound("tag.ExtraAttributes.runes").entrySet()) {
-								runesList.add(rune.getKey() + "_RUNE;" + rune.getValue());
+								itemInfo.getRunesFormatted().add(rune.getKey().toUpperCase() + "_RUNE;" + rune.getValue());
 							}
-							itemInfo.setRunesFormatted(runesList);
 						}
 
 						if (item.containsTag("tag.ExtraAttributes.attributes", TagType.COMPOUND)) {
 							for (Map.Entry<String, Object> attribute : item.getCompound("tag.ExtraAttributes.attributes").entrySet()) {
-								itemInfo.addExtraValues(
-									(int) Math.pow(2, (Integer) attribute.getValue() - 1),
-									"ATTRIBUTE_SHARD_" + attribute.getKey().toUpperCase()
-								);
+								itemInfo
+									.getAttributes()
+									.put("ATTRIBUTE_SHARD_" + attribute.getKey().toUpperCase(), (int) attribute.getValue());
 							}
 						}
 
@@ -619,13 +618,7 @@ public class Utils {
 						}
 
 						// Armor prestige costs
-						if (
-							itemInfo
-								.getId()
-								.matches(
-									"(HOT|BURNING|FIERY|INFERNAL)_(CRIMSON|FERVOR|HOLLOW|TERROR|AURORA)_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
-								)
-						) {
+						if (isCrimsonArmor(itemInfo.getId(), true)) {
 							List<String> prestigeOrder = List.of("HOT", "BURNING", "FIERY", "INFERNAL");
 							for (int j = 0; j <= prestigeOrder.indexOf(itemInfo.getId().split("_")[0]); j++) {
 								for (Map.Entry<String, JsonElement> entry : ARMOR_PRESTIGE_COST

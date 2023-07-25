@@ -478,9 +478,15 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse playerFromUuid(String uuid) {
-		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.PLAYER, uuid);
-		if (cachedResponse != null) {
-			return new HypixelResponse(cachedResponse);
+		return playerFromUuid(uuid, true);
+	}
+
+	public static HypixelResponse playerFromUuid(String uuid, boolean useCache) {
+		if (useCache) {
+			JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.PLAYER, uuid);
+			if (cachedResponse != null) {
+				return new HypixelResponse(cachedResponse);
+			}
 		}
 
 		try {

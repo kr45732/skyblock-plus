@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Constants.GUILD_EXP_TO_LEVEL;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.escapeText;
+import static com.skyblockplus.utils.utils.Utils.crimsonArmorRegex;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -32,17 +33,18 @@ import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 public class HypixelUtils {
 
-	public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
+	public static DiscordInfoStruct getPlayerDiscordInfo(String username, boolean useCache) {
 		try {
 			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 			if (!usernameUuidStruct.isValid()) {
 				return new DiscordInfoStruct(usernameUuidStruct.failCause());
 			}
-			HypixelResponse response = playerFromUuid(usernameUuidStruct.uuid());
+			HypixelResponse response = playerFromUuid(usernameUuidStruct.uuid(), useCache);
 			if (!response.isValid()) {
 				return new DiscordInfoStruct(response.failCause());
 			}
@@ -247,5 +249,10 @@ public class HypixelUtils {
 		}
 
 		return price * (1 - tax);
+	}
+
+	public static boolean isCrimsonArmor(String itemId, boolean onlyPrestige) {
+		Matcher matcher = crimsonArmorRegex.matcher(itemId);
+		return matcher.matches() && (!onlyPrestige || !matcher.group(1).isEmpty());
 	}
 }
