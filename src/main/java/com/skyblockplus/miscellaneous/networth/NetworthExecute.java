@@ -35,6 +35,7 @@ import com.skyblockplus.utils.command.SelectMenuPaginator;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -683,7 +684,28 @@ public class NetworthExecute {
 						source.append("dark auction price paid");
 					}
 				} else {
-					itemCost = getLowestPrice(item.getId().toUpperCase(), false, false, source);
+					String itemId = item.getId();
+
+					// Prestiged crimson armor is soulbound (prestige costs are accounted for in misc)
+					Matcher matcher = crimsonArmorRegex.matcher(item.getId());
+					if (matcher.matches()) {
+						itemId = matcher.group(2) + "_" + matcher.group(3);
+					}
+
+					if (!item.getAttributes().isEmpty()) {
+						String attributeItemId = itemId + "+" + String.join("+", item.getAttributes().keySet());
+						double attributeItemCost = getLowestPrice(attributeItemId, false, false, source);
+						if (attributeItemCost > 0) {
+							itemCost = attributeItemCost;
+							if (verbose) {
+								source.append(" - " + String.join(" & ", item.getAttributes().keySet()));
+							}
+						}
+					}
+
+					if (itemCost == 0) {
+						itemCost = getLowestPrice(itemId, false, false, source);
+					}
 
 					if (item.getShensAuctionPrice() != -1 && item.getShensAuctionPrice() * 0.9 > itemCost) {
 						itemCost = item.getShensAuctionPrice() * 0.9;
@@ -726,13 +748,13 @@ public class NetworthExecute {
 			List<String> enchants = item.getEnchantsFormatted();
 			for (String enchant : enchants) {
 				try {
-					if (!item.getId().equals("ENCHANTED_BOOK") && enchant.equalsIgnoreCase("SCAVENGER;5")) {
+					if (!item.getId().equals("ENCHANTED_BOOK") && enchant.equals("SCAVENGER;5")) {
 						continue;
 					}
 
-					double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
+					double enchantPrice = getLowestPriceEnchant(enchant);
 					if (!item.getId().equals("ENCHANTED_BOOK")) {
-						enchantPrice *= enchantWorth.getOrDefault(enchant.toUpperCase().split(";")[0], 0.9);
+						enchantPrice *= enchantWorth.getOrDefault(enchant.split(";")[0], 0.9);
 					}
 					enchantsExtras += enchantPrice;
 					if (verbose) {
@@ -757,7 +779,7 @@ public class NetworthExecute {
 						continue;
 					}
 
-					double runePrice = getLowestPrice(rune.toUpperCase());
+					double runePrice = getLowestPrice(rune);
 					if (!item.getId().equals("RUNE")) {
 						runePrice *= 0.65;
 					}
@@ -786,51 +808,50 @@ public class NetworthExecute {
 
 		StringBuilder miscStr = verbose ? new StringBuilder("[") : null;
 		try {
+			for (Map.Entry<String, Integer> attribute : item.getAttributes().entrySet()) {
+				// Second -1 is since level 1 is accounted for by the base calculation
+				int count = (int) Math.pow(2, attribute.getValue() - 1) - 1;
+				if (count == 0) {
+					continue;
+				}
+
+				double miscPrice = getLowestPrice(attribute.getKey());
+				if (attributesBaseCosts.containsKey(item.getId())) {
+					double calcBasePrice = getLowestPrice(attributesBaseCosts.get(item.getId()));
+					if (calcBasePrice > 0) {
+						miscPrice = Math.min(miscPrice, calcBasePrice);
+					}
+				} else if (isCrimsonArmor(item.getId(), false)) {
+					double calcBasePrice = Stream
+						.of("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS")
+						.map(a ->
+							higherDepth(extraPrices, ("KUUDRA_" + a + "_" + attribute.getKey().split("ATTRIBUTE_SHARD_")[1]).toLowerCase())
+						)
+						.filter(Objects::nonNull)
+						.mapToDouble(JsonElement::getAsDouble)
+						.average()
+						.orElse(0);
+					if (calcBasePrice > 0) {
+						miscPrice = Math.min(miscPrice, calcBasePrice);
+					}
+				}
+
+				miscPrice *= 0.95;
+				miscExtras += miscPrice * count;
+				if (verbose) {
+					miscStr
+						.append("{\"name\":\"")
+						.append(attribute.getKey() + ";" + attribute.getValue())
+						.append("\",\"total\":\"")
+						.append(simplifyNumber(miscPrice * count))
+						.append("\",\"cost\":\"")
+						.append(simplifyNumber(miscPrice))
+						.append("\"},");
+				}
+			}
+
 			for (Map.Entry<String, Integer> extraItem : item.getExtraStats().entrySet()) {
-				double miscPrice = 0;
-
-				if (extraItem.getKey().startsWith("ATTRIBUTE_SHARD_")) {
-					if (extraItem.getValue() == 1) {
-						continue;
-					}
-
-					double baseAttributePrice = getLowestPrice(extraItem.getKey());
-					if (attributesBaseCosts.containsKey(item.getId())) {
-						double calcBasePrice = getLowestPrice(attributesBaseCosts.get(item.getId()));
-						if (calcBasePrice > 0) {
-							baseAttributePrice = Math.min(baseAttributePrice, calcBasePrice);
-						}
-					} else if (
-						item
-							.getId()
-							.matches(
-								"(|HOT_|BURNING_|FIERY_|INFERNAL_)(CRIMSON|FERVOR|HOLLOW|TERROR|AURORA)_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
-							)
-					) {
-						double calcBasePrice = Stream
-							.of("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS")
-							.map(a ->
-								higherDepth(
-									extraPrices,
-									("KUUDRA_" + a + "_" + extraItem.getKey().split("ATTRIBUTE_SHARD_")[1]).toLowerCase()
-								)
-							)
-							.filter(Objects::nonNull)
-							.mapToDouble(JsonElement::getAsDouble)
-							.average()
-							.orElse(0);
-						if (calcBasePrice > 0) {
-							baseAttributePrice = Math.min(baseAttributePrice, calcBasePrice);
-						}
-					}
-
-					if (baseAttributePrice > 0) {
-						miscPrice = baseAttributePrice;
-					}
-				}
-				if (miscPrice == 0) {
-					miscPrice = getLowestPrice(extraItem.getKey());
-				}
+				double miscPrice = getLowestPrice(extraItem.getKey());
 				if (!extraItem.getKey().equals("SKYBLOCK_COIN")) {
 					miscPrice *= 0.95;
 				}

@@ -58,6 +58,7 @@ public class LeaderboardDatabase {
 		List.of(
 			"username",
 			"uuid",
+			"catacombs_xp",
 			"networth",
 			"museum",
 			"museum_hypixel",
@@ -65,7 +66,6 @@ public class LeaderboardDatabase {
 			"slayer",
 			"skills",
 			"skills_xp",
-			"catacombs_xp",
 			"weight",
 			"wolf",
 			"zombie",

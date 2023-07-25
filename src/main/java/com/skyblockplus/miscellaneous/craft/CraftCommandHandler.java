@@ -1207,7 +1207,7 @@ public class CraftCommandHandler {
 		double totalPrice = 0;
 
 		double basePrice = calculator.getLowestPrice(itemId);
-		if (itemId.matches("(HOT|BURNING|FIERY|INFERNAL)_(CRIMSON|FERVOR|HOLLOW|TERROR|AURORA)_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)")) {
+		if (isCrimsonArmor(itemId, true)) {
 			List<String> prestigeOrder = List.of("HOT", "BURNING", "FIERY", "INFERNAL");
 			for (int j = 0; j <= prestigeOrder.indexOf(itemId.split("_")[0]); j++) {
 				for (Map.Entry<String, JsonElement> entry : ARMOR_PRESTIGE_COST.getAsJsonObject(prestigeOrder.get(j)).entrySet()) {

@@ -43,6 +43,7 @@ public class InvItem {
 	private List<String> lore;
 	private String creationTimestamp;
 	private List<String> enchantsFormatted = new ArrayList<>();
+	private Map<String, Integer> attributes = new TreeMap<>();
 	private List<String> runesFormatted = new ArrayList<>();
 	private Map<String, Integer> extraStats = new HashMap<>();
 	private List<InvItem> backpackItems = new ArrayList<>();
