@@ -836,7 +836,7 @@ public class AutomaticGuild {
 						(rolesEnabled ? "enabled" : "disabled") +
 						"\n" +
 						(!filteredGuildSettings.isEmpty() ? client.getSuccess() : client.getError()) +
-						" Guild member, ranks, and counter sync " +
+						" Guild member/ranks/counter sync " +
 						(!filteredGuildSettings.isEmpty() ? "enabled" : "disabled") +
 						"\n\n• Checked " +
 						formatNumber(memberToRoleChanges.size()) +
