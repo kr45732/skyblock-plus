@@ -18,7 +18,6 @@
 
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.utils.Utils.ignore;
 import static com.skyblockplus.utils.utils.Utils.updateGuildExecutor;
 
 import java.util.*;
@@ -85,7 +84,7 @@ public final class ModifyMemberRecord {
 			updateGuildExecutor.submit(() -> {
 				try {
 					member.modifyNickname(nickname).complete();
-				} catch (Exception e) {}
+				} catch (Exception ignored) {}
 			});
 			queued = true;
 		}
