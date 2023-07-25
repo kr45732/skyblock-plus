@@ -606,7 +606,7 @@ public class LeaderboardDatabase {
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
 					"SELECT uuid FROM stranded_lb WHERE last_updated < " +
-					Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli() +
+					Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli() +
 					" ORDER BY RANDOM() LIMIT 180"
 				)
 			) {

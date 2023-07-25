@@ -292,6 +292,7 @@ public class SettingsExecute {
 			String botManagerRoles = streamJsonArray(higherDepth(serverSettings, "botManagerRoles"))
 				.map(r -> "<@&" + r.getAsString() + ">")
 				.collect(Collectors.joining(" "));
+			String logChannel = higherDepth(serverSettings, "logChannel", "none");
 
 			eb =
 				defaultSettingsEmbed()
@@ -316,7 +317,8 @@ public class SettingsExecute {
 						applyGuestRole.equals("none") || applyGuestRole.isEmpty() ? "None" : "<@&" + applyGuestRole + ">",
 						false
 					)
-					.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false);
+					.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false)
+					.addField("Log Channel", logChannel.equals("none") || logChannel.isEmpty() ? "None" : "<#" + logChannel + ">", false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
 			if (args.length == 2) {
 				eb = displayJacobSettings();
@@ -1888,6 +1890,10 @@ public class SettingsExecute {
 			}
 
 			return defaultSettingsEmbed("**Verify nickname disabled**");
+		}
+
+		if (!guild.getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
+			return errorEmbed("Missing permission to modify nicknames");
 		}
 
 		if (!nickname.contains("[IGN]")) {

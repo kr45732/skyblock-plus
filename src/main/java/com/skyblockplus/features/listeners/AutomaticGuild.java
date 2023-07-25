@@ -26,6 +26,7 @@ import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
 import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -51,7 +52,7 @@ import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import com.skyblockplus.utils.structs.RoleModifyRecord;
+import com.skyblockplus.utils.structs.ModifyMemberRecord;
 import groovy.lang.Tuple3;
 import java.io.File;
 import java.time.Duration;
@@ -134,7 +135,6 @@ public class AutomaticGuild {
 	public final List<Party> partyList = new ArrayList<>();
 	/* Jacob */
 	public final JacobGuild jacobGuild;
-	private final Set<String> updatedMembers = new HashSet<>();
 	/* Miscellaneous */
 	private final List<String> botManagerRoles = new ArrayList<>();
 	private final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
@@ -510,7 +510,7 @@ public class AutomaticGuild {
 			}
 
 			Map<String, HypixelResponse> guildResponses = null;
-			Map<Member, RoleModifyRecord> memberToRoleChanges = new HashMap<>();
+			Map<Member, ModifyMemberRecord> memberToRoleChanges = new HashMap<>();
 			if (verifyEnabled || rolesEnabled) {
 				List<Role> verifyRolesAdd = new ArrayList<>();
 				List<Role> verifyRolesRemove = new ArrayList<>();
@@ -526,19 +526,11 @@ public class AutomaticGuild {
 					} catch (Exception ignored) {}
 				}
 
-				int numUpdated = 0;
-				int updateLimit = rolesEnabled ? 45 : 160;
-
-				// There are less users left in the update sync than max update count
-				if (inGuildUsers.stream().filter(m -> !updatedMembers.contains(m.getId())).limit(updateLimit).count() < updateLimit) {
-					inGuildUsers.sort(Comparator.comparing(m -> updatedMembers.contains(m.getId())));
-					updatedMembers.clear();
-				}
-
+				boolean canModifyNicknames = guild.getSelfMember().hasPermission(Permission.NICKNAME_MANAGE);
 				boolean checkVerify = false;
 				if (verifyEnabled) {
 					String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
-					if (nicknameTemplate.contains("[IGN]")) {
+					if (nicknameTemplate.contains("[IGN]") && canModifyNicknames) {
 						Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
 						while (matcher.find()) {
 							String category = matcher.group(1).toUpperCase();
@@ -563,15 +555,11 @@ public class AutomaticGuild {
 				}
 				List<String> uuidsToRequest = new ArrayList<>();
 				for (Member linkedMember : inGuildUsers) {
-					if (numUpdated < updateLimit && !updatedMembers.contains(linkedMember.getId())) {
-						LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
-						if ((checkVerify && guild.getSelfMember().canInteract(linkedMember)) || rolesEnabled) {
-							uuidsToRequest.add(linkedAccount.uuid());
-						}
-						numUpdated++;
+					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
+					if ((checkVerify && guild.getSelfMember().canInteract(linkedMember)) || rolesEnabled) {
+						uuidsToRequest.add(linkedAccount.uuid());
 					}
 				}
-				numUpdated = 0;
 				Map<String, DataObject> uuidToPlayer = leaderboardDatabase
 					.getCachedPlayers(LinkSlashCommand.getLbTypes(rolesEnabled), Player.Gamemode.SELECTED, uuidsToRequest)
 					.stream()
@@ -579,142 +567,137 @@ public class AutomaticGuild {
 
 				for (Member linkedMember : inGuildUsers) {
 					// updatedMembers.add returns true if ele not in set
-					if (numUpdated < updateLimit && updatedMembers.add(linkedMember.getId())) {
-						LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
-						List<Role> toAddRoles = new ArrayList<>();
-						List<Role> toRemoveRoles = new ArrayList<>();
-						DataObject player = uuidToPlayer.getOrDefault(linkedAccount.uuid(), null);
+					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
+					List<Role> toAddRoles = new ArrayList<>();
+					List<Role> toRemoveRoles = new ArrayList<>();
+					String nickname = null;
+					DataObject player = uuidToPlayer.getOrDefault(linkedAccount.uuid(), null);
 
-						if (verifyEnabled) {
-							toAddRoles.addAll(verifyRolesAdd);
-							toRemoveRoles.addAll(verifyRolesRemove);
+					if (verifyEnabled) {
+						toAddRoles.addAll(verifyRolesAdd);
+						toRemoveRoles.addAll(verifyRolesRemove);
 
-							String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
-							if (nicknameTemplate.contains("[IGN]") && guild.getSelfMember().canInteract(linkedMember)) {
-								nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
+						String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
+						if (nicknameTemplate.contains("[IGN]") && canModifyNicknames && guild.getSelfMember().canInteract(linkedMember)) {
+							nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
 
-								Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
-								while (matcher.find()) {
-									String category = matcher.group(1).toUpperCase();
-									String type = matcher.group(2).toUpperCase();
-									String extra = matcher.group(3) == null ? "" : matcher.group(3);
+							Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
+							while (matcher.find()) {
+								String category = matcher.group(1).toUpperCase();
+								String type = matcher.group(2).toUpperCase();
+								String extra = matcher.group(3) == null ? "" : matcher.group(3);
 
-									if (
-										category.equals("GUILD") &&
-										(type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) &&
-										!guildSettings.isEmpty()
-									) {
-										if (guildResponses == null) {
-											guildResponses =
-												guildSettings
-													.stream()
-													.collect(
-														Collectors.toMap(AutomatedGuild::getGuildId, g -> getGuildFromId(g.getGuildId()))
-													);
-										}
+								if (
+									category.equals("GUILD") &&
+									(type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) &&
+									!guildSettings.isEmpty()
+								) {
+									if (guildResponses == null) {
+										guildResponses =
+											guildSettings
+												.stream()
+												.collect(Collectors.toMap(AutomatedGuild::getGuildId, g -> getGuildFromId(g.getGuildId())));
+									}
 
-										HypixelResponse guildResponse = guildResponses
-											.values()
-											.stream()
-											.filter(g ->
-												streamJsonArray(g.get("members"))
-													.anyMatch(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
-											)
-											.findFirst()
-											.orElse(null);
-
-										if (guildResponse != null && guildResponse.isValid()) {
-											nicknameTemplate =
-												nicknameTemplate.replace(
-													matcher.group(0),
-													switch (type) {
-														case "NAME" -> guildResponse.get("name").getAsString();
-														case "RANK" -> higherDepth(
-															streamJsonArray(guildResponse.get("members"))
-																.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid()))
-																.findFirst()
-																.orElse(null),
-															"rank",
-															""
-														);
-														default -> guildResponse.get("tag").getAsString();
-													} +
-													extra
-												);
-										} else {
-											nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
-										}
-									} else if (
-										category.equals("PLAYER") &&
-										(
-											type.equals("SKILLS") ||
-											type.equals("CATACOMBS") ||
-											type.equals("SLAYER") ||
-											type.equals("WEIGHT") ||
-											type.equals("CLASS") ||
-											type.equals("LEVEL")
+									HypixelResponse guildResponse = guildResponses
+										.values()
+										.stream()
+										.filter(g ->
+											streamJsonArray(g.get("members"))
+												.anyMatch(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
 										)
-									) {
-										if (player != null) {
-											nicknameTemplate =
-												nicknameTemplate.replace(
-													matcher.group(0),
-													switch (type) {
-														case "SKILLS", "WEIGHT", "CATACOMBS", "LEVEL" -> formatNumber(
-															(int) player.getDouble(type.toLowerCase())
-														);
-														case "SLAYER" -> simplifyNumber((long) player.getDouble("slayer"));
-														case "CLASS" -> player.getDouble("selected_class") == -1
-															? ""
-															: "" +
-															DUNGEON_CLASS_NAMES
-																.get((int) player.getDouble("selected_class"))
-																.toUpperCase()
-																.charAt(0);
-														default -> throw new IllegalStateException("Unexpected value: " + type);
-													} +
-													extra
-												);
-										}
-									}
-								}
+										.findFirst()
+										.orElse(null);
 
-								if (!uuidsToRequest.contains(linkedAccount.uuid()) || uuidToPlayer.containsKey(linkedAccount.uuid())) {
-									try {
-										linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
-									} catch (PermissionException ignored) {
-										// The permissions should've already been checked but seems to still throw
+									if (guildResponse != null && guildResponse.isValid()) {
+										nicknameTemplate =
+											nicknameTemplate.replace(
+												matcher.group(0),
+												switch (type) {
+													case "NAME" -> guildResponse.get("name").getAsString();
+													case "RANK" -> higherDepth(
+														streamJsonArray(guildResponse.get("members"))
+															.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid()))
+															.findFirst()
+															.orElse(null),
+														"rank",
+														""
+													);
+													default -> guildResponse.get("tag").getAsString();
+												} +
+												extra
+											);
+									} else {
+										nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
+									}
+								} else if (
+									category.equals("PLAYER") &&
+									(
+										type.equals("SKILLS") ||
+										type.equals("CATACOMBS") ||
+										type.equals("SLAYER") ||
+										type.equals("WEIGHT") ||
+										type.equals("CLASS") ||
+										type.equals("LEVEL")
+									)
+								) {
+									if (player != null) {
+										nicknameTemplate =
+											nicknameTemplate.replace(
+												matcher.group(0),
+												switch (type) {
+													case "SKILLS", "WEIGHT", "CATACOMBS", "LEVEL" -> formatNumber(
+														(int) player.getDouble(type.toLowerCase())
+													);
+													case "SLAYER" -> simplifyNumber((long) player.getDouble("slayer"));
+													case "CLASS" -> player.getDouble("selected_class") == -1
+														? ""
+														: "" +
+														DUNGEON_CLASS_NAMES
+															.get((int) player.getDouble("selected_class"))
+															.toUpperCase()
+															.charAt(0);
+													default -> throw new IllegalStateException("Unexpected value: " + type);
+												} +
+												extra
+											);
 									}
 								}
 							}
-						}
 
-						if (rolesEnabled) {
-							if (player != null) {
-								try {
-									Tuple3<EmbedBuilder, List<Role>, List<Role>> out = RolesSlashCommand.ClaimSubcommand.updateRoles(
-										null,
-										player,
-										linkedMember,
-										rolesSettings,
-										true
-									);
-									toAddRoles.addAll(out.getV2());
-									toRemoveRoles.addAll(out.getV3());
-								} catch (Exception ignored) {}
+							// Player wasn't requested or they were requested successfully
+							if (!uuidsToRequest.contains(linkedAccount.uuid()) || uuidToPlayer.containsKey(linkedAccount.uuid())) {
+								nickname = nicknameTemplate;
 							}
 						}
+					}
 
-						if (!toAddRoles.isEmpty() || !toRemoveRoles.isEmpty()) {
-							memberToRoleChanges.put(
+					if (rolesEnabled && player != null) {
+						try {
+							Tuple3<EmbedBuilder, List<Role>, List<Role>> out = RolesSlashCommand.ClaimSubcommand.updateRoles(
+								null,
+								player,
 								linkedMember,
-								memberToRoleChanges
-									.getOrDefault(linkedMember, new RoleModifyRecord(discordToUuid.get(linkedMember.getId()).uuid()))
-									.update(toAddRoles, toRemoveRoles, guild.getSelfMember())
+								rolesSettings,
+								true
 							);
-						}
+							toAddRoles.addAll(out.getV2());
+							toRemoveRoles.addAll(out.getV3());
+						} catch (Exception ignored) {}
+					}
 
-						numUpdated++;
+					if (!toAddRoles.isEmpty() || !toRemoveRoles.isEmpty() || nickname != null) {
+						String finalNickname = nickname;
+						memberToRoleChanges.compute(
+							linkedMember,
+							(k, v) ->
+								(v == null ? new ModifyMemberRecord() : v).update(
+										guild.getSelfMember(),
+										toAddRoles,
+										toRemoveRoles,
+										finalNickname
+									)
+						);
 					}
 				}
 			}
@@ -782,11 +765,10 @@ public class AutomaticGuild {
 							}
 
 							if (!rolesToAdd.isEmpty() || !rolesToRemove.isEmpty()) {
-								memberToRoleChanges.put(
+								memberToRoleChanges.compute(
 									linkedMember,
-									memberToRoleChanges
-										.getOrDefault(linkedMember, new RoleModifyRecord(discordToUuid.get(linkedMember.getId()).uuid()))
-										.update(rolesToAdd, rolesToRemove, guild.getSelfMember())
+									(k, v) ->
+										(v == null ? new ModifyMemberRecord() : v).update(guild.getSelfMember(), rolesToAdd, rolesToRemove)
 								);
 							}
 						}
@@ -795,7 +777,6 @@ public class AutomaticGuild {
 					if (Objects.equals(currentSetting.getGuildCounterEnable(), "true")) {
 						try {
 							VoiceChannel curVc = guild.getVoiceChannelById(currentSetting.getGuildCounterChannel());
-
 							if (curVc.getName().contains(guildMembers.size() + "/125")) {
 								continue;
 							}
@@ -818,11 +799,16 @@ public class AutomaticGuild {
 				}
 			}
 
-			for (Map.Entry<Member, RoleModifyRecord> entry : memberToRoleChanges.entrySet()) {
-				try {
-					entry.getValue().validate();
-					guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue(ignore, ignore);
-				} catch (Exception ignored) {}
+			int updateCount = 0;
+			int updateLimit = rolesEnabled ? 45 : 160;
+			for (Map.Entry<Member, ModifyMemberRecord> entry : memberToRoleChanges.entrySet()) {
+				if (updateCount >= updateLimit) {
+					break;
+				}
+
+				if (entry.getValue().queue(entry.getKey())) {
+					updateCount++;
+				}
 			}
 
 			System.out.println(
@@ -831,14 +817,31 @@ public class AutomaticGuild {
 				" | Time (" +
 				roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) +
 				"s)" +
-				(!memberToRoleChanges.isEmpty() ? " | Users (" + memberToRoleChanges.size() + ")" : "") +
+				(
+					!memberToRoleChanges.isEmpty()
+						? " | Users (" + updateCount + "/" + updateLimit + "/" + memberToRoleChanges.size() + ")"
+						: ""
+				) +
 				(counterUpdate > 0 ? " | Counters (" + counterUpdate + ")" : "")
 			);
 			logAction(
 				defaultEmbed("Automatic Guild Update")
 					.setDescription(
-						"• Updated " +
+						(verifyEnabled ? client.getSuccess() : client.getError()) +
+						" Verification sync " +
+						(verifyEnabled ? "enabled" : "disabled") +
+						"\n" +
+						(rolesEnabled ? client.getSuccess() : client.getError()) +
+						" Roles claim sync " +
+						(rolesEnabled ? "enabled" : "disabled") +
+						"\n" +
+						(!filteredGuildSettings.isEmpty() ? client.getSuccess() : client.getError()) +
+						" Guild member/ranks/counter sync " +
+						(!filteredGuildSettings.isEmpty() ? "enabled" : "disabled") +
+						"\n\n• Checked " +
 						formatNumber(memberToRoleChanges.size()) +
+						" linked members\n• Updated " +
+						formatNumber(updateCount) +
 						" linked members" +
 						(counterUpdate > 0 ? "\n• Updated " + counterUpdate + " counter" + (counterUpdate > 1 ? "s" : "") : "")
 					)

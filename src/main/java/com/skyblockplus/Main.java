@@ -139,7 +139,7 @@ public class Main {
 				)
 				.setActivity(Activity.playing("Loading..."))
 				.setMemberCachePolicy(MemberCachePolicy.ALL)
-				.disableCache(CacheFlag.VOICE_STATE)
+				.disableCache(CacheFlag.VOICE_STATE, CacheFlag.STICKER, CacheFlag.FORUM_TAGS, CacheFlag.SCHEDULED_EVENTS)
 				.enableIntents(GatewayIntent.GUILD_MEMBERS)
 				.setEnableShutdownHook(false)
 				.build();
