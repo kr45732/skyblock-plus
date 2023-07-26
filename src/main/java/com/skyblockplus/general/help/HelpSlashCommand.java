@@ -191,6 +191,13 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("bin", "Get the lowest bin of an item.", "bin <item>")
 					.addExamples("bin Wither Chestplate")
 					.setCategory("price"),
+				new HelpData(
+					"attributes",
+					"Get the lowest priced attribute combination for an item.",
+					"attributes <item> <attribute_one> <attribute_two>"
+				)
+					.addExamples("bin Aurora Boots Mana Pool Mana Regeneration")
+					.setCategory("price"),
 				new HelpData("bazaar", "Get the bazaar prices of an item.", "bazaar <item>")
 					.addExamples("bazaar Booster Cookie")
 					.setCategory("price"),
@@ -783,6 +790,7 @@ public class HelpSlashCommand extends SlashCommand {
 		paginateBuilder.addStrings(
 			create("auctions [player] [filter] [sort] [verbose]", "Get a player's unclaimed auctions on all profiles") +
 			create("viewauction <uuid>", "Get an auction by its UUID") +
+			create("attributes <item> <attribute_one> <attribute_two>", "Get the lowest priced attribute combination for an item") +
 			create("bin <item>", "Get the lowest bin of an item") +
 			create("bazaar <item>", "Get bazaar prices of an item") +
 			create("average <item>", "Get the average auction price of an item") +
