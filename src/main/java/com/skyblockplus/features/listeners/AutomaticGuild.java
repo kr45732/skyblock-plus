@@ -21,12 +21,10 @@ package com.skyblockplus.features.listeners;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.jerryEmbed;
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.ApiHandler.getHasteUrl;
 import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.StringUtils.formatNumber;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -840,9 +838,8 @@ public class AutomaticGuild {
 						(!filteredGuildSettings.isEmpty() ? "enabled" : "disabled") +
 						"\n\n• Checked " +
 						formatNumber(memberToRoleChanges.size()) +
-						" linked members\n• Updated " +
-						formatNumber(updateCount) +
-						" linked members" +
+						" linked members\n• " +
+						(updateCount == 0 ? "All linked members updated" : "Updated " + formatNumber(updateCount) + " linked members") +
 						(counterUpdate > 0 ? "\n• Updated " + counterUpdate + " counter" + (counterUpdate > 1 ? "s" : "") : "")
 					)
 			);

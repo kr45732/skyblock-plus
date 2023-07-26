@@ -55,7 +55,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,6 +79,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -230,7 +234,7 @@ public class Utils {
 	public static EmbedBuilder defaultEmbed(String title, String titleUrl) {
 		EmbedBuilder eb = new EmbedBuilder()
 			.setColor(BOT_COLOR)
-			.setFooter("By CrypticPlasma • dsc.gg/sb+", null)
+			.setFooter("By @crypticplasma • dsc.gg/sb+", null)
 			.setTimestamp(Instant.now());
 		if (titleUrl != null && titleUrl.length() <= MessageEmbed.URL_MAX_LENGTH && EmbedBuilder.URL_PATTERN.matcher(titleUrl).matches()) {
 			eb.setTitle(title, titleUrl);
@@ -1063,5 +1067,9 @@ public class Utils {
 		PrintWriter pw = new PrintWriter(sw, true);
 		e.printStackTrace(pw);
 		return sw.getBuffer().toString();
+	}
+
+	public static <E> SetUtils.SetView<E> setTriUnion(final Set<? extends E> a, final Set<? extends E> b, final Set<? extends E> c) {
+		return SetUtils.union(SetUtils.union(a, b), c);
 	}
 }

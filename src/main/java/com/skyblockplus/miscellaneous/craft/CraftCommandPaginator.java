@@ -92,7 +92,7 @@ public class CraftCommandPaginator {
 				false
 			)
 			.setThumbnail(getItemThumbnail(itemId))
-			.setFooter("By CrypticPlasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null)
+			.setFooter("By @crypticplasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null)
 			.setImage("attachment://lore.png");
 
 		event
@@ -168,7 +168,7 @@ public class CraftCommandPaginator {
 					false
 				)
 				.setThumbnail(getItemThumbnail(itemId))
-				.setFooter("By CrypticPlasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null)
+				.setFooter("By @crypticplasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null)
 				.setImage("attachment://lore.png");
 
 			event

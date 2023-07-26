@@ -20,7 +20,8 @@ package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
-import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.formatOrSimplify;
+import static com.skyblockplus.utils.utils.StringUtils.idToName;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;

@@ -622,8 +622,6 @@ public class ApiHandler {
 		try {
 			URIBuilder uriBuilder = getQueryApiUrl("query")
 				.addParameter("end", "" + Instant.now().toEpochMilli())
-				.addParameter("sort_by", "highest_bid")
-				.addParameter("sort_order", "ASC")
 				.addParameter("limit", "5");
 			if (isName) {
 				uriBuilder.addParameter("item_name", "%" + query + "%");
@@ -641,15 +639,15 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonObject queryLowestBin(String query) {
+	public static JsonObject queryLowestBin(String internalId) {
 		try {
 			return getJson(
 				getQueryApiUrl("query")
 					.addParameter("end", "" + Instant.now().toEpochMilli())
-					.addParameter("sort_by", "highest_bid")
+					.addParameter("sort_by", "starting_bid")
 					.addParameter("sort_order", "ASC")
 					.addParameter("limit", "1")
-					.addParameter("item_id", query)
+					.addParameter("internal_id", internalId)
 					.addParameter("bin", "true")
 					.toString()
 			)
@@ -660,14 +658,12 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonArray queryLowestBinPet(String petName, String rarity, PriceSlashCommand.AuctionType auctionType) {
+	public static JsonArray queryPet(String petName, String rarity, PriceSlashCommand.AuctionType auctionType) {
 		try {
 			URIBuilder uriBuilder = getQueryApiUrl("query")
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_name", "%" + petName + "%")
 				.addParameter("item_id", "PET")
-				.addParameter("sort_by", "highest_bid")
-				.addParameter("sort_order", "ASC")
 				.addParameter("limit", "5");
 			if (!rarity.equals("ANY")) {
 				uriBuilder.addParameter("tier", rarity);

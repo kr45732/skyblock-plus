@@ -20,7 +20,8 @@ package com.skyblockplus.features.jacob;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.utils.StringUtils.getRelativeTimestamp;
-import static com.skyblockplus.utils.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.scheduler;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import java.util.concurrent.ScheduledFuture;

@@ -19,11 +19,10 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
-import static com.skyblockplus.utils.ApiHandler.queryLowestBinPet;
+import static com.skyblockplus.utils.ApiHandler.queryPet;
 import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
-import static com.skyblockplus.utils.utils.JsonUtils.getQueryItems;
-import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 
@@ -33,6 +32,7 @@ import com.skyblockplus.utils.ApiHandler;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.Comparator;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -67,7 +67,7 @@ public class PriceSlashCommand extends SlashCommand {
 					}
 				}
 
-				auctionsArr = queryLowestBinPet(queryFmt, rarity, auctionType);
+				auctionsArr = queryPet(queryFmt, rarity, auctionType);
 				if (auctionsArr == null) {
 					return errorEmbed("Error fetching auctions");
 				}
@@ -103,7 +103,15 @@ public class PriceSlashCommand extends SlashCommand {
 				"Searched for '" + matchedQuery + "' since no " + auctionType.getName() + " matching '" + query + "' were found"
 			);
 		}
-		for (JsonElement auction : auctionsArr) {
+
+		for (JsonElement auction : streamJsonArray(auctionsArr)
+			.sorted(
+				Comparator
+					.comparing((JsonElement e) -> higherDepth(e, "bin", false))
+					.thenComparing(e -> Math.max(higherDepth(e, "starting_bid").getAsDouble(), higherDepth(e, "starting_bid").getAsDouble())
+					)
+			)
+			.toList()) {
 			boolean isBin = higherDepth(auction, "bin", false);
 			double startingBid = higherDepth(auction, "starting_bid").getAsDouble();
 			double highestBid = higherDepth(auction, "highest_bid").getAsDouble();

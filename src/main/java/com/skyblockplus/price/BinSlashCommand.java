@@ -20,9 +20,11 @@ package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.ApiHandler.queryLowestBin;
 import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
-import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getLowestBinJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.*;
+import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
 import com.google.gson.JsonObject;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -51,36 +53,45 @@ public class BinSlashCommand extends SlashCommand {
 	}
 
 	public static Object getLowestBin(String item) {
-		String itemId = nameToId(item, true);
-		if (itemId == null) {
-			itemId = getClosestMatchFromIds(item, getInternalJsonMappings().keySet());
+		JsonObject lowestBinJson = getLowestBinJson();
+		if (lowestBinJson == null) {
+			return errorEmbed("Error fetching lowest bin prices");
 		}
 
-		JsonObject lowestBinJson = queryLowestBin(itemId);
-		if (lowestBinJson == null) {
+		String itemId = nameToId(item, true);
+		if (itemId == null) {
+			itemId =
+				getClosestMatchFromIds(item, lowestBinJson.keySet().stream().filter(e -> !e.contains("+")).collect(Collectors.toSet()));
+		}
+
+		JsonObject lowestBin = queryLowestBin(itemId);
+		if (lowestBin == null) {
 			return errorEmbed("No bins found for " + idToName(item));
 		}
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
 			BufferedImage loreRender = LoreRenderer.renderLore(
-				Arrays.stream(higherDepth(lowestBinJson, "lore").getAsString().split("\n")).toList()
+				Arrays.stream(higherDepth(lowestBin, "lore").getAsString().split("\n")).toList()
 			);
 			ImageIO.write(loreRender, "png", baos);
 		} catch (Exception ignored) {}
+
+		int count = higherDepth(lowestBin, "count").getAsInt();
 
 		return new MessageEditBuilder()
 			.setEmbeds(
 				defaultEmbed(idToName(itemId))
 					.setDescription(
 						"**Price:** " +
-						formatNumber(higherDepth(lowestBinJson, "starting_bid").getAsLong()) +
+						formatNumber(higherDepth(lowestBin, "starting_bid").getAsLong()) +
+						(count > 1 ? "\n**Count:** " + count : "") +
 						"\n**Seller:** " +
-						uuidToUsername(higherDepth(lowestBinJson, "auctioneer").getAsString()).username() +
+						uuidToUsername(higherDepth(lowestBin, "auctioneer").getAsString()).username() +
 						"\n**Ends:** " +
-						getRelativeTimestamp(higherDepth(lowestBinJson, "end_t").getAsLong()) +
+						getRelativeTimestamp(higherDepth(lowestBin, "end_t").getAsLong()) +
 						"\n**Command:** `/viewauction " +
-						higherDepth(lowestBinJson, "uuid").getAsString() +
+						higherDepth(lowestBin, "uuid").getAsString() +
 						"`"
 					)
 					.setThumbnail(getItemThumbnail(itemId))
@@ -103,15 +114,18 @@ public class BinSlashCommand extends SlashCommand {
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			event.replyClosestMatch(
-				event.getFocusedOption().getValue(),
-				getInternalJsonMappings()
-					.keySet()
-					.stream()
-					.map(StringUtils::idToName)
-					.distinct()
-					.collect(Collectors.toCollection(ArrayList::new))
-			);
+			if (getLowestBinJson() != null) {
+				event.replyClosestMatch(
+					event.getFocusedOption().getValue(),
+					getLowestBinJson()
+						.keySet()
+						.stream()
+						.filter(e -> !e.contains("+"))
+						.map(StringUtils::idToName)
+						.distinct()
+						.collect(Collectors.toCollection(ArrayList::new))
+				);
+			}
 		}
 	}
 }

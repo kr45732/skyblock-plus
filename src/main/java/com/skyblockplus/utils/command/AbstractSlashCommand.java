@@ -23,6 +23,8 @@ import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.utils.data.SerializableData;
 
 public abstract class AbstractSlashCommand {
@@ -107,7 +109,16 @@ public abstract class AbstractSlashCommand {
 		}
 
 		executor.submit(() -> {
-			event.deferReply().complete();
+			try {
+				event.deferReply().complete();
+			} catch (Exception e) {
+				if (e instanceof ErrorResponseException ex) {
+					if (ex.getErrorResponse() != ErrorResponse.UNKNOWN_INTERACTION) {
+						globalExceptionHandler.uncaughtException(event, e);
+					}
+				}
+				return;
+			}
 			try {
 				execute(event);
 			} catch (Exception e) {
