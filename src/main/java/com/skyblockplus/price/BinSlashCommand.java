@@ -18,26 +18,29 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.PET_NAMES;
-import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
+import static com.skyblockplus.utils.ApiHandler.queryLowestBin;
+import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.*;
 
-import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.utils.rendering.LoreRenderer;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.utils.StringUtils;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.api.EmbedBuilder;
+import javax.imageio.ImageIO;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -47,65 +50,44 @@ public class BinSlashCommand extends SlashCommand {
 		this.name = "bin";
 	}
 
-	public static EmbedBuilder getLowestBin(String item) {
-		JsonElement lowestBinJson = getLowestBinJson();
+	public static Object getLowestBin(String item) {
+		String itemId = nameToId(item, true);
+		if (itemId == null) {
+			itemId = getClosestMatchFromIds(item, getInternalJsonMappings().keySet());
+		}
+
+		JsonObject lowestBinJson = queryLowestBin(itemId);
 		if (lowestBinJson == null) {
-			return errorEmbed("Error fetching auctions");
+			return errorEmbed("No bins found for " + idToName(item));
 		}
 
-		EmbedBuilder eb = defaultEmbed("Lowest bin");
-		String itemId = nameToId(item);
-		if (higherDepth(lowestBinJson, itemId) != null) {
-			eb.addField(idToName(itemId), formatNumber(higherDepth(lowestBinJson, itemId, 0L)), false);
-			eb.setThumbnail(getItemThumbnail(itemId));
-			return eb;
-		}
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			BufferedImage loreRender = LoreRenderer.renderLore(
+				Arrays.stream(higherDepth(lowestBinJson, "lore").getAsString().split("\n")).toList()
+			);
+			ImageIO.write(loreRender, "png", baos);
+		} catch (Exception ignored) {}
 
-		JsonElement petJson = getPetNumsJson();
-		for (String i : PET_NAMES) {
-			if (itemId.contains(i)) {
-				String petId = i;
-				boolean raritySpecified = false;
-				for (Map.Entry<String, String> j : RARITY_TO_NUMBER_MAP.entrySet()) {
-					if (itemId.contains(j.getKey())) {
-						petId += j.getValue();
-						raritySpecified = true;
-						break;
-					}
-				}
-
-				if (!raritySpecified) {
-					List<String> petRarities = higherDepth(petJson, petId)
-						.getAsJsonObject()
-						.keySet()
-						.stream()
-						.map(String::toUpperCase)
-						.collect(Collectors.toCollection(ArrayList::new));
-
-					for (String j : petRarities) {
-						if (higherDepth(lowestBinJson, petId + RARITY_TO_NUMBER_MAP.get(j)) != null) {
-							petId += RARITY_TO_NUMBER_MAP.get(j);
-							break;
-						}
-					}
-				}
-
-				if (higherDepth(lowestBinJson, petId) != null) {
-					eb.addField(idToName(petId), formatNumber(higherDepth(lowestBinJson, petId, 0L)), false);
-					eb.setThumbnail(getItemThumbnail(petId));
-					return eb;
-				}
-			}
-		}
-
-		String closestMatch = getClosestMatchFromIds(itemId, getJsonKeys(lowestBinJson));
-		if (closestMatch != null) {
-			eb.addField(idToName(closestMatch), formatNumber(higherDepth(lowestBinJson, closestMatch, 0L)), false);
-			eb.setThumbnail(getItemThumbnail(closestMatch));
-			return eb;
-		}
-
-		return defaultEmbed("No bin found for " + idToName(item));
+		return new MessageEditBuilder()
+			.setEmbeds(
+				defaultEmbed(idToName(itemId))
+					.setDescription(
+						"**Price:** " +
+						formatNumber(higherDepth(lowestBinJson, "starting_bid").getAsLong()) +
+						"\n**Seller:** " +
+						uuidToUsername(higherDepth(lowestBinJson, "auctioneer").getAsString()).username() +
+						"\n**Ends:** " +
+						getRelativeTimestamp(higherDepth(lowestBinJson, "end_t").getAsLong()) +
+						"\n**Command:** `/viewauction " +
+						higherDepth(lowestBinJson, "uuid").getAsString() +
+						"`"
+					)
+					.setThumbnail(getItemThumbnail(itemId))
+					.setImage("attachment://lore.png")
+					.build()
+			)
+			.setFiles(FileUpload.fromData(baos.toByteArray(), "lore.png"));
 	}
 
 	@Override
@@ -121,17 +103,15 @@ public class BinSlashCommand extends SlashCommand {
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			if (getLowestBinJson() != null) {
-				event.replyClosestMatch(
-					event.getFocusedOption().getValue(),
-					getLowestBinJson()
-						.keySet()
-						.stream()
-						.map(StringUtils::idToName)
-						.distinct()
-						.collect(Collectors.toCollection(ArrayList::new))
-				);
-			}
+			event.replyClosestMatch(
+				event.getFocusedOption().getValue(),
+				getInternalJsonMappings()
+					.keySet()
+					.stream()
+					.map(StringUtils::idToName)
+					.distinct()
+					.collect(Collectors.toCollection(ArrayList::new))
+			);
 		}
 	}
 }

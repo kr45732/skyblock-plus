@@ -52,7 +52,6 @@ import org.apache.groovy.util.Maps;
 
 public class MuseumPaginator {
 
-	private static final File loreRenderDir = new File("src/main/java/com/skyblockplus/json/renders");
 	private static final Map<String, String> categoryToEmoji = Maps.of(
 		"weapons",
 		"DIAMOND_SWORD",
@@ -232,7 +231,7 @@ public class MuseumPaginator {
 			}
 
 			BufferedImage chestRender = renderChest(slots);
-			File file = new File(loreRenderDir + "/" + key + "_" + category + "_" + pageNumber + ".png");
+			File file = new File(rendersDirectory + "/" + key + "_" + category + "_" + pageNumber + ".png");
 			ImageIO.write(chestRender, "png", file);
 
 			return file.getPath();
@@ -269,7 +268,7 @@ public class MuseumPaginator {
 						.queue(ignore, ignore);
 				} catch (Exception ignored) {}
 				try {
-					for (File file : loreRenderDir.listFiles(file -> file.getName().startsWith(key))) {
+					for (File file : rendersDirectory.listFiles(file -> file.getName().startsWith(key))) {
 						file.delete();
 					}
 				} catch (Exception ignored) {}

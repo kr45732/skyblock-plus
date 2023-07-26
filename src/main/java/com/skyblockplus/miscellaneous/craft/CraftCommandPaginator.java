@@ -42,7 +42,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 
 public class CraftCommandPaginator {
 
-	private static final File loreRenderDir = new File("src/main/java/com/skyblockplus/json/renders");
 	private final String key;
 	private final JsonArray items;
 	private final ButtonInteractionEvent event;
@@ -199,7 +198,7 @@ public class CraftCommandPaginator {
 					message.editMessageComponents().queue(ignore, ignore);
 				} catch (Exception ignored) {}
 				try {
-					for (File file : loreRenderDir.listFiles(file -> file.getName().startsWith(key))) {
+					for (File file : rendersDirectory.listFiles(file -> file.getName().startsWith(key))) {
 						file.delete();
 					}
 				} catch (Exception ignored) {}
@@ -219,7 +218,7 @@ public class CraftCommandPaginator {
 		List<String> lore = List.of(higherDepth(item, "lore").getAsString().split("\n"));
 
 		BufferedImage bufferedImage = LoreRenderer.renderLore(lore);
-		File file = new File(loreRenderDir + "/" + key + pageNumber + ".png");
+		File file = new File(rendersDirectory + "/" + key + pageNumber + ".png");
 		try {
 			ImageIO.write(bufferedImage, "png", file);
 			return file.getPath();

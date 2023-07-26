@@ -151,11 +151,10 @@ public class Main {
 			}
 		}
 
-		File loreRendersDir = new File("src/main/java/com/skyblockplus/json/renders/");
-		if (!loreRendersDir.exists()) {
-			log.info((loreRendersDir.mkdirs() ? "Successfully created" : "Failed to create") + " lore render directory");
+		if (!rendersDirectory.exists()) {
+			log.info((rendersDirectory.mkdirs() ? "Successfully created" : "Failed to create") + " lore render directory");
 		} else {
-			File[] loreRendersDirFiles = loreRendersDir.listFiles();
+			File[] loreRendersDirFiles = rendersDirectory.listFiles();
 			if (loreRendersDirFiles != null) {
 				Arrays.stream(loreRendersDirFiles).forEach(File::delete);
 			}

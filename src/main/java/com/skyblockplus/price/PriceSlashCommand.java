@@ -19,7 +19,6 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
-import static com.skyblockplus.utils.ApiHandler.queryLowestBin;
 import static com.skyblockplus.utils.ApiHandler.queryLowestBinPet;
 import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
@@ -30,10 +29,10 @@ import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.ApiHandler;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import java.time.Instant;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -80,13 +79,13 @@ public class PriceSlashCommand extends SlashCommand {
 		if (auctionsArr == null || auctionsArr.isEmpty()) {
 			String idStrict = nameToId(query, true);
 			if (idStrict != null) {
-				auctionsArr = queryLowestBin(idStrict, false, auctionType);
+				auctionsArr = ApiHandler.queryAuctions(idStrict, false, auctionType);
 			} else {
 				List<String> queryItems = getQueryItems();
 				if (queryItems != null && queryItems.stream().noneMatch(q -> q.equalsIgnoreCase(query))) {
 					matchedQuery = getClosestMatch(query, queryItems);
 				}
-				auctionsArr = queryLowestBin(matchedQuery != null ? matchedQuery : query, true, auctionType);
+				auctionsArr = ApiHandler.queryAuctions(matchedQuery != null ? matchedQuery : query, true, auctionType);
 			}
 
 			if (auctionsArr == null) {

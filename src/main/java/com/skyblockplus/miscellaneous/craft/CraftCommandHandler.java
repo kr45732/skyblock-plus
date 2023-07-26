@@ -30,6 +30,7 @@ import com.google.gson.JsonElement;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.utils.StringUtils;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -1470,10 +1471,11 @@ public class CraftCommandHandler {
 
 	private AbstractMap.SimpleEntry<String, Integer> getAhSearchUrl() {
 		int maxScore = 0;
-		URIBuilder uriBuilder = getQueryApiUrl("query");
-		uriBuilder.addParameter("item_id", itemId);
-		uriBuilder.addParameter("sort_by", "query");
-		uriBuilder.addParameter("limit", "10");
+		URIBuilder uriBuilder = getQueryApiUrl("query")
+			.addParameter("end", "" + Instant.now().toEpochMilli())
+			.addParameter("item_id", itemId)
+			.addParameter("sort_by", "query")
+			.addParameter("limit", "10");
 		if (recombobulatorCount == 1) {
 			uriBuilder.addParameter("recombobulated", "true");
 			maxScore++;

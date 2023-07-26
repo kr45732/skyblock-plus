@@ -158,6 +158,7 @@ public class Utils {
 	public static final Pattern crimsonArmorRegex = Pattern.compile(
 		"(|HOT_|BURNING_|FIERY_|INFERNAL_)(CRIMSON|FERVOR|HOLLOW|TERROR|AURORA)_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
 	);
+	public static final File rendersDirectory = new File("src/main/java/com/skyblockplus/json/renders");
 	/* Environment */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
