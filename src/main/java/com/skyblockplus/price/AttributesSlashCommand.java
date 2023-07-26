@@ -19,6 +19,7 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.ApiHandler.queryLowestBin;
+import static com.skyblockplus.utils.Constants.allAttributes;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
@@ -34,7 +35,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -48,46 +48,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AttributesSlashCommand extends SlashCommand {
-
-	private static final List<String> ALL_ATTRIBUTES = List.of(
-		"ARACHNO",
-		"ARACHNO_RESISTANCE",
-		"ATTACK_SPEED",
-		"BLAZING",
-		"BLAZING_FORTUNE",
-		"BLAZING_RESISTANCE",
-		"BREEZE",
-		"COMBO",
-		"DEADEYE",
-		"DOMINANCE",
-		"DOUBLE_HOOK",
-		"ELITE",
-		"ENDER",
-		"ENDER_RESISTANCE",
-		"EXPERIENCE",
-		"FISHERMAN",
-		"FISHING_EXPERIENCE",
-		"FISHING_SPEED",
-		"FORTITUDE",
-		"HUNTER",
-		"IGNITION",
-		"INFECTION",
-		"LIFE_RECOVERY",
-		"LIFE_REGENERATION",
-		"LIFELINE",
-		"MAGIC_FIND",
-		"MANA_POOL",
-		"MANA_REGENERATION",
-		"MANA_STEAL",
-		"MIDAS_TOUCH",
-		"SPEED",
-		"TROPHY_HUNTER",
-		"UNDEAD",
-		"UNDEAD_RESISTANCE",
-		"VETERAN",
-		"VITALITY",
-		"WARRIOR"
-	);
 
 	public AttributesSlashCommand() {
 		this.name = "attributes";
@@ -109,30 +69,30 @@ public class AttributesSlashCommand extends SlashCommand {
 		}
 
 		attrOne = attrOne.replace(" ", "_").toUpperCase();
-		if (!ALL_ATTRIBUTES.contains(attrOne)) {
-			attrOne = getClosestMatchFromIds(attrOne, ALL_ATTRIBUTES);
+		if (!allAttributes.contains(attrOne)) {
+			attrOne = getClosestMatchFromIds(attrOne, allAttributes);
 		}
 
-		if (attrTwo != null) {
-			attrTwo = attrTwo.replace(" ", "_").toUpperCase();
-			if (!ALL_ATTRIBUTES.contains(attrTwo)) {
-				attrTwo = getClosestMatchFromIds(attrTwo, ALL_ATTRIBUTES);
-			}
+		attrTwo = attrTwo.replace(" ", "_").toUpperCase();
+		if (!allAttributes.contains(attrTwo)) {
+			attrTwo = getClosestMatchFromIds(attrTwo, allAttributes);
+		}
 
-			if (attrOne.compareTo(attrTwo) > 0) {
-				String tempAttrOne = attrOne;
-				attrOne = attrTwo;
-				attrTwo = tempAttrOne;
-			}
+		if (attrOne.compareTo(attrTwo) > 0) {
+			String tempAttrOne = attrOne;
+			attrOne = attrTwo;
+			attrTwo = tempAttrOne;
 		}
 
 		EmbedBuilder eb = defaultEmbed(idToName(itemId))
-			.appendDescription("**Attribute One:** " + capitalizeString(attrOne.replace("_", " ")));
-		if (attrTwo != null) {
-			eb.appendDescription("\n**Attribute Two:** " + capitalizeString(attrTwo.replace("_", " ")));
-		}
+			.appendDescription(
+				"**Attribute One:** " +
+				capitalizeString(attrOne.replace("_", " ")) +
+				"\n**Attribute Two:** " +
+				capitalizeString(attrTwo.replace("_", " "))
+			);
 
-		String formattedId = itemId + "+ATTRIBUTE_SHARD_" + attrOne + (attrTwo != null ? "+ATTRIBUTE_SHARD_" + attrTwo : "");
+		String formattedId = itemId + "+ATTRIBUTE_SHARD_" + attrOne + "+ATTRIBUTE_SHARD_" + attrTwo;
 		if (!keys.contains(formattedId)) {
 			return eb.setTitle("Error").appendDescription("\n\nProvided attributes were not found for item");
 		}
@@ -227,7 +187,7 @@ public class AttributesSlashCommand extends SlashCommand {
 		) {
 			event.replyClosestMatch(
 				event.getFocusedOption().getValue(),
-				ALL_ATTRIBUTES.stream().map(e -> capitalizeString(e.replace("_", " "))).collect(Collectors.toCollection(ArrayList::new))
+				allAttributes.stream().map(e -> capitalizeString(e.replace("_", " "))).collect(Collectors.toCollection(ArrayList::new))
 			);
 		}
 	}

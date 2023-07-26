@@ -41,6 +41,46 @@ public class Constants {
 
 	/* Harcoded constants */
 	public static final List<String> essenceTypes = List.of("undead", "wither", "dragon", "spider", "ice", "crimson", "diamond", "gold");
+
+	public static final List<String> allAttributes = List.of(
+		"ARACHNO",
+		"ARACHNO_RESISTANCE",
+		"ATTACK_SPEED",
+		"BLAZING",
+		"BLAZING_FORTUNE",
+		"BLAZING_RESISTANCE",
+		"BREEZE",
+		"COMBO",
+		"DEADEYE",
+		"DOMINANCE",
+		"DOUBLE_HOOK",
+		"ELITE",
+		"ENDER",
+		"ENDER_RESISTANCE",
+		"EXPERIENCE",
+		"FISHERMAN",
+		"FISHING_EXPERIENCE",
+		"FISHING_SPEED",
+		"FORTITUDE",
+		"HUNTER",
+		"IGNITION",
+		"INFECTION",
+		"LIFE_RECOVERY",
+		"LIFE_REGENERATION",
+		"LIFELINE",
+		"MAGIC_FIND",
+		"MANA_POOL",
+		"MANA_REGENERATION",
+		"MANA_STEAL",
+		"MIDAS_TOUCH",
+		"SPEED",
+		"TROPHY_HUNTER",
+		"UNDEAD",
+		"UNDEAD_RESISTANCE",
+		"VETERAN",
+		"VITALITY",
+		"WARRIOR"
+	);
 	public static final Map<String, String> dungeonLootChestToEmoji = Maps.of(
 		"wood",
 		"<:dungeon_wood_chest:1108163538905739336>",
