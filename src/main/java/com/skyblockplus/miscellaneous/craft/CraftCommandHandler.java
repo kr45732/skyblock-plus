@@ -1263,7 +1263,7 @@ public class CraftCommandHandler {
 		if (reforge != null) {
 			String baseRarity = higherDepth(getInternalJsonMappings(), itemId + ".base_rarity").getAsString();
 			if (recombobulatorCount == 1) {
-				baseRarity = NUMBER_TO_RARITY_MAP.get("" + (Integer.parseInt(RARITY_TO_NUMBER_MAP.get(baseRarity).replace(";", "")) + 1));
+				baseRarity = NUMBER_TO_RARITY_MAP.get(RARITY_TO_NUMBER_MAP.get(baseRarity) + 1);
 			}
 
 			Map.Entry<String, JsonElement> reforgeStone = getReforgeStonesJson()

@@ -30,6 +30,7 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.InvItem;
+import groovy.lang.Tuple2;
 import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -152,7 +153,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 						.values()
 						.stream()
 						.filter(Objects::nonNull)
-						.sorted(Comparator.comparingInt(o -> Integer.parseInt(RARITY_TO_NUMBER_MAP.get(o.getRarity()).replace(";", ""))))
+						.sorted(Comparator.comparingInt(o -> RARITY_TO_NUMBER_MAP.get(o.getRarity())))
 						.collect(Collectors.toCollection(ArrayList::new));
 				// Don't reverse the rarity because we are iterating reverse order
 				Set<String> ignoredTalismans = new HashSet<>();
@@ -172,45 +173,88 @@ public class TalismanBagSlashCommand extends SlashCommand {
 					}
 				}
 
+				Map<String, Tuple2<Integer, Integer>> rarityToCountMp = new HashMap<>();
+
+				int magicPower = player.getMagicPower();
+				Set<String> ignoredAccessories = new HashSet<>();
+				boolean countedPartyHat = false;
+
+				// Accessories are sorted from highest to lowest rarity
+				// in case they have children accessories with lower rarities
+				for (InvItem accessory : accessoryBag) {
+					String accessoryId = accessory.getId();
+					if (ignoredAccessories.contains(accessoryId)) {
+						continue;
+					}
+
+					ignoredAccessories.add(accessoryId);
+					JsonElement children = higherDepth(getParentsJson(), accessoryId);
+					if (children != null) {
+						for (JsonElement child : children.getAsJsonArray()) {
+							ignoredAccessories.add(child.getAsString());
+						}
+					}
+
+					int extraMagicPower = 0;
+					if (accessoryId.equals("HEGEMONY_ARTIFACT")) {
+						extraMagicPower += rarityToMagicPower.get(accessory.getRarity());
+					} else if (accessoryId.equals("ABICASE")) {
+						JsonElement activeContacts = higherDepth(
+							player.profileJson(),
+							"nether_island_player_data.abiphone.active_contacts"
+						);
+						if (activeContacts != null) {
+							extraMagicPower += activeContacts.getAsJsonArray().size() / 2;
+						}
+					} else if (accessoryId.startsWith("PARTY_HAT")) {
+						if (countedPartyHat) {
+							// Only one party hat counts towards magic power
+							continue;
+						} else {
+							countedPartyHat = true;
+						}
+					}
+
+					int curMagicPower = rarityToMagicPower.get(accessory.getRarity()) + extraMagicPower;
+					rarityToCountMp.compute(
+						accessory.getRarity(),
+						(k, v) -> new Tuple2<>((v != null ? v.getV1() : 0) + 1, (v != null ? v.getV2() : 0) + curMagicPower)
+					);
+				}
+
 				StringBuilder accessoryStr = new StringBuilder();
-				int magicPower = 0;
-				for (Map.Entry<String, Integer> entry : rarityToMagicPower.entrySet()) {
-					long count = accessoryBag.stream().filter(i -> i.getRarity().equals(entry.getKey())).count();
-					long power = count * entry.getValue();
+				for (Map.Entry<String, Tuple2<Integer, Integer>> entry : rarityToCountMp
+					.entrySet()
+					.stream()
+					.sorted(Comparator.comparingInt(e -> RARITY_TO_NUMBER_MAP.get(e.getKey())))
+					.toList()) {
 					accessoryStr
 						.append("\n• ")
 						.append(capitalizeString(entry.getKey().replace("_", " ")))
 						.append(": ")
-						.append(count)
+						.append(entry.getValue().getV1())
 						.append(" (")
-						.append(power)
+						.append(entry.getValue().getV2())
 						.append(" magic power)");
-					magicPower += power;
 				}
-				int hegemony = rarityToMagicPower.getOrDefault(
-					accessoryBag.stream().filter(a -> a.getId().equals("HEGEMONY_ARTIFACT")).map(InvItem::getRarity).findFirst().orElse(""),
-					0
-				);
-				if (hegemony != 0) {
-					magicPower += hegemony;
-					accessoryStr.append("\n• Hegemony Artifact: ").append(hegemony).append(" magic power");
-				}
-				double scaling = Math.pow(29.97 * (Math.log(0.0019 * magicPower + 1)), 1.2);
 
 				String selectedPower = higherDepth(tuningJson, "selected_power", "");
-				eb.setDescription(
-					"**Selected Power:** " +
-					(selectedPower.isEmpty() ? " None" : capitalizeString(selectedPower)) +
-					"\n**Magic Power:** " +
-					formatNumber(magicPower) +
-					"\n**Unlocked Tuning Slots:** " +
-					higherDepth(tuningJson, "tuning").getAsJsonObject().keySet().stream().filter(j -> j.startsWith("slot_")).count()
-				);
-				eb.addField(
-					"Accessory Counts",
-					player.isInventoryApiEnabled() ? accessoryStr.toString() : "Inventory API is disabled",
-					false
-				);
+				double scaling = Math.pow(29.97 * (Math.log(0.0019 * magicPower + 1)), 1.2);
+
+				eb
+					.setDescription(
+						"**Selected Power:** " +
+						(selectedPower.isEmpty() ? " None" : capitalizeString(selectedPower)) +
+						"\n**Magic Power:** " +
+						formatNumber(magicPower) +
+						"\n**Unlocked Tuning Slots:** " +
+						higherDepth(tuningJson, "tuning").getAsJsonObject().keySet().stream().filter(j -> j.startsWith("slot_")).count()
+					)
+					.addField(
+						"Accessory Counts",
+						player.isInventoryApiEnabled() ? accessoryStr.toString() : "Inventory API is disabled",
+						false
+					);
 				if (higherDepth(tuningJson, "unlocked_powers") != null) {
 					JsonArray unlockedPowers = higherDepth(tuningJson, "unlocked_powers").getAsJsonArray();
 					eb.appendDescription("\n**Unlocked Power Stones:** " + unlockedPowers.size());

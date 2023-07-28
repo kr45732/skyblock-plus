@@ -538,7 +538,7 @@ public class NetworthExecute {
 	public void calculateDefaultPetPrices() {
 		for (InvItem item : pets) {
 			double auctionPrice = getMinBinAvg(
-				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity())
+				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + ";" + RARITY_TO_NUMBER_MAP.get(item.getRarity())
 			);
 			if (auctionPrice != -1) {
 				StringBuilder miscStr = new StringBuilder("[");

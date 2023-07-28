@@ -990,130 +990,110 @@ public class Player {
 		/* Emoji viewer arrays & other inventory */
 		public List<String[]> getTalismanBag() {
 			try {
-				String encodedInventoryContents = higherDepth(profileJson(), "talisman_bag.data").getAsString();
-				NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "talisman_bag.data").getAsString()).getList("i");
+				Map<Integer, String> itemsMap = new TreeMap<>();
 
-				NBTList invFrames = decodedInventoryContents.getList("i");
-
-				Map<Integer, String> invFramesMap = new TreeMap<>();
-				for (int i = 0; i < invFrames.size(); i++) {
-					NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
-					if (displayName != null) {
-						invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
-					} else {
-						invFramesMap.put(i + 1, "empty");
-					}
+				for (int i = 0; i < items.size(); i++) {
+					itemsMap.put(i + 1, items.getCompound(i).getString("tag.ExtraAttributes.id", "EMPTY"));
 				}
 
-				if (invFramesMap.size() % 45 != 0) {
-					int toAdd = 45 - (invFramesMap.size() % 45);
-					int initialSize = invFramesMap.size();
+				if (itemsMap.size() % 45 != 0) {
+					int toAdd = 45 - (itemsMap.size() % 45);
+					int initialSize = itemsMap.size();
 					for (int i = 0; i < toAdd; i++) {
-						invFramesMap.put(initialSize + 1 + i, "blank");
+						itemsMap.put(initialSize + 1 + i, "BLANK");
 					}
 				}
 
-				StringBuilder outputStringPart1 = new StringBuilder();
-				StringBuilder outputStringPart2 = new StringBuilder();
-				List<String[]> enderChestPages = new ArrayList<>();
-				StringBuilder curNine = new StringBuilder();
+				List<String[]> pages = new ArrayList<>();
 				int page = 0;
-				for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
-					if ((i.getKey() - page) <= 27) {
-						curNine.append(itemToEmoji(i.getValue()));
-						if (i.getKey() % 9 == 0) {
-							outputStringPart1.append(curNine).append("\n");
-							curNine = new StringBuilder();
+				StringBuilder pageTop = new StringBuilder();
+				StringBuilder pageBottom = new StringBuilder();
+				StringBuilder row = new StringBuilder();
+				for (Map.Entry<Integer, String> i : itemsMap.entrySet()) {
+					row.append(itemToEmoji(i.getValue()));
+
+					if (i.getKey() % 9 == 0) {
+						if (i.getKey() - page <= 27) {
+							pageTop.append(row).append("\n");
+						} else {
+							pageBottom.append(row).append("\n");
 						}
-					} else {
-						curNine.append(itemToEmoji(i.getValue()));
-						if (i.getKey() % 9 == 0) {
-							outputStringPart2.append(curNine).append("\n");
-							curNine = new StringBuilder();
-						}
+						row = new StringBuilder();
 					}
 
 					if (i.getKey() != 0 && i.getKey() % 45 == 0) {
-						enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
-						outputStringPart1 = new StringBuilder();
-						outputStringPart2 = new StringBuilder();
+						pages.add(new String[] { pageTop.toString(), pageBottom.toString() });
+						pageTop = new StringBuilder();
+						pageBottom = new StringBuilder();
 						page += 45;
 					}
 				}
-				return enderChestPages;
+
+				return pages;
 			} catch (Exception ignored) {}
 			return null;
 		}
 
 		public List<String[]> getEnderChest() {
 			try {
-				String encodedInventoryContents = higherDepth(profileJson(), "ender_chest_contents.data").getAsString();
-				NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "ender_chest_contents.data").getAsString()).getList("i");
+				Map<Integer, String> itemsMap = new TreeMap<>();
 
-				NBTList invFrames = decodedInventoryContents.getList("i");
+				for (int i = 0; i < items.size(); i++) {
+					String id = items.getCompound(i).getString("tag.ExtraAttributes.id", "EMPTY");
 
-				Map<Integer, String> invFramesMap = new TreeMap<>();
-				for (int i = 0; i < invFrames.size(); i++) {
-					NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
-					if (displayName != null) {
-						String id = displayName.getString("id", "empty").toLowerCase();
-						if (id.equals("pet")) {
-							JsonElement petInfo = JsonParser.parseString(
-								invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}")
-							);
-							String newId =
-								higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
-							if (!newId.isEmpty()) {
-								id = newId.toLowerCase();
-							}
-						} else if (id.equals("enchanted_book")) {
-							NBTCompound enchantedBooks = invFrames.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
-							if (enchantedBooks.size() == 1) {
-								Map.Entry<String, Object> enchant = enchantedBooks.entrySet().stream().findFirst().get();
-								id = enchant.getKey() + ";" + enchant.getValue();
-							}
+					if (id.equals("PET")) {
+						String petInfoStr = items.getCompound(i).getString("tag.ExtraAttributes.petInfo");
+						if (petInfoStr != null) {
+							JsonElement petInfo = JsonParser.parseString(petInfoStr);
+							id = higherDepth(petInfo, "type", null) + ";" + RARITY_TO_NUMBER_MAP.get(higherDepth(petInfo, "tier", null));
 						}
-						invFramesMap.put(i + 1, id);
-					} else {
-						invFramesMap.put(i + 1, "empty");
+					} else if (id.equals("ENCHANTED_BOOK")) {
+						NBTCompound enchants = items.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
+						if (enchants.size() == 1) {
+							Map.Entry<String, Object> enchant = enchants.entrySet().iterator().next();
+							id = enchant.getKey() + ";" + enchant.getValue();
+						}
 					}
+
+					itemsMap.put(i + 1, id.toUpperCase());
 				}
 
-				StringBuilder outputStringPart1 = new StringBuilder();
-				StringBuilder outputStringPart2 = new StringBuilder();
-				List<String[]> enderChestPages = new ArrayList<>();
-				StringBuilder curNine = new StringBuilder();
+				List<String[]> pages = new ArrayList<>();
 				int page = 0;
-				for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
-					if ((i.getKey() - page) <= 27) {
-						curNine.append(itemToEmoji(i.getValue()));
-						if (i.getKey() % 9 == 0) {
-							outputStringPart1.append(curNine).append("\n");
-							curNine = new StringBuilder();
+				StringBuilder pageTop = new StringBuilder();
+				StringBuilder pageBottom = new StringBuilder();
+				StringBuilder row = new StringBuilder();
+				for (Map.Entry<Integer, String> i : itemsMap.entrySet()) {
+					row.append(itemToEmoji(i.getValue()));
+
+					if (i.getKey() % 9 == 0) {
+						if (i.getKey() - page <= 27) {
+							pageTop.append(row).append("\n");
+						} else {
+							pageBottom.append(row).append("\n");
 						}
-					} else {
-						curNine.append(itemToEmoji(i.getValue()));
-						if (i.getKey() % 9 == 0) {
-							outputStringPart2.append(curNine).append("\n");
-							curNine = new StringBuilder();
-						}
+						row = new StringBuilder();
 					}
 
 					if (i.getKey() != 0 && i.getKey() % 45 == 0) {
-						enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
-						outputStringPart1 = new StringBuilder();
-						outputStringPart2 = new StringBuilder();
+						pages.add(new String[] { pageTop.toString(), pageBottom.toString() });
+						pageTop = new StringBuilder();
+						pageBottom = new StringBuilder();
 						page += 45;
 					}
 				}
-				return enderChestPages;
+
+				return pages;
 			} catch (Exception ignored) {}
 			return null;
 		}
 
 		public List<String[]> getStorage() {
 			try {
-				List<String[]> out = new ArrayList<>();
+				List<String[]> pages = new ArrayList<>();
+
 				for (JsonElement page : higherDepth(profileJson(), "backpack_contents")
 					.getAsJsonObject()
 					.entrySet()
@@ -1121,147 +1101,122 @@ public class Player {
 					.sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey())))
 					.map(Map.Entry::getValue)
 					.collect(Collectors.toCollection(ArrayList::new))) {
-					NBTCompound decodedInventoryContents = NBTReader.readBase64(higherDepth(page, "data").getAsString());
+					NBTList items = NBTReader.readBase64(higherDepth(page, "data").getAsString()).getList("i");
+					Map<Integer, String> itemsMap = new TreeMap<>();
 
-					NBTList invFrames = decodedInventoryContents.getList("i");
-					Map<Integer, String> invFramesMap = new TreeMap<>();
-					for (int i = 0; i < invFrames.size(); i++) {
-						NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
-						if (displayName != null) {
-							String id = displayName.getString("id", "empty").toLowerCase();
-							if (id.equals("pet")) {
-								JsonElement petInfo = JsonParser.parseString(
-									invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}")
-								);
-								String newId =
-									higherDepth(petInfo, "type", "") +
-									RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
-								if (!newId.isEmpty()) {
-									id = newId.toLowerCase();
-								}
-							} else if (id.equals("enchanted_book")) {
-								NBTCompound enchantedBooks = invFrames.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
-								if (enchantedBooks.size() == 1) {
-									Map.Entry<String, Object> enchant = enchantedBooks.entrySet().stream().findFirst().get();
-									id = enchant.getKey() + ";" + enchant.getValue();
-								}
+					for (int i = 0; i < items.size(); i++) {
+						String id = items.getCompound(i).getString("tag.ExtraAttributes.id", "EMPTY");
+
+						if (id.equals("PET")) {
+							String petInfoStr = items.getCompound(i).getString("tag.ExtraAttributes.petInfo");
+							if (petInfoStr != null) {
+								JsonElement petInfo = JsonParser.parseString(petInfoStr);
+								id =
+									higherDepth(petInfo, "type", null) + ";" + RARITY_TO_NUMBER_MAP.get(higherDepth(petInfo, "tier", null));
 							}
-							invFramesMap.put(i + 1, id);
-						} else {
-							invFramesMap.put(i + 1, "empty");
+						} else if (id.equals("ENCHANTED_BOOK")) {
+							NBTCompound enchants = items.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
+							if (enchants.size() == 1) {
+								Map.Entry<String, Object> enchant = enchants.entrySet().iterator().next();
+								id = enchant.getKey() + ";" + enchant.getValue();
+							}
 						}
+
+						itemsMap.put(i + 1, id.toUpperCase());
 					}
-					if (invFrames.size() < 27) {
-						int curSize = invFrames.size();
+
+					if (items.size() < 27) {
+						int curSize = items.size();
 						for (int i = 0; i < 27 - curSize; i++) {
-							invFramesMap.put(i + 1 + curSize, "blank");
+							itemsMap.put(i + 1 + curSize, "BLANK");
 						}
 					}
 
-					StringBuilder outputStringPart1 = new StringBuilder();
-					StringBuilder outputStringPart2 = new StringBuilder();
-					StringBuilder curNine = new StringBuilder();
-					for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
-						if (i.getKey() <= 18) {
-							curNine.append(itemToEmoji(i.getValue()));
-							if (i.getKey() % 9 == 0) {
-								outputStringPart1.append(curNine).append("\n");
-								curNine = new StringBuilder();
+					StringBuilder pageTop = new StringBuilder();
+					StringBuilder pageBottom = new StringBuilder();
+					StringBuilder row = new StringBuilder();
+					for (Map.Entry<Integer, String> i : itemsMap.entrySet()) {
+						row.append(itemToEmoji(i.getValue()));
+
+						if (i.getKey() % 9 == 0) {
+							if (i.getKey() <= 18) {
+								pageTop.append(row).append("\n");
+							} else {
+								pageBottom.append(row).append("\n");
 							}
-						} else {
-							curNine.append(itemToEmoji(i.getValue()));
-							if (i.getKey() % 9 == 0) {
-								outputStringPart2.append(curNine).append("\n");
-								curNine = new StringBuilder();
-							}
+							row = new StringBuilder();
 						}
 					}
 
-					out.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
+					pages.add(new String[] { pageTop.toString(), pageBottom.toString() });
 				}
-				return out;
+
+				return pages;
 			} catch (Exception ignored) {}
 			return null;
 		}
 
 		public String[] getInventory() {
 			try {
-				String encodedInventoryContents = higherDepth(profileJson(), "inv_contents.data").getAsString();
-				NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "inv_contents.data").getAsString()).getList("i");
+				Map<Integer, String> itemsMap = new TreeMap<>();
 
-				NBTList invFrames = decodedInventoryContents.getList("i");
-				Map<Integer, String> invFramesMap = new TreeMap<>();
-				for (int i = 0; i < invFrames.size(); i++) {
-					NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
-					if (displayName != null) {
-						String id = displayName.getString("id", "empty").toLowerCase();
-						if (id.equals("pet")) {
-							JsonElement petInfo = JsonParser.parseString(
-								invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}")
-							);
-							String newId =
-								higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
-							if (!newId.isEmpty()) {
-								id = newId.toLowerCase();
-							}
-						} else if (id.equals("enchanted_book")) {
-							NBTCompound enchantedBooks = invFrames.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
-							if (enchantedBooks.size() == 1) {
-								Map.Entry<String, Object> enchant = enchantedBooks.entrySet().stream().findFirst().get();
-								id = enchant.getKey() + ";" + enchant.getValue();
-							}
+				for (int i = 0; i < items.size(); i++) {
+					String id = items.getCompound(i).getString("tag.ExtraAttributes.id", "EMPTY");
+
+					if (id.equals("PET")) {
+						String petInfoStr = items.getCompound(i).getString("tag.ExtraAttributes.petInfo");
+						if (petInfoStr != null) {
+							JsonElement petInfo = JsonParser.parseString(petInfoStr);
+							id = higherDepth(petInfo, "type", null) + ";" + RARITY_TO_NUMBER_MAP.get(higherDepth(petInfo, "tier", null));
 						}
-						invFramesMap.put(i + 1, id);
-					} else {
-						invFramesMap.put(i + 1, "empty");
+					} else if (id.equals("ENCHANTED_BOOK")) {
+						NBTCompound enchants = items.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
+						if (enchants.size() == 1) {
+							Map.Entry<String, Object> enchant = enchants.entrySet().iterator().next();
+							id = enchant.getKey() + ";" + enchant.getValue();
+						}
+					}
+
+					itemsMap.put(i + 1, id.toUpperCase());
+				}
+
+				StringBuilder pageTop = new StringBuilder();
+				StringBuilder pageBottom = new StringBuilder();
+				StringBuilder row = new StringBuilder();
+				for (Map.Entry<Integer, String> i : itemsMap.entrySet()) {
+					row.append(itemToEmoji(i.getValue()));
+
+					if (i.getKey() % 9 == 0) {
+						if (i.getKey() <= 9 || i.getKey() >= 28) {
+							pageTop.insert(0, row + "\n");
+						} else {
+							pageBottom.append(row).append("\n");
+						}
+						row = new StringBuilder();
 					}
 				}
 
-				StringBuilder outputStringPart1 = new StringBuilder();
-				StringBuilder outputStringPart2 = new StringBuilder();
-				StringBuilder curNine = new StringBuilder();
-				for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
-					if (i.getKey() <= 9 || i.getKey() >= 28) {
-						curNine.append(itemToEmoji(i.getValue()));
-						if (i.getKey() % 9 == 0) {
-							outputStringPart1.insert(0, curNine + "\n");
-							curNine = new StringBuilder();
-						}
-					} else {
-						curNine.append(itemToEmoji(i.getValue()));
-						if (i.getKey() % 9 == 0) {
-							outputStringPart2.append(curNine).append("\n");
-							curNine = new StringBuilder();
-						}
-					}
-				}
-				return new String[] { outputStringPart2.toString(), outputStringPart1.toString() };
+				return new String[] { pageBottom.toString(), pageTop.toString() };
 			} catch (Exception ignored) {}
 			return null;
 		}
 
 		public Map<Integer, ArmorStruct> getWardrobeList() {
 			try {
-				String encodedWardrobeContents = higherDepth(profileJson(), "wardrobe_contents.data").getAsString();
-				int equippedSlot = higherDepth(profileJson(), "wardrobe_equipped_slot").getAsInt();
-				NBTCompound decodedWardrobeContents = NBTReader.readBase64(encodedWardrobeContents);
+				int equippedSlot = higherDepth(profileJson(), "wardrobe_equipped_slot", -1);
+				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "wardrobe_contents.data").getAsString()).getList("i");
+				Map<Integer, String> itemsMap = new HashMap<>();
 
-				NBTList wardrobeFrames = decodedWardrobeContents.getList("i");
-				Map<Integer, String> wardrobeFramesMap = new HashMap<>();
-				for (int i = 0; i < wardrobeFrames.size(); i++) {
-					NBTCompound displayName = wardrobeFrames.getCompound(i).getCompound("tag.display");
-					if (displayName != null) {
-						wardrobeFramesMap.put(i, cleanMcCodes(displayName.getString("Name", "Empty")));
-					} else {
-						wardrobeFramesMap.put(i, "Empty");
-					}
+				for (int i = 0; i < items.size(); i++) {
+					itemsMap.put(i, cleanMcCodes(items.getCompound(i).getString("tag.display.Name", "Empty")));
 				}
 
-				Map<Integer, ArmorStruct> armorStructMap = new HashMap<>(18);
+				Map<Integer, ArmorStruct> armorStructMap = new HashMap<>();
 				for (int i = 0; i < 9; i++) {
 					ArmorStruct pageOneStruct = new ArmorStruct();
-					for (int j = i; j < wardrobeFramesMap.size() / 2; j += 9) {
-						String currentArmorPiece = wardrobeFramesMap.get(j);
+					for (int j = i; j < itemsMap.size() / 2; j += 9) {
+						String currentArmorPiece = itemsMap.get(j);
 						if ((j - i) / 9 == 0) {
 							pageOneStruct.setHelmet(currentArmorPiece);
 						} else if ((j - i) / 9 == 1) {
@@ -1275,8 +1230,8 @@ public class Player {
 					armorStructMap.put(i, pageOneStruct);
 
 					ArmorStruct pageTwoStruct = new ArmorStruct();
-					for (int j = (wardrobeFramesMap.size() / 2) + i; j < wardrobeFramesMap.size(); j += 9) {
-						String currentArmorPiece = wardrobeFramesMap.get(j);
+					for (int j = itemsMap.size() / 2 + i; j < itemsMap.size(); j += 9) {
+						String currentArmorPiece = itemsMap.get(j);
 						if ((j - i) / 9 == 4) {
 							pageTwoStruct.setHelmet(currentArmorPiece);
 						} else if ((j - i) / 9 == 5) {
@@ -1289,8 +1244,9 @@ public class Player {
 					}
 					armorStructMap.put(i + 9, pageTwoStruct);
 				}
-				if (equippedSlot > 0) {
-					armorStructMap.replace((equippedSlot - 1), getArmor().makeBold());
+
+				if (equippedSlot != -1) {
+					armorStructMap.replace(equippedSlot - 1, getArmor().makeBold());
 				}
 
 				return armorStructMap;
@@ -1301,100 +1257,77 @@ public class Player {
 
 		public List<String[]> getWardrobe() {
 			try {
-				int equippedWardrobeSlot = higherDepth(profileJson(), "wardrobe_equipped_slot").getAsInt();
+				int equippedWardrobeSlot = higherDepth(profileJson(), "wardrobe_equipped_slot", -1);
 				Map<Integer, InvItem> equippedArmor = equippedWardrobeSlot != -1 ? getArmorMap() : null;
+				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "wardrobe_contents.data").getAsString()).getList("i");
+				Map<Integer, String> itemsMap = new TreeMap<>();
 
-				String encodedInventoryContents = higherDepth(profileJson(), "wardrobe_contents.data").getAsString();
-				NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+				for (int i = 0; i < items.size(); i++) {
+					String id = items.getCompound(i).getString("tag.ExtraAttributes.id", "EMPTY");
 
-				NBTList invFrames = decodedInventoryContents.getList("i");
-				Map<Integer, String> invFramesMap = new TreeMap<>();
-				for (int i = 0; i < invFrames.size(); i++) {
-					NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
-
-					if (displayName != null) {
-						invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
-					} else if (
-						(equippedArmor != null) &&
-						(equippedWardrobeSlot <= 9) &&
-						((((i + 1) - equippedWardrobeSlot) % 9) == 0) &&
-						((i + 1) <= 36) &&
-						(equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9))) != null
-					) {
-						invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9)).getId().toLowerCase());
-					} else if (
-						(equippedArmor != null) &&
-						(equippedWardrobeSlot > 9) &&
-						((((i + 1) - equippedWardrobeSlot) % 9) == 0) &&
-						((i + 1) > 36) &&
-						(equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) - 3)) != null
-					) {
-						invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) - 3).getId().toLowerCase());
-					} else {
-						invFramesMap.put(i + 1, "empty");
+					if (equippedArmor != null && (i + 1 - equippedWardrobeSlot) % 9 == 0) {
+						if (equippedWardrobeSlot <= 9 && (i + 1 <= 36) && equippedArmor.get((i + 1 - equippedWardrobeSlot) / 9) != null) {
+							id = equippedArmor.get((i + 1 - equippedWardrobeSlot) / 9).getId();
+						} else if (
+							equippedWardrobeSlot > 9 && (i + 1 > 36) && equippedArmor.get((i + 1 - equippedWardrobeSlot) / 9 - 3) != null
+						) {
+							id = equippedArmor.get((i + 1 - equippedWardrobeSlot) / 9 - 3).getId();
+						}
 					}
+
+					itemsMap.put(i + 1, id);
 				}
 
-				if (invFramesMap.size() % 36 != 0) {
-					int toAdd = 36 - (invFramesMap.size() % 36);
-					int initialSize = invFramesMap.size();
+				if (itemsMap.size() % 36 != 0) {
+					int toAdd = 36 - (itemsMap.size() % 36);
+					int initialSize = itemsMap.size();
 					for (int i = 0; i < toAdd; i++) {
-						invFramesMap.put(initialSize + 1 + i, "blank");
+						itemsMap.put(initialSize + 1 + i, "BLANK");
 					}
 				}
 
-				StringBuilder outputStringPart1 = new StringBuilder();
-				StringBuilder outputStringPart2 = new StringBuilder();
-				List<String[]> enderChestPages = new ArrayList<>();
-				StringBuilder curNine = new StringBuilder();
+				List<String[]> pages = new ArrayList<>();
 				int page = 0;
-				for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
-					if ((i.getKey() - page) <= 18) {
-						curNine.append(itemToEmoji(i.getValue()));
-						if (i.getKey() % 9 == 0) {
-							outputStringPart1.append(curNine).append("\n");
-							curNine = new StringBuilder();
+				StringBuilder pageTop = new StringBuilder();
+				StringBuilder pageBottom = new StringBuilder();
+				StringBuilder row = new StringBuilder();
+				for (Map.Entry<Integer, String> i : itemsMap.entrySet()) {
+					row.append(itemToEmoji(i.getValue()));
+
+					if (i.getKey() % 9 == 0) {
+						if (i.getKey() - page <= 18) {
+							pageTop.append(row).append("\n");
+						} else {
+							pageBottom.append(row).append("\n");
 						}
-					} else {
-						curNine.append(itemToEmoji(i.getValue()));
-						if (i.getKey() % 9 == 0) {
-							outputStringPart2.append(curNine).append("\n");
-							curNine = new StringBuilder();
-						}
+						row = new StringBuilder();
 					}
 
 					if (i.getKey() != 0 && i.getKey() % 36 == 0) {
-						enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
-						outputStringPart1 = new StringBuilder();
-						outputStringPart2 = new StringBuilder();
+						pages.add(new String[] { pageTop.toString(), pageBottom.toString() });
+						pageTop = new StringBuilder();
+						pageBottom = new StringBuilder();
 						page += 36;
 					}
 				}
-				return enderChestPages;
+
+				return pages;
 			} catch (Exception ignored) {}
 			return null;
 		}
 
 		public ArmorStruct getArmor() {
 			try {
-				String encodedInventoryContents = higherDepth(profileJson(), "inv_armor.data").getAsString();
-				NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "inv_armor.data").getAsString()).getList("i");
+				Map<Integer, String> itemsMap = new HashMap<>();
 
-				NBTList talismanFrames = decodedInventoryContents.getList("i");
-
-				Map<Integer, String> armorFramesMap = new HashMap<>();
-				for (int i = 0; i < talismanFrames.size(); i++) {
-					NBTCompound displayName = talismanFrames.getCompound(i).getCompound("tag.display");
-					if (displayName != null) {
-						armorFramesMap.put(i, cleanMcCodes(displayName.getString("Name", "Empty")));
-					} else {
-						armorFramesMap.put(i, "Empty");
-					}
+				for (int i = 0; i < items.size(); i++) {
+					itemsMap.put(i, cleanMcCodes(items.getCompound(i).getString("tag.display.Name", "Empty")));
 				}
-				return new ArmorStruct(armorFramesMap.get(3), armorFramesMap.get(2), armorFramesMap.get(1), armorFramesMap.get(0));
-			} catch (Exception e) {
-				return null;
-			}
+
+				return new ArmorStruct(itemsMap.get(3), itemsMap.get(2), itemsMap.get(1), itemsMap.get(0));
+			} catch (Exception ignored) {}
+			return null;
 		}
 
 		public JsonArray getPets() {
@@ -1475,39 +1408,50 @@ public class Player {
 				.values()
 				.stream()
 				.filter(o -> o != null && RARITY_TO_NUMBER_MAP.containsKey(o.getRarity()))
-				.sorted(Comparator.comparingInt(o -> Integer.parseInt(RARITY_TO_NUMBER_MAP.get(o.getRarity()).replace(";", ""))))
+				.sorted(Comparator.comparingInt(o -> -RARITY_TO_NUMBER_MAP.get(o.getRarity())))
 				.collect(Collectors.toCollection(ArrayList::new));
-			// Don't reverse the rarity because we are iterating reverse order
-			Set<String> ignoredTalismans = new HashSet<>();
-			for (int i = accessoryBag.size() - 1; i >= 0; i--) {
-				String accessoryId = accessoryBag.get(i).getId();
 
-				if (ignoredTalismans.contains(accessoryId)) {
-					accessoryBag.remove(i);
+			Set<String> ignoredAccessories = new HashSet<>();
+			boolean countedPartyHat = false;
+			int magicPower = 0;
+
+			// Accessories are sorted from highest to lowest rarity
+			// in case they have children accessories with lower rarities
+			for (InvItem accessory : accessoryBag) {
+				String accessoryId = accessory.getId();
+				if (ignoredAccessories.contains(accessoryId)) {
+					continue;
 				}
 
-				ignoredTalismans.add(accessoryId);
+				ignoredAccessories.add(accessoryId);
 				JsonElement children = higherDepth(getParentsJson(), accessoryId);
 				if (children != null) {
 					for (JsonElement child : children.getAsJsonArray()) {
-						ignoredTalismans.add(child.getAsString());
+						ignoredAccessories.add(child.getAsString());
 					}
 				}
+
+				if (accessoryId.equals("HEGEMONY_ARTIFACT")) {
+					magicPower += rarityToMagicPower.get(accessory.getRarity());
+				} else if (accessoryId.equals("ABICASE")) {
+					JsonElement activeContacts = higherDepth(profileJson(), "nether_island_player_data.abiphone.active_contacts");
+					if (activeContacts != null) {
+						magicPower += activeContacts.getAsJsonArray().size() / 2;
+					}
+				} else if (accessoryId.startsWith("PARTY_HAT")) {
+					if (countedPartyHat) {
+						// Only one party hat counts towards magic power
+						continue;
+					} else {
+						countedPartyHat = true;
+					}
+				}
+
+				magicPower += rarityToMagicPower.get(accessory.getRarity());
 			}
 
-			int magicPower = 0;
-			for (Map.Entry<String, Integer> entry : rarityToMagicPower.entrySet()) {
-				long count = accessoryBag.stream().filter(i -> Objects.equals(i.getRarity(), entry.getKey())).count();
-				long power = count * entry.getValue();
-				magicPower += power;
-			}
-
-			int hegemony = rarityToMagicPower.getOrDefault(
-				accessoryBag.stream().filter(a -> a.getId().equals("HEGEMONY_ARTIFACT")).map(InvItem::getRarity).findFirst().orElse(""),
-				0
-			);
-			if (hegemony != 0) {
-				magicPower += hegemony;
+			if (higherDepth(profileJson(), "rift.access.consumed_prism", false)) {
+				magicPower += 11;
 			}
 
 			return magicPower;

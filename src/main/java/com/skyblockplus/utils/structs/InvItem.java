@@ -95,7 +95,9 @@ public class InvItem {
 
 	public String getFormattedId() {
 		if (id.equals("PET") && getName().contains("] ")) {
-			return getName().split("] ")[1].toUpperCase().replace(" ", "_").replace("_✦", "") + RARITY_TO_NUMBER_MAP.get(getPetRarity());
+			return (
+				getName().split("] ")[1].toUpperCase().replace(" ", "_").replace("_✦", "") + ";" + RARITY_TO_NUMBER_MAP.get(getPetRarity())
+			);
 		} else if (id.equals("ENCHANTED_BOOK")) {
 			return enchantsFormatted.isEmpty() ? id : enchantsFormatted.get(0).toUpperCase();
 		} else if (id.equals("RUNE")) {
@@ -170,7 +172,7 @@ public class InvItem {
 	 */
 	public String getPetRarity() {
 		if (id.equals("PET") && isTierBoosted()) {
-			return NUMBER_TO_RARITY_MAP.get("" + (Integer.parseInt(RARITY_TO_NUMBER_MAP.get(rarity).replace(";", "")) + 1));
+			return NUMBER_TO_RARITY_MAP.get(RARITY_TO_NUMBER_MAP.get(rarity) + 1);
 		}
 		return rarity;
 	}

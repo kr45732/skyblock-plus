@@ -1523,7 +1523,7 @@ public class Constants {
 	public static double CATACOMBS_LEVEL_50_XP;
 	public static double SKILLS_LEVEL_50_XP;
 	public static double SKILLS_LEVEL_60_XP;
-	public static Map<String, String> RARITY_TO_NUMBER_MAP;
+	public static Map<String, Integer> RARITY_TO_NUMBER_MAP;
 	public static List<Integer> CRAFTED_MINIONS_TO_SLOTS;
 	public static List<String> COSMETIC_SKILL_NAMES;
 	public static Map<String, String> SKILLS_EMOJI_MAP;
@@ -1550,7 +1550,7 @@ public class Constants {
 	public static List<String> ESSENCE_ITEM_NAMES;
 	public static List<String> PET_ITEM_NAMES;
 	public static Set<String> ALL_TALISMANS;
-	public static Map<String, String> NUMBER_TO_RARITY_MAP;
+	public static Map<Integer, String> NUMBER_TO_RARITY_MAP;
 	public static List<String> SOULBOUND_ITEMS;
 	public static Map<String, List<String>> CATEGORY_TO_REFORGES;
 
@@ -1573,7 +1573,7 @@ public class Constants {
 			SKILLS_LEVEL_60_XP = higherDepth(CONSTANTS, "SKILLS_LEVEL_60_XP").getAsDouble();
 
 			/* RARITY_TO_NUMBER_MAP */
-			RARITY_TO_NUMBER_MAP = gson.fromJson(higherDepth(CONSTANTS, "RARITY_TO_NUMBER_MAP"), mapStringString);
+			RARITY_TO_NUMBER_MAP = gson.fromJson(higherDepth(CONSTANTS, "RARITY_TO_NUMBER_MAP"), mapStringInteger);
 
 			/* CRAFTED_MINIONS_TO_SLOTS */
 			CRAFTED_MINIONS_TO_SLOTS = gson.fromJson(higherDepth(CONSTANTS, "CRAFTED_MINIONS_TO_SLOTS"), listInteger);
@@ -1677,7 +1677,7 @@ public class Constants {
 
 			/* NUMBER_TO_RARITY_MAP */
 			NUMBER_TO_RARITY_MAP =
-				RARITY_TO_NUMBER_MAP.entrySet().stream().collect(Collectors.toMap(e -> e.getValue().replace(";", ""), Map.Entry::getKey));
+				RARITY_TO_NUMBER_MAP.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
 			/* SOULBOUND_ITEMS */
 			SOULBOUND_ITEMS =

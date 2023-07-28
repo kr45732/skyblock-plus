@@ -65,7 +65,7 @@ public class PetsSlashCommand extends SlashCommand {
 				String rarity = higherDepth(pet, "tier").getAsString();
 
 				petItems.add(
-					getEmoji(petName + RARITY_TO_NUMBER_MAP.get(rarity)) +
+					getEmoji(petName + ";" + RARITY_TO_NUMBER_MAP.get(rarity)) +
 					" " +
 					capitalizeString(rarity) +
 					" [Lvl " +

@@ -121,7 +121,9 @@ public class AuctionsSlashCommand extends SlashCommand {
 					String aucTitle =
 						getEmoji(
 							item.getId().equals("PET")
-								? item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity())
+								? item.getName().split("] ")[1].toUpperCase().replace(" ", "_") +
+								";" +
+								RARITY_TO_NUMBER_MAP.get(item.getRarity())
 								: item.getId()
 						) +
 						" ";

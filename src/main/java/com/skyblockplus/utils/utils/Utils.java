@@ -894,7 +894,8 @@ public class Utils {
 				}
 
 				if (itemName.startsWith("[Lvl")) {
-					itemName = capitalizeString(NUMBER_TO_RARITY_MAP.get(itemId.split(";")[1])) + " " + itemName.split("] ")[1];
+					itemName =
+						capitalizeString(NUMBER_TO_RARITY_MAP.get(Integer.parseInt(itemId.split(";")[1]))) + " " + itemName.split("] ")[1];
 				}
 
 				if (itemName.equals("Enchanted Book")) {
