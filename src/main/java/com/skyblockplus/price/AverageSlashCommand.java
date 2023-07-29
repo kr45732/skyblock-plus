@@ -79,7 +79,7 @@ public class AverageSlashCommand extends SlashCommand {
 				"Average Bin Price",
 				"Cost: " +
 				roundAndFormat(higherDepth(binItemJson, "price").getAsDouble()) +
-				"\nSales: " +
+				"\nSales Per Hour: " +
 				(sales < 1 ? "less than one" : formatNumber(sales)),
 				false
 			);
