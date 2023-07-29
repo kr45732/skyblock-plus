@@ -143,7 +143,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 								failCause = player.getFailCause();
 							}
 
-							return new EventMember(failCause, username, uuid, String.valueOf(curChange), profileName);
+							return new EventMember(failCause, username, uuid, "" + curChange, profileName);
 						},
 						playerRequestExecutor
 					)
@@ -283,7 +283,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				}
 
 				eb.addField("Prizes", ebString.toString(), false);
-				eb.addField("Members Joined", String.valueOf(higherDepth(currentSettings, "membersList").getAsJsonArray().size()), false);
+				eb.addField("Members Joined", "" + higherDepth(currentSettings, "membersList").getAsJsonArray().size(), false);
 
 				return eb;
 			} else {
