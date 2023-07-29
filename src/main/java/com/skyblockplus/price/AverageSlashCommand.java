@@ -109,6 +109,7 @@ public class AverageSlashCommand extends SlashCommand {
 					SetUtils
 						.union(getAverageAuctionJson().keySet(), getAverageBinJson().keySet())
 						.stream()
+						.filter(e -> !e.contains("+"))
 						.map(StringUtils::idToName)
 						.distinct()
 						.collect(Collectors.toCollection(ArrayList::new))

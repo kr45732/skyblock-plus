@@ -23,9 +23,9 @@ import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYea
 import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.Constants.getConstant;
-import static com.skyblockplus.utils.utils.HttpUtils.getJson;
-import static com.skyblockplus.utils.utils.HttpUtils.getJsonObject;
+import static com.skyblockplus.utils.utils.HttpUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.nameToId;
+import static com.skyblockplus.utils.utils.Utils.executor;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -127,11 +127,18 @@ public class JsonUtils {
 			if (!currentMayor.equals("Derpy")) {
 				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).getEpochSecond());
 			}
-			averagePriceJson = getJsonObject(uriBuilder.toString());
 
-			if (averagePriceJson == null) {
-				averagePriceJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
-			}
+			asyncGetJson(uriBuilder.toString())
+				.thenAcceptAsync(
+					e -> {
+						try {
+							averagePriceJson = e.getAsJsonObject();
+						} catch (Exception ex) {
+							averagePriceJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
+						}
+					},
+					executor
+				);
 		}
 
 		return averagePriceJson;
@@ -146,11 +153,18 @@ public class JsonUtils {
 			if (!currentMayor.equals("Derpy")) {
 				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).getEpochSecond());
 			}
-			averageAuctionJson = getJsonObject(uriBuilder.toString());
 
-			if (averageAuctionJson == null) {
-				averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
-			}
+			asyncGetJson(uriBuilder.toString())
+				.thenAcceptAsync(
+					e -> {
+						try {
+							averageAuctionJson = e.getAsJsonObject();
+						} catch (Exception ex) {
+							averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
+						}
+					},
+					executor
+				);
 		}
 
 		return averageAuctionJson;
@@ -167,9 +181,17 @@ public class JsonUtils {
 			}
 			averageBinJson = getJsonObject(uriBuilder.toString());
 
-			if (averageBinJson == null) {
-				averageBinJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
-			}
+			asyncGetJson(uriBuilder.toString())
+				.thenAcceptAsync(
+					e -> {
+						try {
+							averageBinJson = e.getAsJsonObject();
+						} catch (Exception ex) {
+							averageBinJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
+						}
+					},
+					executor
+				);
 		}
 
 		return averageBinJson;
