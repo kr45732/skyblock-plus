@@ -101,24 +101,26 @@ public class AttributesSlashCommand extends SlashCommand {
 
 		JsonElement aucItemJson = higherDepth(averageAuctionJson, formattedId);
 		if (aucItemJson != null) {
+			int sales = higherDepth(aucItemJson, "sales").getAsInt();
 			eb.addField(
 				"Average Auction Price",
 				"Cost: " +
 				roundAndFormat(higherDepth(aucItemJson, "price").getAsDouble()) +
-				"\nSales: " +
-				formatNumber(higherDepth(aucItemJson, "sales").getAsInt()),
+				"\nSales Per Hour: " +
+				(sales < 1 ? "less than one" : formatNumber(sales)),
 				false
 			);
 		}
 
 		JsonElement avgBinItemJson = higherDepth(averageBinJson, formattedId);
 		if (avgBinItemJson != null) {
+			int sales = higherDepth(avgBinItemJson, "sales").getAsInt();
 			eb.addField(
 				"Average Bin Price",
 				"Cost: " +
 				roundAndFormat(higherDepth(avgBinItemJson, "price").getAsDouble()) +
-				"\nSales: " +
-				formatNumber(higherDepth(avgBinItemJson, "sales").getAsInt()),
+				"\nSales Per Hour: " +
+				(sales < 1 ? "less than one" : formatNumber(sales)),
 				false
 			);
 		}

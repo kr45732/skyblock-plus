@@ -123,10 +123,9 @@ public class JsonUtils {
 			// Other requests will use the old json while the new json is being fetched (since it takes a few seconds)
 			averagePriceJsonLastUpdated = Instant.now();
 
-			URIBuilder uriBuilder = getQueryApiUrl("average");
-			uriBuilder.addParameter("center", "modified_median");
+			URIBuilder uriBuilder = getQueryApiUrl("average").addParameter("center", "modified_median").addParameter("step", "60");
 			if (!currentMayor.equals("Derpy")) {
-				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli()).addParameter("step", "60");
+				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).getEpochSecond());
 			}
 			averagePriceJson = getJsonObject(uriBuilder.toString());
 
@@ -143,10 +142,9 @@ public class JsonUtils {
 			// Other requests will use the old json while the new json is being fetched (since it takes a few seconds)
 			averageAuctionJsonLastUpdated = Instant.now();
 
-			URIBuilder uriBuilder = getQueryApiUrl("average_auction");
-			uriBuilder.addParameter("center", "modified_median");
+			URIBuilder uriBuilder = getQueryApiUrl("average_auction").addParameter("center", "modified_median").addParameter("step", "60");
 			if (!currentMayor.equals("Derpy")) {
-				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli()).addParameter("step", "60");
+				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).getEpochSecond());
 			}
 			averageAuctionJson = getJsonObject(uriBuilder.toString());
 
@@ -163,10 +161,9 @@ public class JsonUtils {
 			// Other requests will use the old json while the new json is being fetched (since it takes a few seconds)
 			averageBinJsonLastUpdated = Instant.now();
 
-			URIBuilder uriBuilder = getQueryApiUrl("average_bin");
-			uriBuilder.addParameter("center", "modified_median");
+			URIBuilder uriBuilder = getQueryApiUrl("average_bin").addParameter("center", "modified_median").addParameter("step", "60");
 			if (!currentMayor.equals("Derpy")) {
-				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).toEpochMilli()).addParameter("step", "60");
+				uriBuilder.addParameter("time", "" + Instant.now().minus(4, ChronoUnit.DAYS).getEpochSecond());
 			}
 			averageBinJson = getJsonObject(uriBuilder.toString());
 

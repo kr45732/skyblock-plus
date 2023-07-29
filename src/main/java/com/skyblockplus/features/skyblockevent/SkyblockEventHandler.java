@@ -93,7 +93,7 @@ public class SkyblockEventHandler {
 			case TYPE_GENERIC -> {
 				String selectedType = event.getSelectedOptions().get(0).getValue();
 				switch (selectedType) {
-					case "catacombs", "slayer" -> {
+					case "catacombs" -> {
 						selectMenuState = SelectMenuState.CONFIG_GENERIC;
 						eventSettings.setEventType(selectedType);
 						eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
@@ -121,6 +121,24 @@ public class SkyblockEventHandler {
 							)
 							.queue();
 					}
+					case "slayer" -> {
+						selectMenuState = SelectMenuState.TYPE_SLAYER;
+						List<SelectOption> slayerOptions = SLAYER_NAMES
+							.stream()
+							.map(name -> SelectOption.of(capitalizeString(name), name))
+							.collect(Collectors.toCollection(ArrayList::new));
+						event
+							.editMessageEmbeds(eb.setDescription("Use the menu below to choose the slayers that should be tracked").build())
+							.setActionRow(
+								StringSelectMenu
+									.create("skyblock_event_" + selectMenuState)
+									.addOption("All", "all")
+									.addOptions(slayerOptions)
+									.setMaxValues(slayerOptions.size())
+									.build()
+							)
+							.queue();
+					}
 					case "skills" -> {
 						selectMenuState = SelectMenuState.TYPE_SKILLS;
 						List<SelectOption> skillsOptions = SKILL_NAMES
@@ -128,9 +146,7 @@ public class SkyblockEventHandler {
 							.map(name -> SelectOption.of(capitalizeString(name), name))
 							.collect(Collectors.toCollection(ArrayList::new));
 						event
-							.editMessageEmbeds(
-								eb.setDescription("Use the menu below to choose the skill types that should be tracked").build()
-							)
+							.editMessageEmbeds(eb.setDescription("Use the menu below to choose the skills that should be tracked").build())
 							.setActionRow(
 								StringSelectMenu
 									.create("skyblock_event_" + selectMenuState)
@@ -161,6 +177,16 @@ public class SkyblockEventHandler {
 					weightTypes.add("catacombs");
 				}
 				eventSettings.setEventType("weight." + String.join("-", weightTypes));
+				eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
+				event.editMessage(getGenericConfigMessage()).queue();
+			}
+			case TYPE_SLAYER -> {
+				selectMenuState = SelectMenuState.CONFIG_GENERIC;
+				Set<String> slayerTypes = event.getSelectedOptions().stream().map(SelectOption::getValue).collect(Collectors.toSet());
+				if (slayerTypes.remove("all")) { // Returns true if set contains 'all'
+					slayerTypes.addAll(SLAYER_NAMES);
+				}
+				eventSettings.setEventType("slayer." + String.join("-", slayerTypes));
 				eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 				event.editMessage(getGenericConfigMessage()).queue();
 			}
@@ -586,6 +612,7 @@ public class SkyblockEventHandler {
 	private enum SelectMenuState {
 		TYPE_GENERIC,
 		TYPE_WEIGHT,
+		TYPE_SLAYER,
 		TYPE_SKILLS,
 		CONFIG_GENERIC,
 	}

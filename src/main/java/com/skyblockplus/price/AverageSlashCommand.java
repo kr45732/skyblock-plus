@@ -61,24 +61,26 @@ public class AverageSlashCommand extends SlashCommand {
 
 		JsonElement aucItemJson = higherDepth(averageAuctionJson, itemId);
 		if (aucItemJson != null) {
+			int sales = higherDepth(aucItemJson, "sales").getAsInt();
 			eb.addField(
 				"Average Auction Price",
 				"Cost: " +
 				roundAndFormat(higherDepth(aucItemJson, "price").getAsDouble()) +
-				"\nSales: " +
-				formatNumber(higherDepth(aucItemJson, "sales").getAsInt()),
+				"\nSales Per Hour: " +
+				(sales < 1 ? "less than one" : formatNumber(sales)),
 				false
 			);
 		}
 
 		JsonElement binItemJson = higherDepth(averageBinJson, itemId);
 		if (binItemJson != null) {
+			int sales = higherDepth(binItemJson, "sales").getAsInt();
 			eb.addField(
 				"Average Bin Price",
 				"Cost: " +
 				roundAndFormat(higherDepth(binItemJson, "price").getAsDouble()) +
 				"\nSales: " +
-				formatNumber(higherDepth(binItemJson, "sales").getAsInt()),
+				(sales < 1 ? "less than one" : formatNumber(sales)),
 				false
 			);
 		}
