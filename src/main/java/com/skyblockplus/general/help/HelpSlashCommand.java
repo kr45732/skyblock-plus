@@ -170,11 +170,11 @@ public class HelpSlashCommand extends SlashCommand {
 							"top [player] [guild] [gamemode] [key]"
 						),
 						new HelpData(
-							"ranks",
+							"check",
 							"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" +
 							DISCORD_SERVER_INVITE_LINK +
 							") to set this up for your guild. Set key to true to force use this server's Hypixel API key for more accurate results.",
-							"ranks <player> [gamemode] [key]"
+							"check <player> [gamemode] [key]"
 						)
 					)
 					.setCategory("guild"),
@@ -778,7 +778,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("guild leaderboard <type> [player] [guild] [mode] [key]", "Get a leaderboard for a player's guild") +
 			create("guild kicker <requirements> [player] [gamemode] [key]", "Get all player's who don't meet the provided requirements") +
 			create(
-				"guild ranks [player] [gamemode] [key]",
+				"guild check [player] [gamemode] [key]",
 				"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild"
 			) +
 			create(

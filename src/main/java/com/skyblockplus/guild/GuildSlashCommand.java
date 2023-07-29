@@ -758,10 +758,10 @@ public class GuildSlashCommand extends SlashCommand {
 		}
 	}
 
-	public static class RanksSubcommand extends Subcommand {
+	public static class CheckSubcommand extends Subcommand {
 
-		public RanksSubcommand() {
-			this.name = "ranks";
+		public CheckSubcommand() {
+			this.name = "check";
 			this.cooldown = GLOBAL_COOLDOWN + 2;
 		}
 
