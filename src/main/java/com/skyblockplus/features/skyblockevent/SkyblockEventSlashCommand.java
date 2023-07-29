@@ -434,7 +434,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 						int code = database.addMemberToSkyblockEvent(
 							guildId,
-							new EventMember(player.getUsername(), player.getUuid(), String.valueOf(startingAmount), player.getProfileName())
+							new EventMember(player.getUsername(), player.getUuid(), "" + startingAmount, player.getProfileName())
 						);
 
 						if (code == 200) {
