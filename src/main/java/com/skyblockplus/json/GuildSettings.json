@@ -541,21 +541,21 @@
         "requirements": [
           [
             {
-              "amount": 180,
+              "amount": 220,
               "type": "level"
             },
             {
-              "amount": 1000000000,
+              "amount": 2000000000,
               "type": "networth"
             }
           ],
           [
             {
-              "amount": 180,
+              "amount": 220,
               "type": "level"
             },
             {
-              "amount": 28,
+              "amount": 30,
               "type": "catacombs",
               "convert_from_level": true
             }
@@ -570,17 +570,17 @@
           "requirements": [
             [
               {
-                "amount": 220,
+                "amount": 260,
                 "type": "level"
               },
               {
-                "amount": 4000000000,
+                "amount": 5000000000,
                 "type": "networth"
               }
             ],
             [
               {
-                "amount": 220,
+                "amount": 260,
                 "type": "level"
               },
               {
@@ -598,17 +598,17 @@
           "requirements": [
             [
               {
-                "amount": 280,
+                "amount": 320,
                 "type": "level"
               },
               {
-                "amount": 10000000000,
+                "amount": 15000000000,
                 "type": "networth"
               }
             ],
             [
               {
-                "amount": 280,
+                "amount": 320,
                 "type": "level"
               },
               {
