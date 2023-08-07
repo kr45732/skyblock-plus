@@ -32,7 +32,7 @@ public class LilySlayerWeight extends SlayerWeight {
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName) {
-		return getSlayerWeight(slayerName, player.getSlayer(slayerName));
+		return getSlayerWeight(slayerName, player.getSlayerXp(slayerName));
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName, int currentSlayerXp) {

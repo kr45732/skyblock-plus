@@ -19,6 +19,7 @@
 package com.skyblockplus.miscellaneous.weight;
 
 import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.utils.HypixelUtils.slayerLevelFromXp;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
@@ -113,7 +114,7 @@ public class CalcWeightSlashCommand extends SlashCommand {
 					false
 				);
 		} else if (SLAYER_NAMES.contains(type)) {
-			int curXp = player.getSlayer(type);
+			int curXp = player.getSlayerXp(type);
 			pre = weight.getSlayerWeight().getSlayerWeight(type);
 			post = predictedWeight.getSlayerWeight().getSlayerWeight(type, amount);
 
@@ -122,7 +123,7 @@ public class CalcWeightSlashCommand extends SlashCommand {
 				.addField(
 					"Target",
 					"Level: " +
-					player.getSlayerLevel(type, amount) +
+					slayerLevelFromXp(type, amount) +
 					"\nXP: " +
 					formatNumber(amount) +
 					" (+" +
@@ -132,7 +133,7 @@ public class CalcWeightSlashCommand extends SlashCommand {
 				)
 				.addField(
 					"Total Slayer XP Change",
-					roundAndFormat(player.getTotalSlayer()) + " ➜ " + roundAndFormat(player.getTotalSlayer(type, amount)),
+					roundAndFormat(player.getTotalSlayerXp()) + " ➜ " + roundAndFormat(player.getTotalSlayerXp(type, amount)),
 					false
 				);
 		} else {

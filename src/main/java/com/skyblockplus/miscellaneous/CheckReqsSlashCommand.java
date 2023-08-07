@@ -69,7 +69,7 @@ public class CheckReqsSlashCommand extends SlashCommand {
 
 				for (Map.Entry<String, String> reqEntry : applyReq.getRequirements().entrySet()) {
 					long playerAmount = (long) switch (reqEntry.getKey()) {
-						case "slayer" -> player.getTotalSlayer();
+						case "slayer" -> player.getTotalSlayerXp();
 						case "skills" -> player.getSkillAverage();
 						case "catacombs" -> player.getCatacombs().getProgressLevel();
 						case "weight" -> player.getWeight();

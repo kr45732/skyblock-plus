@@ -273,7 +273,7 @@ public class ApplyUser {
 
 				for (Map.Entry<String, JsonElement> reqEntry : higherDepth(req, "requirements").getAsJsonObject().entrySet()) {
 					long playerAmount = (long) switch (reqEntry.getKey()) {
-						case "slayer" -> player.getTotalSlayer();
+						case "slayer" -> player.getTotalSlayerXp();
 						case "skills" -> player.getSkillAverage();
 						case "catacombs" -> player.getCatacombs().getProgressLevel();
 						case "weight" -> player.getWeight();
@@ -303,7 +303,7 @@ public class ApplyUser {
 				EmbedBuilder eb = defaultEmbed("Does not meet requirements")
 					.setDescription(
 						"**Your statistics:**\n• Slayer - " +
-						formatNumber(player.getTotalSlayer()) +
+						formatNumber(player.getTotalSlayerXp()) +
 						" | Skill Average - " +
 						(player.isSkillsApiEnabled() ? roundAndFormat((long) player.getSkillAverage()) : "API disabled") +
 						" | Catacombs - " +
@@ -342,7 +342,7 @@ public class ApplyUser {
 		}
 
 		try {
-			playerSlayer = formatNumber(player.getTotalSlayer());
+			playerSlayer = formatNumber(player.getTotalSlayerXp());
 		} catch (Exception e) {
 			playerSlayer = "0";
 		}

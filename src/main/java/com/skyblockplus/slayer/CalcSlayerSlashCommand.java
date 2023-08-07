@@ -63,7 +63,7 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
-			int curXp = player.getSlayer(slayerType);
+			int curXp = player.getSlayerXp(slayerType);
 			targetXp =
 				targetLevel != -1
 					? higherDepth(getLevelingJson(), "slayer_xp." + slayerType + ".[" + (targetLevel - 1) + "]").getAsLong()

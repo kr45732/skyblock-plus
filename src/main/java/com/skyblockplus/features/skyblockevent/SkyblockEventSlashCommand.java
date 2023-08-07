@@ -99,7 +99,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 								double startingAmount = higherDepth(eventMember, "startingAmount").getAsDouble();
 								curChange =
 									switch (eventType) {
-										case "catacombs" -> player.getCatacombs().totalExp() - startingAmount;
+										case "catacombs" -> player.getCatacombsXp() - startingAmount;
 										default -> {
 											if (eventType.startsWith("collection.")) {
 												if (player.isCollectionsApiEnabled()) {
@@ -111,7 +111,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 												double slayerXp = 0;
 												String[] slayerTypes = eventType.split("slayer.")[1].split("-");
 												for (String slayerType : slayerTypes) {
-													slayerXp += player.getSlayer(slayerType);
+													slayerXp += player.getSlayerXp(slayerType);
 												}
 												yield slayerXp - startingAmount;
 											} else if (eventType.startsWith("skills.")) {
@@ -378,7 +378,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 						}
 
 						if (eventType.equals("catacombs")) {
-							startingAmount = player.getCatacombs().totalExp();
+							startingAmount = player.getCatacombsXp();
 							startingAmountFormatted = formatNumber(startingAmount) + " total catacombs xp";
 						} else if (eventType.startsWith("collection.")) {
 							startingAmount =
@@ -389,7 +389,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 						} else if (eventType.startsWith("slayer.")) {
 							String[] slayerTypes = eventType.split("slayer.")[1].split("-");
 							for (String slayerType : slayerTypes) {
-								startingAmount += player.getSlayer(slayerType);
+								startingAmount += player.getSlayerXp(slayerType);
 							}
 							startingAmountFormatted = formatNumber(startingAmount) + " " + getEventTypeFormatted(eventType);
 						} else if (eventType.startsWith("skills.")) {

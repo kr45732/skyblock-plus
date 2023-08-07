@@ -181,7 +181,7 @@ public class SlayerSlashCommand extends SlashCommand {
 
 		eb.setDescription(
 			"**Total Slayer:** " +
-			formatNumber(player.getTotalSlayer()) +
+			formatNumber(player.getTotalSlayerXp()) +
 			" XP\n**Total Coins Spent:** " +
 			simplifyNumber(coinsSpentOnSlayers) +
 			"\n**Total Motes Spent:** " +
@@ -189,17 +189,17 @@ public class SlayerSlashCommand extends SlashCommand {
 		);
 		eb.addField(
 			SLAYER_EMOJI_MAP.get("wolf") + " Wolf (" + player.getSlayerLevel("wolf") + ")",
-			simplifyNumber(player.getSlayer("wolf")) + " XP",
+			simplifyNumber(player.getSlayerXp("wolf")) + " XP",
 			true
 		);
 		eb.addField(
 			SLAYER_EMOJI_MAP.get("zombie") + " Zombie (" + player.getSlayerLevel("zombie") + ")",
-			simplifyNumber(player.getSlayer("zombie")) + " XP",
+			simplifyNumber(player.getSlayerXp("zombie")) + " XP",
 			true
 		);
 		eb.addField(
 			SLAYER_EMOJI_MAP.get("spider") + " Spider (" + player.getSlayerLevel("spider") + ")",
-			simplifyNumber(player.getSlayer("spider")) + " XP",
+			simplifyNumber(player.getSlayerXp("spider")) + " XP",
 			true
 		);
 
@@ -209,17 +209,17 @@ public class SlayerSlashCommand extends SlashCommand {
 
 		eb.addField(
 			SLAYER_EMOJI_MAP.get("enderman") + " Enderman (" + player.getSlayerLevel("enderman") + ")",
-			simplifyNumber(player.getSlayer("enderman")) + " XP",
+			simplifyNumber(player.getSlayerXp("enderman")) + " XP",
 			true
 		);
 		eb.addField(
 			SLAYER_EMOJI_MAP.get("blaze") + " Blaze (" + player.getSlayerLevel("blaze") + ")",
-			simplifyNumber(player.getSlayer("blaze")) + " XP",
+			simplifyNumber(player.getSlayerXp("blaze")) + " XP",
 			true
 		);
 		eb.addField(
 			SLAYER_EMOJI_MAP.get("vampire") + " Vampire (" + player.getSlayerLevel("vampire") + ")",
-			simplifyNumber(player.getSlayer("vampire")) + " XP",
+			simplifyNumber(player.getSlayerXp("vampire")) + " XP",
 			true
 		);
 		eb.addField("Boss Kills", endermanKills, true);

@@ -56,7 +56,6 @@ public class SkyblockProfilesParser {
 		"daily_runs",
 		"treasures"
 	);
-	private static final List<String> IGNORED_SB_PROFILE_LB = List.of("bestiary");
 
 	/**
 	 * Tries to begin reading a JSON array or JSON object, returning {@code null} if

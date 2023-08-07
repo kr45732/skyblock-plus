@@ -59,7 +59,7 @@ public class SkyblockSlashCommand extends SlashCommand {
 
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 			eb.addField(getEmoji("SAPLING") + " Skill Average", roundAndFormat(player.getSkillAverage()), true);
-			eb.addField(getEmoji("OVERFLUX_CAPACITOR") + " Total Slayer XP", formatNumber(player.getTotalSlayer()), true);
+			eb.addField(getEmoji("OVERFLUX_CAPACITOR") + " Total Slayer XP", formatNumber(player.getTotalSlayerXp()), true);
 			eb.addField(DUNGEON_EMOJI_MAP.get("catacombs") + " Catacombs", roundAndFormat(player.getCatacombs().getProgressLevel()), true);
 			eb.addField(getEmoji("TRAINING_WEIGHTS") + " Senither Weight", weight.getTotalWeight().getFormatted(), true);
 			eb.addField("\uD83C\uDFC5 Senither Stage", weight.getStage(), true);

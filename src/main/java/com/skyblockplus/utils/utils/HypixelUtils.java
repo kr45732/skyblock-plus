@@ -92,6 +92,19 @@ public class HypixelUtils {
 		return vanillaItems.contains(id);
 	}
 
+	public static int slayerLevelFromXp(String slayerName, int xp) {
+		JsonArray levelArray = higherDepth(getLevelingJson(), "slayer_xp." + slayerName).getAsJsonArray();
+		int level = 0;
+		for (int i = 0; i < levelArray.size(); i++) {
+			if (xp >= levelArray.get(i).getAsInt()) {
+				level = i + 1;
+			} else {
+				break;
+			}
+		}
+		return level;
+	}
+
 	public static SkillsStruct levelingInfoFromExp(long exp, String name) {
 		return levelingInfoFromExp(
 			exp,

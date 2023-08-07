@@ -31,6 +31,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.miscellaneous.LevelSlashCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
+import com.skyblockplus.miscellaneous.weight.cole.ColeWeight;
 import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
 import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
 import com.skyblockplus.skills.CrimsonSlashCommand;
@@ -115,7 +116,6 @@ public class Player {
 			populateProfiles(response.response());
 
 			if (findProfileByName(profileName)) {
-				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : failCause;
 				return;
 			}
 		} catch (Exception e) {
@@ -172,7 +172,6 @@ public class Player {
 			populateProfiles(profileArray);
 
 			if (findProfileByName(profileName)) {
-				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : failCause;
 				return;
 			}
 		} catch (Exception e) {
@@ -243,14 +242,16 @@ public class Player {
 	 * @return true if invalid
 	 */
 	private boolean findProfileByName(String profileName) {
-		try {
-			for (Profile profile : profiles) {
-				if (profile.getProfileName().equalsIgnoreCase(profileName)) {
-					this.selectedProfileIndex = profile.getProfileIndex();
-					return false;
-				}
+		for (Profile profile : profiles) {
+			if (profile.getProfileName().equalsIgnoreCase(profileName)) {
+				this.selectedProfileIndex = profile.getProfileIndex();
+				return false;
 			}
-		} catch (Exception ignored) {}
+		}
+
+		if (failCause.equals("Unknown fail cause")) {
+			failCause = "Invalid profile name";
+		}
 		return true;
 	}
 
@@ -258,14 +259,16 @@ public class Player {
 	 * @return true if invalid
 	 */
 	private boolean findProfileBySelected() {
-		try {
-			for (Profile profile : profiles) {
-				if (higherDepth(profile.getOuterProfileJson(), "selected", false)) {
-					this.selectedProfileIndex = profile.getProfileIndex();
-					return false;
-				}
+		for (Profile profile : profiles) {
+			if (higherDepth(profile.getOuterProfileJson(), "selected", false)) {
+				this.selectedProfileIndex = profile.getProfileIndex();
+				return false;
 			}
-		} catch (Exception ignored) {}
+		}
+
+		if (failCause.equals("Unknown fail cause")) {
+			failCause = "No profile selected";
+		}
 		return true;
 	}
 
@@ -483,14 +486,14 @@ public class Player {
 					String selectedClass = profile.getSelectedDungeonClass();
 					yield selectedClass.equals("none") ? -1 : DUNGEON_CLASS_NAMES.indexOf(selectedClass);
 				}
-				case "slayer", "total_slayer" -> profile.getTotalSlayer();
+				case "slayer", "total_slayer" -> profile.getTotalSlayerXp();
 				case "skills" -> profile.getSkillAverage();
 				case "skills_xp" -> profile.getTotalSkillsXp();
 				case "catacombs" -> profile.getCatacombs().getProgressLevel();
-				case "catacombs_xp" -> profile.getCatacombs().totalExp();
+				case "catacombs_xp" -> profile.getCatacombsXp();
 				case "healer", "mage", "berserk", "archer", "tank" -> profile.getDungeonClass(type).getProgressLevel();
 				case "weight" -> profile.getWeight();
-				case "wolf", "zombie", "spider", "enderman", "blaze", "vampire" -> profile.getSlayer(type);
+				case "wolf", "zombie", "spider", "enderman", "blaze", "vampire" -> profile.getSlayerXp(type);
 				case "alchemy", "combat", "fishing", "farming", "foraging", "carpentry", "mining", "taming", "enchanting", "social" -> {
 					SkillsStruct skillsStruct = profile.getSkill(type);
 					yield skillsStruct != null ? skillsStruct.getProgressLevel() : -1;
@@ -505,9 +508,7 @@ public class Player {
 					"taming_xp",
 					"enchanting_xp",
 					"social_xp" -> profile.getSkillXp(type.split("_xp")[0]);
-				case "healer_xp", "mage_xp", "berserk_xp", "archer_xp", "tank_xp" -> profile
-					.getDungeonClass(type.split("_xp")[0])
-					.totalExp();
+				case "healer_xp", "mage_xp", "berserk_xp", "archer_xp", "tank_xp" -> profile.getDungeonClassXp(type.split("_xp")[0]);
 				case "hotm" -> profile.getHOTM() != null ? profile.getHOTM().totalExp() : -1;
 				case "bank" -> profile.getBankBalance();
 				case "purse" -> profile.getPurseCoins();
@@ -525,6 +526,7 @@ public class Player {
 				case "barbarian_reputation" -> profile.getBarbarianRep();
 				case "lily_weight" -> profile.getLilyWeight();
 				case "lily_slayer_weight" -> new LilyWeight(profile, true).getSlayerWeight().getWeightStruct().getRaw();
+				case "cole_weight" -> profile.getColeWeight();
 				case "level" -> profile.getLevel();
 				default -> {
 					if (collectionNameToId.containsKey(type)) {
@@ -607,12 +609,8 @@ public class Player {
 			return maxLevel;
 		}
 
-		public double getSkillXp(String skillName) {
-			try {
-				return skillName.equals("catacombs") ? getCatacombs().totalExp() : getSkill(skillName).totalExp();
-			} catch (Exception e) {
-				return -1;
-			}
+		public long getSkillXp(String skillName) {
+			return higherDepth(profileJson(), "experience_skill_" + (skillName.equals("social") ? "social2" : skillName), -1L);
 		}
 
 		public SkillsStruct getSkill(String skillName) {
@@ -620,15 +618,12 @@ public class Player {
 		}
 
 		public SkillsStruct getSkill(String skillName, WeightType weightType) {
-			try {
-				return skillInfoFromExp(
-					higherDepth(profileJson(), "experience_skill_" + (skillName.equals("social") ? "social2" : skillName)).getAsLong(),
-					skillName,
-					weightType
-				);
-			} catch (Exception e) {
+			long skillXp = getSkillXp(skillName);
+			if (skillXp == -1) {
 				return null;
 			}
+
+			return skillInfoFromExp(skillXp, skillName, weightType);
 		}
 
 		public double getSkillAverage() {
@@ -638,9 +633,8 @@ public class Player {
 		public long getTotalSkillsXp() {
 			long totalXp = 0;
 			for (String skill : SKILL_NAMES) {
-				try {
-					totalXp += getSkill(skill).totalExp();
-				} catch (Exception e) {
+				long skillXp = getSkillXp(skill);
+				if (skillXp == -1) {
 					return -1;
 				}
 			}
@@ -673,11 +667,7 @@ public class Player {
 		}
 
 		public SkillsStruct skillInfoFromLevel(int targetLevel, String skill) {
-			return skillInfoFromLevel(targetLevel, skill, WeightType.NONE);
-		}
-
-		public SkillsStruct skillInfoFromLevel(int targetLevel, String skill, WeightType weightType) {
-			return levelingInfoFromLevel(targetLevel, skill, getSkillMaxLevel(skill, weightType));
+			return levelingInfoFromLevel(targetLevel, skill, getSkillMaxLevel(skill, WeightType.NONE));
 		}
 
 		public SkillsStruct getHOTM() {
@@ -686,17 +676,17 @@ public class Player {
 		}
 
 		/* Slayer */
-		public int getTotalSlayer() {
-			return getTotalSlayer("", 0);
+		public int getTotalSlayerXp() {
+			return getTotalSlayerXp("", 0);
 		}
 
-		public int getTotalSlayer(String type, int overrideAmount) {
+		public int getTotalSlayerXp(String type, int overrideAmount) {
 			int totalSlayer = 0;
 			for (String slayerName : SLAYER_NAMES) {
 				if (slayerName.equals(type)) {
 					totalSlayer += overrideAmount;
 				} else {
-					totalSlayer += getSlayer(slayerName);
+					totalSlayer += getSlayerXp(slayerName);
 				}
 			}
 			return totalSlayer;
@@ -706,25 +696,12 @@ public class Player {
 			return higherDepth(profileJson(), "slayer_bosses." + slayerName + ".boss_kills_tier_" + tier, 0);
 		}
 
-		public int getSlayer(String slayerName) {
+		public int getSlayerXp(String slayerName) {
 			return higherDepth(profileJson(), "slayer_bosses." + slayerName + ".xp", 0);
 		}
 
 		public int getSlayerLevel(String slayerName) {
-			return getSlayerLevel(slayerName, getSlayer(slayerName));
-		}
-
-		public int getSlayerLevel(String slayerName, int xp) {
-			JsonArray levelArray = higherDepth(getLevelingJson(), "slayer_xp." + slayerName).getAsJsonArray();
-			int level = 0;
-			for (int i = 0; i < levelArray.size(); i++) {
-				if (xp >= levelArray.get(i).getAsInt()) {
-					level = i + 1;
-				} else {
-					break;
-				}
-			}
-			return level;
+			return slayerLevelFromXp(slayerName, getSlayerXp(slayerName));
 		}
 
 		/* Dungeons */
@@ -757,8 +734,8 @@ public class Player {
 			if (storageMap != null) {
 				itemsMap.addAll(new ArrayList<>(getStorageMap().values()));
 			}
-			Set<String> itemsPlayerHas = new HashSet<>();
 
+			Set<String> itemsPlayerHas = new HashSet<>();
 			for (InvItem item : itemsMap) {
 				if (item != null) {
 					if (!item.getBackpackItems().isEmpty()) {
@@ -767,10 +744,8 @@ public class Player {
 								itemsPlayerHas.add(backpackItem.getId());
 							}
 						}
-					} else {
-						if (items.contains(item.getId())) {
-							itemsPlayerHas.add(item.getId());
-						}
+					} else if (items.contains(item.getId())) {
+						itemsPlayerHas.add(item.getId());
 					}
 				}
 			}
@@ -778,12 +753,20 @@ public class Player {
 			return itemsPlayerHas;
 		}
 
+		public long getDungeonClassXp(String className) {
+			return higherDepth(profileJson(), "dungeons.player_classes." + className + ".experience", 0L);
+		}
+
 		public SkillsStruct getDungeonClass(String className) {
-			return skillInfoFromExp(higherDepth(profileJson(), "dungeons.player_classes." + className + ".experience", 0L), className);
+			return skillInfoFromExp(getDungeonClassXp(className), className);
+		}
+
+		public long getCatacombsXp() {
+			return higherDepth(profileJson(), "dungeons.dungeon_types.catacombs.experience", 0L);
 		}
 
 		public SkillsStruct getCatacombs() {
-			return skillInfoFromExp(higherDepth(profileJson(), "dungeons.dungeon_types.catacombs.experience", 0L), "catacombs");
+			return skillInfoFromExp(getCatacombsXp(), "catacombs");
 		}
 
 		/* InvItem maps */
@@ -1457,6 +1440,10 @@ public class Player {
 			return magicPower;
 		}
 
+		public double getColeWeight() {
+			return new ColeWeight(this).getTotalWeight();
+		}
+
 		public double getLilyWeight() {
 			return new LilyWeight(this, true).getTotalWeight().getRaw();
 		}
@@ -1584,12 +1571,12 @@ public class Player {
 		}
 
 		public int getNumMaxedSlayers() {
-			int numMaxedSlayers = getSlayer("wolf") >= 1000000 ? 1 : 0;
-			numMaxedSlayers += getSlayer("zombie") >= 1000000 ? 1 : 0;
-			numMaxedSlayers += getSlayer("spider") >= 1000000 ? 1 : 0;
-			numMaxedSlayers += getSlayer("enderman") >= 1000000 ? 1 : 0;
-			numMaxedSlayers += getSlayer("blaze") >= 1000000 ? 1 : 0;
-			numMaxedSlayers += getSlayer("vampire") >= 2400 ? 1 : 0;
+			int numMaxedSlayers = getSlayerXp("wolf") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayerXp("zombie") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayerXp("spider") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayerXp("enderman") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayerXp("blaze") >= 1000000 ? 1 : 0;
+			numMaxedSlayers += getSlayerXp("vampire") >= 2400 ? 1 : 0;
 			return numMaxedSlayers;
 		}
 

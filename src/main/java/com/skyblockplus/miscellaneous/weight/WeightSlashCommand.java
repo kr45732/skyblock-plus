@@ -20,7 +20,10 @@ package com.skyblockplus.miscellaneous.weight;
 
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
+import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
+import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
+import com.skyblockplus.miscellaneous.weight.cole.ColeWeight;
 import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
 import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
 import com.skyblockplus.utils.Player;
@@ -144,6 +147,31 @@ public class WeightSlashCommand extends SlashCommand {
 				"**Total Weight:** " + lilyWeight.getTotalWeight().getFormatted() + "\n**Stage:** " + lilyWeight.getStage()
 			);
 			extras.addEmbedPage(lilyEb);
+
+			ColeWeight coleWeight = new ColeWeight(player);
+			EmbedBuilder coleEb = player
+				.defaultPlayerEmbed(" | Cole Weight")
+				.setDescription(
+					"**Total Weight:** " +
+					roundAndFormat(coleWeight.getTotalWeight()) +
+					"\n\n" +
+					SKILLS_EMOJI_MAP.get("mining") +
+					" Experience Weight: " +
+					roundAndFormat(coleWeight.getExperienceWeight()) +
+					"\n" +
+					getEmoji("MITHRIL_ORE") +
+					" Powder Weight: " +
+					roundAndFormat(coleWeight.getPowderWeight()) +
+					"\n" +
+					getEmoji("COBBLESTONE") +
+					" Collections Weight: " +
+					roundAndFormat(coleWeight.getCollectionsWeight()) +
+					"\n" +
+					getEmoji("JADE_CRYSTAL") +
+					" Miscellaneous Weight: " +
+					roundAndFormat(coleWeight.getMiscellaneousWeight())
+				);
+			extras.addEmbedPage(coleEb);
 
 			event.paginate(paginateBuilder);
 			return null;
