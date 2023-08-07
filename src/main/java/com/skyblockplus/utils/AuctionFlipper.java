@@ -94,11 +94,12 @@ public class AuctionFlipper {
 				.limit(15)
 				.collect(Collectors.toCollection(ArrayList::new))) {
 				String itemId = higherDepth(auction, "id").getAsString();
+				String altItemId = itemId.contains("+") ? itemId.split("\\+")[0] : itemId;
 				if (isVanillaItem(itemId) || itemId.equals("BEDROCK")) {
 					continue;
 				}
 
-				int sales = higherDepth(avgAuctionJson, itemId + ".sales", 0);
+				int sales = higherDepth(avgAuctionJson, altItemId + ".sales", 0);
 				if (sales < 5) {
 					continue;
 				}
@@ -125,7 +126,7 @@ public class AuctionFlipper {
 							.addField("Estimated Profit", roundAndFormat((long) profit), true)
 							.addField("Sales Per Hour", formatNumber(sales), true)
 							.addField("Command", "`/viewauction " + auctionUuid + "`", true)
-							.setThumbnail(getItemThumbnail(itemId))
+							.setThumbnail(getItemThumbnail(altItemId))
 							.build()
 					)
 					.whenComplete((m, e) -> {
