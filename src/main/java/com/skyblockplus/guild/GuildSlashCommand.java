@@ -20,8 +20,8 @@ package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.gamemodeCommandOption;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.typeToNameSubMap;
 import static com.skyblockplus.utils.utils.HypixelUtils.guildExpToLevel;
 import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromLevel;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
@@ -73,7 +73,7 @@ public class GuildSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		} else if (event.getFocusedOption().getName().equals("type")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), formattedTypesSubList);
+			event.replyClosestMatch(event.getFocusedOption().getValue(), typeToNameSubMap.values());
 		}
 	}
 

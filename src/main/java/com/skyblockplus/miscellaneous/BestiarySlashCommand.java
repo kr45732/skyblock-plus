@@ -19,20 +19,19 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
-import static com.skyblockplus.utils.utils.JsonUtils.getLevelingJson;
-import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.HypixelUtils.bestiaryTierFromKills;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SelectMenuPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import com.skyblockplus.utils.structs.SkillsStruct;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -51,73 +50,53 @@ public class BestiarySlashCommand extends SlashCommand {
 	public static EmbedBuilder getBestiary(String username, String profileName, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
+			if (!higherDepth(player.profileJson(), "bestiary.migration", false)) {
+				return errorEmbed(
+					player.getEscapedUsername() +
+					"'s bestiary is not migrated. Make sure this player has logged on after the <t:1690898400:D> Skyblock update"
+				);
+			}
+
 			Map<SelectOption, EmbedBuilder> pages = new LinkedHashMap<>();
 
-			String bestiaryLevel = roundAndFormat(player.getBestiaryLevel());
-			for (Map.Entry<String, List<String>> location : bestiaryLocationToFamilies.entrySet()) {
-				EmbedBuilder eb = player.defaultPlayerEmbed();
-				eb.setDescription("**Bestiary Level:** " + bestiaryLevel + "\n**Location:** " + location.getKey());
-				for (String mob : location.getValue()) {
-					int kills = higherDepth(player.profileJson(), "bestiary.kills_" + mob, 0);
-					String type = "MOB";
-					if (location.getKey().equals("Private Island")) {
-						type = "ISLAND";
-					} else if (bestiaryBosses.contains(mob)) {
-						type = "BOSS";
-					}
-					String mobName = capitalizeString(mob.replace("family_", "").replace("_", " "));
-					mobName =
-						switch (mobName) {
-							case "Enderman Private" -> "Enderman";
-							case "Unburried Zombie" -> "Crypt Ghoul";
-							case "Ruin Wolf" -> "Wolf";
-							case "Arachne Brood" -> "Arachne's Brood";
-							case "Arachne Keeper" -> "Arachne's Keeper";
-							case "Brood Mother Spider" -> "Brood Mother";
-							case "Respawning Skeleton" -> "Gravel Skeleton";
-							case "Random Slime" -> "Rain Slime";
-							case "Corrupted Protector" -> "Endstone Protector";
-							case "Obsidian Wither" -> "Obsidian Defender";
-							case "Zealot Enderman" -> "Zealot";
-							case "Charging Mushroom Cow" -> "Mushroom Bull";
-							case "Caverns Ghost" -> "Ghost";
-							case "Team Treasurite" -> "Grunt";
-							case "Diamond Skeleton" -> "Miner Skeleton";
-							case "Diamond Zombie" -> "Miner Zombie";
-							case "Invisible Creeper" -> "Sneaky Creeper";
-							case "Worms" -> "Worm";
-							case "Batty Witch" -> "Crazy Witch";
-							case "Diamond Guy" -> "Angry Archeologist";
-							case "Sniper Skeleton" -> "Sniper";
-							case "Crypt Tank Zombie" -> "Tank Zombie";
-							case "Watcher Summon Undead" -> "Undead";
-							case "Dungeon Respawning Skeleton" -> "Undead Skeleton";
-							case "Crypt Witherskeleton" -> "Withermancer";
-							default -> mobName;
-						};
-					SkillsStruct level = levelingInfoFromExp(
-						kills,
-						"bestiary." + type,
-						higherDepth(getLevelingJson(), "bestiary.caps." + type).getAsInt()
+			String bestiaryMilestone = roundAndFormat(player.getBestiaryLevel());
+			String bestiaryTier = roundAndFormat(player.getBestiaryTier());
+			for (Map.Entry<String, JsonElement> entry : getBestiaryJson().entrySet()) {
+				if (entry.getKey().equals("brackets")) {
+					continue;
+				}
+
+				String locationName = higherDepth(entry.getValue(), "name").getAsString();
+				EmbedBuilder eb = player
+					.defaultPlayerEmbed()
+					.setDescription(
+						"**Bestiary Milestone:** " +
+						bestiaryMilestone +
+						"\n**Bestiary Tier:** " +
+						bestiaryTier +
+						"\n**Location:** " +
+						locationName
 					);
+
+				for (JsonElement mob : higherDepth(entry.getValue(), "mobs").getAsJsonArray()) {
+					int kills = 0;
+					for (JsonElement bestiaryName : higherDepth(mob, "mobs").getAsJsonArray()) {
+						kills += higherDepth(player.profileJson(), "bestiary.kills." + bestiaryName.getAsString(), 0);
+					}
+
+					int tier = bestiaryTierFromKills(kills, higherDepth(mob, "bracket").getAsInt(), higherDepth(mob, "cap").getAsInt());
+
 					eb.addField(
-						mobName,
-						"Level: " +
-						roundAndFormat(level.getProgressLevel()) +
-						"\nKills: " +
-						formatNumber(kills) +
-						(
-							(level.expForNext() - level.expCurrent() > 0)
-								? "\nNext: " + formatNumber(level.expForNext() - level.expCurrent())
-								: ""
-						),
+						cleanMcCodes(higherDepth(mob, "name").getAsString()),
+						"Tier: " + roundAndFormat(tier) + "\nKills: " + formatNumber(kills),
 						true
 					);
 				}
-				pages.put(SelectOption.of(location.getKey(), location.getKey().toLowerCase().replace(" ", "_")), eb);
+
+				pages.put(SelectOption.of(locationName, entry.getKey()), eb);
 			}
 
-			new SelectMenuPaginator("private_island", new PaginatorExtras().setSelectPages(pages), event);
+			new SelectMenuPaginator("dynamic", new PaginatorExtras().setSelectPages(pages), event);
 			return null;
 		}
 		return player.getErrorEmbed();

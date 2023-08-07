@@ -21,8 +21,8 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.Constants.gamemodeCommandOption;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.typeToNameSubMap;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
 
@@ -132,7 +132,7 @@ public class GuildLbSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		} else if (event.getFocusedOption().getName().equals("type")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), formattedTypesSubList);
+			event.replyClosestMatch(event.getFocusedOption().getValue(), typeToNameSubMap.values());
 		}
 	}
 }

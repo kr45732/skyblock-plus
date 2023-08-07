@@ -33,7 +33,7 @@ public class ColeWeight {
 
 	public ColeWeight(Player.Profile player) {
 		// Experience
-		experienceWeight += player.getSkillXp("mining") / 1000000.0;
+		experienceWeight += Math.max(player.getSkillXp("mining"), 0) / 1000000.0;
 
 		// Powder
 		powderWeight +=
@@ -75,16 +75,8 @@ public class ColeWeight {
 		collectionsWeight += getCollection(player, "METAL_HEART") / 40.0;
 
 		// Misc
-		miscellaneousWeight +=
-			higherDepth(
-				player.profileJson(),
-				"bestiary.kills.scatha_10",
-				higherDepth(player.profileJson(), "bestiary.kills_scatha_10", 0)
-			) /
-			4.0;
-		miscellaneousWeight +=
-			higherDepth(player.profileJson(), "bestiary.kills.worm_5", higherDepth(player.profileJson(), "bestiary.kills_worm_5", 0)) /
-			16.0;
+		miscellaneousWeight += higherDepth(player.profileJson(), "bestiary.kills.scatha_10", 0) / 4.0;
+		miscellaneousWeight += higherDepth(player.profileJson(), "bestiary.kills.worm_5", 0) / 16.0;
 		miscellaneousWeight += higherDepth(player.profileJson(), "mining_core.crystals.jade_crystal.total_placed", 0) / 2.0;
 	}
 

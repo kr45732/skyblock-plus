@@ -279,7 +279,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 						eb.addField("Estimated Price", roundAndFormat(calculatedPrice), false);
 						try {
 							JsonObject verboseObj = calc.getVerboseJson().getAsJsonArray().get(0).getAsJsonObject();
-							verboseObj.remove("nbt_tag");
+							verboseObj.remove("nbt");
 							eb.addField("Estimated Price Breakdown", "```json\n" + formattedGson.toJson(verboseObj) + "\n```", false);
 						} catch (Exception ignored) {}
 						calc.resetVerboseJson();

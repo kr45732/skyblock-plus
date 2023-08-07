@@ -19,8 +19,8 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.gamemodeCommandOption;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.formattedTypesSubList;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.typeToNameSubMap;
 import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
 
 import com.skyblockplus.utils.Player;
@@ -103,7 +103,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		} else if (event.getFocusedOption().getName().equals("type")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), formattedTypesSubList);
+			event.replyClosestMatch(event.getFocusedOption().getValue(), typeToNameSubMap.values());
 		}
 	}
 }

@@ -263,7 +263,15 @@ public class StringUtils {
 		return FuzzySearch.extractOne(toMatch, matchFrom).getString();
 	}
 
-	public static List<String> getClosestMatches(String toMatch, List<String> matchFrom, int numMatches) {
+	public static String getClosestMatch(String toMatch, Map<String, String> matchFrom) {
+		if (matchFrom == null || matchFrom.isEmpty()) {
+			return toMatch;
+		}
+
+		return FuzzySearch.extractOne(toMatch, matchFrom.entrySet(), Map.Entry::getValue).getReferent().getKey();
+	}
+
+	public static List<String> getClosestMatches(String toMatch, Collection<String> matchFrom, int numMatches) {
 		if (matchFrom == null || matchFrom.isEmpty()) {
 			return new ArrayList<>(List.of(toMatch));
 		}

@@ -527,6 +527,7 @@ public class Player {
 				case "lily_weight" -> profile.getLilyWeight();
 				case "lily_slayer_weight" -> new LilyWeight(profile, true).getSlayerWeight().getWeightStruct().getRaw();
 				case "cole_weight" -> profile.getColeWeight();
+				case "bestiary" -> profile.getBestiaryLevel();
 				case "level" -> profile.getLevel();
 				default -> {
 					if (collectionNameToId.containsKey(type)) {
@@ -1645,22 +1646,24 @@ public class Player {
 		}
 
 		public int getBestiaryTier() {
-			int total = 0;
-			for (Map.Entry<String, List<String>> location : bestiaryLocationToFamilies.entrySet()) {
-				for (String mob : location.getValue()) {
-					int kills = higherDepth(profileJson(), "bestiary.kills_" + mob, 0);
-					String type = "MOB";
-					if (location.getKey().equals("Private Island")) {
-						type = "ISLAND";
-					} else if (bestiaryBosses.contains(mob)) {
-						type = "BOSS";
+			int tier = 0;
+
+			for (Map.Entry<String, JsonElement> entry : getBestiaryJson().entrySet()) {
+				if (entry.getKey().equals("brackets")) {
+					continue;
+				}
+
+				for (JsonElement mob : higherDepth(entry.getValue(), "mobs").getAsJsonArray()) {
+					int kills = 0;
+					for (JsonElement bestiaryName : higherDepth(mob, "mobs").getAsJsonArray()) {
+						kills += higherDepth(profileJson(), "bestiary.kills." + bestiaryName.getAsString(), 0);
 					}
-					total +=
-						levelingInfoFromExp(kills, "bestiary." + type, higherDepth(getLevelingJson(), "bestiary.caps." + type).getAsInt())
-							.currentLevel();
+
+					tier += bestiaryTierFromKills(kills, higherDepth(mob, "bracket").getAsInt(), higherDepth(mob, "cap").getAsInt());
 				}
 			}
-			return total;
+
+			return tier;
 		}
 
 		public double getBestiaryLevel() {

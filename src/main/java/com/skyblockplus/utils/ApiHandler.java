@@ -363,7 +363,7 @@ public class ApiHandler {
 					String username = uuidToUsernameCache.getIfPresent(uuid);
 					return new HypixelResponse(
 						(username != null ? username : "Player") +
-						" has no Skyblock profiles. Make sure this player has logged on after the past Skyblock maintenance (<t:1684270848:D>)"
+						" has no Skyblock profiles. Make sure this player has logged on after the <t:1684270848:D> Skyblock maintenance"
 					);
 				}
 
@@ -430,7 +430,7 @@ public class ApiHandler {
 										String username = uuidToUsernameCache.getIfPresent(uuid);
 										return new HypixelResponse(
 											(username != null ? username : "Player") +
-											" has no Skyblock profiles. Make sure this player has logged on after the past Skyblock maintenance (<t:1684270848:D>)"
+											" has no Skyblock profiles. Make sure this player has logged on after the <t:1684270848:D> Skyblock maintenance"
 										);
 									}
 

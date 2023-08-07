@@ -84,6 +84,7 @@ public class JsonUtils {
 	private static JsonObject essenceShopsJson;
 	private static JsonObject museumCategoriesJson;
 	private static JsonObject jacobDataJson;
+	private static JsonObject bestiaryJson;
 
 	public static JsonObject getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
@@ -116,6 +117,17 @@ public class JsonUtils {
 		}
 
 		return emojiMap;
+	}
+
+	public static JsonObject getBestiaryJson() {
+		if (bestiaryJson == null) {
+			try {
+				bestiaryJson =
+					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/Bestiary.json")).getAsJsonObject();
+			} catch (Exception ignored) {}
+		}
+
+		return bestiaryJson;
 	}
 
 	public static JsonObject getAveragePriceJson() {

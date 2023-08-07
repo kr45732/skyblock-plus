@@ -521,7 +521,7 @@ public class LevelSlashCommand extends SlashCommand {
 		// Slay dragons
 		int dragonSlaySbXp = 0;
 		for (Map.Entry<String, JsonElement> entry : higherDepth(taskJson, "slay_dragons_xp").getAsJsonObject().entrySet()) {
-			if (higherDepth(player.profileJson(), "bestiary.kills_" + entry.getKey() + "_100", 0) > 0) {
+			if (higherDepth(player.profileJson(), "bestiary.kills." + entry.getKey() + "_100", 0) > 0) {
 				dragonSlaySbXp += entry.getValue().getAsInt();
 			}
 		}
@@ -540,11 +540,11 @@ public class LevelSlashCommand extends SlashCommand {
 		// Arachne
 		int defeatedArachneSbXp = 0;
 		// Tier 1
-		if (higherDepth(player.profileJson(), "bestiary.kills_arachne_300", 0) > 0) {
+		if (higherDepth(player.profileJson(), "bestiary.kills.arachne_300", 0) > 0) {
 			defeatedArachneSbXp += 20;
 		}
 		// Tier 2
-		if (higherDepth(player.profileJson(), "bestiary.kills_arachne_500", 0) > 0) {
+		if (higherDepth(player.profileJson(), "bestiary.kills.arachne_500", 0) > 0) {
 			defeatedArachneSbXp += 40;
 		}
 

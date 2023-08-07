@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.utils.Utils.ignore;
 
 import com.skyblockplus.utils.utils.StringUtils;
+import java.util.Collection;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 
@@ -31,7 +32,7 @@ public class AutoCompleteEvent extends CommandAutoCompleteInteractionEvent {
 		super(event.getJDA(), event.getResponseNumber(), event.getInteraction());
 	}
 
-	public void replyClosestMatch(String toMatch, List<String> matchFrom) {
+	public void replyClosestMatch(String toMatch, Collection<String> matchFrom) {
 		List<String> matches = StringUtils.getClosestMatches(toMatch, matchFrom, 25);
 		matches.removeIf(String::isEmpty);
 		if (!matches.isEmpty()) {

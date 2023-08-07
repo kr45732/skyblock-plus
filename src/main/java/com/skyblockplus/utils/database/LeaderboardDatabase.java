@@ -37,10 +37,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
@@ -52,7 +49,7 @@ import org.slf4j.LoggerFactory;
 
 public class LeaderboardDatabase {
 
-	public static final List<String> formattedTypesSubList = new ArrayList<>();
+	public static final Map<String, String> typeToNameSubMap = new HashMap<>();
 	private static final int MAX_INSERT_COUNT = 60;
 	private static final List<String> types = new ArrayList<>(
 		List.of(
@@ -99,7 +96,9 @@ public class LeaderboardDatabase {
 			"mage_reputation",
 			"barbarian_reputation",
 			"lily_slayer_weight",
-			"selected_class"
+			"selected_class",
+			"cole_weight",
+			"bestiary"
 		)
 	);
 	private static final List<String> typesSubList = new ArrayList<>();
@@ -110,9 +109,11 @@ public class LeaderboardDatabase {
 		types.addAll(skyblockStats);
 
 		typesSubList.addAll(types.subList(2, types.size()));
-		formattedTypesSubList.addAll(
-			typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toCollection(ArrayList::new))
-		);
+		for (String type : typesSubList) {
+			if (!type.equals("selected_class")) {
+				typeToNameSubMap.put(type, capitalizeString(type.replace("_", " ")));
+			}
+		}
 	}
 
 	private final HikariDataSource dataSource;
@@ -128,7 +129,7 @@ public class LeaderboardDatabase {
 	public LeaderboardDatabase() {
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(LEADERBOARD_DB_URL);
-		config.setMaximumPoolSize(65);
+		config.setMaximumPoolSize(MAX_INSERT_COUNT);
 		config.setPoolName("Leaderbord Database Pool");
 		dataSource = new HikariDataSource(config);
 
@@ -138,18 +139,7 @@ public class LeaderboardDatabase {
 	}
 
 	public static String getType(String lbType) {
-		lbType =
-			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
-				case "nw" -> "networth";
-				case "eman" -> "enderman";
-				default -> lbType;
-			};
-
-		if (!typesSubList.contains(lbType)) {
-			lbType = getClosestMatch(lbType, typesSubList);
-		}
-
-		return lbType;
+		return lbType.equalsIgnoreCase("nw") ? "networth" : getClosestMatch(lbType, typeToNameSubMap);
 	}
 
 	private Connection getConnection() throws SQLException {
@@ -212,10 +202,9 @@ public class LeaderboardDatabase {
 						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
 				)
 			) {
-				// J is for the list while K is for the params offset
-				for (int j = startingIndex, k = 0; j < Math.min(startingIndex + MAX_INSERT_COUNT, players.size()); j++, k++) {
+				for (int j = startingIndex; j < Math.min(startingIndex + MAX_INSERT_COUNT, players.size()); j++) {
 					Player.Profile player = players.get(j);
-					int offset = k * (3 + typesSubList.size());
+					int offset = (j - startingIndex) * (3 + typesSubList.size());
 
 					statement.setObject(1 + offset, stringToUuid(player.getUuid()));
 					statement.setString(2 + offset, player.getUsername());

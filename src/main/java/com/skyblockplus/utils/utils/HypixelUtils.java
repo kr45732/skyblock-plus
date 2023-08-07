@@ -105,6 +105,20 @@ public class HypixelUtils {
 		return level;
 	}
 
+	public static int bestiaryTierFromKills(int kills, int bracket, int cap) {
+		kills = Math.min(kills, cap);
+		JsonArray levelArray = higherDepth(getBestiaryJson(), "brackets." + bracket).getAsJsonArray();
+		int level = 0;
+		for (int i = 0; i < levelArray.size(); i++) {
+			if (kills >= levelArray.get(i).getAsInt()) {
+				level = i + 1;
+			} else {
+				break;
+			}
+		}
+		return level;
+	}
+
 	public static SkillsStruct levelingInfoFromExp(long exp, String name) {
 		return levelingInfoFromExp(
 			exp,
@@ -115,57 +129,54 @@ public class HypixelUtils {
 
 	public static SkillsStruct levelingInfoFromExp(long exp, String name, int maxLevel) {
 		JsonArray xpTable =
-			switch (name) {
-				case "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(getLevelingJson(), name)
-					.getAsJsonArray();
-				case "catacombs", "healer", "mage", "berserk", "archer", "tank" -> higherDepth(getLevelingJson(), "catacombs")
-					.getAsJsonArray();
-				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
-				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
-			};
+			(
+				switch (name) {
+					case "social", "HOTM" -> higherDepth(getLevelingJson(), name);
+					case "catacombs", "healer", "mage", "berserk", "archer", "tank" -> higherDepth(getLevelingJson(), "catacombs");
+					case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp");
+					default -> higherDepth(getLevelingJson(), "leveling_xp");
+				}
+			).getAsJsonArray();
+		long xpTotal = 0;
 
-		long xpTotal = 0L;
 		int level = 1;
 		for (int i = 0; i < xpTable.size(); i++) {
 			if (i == maxLevel) {
 				break;
 			}
 
-			xpTotal += xpTable.get(i).getAsLong();
-
-			if (xpTotal > exp) {
-				xpTotal -= xpTable.get(i).getAsLong();
+			if (xpTotal + xpTable.get(i).getAsLong() > exp) {
 				break;
-			} else {
-				level = (i + 1);
 			}
-		}
 
-		long xpCurrent = (long) Math.floor(exp - xpTotal);
+			level = i + 1;
+			xpTotal += xpTable.get(i).getAsLong();
+		}
+		long xpCurrent;
 
 		if (exp <= 0) {
 			level = 0;
 			xpCurrent = 0;
+		} else {
+			xpCurrent = (long) Math.floor(exp - xpTotal);
 		}
-
 		long xpForNext = 0;
+
 		if (level < maxLevel && level < xpTable.size()) {
 			xpForNext = (long) Math.ceil(xpTable.get(level).getAsLong());
 		}
+		double progress = 0;
 
-		double progress = xpForNext > 0 ? Math.max(0, Math.min((double) xpCurrent / xpForNext, 1)) : 0;
-
+		if (xpForNext > 0) {
+			progress = Math.max(0, Math.min((double) xpCurrent / xpForNext, 1));
+		}
 		return new SkillsStruct(name, level, maxLevel, exp, xpCurrent, xpForNext, progress);
 	}
 
 	public static SkillsStruct levelingInfoFromLevel(int targetLevel, String name, int maxLevel) {
 		JsonArray skillsTable =
 			switch (name) {
-				case "catacombs", "social", "HOTM", "bestiary.ISLAND", "bestiary.MOB", "bestiary.BOSS" -> higherDepth(
-					getLevelingJson(),
-					name
-				)
-					.getAsJsonArray();
+				case "catacombs", "social", "HOTM" -> higherDepth(getLevelingJson(), name).getAsJsonArray();
 				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
 				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
 			};
