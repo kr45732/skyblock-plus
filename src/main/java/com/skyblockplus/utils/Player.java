@@ -233,11 +233,9 @@ public class Player {
 		for (Profile profile : profiles) {
 			if (higherDepth(profile.getOuterProfileJson(), "selected", false)) {
 				this.selectedProfileIndex = profile.getProfileIndex();
-				return;
+				break;
 			}
 		}
-
-		this.selectedProfileIndex = 0;
 	}
 
 	private void populateProfiles(JsonElement profileElement) {
