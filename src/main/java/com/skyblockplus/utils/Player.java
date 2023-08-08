@@ -64,11 +64,6 @@ public class Player {
 	private int crystalNucleusAchievement = -2;
 
 	/* Constructors */
-	// Empty player, always invalid
-	public Player() {
-		failCause = "No Args Constructor";
-	}
-
 	public Player(String username, boolean updateLb) {
 		if (checkUsername(username)) {
 			return;
@@ -82,10 +77,7 @@ public class Player {
 			}
 
 			populateProfiles(response.response());
-
-			if (findProfileBySelected()) {
-				return;
-			}
+			findProfileBySelected();
 		} catch (Exception e) {
 			failCause = e.getMessage();
 			return;
@@ -95,10 +87,6 @@ public class Player {
 		if (updateLb) {
 			leaderboardDatabase.insertIntoLeaderboard(getSelectedProfile());
 		}
-	}
-
-	public Player(String username, String profileName) {
-		this(username, profileName, true);
 	}
 
 	public Player(String username, String profileName, boolean updateLb) {
@@ -114,7 +102,6 @@ public class Player {
 			}
 
 			populateProfiles(response.response());
-
 			if (findProfileByName(profileName)) {
 				return;
 			}
@@ -130,22 +117,16 @@ public class Player {
 	}
 
 	public Player(String username, String uuid, JsonElement profileArray, boolean updateLb) {
-		this.uuid = uuid;
-		this.username = username;
-		if (uuid == null || username == null) {
+		if (uuid == null || username == null || profileArray == null) {
 			return;
 		}
 
+		this.uuid = uuid;
+		this.username = username;
+
 		try {
-			if (profileArray == null) {
-				return;
-			}
-
 			populateProfiles(profileArray);
-
-			if (findProfileBySelected()) {
-				return;
-			}
+			findProfileBySelected();
 		} catch (Exception e) {
 			failCause = e.getMessage();
 			return;
@@ -158,19 +139,15 @@ public class Player {
 	}
 
 	public Player(String username, String uuid, String profileName, JsonElement profileArray, boolean updateLb) {
-		this.uuid = uuid;
-		this.username = username;
-		if (uuid == null || username == null) {
+		if (uuid == null || username == null || profileArray == null) {
 			return;
 		}
 
+		this.uuid = uuid;
+		this.username = username;
+
 		try {
-			if (profileArray == null) {
-				return;
-			}
-
 			populateProfiles(profileArray);
-
 			if (findProfileByName(profileName)) {
 				return;
 			}
@@ -202,10 +179,7 @@ public class Player {
 			}
 
 			populateProfiles(response.response());
-
-			if (findProfileBySelected()) {
-				return;
-			}
+			findProfileBySelected();
 		} catch (Exception e) {
 			failCause = e.getMessage();
 			return;
@@ -220,7 +194,7 @@ public class Player {
 	}
 
 	public static Profile create(String username, String profileName) {
-		return (profileName != null ? new Player(username, profileName) : new Player(username, true)).getSelectedProfile();
+		return (profileName != null ? new Player(username, profileName, true) : new Player(username, true)).getSelectedProfile();
 	}
 
 	/**
@@ -255,26 +229,20 @@ public class Player {
 		return true;
 	}
 
-	/**
-	 * @return true if invalid
-	 */
-	private boolean findProfileBySelected() {
+	private void findProfileBySelected() {
 		for (Profile profile : profiles) {
 			if (higherDepth(profile.getOuterProfileJson(), "selected", false)) {
 				this.selectedProfileIndex = profile.getProfileIndex();
-				return false;
+				return;
 			}
 		}
 
-		if (failCause.equals("Unknown fail cause")) {
-			failCause = "No profile selected";
-		}
-		return true;
+		this.selectedProfileIndex = 0;
 	}
 
 	private void populateProfiles(JsonElement profileElement) {
 		JsonArray profileArray = profileElement.getAsJsonArray();
-		for (int i = 0; i < profileArray.getAsJsonArray().size(); i++) {
+		for (int i = 0; i < profileArray.size(); i++) {
 			this.profiles.add(new Profile(i, profileArray.get(i)));
 		}
 	}
@@ -288,6 +256,10 @@ public class Player {
 		} else {
 			return new Profile(-1, null);
 		}
+	}
+
+	public boolean isValid() {
+		return valid;
 	}
 
 	@Override

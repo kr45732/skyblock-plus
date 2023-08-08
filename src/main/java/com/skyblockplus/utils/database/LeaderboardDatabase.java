@@ -26,6 +26,8 @@ import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommandEvent;
@@ -125,6 +127,7 @@ public class LeaderboardDatabase {
 	);
 	private ScheduledFuture<?> leaderboardUpdateTask;
 	private int numLeaderboardUpdates = 0;
+	private final Cache<String, Boolean> failedUpdates = Caffeine.newBuilder().expireAfterWrite(12, TimeUnit.HOURS).build();
 
 	public LeaderboardDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -633,23 +636,33 @@ public class LeaderboardDatabase {
 					break;
 				}
 
+				if (failedUpdates.getIfPresent(uuid) != null) {
+					continue;
+				}
+
 				UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
 				if (usernameUuidStruct.isValid()) {
 					HypixelResponse profileResponse = skyblockProfilesFromUuid(usernameUuidStruct.uuid(), true, false);
 					count++;
 
 					if (profileResponse.isValid()) {
-						Player.Profile player = new Player(
+						Player player = new Player(
 							usernameUuidStruct.username(),
 							usernameUuidStruct.uuid(),
 							profileResponse.response(),
 							false
-						)
-							.getSelectedProfile();
-						player.getHighestAmount("networth");
-						players.add(player);
+						);
+
+						if (player.isValid()) {
+							Player.Profile profile = player.getSelectedProfile();
+							profile.getHighestAmount("networth");
+							players.add(profile);
+							continue;
+						}
 					}
 				}
+
+				failedUpdates.put(uuid, true);
 			}
 
 			insertIntoLeaderboard(players);
