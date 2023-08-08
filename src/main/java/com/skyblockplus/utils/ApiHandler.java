@@ -33,8 +33,8 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.price.PriceSlashCommand;
 import com.skyblockplus.utils.database.CacheDatabase;
 import com.skyblockplus.utils.database.LeaderboardDatabase;
-import com.skyblockplus.utils.structs.HttpResult;
 import com.skyblockplus.utils.structs.HypixelResponse;
+import com.skyblockplus.utils.structs.JsonResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.InputStreamReader;
 import java.time.Instant;
@@ -231,20 +231,20 @@ public class ApiHandler {
 		try {
 			switch (mojangApiNum) {
 				case 1 -> {
-					HttpResult usernameRes = getJsonResult("https://playerdb.co/api/player/minecraft/" + username);
-					if (usernameRes == null) {
+					JsonResponse usernameResponse = getJsonResponse("https://playerdb.co/api/player/minecraft/" + username);
+					if (usernameResponse == null) {
 						return new UsernameUuidStruct("An error occurred, please try again in a few seconds");
 					}
 
 					try {
 						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-							usernameRes.get("data.player.username").getAsString(),
-							usernameRes.get("data.player.id").getAsString()
+							usernameResponse.get("data.player.username").getAsString(),
+							usernameResponse.get("data.player.id").getAsString()
 						);
 						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 						return usernameUuidStruct;
 					} catch (Exception e) {
-						return new UsernameUuidStruct(usernameRes.get("message").getAsString(), usernameRes.isRateLimited());
+						return new UsernameUuidStruct(usernameResponse.get("message").getAsString(), usernameResponse.isRateLimited());
 					}
 				}
 				case 2 -> {
@@ -261,20 +261,20 @@ public class ApiHandler {
 					}
 				}
 				default -> {
-					HttpResult usernameRes = getJsonResult("https://api.ashcon.app/mojang/v2/user/" + username);
-					if (usernameRes == null) {
+					JsonResponse usernameResponse = getJsonResponse("https://api.ashcon.app/mojang/v2/user/" + username);
+					if (usernameResponse == null) {
 						return new UsernameUuidStruct("An error occurred, please try again in a few seconds");
 					}
 
 					try {
 						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-							usernameRes.get("username").getAsString(),
-							usernameRes.get("uuid").getAsString()
+							usernameResponse.get("username").getAsString(),
+							usernameResponse.get("uuid").getAsString()
 						);
 						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 						return usernameUuidStruct;
 					} catch (Exception e) {
-						return new UsernameUuidStruct(usernameRes.get("reason").getAsString(), usernameRes.isRateLimited());
+						return new UsernameUuidStruct(usernameResponse.get("reason").getAsString(), usernameResponse.isRateLimited());
 					}
 				}
 			}
@@ -323,7 +323,7 @@ public class ApiHandler {
 	private static UsernameUuidStruct uuidUsernameMojang(String username) {
 		try {
 			// true ? uuid to username : else username to uuid
-			HttpResult usernameRes = getJsonResult(
+			JsonResponse usernameResponse = getJsonResponse(
 				(
 					!isValidMinecraftUsername(username) && isValidMinecraftUuid(username)
 						? "https://sessionserver.mojang.com/session/minecraft/profile/"
@@ -331,24 +331,24 @@ public class ApiHandler {
 				) +
 				username
 			);
-			if (usernameRes == null) {
+			if (usernameResponse == null) {
 				return new UsernameUuidStruct("An error occurred, please try again in a few seconds");
 			}
 
 			// No errorMessage returned when rate limited
-			if (usernameRes.isRateLimited()) {
+			if (usernameResponse.isRateLimited()) {
 				return new UsernameUuidStruct("Mojang has rate limited this request", true);
 			}
 
 			try {
 				UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-					usernameRes.get("name").getAsString(),
-					usernameRes.get("id").getAsString()
+					usernameResponse.get("name").getAsString(),
+					usernameResponse.get("id").getAsString()
 				);
 				uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 				return usernameUuidStruct;
 			} catch (Exception e) {
-				return new UsernameUuidStruct(usernameRes.get("errorMessage").getAsString());
+				return new UsernameUuidStruct(usernameResponse.get("errorMessage").getAsString());
 			}
 		} catch (Exception e) {
 			return new UsernameUuidStruct(e.getMessage());

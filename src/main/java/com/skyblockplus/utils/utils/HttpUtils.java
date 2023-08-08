@@ -27,7 +27,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.skyblockplus.utils.SkyblockProfilesParser;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
-import com.skyblockplus.utils.structs.HttpResult;
+import com.skyblockplus.utils.structs.JsonResponse;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -78,11 +78,11 @@ public class HttpUtils {
 	}
 
 	public static JsonElement getJson(String jsonUrl) {
-		HttpResult res = getJsonResult(jsonUrl);
-		return res != null ? res.response() : null;
+		JsonResponse response = getJsonResponse(jsonUrl);
+		return response != null ? response.response() : null;
 	}
 
-	public static HttpResult getJsonResult(String jsonUrl) {
+	public static JsonResponse getJsonResponse(String jsonUrl) {
 		try {
 			if (jsonUrl.contains(HYPIXEL_API_KEY) && hypixelRateLimiter.isRateLimited()) {
 				long timeTillReset = hypixelRateLimiter.getTimeTillReset();
@@ -112,11 +112,11 @@ public class HttpUtils {
 					if (httpResponse.getStatusLine().getStatusCode() == 502) {
 						JsonObject obj = new JsonObject();
 						obj.addProperty("cause", "Hypixel API returned 502 bad gateway. The API may be down.");
-						return new HttpResult(obj, httpResponse.getStatusLine().getStatusCode());
+						return new JsonResponse(obj, httpResponse.getStatusLine().getStatusCode());
 					} else if (httpResponse.getStatusLine().getStatusCode() == 522) {
 						JsonObject obj = new JsonObject();
 						obj.addProperty("cause", "Hypixel API returned 522 connection timed out. The API may be down.");
-						return new HttpResult(obj, httpResponse.getStatusLine().getStatusCode());
+						return new JsonResponse(obj, httpResponse.getStatusLine().getStatusCode());
 					}
 				}
 
@@ -134,10 +134,10 @@ public class HttpUtils {
 							"cause",
 							"Hypixel API returned 429 too many requests. The API is globally throttled and may be down."
 						);
-						return new HttpResult(obj, httpResponse.getStatusLine().getStatusCode());
+						return new JsonResponse(obj, httpResponse.getStatusLine().getStatusCode());
 					}
 
-					return new HttpResult(json, httpResponse.getStatusLine().getStatusCode());
+					return new JsonResponse(json, httpResponse.getStatusLine().getStatusCode());
 				}
 			}
 		} catch (Exception ignored) {}

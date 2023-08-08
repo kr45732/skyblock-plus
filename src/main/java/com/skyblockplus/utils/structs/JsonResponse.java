@@ -22,7 +22,7 @@ import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 
 import com.google.gson.JsonElement;
 
-public record HttpResult(JsonElement response, Integer statusCode) {
+public record JsonResponse(JsonElement response, Integer statusCode) {
 	public boolean isRateLimited() {
 		return statusCode == 429;
 	}
