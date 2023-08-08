@@ -569,6 +569,23 @@ public class LeaderboardDatabase {
 		});
 	}
 
+	public UsernameUuidStruct usernameToUuid(String username) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT username, uuid FROM stranded_lb WHERE username ILIKE ? LIMIT 1"
+			)
+		) {
+			statement.setString(1, username);
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					return new UsernameUuidStruct(response.getString("username"), response.getString("uuid"));
+				}
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
 	public List<String> getClosestPlayers(String toMatch) {
 		try (
 			Connection connection = getConnection();
@@ -618,7 +635,7 @@ public class LeaderboardDatabase {
 
 				UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
 				if (usernameUuidStruct.isValid()) {
-					HypixelResponse profileResponse = skyblockProfilesFromUuid(usernameUuidStruct.uuid(), HYPIXEL_API_KEY, true, false);
+					HypixelResponse profileResponse = skyblockProfilesFromUuid(usernameUuidStruct.uuid(), true, false);
 					count++;
 
 					if (profileResponse.isValid()) {

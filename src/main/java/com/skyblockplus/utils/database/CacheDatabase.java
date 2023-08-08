@@ -517,5 +517,6 @@ public class CacheDatabase {
 		GUILD,
 		PLAYER,
 		SKYBLOCK_MUSEUM,
+		SKYBLOCK_BINGO,
 	}
 }

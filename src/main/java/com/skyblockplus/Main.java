@@ -126,22 +126,24 @@ public class Main {
 					.collect(Collectors.toMap(Function.identity(), e -> database.getServerSettingsModel(e), (e1, e2) -> e1));
 		log.info("Loaded all server settings");
 
-		jda =
-			DefaultShardManagerBuilder
-				.createDefault(BOT_TOKEN)
-				.setStatus(OnlineStatus.DO_NOT_DISTURB)
-				.addEventListeners(
-					new ExceptionEventListener(waiter),
-					client,
-					new ExceptionEventListener(slashCommandClient),
-					new ExceptionEventListener(new MainListener())
-				)
-				.setActivity(Activity.playing("Loading..."))
-				.setMemberCachePolicy(MemberCachePolicy.ALL)
-				.disableCache(CacheFlag.VOICE_STATE, CacheFlag.STICKER, CacheFlag.FORUM_TAGS, CacheFlag.SCHEDULED_EVENTS)
-				.enableIntents(GatewayIntent.GUILD_MEMBERS)
-				.setEnableShutdownHook(false)
-				.build();
+		DefaultShardManagerBuilder jdaBuilder = DefaultShardManagerBuilder
+			.createDefault(BOT_TOKEN)
+			.setStatus(OnlineStatus.DO_NOT_DISTURB)
+			.addEventListeners(
+				new ExceptionEventListener(waiter),
+				client,
+				new ExceptionEventListener(slashCommandClient),
+				new ExceptionEventListener(new MainListener())
+			)
+			.setActivity(Activity.playing("Loading..."))
+			.setMemberCachePolicy(MemberCachePolicy.ALL)
+			.disableCache(CacheFlag.VOICE_STATE, CacheFlag.STICKER, CacheFlag.FORUM_TAGS, CacheFlag.SCHEDULED_EVENTS)
+			.enableIntents(GatewayIntent.GUILD_MEMBERS)
+			.setEnableShutdownHook(false);
+		if (!isMainBot()) {
+			jdaBuilder.enableIntents(GatewayIntent.MESSAGE_CONTENT);
+		}
+		jda = jdaBuilder.build();
 
 		for (JDA shard : jda.getShards()) {
 			try {

@@ -18,39 +18,16 @@
 
 package com.skyblockplus.utils.structs;
 
-import com.skyblockplus.utils.utils.StringUtils;
-import java.util.Objects;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 
-public record UsernameUuidStruct(String username, String uuid, String failCause, boolean rateLimited) {
-	public UsernameUuidStruct(String username, String uuid) {
-		this(username, uuid.replace("-", ""), null, false);
+import com.google.gson.JsonElement;
+
+public record HttpResult(JsonElement response, Integer statusCode) {
+	public boolean isRateLimited() {
+		return statusCode == 429;
 	}
 
-	public UsernameUuidStruct(String failCause, boolean rateLimited) {
-		this(null, null, failCause, rateLimited);
-	}
-
-	public UsernameUuidStruct(String failCause) {
-		this(failCause, false);
-	}
-
-	public boolean isValid() {
-		return username != null && uuid != null;
-	}
-
-	public String getAvatarUrl() {
-		return StringUtils.getAvatarUrl(uuid);
-	}
-
-	public String getAuctionUrl() {
-		return StringUtils.getAuctionUrl(uuid);
-	}
-
-	public String nameMcHyperLink() {
-		return StringUtils.nameMcHyperLink(username, uuid);
-	}
-
-	public String escapeUsername() {
-		return StringUtils.escapeText(username);
+	public JsonElement get(String path) {
+		return higherDepth(response, path);
 	}
 }

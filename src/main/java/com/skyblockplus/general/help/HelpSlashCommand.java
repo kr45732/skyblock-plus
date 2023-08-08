@@ -293,8 +293,6 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("miscellaneous"),
 				new HelpData("checkapi", "Get a player's enabled and disabled Skyblock APIs", "checkapi [player] [profile]")
 					.setCategory("miscellaneous"),
-				new HelpData("profiles", "Get information about all of a player's profiles.", "profiles [player]")
-					.setCategory("miscellaneous"),
 				new HelpData("cakes", "Get a player's active and inactive cake buffs.", "cakes [player] [profile]")
 					.setCategory("miscellaneous"),
 				new HelpData("bestiary", "Get a player's bestiary statistics.", "bestiary [player] [profile]").setCategory("miscellaneous"),
@@ -316,7 +314,7 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("leaderboard", "Get a global leaderboard.", "leaderboard <type>").setCategory("miscellaneous"),
 				new HelpData("guildlb", "Get a global guild leaderboard.", "guildlb <type> [mode] [comparison]")
 					.setCategory("miscellaneous"),
-				new HelpData("skyblock", "Get an overview of a player's Skyblock statistics", "skyblock [player] [profile]")
+				new HelpData("skyblock", "Get an overview of a player's Skyblock profiles", "skyblock [player] [profile]")
 					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
 					.setCategory("miscellaneous"),
@@ -832,7 +830,6 @@ public class HelpSlashCommand extends SlashCommand {
 				"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount"
 			) +
 			create("hypixel [player]", "Get Hypixel information about a player") +
-			create("profiles [player]", "Get information about all of a player's profiles") +
 			create("missing [player] [profile]", "Get a player's missing talismans") +
 			create("fetchur", "Get the item that fetchur wants today") +
 			create("cakes [player] [profile]", "Get a player's inactive and active cake buffs") +
@@ -847,7 +844,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
 			create("leaderboard <type> [player] [gamemode] [page] [rank] [amount]", "Get a global leaderboard") +
 			create("guildlb <type> [mode] [comparison]", "Get a global guild leaderboard") +
-			create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
+			create("skyblock [player] [profile]", "Get an overview of a player's Skyblock profiles") +
 			create("recipe <item>", "Get the crafting recipe of an item") +
 			create("craft <item>", "Calculate the cost of an item and added upgrades") +
 			create("checkapi [player]", "Check which Skyblock APIs a player has enabled or disabled") +

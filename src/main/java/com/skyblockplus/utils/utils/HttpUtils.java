@@ -27,6 +27,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.skyblockplus.utils.SkyblockProfilesParser;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
+import com.skyblockplus.utils.structs.HttpResult;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -77,12 +78,13 @@ public class HttpUtils {
 	}
 
 	public static JsonElement getJson(String jsonUrl) {
-		return getJson(jsonUrl, HYPIXEL_API_KEY);
+		HttpResult res = getJsonResult(jsonUrl);
+		return res != null ? res.response() : null;
 	}
 
-	public static JsonElement getJson(String jsonUrl, String hypixelApiKey) {
+	public static HttpResult getJsonResult(String jsonUrl) {
 		try {
-			if (jsonUrl.contains(hypixelApiKey) && hypixelRateLimiter.isRateLimited()) {
+			if (jsonUrl.contains(HYPIXEL_API_KEY) && hypixelRateLimiter.isRateLimited()) {
 				long timeTillReset = hypixelRateLimiter.getTimeTillReset();
 				log.info("Sleeping for " + timeTillReset + " seconds");
 				TimeUnit.SECONDS.sleep(timeTillReset);
@@ -98,7 +100,7 @@ public class HttpUtils {
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				if (jsonUrl.contains("api.hypixel.net")) {
-					if (jsonUrl.contains(hypixelApiKey)) {
+					if (jsonUrl.contains(HYPIXEL_API_KEY)) {
 						try {
 							hypixelRateLimiter.update(
 								Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue()),
@@ -110,11 +112,11 @@ public class HttpUtils {
 					if (httpResponse.getStatusLine().getStatusCode() == 502) {
 						JsonObject obj = new JsonObject();
 						obj.addProperty("cause", "Hypixel API returned 502 bad gateway. The API may be down.");
-						return obj;
+						return new HttpResult(obj, httpResponse.getStatusLine().getStatusCode());
 					} else if (httpResponse.getStatusLine().getStatusCode() == 522) {
 						JsonObject obj = new JsonObject();
 						obj.addProperty("cause", "Hypixel API returned 522 connection timed out. The API may be down.");
-						return obj;
+						return new HttpResult(obj, httpResponse.getStatusLine().getStatusCode());
 					}
 				}
 
@@ -132,10 +134,10 @@ public class HttpUtils {
 							"cause",
 							"Hypixel API returned 429 too many requests. The API is globally throttled and may be down."
 						);
-						return obj;
+						return new HttpResult(obj, httpResponse.getStatusLine().getStatusCode());
 					}
 
-					return json;
+					return new HttpResult(json, httpResponse.getStatusLine().getStatusCode());
 				}
 			}
 		} catch (Exception ignored) {}

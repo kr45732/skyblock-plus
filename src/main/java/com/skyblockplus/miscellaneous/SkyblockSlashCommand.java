@@ -18,24 +18,23 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.asyncUuidToUsername;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.getEmoji;
 
-import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
 import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
-import com.skyblockplus.skills.SkillsSlashCommand;
-import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorExtras;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import com.skyblockplus.utils.structs.SkillsStruct;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -54,107 +53,82 @@ public class SkyblockSlashCommand extends SlashCommand {
 		if (player.isValid()) {
 			CustomPaginator.Builder paginator = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES);
 			PaginatorExtras extras = paginator.getExtras();
-			SenitherWeight weight = new SenitherWeight(player, true);
-			LilyWeight lilyWeight = new LilyWeight(player, true);
 
-			EmbedBuilder eb = player.defaultPlayerEmbed();
-			eb.addField(getEmoji("SAPLING") + " Skill Average", roundAndFormat(player.getSkillAverage()), true);
-			eb.addField(getEmoji("OVERFLUX_CAPACITOR") + " Total Slayer XP", formatNumber(player.getTotalSlayerXp()), true);
-			eb.addField(DUNGEON_EMOJI_MAP.get("catacombs") + " Catacombs", roundAndFormat(player.getCatacombs().getProgressLevel()), true);
-			eb.addField(getEmoji("TRAINING_WEIGHTS") + " Senither Weight", weight.getTotalWeight().getFormatted(), true);
-			eb.addField("\uD83C\uDFC5 Senither Stage", weight.getStage(), true);
-			eb.addField(getEmoji("TRAINING_WEIGHTS") + " Lily weight", lilyWeight.getTotalWeight().getFormatted(), true);
-			eb.addField("\uD83C\uDFC5 Lily Stage", lilyWeight.getStage(), true);
-			double playerNetworth = player.getNetworth();
-			eb.addField(
-				getEmoji("ENCHANTED_GOLD") + " Networth",
-				playerNetworth == -1 ? "Inventory API is disabled" : roundAndFormat(playerNetworth),
-				true
-			);
-			eb.addField(
-				getEmoji("PIGGY_BANK") + " Bank & purse coins",
-				(player.getBankBalance() == -1 ? "API disabled" : simplifyNumber(player.getBankBalance())) +
-				" + " +
-				simplifyNumber(player.getPurseCoins()),
-				true
-			);
-			extras.addEmbedPage(eb);
+			Map<String, CompletableFuture<String>> uuidToUsername = new HashMap<>();
+			for (Player.Profile profile : player.getProfiles()) {
+				EmbedBuilder eb = profile.defaultPlayerEmbed(" | " + capitalizeString(profile.getProfileName()));
 
-			extras.addEmbedPage(SkillsSlashCommand.getPlayerSkillsFirstPage(player));
+				JsonObject membersObj = higherDepth(profile.getOuterProfileJson(), "members").getAsJsonObject();
+				for (String uuid : membersObj.keySet()) {
+					if (!uuidToUsername.containsKey(uuid)) {
+						uuidToUsername.put(uuid, asyncUuidToUsername(uuid));
+					}
+				}
 
-			extras.addEmbedPage(SlayerSlashCommand.getPlayerSlayer(player));
+				long created = higherDepth(profile.profileJson(), "first_join", -1L);
+				eb.setDescription("Created: " + (created != -1 ? getRelativeTimestamp(created) : " Unknown"));
+				if (profile.isSelected()) {
+					eb.appendDescription("\nSelected: Yes");
+				}
+				eb.appendDescription("\nGamemode: " + profile.getGamemode().getName() + profile.getGamemode().getSymbol(" "));
+				if (membersObj.size() > 1) {
+					List<String> members = new ArrayList<>();
+					for (String uuid : membersObj.keySet()) {
+						try {
+							members.add(escapeText(uuidToUsername.get(uuid).get()));
+						} catch (Exception ignored) {}
+					}
+					eb.appendDescription("\nMembers: " + String.join(", ", members));
+				}
 
-			try {
-				eb =
-					player
-						.defaultPlayerEmbed()
-						.setDescription(
-							"**Secrets:** " +
-							formatNumber(player.getDungeonSecrets()) +
-							"\n**Selected Class:** " +
-							capitalizeString(player.getSelectedDungeonClass())
-						);
-				SkillsStruct skillInfo = player.getCatacombs();
+				SenitherWeight weight = new SenitherWeight(profile, true);
+				LilyWeight lilyWeight = new LilyWeight(profile, true);
 				eb.addField(
-					DUNGEON_EMOJI_MAP.get("catacombs") + " " + capitalizeString(skillInfo.name()) + " (" + skillInfo.currentLevel() + ")",
-					simplifyNumber(skillInfo.expCurrent()) +
-					" / " +
-					simplifyNumber(skillInfo.expForNext()) +
-					"\nTotal XP: " +
-					simplifyNumber(skillInfo.totalExp()) +
-					"\nProgress: " +
-					(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
+					getEmoji("SAPLING") + " Skill Average",
+					profile.getSkillAverage() == -1 ? "Skills API disabled" : roundAndFormat(profile.getSkillAverage()),
 					true
 				);
-				eb.addBlankField(true).addBlankField(true);
-				for (String className : DUNGEON_CLASS_NAMES) {
-					skillInfo = player.getDungeonClass(className);
-					eb.addField(
-						DUNGEON_EMOJI_MAP.get(className) + " " + capitalizeString(className) + " (" + skillInfo.currentLevel() + ")",
-						simplifyNumber(skillInfo.expCurrent()) +
-						" / " +
-						simplifyNumber(skillInfo.expForNext()) +
-						"\nTotal XP: " +
-						simplifyNumber(skillInfo.totalExp()) +
-						"\nProgress: " +
-						(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
-						true
-					);
+				eb.addField(getEmoji("OVERFLUX_CAPACITOR") + " Total Slayer XP", formatNumber(profile.getTotalSlayerXp()), true);
+				eb.addField(
+					DUNGEON_EMOJI_MAP.get("catacombs") + " Catacombs",
+					roundAndFormat(profile.getCatacombs().getProgressLevel()),
+					true
+				);
+
+				eb.addField("<:levels:1067859971221499954> Level", roundAndFormat(profile.getLevel()), true);
+				eb.addField(
+					getEmoji("TRAINING_WEIGHTS") + " Senither Weight",
+					weight.getTotalWeight().getFormatted(false) + " (" + weight.getStage() + ")",
+					true
+				);
+				eb.addField(
+					getEmoji("TRAINING_WEIGHTS") + " Lily weight",
+					lilyWeight.getTotalWeight().getFormatted(false) + " (" + lilyWeight.getStage() + ")",
+					true
+				);
+
+				double profileNetworth = profile.getNetworth();
+				eb.addField(
+					getEmoji("ENCHANTED_GOLD") + " Networth",
+					profileNetworth == -1 ? "Inventory API is disabled" : formatNumber((long) profileNetworth),
+					true
+				);
+				eb.addField(
+					getEmoji("PIGGY_BANK") + " Bank Balance",
+					profile.getBankBalance() == -1 ? "Banking API disabled" : simplifyNumber(profile.getBankBalance()),
+					true
+				);
+				eb.addField(getEmoji("ENCHANTED_GOLD") + " Purse Coins", simplifyNumber(profile.getPurseCoins()), true);
+
+				eb.addField(getEmoji("COBBLESTONE") + " Maxed Collections", profile.getNumMaxedCollections() + "/73", true);
+				eb.addField(SKILLS_EMOJI_MAP.get("combat") + " Bestiary", roundAndFormat(profile.getBestiaryLevel()), true);
+				eb.addField(getEmoji("COBBLESTONE_GENERATOR_11") + " Minion Slots", "" + profile.getNumberMinionSlots() + "/26", true);
+
+				if (profile.isSelected()) {
+					extras.getEmbedPages().add(0, eb);
+				} else {
+					extras.addEmbedPage(eb);
 				}
-				eb.addBlankField(true);
-				for (Map.Entry<String, JsonElement> dungeon : higherDepth(player.profileJson(), "dungeons.dungeon_types")
-					.getAsJsonObject()
-					.entrySet()) {
-					boolean isRegular = dungeon.getKey().equals("catacombs");
-
-					int min = (isRegular ? 0 : 1);
-					int embedCount = 0;
-					for (int i = min; i < 8; i++) {
-						if (higherDepth(dungeon.getValue(), "tier_completions." + i, 0) == 0) {
-							continue;
-						}
-
-						int fastestSPlusInt = higherDepth(dungeon.getValue(), "fastest_time_s_plus." + i, -1);
-						int minutes = fastestSPlusInt / 1000 / 60;
-						int seconds = fastestSPlusInt / 1000 % 60;
-						String name = i == 0 ? "Entrance" : ((isRegular ? "Floor " : "Master ") + i);
-
-						String ebStr = "Completions: " + higherDepth(dungeon.getValue(), "tier_completions." + i, 0);
-						ebStr += "\nBest Score: " + higherDepth(dungeon.getValue(), "best_score." + i, 0);
-						ebStr +=
-							"\nFastest S+: " + (fastestSPlusInt != -1 ? minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds) : "None");
-
-						eb.addField(DUNGEON_EMOJI_MAP.get(dungeon.getKey() + "_" + i) + " " + capitalizeString(name), ebStr, true);
-						embedCount++;
-					}
-
-					for (int i = 0; i < Math.ceil(embedCount / 3.0) * 3 - embedCount; i++) {
-						eb.addBlankField(true);
-					}
-				}
-				extras.addEmbedPage(eb);
-			} catch (Exception e) {
-				extras.addEmbedPage(player.defaultPlayerEmbed().setDescription("Player has not played dungeons"));
 			}
 
 			event.paginate(paginator);
@@ -176,7 +150,7 @@ public class SkyblockSlashCommand extends SlashCommand {
 	@Override
 	public SlashCommandData getCommandData() {
 		return Commands
-			.slash(name, "Get an overview of a player's Skyblock statistics")
+			.slash(name, "Get an overview of a player's Skyblock profiles")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOptions(profilesCommandOption);
 	}

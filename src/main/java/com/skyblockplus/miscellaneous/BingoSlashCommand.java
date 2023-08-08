@@ -18,9 +18,10 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.skyblockBingoFromUuid;
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
-import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 import static org.springframework.util.StringUtils.countOccurrencesOf;
 
@@ -59,22 +60,14 @@ public class BingoSlashCommand extends SlashCommand {
 		}
 		try {
 			bingoJson =
-				streamJsonArray(
-					higherDepth(
-						getJson("https://api.hypixel.net/skyblock/bingo?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuidStruct.uuid()),
-						"events"
-					)
-				)
-					.filter(e -> higherDepth(e, "key", -1) == higherDepth(bingoInfo, "id", -1))
+				streamJsonArray(skyblockBingoFromUuid(usernameUuidStruct.uuid()).response())
+					.filter(e -> higherDepth(e, "key", -1) == higherDepth(bingoInfo, "id", -2))
 					.findFirst()
 					.orElse(null);
 			bingoArr = higherDepth(bingoJson, "completed_goals").getAsJsonArray();
 		} catch (Exception ignored) {}
 
-		EmbedBuilder eb = defaultEmbed(
-			usernameUuidStruct.username(),
-			com.skyblockplus.utils.utils.StringUtils.skyblockStatsLink(usernameUuidStruct.uuid(), null)
-		);
+		EmbedBuilder eb = defaultEmbed(usernameUuidStruct.username(), skyblockStatsLink(usernameUuidStruct.uuid(), null));
 		StringBuilder regGoals = new StringBuilder();
 		StringBuilder communityGoals = new StringBuilder();
 		StringBuilder cardStr = new StringBuilder(); // C = community done, c = community not done, S = self done, s = self not done
@@ -101,11 +94,11 @@ public class BingoSlashCommand extends SlashCommand {
 					.append(" ")
 					.append(higherDepth(goal, "name").getAsString())
 					.append(": ")
-					.append(com.skyblockplus.utils.utils.StringUtils.simplifyNumber(progress))
+					.append(simplifyNumber(progress))
 					.append("/")
-					.append(com.skyblockplus.utils.utils.StringUtils.simplifyNumber(nextTier))
+					.append(simplifyNumber(nextTier))
 					.append(" (")
-					.append((com.skyblockplus.utils.utils.StringUtils.roundProgress((double) Math.min(progress, nextTier) / nextTier)))
+					.append((roundProgress((double) Math.min(progress, nextTier) / nextTier)))
 					.append(")");
 			} else {
 				boolean completedGoal = streamJsonArray(bingoArr)
@@ -117,7 +110,7 @@ public class BingoSlashCommand extends SlashCommand {
 					.append(" ")
 					.append(higherDepth(goal, "name").getAsString())
 					.append(": ")
-					.append(com.skyblockplus.utils.utils.StringUtils.cleanMcCodes(higherDepth(goal, "lore").getAsString()));
+					.append(cleanMcCodes(higherDepth(goal, "lore").getAsString()));
 			}
 		}
 		eb.setDescription(

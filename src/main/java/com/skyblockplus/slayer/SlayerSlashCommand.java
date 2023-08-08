@@ -46,10 +46,6 @@ public class SlayerSlashCommand extends SlashCommand {
 			return player.getErrorEmbed();
 		}
 
-		return getPlayerSlayer(player);
-	}
-
-	public static EmbedBuilder getPlayerSlayer(Player.Profile player) {
 		EmbedBuilder eb = player.defaultPlayerEmbed();
 
 		int wolfOneKills = player.getSlayerBossKills("wolf", 0);

@@ -56,7 +56,37 @@ public class SkillsSlashCommand extends SlashCommand {
 			CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES);
 			PaginatorExtras extras = paginateBuilder.getExtras();
 
-			EmbedBuilder eb = getPlayerSkillsFirstPage(player);
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+			double trueSA = 0;
+			double progressSA = 0;
+			for (String skillName : ALL_SKILL_NAMES) {
+				SkillsStruct skillInfo = player.getSkill(skillName);
+				if (skillInfo != null) {
+					eb.addField(
+						SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.name()) + " (" + skillInfo.currentLevel() + ")",
+						simplifyNumber(skillInfo.expCurrent()) +
+						" / " +
+						simplifyNumber(skillInfo.expForNext()) +
+						"\nTotal XP: " +
+						simplifyNumber(skillInfo.totalExp()) +
+						"\nProgress: " +
+						(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
+						true
+					);
+					if (!COSMETIC_SKILL_NAMES.contains(skillName)) {
+						trueSA += skillInfo.currentLevel();
+						progressSA += skillInfo.getProgressLevel();
+					}
+				} else {
+					eb.addField(SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillName) + " (?) ", "Unable to retrieve", true);
+				}
+			}
+			trueSA /= SKILL_NAMES.size();
+			progressSA /= SKILL_NAMES.size();
+			eb.setDescription(
+				"**True Skill Average:** " + roundAndFormat(trueSA) + "\n**Progress Skill Average:** " + roundAndFormat(progressSA)
+			);
+			eb.addBlankField(true);
 			extras.addEmbedPage(eb);
 
 			eb = player.defaultPlayerEmbed();
@@ -131,41 +161,6 @@ public class SkillsSlashCommand extends SlashCommand {
 			return null;
 		}
 		return player.getErrorEmbed();
-	}
-
-	public static EmbedBuilder getPlayerSkillsFirstPage(Player.Profile player) {
-		EmbedBuilder eb = player.defaultPlayerEmbed();
-		double trueSA = 0;
-		double progressSA = 0;
-		for (String skillName : ALL_SKILL_NAMES) {
-			SkillsStruct skillInfo = player.getSkill(skillName);
-			if (skillInfo != null) {
-				eb.addField(
-					SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.name()) + " (" + skillInfo.currentLevel() + ")",
-					simplifyNumber(skillInfo.expCurrent()) +
-					" / " +
-					simplifyNumber(skillInfo.expForNext()) +
-					"\nTotal XP: " +
-					simplifyNumber(skillInfo.totalExp()) +
-					"\nProgress: " +
-					(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
-					true
-				);
-				if (!COSMETIC_SKILL_NAMES.contains(skillName)) {
-					trueSA += skillInfo.currentLevel();
-					progressSA += skillInfo.getProgressLevel();
-				}
-			} else {
-				eb.addField(SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillName) + " (?) ", "Unable to retrieve", true);
-			}
-		}
-		trueSA /= SKILL_NAMES.size();
-		progressSA /= SKILL_NAMES.size();
-		eb.setDescription(
-			"**True Skill Average:** " + roundAndFormat(trueSA) + "\n**Progress Skill Average:** " + roundAndFormat(progressSA)
-		);
-		eb.addBlankField(true);
-		return eb;
 	}
 
 	@Override

@@ -33,6 +33,7 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.price.PriceSlashCommand;
 import com.skyblockplus.utils.database.CacheDatabase;
 import com.skyblockplus.utils.database.LeaderboardDatabase;
+import com.skyblockplus.utils.structs.HttpResult;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.InputStreamReader;
@@ -183,6 +184,8 @@ public class ApiHandler {
 			if (!isValidMinecraftUuid(username)) {
 				return new UsernameUuidStruct("No user with the name '" + username + "' was found");
 			}
+
+			return uuidToUsername(username);
 		}
 
 		Map.Entry<String, String> cachedResponse = uuidToUsernameCache
@@ -193,16 +196,26 @@ public class ApiHandler {
 			.findFirst()
 			.orElse(null);
 
-		if (cachedResponse == null && !isValidMinecraftUsername(username) && isValidMinecraftUuid(username)) {
-			return uuidToUsername(username);
-		}
-
 		if (cachedResponse != null) {
 			return new UsernameUuidStruct(cachedResponse.getValue(), cachedResponse.getKey());
 		}
 
 		UsernameUuidStruct response = uuidUsername(username);
-		return allowMojangApi && response.isRateLimited() ? uuidUsernameMojang(username) : response;
+		if (response.rateLimited()) {
+			if (allowMojangApi) {
+				UsernameUuidStruct mojangResponse = uuidUsernameMojang(username);
+				if (!mojangResponse.rateLimited()) {
+					return mojangResponse;
+				}
+			}
+
+			UsernameUuidStruct databaseResponse = leaderboardDatabase.usernameToUuid(username);
+			if (databaseResponse != null) {
+				return databaseResponse;
+			}
+		}
+
+		return response;
 	}
 
 	public static UsernameUuidStruct uuidToUsername(String uuid) {
@@ -218,21 +231,20 @@ public class ApiHandler {
 		try {
 			switch (mojangApiNum) {
 				case 1 -> {
-					JsonElement usernameJson = getJson("https://playerdb.co/api/player/minecraft/" + username);
+					HttpResult usernameRes = getJsonResult("https://playerdb.co/api/player/minecraft/" + username);
+					if (usernameRes == null) {
+						return new UsernameUuidStruct("An error occurred, please try again in a few seconds");
+					}
+
 					try {
 						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-							higherDepth(usernameJson, "data.player.username").getAsString(),
-							higherDepth(usernameJson, "data.player.id").getAsString()
+							usernameRes.get("data.player.username").getAsString(),
+							usernameRes.get("data.player.id").getAsString()
 						);
 						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 						return usernameUuidStruct;
 					} catch (Exception e) {
-						String message = higherDepth(usernameJson, "message").getAsString();
-						return new UsernameUuidStruct(
-							allowMojangApi && message.equals("Mojang API lookup failed.")
-								? "Mojang has rate limited this request."
-								: message
-						);
+						return new UsernameUuidStruct(usernameRes.get("message").getAsString(), usernameRes.isRateLimited());
 					}
 				}
 				case 2 -> {
@@ -249,20 +261,20 @@ public class ApiHandler {
 					}
 				}
 				default -> {
-					JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
+					HttpResult usernameRes = getJsonResult("https://api.ashcon.app/mojang/v2/user/" + username);
+					if (usernameRes == null) {
+						return new UsernameUuidStruct("An error occurred, please try again in a few seconds");
+					}
+
 					try {
 						UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-							higherDepth(usernameJson, "username").getAsString(),
-							higherDepth(usernameJson, "uuid").getAsString()
+							usernameRes.get("username").getAsString(),
+							usernameRes.get("uuid").getAsString()
 						);
 						uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 						return usernameUuidStruct;
 					} catch (Exception e) {
-						return new UsernameUuidStruct(
-							allowMojangApi && higherDepth(usernameJson, "error", "").equals("Too Many Requests")
-								? "Mojang has rate limited this request."
-								: higherDepth(usernameJson, "reason").getAsString()
-						);
+						return new UsernameUuidStruct(usernameRes.get("reason").getAsString(), usernameRes.isRateLimited());
 					}
 				}
 			}
@@ -311,7 +323,7 @@ public class ApiHandler {
 	private static UsernameUuidStruct uuidUsernameMojang(String username) {
 		try {
 			// true ? uuid to username : else username to uuid
-			JsonElement usernameJson = getJson(
+			HttpResult usernameRes = getJsonResult(
 				(
 					!isValidMinecraftUsername(username) && isValidMinecraftUuid(username)
 						? "https://sessionserver.mojang.com/session/minecraft/profile/"
@@ -319,15 +331,24 @@ public class ApiHandler {
 				) +
 				username
 			);
+			if (usernameRes == null) {
+				return new UsernameUuidStruct("An error occurred, please try again in a few seconds");
+			}
+
+			// No errorMessage returned when rate limited
+			if (usernameRes.isRateLimited()) {
+				return new UsernameUuidStruct("Mojang has rate limited this request", true);
+			}
+
 			try {
 				UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-					higherDepth(usernameJson, "name").getAsString(),
-					higherDepth(usernameJson, "id").getAsString()
+					usernameRes.get("name").getAsString(),
+					usernameRes.get("id").getAsString()
 				);
 				uuidToUsernameCache.put(usernameUuidStruct.uuid(), usernameUuidStruct.username());
 				return usernameUuidStruct;
 			} catch (Exception e) {
-				return new UsernameUuidStruct(higherDepth(usernameJson, "errorMessage").getAsString());
+				return new UsernameUuidStruct(usernameRes.get("errorMessage").getAsString());
 			}
 		} catch (Exception e) {
 			return new UsernameUuidStruct(e.getMessage());
@@ -335,14 +356,10 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid) {
-		return skyblockProfilesFromUuid(uuid, HYPIXEL_API_KEY);
+		return skyblockProfilesFromUuid(uuid, true, true);
 	}
 
-	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
-		return skyblockProfilesFromUuid(uuid, hypixelApiKey, true, true);
-	}
-
-	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean useCache, boolean shouldCache) {
+	public static HypixelResponse skyblockProfilesFromUuid(String uuid, boolean useCache, boolean shouldCache) {
 		if (useCache) {
 			JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_PROFILES, uuid);
 			if (cachedResponse != null) {
@@ -351,10 +368,7 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement profilesJson = getJson(
-				getHypixelApiUrl("/skyblock/profiles", hypixelApiKey).addParameter("uuid", uuid).toString(),
-				hypixelApiKey
-			);
+			JsonElement profilesJson = getJson(getHypixelApiUrl("/skyblock/profiles").addParameter("uuid", uuid).toString());
 
 			try {
 				if (
@@ -383,12 +397,12 @@ public class ApiHandler {
 	/**
 	 * Does not cache the profiles json
 	 */
-	public static CompletableFuture<HypixelResponse> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
+	public static CompletableFuture<HypixelResponse> asyncSkyblockProfilesFromUuid(String uuid) {
 		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_PROFILES, uuid);
 		if (cachedResponse != null) {
 			return CompletableFuture.completedFuture(new HypixelResponse(cachedResponse));
 		} else {
-			return asyncGet(getHypixelApiUrl("/skyblock/profiles", hypixelApiKey).addParameter("uuid", uuid).toString())
+			return asyncGet(getHypixelApiUrl("/skyblock/profiles").addParameter("uuid", uuid).toString())
 				.thenApplyAsync(
 					httpResponse -> {
 						try {
@@ -448,6 +462,27 @@ public class ApiHandler {
 		}
 	}
 
+	public static HypixelResponse skyblockBingoFromUuid(String uuid) {
+		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_BINGO, uuid);
+		if (cachedResponse != null) {
+			return new HypixelResponse(cachedResponse);
+		}
+
+		try {
+			JsonElement bingoJson = getJson(getHypixelApiUrl("/skyblock/bingo").addParameter("uuid", uuid).toString());
+
+			try {
+				JsonArray eventsArray = higherDepth(bingoJson, "events").getAsJsonArray();
+				cacheDatabase.cacheJson(new CacheDatabase.CacheId(CacheDatabase.CacheType.SKYBLOCK_BINGO, uuid), eventsArray);
+				return new HypixelResponse(eventsArray);
+			} catch (Exception e) {
+				return new HypixelResponse(higherDepth(bingoJson, "cause").getAsString());
+			}
+		} catch (Exception e) {
+			return new HypixelResponse(e.getMessage());
+		}
+	}
+
 	public static HypixelResponse skyblockMuseumFromProfileId(String profileId, String uuid) {
 		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_MUSEUM, profileId);
 		if (cachedResponse != null) {
@@ -455,9 +490,7 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement museumJson = getJson(
-				getHypixelApiUrl("/skyblock/museum", HYPIXEL_API_KEY).addParameter("profile", profileId).toString()
-			);
+			JsonElement museumJson = getJson(getHypixelApiUrl("/skyblock/museum").addParameter("profile", profileId).toString());
 
 			try {
 				if (higherDepth(museumJson, "members." + uuid) == null) {
@@ -489,7 +522,7 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement playerJson = getJson(getHypixelApiUrl("/player", HYPIXEL_API_KEY).addParameter("uuid", uuid).toString());
+			JsonElement playerJson = getJson(getHypixelApiUrl("/player").addParameter("uuid", uuid).toString());
 
 			try {
 				if (higherDepth(playerJson, "player").isJsonNull()) {
@@ -510,9 +543,7 @@ public class ApiHandler {
 
 	public static HypixelResponse getAuctionGeneric(String param, String value) {
 		try {
-			JsonElement auctionResponse = getJson(
-				getHypixelApiUrl("/skyblock/auction", HYPIXEL_API_KEY).addParameter(param, value).toString()
-			);
+			JsonElement auctionResponse = getJson(getHypixelApiUrl("/skyblock/auction").addParameter(param, value).toString());
 			try {
 				return new HypixelResponse(higherDepth(auctionResponse, "auctions").getAsJsonArray());
 			} catch (Exception e) {
@@ -539,7 +570,7 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement guildResponse = getJson(getHypixelApiUrl("/guild", HYPIXEL_API_KEY).addParameter(param, value).toString());
+			JsonElement guildResponse = getJson(getHypixelApiUrl("/guild").addParameter(param, value).toString());
 
 			try {
 				if (higherDepth(guildResponse, "guild").isJsonNull()) {
@@ -589,13 +620,9 @@ public class ApiHandler {
 		return getGuildGeneric("name", guildName.replace("_", " "));
 	}
 
-	public static URIBuilder getHypixelApiUrl(String path, String hypixelApiKey) {
+	public static URIBuilder getHypixelApiUrl(String path) {
 		try {
-			URIBuilder uriBuilder = new URIBuilder("https://api.hypixel.net").setPath(path);
-			if (hypixelApiKey != null) {
-				uriBuilder.addParameter("key", hypixelApiKey);
-			}
-			return uriBuilder;
+			return new URIBuilder("https://api.hypixel.net").setPath(path).addParameter("key", HYPIXEL_API_KEY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
