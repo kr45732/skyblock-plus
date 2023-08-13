@@ -2511,6 +2511,8 @@ public class SettingsExecute {
 				return apiFailMessage(responseCode);
 			}
 
+			validLogEvents.forEach(this::addLogEvent);
+
 			guildMap.get(guild.getId()).setLogChannel(channel);
 			return defaultSettingsEmbed("**Log channel set to:** " + channel.getAsMention());
 		}

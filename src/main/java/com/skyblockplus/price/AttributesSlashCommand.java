@@ -35,15 +35,17 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
-import org.apache.commons.collections4.SetUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -61,7 +63,10 @@ public class AttributesSlashCommand extends SlashCommand {
 			return defaultEmbed("Error fetching auction prices");
 		}
 
-		SetUtils.SetView<String> keys = setTriUnion(averageAuctionJson.keySet(), averageBinJson.keySet(), lowestBinJson.keySet());
+		Set<String> keys = setTriUnion(averageAuctionJson.keySet(), averageBinJson.keySet(), lowestBinJson.keySet())
+			.stream()
+			.filter(e -> e.contains("+"))
+			.collect(Collectors.toCollection(HashSet::new));
 
 		String itemId = nameToId(item, true);
 		if (itemId == null) {
@@ -173,7 +178,7 @@ public class AttributesSlashCommand extends SlashCommand {
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			if (getAverageAuctionJson() != null && getAverageBinJson() != null) {
+			if (getLowestBinJson() != null && getAverageAuctionJson() != null && getAverageBinJson() != null) {
 				event.replyClosestMatch(
 					event.getFocusedOption().getValue(),
 					setTriUnion(getLowestBinJson().keySet(), getAverageAuctionJson().keySet(), getAverageBinJson().keySet())
@@ -187,6 +192,38 @@ public class AttributesSlashCommand extends SlashCommand {
 		} else if (
 			event.getFocusedOption().getName().equals("attribute_one") || event.getFocusedOption().getName().equals("attribute_two")
 		) {
+			String itemName = event.getOption("item", OptionMapping::getAsString);
+			if (itemName != null && getLowestBinJson() != null && getAverageAuctionJson() != null && getAverageBinJson() != null) {
+				Set<String> keys = setTriUnion(getLowestBinJson().keySet(), getAverageAuctionJson().keySet(), getAverageBinJson().keySet())
+					.stream()
+					.filter(e -> e.contains("+"))
+					.collect(Collectors.toCollection(HashSet::new));
+
+				String itemId = nameToId(itemName, true);
+				if (itemId == null) {
+					itemId = getClosestMatchFromIds(itemName, keys);
+				}
+				String finalItemId = itemId;
+
+				Set<String> options = allAttributes
+					.stream()
+					.filter(attribute ->
+						keys
+							.stream()
+							.anyMatch(e ->
+								e.startsWith(finalItemId + "+ATTRIBUTE_SHARD_" + attribute) ||
+								(e.startsWith(finalItemId + "+ATTRIBUTE_SHARD_") && e.endsWith("+ATTRIBUTE_SHARD_" + attribute))
+							)
+					)
+					.map(e -> capitalizeString(e.replace("_", " ")))
+					.collect(Collectors.toCollection(HashSet::new));
+
+				if (!options.isEmpty()) {
+					event.replyClosestMatch(event.getFocusedOption().getValue(), options);
+					return;
+				}
+			}
+
 			event.replyClosestMatch(
 				event.getFocusedOption().getValue(),
 				allAttributes.stream().map(e -> capitalizeString(e.replace("_", " "))).collect(Collectors.toCollection(ArrayList::new))
