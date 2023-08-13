@@ -1416,8 +1416,8 @@ public class AutomaticGuild {
 	}
 
 	public void setLogEvents(List<String> botManagerRoles) {
-		this.botManagerRoles.clear();
-		this.botManagerRoles.addAll(botManagerRoles);
+		this.logEvents.clear();
+		this.logEvents.addAll(botManagerRoles);
 	}
 
 	public void logAction(String eventType, EmbedBuilder eb) {
