@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils.database;
 
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.utils.Utils.gson;
 
 import com.google.gson.JsonArray;
@@ -223,6 +224,8 @@ public class Database {
 
 	public boolean insertLinkedAccount(LinkedAccount linkedAccount, Member member, JsonElement verifySettings) {
 		try {
+			boolean upsert = false;
+
 			String discord = linkedAccount.discord();
 			long lastUpdated = linkedAccount.lastUpdated();
 			String username = linkedAccount.username();
@@ -238,10 +241,13 @@ public class Database {
 				statement.setString(2, username);
 				statement.setString(3, uuid);
 				try (ResultSet response = statement.executeQuery()) {
-					if (response.next() && member != null && verifySettings != null) {
-						String discordOld = response.getString("discord");
-						if (!discord.equals(discordOld)) {
-							UnlinkSlashCommand.unlinkAccount(member, verifySettings);
+					if (response.next()) {
+						upsert = true;
+						if (member != null && verifySettings != null) {
+							String discordOld = response.getString("discord");
+							if (!discord.equals(discordOld)) {
+								UnlinkSlashCommand.unlinkAccount(member, verifySettings);
+							}
 						}
 					}
 				}
@@ -257,12 +263,18 @@ public class Database {
 				statement.setString(2, discord);
 				statement.setString(3, username);
 				statement.setString(4, uuid);
-				return statement.executeUpdate() == 1;
+				if (statement.executeUpdate() == 1) {
+					if (!upsert) {
+						leaderboardDatabase.insertIfNotExist(uuid);
+					}
+					return true;
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
 		}
+
+		return false;
 	}
 
 	public LinkedAccount getByUsername(String username) {

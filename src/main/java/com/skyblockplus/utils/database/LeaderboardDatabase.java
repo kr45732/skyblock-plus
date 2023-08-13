@@ -149,6 +149,30 @@ public class LeaderboardDatabase {
 		return dataSource.getConnection();
 	}
 
+	public void insertIfNotExist(String uuid) {
+		if (failedUpdates.getIfPresent(uuid) != null) {
+			return;
+		}
+
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM stranded_lb WHERE uuid = ? LIMIT 1")
+		) {
+			statement.setObject(1, stringToUuid(uuid));
+			try (ResultSet response = statement.executeQuery()) {
+				if (!response.next()) {
+					playerRequestExecutor.submit(() -> {
+						if (!Player.create(uuid).isValid()) {
+							failedUpdates.put(uuid, true);
+						}
+					});
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void insertIntoLeaderboard(Player.Profile player) {
 		if (player.isValid()) {
 			List<Player.Profile> players = List.of(player);
