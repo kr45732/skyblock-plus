@@ -52,6 +52,7 @@ public class EventGuild {
 						TextChannel channel = jda.getGuildById(parent.guildId).getTextChannelById(wantedEvent.getChannelId());
 						if (channel == null || !channel.canTalk()) {
 							parent.logAction(
+								"bot_permission_error",
 								defaultEmbed("Event Notifications")
 									.setDescription("Missing permissions to view or send messages in <#" + wantedEvent.getChannelId() + ">")
 							);

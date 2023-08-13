@@ -48,6 +48,7 @@ public class JacobGuild {
 			if (enable) {
 				if (!channel.canTalk()) {
 					parent.logAction(
+						"bot_permission_error",
 						defaultEmbed("Jacob Notifications")
 							.setDescription("Missing permissions to view or send messages in " + channel.getAsMention())
 					);

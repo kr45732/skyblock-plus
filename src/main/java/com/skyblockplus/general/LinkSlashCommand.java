@@ -354,6 +354,7 @@ public class LinkSlashCommand extends SlashCommand {
 		guildMap
 			.get(member.getGuild().getId())
 			.logAction(
+				"member_verify",
 				defaultEmbed(linkedAccount.username() + " Verified", nameMcLink(linkedAccount.uuid()))
 					.setDescription(
 						(

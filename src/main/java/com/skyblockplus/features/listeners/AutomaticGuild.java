@@ -105,7 +105,7 @@ public class AutomaticGuild {
 	private static final Logger log = LoggerFactory.getLogger(AutomaticGuild.class);
 
 	private static final ScheduledFuture<?> logFuture = scheduler.scheduleWithFixedDelay(
-		() -> guildMap.values().forEach(g -> g.logAction(null, null)),
+		() -> guildMap.values().forEach(g -> g.logAction("automatic", null)),
 		5,
 		5,
 		TimeUnit.MINUTES
@@ -832,6 +832,7 @@ public class AutomaticGuild {
 				(counterUpdate > 0 ? " | Counters (" + counterUpdate + ")" : "")
 			);
 			logAction(
+				"guild_sync",
 				defaultEmbed("Automatic Guild Update")
 					.setDescription(
 						(verifyEnabled ? client.getSuccess() : client.getError()) +
@@ -863,6 +864,7 @@ public class AutomaticGuild {
 			if (fetchurChannel != null) {
 				if (!fetchurChannel.canTalk()) {
 					logAction(
+						"bot_permission_error",
 						defaultEmbed("Fetchur Notifications")
 							.setDescription("Missing permissions to view or send messages in " + fetchurChannel.getAsMention())
 					);
@@ -888,6 +890,7 @@ public class AutomaticGuild {
 			if (mayorChannel != null) {
 				if (!mayorChannel.canTalk()) {
 					logAction(
+						"bot_permission_error",
 						defaultEmbed("Mayor Notifications")
 							.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
 					);
@@ -941,6 +944,7 @@ public class AutomaticGuild {
 
 				if (!mayorChannel.canTalk()) {
 					logAction(
+						"bot_permission_error",
 						defaultEmbed("Mayor Notifications")
 							.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
 					);
@@ -1416,13 +1420,17 @@ public class AutomaticGuild {
 		this.botManagerRoles.addAll(botManagerRoles);
 	}
 
-	public void logAction(EmbedBuilder eb) {
-		logAction(eb, jda.getGuildById(guildId).getSelfMember());
+	public void logAction(String eventType, EmbedBuilder eb) {
+		logAction(eventType, eb, jda.getGuildById(guildId).getSelfMember());
 	}
 
-	public void logAction(EmbedBuilder eb, Member member) {
+	public void logAction(String eventType, EmbedBuilder eb, Member member) {
 		try {
 			if (logChannel == null || !logChannel.canTalk()) {
+				return;
+			}
+
+			if (!eventType.equals("automatic") && !logEvents.contains(eventType)) {
 				return;
 			}
 
