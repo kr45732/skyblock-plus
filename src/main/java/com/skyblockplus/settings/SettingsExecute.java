@@ -69,6 +69,7 @@ import org.apache.groovy.util.Maps;
 
 public class SettingsExecute {
 
+	private static final List<String> validLogEvents = List.of("member_verify", "guild_sync", "bot_permission_error");
 	private static final Map<String, String> allAutomatedRoles = new LinkedHashMap<>(
 		Maps.of(
 			"wolf",
@@ -226,17 +227,17 @@ public class SettingsExecute {
 					case "fetchur_ping" -> setFetchurPing(args[3]);
 					case "mayor_channel" -> setMayorChannel(args[3]);
 					case "mayor_ping" -> setMayorPing(args[3]);
-					case "log_channel" -> setLogChannel(args[3]);
 					default -> getHelpEmbed("settings set");
 				};
 		} else if (args.length == 3 && args[1].equals("delete")) {
-			eb =
-				switch (args[2]) {
-					case "all" -> database.deleteServerSettings(guild.getId()) == 200
+			if (args[2].equals("all")) {
+				eb =
+					database.deleteServerSettings(guild.getId()) == 200
 						? defaultEmbed("Success").setDescription("Server settings deleted")
 						: errorEmbed("Error deleting server settings");
-					default -> getHelpEmbed("settings delete");
-				};
+			} else {
+				eb = getHelpEmbed("settings delete");
+			}
 		} else if (args.length >= 2 && args[1].equals("blacklist")) {
 			args = content.split("\\s+", 5);
 			if (args.length == 2) {
@@ -272,6 +273,18 @@ public class SettingsExecute {
 			if (eb == null) {
 				eb = getHelpEmbed("settings bot_manager");
 			}
+		} else if (args.length == 4 && args[1].equals("log")) {
+			eb =
+				switch (args[2]) {
+					case "channel" -> setLogChannel(args[3]);
+					case "add" -> addLogEvent(args[3]);
+					case "remove" -> removeLogEvent(args[3]);
+					default -> null;
+				};
+
+			if (eb == null) {
+				eb = getHelpEmbed("settings log");
+			}
 		} else if (args.length == 1) {
 			eb =
 				defaultSettingsEmbed()
@@ -292,6 +305,9 @@ public class SettingsExecute {
 				.map(r -> "<@&" + r.getAsString() + ">")
 				.collect(Collectors.joining(" "));
 			String logChannel = higherDepth(serverSettings, "logChannel", "none");
+			String logEvents = streamJsonArray(higherDepth(serverSettings, "logEvents"))
+				.map(JsonElement::getAsString)
+				.collect(Collectors.joining(" "));
 
 			eb =
 				defaultSettingsEmbed()
@@ -317,7 +333,8 @@ public class SettingsExecute {
 						false
 					)
 					.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false)
-					.addField("Log Channel", logChannel.equals("none") || logChannel.isEmpty() ? "None" : "<#" + logChannel + ">", false);
+					.addField("Log Channel", logChannel.equals("none") || logChannel.isEmpty() ? "None" : "<#" + logChannel + ">", false)
+					.addField("Log Events", logEvents.isEmpty() ? "None" : logEvents, false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
 			if (args.length == 2) {
 				eb = displayJacobSettings();
@@ -1654,63 +1671,67 @@ public class SettingsExecute {
 		}
 
 		String guildName = "";
-		if (roleName.equals("guild_ranks")) {
-			JsonElement guildRoleSettings = database.getGuildSettings(guild.getId(), roleValue);
-			if (!higherDepth(guildRoleSettings, "guildRanksEnable", false)) {
-				return errorEmbed("Provided automatic guild name is invalid or automatic guild ranks are not enabled");
+		switch (roleName) {
+			case "guild_ranks" -> {
+				JsonElement guildRoleSettings = database.getGuildSettings(guild.getId(), roleValue);
+				if (!higherDepth(guildRoleSettings, "guildRanksEnable", false)) {
+					return errorEmbed("Provided automatic guild name is invalid or automatic guild ranks are not enabled");
+				}
+				RoleModel roleSettings = database.getRoleSettings(guild.getId(), "guild_ranks");
+				if (roleSettings == null) {
+					roleSettings = new RoleModel(roleName);
+				}
+				roleSettings.addLevel(roleValue, roleValue);
+				int responseCode = database.setRoleSettings(guild.getId(), roleSettings);
+				if (responseCode != 200) {
+					return apiFailMessage(responseCode);
+				}
+				return defaultSettingsEmbed("Added guild ranks for automatic guild - `" + roleValue + "`");
 			}
-
-			RoleModel roleSettings = database.getRoleSettings(guild.getId(), "guild_ranks");
-			if (roleSettings == null) {
-				roleSettings = new RoleModel(roleName);
+			case "guild_member" -> {
+				HypixelResponse guildJson = getGuildFromName(roleValue);
+				if (!guildJson.isValid()) {
+					return guildJson.getErrorEmbed();
+				}
+				roleValue = guildJson.get("_id").getAsString();
+				guildName = guildJson.get("name").getAsString();
 			}
-			roleSettings.addLevel(roleValue, roleValue);
-
-			int responseCode = database.setRoleSettings(guild.getId(), roleSettings);
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
+			case "gamemode" -> {
+				if (!roleValue.equals("ironman") && !roleValue.equals("stranded")) {
+					return errorEmbed("Mode must be ironman or stranded");
+				}
 			}
-			return defaultSettingsEmbed("Added guild ranks for automatic guild - `" + roleValue + "`");
-		} else if (roleName.equals("guild_member")) {
-			HypixelResponse guildJson = getGuildFromName(roleValue);
-			if (!guildJson.isValid()) {
-				return guildJson.getErrorEmbed();
+			case "player_items" -> {
+				roleValue = roleValue.replace("_", " ");
+				String itemId = nameToId(roleValue, true);
+				if (itemId == null) {
+					return errorEmbed(
+						"No item with the name `" +
+						roleValue +
+						"` exists. Perhaps you meant one of the following: " +
+						FuzzySearch
+							.extractTop(
+								roleValue,
+								getInternalJsonMappings()
+									.entrySet()
+									.stream()
+									.map(e -> higherDepth(e.getValue(), "name", ""))
+									.collect(Collectors.toCollection(ArrayList::new)),
+								5
+							)
+							.stream()
+							.map(e -> e.getString().replace(" ", "_"))
+							.collect(Collectors.joining(", "))
+					);
+				}
+				roleValue = itemId;
 			}
-			roleValue = guildJson.get("_id").getAsString();
-			guildName = guildJson.get("name").getAsString();
-		} else if (roleName.equals("gamemode")) {
-			if (!roleValue.equals("ironman") && !roleValue.equals("stranded")) {
-				return errorEmbed("Mode must be ironman or stranded");
-			}
-		} else if (roleName.equals("player_items")) {
-			roleValue = roleValue.replace("_", " ");
-			String itemId = nameToId(roleValue, true);
-			if (itemId == null) {
-				return errorEmbed(
-					"No item with the name `" +
-					roleValue +
-					"` exists. Perhaps you meant one of the following: " +
-					FuzzySearch
-						.extractTop(
-							roleValue,
-							getInternalJsonMappings()
-								.entrySet()
-								.stream()
-								.map(e -> higherDepth(e.getValue(), "name", ""))
-								.collect(Collectors.toCollection(ArrayList::new)),
-							5
-						)
-						.stream()
-						.map(e -> e.getString().replace(" ", "_"))
-						.collect(Collectors.joining(", "))
-				);
-			}
-			roleValue = itemId;
-		} else {
-			try {
-				Long.parseLong(roleValue);
-			} catch (Exception e) {
-				return errorEmbed("Role value must be an integer");
+			default -> {
+				try {
+					Long.parseLong(roleValue);
+				} catch (Exception e) {
+					return errorEmbed("Role value must be an integer");
+				}
 			}
 		}
 
@@ -2493,6 +2514,41 @@ public class SettingsExecute {
 			guildMap.get(guild.getId()).setLogChannel(channel);
 			return defaultSettingsEmbed("**Log channel set to:** " + channel.getAsMention());
 		}
+	}
+
+	public EmbedBuilder addLogEvent(String logEvent) {
+		if (!validLogEvents.contains(logEvent)) {
+			return errorEmbed("Invalid log event");
+		}
+
+		JsonArray curEvents = higherDepth(serverSettings, "logEvents").getAsJsonArray();
+		curEvents.remove(new JsonPrimitive(logEvent));
+		curEvents.add(logEvent);
+
+		int responseCode = database.setLogEvents(guild.getId(), curEvents);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setLogEvents(gson.fromJson(curEvents, new TypeToken<List<String>>() {}.getType()));
+		return defaultSettingsEmbed("**Added log event:** " + logEvent);
+	}
+
+	public EmbedBuilder removeLogEvent(String logEvent) {
+		if (!validLogEvents.contains(logEvent)) {
+			return errorEmbed("Invalid log event");
+		}
+
+		JsonArray curEvents = higherDepth(serverSettings, "logEvents").getAsJsonArray();
+		curEvents.remove(new JsonPrimitive(logEvent));
+
+		int responseCode = database.setLogEvents(guild.getId(), curEvents);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setLogEvents(gson.fromJson(curEvents, new TypeToken<List<String>>() {}.getType()));
+		return defaultSettingsEmbed("**Removed log event:** " + logEvent);
 	}
 
 	public EmbedBuilder setMayorPing(String roleMention) {

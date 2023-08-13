@@ -406,11 +406,6 @@ public class HelpSlashCommand extends SlashCommand {
 									"guest_role",
 									"Set the role that will be given to linked users that are not in any of the setup automatic guilds. Requires at least one automatic guild to be setup.",
 									"guest_role <@role>"
-								),
-								new HelpData(
-									"log_channel",
-									"Set the channel where automatic actions will be logged to.",
-									"log_channel <#channel>"
 								)
 							),
 						new HelpData("bot_manager", "Manage bot manager roles.")
@@ -421,6 +416,16 @@ public class HelpSlashCommand extends SlashCommand {
 									"add <@role>"
 								),
 								new HelpData("remove", "Remove a bot manager role.", "remove <@role>")
+							),
+						new HelpData("log", "Manage log settings.")
+							.addSubcommands(
+								new HelpData("channel", "Set the channel where events will be logged to.", "channel <#channel>"),
+								new HelpData(
+									"add",
+									"Add a log event. Valid events are user_verify, guild_sync, and bot_permission_error.",
+									"add <event>"
+								),
+								new HelpData("remove", "Remove a log event.", "remove <event>")
 							),
 						new HelpData("blacklist", "View or manage the application blacklist for this server.")
 							.addSecondData(
@@ -892,7 +897,9 @@ public class HelpSlashCommand extends SlashCommand {
 			) +
 			create("settings set mayor_ping <@role>", "Role that will be pinged when mayor notifications are sent") +
 			create("settings set guest_role <@role>", "Set the guest role") +
-			create("settings set log_channel <#channel>", "Set the action log channel") +
+			create("settings set log channel <#channel>", "Set the action log channel") +
+			create("settings set log add <event>", "Add an event to log") +
+			create("settings set log remove <event>", "Remove a log event") +
 			create("settings bot_manager add <@role>", "Add a bot manager role") +
 			create("settings bot_manager remove <@role>", "Remove a bot manager role") +
 			create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +

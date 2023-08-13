@@ -179,6 +179,8 @@ public class AutomaticGuild {
 	@Setter
 	private TextChannel logChannel = null;
 
+	private final List<String> logEvents = new ArrayList<>();
+
 	@Setter
 	private JsonArray blacklist = new JsonArray();
 
@@ -276,6 +278,13 @@ public class AutomaticGuild {
 		} catch (Exception ignored) {}
 		try {
 			logChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "logChannel", null));
+		} catch (Exception ignored) {}
+		try {
+			logEvents.addAll(
+				streamJsonArray(higherDepth(serverSettings, "logEvents"))
+					.map(JsonElement::getAsString)
+					.collect(Collectors.toCollection(ArrayList::new))
+			);
 		} catch (Exception ignored) {}
 		if (cacheDatabase.partyCaches.containsKey(guildId)) {
 			partyList.addAll(cacheDatabase.partyCaches.get(guildId));
@@ -1400,6 +1409,11 @@ public class AutomaticGuild {
 			return botManagerRoles.stream().anyMatch(playerRoles::contains);
 		}
 		return true;
+	}
+
+	public void setLogEvents(List<String> botManagerRoles) {
+		this.botManagerRoles.clear();
+		this.botManagerRoles.addAll(botManagerRoles);
 	}
 
 	public void logAction(EmbedBuilder eb) {

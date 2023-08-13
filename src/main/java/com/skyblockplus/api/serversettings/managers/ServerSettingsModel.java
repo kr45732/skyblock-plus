@@ -84,6 +84,10 @@ public class ServerSettingsModel {
 
 	private String logChannel = "";
 
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> logEvents = new ArrayList<>();
+
 	@Embedded
 	private EventNotifSettings eventNotif = new EventNotifSettings();
 

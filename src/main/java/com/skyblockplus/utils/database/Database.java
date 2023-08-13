@@ -218,6 +218,10 @@ public class Database {
 		return settingsService.setLogChannel(serverId, newSettings).getStatusCode().value();
 	}
 
+	public int setLogEvents(String serverId, JsonArray newSettings) {
+		return settingsService.setLogEvents(serverId, gson.fromJson(newSettings, String[].class)).getStatusCode().value();
+	}
+
 	public Connection getConnection() throws SQLException {
 		return dataSource.getConnection();
 	}
