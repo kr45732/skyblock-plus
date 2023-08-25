@@ -39,7 +39,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 
 	public LeaderboardSlashCommand() {
 		this.name = "leaderboard";
-		this.cooldown = GLOBAL_COOLDOWN + 1;
+		this.cooldown = GLOBAL_COOLDOWN;
 	}
 
 	public static EmbedBuilder getLeaderboard(

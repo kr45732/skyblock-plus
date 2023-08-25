@@ -59,7 +59,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 
 	public AuctionsSlashCommand() {
 		this.name = "auctions";
-		this.cooldown = GLOBAL_COOLDOWN + 1;
+		this.cooldown = GLOBAL_COOLDOWN;
 	}
 
 	public static Object getPlayerAuction(

@@ -224,7 +224,10 @@ public class Player {
 		}
 
 		if (failCause.equals("Unknown fail cause")) {
-			failCause = "Invalid profile name";
+			failCause =
+				"Invalid profile. Did you mean " +
+				getClosestMatch(profileName, profiles.stream().map(Profile::getProfileName).toList()) +
+				"?";
 		}
 		return true;
 	}

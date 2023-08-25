@@ -66,7 +66,7 @@ public class StringUtils {
 	public static String simplifyNumber(double number) {
 		String formattedNumber;
 		if (number >= 1000000000000000D) {
-			formattedNumber = ">1000T";
+			formattedNumber = ">999T";
 		} else if (number >= 1000000000000D) {
 			formattedNumber = df.format(number / 1000000000000D) + "T";
 		} else if (number >= 1000000000) {

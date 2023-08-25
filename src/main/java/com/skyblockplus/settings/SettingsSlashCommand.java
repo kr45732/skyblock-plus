@@ -35,7 +35,7 @@ public class SettingsSlashCommand extends SlashCommand {
 		this.name = "settings";
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 		this.logCommand = false;
-		this.cooldown = GLOBAL_COOLDOWN + 2;
+		this.cooldown = GLOBAL_COOLDOWN;
 	}
 
 	@Override
