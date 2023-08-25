@@ -122,8 +122,22 @@ public class JsonUtils {
 	public static JsonObject getBestiaryJson() {
 		if (bestiaryJson == null) {
 			try {
-				bestiaryJson =
-					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/Bestiary.json")).getAsJsonObject();
+				JsonObject bestiaryJsonParsed = new JsonObject();
+				for (Map.Entry<String, JsonElement> entry : JsonParser
+					.parseReader(new FileReader("src/main/java/com/skyblockplus/json/Bestiary.json"))
+					.getAsJsonObject()
+					.entrySet()) {
+					if (higherDepth(entry.getValue(), "hasSubcategories", false)) {
+						for (Map.Entry<String, JsonElement> subEntry : entry.getValue().getAsJsonObject().entrySet()) {
+							if (higherDepth(subEntry.getValue(), "mobs") != null) {
+								bestiaryJsonParsed.add(subEntry.getKey(), subEntry.getValue());
+							}
+						}
+					} else {
+						bestiaryJsonParsed.add(entry.getKey(), entry.getValue());
+					}
+				}
+				bestiaryJson = bestiaryJsonParsed;
 			} catch (Exception ignored) {}
 		}
 

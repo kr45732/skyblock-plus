@@ -130,6 +130,39 @@ public class ApiController {
 		}
 	}
 
+	//	@CrossOrigin("*")
+	//	@GetMapping("/mutualGuilds")
+	//	public ResponseEntity<?> getMutualGuilds(@RequestParam(value = "userId") String userId) {
+	//		Map<String, String> res = new HashMap<>();
+	//		for (Guild guild : jda.getMutualGuilds(jda.retrieveUserById(userId).complete())) {
+	//			res.put(guild.getId(), guild.getName());
+	//		}
+	//		return new ResponseEntity<>(res, HttpStatus.OK);
+	//	}
+	//
+	//	@CrossOrigin("*")
+	//	@GetMapping("/settings/verify")
+	//	public ResponseEntity<?> getVerifySettingsPub(@RequestParam(value = "guildId") String guildId) {
+	//		return settingsService.getVerifySettings(guildId);
+	//	}
+	//
+	//	@CrossOrigin("*")
+	//	@PostMapping(value = "/settings/verify", consumes = "application/json")
+	//	public ResponseEntity<?> postVerifySettingsPub(@RequestParam("guildId") String guildId, @RequestBody AutomatedVerify verifySettings) {
+	//		return settingsService.setVerifySettings(guildId, verifySettings);
+	//	}
+	//
+	//	@CrossOrigin("*")
+	//	@GetMapping("/guild/data")
+	//	public ResponseEntity<?> getGuildData(@RequestParam(value = "guildId") String guildId) {
+	//		Guild guild = jda.getGuildById(guildId);
+	//		DataObject res = DataObject.empty()
+	//				.put("name", guild.getName())
+	//				.put("textChannels", guild.getTextChannels().stream().collect(Collectors.toMap(e -> e.getId(), e -> e.getName())))
+	//				.put("roles", guild.getRoles().stream().filter(r -> !r.isManaged() && !r.isPublicRole() && guild.getSelfMember().canInteract(r)).collect(Collectors.toMap(e -> e.getId(), e -> e.getName())));
+	//		return new ResponseEntity<>(res.toMap(), HttpStatus.OK);
+	//	}
+
 	@GetMapping("/private/server/all")
 	public List<ServerSettingsModel> getAllServerSettings() {
 		return settingsService.getAllServerSettings();

@@ -107,16 +107,15 @@ public class HypixelUtils {
 
 	public static int bestiaryTierFromKills(int kills, int bracket, int cap) {
 		kills = Math.min(kills, cap);
-		JsonArray levelArray = higherDepth(getBestiaryJson(), "brackets." + bracket).getAsJsonArray();
-		int level = 0;
-		for (int i = 0; i < levelArray.size(); i++) {
-			if (kills >= levelArray.get(i).getAsInt()) {
-				level = i + 1;
+		int tier = 0;
+		for (JsonElement requiredKills : higherDepth(getBestiaryJson(), "brackets." + bracket).getAsJsonArray()) {
+			if (kills >= requiredKills.getAsInt()) {
+				tier++;
 			} else {
 				break;
 			}
 		}
-		return level;
+		return tier;
 	}
 
 	public static SkillsStruct levelingInfoFromExp(long exp, String name) {

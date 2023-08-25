@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.settings.SettingsExecute.allAutomatedRoles;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
@@ -147,6 +148,9 @@ public class RolesSlashCommand extends SlashCommand {
 				}
 
 				String roleName = higherDepth(roleSettings, "name").getAsString();
+				if (!allAutomatedRoles.containsKey(roleName)) {
+					continue;
+				}
 
 				if (
 					skipRoles &&
@@ -553,6 +557,10 @@ public class RolesSlashCommand extends SlashCommand {
 				}
 
 				String currentRoleName = higherDepth(roleSettings, "name").getAsString();
+				if (!allAutomatedRoles.containsKey(currentRoleName)) {
+					continue;
+				}
+
 				if (currentRoleName.equals("guild_ranks")) {
 					JsonArray curLevels = higherDepth(roleSettings, "levels").getAsJsonArray();
 					for (JsonElement curLevel : curLevels) {

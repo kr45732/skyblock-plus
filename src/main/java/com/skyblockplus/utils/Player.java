@@ -1631,10 +1631,9 @@ public class Player {
 				}
 
 				for (JsonElement mob : higherDepth(entry.getValue(), "mobs").getAsJsonArray()) {
-					int kills = 0;
-					for (JsonElement bestiaryName : higherDepth(mob, "mobs").getAsJsonArray()) {
-						kills += higherDepth(profileJson(), "bestiary.kills." + bestiaryName.getAsString(), 0);
-					}
+					int kills = streamJsonArray(higherDepth(mob, "mobs"))
+						.mapToInt(e -> higherDepth(profileJson(), "bestiary.kills." + e.getAsString(), 0))
+						.sum();
 
 					tier += bestiaryTierFromKills(kills, higherDepth(mob, "bracket").getAsInt(), higherDepth(mob, "cap").getAsInt());
 				}

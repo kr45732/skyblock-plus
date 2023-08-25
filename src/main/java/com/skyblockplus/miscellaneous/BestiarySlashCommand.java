@@ -80,15 +80,17 @@ public class BestiarySlashCommand extends SlashCommand {
 
 				for (JsonElement mob : higherDepth(entry.getValue(), "mobs").getAsJsonArray()) {
 					int kills = 0;
+					int deaths = 0;
 					for (JsonElement bestiaryName : higherDepth(mob, "mobs").getAsJsonArray()) {
 						kills += higherDepth(player.profileJson(), "bestiary.kills." + bestiaryName.getAsString(), 0);
+						deaths += higherDepth(player.profileJson(), "bestiary.deaths." + bestiaryName.getAsString(), 0);
 					}
 
 					int tier = bestiaryTierFromKills(kills, higherDepth(mob, "bracket").getAsInt(), higherDepth(mob, "cap").getAsInt());
 
 					eb.addField(
-						cleanMcCodes(higherDepth(mob, "name").getAsString()),
-						"Tier: " + roundAndFormat(tier) + "\nKills: " + formatNumber(kills),
+						cleanMcCodes(higherDepth(mob, "name").getAsString()) + " (" + roundAndFormat(tier) + ")",
+						"Kills: " + formatNumber(kills) + "\nDeaths: " + formatNumber(deaths),
 						true
 					);
 				}

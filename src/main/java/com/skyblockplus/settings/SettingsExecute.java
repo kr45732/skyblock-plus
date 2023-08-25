@@ -70,7 +70,7 @@ import org.apache.groovy.util.Maps;
 public class SettingsExecute {
 
 	private static final List<String> validLogEvents = List.of("member_verify", "guild_sync", "bot_permission_error");
-	private static final Map<String, String> allAutomatedRoles = new LinkedHashMap<>(
+	public static final Map<String, String> allAutomatedRoles = new LinkedHashMap<>(
 		Maps.of(
 			"wolf",
 			null,
@@ -2245,7 +2245,7 @@ public class SettingsExecute {
 			JsonElement referent = match.getReferent();
 			String thisUser = higherDepth(referent, "username").getAsString();
 			eb.addField(
-				thisUser,
+				escapeText(thisUser),
 				"Reason: " +
 				higherDepth(referent, "reason").getAsString() +
 				"\nNameMC: " +
