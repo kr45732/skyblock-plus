@@ -63,6 +63,8 @@ public class CakesSlashCommand extends SlashCommand {
 			cakeNameToId.put("cake_farming_fortune", "EPOCH_CAKE_BROWN");
 			cakeNameToId.put("cake_foraging_fortune", "EPOCH_CAKE_WHITE");
 			cakeNameToId.put("cake_mining_fortune", "EPOCH_CAKE_CYAN");
+			cakeNameToId.put("cake_true_defense", "EPOCH_CAKE_GRAY");
+			cakeNameToId.put("cake_vitality", "EPOCH_CAKE_DARK_GREEN");
 
 			StringBuilder activeCakes = new StringBuilder();
 			if (higherDepth(player.profileJson(), "temp_stat_buffs") != null) {

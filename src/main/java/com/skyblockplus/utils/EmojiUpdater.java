@@ -520,7 +520,8 @@ public class EmojiUpdater {
 						.replace("___", "_")
 						.replace("+", "plus")
 						.replace("&", "and")
-						.replaceAll("[™./()#'⸕❁✧❈☘✎❤❂◆©®]", "")
+						.replaceAll("[Ⓑⓑ]", "b")
+						.replaceAll("[™./()#'⸕❁✧❈☘✎❤❂◆©®༕]", "")
 						.replace("colossal_experience_bottle_upgrade", "colossal_exp_bottle_upgrade")
 						.replace("very_official_yellow_rock_of_love!", "official_yellow_rock_of_love")
 						.replace("exceedingly_rare_ender_artifact_upgrader", "ender_artifact_upgrader")
@@ -539,7 +540,8 @@ public class EmojiUpdater {
 						.replace("travel_scroll_to_the_trappers_den", "travel_scroll_trappers_den")
 						.replace("extreme_bingo_card_extreme_bingo_1", "extreme_bingo_card")
 						.replace("travel_scroll_to_the_wizard_tower", "travel_scroll_wizard_tower")
-						.replace("perma_jelled_garlic_flavored_re_heated_gummy_polar_bear", "gummy_polar_bear_accessory");
+						.replace("perma_jelled_garlic_flavored_re_heated_gummy_polar_bear", "gummy_polar_bear_accessory")
+						.replace("aspect_of_the_jerry,_signature_edition", "aspect_of_the_jerry_signature");
 
 					name =
 						switch (name = name.startsWith("_") ? name.substring(1) : name) {
@@ -564,6 +566,7 @@ public class EmojiUpdater {
 					String urlOrPath = entry.getValue().getAsString();
 					Emoji emoji;
 					if (urlOrPath.startsWith("src/main/java/com/skyblockplus/json")) {
+						System.out.println(name);
 						emoji = curGuild.createEmoji(name, Icon.from(new File(urlOrPath))).complete();
 					} else {
 						URLConnection urlConn = new URL(urlOrPath).openConnection();
