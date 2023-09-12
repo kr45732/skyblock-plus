@@ -566,7 +566,6 @@ public class EmojiUpdater {
 					String urlOrPath = entry.getValue().getAsString();
 					Emoji emoji;
 					if (urlOrPath.startsWith("src/main/java/com/skyblockplus/json")) {
-						System.out.println(name);
 						emoji = curGuild.createEmoji(name, Icon.from(new File(urlOrPath))).complete();
 					} else {
 						URLConnection urlConn = new URL(urlOrPath).openConnection();
