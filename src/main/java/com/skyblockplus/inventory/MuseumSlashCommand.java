@@ -177,7 +177,7 @@ public class MuseumSlashCommand extends SlashCommand {
 			Map<String, Double> formattedToCost = new HashMap<>();
 
 			for (Map.Entry<String, JsonElement> entry : getMuseumCategoriesJson().entrySet()) {
-				if (entry.getKey().equals("weapons") || entry.getKey().equals("rarities") || entry.getKey().equals("armor_sets")) {
+				if (entry.getKey().equals("weapons") || entry.getKey().equals("rarities") || entry.getKey().equals("armor")) {
 					for (JsonElement item : entry.getValue().getAsJsonArray()) {
 						String itemId = item.getAsString();
 
@@ -185,8 +185,8 @@ public class MuseumSlashCommand extends SlashCommand {
 							continue;
 						}
 
-						if (entry.getKey().equals("armor_sets")) {
-							List<String> setPieces = streamJsonArray(higherDepth(getMuseumCategoriesJson(), "armor_to_set." + itemId))
+						if (entry.getKey().equals("armor")) {
+							List<String> setPieces = streamJsonArray(getConstant("MUSEUM_ARMOR_TO_SET." + itemId))
 								.filter(e -> !e.isJsonNull())
 								.map(JsonElement::getAsString)
 								.toList();

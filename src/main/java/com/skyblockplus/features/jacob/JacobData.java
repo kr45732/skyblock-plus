@@ -25,6 +25,7 @@ import lombok.Data;
 @Data
 public class JacobData {
 
+	private boolean complete = true;
 	private int year;
 	private List<JacobContest> contests;
 

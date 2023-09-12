@@ -29,6 +29,7 @@ import com.skyblockplus.api.controller.ApiController;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.features.event.EventHandler;
 import com.skyblockplus.features.fetchur.FetchurHandler;
+import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.listeners.MainListener;
 import com.skyblockplus.features.mayor.MayorHandler;
 import com.skyblockplus.price.AuctionTracker;
@@ -168,6 +169,7 @@ public class Main {
 		ApiController.initialize();
 		FetchurHandler.initialize();
 		scheduler.scheduleWithFixedDelay(MayorHandler::initialize, 1, 5, TimeUnit.MINUTES);
+		JacobHandler.initialize();
 		EventHandler.initialize();
 
 		if (isMainBot()) {

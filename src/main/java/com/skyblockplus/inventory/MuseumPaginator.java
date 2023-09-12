@@ -55,11 +55,11 @@ public class MuseumPaginator {
 	private static final Map<String, String> categoryToEmoji = Maps.of(
 		"weapons",
 		"DIAMOND_SWORD",
-		"armor_sets",
+		"armor",
 		"DIAMOND_CHESTPLATE",
 		"rarities",
 		"JADERALD",
-		"special_items",
+		"special",
 		"CAKE"
 	);
 	private final Set<String> items;

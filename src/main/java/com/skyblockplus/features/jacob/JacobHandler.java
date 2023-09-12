@@ -19,39 +19,25 @@
 package com.skyblockplus.features.jacob;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
+import static com.skyblockplus.utils.utils.HttpUtils.getJsonObject;
+import static com.skyblockplus.utils.utils.JsonUtils.collectJsonArray;
 import static com.skyblockplus.utils.utils.StringUtils.getRelativeTimestamp;
-import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.utils.Utils.scheduler;
+import static com.skyblockplus.utils.utils.Utils.*;
 
+import com.google.gson.JsonObject;
 import com.skyblockplus.features.listeners.AutomaticGuild;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class JacobHandler {
 
-	public static ScheduledFuture<?> jacobFuture;
 	private static JacobData jacobData = null;
 
-	public static JacobData getJacobData() {
-		return jacobData;
-	}
-
-	public static void setJacobData(JacobData jacobData) {
-		JacobHandler.jacobData = jacobData;
-		if (jacobFuture == null || jacobFuture.isDone()) {
-			queue();
-		}
-	}
-
-	private static void queue() {
-		if (jacobData == null) {
-			return;
-		}
-
-		JacobContest nextContest = jacobData.getNextContest();
-		if (nextContest != null) {
-			jacobFuture =
+	public static void initialize() {
+		if (jacobData != null) {
+			JacobContest nextContest = jacobData.getNextContest();
+			if (nextContest != null) {
 				scheduler.schedule(
 					() -> {
 						try {
@@ -74,7 +60,8 @@ public class JacobHandler {
 									} catch (Exception ignored) {}
 								}
 							}
-							queue();
+
+							initialize();
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -82,6 +69,48 @@ public class JacobHandler {
 					nextContest.getDurationUntil().minusMinutes(5).toMillis(),
 					TimeUnit.MILLISECONDS
 				);
+				return;
+			}
 		}
+
+		scheduler.schedule(
+			() -> {
+				if (jacobData == null || jacobData.getYear() != getSkyblockYear() || !jacobData.isComplete()) {
+					setJacobDataFromApi();
+				}
+				initialize();
+			},
+			15,
+			TimeUnit.MINUTES
+		);
+	}
+
+	public static JacobData getJacobData() {
+		return jacobData;
+	}
+
+	public static void setJacobData(JacobData jacobData) {
+		JacobHandler.jacobData = jacobData;
+	}
+
+	public static void setJacobDataFromApi() {
+		JsonObject rawJacobData = getJsonObject("https://api.elitebot.dev/Contests/at/" + getSkyblockYear());
+		rawJacobData.add(
+			"contests",
+			collectJsonArray(
+				rawJacobData
+					.getAsJsonObject("contests")
+					.entrySet()
+					.stream()
+					.map(e -> {
+						JsonObject contest = new JsonObject();
+						contest.addProperty("time", Long.parseLong(e.getKey()) * 1000);
+						contest.add("crops", e.getValue());
+						return contest;
+					})
+			)
+		);
+
+		setJacobData(gson.fromJson(rawJacobData, JacobData.class));
 	}
 }

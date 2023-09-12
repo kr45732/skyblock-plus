@@ -22,7 +22,6 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
 import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
-import static com.skyblockplus.utils.utils.JsonUtils.getJacobDataJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.roundAndFormat;
 import static com.skyblockplus.utils.utils.Utils.*;
@@ -308,7 +307,7 @@ public class CacheDatabase {
 
 		if (JacobHandler.getJacobData() == null) {
 			try {
-				JacobHandler.setJacobData(gson.fromJson(getJacobDataJson(), JacobData.class));
+				JacobHandler.setJacobDataFromApi();
 				log.info("Fetched jacob data");
 			} catch (Exception e) {
 				log.error("", e);

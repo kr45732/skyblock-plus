@@ -83,7 +83,6 @@ public class JsonUtils {
 	private static JsonObject sbLevelsJson;
 	private static JsonObject essenceShopsJson;
 	private static JsonObject museumCategoriesJson;
-	private static JsonObject jacobDataJson;
 	private static JsonObject bestiaryJson;
 
 	public static JsonObject getLowestBinJson() {
@@ -123,9 +122,11 @@ public class JsonUtils {
 		if (bestiaryJson == null) {
 			try {
 				JsonObject bestiaryJsonParsed = new JsonObject();
-				for (Map.Entry<String, JsonElement> entry : JsonParser
-					.parseReader(new FileReader("src/main/java/com/skyblockplus/json/Bestiary.json"))
-					.getAsJsonObject()
+				for (Map.Entry<String, JsonElement> entry : getJsonObject(
+					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" +
+					getNeuBranch() +
+					"/constants/bestiary.json"
+				)
 					.entrySet()) {
 					if (higherDepth(entry.getValue(), "hasSubcategories", false)) {
 						for (Map.Entry<String, JsonElement> subEntry : entry.getValue().getAsJsonObject().entrySet()) {
@@ -394,37 +395,15 @@ public class JsonUtils {
 		if (museumCategoriesJson == null) {
 			try {
 				museumCategoriesJson =
-					getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/MuseumCategories.json");
+					getJsonObject(
+						"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" +
+						getNeuBranch() +
+						"/constants/museum.json"
+					);
 			} catch (Exception ignored) {}
 		}
 
 		return museumCategoriesJson;
-	}
-
-	public static JsonObject getJacobDataJson() {
-		if (jacobDataJson == null) {
-			try {
-				JsonObject rawJacobData = getJsonObject("https://api.elitebot.dev/Contests/at/" + getSkyblockYear());
-				rawJacobData.add(
-					"contests",
-					collectJsonArray(
-						rawJacobData
-							.getAsJsonObject("contests")
-							.entrySet()
-							.stream()
-							.map(e -> {
-								JsonObject contest = new JsonObject();
-								contest.addProperty("time", Long.parseLong(e.getKey()) * 1000);
-								contest.add("crops", e.getValue());
-								return contest;
-							})
-					)
-				);
-				jacobDataJson = rawJacobData;
-			} catch (Exception ignored) {}
-		}
-
-		return jacobDataJson;
 	}
 
 	public static JsonObject getBitsJson() {
