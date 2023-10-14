@@ -80,6 +80,7 @@ public class LinkSlashCommand extends SlashCommand {
 		"berserk",
 		"archer",
 		"tank",
+		"class_average",
 		"mage_reputation",
 		"barbarian_reputation",
 		"maxed_collections",

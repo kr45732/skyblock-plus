@@ -265,16 +265,17 @@ public class ApplyGuild {
 			return true;
 		}
 
-		JsonArray currentBlacklist = guildMap.get(event.getGuild().getId()).getBlacklist();
-		JsonElement blacklisted = streamJsonArray(currentBlacklist)
+		Optional<JsonElement> blacklisted = streamJsonArray(guildMap.get(event.getGuild().getId()).getBlacklist())
 			.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(linkedAccount.uuid()))
-			.findFirst()
-			.orElse(null);
-		if (blacklisted != null) {
+			.findFirst();
+		if (blacklisted.isPresent()) {
 			event
 				.getHook()
 				.editOriginal(
-					client.getError() + " You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`"
+					client.getError() +
+					" You have been blacklisted with reason `" +
+					higherDepth(blacklisted.get(), "reason").getAsString() +
+					"`"
 				)
 				.queue();
 			return true;
@@ -301,39 +302,15 @@ public class ApplyGuild {
 		if (!player.isValid()) {
 			event.getHook().editOriginal(client.getError() + " Failed to fetch player data: `" + player.getFailCause() + "`").queue();
 			return true;
-		} else {
-			Player.Gamemode gamemode = Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all"));
-			if (player.getMatchingProfileNames(gamemode).isEmpty()) {
-				event
-					.getHook()
-					.editOriginal(client.getError() + " You have no " + gamemode.toString().toLowerCase() + " profiles created")
-					.queue();
-				return true;
-			}
 		}
 
-		if (higherDepth(currentSettings, "applyCheckApi", false)) {
-			boolean invEnabled = player.isInventoryApiEnabled();
-			boolean bankEnabled = player.isBankApiEnabled();
-			boolean collectionsEnabled = player.isCollectionsApiEnabled();
-			boolean vaultEnabled = player.isVaultApiEnabled();
-			boolean skillsEnabled = player.isSkillsApiEnabled();
-
-			if (!invEnabled || !bankEnabled || !collectionsEnabled || !vaultEnabled || !skillsEnabled) {
-				String out =
-					(invEnabled ? "" : "inventory, ") +
-					(bankEnabled ? "" : "bank, ") +
-					(collectionsEnabled ? "" : "collections, ") +
-					(vaultEnabled ? "" : "vault, ") +
-					(skillsEnabled ? "" : "skills, ");
-				out = capitalizeString(out.substring(0, out.length() - 2));
-
-				event
-					.getHook()
-					.editOriginal(client.getError() + " " + out + " API" + (out.contains(",") ? "s" : "") + " not enabled")
-					.queue();
-				return true;
-			}
+		Player.Gamemode gamemode = Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all"));
+		if (player.getMatchingProfileNames(gamemode).isEmpty()) {
+			event
+				.getHook()
+				.editOriginal(client.getError() + " You have no " + gamemode.toString().toLowerCase() + " profiles created")
+				.queue();
+			return true;
 		}
 
 		new ApplyUser(event, player, this);

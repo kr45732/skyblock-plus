@@ -502,6 +502,7 @@ public class Player {
 				case "dungeon_secrets" -> getDungeonSecrets();
 				case "maxed_slayers" -> profile.getNumMaxedSlayers();
 				case "maxed_collections" -> profile.getNumMaxedCollections();
+				case "class_average" -> profile.getDungeonClassAverage();
 				case "mage_reputation" -> profile.getMageRep();
 				case "barbarian_reputation" -> profile.getBarbarianRep();
 				case "lily_weight" -> profile.getLilyWeight();
@@ -740,6 +741,18 @@ public class Player {
 
 		public SkillsStruct getDungeonClass(String className) {
 			return skillInfoFromExp(getDungeonClassXp(className), className);
+		}
+
+		public double getDungeonClassAverage() {
+			double dungeonClassAverage = 0;
+			for (String className : DUNGEON_CLASS_NAMES) {
+				try {
+					dungeonClassAverage += getDungeonClass(className).getProgressLevel();
+				} catch (Exception e) {
+					return -1;
+				}
+			}
+			return dungeonClassAverage / DUNGEON_CLASS_NAMES.size();
 		}
 
 		public long getCatacombsXp() {

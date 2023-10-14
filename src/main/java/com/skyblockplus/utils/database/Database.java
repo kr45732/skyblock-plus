@@ -309,6 +309,20 @@ public class Database {
 		return null;
 	}
 
+	public int getNumLinkedAccounts() {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) count FROM linked_account")
+		) {
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					return response.getInt("count");
+				}
+			}
+		} catch (Exception ignored) {}
+		return -1;
+	}
+
 	public List<LinkedAccount> getBeforeLastUpdated(long lastUpdated) {
 		try (
 			Connection connection = getConnection();

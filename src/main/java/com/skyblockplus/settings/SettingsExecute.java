@@ -131,7 +131,7 @@ public class SettingsExecute {
 			"total_slayer",
 			"**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n",
 			"maxed_slayers",
-			"**The number of maxed slayers a player has**\nExample: `/settings roles add maxed_slayers 6 @maxed all slayers`\n",
+			"**The number of maxed slayers a player has**\nExample: `/settings roles add maxed_slayers 6 @maxed slayers`\n",
 			"skill_average",
 			"**A player's skill average**\nExample: `/settings roles add skill_average 55 @maxed skills`\n",
 			"pet_score",
@@ -146,6 +146,8 @@ public class SettingsExecute {
 			"**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n",
 			"player_items",
 			"**Items that a player has**\nExample: `/settings roles add player_items hyperion @mage gamer`\n",
+			"class_average",
+			"**A player's average dungeon classes level**\nExample: `/settings roles add class_average 50 @maxed classes`\n",
 			"mage_reputation",
 			"**A player's mage reputation**\nExample: `/settings roles add mage_reputation 1000 @1k mage rep`\n",
 			"barbarian_reputation",
@@ -597,7 +599,7 @@ public class SettingsExecute {
 			}
 
 			if (eb == null) {
-				eb = getHelpEmbed("settings guild");
+				eb = getHelpEmbed("settings guild" + (args.length >= 4 && args[3].equals("apply") ? " apply" : ""));
 			}
 		}
 

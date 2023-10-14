@@ -54,17 +54,13 @@ public class CheckApiSlashCommand extends SlashCommand {
 				(invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) +
 				"\n" +
 				(invEnabled ? client.getSuccess() : client.getError()) +
-				" Inventory API" +
-				"\n" +
+				" Inventory API\n" +
 				(bankEnabled ? client.getSuccess() : client.getError()) +
-				" Bank API" +
-				"\n" +
+				" Bank API\n" +
 				(collectionsEnabled ? client.getSuccess() : client.getError()) +
-				" Collections API" +
-				"\n" +
+				" Collections API\n" +
 				(skillsEnabled ? client.getSuccess() : client.getError()) +
-				" Skills API" +
-				"\n" +
+				" Skills API\n" +
 				(vaultEnabled ? client.getSuccess() : client.getError()) +
 				" Personal Vault API"
 			);

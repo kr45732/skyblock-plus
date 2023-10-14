@@ -349,6 +349,7 @@ public class RolesSlashCommand extends SlashCommand {
 										"berserk",
 										"archer",
 										"tank",
+										"class_average",
 										"mage_reputation",
 										"barbarian_reputation",
 										"maxed_collections" -> player.getAmount(roleName, useHighest);

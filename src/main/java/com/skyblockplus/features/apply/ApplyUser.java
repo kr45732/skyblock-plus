@@ -28,12 +28,14 @@ import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.UserSnowflake;
@@ -45,6 +47,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
@@ -261,8 +264,59 @@ public class ApplyUser {
 
 	private void stateZero(String profile, JsonElement currentSettings, TextChannel applicationChannel, InteractionHook hook) {
 		Player.Profile player = Player.create(playerUsername, profile);
-		JsonArray currentReqs = higherDepth(currentSettings, "applyReqs").getAsJsonArray();
 
+		if (higherDepth(currentSettings, "applyCheckApi", false)) {
+			boolean invEnabled = player.isInventoryApiEnabled();
+			boolean bankEnabled = player.isBankApiEnabled();
+			boolean collectionsEnabled = player.isCollectionsApiEnabled();
+			boolean vaultEnabled = player.isVaultApiEnabled();
+			boolean skillsEnabled = player.isSkillsApiEnabled();
+
+			if (!invEnabled || !bankEnabled || !collectionsEnabled || !vaultEnabled || !skillsEnabled) {
+				EmbedBuilder eb = defaultEmbed("APIs not enabled")
+					.setDescription(
+						(invEnabled ? client.getSuccess() : client.getError()) +
+						" Inventory API\n" +
+						(bankEnabled ? client.getSuccess() : client.getError()) +
+						" Bank API\n" +
+						(collectionsEnabled ? client.getSuccess() : client.getError()) +
+						" Collections API\n" +
+						(skillsEnabled ? client.getSuccess() : client.getError()) +
+						" Skills API\n" +
+						(vaultEnabled ? client.getSuccess() : client.getError()) +
+						" Personal Vault API"
+					);
+
+				List<Button> buttons = new ArrayList<>();
+				if (!profileNames.isEmpty()) {
+					buttons.add(Button.primary("apply_user_retry", "Retry"));
+					buttons.add(Button.danger("apply_user_cancel", "Cancel"));
+					state = 1;
+				} else {
+					buttons.add(Button.success("apply_user_delete_channel", "Close Channel"));
+					state = 3;
+				}
+
+				if (applicationChannel != null) {
+					applicationChannel
+						.sendMessageEmbeds(eb.build())
+						.setActionRow(buttons)
+						.queue(m -> {
+							reactMessageId = m.getId();
+						});
+				} else {
+					hook
+						.editOriginalEmbeds(eb.build())
+						.setActionRow(buttons)
+						.queue(m -> {
+							reactMessageId = m.getId();
+						});
+				}
+				return;
+			}
+		}
+
+		JsonArray currentReqs = higherDepth(currentSettings, "applyReqs").getAsJsonArray();
 		if (!currentReqs.isEmpty()) {
 			boolean meetReqsOr = currentReqs.isEmpty();
 			StringBuilder missingReqsStr = new StringBuilder();
@@ -320,21 +374,29 @@ public class ApplyUser {
 					.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr)
 					.appendDescription("\nIf any of these value seem incorrect, then make sure all your APIs are enabled");
 
+				List<Button> buttons = new ArrayList<>();
+				if (!profileNames.isEmpty()) {
+					buttons.add(Button.primary("apply_user_retry", "Retry"));
+					buttons.add(Button.danger("apply_user_cancel", "Cancel"));
+					state = 1;
+				} else {
+					buttons.add(Button.success("apply_user_delete_channel", "Close Channel"));
+					state = 3;
+				}
+
 				if (applicationChannel != null) {
 					applicationChannel
 						.sendMessageEmbeds(eb.build())
-						.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
+						.setActionRow(buttons)
 						.queue(m -> {
 							reactMessageId = m.getId();
-							state = 3;
 						});
 				} else {
 					hook
 						.editOriginalEmbeds(eb.build())
-						.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
+						.setActionRow(buttons)
 						.queue(m -> {
 							reactMessageId = m.getId();
-							state = 3;
 						});
 				}
 				return;

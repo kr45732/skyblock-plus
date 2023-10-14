@@ -95,6 +95,7 @@ public class LeaderboardDatabase {
 			"berserk_xp",
 			"archer_xp",
 			"tank_xp",
+			"class_average",
 			"mage_reputation",
 			"barbarian_reputation",
 			"lily_slayer_weight",

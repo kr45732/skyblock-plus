@@ -74,7 +74,7 @@ public class ApiController {
 			DataObject
 				.empty()
 				.put("guild_count", jda.getGuildCache().size())
-				.put("user_count", getUserCount())
+				.put("user_count", database.getNumLinkedAccounts())
 				.put("total_command_uses", commandUses.values().stream().mapToInt(Integer::intValue).sum())
 				.put(
 					"command_uses",

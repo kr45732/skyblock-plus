@@ -25,8 +25,7 @@ import static com.skyblockplus.utils.utils.HypixelUtils.isVanillaItem;
 import static com.skyblockplus.utils.utils.JsonUtils.getAveragePriceJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.utils.Utils.getEmoji;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
@@ -52,7 +51,7 @@ public class FlipsSlashCommand extends SlashCommand {
 		if (underBinJsonLastUpdated != null) {
 			eb.appendDescription("**Next Update:** " + getRelativeTimestamp(underBinJsonLastUpdated.plusSeconds(60)));
 		}
-		eb.appendDescription("\n**Live Updates:** [**Join**](https://discord.gg/GZWZbcxpv4)");
+		eb.appendDescription("\n**Live Updates:** [**Join**](" + DISCORD_SERVER_INVITE_LINK + ")");
 
 		if (underBinJson == null || underBinJson.getAsJsonObject().isEmpty()) {
 			return eb.appendDescription("\n\nNo auction flips found at the moment");
