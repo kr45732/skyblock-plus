@@ -693,5 +693,56 @@
       },
       "ranks": []
     }
+  },
+  "645face78ea8c90b385c922c": {
+    "name": "EtherealVortex",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "bridgebot",
+        "staff"
+      ],
+      "default_rank": {
+        "requirements": [
+          [
+            {
+              "amount": 100,
+              "type": "level"
+            }
+          ]
+        ],
+        "names": [
+          "initiator"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 180,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "explorer"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 260,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "overlord"
+          ]
+        }
+      ]
+    }
   }
 }
