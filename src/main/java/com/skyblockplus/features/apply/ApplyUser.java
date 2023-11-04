@@ -28,14 +28,12 @@ import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.UserSnowflake;
@@ -47,7 +45,6 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
@@ -271,8 +268,9 @@ public class ApplyUser {
 			boolean collectionsEnabled = player.isCollectionsApiEnabled();
 			boolean vaultEnabled = player.isVaultApiEnabled();
 			boolean skillsEnabled = player.isSkillsApiEnabled();
+			boolean museumEnabled = player.getMuseum().isValid();
 
-			if (!invEnabled || !bankEnabled || !collectionsEnabled || !vaultEnabled || !skillsEnabled) {
+			if (!invEnabled || !bankEnabled || !collectionsEnabled || !vaultEnabled || !skillsEnabled || !museumEnabled) {
 				EmbedBuilder eb = defaultEmbed("APIs not enabled")
 					.setDescription(
 						(invEnabled ? client.getSuccess() : client.getError()) +
@@ -284,7 +282,9 @@ public class ApplyUser {
 						(skillsEnabled ? client.getSuccess() : client.getError()) +
 						" Skills API\n" +
 						(vaultEnabled ? client.getSuccess() : client.getError()) +
-						" Personal Vault API"
+						" Personal Vault API" +
+						(museumEnabled ? client.getSuccess() : client.getError()) +
+						" Museum API"
 					);
 
 				List<Button> buttons = new ArrayList<>();

@@ -21,7 +21,6 @@ package com.skyblockplus.features.apply;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
-import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;

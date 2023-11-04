@@ -521,7 +521,7 @@ public class EmojiUpdater {
 						.replace("+", "plus")
 						.replace("&", "and")
 						.replaceAll("[Ⓑⓑ]", "b")
-						.replaceAll("[™./()#'⸕❁✧❈☘✎❤❂◆©®༕]", "")
+						.replaceAll("[™./()#'⸕❁✧❈☘✎❤❂◆©®༕:]", "")
 						.replace("colossal_experience_bottle_upgrade", "colossal_exp_bottle_upgrade")
 						.replace("very_official_yellow_rock_of_love!", "official_yellow_rock_of_love")
 						.replace("exceedingly_rare_ender_artifact_upgrader", "ender_artifact_upgrader")

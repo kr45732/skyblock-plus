@@ -19,7 +19,6 @@
 package com.skyblockplus.utils.structs;
 
 import com.skyblockplus.utils.utils.StringUtils;
-import java.util.Objects;
 
 public record UsernameUuidStruct(String username, String uuid, String failCause, boolean rateLimited) {
 	public UsernameUuidStruct(String username, String uuid) {

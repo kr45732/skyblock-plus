@@ -19,7 +19,6 @@
 package com.skyblockplus.utils.utils;
 
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
-import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
 import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.Constants.getConstant;

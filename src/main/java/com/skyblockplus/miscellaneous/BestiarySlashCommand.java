@@ -18,9 +18,10 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.HypixelUtils.bestiaryTierFromKills;
-import static com.skyblockplus.utils.utils.JsonUtils.*;
+import static com.skyblockplus.utils.utils.JsonUtils.getBestiaryJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.errorEmbed;
 
