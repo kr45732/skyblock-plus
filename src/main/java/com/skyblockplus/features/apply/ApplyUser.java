@@ -282,7 +282,7 @@ public class ApplyUser {
 						(skillsEnabled ? client.getSuccess() : client.getError()) +
 						" Skills API\n" +
 						(vaultEnabled ? client.getSuccess() : client.getError()) +
-						" Personal Vault API" +
+						" Personal Vault API\n" +
 						(museumEnabled ? client.getSuccess() : client.getError()) +
 						" Museum API"
 					);
