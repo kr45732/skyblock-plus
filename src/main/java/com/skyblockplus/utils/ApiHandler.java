@@ -128,10 +128,7 @@ public class ApiHandler {
 			postJson(
 				"https://discordbotlist.com/api/v1/bots/" + selfUserId + "/stats",
 				dscBotListJson,
-				new BasicHeader(
-					"Authorization",
-					"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0IjoxLCJpZCI6Ijc5Njc5MTE2NzM2NjU5NDU5MiIsImlhdCI6MTY2MDc0ODQ0OH0._yWDDG-qXfYAyKzjYw5n76hQgyqEQ5ysbLwu1nRmKOo"
-				)
+				new BasicHeader("Authorization", DISCORD_BOT_LIST_TOKEN)
 			);
 
 			JsonObject dscBotsJson = new JsonObject();
@@ -139,33 +136,16 @@ public class ApiHandler {
 			postJson(
 				"https://discord.bots.gg/api/v1/bots/" + selfUserId + "/stats",
 				dscBotsJson,
-				new BasicHeader(
-					"Authorization",
-					"eyJhbGciOiJIUzI1NiJ9.eyJhcGkiOnRydWUsImlkIjoiMzg1OTM5MDMxNTk2NDY2MTc2IiwiaWF0IjoxNjYwNzQ4NTk0fQ.F1r05If3Sizp9M4MfBpzvrxi854HrPpcw5fINZcpEj8"
-				)
+				new BasicHeader("Authorization", DISCORD_BOTS_GG_TOKEN)
 			);
 
 			JsonObject discordsJson = new JsonObject();
 			discordsJson.addProperty("server_count", serverCount);
-			postJson(
-				"https://discords.com/bots/api/bot/" + selfUserId,
-				discordsJson,
-				new BasicHeader(
-					"Authorization",
-					"e2574f9c2bbe92a80c387f4b4f9c43ef0b8d747189375eef19a98165ffc0e1341e7abd333b037eee5ca9e9e31ca906a945f6d30eb477fbf4acb7ca0e0938ff40"
-				)
-			);
+			postJson("https://discords.com/bots/api/bot/" + selfUserId, discordsJson, new BasicHeader("Authorization", DISCORDS_COM_TOKEN));
 
 			JsonObject topGgJson = new JsonObject();
 			topGgJson.addProperty("server_count", serverCount);
-			postJson(
-				"https://top.gg/api/bots/" + selfUserId + "/stats",
-				topGgJson,
-				new BasicHeader(
-					"Authorization",
-					"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijc5Njc5MTE2NzM2NjU5NDU5MiIsImJvdCI6dHJ1ZSwiaWF0IjoxNjM5NTMyMTI2fQ.YN6n3mXXgbENfQv1k8OylJV6tfZHqEFgciVGGt_Tsa0"
-				)
-			);
+			postJson("https://top.gg/api/bots/" + selfUserId + "/stats", topGgJson, new BasicHeader("Authorization", TOP_GG_TOKEN));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

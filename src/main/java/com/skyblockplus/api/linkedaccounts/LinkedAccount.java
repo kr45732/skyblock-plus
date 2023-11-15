@@ -18,4 +18,10 @@
 
 package com.skyblockplus.api.linkedaccounts;
 
+/**
+ * @param lastUpdated unix timestamp in milliseconds
+ * @param discord discord ID
+ * @param uuid minecraft UUID
+ * @param username minecraft username
+ */
 public record LinkedAccount(long lastUpdated, String discord, String uuid, String username) {}

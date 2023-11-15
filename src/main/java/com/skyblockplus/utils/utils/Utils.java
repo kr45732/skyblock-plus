@@ -177,6 +177,14 @@ public class Utils {
 	public static String LEADERBOARD_DB_URL = "";
 	public static String CLIENT_SECRET = "";
 	public static String BASE_URL = "";
+	public static String JACOB_KEY = "";
+	public static String JACOB_API = "";
+	public static String EXTRAS_API = "";
+	public static String HASTE_KEY = "";
+	public static String DISCORD_BOT_LIST_TOKEN = "";
+	public static String DISCORD_BOTS_GG_TOKEN = "";
+	public static String DISCORDS_COM_TOKEN = "";
+	public static String TOP_GG_TOKEN = "";
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
@@ -282,7 +290,7 @@ public class Utils {
 			appProps.load(fs);
 			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
 			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
-			DATABASE_URL = ((String) appProps.get("DATABASE_URL"));
+			DATABASE_URL = (String) appProps.get("DATABASE_URL");
 			GITHUB_TOKEN = (String) appProps.get("GITHUB_TOKEN");
 			API_USERNAME = (String) appProps.get("API_USERNAME");
 			API_PASSWORD = (String) appProps.get("API_PASSWORD");
@@ -293,6 +301,14 @@ public class Utils {
 			LEADERBOARD_DB_URL = (String) appProps.get("LEADERBOARD_DB_URL");
 			CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
 			BASE_URL = (String) appProps.get("BASE_URL");
+			JACOB_KEY = (String) appProps.get("JACOB_KEY");
+			JACOB_API = (String) appProps.get("JACOB_API");
+			EXTRAS_API = (String) appProps.get("EXTRAS_API");
+			HASTE_KEY = (String) appProps.get("HASTE_KEY");
+			DISCORD_BOT_LIST_TOKEN = (String) appProps.get("DISCORD_BOT_LIST_TOKEN");
+			DISCORD_BOTS_GG_TOKEN = (String) appProps.get("DISCORD_BOTS_GG_TOKEN");
+			DISCORDS_COM_TOKEN = (String) appProps.get("DISCORDS_COM_TOKEN");
+			TOP_GG_TOKEN = (String) appProps.get("TOP_GG_TOKEN");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -307,6 +323,14 @@ public class Utils {
 			LEADERBOARD_DB_URL = System.getenv("LEADERBOARD_DB_URL");
 			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
 			BASE_URL = System.getenv("BASE_URL");
+			JACOB_KEY = System.getenv("JACOB_KEY");
+			JACOB_API = System.getenv("JACOB_API");
+			EXTRAS_API = System.getenv("EXTRAS_API");
+			HASTE_KEY = System.getenv("HASTE_KEY");
+			DISCORD_BOT_LIST_TOKEN = System.getenv("DISCORD_BOT_LIST_TOKEN");
+			DISCORD_BOTS_GG_TOKEN = System.getenv("DISCORD_BOTS_GG_TOKEN");
+			DISCORDS_COM_TOKEN = System.getenv("DISCORDS_COM_TOKEN");
+			TOP_GG_TOKEN = System.getenv("TOP_GG_TOKEN");
 		}
 	}
 
@@ -328,7 +352,7 @@ public class Utils {
 
 	public static String makeHastePost(Object body) {
 		try {
-			return getHasteUrl() + higherDepth(postUrl(getHasteUrl() + "?key=cab35a7a9b1242beeaf0e6dfb69404d5", body), "key").getAsString();
+			return getHasteUrl() + higherDepth(postUrl(getHasteUrl() + "?key=" + HASTE_KEY, body), "key").getAsString();
 		} catch (Exception e) {
 			return null;
 		}

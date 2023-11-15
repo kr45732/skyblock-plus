@@ -34,8 +34,8 @@ public class SubdomainFilter implements Filter {
 
 		String serverName = req.getServerName();
 		if (serverName.contains(BASE_URL) && !serverName.equals(BASE_URL)) {
-			String test = req.getServerName().split("." + BASE_URL)[0];
-			reqWrapper.addHeader("X-Subdomain-Internal", test);
+			String subdomain = req.getServerName().split("." + BASE_URL)[0];
+			reqWrapper.addHeader("X-Subdomain-Internal", subdomain);
 		}
 
 		chain.doFilter(reqWrapper, res);
