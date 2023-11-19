@@ -117,6 +117,10 @@ public class SkillsSlashCommand extends SlashCommand {
 			if (higherDepth(jacobStats, "perks") != null && higherDepth(jacobStats, "perks").getAsJsonObject().size() > 0) {
 				StringBuilder ebStr = new StringBuilder();
 				for (Map.Entry<String, JsonElement> perk : higherDepth(jacobStats, "perks").getAsJsonObject().entrySet()) {
+					if (!perk.getValue().isJsonPrimitive() || !perk.getValue().getAsJsonPrimitive().isNumber()) {
+						continue;
+					}
+
 					ebStr
 						.append("\n⭐ ")
 						.append(capitalizeString(perk.getKey().replace("_", " ")))
