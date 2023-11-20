@@ -966,9 +966,13 @@ public class Utils {
 
 				if (higherDepth(itemJson, "recipes") != null) {
 					for (JsonElement recipe : higherDepth(itemJson, "recipes").getAsJsonArray()) {
-						if (higherDepth(recipe, "type").getAsString().equals("forge")) {
+						String recipeType = higherDepth(recipe, "type", "");
+						if (recipeType.equals("forge") && !properties.has("forge")) {
 							properties.add("forge", higherDepth(recipe, "duration"));
-							break;
+						} else if (recipeType.equals("crafting") && !properties.has("recipe")) {
+							// TODO: handle multiple recipes (this just uses the first one)
+							recipe.getAsJsonObject().remove("type");
+							properties.add("recipe", recipe);
 						}
 					}
 				}
