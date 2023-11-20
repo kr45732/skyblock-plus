@@ -72,7 +72,7 @@ public class AuctionTracker {
 				return;
 			}
 
-			JsonElement endedAuctionsJson = getJson(getHypixelApiUrl("/skyblock/auctions_ended", false).toString());
+			JsonElement endedAuctionsJson = getJson(getHypixelApiUrl("/skyblock/auctions_ended", false));
 			if (higherDepth(endedAuctionsJson, "auctions") == null) {
 				return;
 			}

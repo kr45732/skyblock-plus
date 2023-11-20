@@ -138,7 +138,7 @@ public class AuctionFlipper {
 			}
 		}
 
-		JsonElement endedAuctionsJson = getJson(getHypixelApiUrl("/skyblock/auctions_ended", false).toString());
+		JsonElement endedAuctionsJson = getJson(getHypixelApiUrl("/skyblock/auctions_ended", false));
 		if (higherDepth(endedAuctionsJson, "auctions") != null) {
 			for (JsonElement auction : higherDepth(endedAuctionsJson, "auctions").getAsJsonArray()) {
 				long price = higherDepth(auction, "price").getAsLong();

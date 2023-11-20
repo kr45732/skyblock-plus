@@ -56,7 +56,7 @@ public class MayorHandler {
 	public static void initialize() {
 		try {
 			if (currentMayor.isEmpty()) {
-				JsonElement mayorJson = getJson(getHypixelApiUrl("/resources/skyblock/election", false).toString());
+				JsonElement mayorJson = getJson(getHypixelApiUrl("/resources/skyblock/election", false));
 				currentMayor = higherDepth(mayorJson, "mayor.name", "");
 				currentMayorYear = higherDepth(mayorJson, "mayor.election.year", 0);
 			}
@@ -81,7 +81,7 @@ public class MayorHandler {
 		Button button = null;
 
 		try {
-			JsonElement cur = higherDepth(getJson(getHypixelApiUrl("/resources/skyblock/election", false).toString()), "mayor");
+			JsonElement cur = higherDepth(getJson(getHypixelApiUrl("/resources/skyblock/election", false)), "mayor");
 			JsonArray mayors = collectJsonArray(
 				streamJsonArray(higherDepth(cur, "election.candidates"))
 					.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
@@ -186,7 +186,7 @@ public class MayorHandler {
 
 	public static void updateCurrentElection() {
 		try {
-			JsonElement cur = higherDepth(getJson(getHypixelApiUrl("/resources/skyblock/election", false).toString()), "current");
+			JsonElement cur = higherDepth(getJson(getHypixelApiUrl("/resources/skyblock/election", false)), "current");
 			if (higherDepth(cur, "candidates") == null) { // Election not open
 				return;
 			}

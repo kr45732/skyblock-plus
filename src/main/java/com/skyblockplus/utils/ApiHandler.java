@@ -348,7 +348,7 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement profilesJson = getJson(getHypixelApiUrl("/skyblock/profiles").addParameter("uuid", uuid).toString());
+			JsonElement profilesJson = getJson(getHypixelApiUrl("/skyblock/profiles").addParameter("uuid", uuid));
 
 			try {
 				if (
@@ -449,7 +449,7 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement bingoJson = getJson(getHypixelApiUrl("/skyblock/bingo").addParameter("uuid", uuid).toString());
+			JsonElement bingoJson = getJson(getHypixelApiUrl("/skyblock/bingo").addParameter("uuid", uuid));
 
 			try {
 				JsonArray eventsArray = higherDepth(bingoJson, "events").getAsJsonArray();
@@ -470,7 +470,7 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement museumJson = getJson(getHypixelApiUrl("/skyblock/museum").addParameter("profile", profileId).toString());
+			JsonElement museumJson = getJson(getHypixelApiUrl("/skyblock/museum").addParameter("profile", profileId));
 
 			try {
 				if (higherDepth(museumJson, "members." + uuid) == null) {
@@ -502,7 +502,7 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement playerJson = getJson(getHypixelApiUrl("/player").addParameter("uuid", uuid).toString());
+			JsonElement playerJson = getJson(getHypixelApiUrl("/player").addParameter("uuid", uuid));
 
 			try {
 				if (higherDepth(playerJson, "player").isJsonNull()) {
@@ -523,7 +523,7 @@ public class ApiHandler {
 
 	public static HypixelResponse getAuctionGeneric(String param, String value) {
 		try {
-			JsonElement auctionResponse = getJson(getHypixelApiUrl("/skyblock/auction").addParameter(param, value).toString());
+			JsonElement auctionResponse = getJson(getHypixelApiUrl("/skyblock/auction").addParameter(param, value));
 			try {
 				return new HypixelResponse(higherDepth(auctionResponse, "auctions").getAsJsonArray());
 			} catch (Exception e) {
@@ -550,7 +550,7 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement guildResponse = getJson(getHypixelApiUrl("/guild").addParameter(param, value).toString());
+			JsonElement guildResponse = getJson(getHypixelApiUrl("/guild").addParameter(param, value));
 
 			try {
 				if (higherDepth(guildResponse, "guild").isJsonNull()) {
