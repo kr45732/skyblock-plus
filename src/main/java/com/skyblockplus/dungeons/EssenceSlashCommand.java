@@ -170,7 +170,9 @@ public class EssenceSlashCommand extends SlashCommand {
 						.append("** ")
 						.append(capitalizeString(essence))
 						.append(" Essence:** ")
-						.append(formatNumber(higherDepth(player.profileJson(), "essence_" + essence, 0)))
+						.append(
+							formatNumber(higherDepth(player.profileJson(), "currencies.essence." + essence.toUpperCase() + ".current", 0))
+						)
 						.append("\n");
 				}
 				pages.put(SelectOption.of("Amounts", "amounts"), player.defaultPlayerEmbed().setDescription(amountsStr));
@@ -179,7 +181,7 @@ public class EssenceSlashCommand extends SlashCommand {
 					StringBuilder ebStr = new StringBuilder();
 
 					for (Map.Entry<String, JsonElement> essenceUpgrade : essenceShop.getValue().getAsJsonObject().entrySet()) {
-						int level = higherDepth(player.profileJson(), "perks." + essenceUpgrade.getKey(), 0);
+						int level = higherDepth(player.profileJson(), "player_data.perks." + essenceUpgrade.getKey(), 0);
 						JsonArray tiers = higherDepth(essenceUpgrade.getValue(), "costs").getAsJsonArray();
 
 						ebStr

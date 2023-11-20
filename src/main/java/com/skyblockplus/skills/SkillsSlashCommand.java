@@ -90,7 +90,7 @@ public class SkillsSlashCommand extends SlashCommand {
 			extras.addEmbedPage(eb);
 
 			eb = player.defaultPlayerEmbed();
-			JsonElement jacobStats = higherDepth(player.profileJson(), "jacob2");
+			JsonElement jacobStats = higherDepth(player.profileJson(), "jacobs_contest");
 			int bronze = higherDepth(jacobStats, "medals_inv.bronze", 0);
 			int silver = higherDepth(jacobStats, "medals_inv.silver", 0);
 			int gold = higherDepth(jacobStats, "medals_inv.gold", 0);

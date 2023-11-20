@@ -220,7 +220,7 @@ public class LevelSlashCommand extends SlashCommand {
 		Set<String> uniqueCraftedMinions = new HashSet<>();
 		for (Map.Entry<String, JsonElement> member : higherDepth(player.getOuterProfileJson(), "members").getAsJsonObject().entrySet()) {
 			try {
-				for (JsonElement minion : higherDepth(member.getValue(), "crafted_generators").getAsJsonArray()) {
+				for (JsonElement minion : higherDepth(member.getValue(), "player_data.crafted_generators").getAsJsonArray()) {
 					uniqueCraftedMinions.add(minion.getAsString());
 				}
 			} catch (Exception ignored) {}
@@ -387,7 +387,7 @@ public class LevelSlashCommand extends SlashCommand {
 		for (Map.Entry<String, JsonElement> essenceShop : getEssenceShopsJson().entrySet()) {
 			int shopSbXp = 0;
 			for (Map.Entry<String, JsonElement> upgrade : essenceShop.getValue().getAsJsonObject().entrySet()) {
-				int upgradeTier = higherDepth(player.profileJson(), "perks." + upgrade.getKey(), 0);
+				int upgradeTier = higherDepth(player.profileJson(), "player_data.perks." + upgrade.getKey(), 0);
 
 				int upgradeSbXp = 0;
 				for (int i = 0; i < upgradeTier; i++) {
@@ -516,7 +516,7 @@ public class LevelSlashCommand extends SlashCommand {
 		int bestiarySbXp = player.getBestiaryTier() + (int) player.getBestiaryLevel() * 2;
 
 		// Mythological Kills
-		int mythologicalKillsSbXp = Math.min(higherDepth(player.profileJson(), "stats.mythos_kills", 0), 10000) / 100;
+		int mythologicalKillsSbXp = Math.min(higherDepth(player.profileJson(), "player_stats.mythos.kills", 0), 10000) / 100;
 
 		// Slay dragons
 		int dragonSlaySbXp = 0;
@@ -630,7 +630,7 @@ public class LevelSlashCommand extends SlashCommand {
 		// Commissions
 		int commissionsSbXp = 0;
 		int[] commissionMilestoneXpArray = { 20, 30, 30, 50, 50, 75 };
-		JsonElement tutorialArray = higherDepth(player.profileJson(), "tutorial");
+		JsonElement tutorialArray = higherDepth(player.profileJson(), "objectives.tutorial");
 		if (tutorialArray != null) {
 			for (JsonElement tutorial : tutorialArray.getAsJsonArray()) {
 				if (
@@ -667,7 +667,7 @@ public class LevelSlashCommand extends SlashCommand {
 		// Rock pet milestones
 		int rockPetSbXp = 0;
 
-		int rockPetMilestone = higherDepth(player.profileJson(), "stats.pet_milestone_ores_mined", 0);
+		int rockPetMilestone = higherDepth(player.profileJson(), "player_stats.pets.milestone.ores_mined", 0);
 		int[] rockMilestonesRequired = { 2500, 7500, 20000, 100000, 250000 };
 		for (int milestone : rockMilestonesRequired) {
 			if (rockPetMilestone >= milestone) {
@@ -688,7 +688,7 @@ public class LevelSlashCommand extends SlashCommand {
 		String farmingStr = "";
 
 		// Anita shop upgrades
-		int doubleDrops = higherDepth(player.profileJson(), "jacob2.perks.double_drops", 0);
+		int doubleDrops = higherDepth(player.profileJson(), "jacobs_contest.perks.double_drops", 0);
 		int farmingLevelCap = player.getFarmingCapUpgrade();
 		int anitaShopUpgradeSbXp = (doubleDrops + farmingLevelCap) * 10;
 
@@ -720,7 +720,7 @@ public class LevelSlashCommand extends SlashCommand {
 
 		// Dolphin pet milestones
 		int dolphinPetSbXp = 0;
-		int dolphinMilestoneXp = higherDepth(player.profileJson(), "stats.pet_milestone_sea_creatures_killed", 0);
+		int dolphinMilestoneXp = higherDepth(player.profileJson(), "player_stats.pets.milestone.sea_creatures_killed", 0);
 		int[] dolphinMilestoneRequired = { 250, 1000, 2500, 5000, 10000 };
 		for (int milestone : dolphinMilestoneRequired) {
 			if (dolphinMilestoneXp >= milestone) {
@@ -747,7 +747,7 @@ public class LevelSlashCommand extends SlashCommand {
 		int accessoryBagUpgradeSbXp = higherDepth(player.profileJson(), "accessory_bag_storage.bag_upgrades_purchased", 0) * 2;
 
 		// Reaper peppers
-		int reaperPepperSbXp = higherDepth(player.profileJson(), "reaper_peppers_eaten", 0) * 10;
+		int reaperPepperSbXp = higherDepth(player.profileJson(), "player_data.reaper_peppers_eaten", 0) * 10;
 
 		// Unlocking accessory bag powers
 		int unlockingPowersSbXp = 0;
@@ -784,7 +784,7 @@ public class LevelSlashCommand extends SlashCommand {
 		int harpSbXp = 0;
 
 		JsonObject harpSongToSbXp = higherDepth(getSbLevelsJson(), "miscellaneous_task.harp_songs_names").getAsJsonObject();
-		JsonElement harpQuests = higherDepth(player.profileJson(), "harp_quest");
+		JsonElement harpQuests = higherDepth(player.profileJson(), "quests.harp_quest");
 		if (harpQuests != null) {
 			for (Map.Entry<String, JsonElement> harpSong : harpSongToSbXp.entrySet()) {
 				if (harpQuests.getAsJsonObject().has(harpSong.getKey())) {
@@ -824,7 +824,7 @@ public class LevelSlashCommand extends SlashCommand {
 		// Personal bank upgrades
 		int personalBankSbXp = 0;
 		// Field is zero indexed
-		int personalBankUpgrade = higherDepth(player.profileJson(), "personal_bank_upgrade", 0);
+		int personalBankUpgrade = higherDepth(player.profileJson(), "profile.personal_bank_upgrade", 0);
 		for (int i = 1; i <= personalBankUpgrade; i++) {
 			personalBankSbXp +=
 				switch (i) {

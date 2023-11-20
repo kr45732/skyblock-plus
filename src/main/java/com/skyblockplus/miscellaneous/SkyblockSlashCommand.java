@@ -68,7 +68,7 @@ public class SkyblockSlashCommand extends SlashCommand {
 					}
 				}
 
-				long created = higherDepth(profile.profileJson(), "first_join", -1L);
+				long created = higherDepth(profile.profileJson(), "profile.first_join", -1L);
 				eb.setDescription("Created: " + (created != -1 ? getRelativeTimestamp(created) : " Unknown"));
 				if (profile.isSelected()) {
 					eb.appendDescription("\nSelected: Yes");

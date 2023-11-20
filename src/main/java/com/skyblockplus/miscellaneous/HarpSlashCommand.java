@@ -46,7 +46,7 @@ public class HarpSlashCommand extends SlashCommand {
 	public static EmbedBuilder getHarp(String username, String profileName) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
-			JsonElement harpJson = higherDepth(player.profileJson(), "harp_quest");
+			JsonElement harpJson = higherDepth(player.profileJson(), "quests.harp_quest");
 			if (harpJson == null) {
 				return defaultEmbed("Player has not used the harp");
 			}

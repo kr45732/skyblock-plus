@@ -67,8 +67,8 @@ public class CakesSlashCommand extends SlashCommand {
 			cakeNameToId.put("cake_vitality", "EPOCH_CAKE_DARK_GREEN");
 
 			StringBuilder activeCakes = new StringBuilder();
-			if (higherDepth(player.profileJson(), "temp_stat_buffs") != null) {
-				for (JsonElement cake : higherDepth(player.profileJson(), "temp_stat_buffs").getAsJsonArray()) {
+			if (higherDepth(player.profileJson(), "player_data.temp_stat_buffs") != null) {
+				for (JsonElement cake : higherDepth(player.profileJson(), "player_data.temp_stat_buffs").getAsJsonArray()) {
 					Instant expires = Instant.ofEpochMilli(higherDepth(cake, "expire_at").getAsLong());
 					if (expires.isAfter(Instant.now())) {
 						String cakeName = higherDepth(cake, "key").getAsString();

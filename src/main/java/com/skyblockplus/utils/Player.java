@@ -561,7 +561,7 @@ public class Player {
 		}
 
 		public double getPurseCoins() {
-			return higherDepth(profileJson(), "coin_purse", 0.0);
+			return higherDepth(profileJson(), "currencies.coin_purse", 0.0);
 		}
 
 		public JsonArray getBankHistory() {
@@ -574,7 +574,7 @@ public class Player {
 
 		/* Skills */
 		public int getFarmingCapUpgrade() {
-			return higherDepth(profileJson(), "jacob2.perks.farming_level_cap", 0);
+			return higherDepth(profileJson(), "jacobs_contest.perks.farming_level_cap", 0);
 		}
 
 		public int getSkillMaxLevel(String skillName, WeightType weightType) {
@@ -592,7 +592,7 @@ public class Player {
 		}
 
 		public long getSkillXp(String skillName) {
-			return higherDepth(profileJson(), "experience_skill_" + (skillName.equals("social") ? "social2" : skillName), -1L);
+			return higherDepth(profileJson(), "player_data.experience.SKILL_" + skillName.toUpperCase(), -1L);
 		}
 
 		public SkillsStruct getSkill(String skillName) {
@@ -675,11 +675,11 @@ public class Player {
 		}
 
 		public int getSlayerBossKills(String slayerName, int tier) {
-			return higherDepth(profileJson(), "slayer_bosses." + slayerName + ".boss_kills_tier_" + tier, 0);
+			return higherDepth(profileJson(), "slayer.slayer_bosses." + slayerName + ".boss_kills_tier_" + tier, 0);
 		}
 
 		public int getSlayerXp(String slayerName) {
-			return higherDepth(profileJson(), "slayer_bosses." + slayerName + ".xp", 0);
+			return higherDepth(profileJson(), "slayer.slayer_bosses." + slayerName + ".xp", 0);
 		}
 
 		public int getSlayerLevel(String slayerName) {
@@ -770,7 +770,7 @@ public class Player {
 
 		public Map<Integer, InvItem> getInventoryMap(boolean sort) {
 			try {
-				String contents = higherDepth(profileJson(), "inv_contents.data").getAsString();
+				String contents = higherDepth(profileJson(), "inventory.inv_contents.data").getAsString();
 				NBTCompound parsedContents = NBTReader.readBase64(contents);
 				Map<Integer, InvItem> invMap = getGenericInventoryMap(parsedContents);
 				if (sort) {
@@ -794,7 +794,7 @@ public class Player {
 
 		public Map<Integer, InvItem> getPersonalVaultMap() {
 			try {
-				String contents = higherDepth(profileJson(), "personal_vault_contents.data").getAsString();
+				String contents = higherDepth(profileJson(), "inventory.personal_vault_contents.data").getAsString();
 				NBTCompound parsedContents = NBTReader.readBase64(contents);
 				return getGenericInventoryMap(parsedContents);
 			} catch (Exception ignored) {}
@@ -805,7 +805,9 @@ public class Player {
 			try {
 				Map<Integer, InvItem> storageMap = new HashMap<>();
 				int counter = 1;
-				for (Map.Entry<String, JsonElement> bp : higherDepth(profileJson(), "backpack_contents").getAsJsonObject().entrySet()) {
+				for (Map.Entry<String, JsonElement> bp : higherDepth(profileJson(), "inventory.backpack_contents")
+					.getAsJsonObject()
+					.entrySet()) {
 					Collection<InvItem> curBpMap = getGenericInventoryMap(
 						NBTReader.readBase64(higherDepth(bp.getValue(), "data").getAsString())
 					)
@@ -864,7 +866,7 @@ public class Player {
 
 		public Map<Integer, InvItem> getTalismanBagMap() {
 			try {
-				String contents = higherDepth(profileJson(), "talisman_bag.data").getAsString();
+				String contents = higherDepth(profileJson(), "inventory.bag_contents.talisman_bag.data").getAsString();
 				NBTCompound parsedContents = NBTReader.readBase64(contents);
 				return getGenericInventoryMap(parsedContents);
 			} catch (Exception ignored) {}
@@ -873,7 +875,7 @@ public class Player {
 
 		public Map<Integer, InvItem> getEquipmentMap() {
 			try {
-				String contents = higherDepth(profileJson(), "equippment_contents.data").getAsString();
+				String contents = higherDepth(profileJson(), "inventory.equipment_contents.data").getAsString();
 				NBTCompound parsedContents = NBTReader.readBase64(contents);
 				return getGenericInventoryMap(parsedContents);
 			} catch (Exception ignored) {}
@@ -882,7 +884,7 @@ public class Player {
 
 		public Map<Integer, InvItem> getArmorMap() {
 			try {
-				String contents = higherDepth(profileJson(), "inv_armor.data").getAsString();
+				String contents = higherDepth(profileJson(), "inventory.inv_armor.data").getAsString();
 				NBTCompound parsedContents = NBTReader.readBase64(contents);
 				Map<Integer, InvItem> oldMap = getGenericInventoryMap(parsedContents);
 				Map<Integer, InvItem> orderedMap = new HashMap<>();
@@ -897,7 +899,7 @@ public class Player {
 
 		public Map<Integer, InvItem> getWardrobeMap() {
 			try {
-				String contents = higherDepth(profileJson(), "wardrobe_contents.data").getAsString();
+				String contents = higherDepth(profileJson(), "inventory.wardrobe_contents.data").getAsString();
 				NBTCompound parsedContents = NBTReader.readBase64(contents);
 				return getGenericInventoryMap(parsedContents);
 			} catch (Exception ignored) {}
@@ -943,7 +945,7 @@ public class Player {
 
 		public Map<Integer, InvItem> getEnderChestMap() {
 			try {
-				String contents = higherDepth(profileJson(), "ender_chest_contents.data").getAsString();
+				String contents = higherDepth(profileJson(), "inventory.ender_chest_contents.data").getAsString();
 				NBTCompound parsedContents = NBTReader.readBase64(contents);
 				return getGenericInventoryMap(parsedContents);
 			} catch (Exception ignored) {}
@@ -952,7 +954,7 @@ public class Player {
 
 		public Map<String, Integer> getPlayerSacks() {
 			try {
-				JsonObject sacksJson = higherDepth(profileJson(), "sacks_counts").getAsJsonObject();
+				JsonObject sacksJson = higherDepth(profileJson(), "inventory.sacks_counts").getAsJsonObject();
 				Map<String, Integer> sacksMap = new HashMap<>();
 				for (Map.Entry<String, JsonElement> sacksEntry : sacksJson.entrySet()) {
 					sacksMap.put(sacksEntry.getKey(), sacksEntry.getValue().getAsInt());
@@ -967,7 +969,9 @@ public class Player {
 		/* Emoji viewer arrays & other inventory */
 		public List<String[]> getTalismanBag() {
 			try {
-				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "talisman_bag.data").getAsString()).getList("i");
+				NBTList items = NBTReader
+					.readBase64(higherDepth(profileJson(), "inventory.bag_contents.talisman_bag.data").getAsString())
+					.getList("i");
 				Map<Integer, String> itemsMap = new TreeMap<>();
 
 				for (int i = 0; i < items.size(); i++) {
@@ -1014,7 +1018,9 @@ public class Player {
 
 		public List<String[]> getEnderChest() {
 			try {
-				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "ender_chest_contents.data").getAsString()).getList("i");
+				NBTList items = NBTReader
+					.readBase64(higherDepth(profileJson(), "inventory.ender_chest_contents.data").getAsString())
+					.getList("i");
 				Map<Integer, String> itemsMap = new TreeMap<>();
 
 				for (int i = 0; i < items.size(); i++) {
@@ -1071,7 +1077,7 @@ public class Player {
 			try {
 				List<String[]> pages = new ArrayList<>();
 
-				for (JsonElement page : higherDepth(profileJson(), "backpack_contents")
+				for (JsonElement page : higherDepth(profileJson(), "inventory.backpack_contents")
 					.getAsJsonObject()
 					.entrySet()
 					.stream()
@@ -1135,7 +1141,7 @@ public class Player {
 
 		public String[] getInventory() {
 			try {
-				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "inv_contents.data").getAsString()).getList("i");
+				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "inventory.inv_contents.data").getAsString()).getList("i");
 				Map<Integer, String> itemsMap = new TreeMap<>();
 
 				for (int i = 0; i < items.size(); i++) {
@@ -1181,8 +1187,10 @@ public class Player {
 
 		public Map<Integer, ArmorStruct> getWardrobeList() {
 			try {
-				int equippedSlot = higherDepth(profileJson(), "wardrobe_equipped_slot", -1);
-				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "wardrobe_contents.data").getAsString()).getList("i");
+				int equippedSlot = higherDepth(profileJson(), "inventory.wardrobe_equipped_slot", -1);
+				NBTList items = NBTReader
+					.readBase64(higherDepth(profileJson(), "inventory.wardrobe_contents.data").getAsString())
+					.getList("i");
 				Map<Integer, String> itemsMap = new HashMap<>();
 
 				for (int i = 0; i < items.size(); i++) {
@@ -1234,9 +1242,11 @@ public class Player {
 
 		public List<String[]> getWardrobe() {
 			try {
-				int equippedWardrobeSlot = higherDepth(profileJson(), "wardrobe_equipped_slot", -1);
+				int equippedWardrobeSlot = higherDepth(profileJson(), "inventory.wardrobe_equipped_slot", -1);
 				Map<Integer, InvItem> equippedArmor = equippedWardrobeSlot != -1 ? getArmorMap() : null;
-				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "wardrobe_contents.data").getAsString()).getList("i");
+				NBTList items = NBTReader
+					.readBase64(higherDepth(profileJson(), "inventory.wardrobe_contents.data").getAsString())
+					.getList("i");
 				Map<Integer, String> itemsMap = new TreeMap<>();
 
 				for (int i = 0; i < items.size(); i++) {
@@ -1295,7 +1305,7 @@ public class Player {
 
 		public ArmorStruct getArmor() {
 			try {
-				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "inv_armor.data").getAsString()).getList("i");
+				NBTList items = NBTReader.readBase64(higherDepth(profileJson(), "inventory.inv_armor.data").getAsString()).getList("i");
 				Map<Integer, String> itemsMap = new HashMap<>();
 
 				for (int i = 0; i < items.size(); i++) {
@@ -1308,12 +1318,12 @@ public class Player {
 		}
 
 		public JsonArray getPets() {
-			return higherDepth(profileJson(), "pets").getAsJsonArray();
+			return higherDepth(profileJson(), "pets_data.pets").getAsJsonArray();
 		}
 
 		/* Miscellaneous */
 		public int getFairySouls() {
-			return higherDepth(profileJson(), "fairy_souls_collected", 0);
+			return higherDepth(profileJson(), "fairy_soul.total_collected", 0);
 		}
 
 		public double getExactLevel() {
@@ -1494,7 +1504,7 @@ public class Player {
 
 				for (Map.Entry<String, JsonElement> member : higherDepth(getOuterProfileJson(), "members").getAsJsonObject().entrySet()) {
 					try {
-						JsonArray craftedMinions = higherDepth(member.getValue(), "crafted_generators").getAsJsonArray();
+						JsonArray craftedMinions = higherDepth(member.getValue(), "player_data.crafted_generators").getAsJsonArray();
 						for (JsonElement minion : craftedMinions) {
 							uniqueCraftedMinions.add(minion.getAsString());
 						}
@@ -1587,7 +1597,7 @@ public class Player {
 		}
 
 		public double getStat(String stat) {
-			return higherDepth(profileJson(), "stats." + skyblockStatToCase.getOrDefault(stat, stat), -1.0);
+			return higherDepth(profileJson(), "player_stats." + skyblockStatV2Mappings.getOrDefault(stat, stat), -1.0);
 		}
 
 		public int getNumMaxedCollections() {
@@ -1663,7 +1673,7 @@ public class Player {
 		}
 
 		public boolean isInventoryApiEnabled() {
-			return higherDepth(profileJson(), "inv_contents.data", null) != null;
+			return higherDepth(profileJson(), "inventory.inv_contents.data", null) != null;
 		}
 
 		public boolean isBankApiEnabled() {
@@ -1678,11 +1688,11 @@ public class Player {
 		}
 
 		public boolean isVaultApiEnabled() {
-			return higherDepth(profileJson(), "personal_vault_contents.data", null) != null;
+			return higherDepth(profileJson(), "inventory.personal_vault_contents.data", null) != null;
 		}
 
 		public boolean isSkillsApiEnabled() {
-			return higherDepth(profileJson(), "experience_skill_combat") != null;
+			return higherDepth(profileJson(), "player_data.experience") != null;
 		}
 
 		public int getDojoPoints() {

@@ -160,7 +160,8 @@ public class NetworthExecute {
 		for (String essence : essenceTypes) {
 			addTotal(
 				"essence",
-				getLowestPrice("ESSENCE_" + essence.toUpperCase()) * higherDepth(player.profileJson(), "essence_" + essence, 0)
+				getLowestPrice("ESSENCE_" + essence.toUpperCase()) *
+				higherDepth(player.profileJson(), "currencies.essence." + essence.toUpperCase() + ".current", 0)
 			);
 		}
 
