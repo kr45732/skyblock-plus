@@ -242,7 +242,7 @@ public class Utils {
 	public static EmbedBuilder defaultEmbed(String title, String titleUrl) {
 		EmbedBuilder eb = new EmbedBuilder()
 			.setColor(BOT_COLOR)
-			.setFooter("By @crypticplasma • dsc.gg/sb+", null)
+			.setFooter("SB+ is open source • sbplus.codes/gh")
 			.setTimestamp(Instant.now());
 		if (titleUrl != null && titleUrl.length() <= MessageEmbed.URL_MAX_LENGTH && EmbedBuilder.URL_PATTERN.matcher(titleUrl).matches()) {
 			eb.setTitle(title, titleUrl);

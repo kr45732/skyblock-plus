@@ -302,7 +302,7 @@ public class CustomPaginator {
 
 		embedBuilder
 			.setColor(color)
-			.setFooter("By @crypticplasma" + (showPageNumbers ? " • Page " + pageNum + "/" + pages : "") + " • dsc.gg/sb+", null)
+			.setFooter("SB+ is open source • sbplus.codes/gh" + (showPageNumbers ? " • Page " + pageNum + "/" + pages : ""))
 			.setTimestamp(Instant.now());
 
 		return embedBuilder.build();

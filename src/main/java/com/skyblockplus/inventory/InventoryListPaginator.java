@@ -75,7 +75,7 @@ public class InventoryListPaginator {
 		EmbedBuilder eb = player
 			.defaultPlayerEmbed()
 			.setThumbnail(null)
-			.setFooter("By @crypticplasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null);
+			.setFooter("SB+ is open source • sbplus.codes/gh • Page " + (pageNumber + 1) + "/" + items.size());
 		InvItem item = items.get(pageNumber);
 		if (item == null) {
 			eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
@@ -178,7 +178,7 @@ public class InventoryListPaginator {
 			EmbedBuilder eb = player
 				.defaultPlayerEmbed()
 				.setThumbnail(null)
-				.setFooter("By @crypticplasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null);
+				.setFooter("SB+ is open source • sbplus.codes/gh • Page " + (pageNumber + 1) + "/" + items.size());
 			InvItem item = items.get(pageNumber);
 			if (item == null) {
 				eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));
@@ -225,7 +225,7 @@ public class InventoryListPaginator {
 		EmbedBuilder eb = player
 			.defaultPlayerEmbed()
 			.setThumbnail(null)
-			.setFooter("By @crypticplasma • Page " + (pageNumber + 1) + "/" + items.size() + " • dsc.gg/sb+", null);
+			.setFooter("SB+ is open source • sbplus.codes/gh • Page " + (pageNumber + 1) + "/" + items.size());
 		InvItem item = items.get(pageNumber);
 		if (item == null) {
 			eb.setDescription("**Item:** empty\n**Slot:** " + (pageNumber + 1));

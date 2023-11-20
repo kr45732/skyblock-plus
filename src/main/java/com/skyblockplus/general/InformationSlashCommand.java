@@ -97,7 +97,7 @@ public class InformationSlashCommand extends SlashCommand {
 									.setThumbnail(
 										"https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif"
 									)
-									.setFooter("dsc.gg/sb+ • Last restart")
+									.setFooter("SB+ is open source • sbplus.codes/gh • Last restart")
 									.setTimestamp(client.getStartTime())
 									.build()
 							)

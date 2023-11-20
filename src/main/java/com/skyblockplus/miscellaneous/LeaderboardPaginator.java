@@ -175,7 +175,7 @@ public class LeaderboardPaginator {
 			)
 			.addField("", columnOne.toString(), true)
 			.addField("", columnTwo.toString(), true)
-			.setFooter("By @crypticplasma • Page " + ((pageFirstRank - 1) / 20 + 1) + " • dsc.gg/sb+", null);
+			.setFooter("SB+ is open source • sbplus.codes/gh • Page " + ((pageFirstRank - 1) / 20 + 1));
 	}
 
 	private boolean condition(GenericInteractionCreateEvent genericEvent) {
