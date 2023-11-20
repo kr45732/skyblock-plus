@@ -21,6 +21,7 @@ package com.skyblockplus.features.mayor;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.miscellaneous.CalendarSlashCommand.YEAR_0;
 import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
+import static com.skyblockplus.utils.ApiHandler.getHypixelApiUrl;
 import static com.skyblockplus.utils.Constants.MAYOR_NAME_TO_SKIN;
 import static com.skyblockplus.utils.Constants.mayorNameToEmoji;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
@@ -55,7 +56,7 @@ public class MayorHandler {
 	public static void initialize() {
 		try {
 			if (currentMayor.isEmpty()) {
-				JsonElement mayorJson = getJson("https://api.hypixel.net/resources/skyblock/election");
+				JsonElement mayorJson = getJson(getHypixelApiUrl("/resources/skyblock/election", false).toString());
 				currentMayor = higherDepth(mayorJson, "mayor.name", "");
 				currentMayorYear = higherDepth(mayorJson, "mayor.election.year", 0);
 			}
@@ -80,7 +81,7 @@ public class MayorHandler {
 		Button button = null;
 
 		try {
-			JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor");
+			JsonElement cur = higherDepth(getJson(getHypixelApiUrl("/resources/skyblock/election", false).toString()), "mayor");
 			JsonArray mayors = collectJsonArray(
 				streamJsonArray(higherDepth(cur, "election.candidates"))
 					.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
@@ -185,7 +186,7 @@ public class MayorHandler {
 
 	public static void updateCurrentElection() {
 		try {
-			JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "current");
+			JsonElement cur = higherDepth(getJson(getHypixelApiUrl("/resources/skyblock/election", false).toString()), "current");
 			if (higherDepth(cur, "candidates") == null) { // Election not open
 				return;
 			}

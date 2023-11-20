@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.utils.ApiHandler.getHypixelApiUrl;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.HttpUtils.okHttpClient;
@@ -137,7 +138,7 @@ public class AuctionFlipper {
 			}
 		}
 
-		JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
+		JsonElement endedAuctionsJson = getJson(getHypixelApiUrl("/skyblock/auctions_ended", false).toString());
 		if (higherDepth(endedAuctionsJson, "auctions") != null) {
 			for (JsonElement auction : higherDepth(endedAuctionsJson, "auctions").getAsJsonArray()) {
 				long price = higherDepth(auction, "price").getAsLong();

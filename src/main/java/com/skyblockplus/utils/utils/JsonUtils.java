@@ -19,8 +19,7 @@
 package com.skyblockplus.utils.utils;
 
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
-import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
-import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.getConstant;
 import static com.skyblockplus.utils.utils.HttpUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.nameToId;
@@ -226,7 +225,7 @@ public class JsonUtils {
 
 	public static JsonObject getBingoInfoJson() {
 		if (bingoInfoJson == null || Duration.between(bingoJsonLastUpdated, Instant.now()).toMinutes() >= 5) {
-			bingoInfoJson = getJsonObject("https://api.hypixel.net/resources/skyblock/bingo");
+			bingoInfoJson = getJsonObject(getHypixelApiUrl("/resources/skyblock/bingo", false).toString());
 			bingoJsonLastUpdated = Instant.now();
 		}
 
@@ -237,7 +236,7 @@ public class JsonUtils {
 		if (bazaarJson == null || Duration.between(bazaarJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			try {
 				JsonObject tempBazaarJson = new JsonObject();
-				for (Map.Entry<String, JsonElement> entry : getJsonObject("https://api.hypixel.net/skyblock/bazaar")
+				for (Map.Entry<String, JsonElement> entry : getJsonObject(getHypixelApiUrl("/skyblock/bazaar", false).toString())
 					.get("products")
 					.getAsJsonObject()
 					.entrySet()) {
@@ -291,7 +290,8 @@ public class JsonUtils {
 	public static Map<String, JsonElement> getSkyblockItemsJson() {
 		if (skyblockItemsJson == null) {
 			skyblockItemsJson = new HashMap<>();
-			for (JsonElement item : higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items").getAsJsonArray()) {
+			for (JsonElement item : higherDepth(getJson(getHypixelApiUrl("/resources/skyblock/items", false).toString()), "items")
+				.getAsJsonArray()) {
 				if (higherDepth(item, "gemstone_slots") != null) {
 					Map<String, Integer> count = new HashMap<>();
 					for (JsonElement slot : higherDepth(item, "gemstone_slots").getAsJsonArray()) {
@@ -508,7 +508,7 @@ public class JsonUtils {
 		if (collectionsJson == null) {
 			collectionsJson = new JsonObject();
 			JsonObject hypixelCollectionsJson = higherDepth(
-				getJson("https://api.hypixel.net/resources/skyblock/collections"),
+				getJson(getHypixelApiUrl("/resources/skyblock/collections", false).toString()),
 				"collections"
 			)
 				.getAsJsonObject();

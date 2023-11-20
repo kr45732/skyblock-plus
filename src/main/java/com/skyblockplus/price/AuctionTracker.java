@@ -18,6 +18,7 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.ApiHandler.getHypixelApiUrl;
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
@@ -71,7 +72,7 @@ public class AuctionTracker {
 				return;
 			}
 
-			JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
+			JsonElement endedAuctionsJson = getJson(getHypixelApiUrl("/skyblock/auctions_ended", false).toString());
 			if (higherDepth(endedAuctionsJson, "auctions") == null) {
 				return;
 			}

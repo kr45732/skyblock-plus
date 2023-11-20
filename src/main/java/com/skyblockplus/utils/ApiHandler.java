@@ -601,8 +601,13 @@ public class ApiHandler {
 	}
 
 	public static URIBuilder getHypixelApiUrl(String path) {
+		return getHypixelApiUrl(path, true);
+	}
+
+	public static URIBuilder getHypixelApiUrl(String path, boolean authenticated) {
 		try {
-			return new URIBuilder("https://api.hypixel.net").setPath(path).addParameter("key", HYPIXEL_API_KEY);
+			URIBuilder uri = new URIBuilder("https://api.hypixel.net").setPath("/v2" + (path.startsWith("/") ? "" : "/") + path);
+			return authenticated ? uri.addParameter("key", HYPIXEL_API_KEY) : uri;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
