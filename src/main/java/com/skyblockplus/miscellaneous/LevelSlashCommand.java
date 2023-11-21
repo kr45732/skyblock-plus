@@ -329,7 +329,7 @@ public class LevelSlashCommand extends SlashCommand {
 		JsonElement cataTierCompletions = higherDepth(player.profileJson(), "dungeons.dungeon_types.catacombs.tier_completions");
 		if (cataTierCompletions != null) {
 			for (Map.Entry<String, JsonElement> completion : cataTierCompletions.getAsJsonObject().entrySet()) {
-				if (completion.getValue().getAsInt() > 0) {
+				if (!completion.getKey().equals("total") && completion.getValue().getAsInt() > 0) {
 					floorCompletionSbXp +=
 						higherDepth(taskJson, "complete_catacombs.[" + Integer.parseInt(completion.getKey()) + "]").getAsInt();
 				}
@@ -341,7 +341,7 @@ public class LevelSlashCommand extends SlashCommand {
 		JsonElement masterTierCompletions = higherDepth(player.profileJson(), "dungeons.dungeon_types.master_catacombs.tier_completions");
 		if (masterTierCompletions != null) {
 			for (Map.Entry<String, JsonElement> completion : masterTierCompletions.getAsJsonObject().entrySet()) {
-				if (completion.getValue().getAsInt() > 0) {
+				if (!completion.getKey().equals("total") && completion.getValue().getAsInt() > 0) {
 					masterFloorCompletionSbXp += higherDepth(taskJson, "complete_master_catacombs").getAsInt();
 				}
 			}
@@ -440,6 +440,10 @@ public class LevelSlashCommand extends SlashCommand {
 			JsonElement dungeonCompletions = higherDepth(player.profileJson(), "dungeons.dungeon_types." + type + ".tier_completions");
 			if (dungeonCompletions != null) {
 				for (Map.Entry<String, JsonElement> floorCompletions : dungeonCompletions.getAsJsonObject().entrySet()) {
+					if (floorCompletions.getKey().equals("total")) {
+						continue;
+					}
+
 					floorToCompletions.compute(
 						floorCompletions.getKey(),
 						(k, v) -> (v == null ? 0 : v) + floorCompletions.getValue().getAsInt()
