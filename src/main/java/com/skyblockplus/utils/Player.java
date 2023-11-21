@@ -1597,7 +1597,7 @@ public class Player {
 		}
 
 		public double getStat(String stat) {
-			return higherDepth(profileJson(), "player_stats." + skyblockStatV2Mappings.getOrDefault(stat, stat), -1.0);
+			return higherDepth(profileJson(), "player_stats." + V2_STATS_MAP.getOrDefault(stat, stat), -1.0);
 		}
 
 		public int getNumMaxedCollections() {
