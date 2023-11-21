@@ -41,7 +41,6 @@ public class Constants {
 
 	/* Hardcoded constants */
 	public static final List<String> essenceTypes = List.of("undead", "wither", "dragon", "spider", "ice", "crimson", "diamond", "gold");
-
 	public static final List<String> allAttributes = List.of(
 		"ARACHNO",
 		"ARACHNO_RESISTANCE",
