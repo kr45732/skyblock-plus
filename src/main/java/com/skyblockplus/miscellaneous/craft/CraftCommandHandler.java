@@ -200,8 +200,6 @@ public class CraftCommandHandler {
 	private int transmissionTunerCount = 0;
 
 	public CraftCommandHandler(String itemId, SlashCommandEvent slashCommandEvent) {
-		// TODO: Pets (pet skin & held item), attributes, silex
-
 		this.itemId = itemId;
 		this.slashCommandEvent = slashCommandEvent;
 		this.calculator = new NetworthExecute().initPrices();
