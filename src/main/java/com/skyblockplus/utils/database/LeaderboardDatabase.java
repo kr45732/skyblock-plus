@@ -469,7 +469,7 @@ public class LeaderboardDatabase {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"SELECT username, uuid, " +
+				"SELECT username, uuid, last_updated, " +
 				lbTypes
 					.stream()
 					.map(e ->
@@ -509,7 +509,11 @@ public class LeaderboardDatabase {
 				while (response.next()) {
 					String uuid = response.getString("uuid").replace("-", "");
 
-					DataObject playerObj = DataObject.empty().put("username", response.getString("username")).put("uuid", uuid);
+					DataObject playerObj = DataObject
+						.empty()
+						.put("username", response.getString("username"))
+						.put("uuid", uuid)
+						.put("last_updated", response.getLong("last_updated"));
 					for (String lbType : lbTypes) {
 						playerObj.put(lbType, getDouble(response, lbType));
 					}
@@ -545,7 +549,11 @@ public class LeaderboardDatabase {
 						if (player.isValid()) {
 							players.add(player);
 
-							DataObject playerObj = DataObject.empty().put("username", player.getUsername()).put("uuid", uuid);
+							DataObject playerObj = DataObject
+								.empty()
+								.put("username", player.getUsername())
+								.put("uuid", uuid)
+								.put("last_updated", Instant.now().toEpochMilli());
 							for (String lbType : lbTypes) {
 								playerObj.put(lbType, player.getHighestAmount(lbType, mode));
 							}

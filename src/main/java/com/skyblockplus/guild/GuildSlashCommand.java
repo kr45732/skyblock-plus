@@ -437,6 +437,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(hook.getInteraction().getUser()).setColumns(2).setItemsPerPage(20);
 
+			Instant lastUpdatedPlayers = Instant.now();
 			double total = 0;
 			int guildRank = -1;
 			String amt = "None";
@@ -445,6 +446,11 @@ public class GuildSlashCommand extends SlashCommand {
 				double amount = player.getDouble(lbType, -1);
 				if (amount < 0) {
 					continue;
+				}
+
+				Instant lastUpdated = Instant.ofEpochMilli(player.getLong("last_updated"));
+				if (lastUpdated.isBefore(lastUpdatedPlayers)) {
+					lastUpdatedPlayers = lastUpdated;
 				}
 
 				String formattedAmt = formatOrSimplify(amount);
@@ -459,7 +465,10 @@ public class GuildSlashCommand extends SlashCommand {
 
 			String lbTypeFormatted = capitalizeString(lbType.replace("_", " "));
 			String guildId = higherDepth(guildJson, "_id").getAsString();
-			Instant lastUpdated = cacheDatabase.getGuildCacheRequestTime(guildId);
+			Instant lastUpdatedGuild = cacheDatabase.getGuildCacheRequestTime(guildId);
+			if (lastUpdatedGuild != null && lastUpdatedPlayers.isBefore(lastUpdatedGuild)) {
+				lastUpdatedPlayers = lastUpdatedGuild;
+			}
 
 			String ebStr =
 				"**Total " +
@@ -470,7 +479,7 @@ public class GuildSlashCommand extends SlashCommand {
 				lbTypeFormatted +
 				":** " +
 				formatOrSimplify(total / paginateBuilder.size()) +
-				(lastUpdated != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdated) : "");
+				(lastUpdatedPlayers != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdatedPlayers) : "");
 			if (usernameUuidStruct != null) {
 				ebStr +=
 					"\n**Player:** " +
@@ -483,7 +492,7 @@ public class GuildSlashCommand extends SlashCommand {
 					amt;
 			}
 
-			if (lastUpdated == null || Duration.between(lastUpdated, Instant.now()).toDays() >= 1) {
+			if (lastUpdatedGuild == null || Duration.between(lastUpdatedGuild, Instant.now()).toDays() >= 1) {
 				paginateBuilder
 					.getExtras()
 					.addReactiveButtons(
@@ -632,8 +641,14 @@ public class GuildSlashCommand extends SlashCommand {
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(hook.getInteraction().getUser())
 				.updateExtras(e -> e.setType(PaginatorExtras.PaginatorType.EMBED_FIELDS))
 				.setItemsPerPage(15);
+			Instant lastUpdatedPlayers = Instant.now();
 
 			for (DataObject guildMember : playerList) {
+				Instant lastUpdated = Instant.ofEpochMilli(guildMember.getLong("last_updated"));
+				if (lastUpdated.isBefore(lastUpdatedPlayers)) {
+					lastUpdatedPlayers = lastUpdated;
+				}
+
 				boolean meetsReqsOr = false;
 
 				for (String req : reqsArr) {
@@ -691,17 +706,21 @@ public class GuildSlashCommand extends SlashCommand {
 				}
 			}
 
-			Instant lastUpdated = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+			Instant lastUpdatedGuild = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+			if (lastUpdatedGuild != null && lastUpdatedPlayers.isBefore(lastUpdatedGuild)) {
+				lastUpdatedPlayers = lastUpdatedGuild;
+			}
+
 			paginateBuilder
 				.getExtras()
 				.setEveryPageTitle("Guild Kick Helper")
 				.setEveryPageText(
 					"**Total Missing Requirements:** " +
 					paginateBuilder.size() +
-					(lastUpdated != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdated) : "")
+					(lastUpdatedPlayers != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdatedPlayers) : "")
 				);
 
-			if (lastUpdated == null || Duration.between(lastUpdated, Instant.now()).toDays() >= 1) {
+			if (lastUpdatedGuild == null || Duration.between(lastUpdatedGuild, Instant.now()).toDays() >= 1) {
 				paginateBuilder
 					.getExtras()
 					.addReactiveButtons(
@@ -840,6 +859,7 @@ public class GuildSlashCommand extends SlashCommand {
 				}
 			}
 
+			Instant lastUpdatedPlayers = Instant.now();
 			List<String> uniqueGuildName = new ArrayList<>();
 			for (int i = playerList.size() - 1; i >= 0; i--) {
 				DataObject lbM = playerList.get(i);
@@ -854,6 +874,11 @@ public class GuildSlashCommand extends SlashCommand {
 				if (curRank == null || ignoredRanks.contains(curRank.toLowerCase())) {
 					playerList.remove(i);
 				} else {
+					Instant lastUpdated = Instant.ofEpochMilli(lbM.getLong("last_updated"));
+					if (lastUpdated.isBefore(lastUpdatedPlayers)) {
+						lastUpdatedPlayers = lastUpdated;
+					}
+
 					playerList
 						.get(i)
 						.put("rank", curRank.toLowerCase())
@@ -1121,17 +1146,21 @@ public class GuildSlashCommand extends SlashCommand {
 				paginateBuilder.getExtras().addStrings(pbItems.stream().sorted().collect(Collectors.toCollection(ArrayList::new)));
 			}
 
-			Instant lastUpdated = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+			Instant lastUpdatedGuild = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+			if (lastUpdatedGuild != null && lastUpdatedPlayers.isBefore(lastUpdatedGuild)) {
+				lastUpdatedPlayers = lastUpdatedGuild;
+			}
+
 			paginateBuilder
 				.getExtras()
 				.setEveryPageTitle("Rank changes for " + guildName)
 				.setEveryPageText(
 					"**Total rank changes:** " +
 					totalChange +
-					(lastUpdated != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdated) : "")
+					(lastUpdatedPlayers != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdatedPlayers) : "")
 				);
 
-			if (lastUpdated == null || Duration.between(lastUpdated, Instant.now()).toDays() >= 1) {
+			if (lastUpdatedGuild == null || Duration.between(lastUpdatedGuild, Instant.now()).toDays() >= 1) {
 				paginateBuilder
 					.getExtras()
 					.addReactiveButtons(
@@ -1234,9 +1263,15 @@ public class GuildSlashCommand extends SlashCommand {
 			double averageCata = playerList.stream().mapToDouble(m -> m.getDouble("catacombs", 0)).average().orElse(0);
 			double averageWeight = playerList.stream().mapToDouble(m -> m.getDouble("weight", 0)).average().orElse(0);
 
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(hook.getInteraction().getUser()).showPageNumbers(false);
-			Instant lastUpdated = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+			Instant lastUpdatedPlayers = Instant.ofEpochMilli(
+				playerList.stream().mapToLong(m -> m.getLong("last_updated")).min().orElse(Instant.now().toEpochMilli())
+			);
+			Instant lastUpdatedGuild = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+			if (lastUpdatedGuild != null && lastUpdatedPlayers.isBefore(lastUpdatedGuild)) {
+				lastUpdatedPlayers = lastUpdatedGuild;
+			}
 
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(hook.getInteraction().getUser()).showPageNumbers(false);
 			paginateBuilder
 				.getExtras()
 				.setType(PaginatorExtras.PaginatorType.EMBED_PAGES)
@@ -1255,7 +1290,8 @@ public class GuildSlashCommand extends SlashCommand {
 							roundAndFormat(averageCata) +
 							"\n**Average Weight:** " +
 							roundAndFormat(averageWeight) +
-							(lastUpdated != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdated) : "")
+							"\n**Last Updated:** " +
+							getRelativeTimestamp(lastUpdatedPlayers)
 						)
 						.addField("Top 5 Skyblock Level", levelStr, true)
 						.addField("Top 5 Networth", networthStr, true)
@@ -1268,7 +1304,7 @@ public class GuildSlashCommand extends SlashCommand {
 						.addBlankField(true)
 				);
 
-			if (lastUpdated == null || Duration.between(lastUpdated, Instant.now()).toDays() >= 1) {
+			if (lastUpdatedGuild == null || Duration.between(lastUpdatedGuild, Instant.now()).toDays() >= 1) {
 				paginateBuilder
 					.getExtras()
 					.addReactiveButtons(
