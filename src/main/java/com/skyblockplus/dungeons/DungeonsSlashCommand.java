@@ -100,7 +100,7 @@ public class DungeonsSlashCommand extends SlashCommand {
 					boolean isRegular = dungeon.getKey().equals("catacombs");
 
 					int min = (isRegular ? 0 : 1);
-					for (int i = min; i < 8; i++) {
+					for (int i = min; i <= 7; i++) {
 						int fastestSPlusInt = higherDepth(dungeon.getValue(), "fastest_time_s_plus." + i, -1);
 						int minutes = fastestSPlusInt / 1000 / 60;
 						int seconds = fastestSPlusInt / 1000 % 60;
