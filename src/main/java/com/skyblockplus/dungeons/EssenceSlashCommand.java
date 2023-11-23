@@ -107,7 +107,7 @@ public class EssenceSlashCommand extends SlashCommand {
 				String essenceType = higherDepth(itemJson, "type", "None").toLowerCase();
 				for (Map.Entry<String, JsonElement> level : itemJson.getAsJsonObject().entrySet()) {
 					switch (level.getKey()) {
-						case "items" -> {}
+						case "items", "catacombs_requirements" -> {}
 						case "type" -> eb.setDescription("**Essence Type:** " + capitalizeString(essenceType));
 						case "dungeonize" -> eb.appendDescription(
 							"\n➜ **Dungeonize:** " + ESSENCE_EMOJI_MAP.get(essenceType) + " x" + level.getValue().getAsString()
