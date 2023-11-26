@@ -744,5 +744,68 @@
         }
       ]
     }
+  },
+  "6420b34e8ea8c9ed87b9aa35": {
+    "name": "Eternitea",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "staff"
+      ],
+      "default_rank": {
+        "requirements": [
+          [
+            {
+              "amount": 20,
+              "type": "skills"
+            }
+          ]
+        ],
+        "names": [
+          "novice"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 30,
+                "type": "skills"
+              }
+            ]
+          ],
+          "names": [
+            "gardien"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 38,
+                "type": "skills"
+              }
+            ]
+          ],
+          "names": [
+            "ancien"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 42,
+                "type": "skills"
+              }
+            ]
+          ],
+          "names": [
+            "inquisiteur"
+          ]
+        }
+      ]
+    }
   }
 }
