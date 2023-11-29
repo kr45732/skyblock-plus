@@ -807,5 +807,49 @@
         }
       ]
     }
+  },
+  "652f38558ea8c9dca6f34ff5": {
+    "name": "Sb Secs",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "coowner",
+        "recruiters"
+      ],
+      "default_rank": {
+        "requirements": [],
+        "names": [
+          "midgame"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 160,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "midgame"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 250,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "endgame"
+          ]
+        }
+      ]
+    }
   }
 }
