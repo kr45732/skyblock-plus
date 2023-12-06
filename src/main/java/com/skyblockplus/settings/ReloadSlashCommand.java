@@ -38,7 +38,6 @@ public class ReloadSlashCommand extends SlashCommand {
 	public ReloadSlashCommand() {
 		this.name = "reload";
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
-		this.cooldown = GLOBAL_COOLDOWN;
 	}
 
 	public static EmbedBuilder getReloadEmbed(Guild guild) {

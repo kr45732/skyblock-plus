@@ -46,7 +46,6 @@ public class GuildLbSlashCommand extends SlashCommand {
 
 	public GuildLbSlashCommand() {
 		this.name = "guildlb";
-		this.cooldown = GLOBAL_COOLDOWN;
 	}
 
 	public static EmbedBuilder getGuildLb(String lbTypeParam, Player.Gamemode gamemode, String comparisonMethod, SlashCommandEvent event) {

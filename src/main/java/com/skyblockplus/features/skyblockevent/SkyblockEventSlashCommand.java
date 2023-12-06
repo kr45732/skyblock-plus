@@ -573,7 +573,6 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		public LeaderboardSubcommand() {
 			this.name = "leaderboard";
-			this.cooldown = GLOBAL_COOLDOWN;
 		}
 
 		public static EmbedBuilder getEventLeaderboard(

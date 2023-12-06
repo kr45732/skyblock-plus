@@ -376,7 +376,6 @@ public class GuildSlashCommand extends SlashCommand {
 
 		public LeaderboardSubcommand() {
 			this.name = "leaderboard";
-			this.cooldown = GLOBAL_COOLDOWN;
 		}
 
 		public static EmbedBuilder getLeaderboard(
@@ -555,7 +554,6 @@ public class GuildSlashCommand extends SlashCommand {
 
 		public KickerSubcommand() {
 			this.name = "kicker";
-			this.cooldown = GLOBAL_COOLDOWN;
 		}
 
 		public static EmbedBuilder getGuildKicker(
@@ -781,7 +779,6 @@ public class GuildSlashCommand extends SlashCommand {
 
 		public CheckSubcommand() {
 			this.name = "check";
-			this.cooldown = GLOBAL_COOLDOWN;
 		}
 
 		public static EmbedBuilder getRanks(String username, Player.Gamemode gamemode, SlashCommandEvent event) {
@@ -1197,7 +1194,6 @@ public class GuildSlashCommand extends SlashCommand {
 
 		public TopSubcommand() {
 			this.name = "top";
-			this.cooldown = GLOBAL_COOLDOWN;
 		}
 
 		public static EmbedBuilder getTop(String username, String guildName, Player.Gamemode gamemode, SlashCommandEvent event) {

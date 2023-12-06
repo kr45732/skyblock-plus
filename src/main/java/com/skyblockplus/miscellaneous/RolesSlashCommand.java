@@ -77,7 +77,6 @@ public class RolesSlashCommand extends SlashCommand {
 
 		public ClaimSubcommand() {
 			this.name = "claim";
-			this.cooldown = GLOBAL_COOLDOWN;
 		}
 
 		public static EmbedBuilder getRolesClaimEmbed(String profile, Member member) {

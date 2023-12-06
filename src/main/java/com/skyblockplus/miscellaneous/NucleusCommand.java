@@ -40,7 +40,6 @@ public class NucleusCommand extends Command {
 
 	public NucleusCommand() {
 		this.name = "nucleus";
-		this.cooldown = GLOBAL_COOLDOWN;
 		this.botPermissions = defaultPerms();
 	}
 

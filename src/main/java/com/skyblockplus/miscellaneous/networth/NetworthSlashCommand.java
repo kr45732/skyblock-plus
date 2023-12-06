@@ -34,7 +34,6 @@ public class NetworthSlashCommand extends SlashCommand {
 
 	public NetworthSlashCommand() {
 		this.name = "networth";
-		this.cooldown = GLOBAL_COOLDOWN;
 	}
 
 	@Override

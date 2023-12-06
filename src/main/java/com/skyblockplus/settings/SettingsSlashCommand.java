@@ -34,16 +34,11 @@ public class SettingsSlashCommand extends SlashCommand {
 	public SettingsSlashCommand() {
 		this.name = "settings";
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
-		this.logCommand = false;
-		this.cooldown = GLOBAL_COOLDOWN;
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		String content = "settings " + event.getOptionStr("command", "");
-		if (!content.contains("hypixel_key")) {
-			event.logCommand();
-		}
 
 		event.paginate(
 			new SettingsExecute(event.getGuild(), event.getUser(), event.getHook()).getSettingsEmbed(content, content.split("\\s+"))

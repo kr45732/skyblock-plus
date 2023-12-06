@@ -372,16 +372,10 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("general", "View general settings for this server."),
 						new HelpData("delete", "Delete certain settings from the database.")
 							.addSubcommands(
-								new HelpData("all", "Delete the current server settings."),
-								new HelpData("hypixel_key", "Delete the set Hypixel API of this server.")
+								new HelpData("all", "Delete the current server settings.")
 							),
 						new HelpData("set", "Set certain settings.")
 							.addSubcommands(
-								new HelpData(
-									"hypixel_key",
-									"Set a Hypixel API key for this server. Once set, this cannot be viewed for the privacy of the key owner.",
-									"hypixel_key <key>"
-								),
 								new HelpData(
 									"fetchur_channel",
 									"Set the channel where fetchur notifications will be posted at 12 am EST every day.",
@@ -885,7 +879,6 @@ public class HelpSlashCommand extends SlashCommand {
 			create("setup", "A short walk-through on how to setup the bot") +
 			create("categories", "Get the name and id of all categories in this server") +
 			create("reload", "Reload the guild application and verification settings") +
-			create("settings set hypixel_key <key>", "Set a Hypixel API key for this server") +
 			create(
 				"settings set fetchur_channel <#channel>",
 				"Set the channel where fetchur item notifications will be sent every day at 12 am EST"
@@ -902,7 +895,6 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings set log remove <event>", "Remove a log event") +
 			create("settings bot_manager add <@role>", "Add a bot manager role") +
 			create("settings bot_manager remove <@role>", "Remove a bot manager role") +
-			create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 			create("settings delete all", "Delete the current server settings") +
 			create("settings blacklist", "List all players that are blacklisted") +
 			create("settings blacklist add <player> [reason]", "Blacklist a player from verifying or applying in this server") +
