@@ -103,7 +103,6 @@ public abstract class AbstractSlashCommand {
 			}
 		}
 
-
 		event.logCommand();
 
 		executor.submit(() -> {

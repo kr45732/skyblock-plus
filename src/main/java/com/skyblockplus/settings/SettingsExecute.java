@@ -231,15 +231,11 @@ public class SettingsExecute {
 					case "mayor_ping" -> setMayorPing(args[3]);
 					default -> getHelpEmbed("settings set");
 				};
-		} else if (args.length == 3 && args[1].equals("delete")) {
-			if (args[2].equals("all")) {
-				eb =
-					database.deleteServerSettings(guild.getId()) == 200
-						? defaultEmbed("Success").setDescription("Server settings deleted")
-						: errorEmbed("Error deleting server settings");
-			} else {
-				eb = getHelpEmbed("settings delete");
-			}
+		} else if (args.length == 2 && args[1].equals("reset")) {
+			eb =
+				database.deleteServerSettings(guild.getId()) == 200
+					? defaultEmbed("Success").setDescription("Server settings resetted")
+					: errorEmbed("Error resetting server settings");
 		} else if (args.length >= 2 && args[1].equals("blacklist")) {
 			args = content.split("\\s+", 5);
 			if (args.length == 2) {

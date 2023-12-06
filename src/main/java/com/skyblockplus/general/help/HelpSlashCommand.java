@@ -370,10 +370,7 @@ public class HelpSlashCommand extends SlashCommand {
 					.addSecondData("View the current settings for this server.", "settings")
 					.addSubcommands(
 						new HelpData("general", "View general settings for this server."),
-						new HelpData("delete", "Delete certain settings from the database.")
-							.addSubcommands(
-								new HelpData("all", "Delete the current server settings.")
-							),
+						new HelpData("reset", "Clear and reset the current server settings."),
 						new HelpData("set", "Set certain settings.")
 							.addSubcommands(
 								new HelpData(
@@ -487,7 +484,7 @@ public class HelpSlashCommand extends SlashCommand {
 									),
 								new HelpData(
 									"channel",
-									"The channel where the verify message will be sent. Other messages will be auto-deleted.",
+									"The channel where the verify message and verify button will be sent.",
 									"channel <#channel>"
 								),
 								new HelpData(
@@ -895,7 +892,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings set log remove <event>", "Remove a log event") +
 			create("settings bot_manager add <@role>", "Add a bot manager role") +
 			create("settings bot_manager remove <@role>", "Remove a bot manager role") +
-			create("settings delete all", "Delete the current server settings") +
+			create("settings reset", "Reset the server settings") +
 			create("settings blacklist", "List all players that are blacklisted") +
 			create("settings blacklist add <player> [reason]", "Blacklist a player from verifying or applying in this server") +
 			create(
@@ -931,10 +928,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings verify message <message>", "The message that users will see when verifying") +
 			create("settings verify role add <@role>", "Add a role that user will receive upon being verified") +
 			create("settings verify role remove <@role>", "Remove a verify role") +
-			create(
-				"settings verify channel <#channel>",
-				"Channel where the verify message will be sent and messages will be auto deleted"
-			) +
+			create("settings verify channel <#channel>", "Channel where the verify message and button will be sent") +
 			create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none") +
 			create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
 			create("settings verify sync <enable|disable>", "Enable or disable automatic verify role and nickname syncing") +
