@@ -333,9 +333,6 @@ public class Utils {
 			AUCTION_FLIPPER_WEBHOOK = System.getenv("AUCTION_FLIPPER_WEBHOOK");
 			BOT_STATUS_WEBHOOK = System.getenv("BOT_STATUS_WEBHOOK");
 		}
-
-		botStatusWebhook =
-			new WebhookClientBuilder(BOT_STATUS_WEBHOOK).setExecutorService(scheduler).setHttpClient(okHttpClient).buildJDA();
 	}
 
 	public static String getEmojiWithName(String id, String name) {

@@ -18,8 +18,10 @@
 
 package com.skyblockplus;
 
+import static com.skyblockplus.utils.utils.HttpUtils.okHttpClient;
 import static com.skyblockplus.utils.utils.Utils.*;
 
+import club.minnced.discord.webhook.WebhookClientBuilder;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -83,6 +85,8 @@ public class Main {
 		ApiHandler.initializeConstants();
 		Constants.initialize();
 		selfUserId = isMainBot() ? "796791167366594592" : "799042642092228658";
+		botStatusWebhook =
+			new WebhookClientBuilder(BOT_STATUS_WEBHOOK).setExecutorService(scheduler).setHttpClient(okHttpClient).buildJDA();
 
 		SpringApplication springApplication = new SpringApplication(Main.class);
 		springApplication.setDefaultProperties(Maps.of("spring.datasource.url", DATABASE_URL));
