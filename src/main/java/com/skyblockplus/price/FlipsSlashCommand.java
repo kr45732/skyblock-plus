@@ -79,7 +79,7 @@ public class FlipsSlashCommand extends SlashCommand {
 
 			double resellPrice = Math.min(
 				higherDepth(auction, "past_bin_price").getAsLong(),
-				higherDepth(avgAuctionJson, itemId + ".price").getAsDouble()
+				higherDepth(avgAuctionJson, itemId + ".price", higherDepth(avgAuctionJson, altItemId + ".price").getAsDouble())
 			);
 			long buyPrice = higherDepth(auction, "starting_bid").getAsLong();
 			double profit = calculateWithTaxes(resellPrice) - buyPrice;

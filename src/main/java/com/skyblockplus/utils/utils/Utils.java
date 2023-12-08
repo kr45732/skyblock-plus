@@ -149,12 +149,6 @@ public class Utils {
 		.create();
 	public static final Consumer<Object> ignore = ignored -> {};
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
-	public static final JDAWebhookClient botStatusWebhook = new WebhookClientBuilder(
-		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
-	)
-		.setExecutorService(scheduler)
-		.setHttpClient(okHttpClient)
-		.buildJDA();
 	/* Constants */
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	private static final Color BOT_COLOR = new Color(223, 5, 5);
@@ -185,11 +179,14 @@ public class Utils {
 	public static String DISCORD_BOTS_GG_TOKEN = "";
 	public static String DISCORDS_COM_TOKEN = "";
 	public static String TOP_GG_TOKEN = "";
+	public static String AUCTION_FLIPPER_WEBHOOK = "";
+	public static String BOT_STATUS_WEBHOOK = "";
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
 	public static EventWaiter waiter;
 	public static GlobalExceptionHandler globalExceptionHandler;
+	public static JDAWebhookClient botStatusWebhook;
 	public static CommandClient client;
 	public static SlashCommandClient slashCommandClient;
 	public static OAuthClient oAuthClient;
@@ -309,6 +306,8 @@ public class Utils {
 			DISCORD_BOTS_GG_TOKEN = (String) appProps.get("DISCORD_BOTS_GG_TOKEN");
 			DISCORDS_COM_TOKEN = (String) appProps.get("DISCORDS_COM_TOKEN");
 			TOP_GG_TOKEN = (String) appProps.get("TOP_GG_TOKEN");
+			AUCTION_FLIPPER_WEBHOOK = (String) appProps.get("AUCTION_FLIPPER_WEBHOOK");
+			BOT_STATUS_WEBHOOK = (String) appProps.get("BOT_STATUS_WEBHOOK");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -331,7 +330,12 @@ public class Utils {
 			DISCORD_BOTS_GG_TOKEN = System.getenv("DISCORD_BOTS_GG_TOKEN");
 			DISCORDS_COM_TOKEN = System.getenv("DISCORDS_COM_TOKEN");
 			TOP_GG_TOKEN = System.getenv("TOP_GG_TOKEN");
+			AUCTION_FLIPPER_WEBHOOK = System.getenv("AUCTION_FLIPPER_WEBHOOK");
+			BOT_STATUS_WEBHOOK = System.getenv("BOT_STATUS_WEBHOOK");
 		}
+
+		botStatusWebhook =
+			new WebhookClientBuilder(BOT_STATUS_WEBHOOK).setExecutorService(scheduler).setHttpClient(okHttpClient).buildJDA();
 	}
 
 	public static String getEmojiWithName(String id, String name) {

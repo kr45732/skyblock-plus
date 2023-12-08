@@ -43,18 +43,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class AuctionFlipper {
 
-	private static final JDAWebhookClient flipperWebhook = new WebhookClientBuilder(
-		isMainBot()
-			? "https://discord.com/api/webhooks/917160844247334933/WKeMowhugO5-xbLlD8TakRfCskt7D5Sm7giMY8LfN2MzKjxsDUm9Y2yPw61_yzQTgcII"
-			: "https://discord.com/api/webhooks/1116395938789998652/5kwXE0t5qLSYXh03NSUMnDRO6Gin6eDMCvyAz9WemDfc8Q9xPjYaubigXcHEcbouh8cF"
-	)
-		.setExecutorService(scheduler)
-		.setHttpClient(okHttpClient)
-		.buildJDA();
 	private static final Cache<String, FlipItem> auctionUuidToMessage = Caffeine
 		.newBuilder()
 		.expireAfterWrite(45, TimeUnit.MINUTES)
 		.build();
+	private static JDAWebhookClient flipperWebhook;
 	public static JsonElement underBinJson;
 	public static Instant underBinJsonLastUpdated = null;
 	private static boolean enable = false;
@@ -75,6 +68,15 @@ public class AuctionFlipper {
 
 	public static void initialize(boolean enable) {
 		AuctionFlipper.enable = enable;
+		AuctionFlipper.flipperWebhook =
+			new WebhookClientBuilder(
+				isMainBot()
+					? AUCTION_FLIPPER_WEBHOOK
+					: "https://discord.com/api/webhooks/1116395938789998652/5kwXE0t5qLSYXh03NSUMnDRO6Gin6eDMCvyAz9WemDfc8Q9xPjYaubigXcHEcbouh8cF"
+			)
+				.setExecutorService(scheduler)
+				.setHttpClient(okHttpClient)
+				.buildJDA();
 	}
 
 	public static void flip() {
@@ -107,7 +109,7 @@ public class AuctionFlipper {
 
 				double resellPrice = Math.min(
 					higherDepth(auction, "past_bin_price").getAsLong(),
-					higherDepth(avgAuctionJson, itemId + ".price").getAsDouble()
+					higherDepth(avgAuctionJson, itemId + ".price", higherDepth(avgAuctionJson, altItemId + ".price").getAsDouble())
 				);
 				long buyPrice = higherDepth(auction, "starting_bid").getAsLong();
 				double profit = calculateWithTaxes(resellPrice) - buyPrice;
