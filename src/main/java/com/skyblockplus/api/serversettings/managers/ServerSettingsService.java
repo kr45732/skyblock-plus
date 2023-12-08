@@ -224,7 +224,7 @@ public class ServerSettingsService {
 			}
 
 			if (!found) {
-				if (automatedGuilds.size() < 3) {
+				if (automatedGuilds.size() < 4) {
 					automatedGuilds.add(newSettings);
 				} else {
 					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
