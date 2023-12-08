@@ -69,14 +69,7 @@ public class AuctionFlipper {
 	public static void initialize(boolean enable) {
 		AuctionFlipper.enable = enable;
 		AuctionFlipper.flipperWebhook =
-			new WebhookClientBuilder(
-				isMainBot()
-					? AUCTION_FLIPPER_WEBHOOK
-					: "https://discord.com/api/webhooks/1116395938789998652/5kwXE0t5qLSYXh03NSUMnDRO6Gin6eDMCvyAz9WemDfc8Q9xPjYaubigXcHEcbouh8cF"
-			)
-				.setExecutorService(scheduler)
-				.setHttpClient(okHttpClient)
-				.buildJDA();
+			new WebhookClientBuilder(AUCTION_FLIPPER_WEBHOOK).setExecutorService(scheduler).setHttpClient(okHttpClient).buildJDA();
 	}
 
 	public static void flip() {
