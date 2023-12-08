@@ -240,6 +240,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 
 				String selectedPower = higherDepth(tuningJson, "selected_power", "");
 				double scaling = Math.pow(29.97 * (Math.log(0.0019 * magicPower + 1)), 1.2);
+				JsonElement tuningSlots = higherDepth(tuningJson, "tuning");
 
 				eb
 					.setDescription(
@@ -248,7 +249,11 @@ public class TalismanBagSlashCommand extends SlashCommand {
 						"\n**Magic Power:** " +
 						formatNumber(magicPower) +
 						"\n**Unlocked Tuning Slots:** " +
-						higherDepth(tuningJson, "tuning").getAsJsonObject().keySet().stream().filter(j -> j.startsWith("slot_")).count()
+						(
+							tuningSlots != null
+								? tuningSlots.getAsJsonObject().keySet().stream().filter(j -> j.startsWith("slot_")).count()
+								: 0
+						)
 					)
 					.addField(
 						"Accessory Counts",
@@ -283,35 +288,37 @@ public class TalismanBagSlashCommand extends SlashCommand {
 				}
 				extras.addEmbedPage(eb);
 
-				for (Map.Entry<String, JsonElement> slot : higherDepth(tuningJson, "tuning").getAsJsonObject().entrySet()) {
-					if (slot.getKey().startsWith("slot_")) {
-						eb =
-							player
-								.defaultPlayerEmbed()
-								.appendDescription("**Slot:** " + (Integer.parseInt(slot.getKey().split("slot_")[1]) + 1));
+				if (tuningSlots != null) {
+					for (Map.Entry<String, JsonElement> slot : tuningSlots.getAsJsonObject().entrySet()) {
+						if (slot.getKey().startsWith("slot_")) {
+							eb =
+								player
+									.defaultPlayerEmbed()
+									.appendDescription("**Slot:** " + (Integer.parseInt(slot.getKey().split("slot_")[1]) + 1));
 
-						int tuningPointsSpent = 0;
-						StringBuilder statStr = new StringBuilder();
-						for (Map.Entry<String, JsonElement> stat : slot.getValue().getAsJsonObject().entrySet()) {
-							int amountSpent = stat.getValue().getAsInt();
-							tuningPointsSpent += amountSpent;
-							statStr
-								.append("\n")
-								.append(statToEmoji.get(stat.getKey()))
-								.append(" ")
-								.append(capitalizeString(stat.getKey().replace("_", " ")))
-								.append(": ")
-								.append(amountSpent)
-								.append(
-									amountSpent > 0
-										? " (+" +
-										roundAndFormat(amountSpent * tuningStatToMultiplier.getOrDefault(stat.getKey(), 1.0)) +
-										")"
-										: ""
-								);
+							int tuningPointsSpent = 0;
+							StringBuilder statStr = new StringBuilder();
+							for (Map.Entry<String, JsonElement> stat : slot.getValue().getAsJsonObject().entrySet()) {
+								int amountSpent = stat.getValue().getAsInt();
+								tuningPointsSpent += amountSpent;
+								statStr
+									.append("\n")
+									.append(statToEmoji.get(stat.getKey()))
+									.append(" ")
+									.append(capitalizeString(stat.getKey().replace("_", " ")))
+									.append(": ")
+									.append(amountSpent)
+									.append(
+										amountSpent > 0
+											? " (+" +
+											roundAndFormat(amountSpent * tuningStatToMultiplier.getOrDefault(stat.getKey(), 1.0)) +
+											")"
+											: ""
+									);
+							}
+
+							extras.addEmbedPage(eb.appendDescription("\n**Tuning Points Spent:** " + tuningPointsSpent + "\n" + statStr));
 						}
-
-						extras.addEmbedPage(eb.appendDescription("\n**Tuning Points Spent:** " + tuningPointsSpent + "\n" + statStr));
 					}
 				}
 
