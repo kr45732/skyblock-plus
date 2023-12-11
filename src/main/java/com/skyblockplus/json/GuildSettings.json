@@ -827,7 +827,7 @@
           "requirements": [
             [
               {
-                "amount": 160,
+                "amount": 200,
                 "type": "level"
               }
             ]
