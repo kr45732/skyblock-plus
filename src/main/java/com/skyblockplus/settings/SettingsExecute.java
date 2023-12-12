@@ -1504,7 +1504,7 @@ public class SettingsExecute {
 		);
 		extras.addEmbedPage(eb);
 
-		paginateBuilder.build().paginate(interactionHook, 0);
+		paginateBuilder.build().paginate(interactionHook, 1);
 		return null;
 	}
 
@@ -2147,7 +2147,7 @@ public class SettingsExecute {
 			);
 		}
 
-		paginateBuilder.build().paginate(interactionHook, 0);
+		paginateBuilder.build().paginate(interactionHook, 1);
 		return null;
 	}
 

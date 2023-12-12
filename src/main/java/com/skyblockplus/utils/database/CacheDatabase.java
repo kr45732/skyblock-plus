@@ -41,6 +41,7 @@ import com.skyblockplus.utils.oauth.TokenData;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import groovy.lang.Tuple2;
 import java.lang.reflect.Type;
 import java.sql.*;
 import java.time.Instant;
@@ -489,17 +490,17 @@ public class CacheDatabase {
 		return out;
 	}
 
-	public Map<String, List<String>> getGuildCaches() {
-		Map<String, List<String>> out = new HashMap<>();
+	public Map<Tuple2<String, String>, List<String>> getGuildCaches() {
+		Map<Tuple2<String, String>, List<String>> out = new HashMap<>();
 
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT guild_name, members FROM guild")
+			PreparedStatement statement = connection.prepareStatement("SELECT guild_id, guild_name, members FROM guild")
 		) {
 			try (ResultSet response = statement.executeQuery()) {
 				while (response.next()) {
 					out.put(
-						response.getString("guild_name"),
+						new Tuple2<>(response.getString("guild_id"), response.getString("guild_name")),
 						gson.fromJson(response.getString("members"), new TypeToken<List<String>>() {}.getType())
 					);
 				}

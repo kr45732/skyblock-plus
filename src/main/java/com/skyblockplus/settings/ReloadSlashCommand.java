@@ -20,7 +20,6 @@ package com.skyblockplus.settings;
 
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
-import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.utils.command.SlashCommand;

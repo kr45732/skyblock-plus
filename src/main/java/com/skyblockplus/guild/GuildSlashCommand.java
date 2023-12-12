@@ -330,8 +330,8 @@ public class GuildSlashCommand extends SlashCommand {
 				extras.setEveryPageText(
 					"**Player:** " +
 					usernameUuid.username() +
-					"\n**Guild Rank:** " +
-					(guildRank == -1 ? "Not on leaderboard" : "#" + guildRank + "\n**Exp:** " + formatNumber(guildExp))
+					"\n**Rank:** " +
+					(guildRank != -1 ? "#" + guildRank + "\n**Exp:** " + formatNumber(guildExp) : "Not on leaderboard")
 				);
 			}
 
@@ -483,12 +483,8 @@ public class GuildSlashCommand extends SlashCommand {
 				ebStr +=
 					"\n**Player:** " +
 					usernameUuidStruct.username() +
-					"\n**Guild Rank:** " +
-					(guildRank == -1 ? "Not on leaderboard" : "#" + guildRank) +
-					"\n**" +
-					lbTypeFormatted +
-					":** " +
-					amt;
+					"\n**Rank:** " +
+					(guildRank != -1 ? "#" + guildRank + " (" + amt + ")" : "Not on leaderboard");
 			}
 
 			if (lastUpdatedGuild == null || Duration.between(lastUpdatedGuild, Instant.now()).toDays() >= 1) {
@@ -506,7 +502,7 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 
 			paginateBuilder.getExtras().setEveryPageTitle(higherDepth(guildJson, "name").getAsString()).setEveryPageText(ebStr);
-			paginateBuilder.build().paginate(hook, guildRank == -1 ? 0 : guildRank / 20 + 1);
+			paginateBuilder.build().paginate(hook, guildRank != -1 ? (guildRank - 1) / paginateBuilder.getItemsPerPage() + 1 : 1);
 		}
 
 		@Override

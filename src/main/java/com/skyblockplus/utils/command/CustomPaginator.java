@@ -458,5 +458,9 @@ public class CustomPaginator {
 				case EMBED_PAGES -> extras.getEmbedPages().size();
 			};
 		}
+
+		public int getItemsPerPage() {
+			return itemsPerPage;
+		}
 	}
 }

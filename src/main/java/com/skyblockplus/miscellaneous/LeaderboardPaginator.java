@@ -166,7 +166,7 @@ public class LeaderboardPaginator {
 					? "**Player:** " +
 					escapeText(player) +
 					"\n**Rank:** " +
-					(playerRank == -1 ? "Not on leaderboard" : "#" + formatNumber(playerRank)) +
+					(playerRank != -1 ? "#" + formatNumber(playerRank) : "Not on leaderboard") +
 					"\n**" +
 					capitalizeString(lbType.replace("_", " ")) +
 					":** " +

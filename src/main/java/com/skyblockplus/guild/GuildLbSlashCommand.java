@@ -16,21 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.guild;
 
-import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
-import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.gamemodeCommandOption;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.typeToNameSubMap;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.HypixelResponse;
+import groovy.lang.Tuple2;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -48,10 +48,24 @@ public class GuildLbSlashCommand extends SlashCommand {
 		this.name = "guildlb";
 	}
 
-	public static EmbedBuilder getGuildLb(String lbTypeParam, Player.Gamemode gamemode, String comparisonMethod, SlashCommandEvent event) {
+	public static EmbedBuilder getGuildLb(
+		String lbTypeParam,
+		String guildName,
+		Player.Gamemode gamemode,
+		String comparisonMethod,
+		SlashCommandEvent event
+	) {
+		HypixelResponse guildResponse = null;
+		if (guildName != null) {
+			guildResponse = getGuildFromName(guildName);
+			if (!guildResponse.isValid()) {
+				return guildResponse.getErrorEmbed();
+			}
+		}
+
 		String lbType = getType(lbTypeParam);
 
-		Map<String, List<String>> guildCaches = cacheDatabase.getGuildCaches();
+		Map<Tuple2<String, String>, List<String>> guildCaches = cacheDatabase.getGuildCaches();
 		List<String> allGuildMembers = guildCaches.values().stream().flatMap(Collection::stream).toList();
 
 		Map<String, Double> cachedPlayers = leaderboardDatabase
@@ -59,47 +73,60 @@ public class GuildLbSlashCommand extends SlashCommand {
 			.stream()
 			.collect(Collectors.toMap(e -> e.getString("uuid"), e -> e.getDouble(lbType), (e1, e2) -> e1));
 
-		Map<String, Double> guildLbCaches = new HashMap<>();
-		for (Map.Entry<String, List<String>> entry : guildCaches.entrySet()) {
+		Map<Tuple2<String, String>, Double> guildLbCaches = new HashMap<>();
+		for (Map.Entry<Tuple2<String, String>, List<String>> entry : guildCaches.entrySet()) {
 			DoubleStream stream = entry.getValue().stream().filter(cachedPlayers::containsKey).mapToDouble(cachedPlayers::get);
-			double value;
-			if (comparisonMethod.equals("sum")) {
-				value = stream.sum();
-			} else {
-				value = stream.average().orElse(0);
-			}
-			guildLbCaches.put(entry.getKey(), value);
+			guildLbCaches.put(entry.getKey(), comparisonMethod.equals("sum") ? stream.sum() : stream.average().orElse(0));
 		}
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
-		paginateBuilder
-			.getExtras()
-			.setEveryPageTitle(
-				"Global" + (gamemode == Player.Gamemode.ALL ? "" : " " + capitalizeString(gamemode.toString())) + " Guild Leaderboard"
-			)
-			.setEveryPageText(
-				"**Type:** " +
-				capitalizeString(lbType.replace("_", " ")) +
-				" (" +
-				capitalizeString(comparisonMethod) +
-				")" +
-				"\n**Sum:** " +
-				formatOrSimplify(guildLbCaches.values().stream().mapToDouble(e -> e).sum()) +
-				"\n**Average:** " +
-				formatOrSimplify(guildLbCaches.values().stream().mapToDouble(e -> e).average().orElse(0))
-			);
 
-		List<Map.Entry<String, Double>> guildLbEntries = guildLbCaches
+		int guildRank = -1;
+		String amt = "None";
+
+		List<Map.Entry<Tuple2<String, String>, Double>> guildLbEntries = guildLbCaches
 			.entrySet()
 			.stream()
 			.sorted(Comparator.comparingDouble(e -> -e.getValue()))
 			.toList();
 		for (int i = 0; i < guildLbEntries.size(); i++) {
-			Map.Entry<String, Double> entry = guildLbEntries.get(i);
-			paginateBuilder.addStrings("`" + (i + 1) + ")` " + escapeText(entry.getKey()) + ": " + formatOrSimplify(entry.getValue()));
+			Map.Entry<Tuple2<String, String>, Double> entry = guildLbEntries.get(i);
+
+			String formattedAmt = formatOrSimplify(entry.getValue());
+			paginateBuilder.addStrings("`" + (i + 1) + ")` " + escapeText(entry.getKey().getV2()) + ": " + formattedAmt);
+
+			if (guildResponse != null && entry.getKey().getV1().equals(guildResponse.get("_id").getAsString())) {
+				guildRank = i + 1;
+				amt = formattedAmt;
+			}
 		}
 
-		event.paginate(paginateBuilder);
+		String ebStr =
+			"**Type:** " +
+			capitalizeString(lbType.replace("_", " ")) +
+			" (" +
+			capitalizeString(comparisonMethod) +
+			")" +
+			"\n**Sum:** " +
+			formatOrSimplify(guildLbCaches.values().stream().mapToDouble(e -> e).sum()) +
+			"\n**Average:** " +
+			formatOrSimplify(guildLbCaches.values().stream().mapToDouble(e -> e).average().orElse(0));
+		if (guildResponse != null) {
+			ebStr +=
+				"\n**Guild:** " +
+				guildResponse.get("name").getAsString() +
+				"\n**Rank:** " +
+				(guildRank != -1 ? "#" + guildRank + " (" + amt + ")" : "Not on leaderboard");
+		}
+
+		paginateBuilder
+			.getExtras()
+			.setEveryPageTitle(
+				"Global" + (gamemode == Player.Gamemode.ALL ? "" : " " + capitalizeString(gamemode.toString())) + " Guild Leaderboard"
+			)
+			.setEveryPageText(ebStr);
+
+		event.paginate(paginateBuilder, guildRank != -1 ? (guildRank - 1) / paginateBuilder.getItemsPerPage() + 1 : 1);
 		return null;
 	}
 
@@ -108,6 +135,7 @@ public class GuildLbSlashCommand extends SlashCommand {
 		event.paginate(
 			getGuildLb(
 				event.getOptionStr("type"),
+				event.getOptionStr("guild"),
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 				event.getOptionStr("comparison", "average"),
 				event
@@ -120,6 +148,7 @@ public class GuildLbSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get the global guild leaderboard")
 			.addOption(OptionType.STRING, "type", "Leaderboard type", true, true)
+			.addOption(OptionType.STRING, "guild", "Guild name", false)
 			.addOptions(
 				gamemodeCommandOption,
 				new OptionData(OptionType.STRING, "comparison", "Comparison method").addChoice("Average", "average").addChoice("Sum", "sum")

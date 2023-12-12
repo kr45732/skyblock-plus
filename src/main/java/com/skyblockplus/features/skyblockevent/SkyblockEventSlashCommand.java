@@ -617,7 +617,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			if (slashCommandEvent != null) {
 				slashCommandEvent.paginate(paginateBuilder);
 			} else {
-				paginateBuilder.build().paginate(buttonEvent.getHook(), 0);
+				paginateBuilder.build().paginate(buttonEvent.getHook(), 1);
 			}
 			return null;
 		}

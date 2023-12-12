@@ -21,7 +21,6 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.utils.Constants.gamemodeCommandOption;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 import static com.skyblockplus.utils.database.LeaderboardDatabase.typeToNameSubMap;
-import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommand;

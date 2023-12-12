@@ -18,8 +18,6 @@
 
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.utils.utils.Utils.GLOBAL_COOLDOWN;
-
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import net.dv8tion.jda.api.Permission;

@@ -154,30 +154,28 @@ public class HelpSlashCommand extends SlashCommand {
 							"Get the experience leaderboard for a guild. Defaults to seven days.",
 							"experience [player] [guild] [days]"
 						),
-						new HelpData(
-							"leaderboard",
-							"Get a leaderboard for a guild. Set key to true to force use this server's Hypixel API key for more accurate results.",
-							"leaderboard <type> [player] [guild] [gamemode] [key]"
-						),
+						new HelpData("leaderboard", "Get a leaderboard for a guild.", "leaderboard <type> [player] [guild] [gamemode]"),
 						new HelpData(
 							"kicker",
-							"Get all player's who don't meet the provided requirements. Requirements are in the format `[type:value ...] ...`.  The requirement type can be skills, slayer, catacombs, weight, or level. The requirement value must be an integer. You can have up to 3 sets of requirements. Set key to true to force use this server's Hypixel API key for more accurate results.",
-							"kicker <requirements...> [player] [gamemode] [key]"
-						),
+							"Get all player's who don't meet the provided requirements. Requirements are in the format `[type:value ...] ...`. The requirement type can be skills, slayer, catacombs, weight, or level. The requirement value must be an integer. Requirements inside the brackets require at least one to be met, while outside require all to be met.",
+							"kicker <requirements...> [player] [gamemode]"
+						)
+							.addExamples("kicker [level:300] [skills:40]", "kicker [level:200 slayer:2000000] [level:300]"),
 						new HelpData(
 							"top",
-							"Get a guild's average and top 5 leaderboards of slayer, skills, catacombs, weight, networth, and level. Set key to true to force use this server's Hypixel API key for more accurate results.",
-							"top [player] [guild] [gamemode] [key]"
+							"Get a guild's average and top 5 leaderboards of slayer, skills, catacombs, weight, networth, and level.",
+							"top [player] [guild] [gamemode]"
 						),
 						new HelpData(
 							"check",
-							"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" +
+							"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild based on numerical requirements. Please join the [Skyblock Plus Discord](" +
 							DISCORD_SERVER_INVITE_LINK +
-							") to set this up for your guild. Set key to true to force use this server's Hypixel API key for more accurate results.",
-							"check <player> [gamemode] [key]"
+							") and mention CrypticPlasma to setup this for your guild.",
+							"check <player> [gamemode]"
 						)
 					)
 					.setCategory("guild"),
+				new HelpData("guildlb", "Get a global guild leaderboard.", "guildlb <type> [mode] [comparison]").setCategory("guild"),
 				// Auctions
 				new HelpData(
 					"auctions",
@@ -312,8 +310,6 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("jacob [crop]", "Get the upcoming contests and their crops.").setCategory("miscellaneous"),
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
 				new HelpData("leaderboard", "Get a global leaderboard.", "leaderboard <type>").setCategory("miscellaneous"),
-				new HelpData("guildlb", "Get a global guild leaderboard.", "guildlb <type> [mode] [comparison]")
-					.setCategory("miscellaneous"),
 				new HelpData("skyblock", "Get an overview of a player's Skyblock profiles", "skyblock [player] [profile]")
 					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
@@ -769,16 +765,17 @@ public class HelpSlashCommand extends SlashCommand {
 			create("guild information [player] [guild]", "Get information and statistics about a guild") +
 			create("guild members [player] [guild]", "Get a list of all members in a guild") +
 			create("guild experience [player] [guild]", "Get the experience leaderboard for a guild") +
-			create("guild leaderboard <type> [player] [guild] [mode] [key]", "Get a leaderboard for a player's guild") +
-			create("guild kicker <requirements> [player] [gamemode] [key]", "Get all player's who don't meet the provided requirements") +
+			create("guild leaderboard <type> [player] [guild] [mode]", "Get a leaderboard for a player's guild") +
+			create("guild kicker <requirements> [player] [gamemode]", "Get all player's who don't meet the provided requirements") +
 			create(
-				"guild check [player] [gamemode] [key]",
+				"guild check [player] [gamemode]",
 				"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild"
 			) +
 			create(
-				"guild top [player] [guild] [gamemode] [key]",
+				"guild top [player] [guild] [gamemode]",
 				"Get a guild's Skyblock statistics of slayer, skills, catacombs, weight, level, and networth"
-			)
+			) +
+			create("guildlb <type> [mode] [comparison]", "Get a global guild leaderboard")
 		);
 
 		paginateBuilder.addStrings(
@@ -839,7 +836,6 @@ public class HelpSlashCommand extends SlashCommand {
 			create("mayor", "Get information about the current mayor or the running election") +
 			create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
 			create("leaderboard <type> [player] [gamemode] [page] [rank] [amount]", "Get a global leaderboard") +
-			create("guildlb <type> [mode] [comparison]", "Get a global guild leaderboard") +
 			create("skyblock [player] [profile]", "Get an overview of a player's Skyblock profiles") +
 			create("recipe <item>", "Get the crafting recipe of an item") +
 			create("craft <item>", "Calculate the cost of an item and added upgrades") +
