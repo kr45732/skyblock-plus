@@ -175,7 +175,8 @@ public class HelpSlashCommand extends SlashCommand {
 						)
 					)
 					.setCategory("guild"),
-				new HelpData("guildlb", "Get a global guild leaderboard.", "guildlb <type> [mode] [comparison]").setCategory("guild"),
+				new HelpData("guildlb", "Get a global guild leaderboard.", "guildlb <type> [guild] [mode] [comparison]")
+					.setCategory("guild"),
 				// Auctions
 				new HelpData(
 					"auctions",
@@ -775,7 +776,7 @@ public class HelpSlashCommand extends SlashCommand {
 				"guild top [player] [guild] [gamemode]",
 				"Get a guild's Skyblock statistics of slayer, skills, catacombs, weight, level, and networth"
 			) +
-			create("guildlb <type> [mode] [comparison]", "Get a global guild leaderboard")
+			create("guildlb <type> [guild] [mode] [comparison]", "Get a global guild leaderboard")
 		);
 
 		paginateBuilder.addStrings(
