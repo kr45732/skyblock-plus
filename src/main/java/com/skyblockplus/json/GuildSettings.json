@@ -851,5 +851,36 @@
         }
       ]
     }
+  },
+  "657a0d968ea8c9dca6f36d85": {
+    "name": "SbMins",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "coowner",
+        "recruiter"
+      ],
+      "default_rank": {
+        "requirements": [],
+        "names": [
+          "earlygame"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 120,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "midgame"
+          ]
+        }
+      ]
+    }
   }
 }
