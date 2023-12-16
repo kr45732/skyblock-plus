@@ -777,20 +777,24 @@ public class GuildSlashCommand extends SlashCommand {
 			this.name = "check";
 		}
 
-		public static EmbedBuilder getRanks(String username, Player.Gamemode gamemode, SlashCommandEvent event) {
-			UsernameUuidStruct usernameUuid = usernameToUuid(username);
-			if (!usernameUuid.isValid()) {
-				return errorEmbed(usernameUuid.failCause());
+		public static EmbedBuilder getRanks(String username, String guildName, Player.Gamemode gamemode, SlashCommandEvent event) {
+			HypixelResponse guildResponse;
+			if (username != null) {
+				UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+				if (!usernameUuidStruct.isValid()) {
+					return errorEmbed(usernameUuidStruct.failCause());
+				}
+				guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
+			} else {
+				guildResponse = getGuildFromName(guildName);
 			}
-
-			HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.uuid());
 			if (!guildResponse.isValid()) {
 				return guildResponse.getErrorEmbed();
 			}
 
 			JsonElement guildJson = guildResponse.response();
 			String guildId = higherDepth(guildJson, "_id").getAsString();
-			String guildName = higherDepth(guildJson, "name").getAsString();
+			guildName = higherDepth(guildJson, "name").getAsString();
 
 			JsonElement lbSettings;
 			try {
@@ -1171,17 +1175,23 @@ public class GuildSlashCommand extends SlashCommand {
 
 		@Override
 		protected void execute(SlashCommandEvent event) {
+			String guild = event.getOptionStr("guild");
+			if (guild != null) {
+				event.paginate(getRanks(null, guild, Player.Gamemode.of(event.getOptionStr("gamemode", "all")), event));
+			}
+
 			if (event.invalidPlayerOption()) {
 				return;
 			}
 
-			event.paginate(getRanks(event.player, Player.Gamemode.of(event.getOptionStr("gamemode", "all")), event));
+			event.paginate(getRanks(event.player, null, Player.Gamemode.of(event.getOptionStr("gamemode", "all")), event));
 		}
 
 		@Override
 		protected SubcommandData getCommandData() {
 			return new SubcommandData(name, "Get helper which shows who to promote or demote in your guild")
 				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "guild", "Guild name", false)
 				.addOptions(gamemodeCommandOption);
 		}
 	}
