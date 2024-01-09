@@ -70,7 +70,8 @@ public class BingoSlashCommand extends SlashCommand {
 		EmbedBuilder eb = defaultEmbed(usernameUuidStruct.username(), skyblockStatsLink(usernameUuidStruct.uuid(), null));
 		StringBuilder regGoals = new StringBuilder();
 		StringBuilder communityGoals = new StringBuilder();
-		StringBuilder cardStr = new StringBuilder(); // C = community done, c = community not done, S = self done, s = self not done
+		StringBuilder cardStr = new StringBuilder(); // C = community done, c = community not done, S = self done, s = self
+		// not done
 		for (JsonElement goal : higherDepth(bingoInfo, "goals").getAsJsonArray()) {
 			if (higherDepth(goal, "progress", -1) != -1) {
 				long progress = higherDepth(goal, "progress").getAsLong();
@@ -114,16 +115,12 @@ public class BingoSlashCommand extends SlashCommand {
 			}
 		}
 		eb.setDescription(
-			(
-				bingoJson == null
+			(bingoJson == null
 					? "**This player has no bingo profiles**"
-					: (
-						"**Goals Completed:** " +
+					: ("**Goals Completed:** " +
 						(bingoArr.size() + countOccurrencesOf(cardStr.toString(), "C")) +
 						"\n**Points:** " +
-						higherDepth(bingoJson, "points", 0)
-					)
-			)
+						higherDepth(bingoJson, "points", 0)))
 		);
 		eb.appendDescription("\n\n**Self Goals:**" + regGoals);
 		eb.appendDescription("\n\n**Community Goals:**" + communityGoals);

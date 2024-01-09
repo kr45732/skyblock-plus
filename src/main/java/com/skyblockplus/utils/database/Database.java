@@ -77,7 +77,8 @@ public class Database {
 	}
 
 	public JsonElement getServerSettings(String serverId) {
-		return gson.toJsonTree(settingsService.getServerSettingsById(serverId).getBody());
+		ServerSettingsModel serverSettings = settingsService.getServerSettingsById(serverId).getBody();
+		return serverSettings != null ? gson.toJsonTree(serverSettings) : null;
 	}
 
 	public int newServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
@@ -104,9 +105,7 @@ public class Database {
 		return gson.toJsonTree(settingsService.getRolesSettings(serverId).getBody());
 	}
 
-	/**
-	 * Only updates enable, useHighest, enableAutomaticSync
-	 */
+	/** Only updates enable, useHighest, enableAutomaticSync */
 	public int setRolesSettings(String serverId, JsonElement newRoleSettings) {
 		return settingsService.setRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCode().value();
 	}
@@ -238,7 +237,7 @@ public class Database {
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"DELETE FROM linked_account WHERE discord = ? OR username = ? or uuid = ? RETURNING discord"
+					"DELETE FROM linked_account WHERE discord = ? OR username = ? or uuid = ?" + " RETURNING discord"
 				)
 			) {
 				statement.setString(1, discord);
@@ -260,7 +259,7 @@ public class Database {
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?, ?, ?)"
+					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?," + " ?, ?)"
 				)
 			) {
 				statement.setLong(1, lastUpdated);

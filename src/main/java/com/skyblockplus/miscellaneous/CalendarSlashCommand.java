@@ -79,7 +79,7 @@ public class CalendarSlashCommand extends SlashCommand {
 		int currentDayTime = (int) Math.floorDiv(currentMonthOffsetTime, DAY_MS);
 		long currentDayOffsetTime = (currentMonthOffsetTime - (long) currentDayTime * DAY_MS) % DAY_MS;
 		long currentHourTime = Math.floorDiv(currentDayOffsetTime, HOUR_MS);
-		long currentMinuteTime = (long) Math.floor(((double) currentDayOffsetTime - currentHourTime * HOUR_MS) / HOUR_MS * 60);
+		long currentMinuteTime = (long) Math.floor((((double) currentDayOffsetTime - currentHourTime * HOUR_MS) / HOUR_MS) * 60);
 
 		String suffix = "am";
 		if (currentHourTime >= 12) {
@@ -311,7 +311,7 @@ public class CalendarSlashCommand extends SlashCommand {
 
 	private static String nth(int n) {
 		try {
-			return n + new String[] { "st", "nd", "rd" }[((n + 90) % 100 - 10) % 10 - 1];
+			return n + new String[] { "st", "nd", "rd" }[((((n + 90) % 100) - 10) % 10) - 1];
 		} catch (Exception e) {
 			return n + "th";
 		}

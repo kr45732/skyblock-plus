@@ -82,30 +82,30 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 				long cost = killsNeeded;
 				if (slayerType.equals("blaze")) {
 					cost *=
-						switch (i) {
-							case 0 -> 10000L;
-							case 1 -> 25000L;
-							case 2 -> 60000L;
-							default -> 150000L;
-						};
+					switch (i) {
+						case 0 -> 10000L;
+						case 1 -> 25000L;
+						case 2 -> 60000L;
+						default -> 150000L;
+					};
 				} else if (slayerType.equals("vampire")) {
 					cost *=
-						switch (i) {
-							case 0 -> 2000L;
-							case 1 -> 4000L;
-							case 2 -> 5000L;
-							case 3 -> 7000L;
-							default -> 10000L;
-						};
+					switch (i) {
+						case 0 -> 2000L;
+						case 1 -> 4000L;
+						case 2 -> 5000L;
+						case 3 -> 7000L;
+						default -> 10000L;
+					};
 				} else {
 					cost *=
-						switch (i) {
-							case 0 -> 2000L;
-							case 1 -> 7500L;
-							case 2 -> 20000L;
-							case 3 -> 50000L;
-							default -> 100000L;
-						};
+					switch (i) {
+						case 0 -> 2000L;
+						case 1 -> 7500L;
+						case 2 -> 20000L;
+						case 3 -> 50000L;
+						default -> 100000L;
+					};
 				}
 
 				boolean unlockedTier = i == 0 || player.getSlayerBossKills(slayerType, i - 1) > 0;

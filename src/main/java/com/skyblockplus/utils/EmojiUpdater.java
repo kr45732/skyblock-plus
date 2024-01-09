@@ -57,13 +57,11 @@ public class EmojiUpdater {
 	public static JsonElement getMissing(String... url) {
 		try {
 			Set<String> processedItemsSet =
-				(
-					url.length == 0
+				(url.length == 0
 						? JsonParser
 							.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
 							.getAsJsonObject()
-						: getJson(url[0])
-				).getAsJsonObject()
+						: getJson(url[0])).getAsJsonObject()
 					.keySet();
 			Set<String> allItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
 				.getAsJsonObject()
@@ -295,14 +293,12 @@ public class EmojiUpdater {
 								String id = higherDepth(json, "internalname").getAsString();
 								return (
 									higherDepth(json, "nbttag").getAsString().startsWith("{ench:[") &&
-									!(
-										id.endsWith("_MINIBOSS") ||
+									!(id.endsWith("_MINIBOSS") ||
 										id.endsWith("_MONSTER") ||
 										id.endsWith("_ANIMAL") ||
 										id.endsWith("_SC") ||
 										id.endsWith("_BOSS") ||
-										id.endsWith("_NPC")
-									)
+										id.endsWith("_NPC"))
 								);
 							} catch (Exception e) {
 								e.printStackTrace();

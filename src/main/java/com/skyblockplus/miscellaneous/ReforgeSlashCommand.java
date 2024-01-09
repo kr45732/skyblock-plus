@@ -76,15 +76,11 @@ public class ReforgeSlashCommand extends SlashCommand {
 				"Cost: " +
 				formatNumber(higherDepth(reforgeStoneJson, "reforgeCosts." + stat.getKey()).getAsLong()) +
 				"\n" +
-				(
-					higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null) != null
-						? (
-							"➜ Ability: " +
+				(higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null) != null
+						? ("➜ Ability: " +
 							cleanMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null)).replace("\n", " ") +
-							"\n"
-						)
-						: ""
-				) +
+							"\n")
+						: "") +
 				stat
 					.getValue()
 					.getAsJsonObject()

@@ -100,7 +100,8 @@ public class ApplyUser {
 				.getHook()
 				.editOriginal(
 					client.getError() +
-					" Unable to create a new application since the application category has reached 50/50 channels. Please report this to the server's staff."
+					" Unable to create a new application since the application category has reached" +
+					" 50/50 channels. Please report this to the server's staff."
 				)
 				.queue();
 			return;
@@ -372,7 +373,7 @@ public class ApplyUser {
 						roundAndFormat((long) player.getNetworth())
 					)
 					.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr)
-					.appendDescription("\nIf any of these value seem incorrect, then make sure all your APIs are enabled");
+					.appendDescription("\n" + "If any of these value seem incorrect, then make sure all your APIs are" + " enabled");
 
 				List<Button> buttons = new ArrayList<>();
 				if (!profileNames.isEmpty()) {

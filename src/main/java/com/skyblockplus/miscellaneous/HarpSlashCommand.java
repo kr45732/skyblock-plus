@@ -77,7 +77,7 @@ public class HarpSlashCommand extends SlashCommand {
 					}
 				}
 			}
-			for (int i = 0; i < 3 - eb.getFields().size() % 3; i++) {
+			for (int i = 0; i < 3 - (eb.getFields().size() % 3); i++) {
 				eb.addBlankField(true);
 			}
 

@@ -60,9 +60,7 @@ public class InvItem {
 		this.essenceType = essenceType;
 	}
 
-	/**
-	 * Will only set it for midas sword or midas staff
-	 */
+	/** Will only set it for midas sword or midas staff */
 	public void setDarkAuctionPrice(long darkAuctionPrice) {
 		if (id != null && (id.equals("MIDAS_SWORD") || id.equals("MIDAS_STAFF"))) {
 			this.darkAuctionPrice = darkAuctionPrice;
@@ -167,9 +165,7 @@ public class InvItem {
 		return null;
 	}
 
-	/**
-	 * Converts tier boosted pets to the post-boosted rarity
-	 */
+	/** Converts tier boosted pets to the post-boosted rarity */
 	public String getPetRarity() {
 		if (id.equals("PET") && isTierBoosted()) {
 			return NUMBER_TO_RARITY_MAP.get(RARITY_TO_NUMBER_MAP.get(rarity) + 1);

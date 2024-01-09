@@ -50,8 +50,7 @@ public class CalcDragsSlashCommand extends SlashCommand {
 	public static EmbedBuilder getCalcDrags(int position, double damageRatio, int eyesPlaced, SlashCommandEvent event) {
 		position = damageRatio == 1 ? 1 : position;
 		damageRatio = position == 1 ? 1 : damageRatio;
-		int estimatedQuality = (int) (
-			switch (position) {
+		int estimatedQuality = (int) (switch (position) {
 				case 1 -> 200;
 				case 2 -> 175;
 				case 3 -> 150;
@@ -62,11 +61,8 @@ public class CalcDragsSlashCommand extends SlashCommand {
 				case 11, 12 -> 80;
 				default -> 70;
 			} +
-			100 *
-			damageRatio +
-			100 *
-			eyesPlaced
-		);
+			100 * damageRatio +
+			100 * eyesPlaced);
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator(PaginatorExtras.PaginatorType.EMBED_PAGES).setItemsPerPage(10);
 		PaginatorExtras extras = paginateBuilder.getExtras();
@@ -98,18 +94,16 @@ public class CalcDragsSlashCommand extends SlashCommand {
 					"➜ Quality: " +
 					higherDepth(entry.getValue(), "quality", 0) +
 					"\n➜ Drop Chance: " +
-					(
-						higherDepth(entry.getValue(), "eye", false)
+					(higherDepth(entry.getValue(), "eye", false)
 							? formatNumber(
 								Double.parseDouble(higherDepth(entry.getValue(), "drop_chance", "").replace("%", "")) * eyesPlaced
 							) +
 							"%"
-							: higherDepth(entry.getValue(), "drop_chance", "")
-					),
+							: higherDepth(entry.getValue(), "drop_chance", "")),
 					true
 				);
 			}
-			for (int i = 0; i < 3 - eb.getFields().size() % 3; i++) {
+			for (int i = 0; i < 3 - (eb.getFields().size() % 3); i++) {
 				eb.addBlankField(true);
 			}
 			extras.addEmbedPage(eb);

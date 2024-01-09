@@ -83,7 +83,7 @@ public class SettingsExecute {
 			"enderman",
 			null,
 			"vampire",
-			"**A player's vampire slayer xp**\nExample: `/settings roles add vampire 2400 @vampire 5`\n",
+			"**A player's vampire slayer xp**\n" + "Example: `/settings roles add vampire 2400 @vampire 5`\n",
 			"alchemy",
 			null,
 			"combat",
@@ -119,41 +119,45 @@ public class SettingsExecute {
 			"weight",
 			"**A player's weight**\nExample: `/settings roles add weight 5000 @5k weight`\n",
 			"guild_member",
-			"**Member role for Hypixel guilds**\nExample: `/settings roles add guild_member skyblock_forceful @guild member`\n",
+			"**Member role for Hypixel guilds**\n" + "Example: `/settings roles add guild_member skyblock_forceful @guild member`\n",
 			"guild_ranks",
-			"**If a player is in a guild setup in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be linked here. To modify guild ranks use `/settings guild <name>`\n",
+			"**If a player is in a guild setup in `/settings guild`, they will be given the" +
+			" corresponding rank role set there**\n" +
+			"Note: this role can only be linked here. To modify guild ranks use `/settings" +
+			" guild <name>`\n",
 			"coins",
-			"**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n",
+			"**Coins in a player's bank and purse**\n" + "Example: `/settings roles add coins 1000000 @millionaire`\n",
 			"fairy_souls",
-			"**Amount of collected fairy souls**\nExample: `/settings roles add fairy_souls 50 @50 souls collected`\n",
+			"**Amount of collected fairy souls**\n" + "Example: `/settings roles add fairy_souls 50 @50 souls collected`\n",
 			"minion_slots",
-			"**Number of minion slots excluding upgrades**\nExample: `/settings roles add minion_slots 24 @maxed minion slots`\n",
+			"**Number of minion slots excluding upgrades**\n" + "Example: `/settings roles add minion_slots 24 @maxed minion slots`\n",
 			"total_slayer",
-			"**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n",
+			"**A player's total slayer xp**\n" + "Example: `/settings roles add total_slayer 1000000 @1m slayer`\n",
 			"maxed_slayers",
-			"**The number of maxed slayers a player has**\nExample: `/settings roles add maxed_slayers 6 @maxed slayers`\n",
+			"**The number of maxed slayers a player has**\n" + "Example: `/settings roles add maxed_slayers 6 @maxed slayers`\n",
 			"skill_average",
-			"**A player's skill average**\nExample: `/settings roles add skill_average 55 @maxed skills`\n",
+			"**A player's skill average**\n" + "Example: `/settings roles add skill_average 55 @maxed skills`\n",
 			"pet_score",
-			"**A player's pet score**\nExample: `/settings roles add pet_score 100 @100 pet score`\n",
+			"**A player's pet score**\n" + "Example: `/settings roles add pet_score 100 @100 pet score`\n",
 			"dungeon_secrets",
-			"**A player's dungeon secrets count**\nExample: `/settings roles add dungeon_secrets 25000 @secrets sweat`\n",
+			"**A player's dungeon secrets count**\n" + "Example: `/settings roles add dungeon_secrets 25000 @secrets sweat`\n",
 			"networth",
-			"**A player's networth**\nExample: `/settings roles add networth 1000000000 @billionaire`\n",
+			"**A player's networth**\n" + "Example: `/settings roles add networth 1000000000 @billionaire`\n",
 			"gamemode",
-			"**Playing on an ironman or stranded profile**\nExample: `/settings roles add gamemode stranded @stranded gamer`\n",
+			"**Playing on an ironman or stranded profile**\n" + "Example: `/settings roles add gamemode stranded @stranded gamer`\n",
 			"maxed_collections",
-			"**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n",
+			"**Number of a player's individually maxed collections**\n" +
+			"Example: `/settings roles add maxed_collections 62 @all collections maxed`\n",
 			"player_items",
-			"**Items that a player has**\nExample: `/settings roles add player_items hyperion @mage gamer`\n",
+			"**Items that a player has**\n" + "Example: `/settings roles add player_items hyperion @mage gamer`\n",
 			"class_average",
-			"**A player's average dungeon classes level**\nExample: `/settings roles add class_average 50 @maxed classes`\n",
+			"**A player's average dungeon classes level**\n" + "Example: `/settings roles add class_average 50 @maxed classes`\n",
 			"mage_reputation",
-			"**A player's mage reputation**\nExample: `/settings roles add mage_reputation 1000 @1k mage rep`\n",
+			"**A player's mage reputation**\n" + "Example: `/settings roles add mage_reputation 1000 @1k mage rep`\n",
 			"barbarian_reputation",
-			"**A player's barbarian reputation**\nExample: `/settings roles add barbarian_reputation 1000 @1k barbarian rep`\n",
+			"**A player's barbarian reputation**\n" + "Example: `/settings roles add barbarian_reputation 1000 @1k barbarian rep`\n",
 			"level",
-			"**A player's Skyblock level**\nExample: `/settings roles add level 500 @maxed level`\n"
+			"**A player's Skyblock level**\n" + "Example: `/settings roles add level 500 @maxed level`\n"
 		)
 	);
 
@@ -212,7 +216,7 @@ public class SettingsExecute {
 		this.author = author;
 		this.interactionHook = interactionHook;
 
-		if (database.getServerSettings(guild.getId()) != null) {
+		if (database.getServerSettings(guild.getId()) == null) {
 			database.newServerSettings(guild.getId(), new ServerSettingsModel(guild.getName(), guild.getId()));
 		}
 		this.serverSettings = database.getServerSettings(guild.getId()).getAsJsonObject();
@@ -528,10 +532,8 @@ public class SettingsExecute {
 			} else if (
 				(args = content.split("\\s+", 6)).length == 6 &&
 				!(args[3].equals("ranks") && args[4].equals("add")) &&
-				!(
-					args[3].equals("apply") &&
-					(args[4].equals("staff_roles") || args[4].equals("requirements") || args[4].equals("reqs") || args[4].equals("req"))
-				)
+				!(args[3].equals("apply") &&
+					(args[4].equals("staff_roles") || args[4].equals("requirements") || args[4].equals("reqs") || args[4].equals("req")))
 			) {
 				JsonElement guildSettings = database.getGuildSettings(guild.getId(), args[2]);
 				if (guildSettings == null || guildSettings.isJsonNull()) {
@@ -1037,14 +1039,12 @@ public class SettingsExecute {
 
 		return errorEmbed(
 			"Invalid guild rank. " +
-			(
-				guildRanks.size() > 0
+			(guildRanks.size() > 0
 					? "Valid guild ranks are: " +
 					streamJsonArray(guildRanks)
 						.map(r -> higherDepth(r, "name").getAsString().replace(" ", "_"))
 						.collect(Collectors.joining(", "))
-					: "No guild ranks found"
-			)
+					: "No guild ranks found")
 		);
 	}
 
@@ -1082,7 +1082,9 @@ public class SettingsExecute {
 				higherDepth(guildSettings, "applyDenyMessage", "").isEmpty()
 			) {
 				return errorEmbed(
-					"All required application settings must be set before enabling\n\nRequired settings: channel, staff_channel, category, message, accept_message, deny_message"
+					"All required application settings must be set before enabling\n\n" +
+					"Required settings: channel, staff_channel, category, message, accept_message," +
+					" deny_message"
 				);
 			}
 		}
@@ -1423,7 +1425,7 @@ public class SettingsExecute {
 					.collect(Collectors.joining())
 			);
 		} catch (Exception e) {
-			return errorEmbed("Invalid requirement index. Run `/settings guild <name>` to see the current apply requirements");
+			return errorEmbed("Invalid requirement index. Run `/settings guild <name>` to see the current apply" + " requirements");
 		}
 	}
 
@@ -1495,11 +1497,9 @@ public class SettingsExecute {
 			"Guild Counter",
 			"• " +
 			(higherDepth(settings, "guildCounterEnable", false) ? "Enabled" : "Disabled") +
-			(
-				higherDepth(settings, "guildCounterEnable", false)
+			(higherDepth(settings, "guildCounterEnable", false)
 					? "\n• Counter Channel: " + displaySettings(settings, "guildCounterChannel")
-					: ""
-			),
+					: ""),
 			false
 		);
 		extras.addEmbedPage(eb);
@@ -1852,7 +1852,8 @@ public class SettingsExecute {
 						(key.getValue().isJsonArray() && key.getValue().getAsJsonArray().isEmpty())
 					) {
 						return errorEmbed(
-							"The following settings must be set before enabling verify: message, channel, and at least one verified role"
+							"The following settings must be set before enabling verify: message, channel, and" +
+							" at least one verified role"
 						);
 					}
 				}
@@ -1936,21 +1937,19 @@ public class SettingsExecute {
 				nickname = nickname.replace(matcher.group(0), "");
 			} else if (
 				category.equals("PLAYER") &&
-				(
-					type.equals("SKILLS") ||
+				(type.equals("SKILLS") ||
 					type.equals("CATACOMBS") ||
 					type.equals("SLAYER") ||
 					type.equals("WEIGHT") ||
 					type.equals("CLASS") ||
-					type.equals("LEVEL")
-				)
+					type.equals("LEVEL"))
 			) {
 				nickname = nickname.replace(matcher.group(0), "");
 			}
 		}
 
 		if (nickname.replace("[IGN]", "").length() > 15) {
-			return errorEmbed("Nickname prefix and/or postfix, excluding templates, must be less than or equal to 15 letters");
+			return errorEmbed("Nickname prefix and/or postfix, excluding templates, must be less than or equal to 15" + " letters");
 		}
 
 		int responseCode = updateVerifySettings("verifiedNickname", origNick);

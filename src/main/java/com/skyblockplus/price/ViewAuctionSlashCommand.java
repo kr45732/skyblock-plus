@@ -90,18 +90,18 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 			} else {
 				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending " + getRelativeTimestamp(endingAt);
 				ebStr +=
-					bidsArr.size() > 0
-						? "\n**Highest bidder:** " +
-						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username()
-						: "";
+				bidsArr.size() > 0
+					? "\n**Highest bidder:** " +
+					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username()
+					: "";
 			}
 		} else {
 			if (highestBid >= startingBid) {
 				ebStr +=
-					"\n**Auction sold** for " +
-					simplifyNumber(highestBid) +
-					" coins to " +
-					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username();
+				"\n**Auction sold** for " +
+				simplifyNumber(highestBid) +
+				" coins to " +
+				uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username();
 			} else {
 				ebStr = "\n**Auction did not sell**";
 			}

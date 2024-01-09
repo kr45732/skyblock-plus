@@ -49,7 +49,8 @@ public class LoreRenderer {
 			)
 		);
 	private static final String ASCII_ALPHABET =
-		"ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■\u0000";
+		"ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ\u0000\u0000\u0000\u0000\u0000\u0000\u0000" +
+		" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■\u0000";
 	private static final int GLYPH_SIZE = 8;
 	private static final Map<Character, Glyph> glyphCache = new ConcurrentHashMap<>();
 
@@ -165,7 +166,7 @@ public class LoreRenderer {
 		}
 
 		int lastByte = char1 & 0xFF;
-		int page = char1 >> 8 & 0xFF;
+		int page = (char1 >> 8) & 0xFF;
 		String pageName = "unicode_page_" + String.format("%02x", page);
 
 		BufferedImage fontImage;
@@ -189,7 +190,9 @@ public class LoreRenderer {
 		for (int i = scale * GLYPH_SIZE - 1; i >= 0; i--) {
 			int finalI = i;
 			if (
-				IntStream.range(0, scale * GLYPH_SIZE).anyMatch(it -> (fontImage.getRGB(xOffset + finalI, yOffset + it) >> 24 & 0xFF) != 0)
+				IntStream
+					.range(0, scale * GLYPH_SIZE)
+					.anyMatch(it -> ((fontImage.getRGB(xOffset + finalI, yOffset + it) >> 24) & 0xFF) != 0)
 			) {
 				return (int) Math.ceil(((double) i + 2) / scale);
 			}
@@ -275,7 +278,7 @@ public class LoreRenderer {
 			int actualScale = scale / this.scale;
 			for (int x = 0; x < GLYPH_SIZE * this.scale; x++) {
 				for (int y = 0; y < GLYPH_SIZE * this.scale; y++) {
-					boolean isSet = (thinTexture.getRGB(x, y) >> 24 & 0xFF) != 0x00;
+					boolean isSet = ((thinTexture.getRGB(x, y) >> 24) & 0xFF) != 0x00;
 					if (isSet) {
 						graphics.fillRect(xPos + x * actualScale, yPos + y * actualScale, actualScale, actualScale);
 					}

@@ -37,17 +37,13 @@ public class ColeWeight {
 
 		// Powder
 		powderWeight +=
-			(
-				higherDepth(player.profileJson(), "mining_core.powder_mithril_total", 0) +
-				higherDepth(player.profileJson(), "mining_core.powder_spent_mithril", 0)
-			) /
-			60000.0;
+		(higherDepth(player.profileJson(), "mining_core.powder_mithril_total", 0) +
+			higherDepth(player.profileJson(), "mining_core.powder_spent_mithril", 0)) /
+		60000.0;
 		powderWeight +=
-			(
-				higherDepth(player.profileJson(), "mining_core.powder_gemstone_total", 0) +
-				higherDepth(player.profileJson(), "mining_core.powder_spent_gemstone", 0)
-			) /
-			60000.0;
+		(higherDepth(player.profileJson(), "mining_core.powder_gemstone_total", 0) +
+			higherDepth(player.profileJson(), "mining_core.powder_spent_gemstone", 0)) /
+		60000.0;
 
 		// Collections
 		collectionsWeight += getCollection(player, "MITHRIL_ORE") / 500000.0;

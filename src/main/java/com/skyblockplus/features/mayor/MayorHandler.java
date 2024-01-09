@@ -250,7 +250,9 @@ public class MayorHandler {
 								streamJsonArray(curMayors)
 									.map(m -> higherDepth(m, "votes").getAsString())
 									.collect(Collectors.joining(",")) +
-								"], backgroundColor: getGradientFillHelper('vertical', [\"#023020\", \"#32CD32\"]), }] }, options: { title: { display: true, text: 'Mayor Election Graph | Year " +
+								"], backgroundColor: getGradientFillHelper('vertical', [\"#023020\"," +
+								" \"#32CD32\"]), }] }, options: { title: { display: true, text:" +
+								" 'Mayor Election Graph | Year " +
 								year +
 								"' }, legend: { display: false, } } }"
 							)

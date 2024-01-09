@@ -97,7 +97,7 @@ public class SetupCommandHandler {
 				hook
 					.editOriginalEmbeds(
 						defaultEmbed("Setup")
-							.setDescription("Use the menu below to choose an existing automatic guild or create a new one")
+							.setDescription("Use the menu below to choose an existing automatic guild or create a new" + " one")
 							.build()
 					)
 					.setActionRow(StringSelectMenu.create("setup_command_" + featureType).addOptions(selectOptions).build())

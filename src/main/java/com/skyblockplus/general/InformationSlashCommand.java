@@ -52,7 +52,11 @@ public class InformationSlashCommand extends SlashCommand {
 							.setEmbeds(
 								defaultEmbed("Skyblock Plus")
 									.setDescription(
-										"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
+										"Skyblock Plus is a Skyblock focused Discord bot that has" +
+										" many commands to help Skyblock players and guild" +
+										" staff! It allows for quick retrieval of Skyblock" +
+										" stats plus customizable features for a better" +
+										" Skyblock experience."
 									)
 									.addField(
 										"Statistics",
@@ -87,8 +91,7 @@ public class InformationSlashCommand extends SlashCommand {
 										"Usage",
 										"**Memory:** " +
 										roundAndFormat(
-											100.0 *
-											(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) /
+											(100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())) /
 											(Runtime.getRuntime().maxMemory())
 										) +
 										"%",

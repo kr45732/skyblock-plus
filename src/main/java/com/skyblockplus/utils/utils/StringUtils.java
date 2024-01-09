@@ -112,7 +112,7 @@ public class StringUtils {
 	}
 
 	public static String toPrettyTime(long millis) {
-		long seconds = millis / 1000 % 60;
+		long seconds = (millis / 1000) % 60;
 		long minutes = (millis / 1000 / 60) % 60;
 		long hours = (millis / 1000 / 60 / 60) % 24;
 		long days = (millis / 1000 / 60 / 60 / 24);
@@ -221,7 +221,7 @@ public class StringUtils {
 	}
 
 	/**
-	 * @param toMatch   name to match
+	 * @param toMatch name to match
 	 * @param matchFrom list of ids (will convert to their names)
 	 * @return id of the closest matching name
 	 */

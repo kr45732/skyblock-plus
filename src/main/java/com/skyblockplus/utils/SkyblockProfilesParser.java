@@ -58,8 +58,8 @@ public class SkyblockProfilesParser {
 	);
 
 	/**
-	 * Tries to begin reading a JSON array or JSON object, returning {@code null} if
-	 * the next element is neither of those.
+	 * Tries to begin reading a JSON array or JSON object, returning {@code null} if the next element
+	 * is neither of those.
 	 */
 	private static JsonElement tryBeginNesting(JsonReader in, JsonToken peeked) throws IOException {
 		switch (peeked) {
@@ -74,9 +74,7 @@ public class SkyblockProfilesParser {
 		}
 	}
 
-	/**
-	 * Reads a {@link JsonElement} which cannot have any nested elements
-	 */
+	/** Reads a {@link JsonElement} which cannot have any nested elements */
 	private static JsonElement readTerminal(JsonReader in, JsonToken peeked) throws IOException {
 		switch (peeked) {
 			case STRING:

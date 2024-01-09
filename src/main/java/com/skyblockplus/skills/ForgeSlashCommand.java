@@ -85,14 +85,10 @@ public class ForgeSlashCommand extends SlashCommand {
 						Instant
 							.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong())
 							.plusSeconds(
-								(long) (
-									(
-										itemId.equals("AMMONITE;4")
+								(long) ((itemId.equals("AMMONITE;4")
 											? 1036800
-											: higherDepth(getInternalJsonMappings(), itemId + ".forge").getAsLong()
-									) *
-									bonus
-								)
+											: higherDepth(getInternalJsonMappings(), itemId + ".forge").getAsLong()) *
+									bonus)
 							)
 					),
 					false

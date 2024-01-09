@@ -1322,7 +1322,8 @@ public class Constants {
 		"ENCHANT_RUNE;3",
 		"GRAND_SEARING_RUNE;3",
 		"GRAND_FREEZING_RUNE;3",
-		"PRIMAL_FEAR_RUNE;3"
+		"PRIMAL_FEAR_RUNE;3",
+		"MEOW_MUSIC_RUNE;3"
 	);
 	public static final List<String> raritiesWithColorCode = List.of(
 		"§f§lCOMMON",

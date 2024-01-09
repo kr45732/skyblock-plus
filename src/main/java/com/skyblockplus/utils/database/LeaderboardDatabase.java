@@ -183,9 +183,7 @@ public class LeaderboardDatabase {
 		}
 	}
 
-	/**
-	 * Once called, these players should not be used again to access stats (does not copy)
-	 */
+	/** Once called, these players should not be used again to access stats (does not copy) */
 	public void insertIntoLeaderboard(List<Player.Profile> players) {
 		players.removeIf(p -> !p.isValid());
 		if (!players.isEmpty()) {
@@ -270,9 +268,7 @@ public class LeaderboardDatabase {
 		}
 	}
 
-	/**
-	 * Sync insert into requestedGamemode and async insert for other gamemodes
-	 */
+	/** Sync insert into requestedGamemode and async insert for other gamemodes */
 	public void insertIntoLeaderboardSync(Player.Profile player, Player.Gamemode requestedGamemode) {
 		if (!player.isValid()) {
 			return;
@@ -330,7 +326,7 @@ public class LeaderboardDatabase {
 
 	/**
 	 * @param rankStart Exclusive
-	 * @param rankEnd   Inclusive
+	 * @param rankEnd Inclusive
 	 */
 	public Map<Integer, DataObject> getLeaderboard(String lbType, Player.Gamemode mode, int rankStart, int rankEnd) {
 		rankStart = Math.max(0, rankStart);
@@ -587,7 +583,8 @@ public class LeaderboardDatabase {
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS rank FROM " +
+					"SELECT rank FROM (SELECT uuid, ROW_NUMBER() OVER(ORDER BY networth DESC) AS" +
+					" rank FROM " +
 					gamemode.toLeaderboardName() +
 					" WHERE networth IS NOT NULL) s WHERE uuid = ? LIMIT 1"
 				)

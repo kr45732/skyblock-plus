@@ -114,7 +114,7 @@ public class LilyDungeonsWeight extends DungeonsWeight {
 				}
 			}
 
-			return weightStruct.add(new WeightStruct(score / max1000 * upperBound * 2));
+			return weightStruct.add(new WeightStruct((score / max1000) * upperBound * 2));
 		} else {
 			if (higherDepth(player.profileJson(), "dungeons.dungeon_types.master_catacombs.tier_completions") == null) {
 				return new WeightStruct();
@@ -133,8 +133,7 @@ public class LilyDungeonsWeight extends DungeonsWeight {
 						upperBound += higherDepth(dungeonCompletionBuffs, masterFloor.getKey()).getAsInt();
 					} else {
 						upperBound +=
-							higherDepth(dungeonCompletionBuffs, masterFloor.getKey()).getAsInt() *
-							Math.pow((amount / threshold), 1.840896416);
+						higherDepth(dungeonCompletionBuffs, masterFloor.getKey()).getAsInt() * Math.pow((amount / threshold), 1.840896416);
 					}
 				}
 

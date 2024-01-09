@@ -77,7 +77,8 @@ public class CacheDatabase {
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"INSERT INTO cache VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = VALUES(id), expiry = VALUES(expiry), data = VALUES(data)"
+					"INSERT INTO cache VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = VALUES(id)," +
+					" expiry = VALUES(expiry), data = VALUES(data)"
 				)
 			) {
 				statement.setString(1, id.getGeneratedId());
@@ -158,7 +159,8 @@ public class CacheDatabase {
 							automaticGuild.getValue().guildId +
 							"', '" +
 							partySettingsJson +
-							"') ON DUPLICATE KEY UPDATE guild_id = VALUES(guild_id), data = VALUES(data)"
+							"') ON DUPLICATE KEY UPDATE guild_id = VALUES(guild_id), data =" +
+							" VALUES(data)"
 						);
 						log.info("Successfully cached PartyList | " + automaticGuild.getKey() + " | " + partyList.size());
 					}
@@ -432,7 +434,7 @@ public class CacheDatabase {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"SELECT request_time FROM guild WHERE request_discord = ? ORDER BY request_time DESC LIMIT 1"
+				"SELECT request_time FROM guild WHERE request_discord = ? ORDER BY request_time" + " DESC LIMIT 1"
 			)
 		) {
 			statement.setObject(1, discordId);
@@ -452,7 +454,10 @@ public class CacheDatabase {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"INSERT INTO guild (guild_id, guild_name, request_time, members, request_discord) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE guild_name = VALUES(guild_name), request_time = VALUES(request_time), members = VALUES(members), request_discord = VALUES(request_discord)"
+				"INSERT INTO guild (guild_id, guild_name, request_time, members, request_discord)" +
+				" VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE guild_name =" +
+				" VALUES(guild_name), request_time = VALUES(request_time), members =" +
+				" VALUES(members), request_discord = VALUES(request_discord)"
 			)
 		) {
 			statement.setString(1, guildId);

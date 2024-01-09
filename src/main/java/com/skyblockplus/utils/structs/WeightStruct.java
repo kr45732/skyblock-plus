@@ -43,7 +43,7 @@ public class WeightStruct {
 
 	/**
 	 * @return The weight struct being added, not this
-	 **/
+	 */
 	public WeightStruct add(WeightStruct o) {
 		this.base += o.base;
 		this.overflow += o.overflow;

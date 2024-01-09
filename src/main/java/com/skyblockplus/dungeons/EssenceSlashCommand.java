@@ -121,16 +121,14 @@ public class EssenceSlashCommand extends SlashCommand {
 							ESSENCE_EMOJI_MAP.get(essenceType) +
 							" x" +
 							level.getValue().getAsString() +
-							(
-								higherDepth(itemJson, "items." + level) != null
+							(higherDepth(itemJson, "items." + level) != null
 									? streamJsonArray(higherDepth(itemJson, "items." + level.getKey()))
 										.map(i -> {
 											String[] split = i.getAsString().split(":");
 											return getEmoji(split[0], idToName(split[0])) + " x" + split[1];
 										})
 										.collect(Collectors.joining(", ", ", ", ""))
-									: ""
-							)
+									: "")
 						);
 					}
 				}

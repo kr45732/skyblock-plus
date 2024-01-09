@@ -146,7 +146,8 @@ public class JsonUtils {
 
 	public static JsonObject getAveragePriceJson() {
 		if (averagePriceJson == null || Duration.between(averagePriceJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			// Other requests will use the old json while the new json is being fetched (since it takes a few seconds)
+			// Other requests will use the old json while the new json is being fetched (since it takes a
+			// few seconds)
 			averagePriceJsonLastUpdated = Instant.now();
 
 			URIBuilder uriBuilder = getQueryApiUrl("average").addParameter("center", "modified_median").addParameter("step", "60");
@@ -172,7 +173,8 @@ public class JsonUtils {
 
 	public static JsonObject getAverageAuctionJson() {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			// Other requests will use the old json while the new json is being fetched (since it takes a few seconds)
+			// Other requests will use the old json while the new json is being fetched (since it takes a
+			// few seconds)
 			averageAuctionJsonLastUpdated = Instant.now();
 
 			URIBuilder uriBuilder = getQueryApiUrl("average_auction").addParameter("center", "modified_median").addParameter("step", "60");
@@ -198,7 +200,8 @@ public class JsonUtils {
 
 	public static JsonObject getAverageBinJson() {
 		if (averageBinJson == null || Duration.between(averageBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			// Other requests will use the old json while the new json is being fetched (since it takes a few seconds)
+			// Other requests will use the old json while the new json is being fetched (since it takes a
+			// few seconds)
 			averageBinJsonLastUpdated = Instant.now();
 
 			URIBuilder uriBuilder = getQueryApiUrl("average_bin").addParameter("center", "modified_median").addParameter("step", "60");

@@ -269,13 +269,11 @@ public class ApiHandler {
 			return CompletableFuture.completedFuture(cachedResponse);
 		} else {
 			return asyncGetJson(
-				(
-					switch (mojangApiNum) {
+				(switch (mojangApiNum) {
 						case 1 -> "https://playerdb.co/api/player/minecraft/";
 						case 2 -> "https://api.minetools.eu/uuid/";
 						default -> "https://api.ashcon.app/mojang/v2/user/";
-					}
-				) +
+					}) +
 				uuid
 			)
 				.thenApplyAsync(
@@ -304,11 +302,9 @@ public class ApiHandler {
 		try {
 			// true ? uuid to username : else username to uuid
 			JsonResponse usernameResponse = getJsonResponse(
-				(
-					!isValidMinecraftUsername(username) && isValidMinecraftUuid(username)
+				(!isValidMinecraftUsername(username) && isValidMinecraftUuid(username)
 						? "https://sessionserver.mojang.com/session/minecraft/profile/"
-						: "https://api.mojang.com/users/profiles/minecraft/"
-				) +
+						: "https://api.mojang.com/users/profiles/minecraft/") +
 				username
 			);
 			if (usernameResponse == null) {
@@ -357,7 +353,8 @@ public class ApiHandler {
 					String username = uuidToUsernameCache.getIfPresent(uuid);
 					return new HypixelResponse(
 						(username != null ? username : "Player") +
-						" has no Skyblock profiles. Make sure this player has logged on after the <t:1684270848:D> Skyblock maintenance"
+						" has no Skyblock profiles. Make sure this player has logged on after the" +
+						" <t:1684270848:D> Skyblock maintenance"
 					);
 				}
 
@@ -374,9 +371,7 @@ public class ApiHandler {
 		}
 	}
 
-	/**
-	 * Does not cache the profiles json
-	 */
+	/** Does not cache the profiles json */
 	public static CompletableFuture<HypixelResponse> asyncSkyblockProfilesFromUuid(String uuid) {
 		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_PROFILES, uuid);
 		if (cachedResponse != null) {
@@ -424,7 +419,8 @@ public class ApiHandler {
 										String username = uuidToUsernameCache.getIfPresent(uuid);
 										return new HypixelResponse(
 											(username != null ? username : "Player") +
-											" has no Skyblock profiles. Make sure this player has logged on after the <t:1684270848:D> Skyblock maintenance"
+											" has no Skyblock profiles. Make sure this player has logged on" +
+											" after the <t:1684270848:D> Skyblock maintenance"
 										);
 									}
 

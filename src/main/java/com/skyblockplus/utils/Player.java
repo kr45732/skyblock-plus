@@ -163,8 +163,8 @@ public class Player {
 	}
 
 	/**
-	 * Ignores profile cache and updates provided gamemode synchronously
-	 * Used only for leaderboard command
+	 * Ignores profile cache and updates provided gamemode synchronously Used only for leaderboard
+	 * command
 	 */
 	public Player(String username, Gamemode gamemode) {
 		if (checkUsername(username)) {
@@ -1332,16 +1332,14 @@ public class Player {
 
 		public double getEstimatedLevel() {
 			return (
-				(
-					LevelSlashCommand.getCoreTasksEmbed(this).total() +
+				(LevelSlashCommand.getCoreTasksEmbed(this).total() +
 					LevelSlashCommand.getEventTasksEmbed(this).total() +
 					LevelSlashCommand.getDungeonTasks(this).total() +
 					LevelSlashCommand.getEssenceShopTasks(this).total() +
 					LevelSlashCommand.getSlayingTasks(this).total() +
 					LevelSlashCommand.getSkillRelatedTasks(this).total() +
 					LevelSlashCommand.getMiscellaneousTasks(this).total() +
-					LevelSlashCommand.getStoryTasks(this).total()
-				) /
+					LevelSlashCommand.getStoryTasks(this).total()) /
 				100.0
 			);
 		}
@@ -1533,6 +1531,7 @@ public class Player {
 			} catch (Exception e) {
 				return 0;
 			}
+
 			Map<String, Integer> petsMap = new HashMap<>();
 			for (JsonElement pet : playerPets) {
 				String petName = higherDepth(pet, "type").getAsString();
@@ -1543,23 +1542,13 @@ public class Player {
 						case "rare" -> 3;
 						case "epic" -> 4;
 						case "legendary" -> 5;
+						case "mythic" -> 6;
 						default -> 0;
 					};
-				if (petsMap.containsKey(petName)) {
-					if (petsMap.get(petName) < rarity) {
-						petsMap.replace(petName, rarity);
-					}
-				} else {
-					petsMap.put(petName, rarity);
-				}
+				petsMap.compute(petName, (k, v) -> v == null || v < rarity ? rarity : v);
 			}
 
-			int petScore = 0;
-			for (int i : petsMap.values()) {
-				petScore += i;
-			}
-
-			return petScore;
+			return petsMap.values().stream().mapToInt(i -> i).sum();
 		}
 
 		public String getSymbol(String... prefix) {

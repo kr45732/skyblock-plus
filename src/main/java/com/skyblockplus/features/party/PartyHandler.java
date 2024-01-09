@@ -131,7 +131,10 @@ public class PartyHandler {
 									.editOriginalEmbeds(
 										defaultEmbed("Party Finder Creator")
 											.setDescription(
-												"Successfully created the party which can be joined using `/party join " + username + "`"
+												"Successfully created the party which can be joined using" +
+												" `/party join " +
+												username +
+												"`"
 											)
 											.build()
 									)

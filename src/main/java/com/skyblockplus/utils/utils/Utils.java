@@ -22,14 +22,14 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.getHasteUrl;
 import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.utils.HttpUtils.*;
+import static com.skyblockplus.utils.utils.HttpUtils.getJson;
+import static com.skyblockplus.utils.utils.HttpUtils.postUrl;
 import static com.skyblockplus.utils.utils.HypixelUtils.getNpcSellPrice;
 import static com.skyblockplus.utils.utils.HypixelUtils.isCrimsonArmor;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static org.springframework.util.StringUtils.countOccurrencesOf;
 
-import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
@@ -486,6 +486,8 @@ public class Utils {
 							}
 						}
 
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.jalapeno_count", 0), "JALAPENO_BOOK");
+
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.wood_singularity_count", 0), "WOOD_SINGULARITY");
 
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.thunder_charge", 0) / 50000, "THUNDER_IN_A_BOTTLE");
@@ -500,10 +502,8 @@ public class Utils {
 
 						// Master stars
 						if (
-							(
-								item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5 ||
-								item.getInt("tag.ExtraAttributes.upgrade_level", 0) > 5
-							)
+							(item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5 ||
+								item.getInt("tag.ExtraAttributes.upgrade_level", 0) > 5)
 						) {
 							String essenceType = higherDepth(getEssenceCostsJson(), itemInfo.getId() + ".type", null);
 							if (essenceType != null && !essenceType.equals("Crimson")) {
@@ -630,22 +630,18 @@ public class Utils {
 								if (!gem.getKey().endsWith("_gem")) {
 									if (gems.containsKey(gem.getKey() + "_gem")) { // "COMBAT_0": "PERFECT" & "COMBAT_0_gem": "JASPER"
 										itemInfo.addExtraValue(
-											(
-												gem.getValue() instanceof NBTCompound gemQualityNbt
+											(gem.getValue() instanceof NBTCompound gemQualityNbt
 													? gemQualityNbt.getString("quality", "UNKNOWN")
-													: gem.getValue()
-											) +
+													: gem.getValue()) +
 											"_" +
 											gems.get(gem.getKey() + "_gem") +
 											"_GEM"
 										);
 									} else if (!gem.getKey().equals("unlocked_slots")) { // "RUBY_0": "PERFECT"
 										itemInfo.addExtraValue(
-											(
-												gem.getValue() instanceof NBTCompound gemQualityNbt
+											(gem.getValue() instanceof NBTCompound gemQualityNbt
 													? gemQualityNbt.getString("quality", "UNKNOWN")
-													: gem.getValue()
-											) +
+													: gem.getValue()) +
 											"_" +
 											gem.getKey().split("_")[0] +
 											"_GEM"
@@ -1067,13 +1063,9 @@ public class Utils {
 				String id = higherDepth(itemJson, "internalname").getAsString().replace("-", ":");
 				if (
 					!bazaarJson.has(id) &&
-					(
-						higherDepth(itemJson, "vanilla", false) ||
-						(
-							higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture") &&
-							!higherDepth(itemJson, "internalname", "").startsWith("EPOCH_CAKE_")
-						)
-					)
+					(higherDepth(itemJson, "vanilla", false) ||
+						(higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture") &&
+							!higherDepth(itemJson, "internalname", "").startsWith("EPOCH_CAKE_")))
 				) {
 					outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
 				}

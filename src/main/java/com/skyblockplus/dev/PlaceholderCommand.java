@@ -50,9 +50,7 @@ public class PlaceholderCommand extends Command {
 					total += " ➜ " + roundAndFormat(Runtime.getRuntime().totalMemory() / 1000000.0) + " MB";
 					free += " ➜ " + roundAndFormat(Runtime.getRuntime().freeMemory() / 1000000.0) + " MB";
 					used +=
-						" ➜ " +
-						roundAndFormat((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) +
-						" MB";
+					" ➜ " + roundAndFormat((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB";
 				}
 
 				getChannel()

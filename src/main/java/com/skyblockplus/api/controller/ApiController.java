@@ -39,9 +39,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Handles requests to api subdomain
- */
+/** Handles requests to api subdomain */
 @RestController
 @RequestMapping(headers = "X-Subdomain-Internal=api")
 public class ApiController {

@@ -153,16 +153,12 @@ public class LinkSlashCommand extends SlashCommand {
 				if (verifySettings != null) {
 					String[] result = updateLinkedUser(verifySettings, toAdd, member);
 					String out =
-						(
-							!result[1].equals("false")
+						(!result[1].equals("false")
 								? result[1].equals("true") ? "\n• Successfully synced your roles" : "\n• Error syncing your roles"
-								: ""
-						) +
-						(
-							!result[0].equals("false")
+								: "") +
+						(!result[0].equals("false")
 								? result[0].equals("true") ? "\n• Successfully synced your nickname" : "\n• Error syncing your nickname"
-								: ""
-						);
+								: "");
 					eb = defaultEmbed("Success").setDescription("You have been linked to `" + playerInfo.username() + "`\n" + out);
 				} else {
 					eb = defaultEmbed("Success").setDescription("You have been linked to `" + playerInfo.username() + "`");
@@ -243,14 +239,12 @@ public class LinkSlashCommand extends SlashCommand {
 						}
 					} else if (
 						category.equals("PLAYER") &&
-						(
-							type.equals("SKILLS") ||
+						(type.equals("SKILLS") ||
 							type.equals("CATACOMBS") ||
 							type.equals("SLAYER") ||
 							type.equals("WEIGHT") ||
 							type.equals("CLASS") ||
-							type.equals("LEVEL")
-						)
+							type.equals("LEVEL"))
 					) {
 						if (!playerRequested) {
 							player =
@@ -358,16 +352,12 @@ public class LinkSlashCommand extends SlashCommand {
 				"member_verify",
 				defaultEmbed(linkedAccount.username() + " Verified", nameMcLink(linkedAccount.uuid()))
 					.setDescription(
-						(
-							!updatedRoles.equals("false")
+						(!updatedRoles.equals("false")
 								? updatedRoles.equals("true") ? "\n• Successfully synced roles" : "\n• Error syncing roles"
-								: ""
-						) +
-						(
-							!updatedNickname.equals("false")
+								: "") +
+						(!updatedNickname.equals("false")
 								? updatedNickname.equals("true") ? "\n• Successfully synced nickname" : "\n• Error syncing nickname"
-								: ""
-						)
+								: "")
 					),
 				member
 			);

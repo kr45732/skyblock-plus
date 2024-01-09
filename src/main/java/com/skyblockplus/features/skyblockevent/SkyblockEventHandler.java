@@ -207,7 +207,9 @@ public class SkyblockEventHandler {
 							event
 								.editMessageEmbeds(
 									eb
-										.setDescription("An announcement channel must be set before creating the event. Please try again.")
+										.setDescription(
+											"An announcement channel must be set before creating the event." + " Please try again."
+										)
 										.build()
 								)
 								.queue();
@@ -217,7 +219,7 @@ public class SkyblockEventHandler {
 						if (eventSettings.getTimeEndingSeconds() == null || eventSettings.getTimeEndingSeconds().isEmpty()) {
 							event
 								.editMessageEmbeds(
-									eb.setDescription("The duration must be set before creating the event. Please try again.").build()
+									eb.setDescription("The duration must be set before creating the event. Please try" + " again.").build()
 								)
 								.queue();
 							waitForEvent();
@@ -226,7 +228,9 @@ public class SkyblockEventHandler {
 						if (!eventSettings.isMinMaxValid()) {
 							event
 								.editMessageEmbeds(
-									eb.setDescription("The maximum value cannot be less than the minimum value. Please try again.").build()
+									eb
+										.setDescription("The maximum value cannot be less than the minimum value. Please try" + " again.")
+										.build()
 								)
 								.queue();
 							waitForEvent();
@@ -260,7 +264,7 @@ public class SkyblockEventHandler {
 									)
 									.addField(
 										"Leaderboard",
-										"Click the leaderboard button below or run `/event leaderboard` to view the leaderboard",
+										"Click the leaderboard button below or run `/event leaderboard` to" + " view the leaderboard",
 										false
 									);
 
@@ -331,7 +335,7 @@ public class SkyblockEventHandler {
 								.addActionRow(
 									TextInput
 										.create("value", "Prizes", TextInputStyle.PARAGRAPH)
-										.setPlaceholder("Use the format position:prize, separating each prize with a new line")
+										.setPlaceholder("Use the format position:prize, separating each prize with a" + " new line")
 										.build()
 								)
 								.build()
@@ -432,7 +436,7 @@ public class SkyblockEventHandler {
 				try {
 					int eventDuration = Integer.parseInt(textDuration);
 					if (eventDuration <= 0 || eventDuration > 672) {
-						eb.setDescription("The event must be at least an hour and at most 4 weeks (672 hours). Please try again.");
+						eb.setDescription("The event must be at least an hour and at most 4 weeks (672 hours). Please try" + " again.");
 						event.editMessageEmbeds(eb.build()).queue();
 					} else {
 						Instant endingTime = Instant.now().plus(eventDuration, ChronoUnit.HOURS);

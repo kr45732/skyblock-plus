@@ -33,10 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-/**
- * Handle requests to verify subdomain
- * Used to handle OAuth for linked roles
- */
+/** Handle requests to verify subdomain Used to handle OAuth for linked roles */
 @RestController
 @RequestMapping(headers = "X-Subdomain-Internal=verify")
 public class VerifyController {

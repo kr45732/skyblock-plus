@@ -36,9 +36,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-/**
- * Enforce authentication for private endpoints
- */
+/** Enforce authentication for private endpoints */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {

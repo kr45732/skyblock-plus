@@ -68,16 +68,14 @@ public class LevelSlashCommand extends SlashCommand {
 		boolean isEstimated = higherDepth(player.profileJson(), "leveling.experience") == null;
 		double apiSbLevel = player.getExactLevel();
 		double calculatedSbLevel =
-			(
-				coreTasks.total() +
+			(coreTasks.total() +
 				eventTasks.total() +
 				dungeonTasks.total() +
 				essenceShopTasks.total() +
 				slayingTasks.total() +
 				skillRelatedTasks.total() +
 				miscellaneousTasks.total() +
-				storyTasks.total()
-			) /
+				storyTasks.total()) /
 			100.0;
 
 		double displaySbLevel = apiSbLevel == 0 ? calculatedSbLevel : apiSbLevel;
@@ -179,7 +177,7 @@ public class LevelSlashCommand extends SlashCommand {
 		}
 
 		// Fairy souls
-		int fairySoulSbXp = player.getFairySouls() / 5 * higherDepth(taskJson, "fairy_souls_xp").getAsInt();
+		int fairySoulSbXp = (player.getFairySouls() / 5) * higherDepth(taskJson, "fairy_souls_xp").getAsInt();
 
 		// Accessories
 		int magicPowerSbXp =
@@ -331,7 +329,7 @@ public class LevelSlashCommand extends SlashCommand {
 			for (Map.Entry<String, JsonElement> completion : cataTierCompletions.getAsJsonObject().entrySet()) {
 				if (!completion.getKey().equals("total") && completion.getValue().getAsInt() > 0) {
 					floorCompletionSbXp +=
-						higherDepth(taskJson, "complete_catacombs.[" + Integer.parseInt(completion.getKey()) + "]").getAsInt();
+					higherDepth(taskJson, "complete_catacombs.[" + Integer.parseInt(completion.getKey()) + "]").getAsInt();
 				}
 			}
 		}
@@ -458,12 +456,12 @@ public class LevelSlashCommand extends SlashCommand {
 
 		for (Map.Entry<String, Integer> levelCompletions : floorToCompletions.entrySet()) {
 			bossCollectionsSbXp +=
-				switch (levelCompletions.getKey()) {
-					case "1", "2", "3" -> loopThroughCollection(bossLow, levelCompletions.getValue());
-					case "4" -> loopThroughCollection(thorn, levelCompletions.getValue());
-					case "5", "6", "7" -> loopThroughCollection(bossHigh, levelCompletions.getValue());
-					default -> 0;
-				};
+			switch (levelCompletions.getKey()) {
+				case "1", "2", "3" -> loopThroughCollection(bossLow, levelCompletions.getValue());
+				case "4" -> loopThroughCollection(thorn, levelCompletions.getValue());
+				case "5", "6", "7" -> loopThroughCollection(bossHigh, levelCompletions.getValue());
+				default -> 0;
+			};
 		}
 
 		// Kuudra
@@ -591,16 +589,16 @@ public class LevelSlashCommand extends SlashCommand {
 		if (hotmSkill != null) {
 			for (int i = 1; i <= hotmSkill.currentLevel(); i++) {
 				hotmSbXp +=
-					switch (i) {
-						case 1 -> 35;
-						case 2 -> 45;
-						case 3 -> 60;
-						case 4 -> 75;
-						case 5 -> 90;
-						case 6 -> 110;
-						case 7 -> 130;
-						default -> 0;
-					};
+				switch (i) {
+					case 1 -> 35;
+					case 2 -> 45;
+					case 3 -> 60;
+					case 4 -> 75;
+					case 5 -> 90;
+					case 6 -> 110;
+					case 7 -> 130;
+					default -> 0;
+				};
 			}
 		}
 
@@ -617,8 +615,7 @@ public class LevelSlashCommand extends SlashCommand {
 		powderSbXp += Math.min(mithrilPowder, normalCap) / 2400;
 		if (mithrilPowder > normalCap) {
 			powderSbXp +=
-				3.75 *
-				(Math.sqrt(1 + 8 * (Math.sqrt((1758267.0 / mithrilCap) * (Math.min(mithrilPowder, mithrilCap) - normalCap + 9)))) - 3);
+			3.75 * (Math.sqrt(1 + 8 * (Math.sqrt((1758267.0 / mithrilCap) * (Math.min(mithrilPowder, mithrilCap) - normalCap + 9)))) - 3);
 		}
 
 		long gemstonePowder =
@@ -627,8 +624,8 @@ public class LevelSlashCommand extends SlashCommand {
 		powderSbXp += Math.min(gemstonePowder, normalCap) / 2500;
 		if (gemstonePowder > normalCap) {
 			powderSbXp +=
-				4.25 *
-				(Math.sqrt(1 + 8 * (Math.sqrt((1758267.0 / gemstoneCap) * (Math.min(gemstonePowder, gemstoneCap) - normalCap + 9)))) - 3);
+			4.25 *
+			(Math.sqrt(1 + 8 * (Math.sqrt((1758267.0 / gemstoneCap) * (Math.min(gemstonePowder, gemstoneCap) - normalCap + 9)))) - 3);
 		}
 
 		// Commissions
@@ -656,16 +653,16 @@ public class LevelSlashCommand extends SlashCommand {
 		int potmLevel = higherDepth(player.profileJson(), "mining_core.nodes.special_0", 0);
 		for (int i = 1; i <= potmLevel; i++) {
 			peakOfTheMountainSbXp +=
-				switch (i) {
-					case 1 -> 25;
-					case 2 -> 35;
-					case 3 -> 50;
-					case 4 -> 65;
-					case 5 -> 75;
-					case 6 -> 100;
-					case 7 -> 125;
-					default -> 9;
-				};
+			switch (i) {
+				case 1 -> 25;
+				case 2 -> 35;
+				case 3 -> 50;
+				case 4 -> 65;
+				case 5 -> 75;
+				case 6 -> 100;
+				case 7 -> 125;
+				default -> 9;
+			};
 		}
 
 		// Rock pet milestones
@@ -831,12 +828,12 @@ public class LevelSlashCommand extends SlashCommand {
 		int personalBankUpgrade = higherDepth(player.profileJson(), "profile.personal_bank_upgrade", 0);
 		for (int i = 1; i <= personalBankUpgrade; i++) {
 			personalBankSbXp +=
-				switch (i) {
-					case 1 -> 25;
-					case 2 -> 35;
-					case 3 -> 50;
-					default -> 0;
-				};
+			switch (i) {
+				case 1 -> 25;
+				case 2 -> 35;
+				case 3 -> 50;
+				default -> 0;
+			};
 		}
 
 		// Miscellaneous tasks total

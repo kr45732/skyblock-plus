@@ -243,7 +243,9 @@ public class PartySlashCommand extends SlashCommand {
 								.setEmbeds(
 									defaultEmbed("Party Finder")
 										.setDescription(
-											"Your party has reached 5/5 players and has been unlisted. The party leader can click the button below to close this channel."
+											"Your party has reached 5/5 players and has been unlisted." +
+											" The party leader can click the button below to close" +
+											" this channel."
 										)
 										.build()
 								)
@@ -261,7 +263,8 @@ public class PartySlashCommand extends SlashCommand {
 						.setEmbeds(
 							defaultEmbed("Party Finder")
 								.setDescription(
-									"Your party has reached 5/5 players and has been unlisted. Missing permissions: `" +
+									"Your party has reached 5/5 players and has been unlisted. Missing" +
+									" permissions: `" +
 									e.getPermission().getName() +
 									"`"
 								)

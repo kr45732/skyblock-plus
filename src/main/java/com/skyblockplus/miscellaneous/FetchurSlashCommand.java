@@ -39,7 +39,7 @@ public class FetchurSlashCommand extends SlashCommand {
 	}
 
 	public static EmbedBuilder getFetchurItem() {
-		int index = LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() % FETCHUR_ITEMS.size() - 1;
+		int index = (LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() % FETCHUR_ITEMS.size()) - 1;
 		if (index == -1) {
 			index = FETCHUR_ITEMS.size() - 1;
 		}

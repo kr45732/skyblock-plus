@@ -51,10 +51,12 @@ public class BestiarySlashCommand extends SlashCommand {
 	public static EmbedBuilder getBestiary(String username, String profileName, SlashCommandEvent event) {
 		Player.Profile player = Player.create(username, profileName);
 		if (player.isValid()) {
-			if (!higherDepth(player.profileJson(), "bestiary.migration", false)) {
+			// default is true since new profiles already use the new format (hence don't have this field)
+			if (!higherDepth(player.profileJson(), "bestiary.migration", true)) {
 				return errorEmbed(
 					player.getEscapedUsername() +
-					"'s bestiary is not migrated. Make sure this player has logged on after the <t:1690898400:D> Skyblock update"
+					"'s bestiary is not migrated. Make sure this player has logged on after the" +
+					" <t:1690898400:D> Skyblock update"
 				);
 			}
 

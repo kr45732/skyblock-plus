@@ -51,8 +51,8 @@ public abstract class CommandExecute extends CommandEvent {
 
 	/**
 	 * @param index which arg index the mention is located at or -1 if author
-	 * @return embed if a mention was found and the mentioned user is not linked,
-	 * otherwise null (no mention found or the user is linked)
+	 * @return embed if a mention was found and the mentioned user is not linked, otherwise null (no
+	 *     mention found or the user is linked)
 	 */
 	protected EmbedBuilder getMentionedUsername(int index) {
 		if (index == -1) {
@@ -70,8 +70,8 @@ public abstract class CommandExecute extends CommandEvent {
 
 	/**
 	 * @param userId the user's Discord id
-	 * @return embed if the provided userId is not linked to the bot, otherwise null
-	 * (the provided userId is linked)
+	 * @return embed if the provided userId is not linked to the bot, otherwise null (the provided
+	 *     userId is linked)
 	 */
 	protected EmbedBuilder getLinkedUser(String userId) {
 		LinkedAccount linkedUserUsername = database.getByDiscord(userId);

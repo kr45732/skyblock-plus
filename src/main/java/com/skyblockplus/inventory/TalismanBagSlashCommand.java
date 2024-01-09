@@ -249,11 +249,9 @@ public class TalismanBagSlashCommand extends SlashCommand {
 						"\n**Magic Power:** " +
 						formatNumber(magicPower) +
 						"\n**Unlocked Tuning Slots:** " +
-						(
-							tuningSlots != null
+						(tuningSlots != null
 								? tuningSlots.getAsJsonObject().keySet().stream().filter(j -> j.startsWith("slot_")).count()
-								: 0
-						)
+								: 0)
 					)
 					.addField(
 						"Accessory Counts",

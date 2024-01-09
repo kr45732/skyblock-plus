@@ -112,83 +112,83 @@ public class HypixelSlashCommand extends SlashCommand {
 		String skyblockItems = "";
 		if (player.get("skyblock_free_cookie") != null) {
 			skyblockItems +=
-				"• Free booster cookie: " +
-				"<t:" +
-				Instant.ofEpochMilli(player.get("skyblock_free_cookie").getAsLong()).getEpochSecond() +
-				":d>" +
-				"\n";
+			"• Free booster cookie: " +
+			"<t:" +
+			Instant.ofEpochMilli(player.get("skyblock_free_cookie").getAsLong()).getEpochSecond() +
+			":d>" +
+			"\n";
 		}
 
 		if (player.get("scorpius_bribe_96") != null) {
 			skyblockItems +=
-				"• Scorpius Bribe (96): " +
-				"<t:" +
-				Instant.ofEpochMilli(player.get("scorpius_bribe_96").getAsLong()).getEpochSecond() +
-				":d>" +
-				"\n";
+			"• Scorpius Bribe (96): " +
+			"<t:" +
+			Instant.ofEpochMilli(player.get("scorpius_bribe_96").getAsLong()).getEpochSecond() +
+			":d>" +
+			"\n";
 		}
 
 		if (player.get("scorpius_bribe_120") != null) {
 			skyblockItems +=
-				"• Scorpius Bribe (120): " +
-				"<t:" +
-				Instant.ofEpochMilli(player.get("scorpius_bribe_120").getAsLong()).getEpochSecond() +
-				":d>" +
-				"\n";
+			"• Scorpius Bribe (120): " +
+			"<t:" +
+			Instant.ofEpochMilli(player.get("scorpius_bribe_120").getAsLong()).getEpochSecond() +
+			":d>" +
+			"\n";
 		}
 
 		if (player.get("scorpius_bribe_144") != null) {
 			skyblockItems +=
-				"• Scorpius Bribe (144): " +
-				"<t:" +
-				Instant.ofEpochMilli(player.get("scorpius_bribe_144").getAsLong()).getEpochSecond() +
-				":d>" +
-				"\n";
+			"• Scorpius Bribe (144): " +
+			"<t:" +
+			Instant.ofEpochMilli(player.get("scorpius_bribe_144").getAsLong()).getEpochSecond() +
+			":d>" +
+			"\n";
 		}
 
 		if (player.get("scorpius_bribe_168") != null) {
 			skyblockItems +=
-				"• Scorpius Bribe (168): " +
-				"<t:" +
-				Instant.ofEpochMilli(player.get("scorpius_bribe_168").getAsLong()).getEpochSecond() +
-				":d>" +
-				"\n";
+			"• Scorpius Bribe (168): " +
+			"<t:" +
+			Instant.ofEpochMilli(player.get("scorpius_bribe_168").getAsLong()).getEpochSecond() +
+			":d>" +
+			"\n";
 		}
 
 		if (player.get("scorpius_bribe_192") != null) {
 			skyblockItems +=
-				"• Scorpius Bribe (192): " +
-				"<t:" +
-				Instant.ofEpochMilli(player.get("scorpius_bribe_192").getAsLong()).getEpochSecond() +
-				":d>" +
-				"\n";
+			"• Scorpius Bribe (192): " +
+			"<t:" +
+			Instant.ofEpochMilli(player.get("scorpius_bribe_192").getAsLong()).getEpochSecond() +
+			":d>" +
+			"\n";
 		}
 
 		if (player.get("claimed_potato_talisman") != null) {
 			skyblockItems +=
-				"• Potato Talisman: " +
-				"<t:" +
-				Instant.ofEpochMilli(player.get("claimed_potato_talisman").getAsLong()).getEpochSecond() +
-				":d>" +
-				"\n";
+			"• Potato Talisman: " +
+			"<t:" +
+			Instant.ofEpochMilli(player.get("claimed_potato_talisman").getAsLong()).getEpochSecond() +
+			":d>" +
+			"\n";
 		}
 
 		if (player.get("claimed_potato_basket") != null) {
 			skyblockItems +=
-				"• Potato Basket: " +
-				"<t:" +
-				Instant.ofEpochMilli(player.get("claimed_potato_basket").getAsLong()).getEpochSecond() +
-				":d>" +
-				"\n";
+			"• Potato Basket: " +
+			"<t:" +
+			Instant.ofEpochMilli(player.get("claimed_potato_basket").getAsLong()).getEpochSecond() +
+			":d>" +
+			"\n";
 		}
 
 		if (player.get("claim_potato_war_crown") != null) {
 			skyblockItems +=
-				"• Potato War Crown: " +
-				"<t:" +
-				Instant.ofEpochMilli(player.get("claim_potato_war_crown").getAsLong()).getEpochSecond() +
-				":d>" +
-				"\n";
+			"• Potato War Crown: " +
+			"<t:" +
+			Instant.ofEpochMilli(player.get("claim_potato_war_crown").getAsLong()).getEpochSecond() +
+			":d>" +
+			"\n";
 		}
 
 		if (skyblockItems.length() > 0) {

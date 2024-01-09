@@ -333,7 +333,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				if (database.eventHasMemberByUuid(guildId, uuid)) {
 					return errorEmbed(
 						member != null
-							? "You are already in the event! If you want to leave or change profile use `/event leave`"
+							? "You are already in the event! If you want to leave or change profile use" + " `/event leave`"
 							: "Player is already in the event"
 					);
 				}

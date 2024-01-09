@@ -145,9 +145,7 @@ public class PaginatorExtras {
 		return addStrings(strings);
 	}
 
-	/**
-	 * Only on one row after arrows
-	 */
+	/** Only on one row after arrows */
 	public PaginatorExtras addButton(Button button) {
 		this.reactiveButtons.add(new ReactiveButton(button));
 		return this;
@@ -194,10 +192,9 @@ public class PaginatorExtras {
 	@Data
 	public static class ReactiveButton {
 
-		/**
-		 * Return true if the action acknowledges the event (will not update the embed)
-		 */
+		/** Return true if the action acknowledges the event (will not update the embed) */
 		private final Function<ReactiveAction, Boolean> action;
+
 		private final Button button;
 		private final boolean reactive;
 		private boolean visible;
@@ -239,9 +236,7 @@ public class PaginatorExtras {
 		}
 
 		public record ReactiveAction(CustomPaginator paginator, ButtonInteractionEvent event, int page) {
-			/**
-			 * Continue listening for pagination
-			 */
+			/** Continue listening for pagination */
 			public void pagination() {
 				paginator.pagination(this);
 			}

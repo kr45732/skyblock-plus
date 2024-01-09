@@ -104,21 +104,21 @@ public class GuildSlashCommand extends SlashCommand {
 			guildName = hypixelResponse.get("name").getAsString();
 
 			guildInfo +=
-				"• " +
-				guildName +
-				" was created on <t:" +
-				Instant.ofEpochMilli(hypixelResponse.get("created").getAsLong()).getEpochSecond() +
-				":D>\n";
+			"• " +
+			guildName +
+			" was created on <t:" +
+			Instant.ofEpochMilli(hypixelResponse.get("created").getAsLong()).getEpochSecond() +
+			":D>\n";
 
 			JsonArray guildMembers = hypixelResponse.get("members").getAsJsonArray();
 			for (JsonElement currentMember : guildMembers) {
 				if (higherDepth(currentMember, "rank").getAsString().equals("Guild Master")) {
 					guildInfo +=
-						"• " +
-						guildName +
-						"'s guild master is " +
-						uuidToUsername(higherDepth(currentMember, "uuid").getAsString()).username() +
-						"\n";
+					"• " +
+					guildName +
+					"'s guild master is " +
+					uuidToUsername(higherDepth(currentMember, "uuid").getAsString()).username() +
+					"\n";
 					break;
 				}
 			}
@@ -132,12 +132,12 @@ public class GuildSlashCommand extends SlashCommand {
 					.collect(Collectors.toCollection(ArrayList::new));
 				if (!preferedGames.isEmpty()) {
 					guildInfo +=
-						"• " +
-						guildName +
-						"'s preferred " +
-						(preferedGames.size() == 1 ? "game is " : "games are ") +
-						String.join(", ", preferedGames) +
-						"\n";
+					"• " +
+					guildName +
+					"'s preferred " +
+					(preferedGames.size() == 1 ? "game is " : "games are ") +
+					String.join(", ", preferedGames) +
+					"\n";
 				}
 			}
 
@@ -481,10 +481,10 @@ public class GuildSlashCommand extends SlashCommand {
 				(lastUpdatedPlayers != null ? "\n**Last Updated:** " + getRelativeTimestamp(lastUpdatedPlayers) : "");
 			if (usernameUuidStruct != null) {
 				ebStr +=
-					"\n**Player:** " +
-					usernameUuidStruct.username() +
-					"\n**Rank:** " +
-					(guildRank != -1 ? "#" + guildRank + " (" + amt + ")" : "Not on leaderboard");
+				"\n**Player:** " +
+				usernameUuidStruct.username() +
+				"\n**Rank:** " +
+				(guildRank != -1 ? "#" + guildRank + " (" + amt + ")" : "Not on leaderboard");
 			}
 
 			if (lastUpdatedGuild == null || Duration.between(lastUpdatedGuild, Instant.now()).toDays() >= 1) {
@@ -1449,7 +1449,8 @@ public class GuildSlashCommand extends SlashCommand {
 								members.size() +
 								" players. You are #" +
 								(hypixelGuildFetchQueue.indexOf(guildId) + 1) +
-								" in the queue. This may take some time depending on the guild size."
+								" in the queue. This may take some time depending on the guild" +
+								" size."
 							)
 							.build()
 					)
@@ -1467,7 +1468,8 @@ public class GuildSlashCommand extends SlashCommand {
 						if (out == null) {
 							m
 								.editOriginalEmbeds(
-									errorEmbed("There was an error while updating the guild, please try again in a few seconds").build()
+									errorEmbed("There was an error while updating the guild, please try" + " again in a few seconds")
+										.build()
 								)
 								.queue();
 						} else {

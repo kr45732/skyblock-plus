@@ -56,7 +56,7 @@ public class ScammerSlashCommand extends SlashCommand {
 			.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)");
 		if (scammerJson == null) {
 			return eb.setDescription(
-				client.getSuccess() + " This player is not marked as a scammer, however still be cautious when trading with any player"
+				client.getSuccess() + " This player is not marked as a scammer, however still be cautious when trading" + " with any player"
 			);
 		}
 

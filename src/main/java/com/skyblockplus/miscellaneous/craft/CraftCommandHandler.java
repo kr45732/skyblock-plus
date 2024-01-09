@@ -1212,8 +1212,8 @@ public class CraftCommandHandler {
 			for (int j = 0; j <= prestigeOrder.indexOf(itemId.split("_")[0]); j++) {
 				for (Map.Entry<String, JsonElement> entry : ARMOR_PRESTIGE_COST.getAsJsonObject(prestigeOrder.get(j)).entrySet()) {
 					basePrice +=
-						entry.getValue().getAsInt() *
-						calculator.getLowestPrice(entry.getKey().equals("CRIMSON_ESSENCE") ? "ESSENCE_CRIMSON" : entry.getKey());
+					entry.getValue().getAsInt() *
+					calculator.getLowestPrice(entry.getKey().equals("CRIMSON_ESSENCE") ? "ESSENCE_CRIMSON" : entry.getKey());
 				}
 			}
 		}
@@ -1339,16 +1339,16 @@ public class CraftCommandHandler {
 				double masterStarCost = 0;
 				for (int i = 1; i <= masterStarCount; i++) {
 					masterStarCost +=
-						calculator.getLowestPrice(
-							switch (i) {
-								case 5 -> "FIFTH_MASTER_STAR";
-								case 4 -> "FOURTH_MASTER_STAR";
-								case 3 -> "THIRD_MASTER_STAR";
-								case 2 -> "SECOND_MASTER_STAR";
-								case 1 -> "FIRST_MASTER_STAR";
-								default -> throw new IllegalStateException("Unexpected value: " + i);
-							}
-						);
+					calculator.getLowestPrice(
+						switch (i) {
+							case 5 -> "FIFTH_MASTER_STAR";
+							case 4 -> "FOURTH_MASTER_STAR";
+							case 3 -> "THIRD_MASTER_STAR";
+							case 2 -> "SECOND_MASTER_STAR";
+							case 1 -> "FIRST_MASTER_STAR";
+							default -> throw new IllegalStateException("Unexpected value: " + i);
+						}
+					);
 				}
 				ebStr
 					.append("\n")

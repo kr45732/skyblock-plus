@@ -103,13 +103,13 @@ public class DungeonsSlashCommand extends SlashCommand {
 					for (int i = min; i <= 7; i++) {
 						int fastestSPlusInt = higherDepth(dungeon.getValue(), "fastest_time_s_plus." + i, -1);
 						int minutes = fastestSPlusInt / 1000 / 60;
-						int seconds = fastestSPlusInt / 1000 % 60;
+						int seconds = (fastestSPlusInt / 1000) % 60;
 						String name = i == 0 ? "Entrance" : ((isRegular ? "Floor " : "Master ") + i);
 
 						String ebStr = "Completions: " + higherDepth(dungeon.getValue(), "tier_completions." + i, 0);
 						ebStr += "\nBest Score: " + higherDepth(dungeon.getValue(), "best_score." + i, 0);
 						ebStr +=
-							"\nFastest S+: " + (fastestSPlusInt != -1 ? minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds) : "None");
+						"\nFastest S+: " + (fastestSPlusInt != -1 ? minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds) : "None");
 
 						extras.addEmbedField(DUNGEON_EMOJI_MAP.get(dungeon.getKey() + "_" + i) + " " + capitalizeString(name), ebStr, true);
 					}

@@ -65,11 +65,9 @@ public class LilySkillsWeight extends SkillsWeight {
 		skillAverage /= SKILL_NAMES.size() - 1;
 
 		double base =
-			(
-				(12 * Math.pow((skillAverage / 60), 2.44780217148309)) *
+			((12 * Math.pow((skillAverage / 60), 2.44780217148309)) *
 				srwTable.get(skillsStruct.currentLevel()).getAsDouble() *
-				srwTable.get(srwTable.size() - 1).getAsDouble()
-			) +
+				srwTable.get(srwTable.size() - 1).getAsDouble()) +
 			(srwTable.get(srwTable.size() - 1).getAsDouble() * Math.pow(skillsStruct.currentLevel() / 60.0, Math.pow(2, 0.5)));
 		double overall = higherDepth(getWeightJson(), "lily.skills.overall").getAsDouble();
 		base *= overall;

@@ -104,7 +104,7 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("slayer", "Get a player's slayer data.", "slayer [player] [profile]").setCategory("slayer"),
 				new HelpData(
 					"calcslayer",
-					"Calculate the number of slayer bosses needed to reach a certain level or xp amount.",
+					"Calculate the number of slayer bosses needed to reach a certain level or xp" + " amount.",
 					"calcslayer <type> [player] [profile] [level] [xp] [system]"
 				)
 					.setCategory("slayer"),
@@ -119,13 +119,13 @@ public class HelpSlashCommand extends SlashCommand {
 					.addSubcommands(
 						new HelpData(
 							"upgrade",
-							"Interactive message to calculate the amount of essence and items to upgrade an item.",
+							"Interactive message to calculate the amount of essence and items to" + " upgrade an item.",
 							"upgrade <item>"
 						)
 							.addExamples("upgrade Hyperion"),
 						new HelpData(
 							"information",
-							"Get the amount of essence and items to upgrade an item for each level.",
+							"Get the amount of essence and items to upgrade an item for each" + " level.",
 							"information <item>"
 						)
 							.addExamples("information Hyperion"),
@@ -140,7 +140,7 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("dungeons"),
 				new HelpData(
 					"calcdrops",
-					"Calculate the drop rate and cost of all chests for a dungeons floor or for an item.",
+					"Calculate the drop rate and cost of all chests for a dungeons floor or for an" + " item.",
 					"calcdrops <floor> [item] [luck] [accessory]"
 				)
 					.setCategory("dungeons"),
@@ -157,18 +157,25 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("leaderboard", "Get a leaderboard for a guild.", "leaderboard <type> [player] [guild] [gamemode]"),
 						new HelpData(
 							"kicker",
-							"Get all player's who don't meet the provided requirements. Requirements are in the format `[type:value ...] ...`. The requirement type can be skills, slayer, catacombs, weight, or level. The requirement value must be an integer. Requirements inside the brackets require at least one to be met, while outside require all to be met.",
+							"Get all player's who don't meet the provided requirements." +
+							" Requirements are in the format `[type:value ...] ...`. The" +
+							" requirement type can be skills, slayer, catacombs, weight, or" +
+							" level. The requirement value must be an integer. Requirements" +
+							" inside the brackets require at least one to be met, while" +
+							" outside require all to be met.",
 							"kicker <requirements...> [player] [gamemode]"
 						)
 							.addExamples("kicker [level:300] [skills:40]", "kicker [level:200 slayer:2000000] [level:300]"),
 						new HelpData(
 							"top",
-							"Get a guild's average and top 5 leaderboards of slayer, skills, catacombs, weight, networth, and level.",
+							"Get a guild's average and top 5 leaderboards of slayer, skills, catacombs," + " weight, networth, and level.",
 							"top [player] [guild] [gamemode]"
 						),
 						new HelpData(
 							"check",
-							"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild based on numerical requirements. Please join the [Skyblock Plus Discord](" +
+							"A customizable helper that will tell you who to kick, promote or demote in" +
+							" your Hypixel guild based on numerical requirements. Please join the" +
+							" [Skyblock Plus Discord](" +
 							DISCORD_SERVER_INVITE_LINK +
 							") and mention CrypticPlasma to setup this for your guild.",
 							"check <player> [gamemode]"
@@ -180,7 +187,8 @@ public class HelpSlashCommand extends SlashCommand {
 				// Auctions
 				new HelpData(
 					"auctions",
-					"Get and/or track a player's unclaimed auctions on all profiles. Set verbose to true to show an estimated price breakdown for each auction.",
+					"Get and/or track a player's unclaimed auctions on all profiles. Set verbose to" +
+					" true to show an estimated price breakdown for each auction.",
 					"auctions [player] [filter] [sort] [verbose]"
 				)
 					.setCategory("price"),
@@ -206,7 +214,9 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("bids", "Get a player's auction house bids", "bids [player]").setCategory("price"),
 				new HelpData(
 					"price",
-					"Query the auction house for the lowest prices of an item. Allows for more specific queries than bin or average command. Defaults to searching auctions and bins.",
+					"Query the auction house for the lowest prices of an item. Allows for more" +
+					" specific queries than bin or average command. Defaults to searching" +
+					" auctions and bins.",
 					"price <item> [type]"
 				)
 					.addExamples("price Necron's Chestplate ✪✪✪✪✪")
@@ -250,7 +260,9 @@ public class HelpSlashCommand extends SlashCommand {
 					.setCategory("inventory"),
 				new HelpData(
 					"sacks",
-					"Get a player's sacks content bag represented in a list and sorted by descending price. Costs can be calculated from (source) bazaar only, npc only, or npc and bazaar.",
+					"Get a player's sacks content bag represented in a list and sorted by" +
+					" descending price. Costs can be calculated from (source) bazaar only," +
+					" npc only, or npc and bazaar.",
 					"sacks [player] [profile] [source]"
 				)
 					.setCategory("inventory"),
@@ -271,19 +283,19 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("coins", "Get a player's coins and bank history.", "coins [player] [profile]").setCategory("miscellaneous"),
 				new HelpData(
 					"networth",
-					"Calculate a player's networth. Set verbose to true to get a detailed breakdown of the calculations.",
+					"Calculate a player's networth. Set verbose to true to get a detailed breakdown" + " of the calculations.",
 					"networth [player] [profile] [verbose]"
 				)
 					.setCategory("miscellaneous"),
 				new HelpData(
 					"weight",
-					"Get a player's slayer, skills, dungeons, and total weight. Shows both Senither and Lily weight.",
+					"Get a player's slayer, skills, dungeons, and total weight. Shows both Senither" + " and Lily weight.",
 					"weight [player] [profile]"
 				)
 					.setCategory("miscellaneous"),
 				new HelpData(
 					"calcweight",
-					"Calculate predicted weight change for a reaching a skills, slayers, or dungeons level/amount.",
+					"Calculate predicted weight change for a reaching a skills, slayers, or" + " dungeons level/amount.",
 					"calcweight <type> <amount> [player] [profile] [system]"
 				)
 					.setCategory("miscellaneous"),
@@ -320,13 +332,14 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("calendar", "Get the current Skyblock datetime and running or upcoming events").setCategory("miscellaneous"),
 				new HelpData(
 					"scammer",
-					"Check if a player is marked as a scammer in the SkyblockZ database with the reason, Discords, and Minecraft alts",
+					"Check if a player is marked as a scammer in the SkyblockZ database with the" + " reason, Discords, and Minecraft alts",
 					"scammer [player]"
 				)
 					.setCategory("miscellaneous"),
 				new HelpData(
 					"calcdrags",
-					"Calculate your loot quality and predicted loot from dragons in the end. The ratio is your damage divided by first place damage.",
+					"Calculate your loot quality and predicted loot from dragons in the end. The" +
+					" ratio is your damage divided by first place damage.",
 					"calcdrags [position] [eyes] [ratio]"
 				)
 					.setCategory("miscellaneous"),
@@ -356,7 +369,8 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("leaderboard", "Get the leaderboard for current event."),
 						new HelpData(
 							"end",
-							"Force end the event. If silent is true, the event will be canceled and no prizes or winners will be announced.",
+							"Force end the event. If silent is true, the event will be canceled and no" +
+							" prizes or winners will be announced.",
 							"end [silent]"
 						)
 					)
@@ -372,17 +386,17 @@ public class HelpSlashCommand extends SlashCommand {
 							.addSubcommands(
 								new HelpData(
 									"fetchur_channel",
-									"Set the channel where fetchur notifications will be posted at 12 am EST every day.",
+									"Set the channel where fetchur notifications will be posted at 12" + " am EST every day.",
 									"fetchur_channel <#channel>"
 								),
 								new HelpData(
 									"fetchur_ping",
-									"Set the role that will be pinged with the daily fetchur notifications.",
+									"Set the role that will be pinged with the daily fetchur" + " notifications.",
 									"fetchur_ping <@role>"
 								),
 								new HelpData(
 									"mayor_channel",
-									"Set the channel where notifications will be sent when a new mayor is elected or perks rotate.",
+									"Set the channel where notifications will be sent when a new mayor" + " is elected or perks rotate.",
 									"mayor_channel <#channel>"
 								),
 								new HelpData(
@@ -392,7 +406,9 @@ public class HelpSlashCommand extends SlashCommand {
 								),
 								new HelpData(
 									"guest_role",
-									"Set the role that will be given to linked users that are not in any of the setup automatic guilds. Requires at least one automatic guild to be setup.",
+									"Set the role that will be given to linked users that are not in" +
+									" any of the setup automatic guilds. Requires at least one" +
+									" automatic guild to be setup.",
 									"guest_role <@role>"
 								)
 							),
@@ -400,7 +416,7 @@ public class HelpSlashCommand extends SlashCommand {
 							.addSubcommands(
 								new HelpData(
 									"add",
-									"Add a bot manager role. This allows members with this role to use features that are admin only.",
+									"Add a bot manager role. This allows members with this role to use" + " features that are admin only.",
 									"add <@role>"
 								),
 								new HelpData("remove", "Remove a bot manager role.", "remove <@role>")
@@ -410,31 +426,32 @@ public class HelpSlashCommand extends SlashCommand {
 								new HelpData("channel", "Set the channel where events will be logged to.", "channel <#channel>"),
 								new HelpData(
 									"add",
-									"Add a log event. Valid events are user_verify, guild_sync, and bot_permission_error.",
+									"Add a log event. Valid events are user_verify, guild_sync, and" + " bot_permission_error.",
 									"add <event>"
 								),
 								new HelpData("remove", "Remove a log event.", "remove <event>")
 							),
 						new HelpData("blacklist", "View or manage the application blacklist for this server.")
 							.addSecondData(
-								"Get a list of all the blacklisted players on this server with the reasons and NameMC links.",
+								"Get a list of all the blacklisted players on this server with the" + " reasons and NameMC links.",
 								"blacklist"
 							)
 							.addSubcommands(
 								new HelpData(
 									"add",
-									"Add a player to the blacklist. Reason will default to 'not provided' if not set.",
+									"Add a player to the blacklist. Reason will default to 'not" + " provided' if not set.",
 									"add <player> [reason]"
 								),
 								new HelpData(
 									"ban",
-									"Add a player to the blacklist and ban them from the server. Reason will default to 'not provided' if not set.",
+									"Add a player to the blacklist and ban them from the server. Reason" +
+									" will default to 'not provided' if not set.",
 									"ban <player> <discord> [reason]"
 								),
 								new HelpData("remove", "Remove a player from the blacklist.", "remove <player>"),
 								new HelpData(
 									"search",
-									"Search for a player in the blacklist. Will show top five closest results.",
+									"Search for a player in the blacklist. Will show top five closest" + " results.",
 									"search <player>"
 								),
 								new HelpData("share", "Share your blacklist with another server.", "share <server_id>"),
@@ -469,45 +486,67 @@ public class HelpSlashCommand extends SlashCommand {
 								new HelpData("enable", "Enable automatic verify."),
 								new HelpData("disable", "Disable automatic verify."),
 								new HelpData("message", "The message that users will see when verifying.", "message <message>")
-									.addExamples("message Run /link <IGN> replacing IGN with your IGN to verify!"),
+									.addExamples("message Run /link <IGN> replacing IGN with your IGN to" + " verify!"),
 								new HelpData("role", "Modify roles given on verification")
 									.addSubcommands(
 										new HelpData(
 											"add",
-											"Add a role that user will receive upon being verified. The role cannot be @everyone or a managed role. You can add a max of 5 roles.",
+											"Add a role that user will receive upon being verified. The" +
+											" role cannot be @everyone or a managed role. You can" +
+											" add a max of 5 roles.",
 											"add <@role>"
 										),
 										new HelpData("remove", "Remove a verify role.", "remove <@role>")
 									),
 								new HelpData(
 									"channel",
-									"The channel where the verify message and verify button will be sent.",
+									"The channel where the verify message and verify button will be" + " sent.",
 									"channel <#channel>"
 								),
 								new HelpData(
 									"nickname",
-									"The nickname template that a user will be renamed to on verifying. Can be set to none. Add .{text} for text that should only be added if the previous template was met. See example [here](https://discord.com/channels/796790757947867156/802749920679165994/937099157200580618)\n\nYou can use the following templates:\n• [GUILD.NAME]\n• [GUILD.TAG]\n• [GUILD.RANK]\n• [PLAYER.SKILLS]\n• [PLAYER.CATACOMBS]\n• [PLAYER.SLAYER]\n• [PLAYER.WEIGHT]\n• [PLAYER.CLASS]\n• [PLAYER.LEVEL]",
+									"The nickname template that a user will be renamed to on" +
+									" verifying. Can be set to none. Add .{text} for text" +
+									" that should only be added if the previous template was" +
+									" met. See example" +
+									" [here](https://discord.com/channels/796790757947867156/802749920679165994/937099157200580618)\n\n" +
+									"You can use the following templates:\n" +
+									"• [GUILD.NAME]\n" +
+									"• [GUILD.TAG]\n" +
+									"• [GUILD.RANK]\n" +
+									"• [PLAYER.SKILLS]\n" +
+									"• [PLAYER.CATACOMBS]\n" +
+									"• [PLAYER.SLAYER]\n" +
+									"• [PLAYER.WEIGHT]\n" +
+									"• [PLAYER.CLASS]\n" +
+									"• [PLAYER.LEVEL]",
 									"nickname [prefix] [IGN] [postfix]"
 								)
 									.addExamples("nickname Verified | [IGN]", "nickname [[GUILD.RANK]] [IGN]"),
 								new HelpData(
 									"remove_role",
-									"Set the role that will be removed on verifying and re-added when un-verifying.",
+									"Set the role that will be removed on verifying and re-added when" + " un-verifying.",
 									"remove_role <@role>"
 								),
 								new HelpData(
 									"sync",
-									"Enable or disable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every hour (up to 160 members per sync).",
+									"Enable or disable verification automatic sync. This will sync the" +
+									" verified role(s) and nickname when a user joins the server" +
+									" or every hour (up to 160 members per sync).",
 									"sync <enable|disable>"
 								),
 								new HelpData(
 									"dm_on_join",
-									"Enable or disable verification automatic DM on join sync. This will toggle if a user should be messaged when their roles are synced on joining the server.",
+									"Enable or disable verification automatic DM on join sync. This" +
+									" will toggle if a user should be messaged when their roles" +
+									" are synced on joining the server.",
 									"dm_on_join <enable|disable>"
 								),
 								new HelpData(
 									"roles_claim",
-									"Enable or disable automatic roles claim sync. This is the same as running the roles claim command on joining/linking/verifying.",
+									"Enable or disable automatic roles claim sync. This is the same as" +
+									" running the roles claim command on" +
+									" joining/linking/verifying.",
 									"roles_claim <enable|disable>"
 								)
 							),
@@ -518,7 +557,7 @@ public class HelpSlashCommand extends SlashCommand {
 								new HelpData("disable", "Disable automatic roles."),
 								new HelpData(
 									"add",
-									"Add a new level to a role with its corresponding Discord role.",
+									"Add a new level to a role with its corresponding Discord" + " role.",
 									"add <role_name> <value> <@role>"
 								)
 									.addExamples("add wolf 400000 @wolf 8", "add alchemy 50 @alchemy 50"),
@@ -526,12 +565,14 @@ public class HelpSlashCommand extends SlashCommand {
 									.addExamples("remove wolf 400000", "remove alchemy 50"),
 								new HelpData(
 									"use_highest",
-									"Enable or disable using the highest values across all profile. Default is false",
+									"Enable or disable using the highest values across all profile." + " Default is false",
 									"use_highest <enable|disable>"
 								),
 								new HelpData(
 									"sync",
-									"Enable or disable automatic roles claim sync. This is the same as running `/roles claim` automatically every hour (up to 45 members will be updated per sync)."
+									"Enable or disable automatic roles claim sync. This is the same as" +
+									" running `/roles claim` automatically every hour (up to 45" +
+									" members will be updated per sync)."
 								)
 							),
 						new HelpData("guild", "Main command for automatic guild (application and guild role/ranks).")
@@ -555,7 +596,9 @@ public class HelpSlashCommand extends SlashCommand {
 									),
 								new HelpData(
 									"counter",
-									"Enable or disable the guild member counter. This will create the voice channel to display the current guild member count and updates every hour.",
+									"Enable or disable the guild member counter. This will create the" +
+									" voice channel to display the current guild member count and" +
+									" updates every hour.",
 									"settings guild <name> counter",
 									true
 								),
@@ -565,7 +608,7 @@ public class HelpSlashCommand extends SlashCommand {
 										new HelpData("disable", "Disable automatic apply.", "settings guild <name> apply disable", true),
 										new HelpData(
 											"close",
-											"Close automatic apply. Disables the button to create a new application.",
+											"Close automatic apply. Disables the button to create a new" + " application.",
 											"settings guild <name> apply close",
 											true
 										),
@@ -590,44 +633,47 @@ public class HelpSlashCommand extends SlashCommand {
 											.addSubcommands(
 												new HelpData(
 													"add",
-													"Add a role which will be pinged when a new application is submitted.",
-													"settings guild <name> apply staff_roles add <@role>",
+													"Add a role which will be pinged when a new" + " application is submitted.",
+													"settings guild <name> apply staff_roles add" + " <@role>",
 													true
 												),
 												new HelpData(
 													"remove",
 													"Remove a staff ping role.",
-													"settings guild <name> apply staff_roles remove <@role>",
+													"settings guild <name> apply staff_roles remove" + " <@role>",
 													true
 												)
 											),
 										new HelpData(
 											"channel",
-											"Channel where the message to react for applying will sent.",
+											"Channel where the message to react for applying will" + " sent.",
 											"settings guild <name> apply channel <#channel>",
 											true
 										),
 										new HelpData(
 											"check_api",
-											"Whether an applicant must have all APIs enabled in order to apply.",
+											"Whether an applicant must have all APIs enabled in order" + " to apply.",
 											"settings guild <name> apply check_api <enable|disable>",
 											true
 										),
 										new HelpData(
 											"category",
-											"Category where new apply channels will be made. Run `categories` to get the ID's of all categories in the server.",
+											"Category where new apply channels will be made. Run" +
+											" `categories` to get the ID's of all categories in" +
+											" the server.",
 											"settings guild <name> apply category <category>",
 											true
 										),
 										new HelpData(
 											"staff_channel",
-											"Channel where new applications will be sent to be reviewed by staff.",
+											"Channel where new applications will be sent to be reviewed" + " by staff.",
 											"settings guild <name> apply staff_channel <#channel>",
 											true
 										),
 										new HelpData(
 											"waiting_channel",
-											"Channel where the players who were accepted or waitlisted will be sent. Optional and can be set to none.",
+											"Channel where the players who were accepted or waitlisted" +
+											" will be sent. Optional and can be set to none.",
 											"settings guild <name> apply waiting_channel <#channel>",
 											true
 										),
@@ -639,13 +685,16 @@ public class HelpSlashCommand extends SlashCommand {
 										),
 										new HelpData(
 											"waitlist_message",
-											"Message that will be sent if applicant is waitlisted. Optional and can be set to none.",
+											"Message that will be sent if applicant is waitlisted." + " Optional and can be set to none.",
 											"settings guild <name> apply waitlist_message <message>",
 											true
 										),
 										new HelpData(
 											"gamemode",
-											"Whether applicants must use a certain gamemode profile in their application. Defaults to all. Options are: all, regular, ironman, stranded, or ironman_stranded.",
+											"Whether applicants must use a certain gamemode profile in" +
+											" their application. Defaults to all. Options are:" +
+											" all, regular, ironman, stranded, or" +
+											" ironman_stranded.",
 											"settings guild <name> apply gamemode <gamemode>",
 											true
 										),
@@ -657,28 +706,38 @@ public class HelpSlashCommand extends SlashCommand {
 										),
 										new HelpData(
 											"requirements",
-											"Requirements applications must meet. An application will be auto-denied if they do not meet the requirements.",
+											"Requirements applications must meet. An application" +
+											" will be auto-denied if they do not meet the" +
+											" requirements.",
 											"settings guild <name> apply requirements",
 											true
 										)
 											.addSubcommands(
 												new HelpData(
 													"add",
-													"Add a requirement that applicant must meet. Types are slayer, skills, catacombs, weight, lily_weight, level, networth, and farming_weight. At least one of the requirement types must be set.",
-													"settings guild <name> apply requirements add [type:amount] ...",
+													"Add a requirement that applicant must meet. Types" +
+													" are slayer, skills, catacombs, weight," +
+													" lily_weight, level, networth, and" +
+													" farming_weight. At least one of the" +
+													" requirement types must be set.",
+													"settings guild <name> apply requirements add" + " [type:amount] ...",
 													true
 												),
 												new HelpData(
 													"remove",
-													"Remove a requirement by its index. Run `settings guild <name>` to see the index for all current requirements.",
-													"settings guild <name> apply requirements remove <index>",
+													"Remove a requirement by its index. Run `settings" +
+													" guild <name>` to see the index for all" +
+													" current requirements.",
+													"settings guild <name> apply requirements remove" + " <index>",
 													true
 												)
 											),
 										new HelpData(
 											"scammer_check",
-											"Enable or disable if a player should automatically be denied if they are marked as a scammer in the SkyblockZ database. Defaults to false.",
-											"settings guild <name> apply scammer_check <enable|disable>",
+											"Enable or disable if a player should automatically be" +
+											" denied if they are marked as a scammer in the" +
+											" SkyblockZ database. Defaults to false.",
+											"settings guild <name> apply scammer_check" + " <enable|disable>",
 											true
 										)
 									)
@@ -688,7 +747,9 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("categories", "Get the ids of all categories in this server.").setCategory("settings"),
 				new HelpData(
 					"reload",
-					"Reload the automatic guild application(s) and automatic verification settings. This is required for most changes to take effect for both of these features."
+					"Reload the automatic guild application(s) and automatic verification settings." +
+					" This is required for most changes to take effect for both of these" +
+					" features."
 				)
 					.setCategory("settings")
 			)
@@ -770,11 +831,11 @@ public class HelpSlashCommand extends SlashCommand {
 			create("guild kicker <requirements> [player] [gamemode]", "Get all player's who don't meet the provided requirements") +
 			create(
 				"guild check [player] [gamemode]",
-				"A customizable helper that will tell you who to kick, promote or demote in your Hypixel guild"
+				"A customizable helper that will tell you who to kick, promote or demote in your" + " Hypixel guild"
 			) +
 			create(
 				"guild top [player] [guild] [gamemode]",
-				"Get a guild's Skyblock statistics of slayer, skills, catacombs, weight, level, and networth"
+				"Get a guild's Skyblock statistics of slayer, skills, catacombs, weight, level, and" + " networth"
 			) +
 			create("guildlb <type> [guild] [mode] [comparison]", "Get a global guild leaderboard")
 		);
@@ -821,7 +882,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +
 			create(
 				"calcweight <type> <amount> [player] [profile] [system]",
-				"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount"
+				"Calculate predicted weight change for a reaching certain skill, slayer, or" + " catacombs level/amount"
 			) +
 			create("hypixel [player]", "Get Hypixel information about a player") +
 			create("missing [player] [profile]", "Get a player's missing talismans") +
@@ -875,7 +936,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("reload", "Reload the guild application and verification settings") +
 			create(
 				"settings set fetchur_channel <#channel>",
-				"Set the channel where fetchur item notifications will be sent every day at 12 am EST"
+				"Set the channel where fetchur item notifications will be sent every day at 12 am" + " EST"
 			) +
 			create("settings set fetchur_ping <@role>", "Role that will be pinged when the fetchur item notifications is sent") +
 			create(
@@ -963,7 +1024,7 @@ public class HelpSlashCommand extends SlashCommand {
 			) +
 			create(
 				"settings guild <name> apply waiting_channel <#channel>",
-				"Channel where the players who were accepted or waitlisted will be sent. Can be set to none"
+				"Channel where the players who were accepted or waitlisted will be sent. Can be set" + " to none"
 			) +
 			create("settings guild <name> apply accept_message <message>", "Message that will be sent if applicant is accepted") +
 			create(
@@ -972,20 +1033,20 @@ public class HelpSlashCommand extends SlashCommand {
 			) +
 			create(
 				"settings guild <name> apply gamemode <gamemode>",
-				"Whether applicants must use a certain gamemode profile in their application. Defaults to 'all'"
+				"Whether applicants must use a certain gamemode profile in their application." + " Defaults to 'all'"
 			) +
 			create("settings guild <name> apply deny_message <message>", "Message that will be sent if applicant is denied") +
 			create(
 				"settings guild <name> apply requirements add [type:amount] ...",
-				"Add a requirement that applicant must meet. At least one of the requirement types must be set. Can be empty"
+				"Add a requirement that applicant must meet. At least one of the requirement types" + " must be set. Can be empty"
 			) +
 			create(
 				"settings guild <name> apply requirements remove <index>",
-				"Remove a requirement. Run `settings guild <name>` to see the index for all current requirements"
+				"Remove a requirement. Run `settings guild <name>` to see the index for all current" + " requirements"
 			) +
 			create(
 				"settings guild <name> apply scammer_check <enable|disable>",
-				"Whether the applicant should be automatically be denied if marked a scammer in the SkyblockZ database"
+				"Whether the applicant should be automatically be denied if marked a scammer in the" + " SkyblockZ database"
 			)
 		);
 
@@ -994,7 +1055,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings roles <enable|disable>", "Enable or disable automatic roles") +
 			create(
 				"settings roles use_highest <enable|disable>",
-				"Enable or disable using the highest values or last played on profile. Default is false"
+				"Enable or disable using the highest values or last played on profile. Default is" + " false"
 			) +
 			create("settings roles sync <enable|disable>", "Enable or disable automatic roles claim sync") +
 			create("settings roles add <role_name> <value> <@role>", "Add a new level to a role with its corresponding Discord role") +

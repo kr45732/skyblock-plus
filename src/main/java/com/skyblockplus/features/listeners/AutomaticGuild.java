@@ -545,14 +545,12 @@ public class AutomaticGuild {
 
 							if (
 								category.equals("PLAYER") &&
-								(
-									type.equals("SKILLS") ||
+								(type.equals("SKILLS") ||
 									type.equals("CATACOMBS") ||
 									type.equals("SLAYER") ||
 									type.equals("WEIGHT") ||
 									type.equals("CLASS") ||
-									type.equals("LEVEL")
-								)
+									type.equals("LEVEL"))
 							) {
 								checkVerify = true;
 								break;
@@ -639,14 +637,12 @@ public class AutomaticGuild {
 									}
 								} else if (
 									category.equals("PLAYER") &&
-									(
-										type.equals("SKILLS") ||
+									(type.equals("SKILLS") ||
 										type.equals("CATACOMBS") ||
 										type.equals("SLAYER") ||
 										type.equals("WEIGHT") ||
 										type.equals("CLASS") ||
-										type.equals("LEVEL")
-									)
+										type.equals("LEVEL"))
 								) {
 									if (player != null) {
 										nicknameTemplate =
@@ -824,11 +820,9 @@ public class AutomaticGuild {
 				" | Time (" +
 				roundAndFormat((System.currentTimeMillis() - startTime) / 1000.0) +
 				"s)" +
-				(
-					!memberToRoleChanges.isEmpty()
+				(!memberToRoleChanges.isEmpty()
 						? " | Users (" + updateCount + "/" + updateLimit + "/" + memberToRoleChanges.size() + ")"
-						: ""
-				) +
+						: "") +
 				(counterUpdate > 0 ? " | Counters (" + counterUpdate + ")" : "")
 			);
 			logAction(
@@ -1033,7 +1027,8 @@ public class AutomaticGuild {
 												client.getSuccess() +
 												" Your networth bug report has been resolved by " +
 												event.getUser().getAsMention() +
-												" (replies to this message will not be seen)\n**Comment:** " +
+												" (replies to this message will not be seen)\n" +
+												"**Comment:** " +
 												replyMessage
 											)
 											.queue(ignore, ignore),
@@ -1132,11 +1127,9 @@ public class AutomaticGuild {
 			Message msg = guildMap.get("796790757947867156").lastMayorElectionOpenMessage;
 			event
 				.reply(
-					(
-						msg != null
+					(msg != null
 							? new MessageCreateBuilder().applyMessage(msg)
-							: new MessageCreateBuilder().setEmbeds(errorEmbed("Election is not open").build())
-					).build()
+							: new MessageCreateBuilder().setEmbeds(errorEmbed("Election is not open").build())).build()
 				)
 				.setEphemeral(true)
 				.queue();
@@ -1271,11 +1264,11 @@ public class AutomaticGuild {
 										"Stop Tracking Auctions"
 									)
 								);
-								(
-									event.getMessage().getActionRows().size() == 1
+								(event.getMessage().getActionRows().size() == 1
 										? event.getMessage().editMessageComponents(updatedButton)
-										: event.getMessage().editMessageComponents(event.getMessage().getActionRows().get(0), updatedButton)
-								).queue();
+										: event
+											.getMessage()
+											.editMessageComponents(event.getMessage().getActionRows().get(0), updatedButton)).queue();
 							}
 						} else if (event.getComponentId().startsWith("track_auctions_stop_")) {
 							MessageEmbed eb = AuctionTracker.stopTrackingAuctions(event.getUser().getId()).build();
@@ -1287,11 +1280,11 @@ public class AutomaticGuild {
 										"Track Auctions"
 									)
 								);
-								(
-									event.getMessage().getActionRows().size() == 1
+								(event.getMessage().getActionRows().size() == 1
 										? event.getMessage().editMessageComponents(updatedButton)
-										: event.getMessage().editMessageComponents(event.getMessage().getActionRows().get(0), updatedButton)
-								).queue();
+										: event
+											.getMessage()
+											.editMessageComponents(event.getMessage().getActionRows().get(0), updatedButton)).queue();
 							}
 
 							action.queue();

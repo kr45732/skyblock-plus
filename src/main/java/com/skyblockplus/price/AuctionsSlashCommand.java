@@ -130,12 +130,10 @@ public class AuctionsSlashCommand extends SlashCommand {
 						aucTitle += cleanMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
 					} else {
 						aucTitle +=
-							(
-								item.getId().equals("PET")
-									? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " "
-									: (item.getCount() > 1 ? item.getCount() + "x " : "")
-							) +
-							higherDepth(currentAuction, "item_name").getAsString();
+						(item.getId().equals("PET")
+								? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " "
+								: (item.getCount() > 1 ? item.getCount() + "x " : "")) +
+						higherDepth(currentAuction, "item_name").getAsString();
 					}
 
 					String desc;
@@ -157,9 +155,9 @@ public class AuctionsSlashCommand extends SlashCommand {
 							desc = "Auction sold for " + simplifyNumber(highestBid) + " coins";
 							totalSoldValue += highestBid;
 							auctionTax +=
-								(highestBid > 1000000)
-									? ((0.99 * highestBid < 1000000) ? (highestBid - 1000000) : (long) (0.01 * highestBid))
-									: 0;
+							(highestBid > 1000000)
+								? ((0.99 * highestBid < 1000000) ? (highestBid - 1000000) : (long) (0.01 * highestBid))
+								: 0;
 						} else {
 							desc = "Auction did not sell";
 							failedToSell += startingBid;
@@ -189,13 +187,11 @@ public class AuctionsSlashCommand extends SlashCommand {
 				.setEveryPageTitleUrl(player.getAuctionUrl())
 				.setEveryPageThumbnail(player.getAvatarUrl())
 				.setEveryPageText(
-					(
-						totalSoldValue > 0
+					(totalSoldValue > 0
 							? "**Sold Auctions Value:** " +
 							simplifyNumber(totalSoldValue) +
 							(auctionTax > 0 ? " - " + simplifyNumber(auctionTax) + " = " + simplifyNumber(totalSoldValue - auctionTax) : "")
-							: ""
-					) +
+							: "") +
 					(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue) : "") +
 					(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "")
 				)
@@ -305,17 +301,13 @@ public class AuctionsSlashCommand extends SlashCommand {
 							.setTitle(player.getEscapedUsername(), player.getAuctionUrl())
 							.setThumbnail(player.getAvatarUrl())
 							.setDescription(
-								(
-									totalSoldValue > 0
+								(totalSoldValue > 0
 										? "**Sold Auctions Value:** " +
 										simplifyNumber(totalSoldValue) +
-										(
-											auctionTax > 0
+										(auctionTax > 0
 												? " - " + simplifyNumber(auctionTax) + " = " + simplifyNumber(totalSoldValue - auctionTax)
-												: ""
-										)
-										: ""
-								) +
+												: "")
+										: "") +
 								(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue) : "") +
 								(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "")
 							)

@@ -113,10 +113,10 @@ public class GuildLbSlashCommand extends SlashCommand {
 			formatOrSimplify(guildLbCaches.values().stream().mapToDouble(e -> e).average().orElse(0));
 		if (guildResponse != null) {
 			ebStr +=
-				"\n**Guild:** " +
-				guildResponse.get("name").getAsString() +
-				"\n**Rank:** " +
-				(guildRank != -1 ? "#" + guildRank + " (" + amt + ")" : "Not on leaderboard");
+			"\n**Guild:** " +
+			guildResponse.get("name").getAsString() +
+			"\n**Rank:** " +
+			(guildRank != -1 ? "#" + guildRank + " (" + amt + ")" : "Not on leaderboard");
 		}
 
 		paginateBuilder

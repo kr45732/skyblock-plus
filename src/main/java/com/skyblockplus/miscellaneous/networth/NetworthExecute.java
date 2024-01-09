@@ -308,11 +308,9 @@ public class NetworthExecute {
 			" (" +
 			roundAndFormat(totalNetworth) +
 			")\n**" +
-			(
-				Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
+			(Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
 					? capitalizeString(player.getGamemode().toString()) + " "
-					: ""
-			) +
+					: "") +
 			"Leaderboard Position:** " +
 			(networthPosition != -1 ? formatNumber(networthPosition) : "Not on leaderboard");
 		EmbedBuilder eb = player
@@ -727,10 +725,8 @@ public class NetworthExecute {
 			if (
 				item.isRecombobulated() &&
 				item.getDungeonFloor() == -1 &&
-				(
-					!item.getEnchantsFormatted().isEmpty() ||
-					allowedRecombCategories.contains(higherDepth(getSkyblockItemsJson().get(item.getId()), "category", ""))
-				)
+				(!item.getEnchantsFormatted().isEmpty() ||
+					allowedRecombCategories.contains(higherDepth(getSkyblockItemsJson().get(item.getId()), "category", "")))
 			) {
 				recombobulatedExtra = recombPrice * 0.9;
 			}
@@ -895,8 +891,7 @@ public class NetworthExecute {
 
 		double totalPrice =
 			itemCount *
-			(
-				itemCost +
+			(itemCost +
 				recombobulatedExtra +
 				hpbExtras +
 				enchantsExtras +
@@ -905,8 +900,7 @@ public class NetworthExecute {
 				miscExtras +
 				backpackExtras +
 				essenceExtras +
-				runesExtras
-			);
+				runesExtras);
 
 		if (verbose) {
 			out.append("{");

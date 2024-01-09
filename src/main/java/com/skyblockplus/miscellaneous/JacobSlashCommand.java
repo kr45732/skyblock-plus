@@ -76,7 +76,7 @@ public class JacobSlashCommand extends SlashCommand {
 				.collect(Collectors.toCollection(ArrayList::new))) {
 			extras.addEmbedField("Contest", getRelativeTimestamp(contest.getTimeInstant()) + "\n" + contest.getCropsFormatted(), true);
 		}
-		for (int i = 0; i < 3 - extras.getEmbedFields().size() % 3; i++) {
+		for (int i = 0; i < 3 - (extras.getEmbedFields().size() % 3); i++) {
 			extras.addBlankField(true);
 		}
 		event.paginate(paginateBuilder);

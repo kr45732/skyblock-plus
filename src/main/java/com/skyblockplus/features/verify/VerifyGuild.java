@@ -92,20 +92,16 @@ public class VerifyGuild {
 										"You have automatically been synced in `" +
 										event.getGuild().getName() +
 										"`" +
-										(
-											!result[1].equals("false")
+										(!result[1].equals("false")
 												? result[1].equals("true")
 													? "\n• Successfully synced your roles"
 													: "\n• Error syncing your roles"
-												: ""
-										) +
-										(
-											!result[0].equals("false")
+												: "") +
+										(!result[0].equals("false")
 												? result[0].equals("true")
 													? "\n• Successfully synced your nickname"
 													: "\n• Error syncing your nickname"
-												: ""
-										)
+												: "")
 									)
 									.build()
 							)

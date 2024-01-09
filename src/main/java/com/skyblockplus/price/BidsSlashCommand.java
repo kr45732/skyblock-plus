@@ -73,7 +73,7 @@ public class BidsSlashCommand extends SlashCommand {
 			Duration duration = Duration.between(Instant.now(), endingAt);
 
 			itemName +=
-				(isPet ? capitalizeString(higherDepth(bid, "tier").getAsString()) + " " : "") + higherDepth(bid, "item_name").getAsString();
+			(isPet ? capitalizeString(higherDepth(bid, "tier").getAsString()) + " " : "") + higherDepth(bid, "item_name").getAsString();
 
 			JsonArray bidsArr = higherDepth(bid, "bids").getAsJsonArray();
 			long highestBid = higherDepth(bidsArr, "[" + (bidsArr.size() - 1) + "].amount").getAsLong();
@@ -81,7 +81,7 @@ public class BidsSlashCommand extends SlashCommand {
 				auctionDesc = "Current bid: " + simplifyNumber(highestBid);
 				auctionDesc += " | Ending " + getRelativeTimestamp(endingAt);
 				auctionDesc +=
-					"\nHighest bidder: " + uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username();
+				"\nHighest bidder: " + uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username();
 				for (int i = bidsArr.size() - 1; i >= 0; i--) {
 					JsonElement curBid = bidsArr.get(i);
 					if (higherDepth(curBid, "bidder").getAsString().equals(usernameUuidStruct.uuid())) {
@@ -92,9 +92,9 @@ public class BidsSlashCommand extends SlashCommand {
 			} else {
 				auctionDesc = "Auction sold for " + simplifyNumber(highestBid) + " coins";
 				auctionDesc +=
-					"\n " +
-					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username() +
-					" won the auction";
+				"\n " +
+				uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username() +
+				" won the auction";
 			}
 
 			extras.addEmbedField(itemName, auctionDesc, false);

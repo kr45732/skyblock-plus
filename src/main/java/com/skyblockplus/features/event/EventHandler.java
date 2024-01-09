@@ -142,10 +142,8 @@ public class EventHandler {
 		}
 		Instant zooEarlySummer = Instant.ofEpochMilli(
 			CalendarSlashCommand.YEAR_0 +
-			(CalendarSlashCommand.getSkyblockYear() - 1) *
-			CalendarSlashCommand.YEAR_MS +
-			3 *
-			CalendarSlashCommand.MONTH_MS
+			(CalendarSlashCommand.getSkyblockYear() - 1) * CalendarSlashCommand.YEAR_MS +
+			3 * CalendarSlashCommand.MONTH_MS
 		);
 		if (
 			zooEarlySummer.toEpochMilli() <= nowEpoch &&
@@ -188,10 +186,8 @@ public class EventHandler {
 		index++;
 		Instant zooEarlyWinter = Instant.ofEpochMilli(
 			CalendarSlashCommand.YEAR_0 +
-			(CalendarSlashCommand.getSkyblockYear() - 1) *
-			CalendarSlashCommand.YEAR_MS +
-			9 *
-			CalendarSlashCommand.MONTH_MS
+			(CalendarSlashCommand.getSkyblockYear() - 1) * CalendarSlashCommand.YEAR_MS +
+			9 * CalendarSlashCommand.MONTH_MS
 		);
 		if (
 			zooEarlyWinter.toEpochMilli() <= nowEpoch &&
@@ -234,10 +230,8 @@ public class EventHandler {
 		index++;
 		Instant jerryIslandOpen = Instant.ofEpochMilli(
 			CalendarSlashCommand.YEAR_0 +
-			(CalendarSlashCommand.getSkyblockYear() - 1) *
-			CalendarSlashCommand.YEAR_MS +
-			11 *
-			CalendarSlashCommand.MONTH_MS
+			(CalendarSlashCommand.getSkyblockYear() - 1) * CalendarSlashCommand.YEAR_MS +
+			11 * CalendarSlashCommand.MONTH_MS
 		);
 		if (
 			jerryIslandOpen.toEpochMilli() <= nowEpoch &&
@@ -284,12 +278,9 @@ public class EventHandler {
 		index++;
 		Instant newYearEvent = Instant.ofEpochMilli(
 			CalendarSlashCommand.YEAR_0 +
-			(CalendarSlashCommand.getSkyblockYear() - 1) *
-			CalendarSlashCommand.YEAR_MS +
-			11 *
-			CalendarSlashCommand.MONTH_MS +
-			28 *
-			CalendarSlashCommand.DAY_MS
+			(CalendarSlashCommand.getSkyblockYear() - 1) * CalendarSlashCommand.YEAR_MS +
+			11 * CalendarSlashCommand.MONTH_MS +
+			28 * CalendarSlashCommand.DAY_MS
 		);
 		if (
 			newYearEvent.toEpochMilli() <= nowEpoch &&
@@ -317,12 +308,9 @@ public class EventHandler {
 		Instant spookyFishing = Instant
 			.ofEpochMilli(
 				CalendarSlashCommand.YEAR_0 +
-				(CalendarSlashCommand.getSkyblockYear() - 1) *
-				CalendarSlashCommand.YEAR_MS +
-				7 *
-				CalendarSlashCommand.MONTH_MS +
-				28 *
-				CalendarSlashCommand.DAY_MS
+				(CalendarSlashCommand.getSkyblockYear() - 1) * CalendarSlashCommand.YEAR_MS +
+				7 * CalendarSlashCommand.MONTH_MS +
+				28 * CalendarSlashCommand.DAY_MS
 			)
 			.minus(1, ChronoUnit.HOURS);
 		if (
@@ -346,12 +334,9 @@ public class EventHandler {
 		index++;
 		Instant spookyEvent = Instant.ofEpochMilli(
 			CalendarSlashCommand.YEAR_0 +
-			(CalendarSlashCommand.getSkyblockYear() - 1) *
-			CalendarSlashCommand.YEAR_MS +
-			7 *
-			CalendarSlashCommand.MONTH_MS +
-			28 *
-			CalendarSlashCommand.DAY_MS
+			(CalendarSlashCommand.getSkyblockYear() - 1) * CalendarSlashCommand.YEAR_MS +
+			7 * CalendarSlashCommand.MONTH_MS +
+			28 * CalendarSlashCommand.DAY_MS
 		);
 		if (
 			spookyEvent.toEpochMilli() <= nowEpoch &&
@@ -378,10 +363,9 @@ public class EventHandler {
 		) {
 			Instant fishingFestival = Instant.ofEpochMilli(
 				CalendarSlashCommand.YEAR_0 +
-				(CalendarSlashCommand.getSkyblockYear() - 1) *
-				CalendarSlashCommand.YEAR_MS +
+				(CalendarSlashCommand.getSkyblockYear() - 1) * CalendarSlashCommand.YEAR_MS +
 				Math.floorDiv((nowEpoch - CalendarSlashCommand.YEAR_0) % CalendarSlashCommand.YEAR_MS, CalendarSlashCommand.MONTH_MS) *
-				CalendarSlashCommand.MONTH_MS
+					CalendarSlashCommand.MONTH_MS
 			);
 			if (
 				fishingFestival.toEpochMilli() <= nowEpoch &&
@@ -425,12 +409,9 @@ public class EventHandler {
 		}
 		Instant fallenStar = Instant.ofEpochMilli(
 			CalendarSlashCommand.YEAR_0 +
-			(CalendarSlashCommand.getSkyblockYear() - 1) *
-			CalendarSlashCommand.YEAR_MS +
-			currentMonth *
-			CalendarSlashCommand.MONTH_MS +
-			(out - 1) *
-			CalendarSlashCommand.DAY_MS
+			(CalendarSlashCommand.getSkyblockYear() - 1) * CalendarSlashCommand.YEAR_MS +
+			currentMonth * CalendarSlashCommand.MONTH_MS +
+			(out - 1) * CalendarSlashCommand.DAY_MS
 		);
 		if (
 			fallenStar.toEpochMilli() <= nowEpoch &&
@@ -467,12 +448,9 @@ public class EventHandler {
 		}
 		Instant bankStart = Instant.ofEpochMilli(
 			CalendarSlashCommand.YEAR_0 +
-			(CalendarSlashCommand.getSkyblockYear() - 1) *
-			CalendarSlashCommand.YEAR_MS +
-			currentMonthBank *
-			CalendarSlashCommand.MONTH_MS +
-			31 *
-			CalendarSlashCommand.DAY_MS
+			(CalendarSlashCommand.getSkyblockYear() - 1) * CalendarSlashCommand.YEAR_MS +
+			currentMonthBank * CalendarSlashCommand.MONTH_MS +
+			31 * CalendarSlashCommand.DAY_MS
 		);
 		if (
 			bankStart.toEpochMilli() <= nowEpoch &&

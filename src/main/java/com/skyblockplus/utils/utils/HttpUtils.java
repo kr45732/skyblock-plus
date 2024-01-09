@@ -137,7 +137,7 @@ public class HttpUtils {
 						JsonObject obj = new JsonObject();
 						obj.addProperty(
 							"cause",
-							"Hypixel API returned 429 too many requests. The API is globally throttled and may be down."
+							"Hypixel API returned 429 too many requests. The API is globally throttled and may" + " be down."
 						);
 						return new JsonResponse(obj, httpResponse.getStatusLine().getStatusCode());
 					}

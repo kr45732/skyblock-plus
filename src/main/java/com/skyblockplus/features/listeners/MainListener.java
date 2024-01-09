@@ -118,9 +118,13 @@ public class MainListener extends ListenerAdapter {
 								.setDescription(
 									"- Thank you for adding me to " +
 									event.getGuild().getName() +
-									"\n- You can view my commands by running `/help`\n- Make sure to check out `/setup`, use the select menu below, or view the [forum post](" +
+									"\n" +
+									"- You can view my commands by running `/help`\n" +
+									"- Make sure to check out `/setup`, use the select menu below, or" +
+									" view the [forum post](" +
 									FORUM_POST_LINK +
-									") on how to setup customizable features such as automatic roles, verification, notifications, and much more!"
+									") on how to setup customizable features such as automatic roles," +
+									" verification, notifications, and much more!"
 								)
 								.build()
 						)

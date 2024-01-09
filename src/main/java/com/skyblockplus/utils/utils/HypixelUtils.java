@@ -128,14 +128,12 @@ public class HypixelUtils {
 
 	public static SkillsStruct levelingInfoFromExp(long exp, String name, int maxLevel) {
 		JsonArray xpTable =
-			(
-				switch (name) {
+			(switch (name) {
 					case "social", "HOTM" -> higherDepth(getLevelingJson(), name);
 					case "catacombs", "healer", "mage", "berserk", "archer", "tank" -> higherDepth(getLevelingJson(), "catacombs");
 					case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp");
 					default -> higherDepth(getLevelingJson(), "leveling_xp");
-				}
-			).getAsJsonArray();
+				}).getAsJsonArray();
 		long xpTotal = 0;
 
 		int level = 1;
@@ -201,10 +199,7 @@ public class HypixelUtils {
 		return new SkillsStruct(name, targetLevel, maxLevel, xpTotal, 0, xpForNext, 0);
 	}
 
-	/**
-	 * Used only for NetworthExecute
-	 * Note: some npc_buy.cost can be decimals
-	 */
+	/** Used only for NetworthExecute Note: some npc_buy.cost can be decimals */
 	public static List<String> getRecipe(String itemId) {
 		JsonElement recipe = higherDepth(getInternalJsonMappings(), itemId + ".recipe");
 		if (recipe != null) {

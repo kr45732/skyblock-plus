@@ -145,35 +145,21 @@ public class SlayerSlashCommand extends SlashCommand {
 			formatNumber(vampireFiveKills);
 
 		long coinsSpentOnSlayers =
-			2000L *
-			(wolfOneKills + zombieOneKills + spiderOneKills + endermanOneKills) +
-			7500L *
-			(wolfTwoKills + zombieTwoKills + spiderTwoKills + endermanTwoKills) +
-			20000L *
-			(wolfThreeKills + zombieThreeKills + spiderThreeKills + endermanThreeKills) +
-			50000L *
-			(wolfFourKills + zombieFourKills + spiderFourKills + endermanFourKills) +
-			100000L *
-			zombieFiveKills +
-			10000L *
-			blazeOneKills +
-			25000L *
-			blazeTwoKills +
-			60000L *
-			blazeThreeKills +
-			150000L *
-			blazeFourKills;
+			2000L * (wolfOneKills + zombieOneKills + spiderOneKills + endermanOneKills) +
+			7500L * (wolfTwoKills + zombieTwoKills + spiderTwoKills + endermanTwoKills) +
+			20000L * (wolfThreeKills + zombieThreeKills + spiderThreeKills + endermanThreeKills) +
+			50000L * (wolfFourKills + zombieFourKills + spiderFourKills + endermanFourKills) +
+			100000L * zombieFiveKills +
+			10000L * blazeOneKills +
+			25000L * blazeTwoKills +
+			60000L * blazeThreeKills +
+			150000L * blazeFourKills;
 		long motesSpentOnSlayers =
-			2000L *
-			vampireOneKills +
-			4000L *
-			vampireTwoKills +
-			5000L *
-			vampireThreeKills +
-			7000L *
-			vampireFourKills +
-			10000L *
-			vampireFiveKills;
+			2000L * vampireOneKills +
+			4000L * vampireTwoKills +
+			5000L * vampireThreeKills +
+			7000L * vampireFourKills +
+			10000L * vampireFiveKills;
 
 		eb.setDescription(
 			"**Total Slayer:** " +
