@@ -1532,23 +1532,31 @@ public class Player {
 				return 0;
 			}
 
-			Map<String, Integer> petsMap = new HashMap<>();
+			Map<String, Integer> highestRarity = new HashMap<>();
+			List<String> highestLevel = new ArrayList<>();
 			for (JsonElement pet : playerPets) {
 				String petName = higherDepth(pet, "type").getAsString();
-				int rarity =
-					switch (higherDepth(pet, "tier").getAsString().toLowerCase()) {
-						case "common" -> 1;
-						case "uncommon" -> 2;
-						case "rare" -> 3;
-						case "epic" -> 4;
-						case "legendary" -> 5;
-						case "mythic" -> 6;
+				String rarity = higherDepth(pet, "tier").getAsString();
+
+				int rarityInt =
+					switch (rarity) {
+						case "COMMON" -> 1;
+						case "UNCOMMON" -> 2;
+						case "RARE" -> 3;
+						case "EPIC" -> 4;
+						case "LEGENDARY" -> 5;
+						case "MYTHIC" -> 6;
 						default -> 0;
 					};
-				petsMap.compute(petName, (k, v) -> v == null || v < rarity ? rarity : v);
+				highestRarity.compute(petName, (k, v) -> v == null || v < rarityInt ? rarityInt : v);
+
+				// Each unique maxed pet adds a bonus pet score
+				if (!highestLevel.contains(petName) && petLevelFromXp(higherDepth(pet, "exp", 0L), rarity, petName) >= higherDepth(getPetJson(), "custom_pet_leveling." + petName + ".max_level", 100)) {
+					highestLevel.add(petName);
+				}
 			}
 
-			return petsMap.values().stream().mapToInt(i -> i).sum();
+			return highestRarity.values().stream().mapToInt(i -> i).sum() + highestLevel.size();
 		}
 
 		public String getSymbol(String... prefix) {
