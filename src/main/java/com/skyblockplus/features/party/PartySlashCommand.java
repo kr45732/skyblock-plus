@@ -263,8 +263,7 @@ public class PartySlashCommand extends SlashCommand {
 						.setEmbeds(
 							defaultEmbed("Party Finder")
 								.setDescription(
-									"Your party has reached 5/5 players and has been unlisted. Missing" +
-									" permissions: `" +
+									"Your party has reached 5/5 players and has been unlisted. Missing permissions: `" +
 									e.getPermission().getName() +
 									"`"
 								)

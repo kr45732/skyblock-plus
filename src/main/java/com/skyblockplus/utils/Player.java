@@ -163,7 +163,7 @@ public class Player {
 	}
 
 	/**
-	 * Ignores profile cache and updates provided gamemode synchronously Used only for leaderboard
+	 * Ignores profile cache and updates provided gamemode synchronously. Used only for leaderboard
 	 * command
 	 */
 	public Player(String username, Gamemode gamemode) {

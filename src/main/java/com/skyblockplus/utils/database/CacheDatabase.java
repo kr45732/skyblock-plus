@@ -434,7 +434,7 @@ public class CacheDatabase {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"SELECT request_time FROM guild WHERE request_discord = ? ORDER BY request_time" + " DESC LIMIT 1"
+				"SELECT request_time FROM guild WHERE request_discord = ? ORDER BY request_time DESC LIMIT 1"
 			)
 		) {
 			statement.setObject(1, discordId);

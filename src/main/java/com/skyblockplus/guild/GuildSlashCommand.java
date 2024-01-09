@@ -1468,8 +1468,7 @@ public class GuildSlashCommand extends SlashCommand {
 						if (out == null) {
 							m
 								.editOriginalEmbeds(
-									errorEmbed("There was an error while updating the guild, please try" + " again in a few seconds")
-										.build()
+									errorEmbed("There was an error while updating the guild, please try again in a few seconds").build()
 								)
 								.queue();
 						} else {

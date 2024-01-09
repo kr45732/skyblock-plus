@@ -237,7 +237,7 @@ public class Database {
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"DELETE FROM linked_account WHERE discord = ? OR username = ? or uuid = ?" + " RETURNING discord"
+					"DELETE FROM linked_account WHERE discord = ? OR username = ? or uuid = ? RETURNING discord"
 				)
 			) {
 				statement.setString(1, discord);
@@ -259,7 +259,7 @@ public class Database {
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?," + " ?, ?)"
+					"INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?, ?, ?)"
 				)
 			) {
 				statement.setLong(1, lastUpdated);

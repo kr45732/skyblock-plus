@@ -373,7 +373,7 @@ public class ApplyUser {
 						roundAndFormat((long) player.getNetworth())
 					)
 					.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr)
-					.appendDescription("\n" + "If any of these value seem incorrect, then make sure all your APIs are" + " enabled");
+					.appendDescription("\nIf any of these value seem incorrect, then make sure all your APIs are enabled");
 
 				List<Button> buttons = new ArrayList<>();
 				if (!profileNames.isEmpty()) {

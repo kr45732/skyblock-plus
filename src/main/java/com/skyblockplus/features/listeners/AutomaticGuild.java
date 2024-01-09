@@ -1027,8 +1027,7 @@ public class AutomaticGuild {
 												client.getSuccess() +
 												" Your networth bug report has been resolved by " +
 												event.getUser().getAsMention() +
-												" (replies to this message will not be seen)\n" +
-												"**Comment:** " +
+												" (replies to this message will not be seen)\n**Comment:** " +
 												replyMessage
 											)
 											.queue(ignore, ignore),
