@@ -827,7 +827,7 @@
           "requirements": [
             [
               {
-                "amount": 40,
+                "amount": 45,
                 "type": "skills"
               },
               {
@@ -844,7 +844,7 @@
           "requirements": [
             [
               {
-                "amount": 45,
+                "amount": 50,
                 "type": "skills"
               },
               {
