@@ -1551,7 +1551,11 @@ public class Player {
 				highestRarity.compute(petName, (k, v) -> v == null || v < rarityInt ? rarityInt : v);
 
 				// Each unique maxed pet adds a bonus pet score
-				if (!highestLevel.contains(petName) && petLevelFromXp(higherDepth(pet, "exp", 0L), rarity, petName) >= higherDepth(getPetJson(), "custom_pet_leveling." + petName + ".max_level", 100)) {
+				if (
+					!highestLevel.contains(petName) &&
+					petLevelFromXp(higherDepth(pet, "exp", 0L), rarity, petName) >=
+						higherDepth(getPetJson(), "custom_pet_leveling." + petName + ".max_level", 100)
+				) {
 					highestLevel.add(petName);
 				}
 			}

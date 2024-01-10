@@ -94,7 +94,7 @@ public class MissingSlashCommand extends SlashCommand {
 		if (player.isValid()) {
 			if (!player.isInventoryApiEnabled()) {
 				return withApiHelpButton(errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
-			}//rift.access.consumed_prism
+			}
 
 			Map<Integer, InvItem> talismanBag = player.getTalismanBagMap();
 			if (talismanBag == null) {
