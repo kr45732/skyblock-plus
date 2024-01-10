@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
 public class MissingSlashCommand extends SlashCommand {
 
 	private static final List<String> unobtainableIronmanTalismans = List.of("BLOOD_GOD_CREST", "POTATO_TALISMAN");
-	private static final List<String> riftOnlyTalismans = List.of(
+	private static final List<String> accessoryBlacklist = List.of(
 		"GARLIC_FLAVORED_GUMMY_BEAR",
 		"PUNCHCARD_ARTIFACT",
 		"RING_OF_BROKEN_LOVE",
@@ -58,7 +58,8 @@ public class MissingSlashCommand extends SlashCommand {
 		"CRUX_TALISMAN_3",
 		"CRUX_TALISMAN_4",
 		"CRUX_TALISMAN_5",
-		"CRUX_TALISMAN_6"
+		"CRUX_TALISMAN_6",
+		"GENERAL_MEDALLION"
 	);
 	private static final List<String> crabHatColors = List.of(
 		"RED",
@@ -93,7 +94,7 @@ public class MissingSlashCommand extends SlashCommand {
 		if (player.isValid()) {
 			if (!player.isInventoryApiEnabled()) {
 				return withApiHelpButton(errorEmbed(player.getEscapedUsername() + "'s inventory API is disabled"));
-			}
+			}//rift.access.consumed_prism
 
 			Map<Integer, InvItem> talismanBag = player.getTalismanBagMap();
 			if (talismanBag == null) {
@@ -110,7 +111,11 @@ public class MissingSlashCommand extends SlashCommand {
 			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
 			List<String> missingTalismans = new ArrayList<>(ALL_TALISMANS);
 
-			missingTalismans.removeAll(riftOnlyTalismans);
+			missingTalismans.removeAll(accessoryBlacklist);
+
+			if (higherDepth(player.profileJson(), "rift.access.consumed_prism", false)) {
+				missingTalismans.remove("RIFT_PRISM");
+			}
 
 			for (String playerItem : playerItems) {
 				if (playerItem.startsWith("PARTY_HAT_CRAB_")) {
