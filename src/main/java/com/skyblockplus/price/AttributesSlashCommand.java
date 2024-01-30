@@ -97,7 +97,12 @@ public class AttributesSlashCommand extends SlashCommand {
 				capitalizeString(attrTwo.replace("_", " "))
 			);
 
-		String formattedId = itemId + "+ATTRIBUTE_SHARD_" + attrOne + "+ATTRIBUTE_SHARD_" + attrTwo;
+		String formattedId =
+			itemId +
+			"+ATTRIBUTE_SHARD_" +
+			(attrOne.equals("VITALITY") ? "MENDING" : attrOne) +
+			"+ATTRIBUTE_SHARD_" +
+			(attrTwo.equals("VITALITY") ? "MENDING" : attrTwo);
 		if (!keys.contains(formattedId)) {
 			return eb.setTitle("Error").appendDescription("\n\nProvided attributes were not found for item");
 		}
@@ -211,8 +216,9 @@ public class AttributesSlashCommand extends SlashCommand {
 						keys
 							.stream()
 							.anyMatch(e ->
-								e.startsWith(finalItemId + "+ATTRIBUTE_SHARD_" + attribute) ||
-								(e.startsWith(finalItemId + "+ATTRIBUTE_SHARD_") && e.endsWith("+ATTRIBUTE_SHARD_" + attribute))
+								e.startsWith(finalItemId + "+ATTRIBUTE_SHARD_" + (attribute.equals("VITALITY") ? "MENDING" : attribute)) ||
+								(e.startsWith(finalItemId + "+ATTRIBUTE_SHARD_") &&
+									e.endsWith("+ATTRIBUTE_SHARD_" + (attribute.equals("VITALITY") ? "MENDING" : attribute)))
 							)
 					)
 					.map(e -> capitalizeString(e.replace("_", " ")))

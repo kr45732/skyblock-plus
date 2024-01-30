@@ -500,7 +500,7 @@ public class SettingsExecute {
 			} else if (args.length == 2) {
 				JsonArray automatedGuilds = higherDepth(serverSettings, "automatedGuilds").getAsJsonArray();
 				if (automatedGuilds.isEmpty()) {
-					eb = defaultSettingsEmbed().setDescription("No guilds setup");
+					eb = defaultSettingsEmbed("No guilds setup");
 				} else {
 					EmbedBuilder eb1 = defaultSettingsEmbed();
 					for (JsonElement automatedGuild : automatedGuilds) {
@@ -635,7 +635,7 @@ public class SettingsExecute {
 		ebFieldString += "**" + displaySettings(jacobSettings, "enable") + "**";
 		ebFieldString += "\n• **Channel:** " + displaySettings(jacobSettings, "channel");
 		ebFieldString += "\n• **Crops:** " + displaySettings(jacobSettings, "crops");
-		return defaultSettingsEmbed().setDescription(ebFieldString);
+		return defaultSettingsEmbed(ebFieldString);
 	}
 
 	public EmbedBuilder setJacobChannel(String channelMention) {
@@ -773,7 +773,7 @@ public class SettingsExecute {
 		String ebFieldString = "";
 		ebFieldString += "**" + displaySettings(eventSettings, "enable") + "**";
 		ebFieldString += "\n• **Events:** " + displaySettings(eventSettings, "events");
-		return defaultSettingsEmbed().setDescription(ebFieldString);
+		return defaultSettingsEmbed(ebFieldString);
 	}
 
 	public EmbedBuilder removeEvent(String eventIn) {
