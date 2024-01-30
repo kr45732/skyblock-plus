@@ -67,19 +67,19 @@ public class FlipsSlashCommand extends SlashCommand {
 			.limit(15)
 			.collect(Collectors.toCollection(ArrayList::new))) {
 			String itemId = higherDepth(auction, "id").getAsString();
-			String altItemId = itemId.contains("+") ? itemId.split("\\+")[0] : itemId;
+			itemId = itemId.contains("+") ? itemId.split("\\+")[0] : itemId;
 			if (isVanillaItem(itemId) || itemId.equals("BEDROCK")) {
 				continue;
 			}
 
-			int sales = higherDepth(avgAuctionJson, altItemId + ".sales", 0);
+			int sales = higherDepth(avgAuctionJson, itemId + ".sales", 0);
 			if (sales < 5) {
 				continue;
 			}
 
 			double resellPrice = Math.min(
 				higherDepth(auction, "past_bin_price").getAsLong(),
-				higherDepth(avgAuctionJson, itemId + ".price", higherDepth(avgAuctionJson, altItemId + ".price").getAsDouble())
+				higherDepth(avgAuctionJson, itemId + ".price", higherDepth(avgAuctionJson, itemId + ".price").getAsDouble())
 			);
 			long buyPrice = higherDepth(auction, "starting_bid").getAsLong();
 			double profit = calculateWithTaxes(resellPrice) - buyPrice;
@@ -92,7 +92,7 @@ public class FlipsSlashCommand extends SlashCommand {
 			String auctionUuid = higherDepth(auction, "uuid").getAsString();
 
 			eb.addField(
-				getEmoji(altItemId) + " " + itemName,
+				getEmoji(itemId) + " " + itemName,
 				"**Price:** " +
 				roundAndFormat(buyPrice) +
 				"\n**Estimated Profit:** " +

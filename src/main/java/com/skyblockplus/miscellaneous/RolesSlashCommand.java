@@ -505,7 +505,7 @@ public class RolesSlashCommand extends SlashCommand {
 		}
 
 		private static String roleDeletedString(String name) {
-			return "<@&" + name + "\n";
+			return "<@&" + name + ">\n";
 		}
 
 		@Override

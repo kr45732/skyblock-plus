@@ -487,7 +487,7 @@ public class HelpSlashCommand extends SlashCommand {
 								new HelpData("disable", "Disable automatic verify."),
 								new HelpData("message", "The message that users will see when verifying.", "message <message>")
 									.addExamples("message Run /link <IGN> replacing IGN with your IGN to verify!"),
-								new HelpData("role", "Modify roles given on verification")
+								new HelpData("roles", "Modify roles given on verification")
 									.addSubcommands(
 										new HelpData(
 											"add",
@@ -984,8 +984,8 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings verify", "Get the current verify settings for the bot") +
 			create("settings verify <enable|disable>", "Enable or disable automatic verify") +
 			create("settings verify message <message>", "The message that users will see when verifying") +
-			create("settings verify role add <@role>", "Add a role that user will receive upon being verified") +
-			create("settings verify role remove <@role>", "Remove a verify role") +
+			create("settings verify roles add <@role>", "Add a role that user will receive upon being verified") +
+			create("settings verify roles remove <@role>", "Remove a verify role") +
 			create("settings verify channel <#channel>", "Channel where the verify message and button will be sent") +
 			create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none") +
 			create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
