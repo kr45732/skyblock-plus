@@ -187,8 +187,7 @@ public class HelpSlashCommand extends SlashCommand {
 				// Auctions
 				new HelpData(
 					"auctions",
-					"Get and/or track a player's unclaimed auctions on all profiles. Set verbose to" +
-					" true to show an estimated price breakdown for each auction.",
+					"Get and/or track a player's unclaimed auctions on all profiles. Set verbose to true to show an estimated price breakdown for each auction.",
 					"auctions [player] [filter] [sort] [verbose]"
 				)
 					.setCategory("price"),
@@ -221,9 +220,9 @@ public class HelpSlashCommand extends SlashCommand {
 				)
 					.addExamples("price Necron's Chestplate ✪✪✪✪✪")
 					.setCategory("price"),
-				new HelpData("bits", "Get the coins to bits ratio for items in the bits shop.", "bits").setCategory("price"),
-				new HelpData("copper", "Get the coins to copper ratio for items in the SkyMart shop.", "copper").setCategory("price"),
-				new HelpData("flips", "Get current auction flips (**experimental**).", "flips").setCategory("price"),
+				new HelpData("bits", "Get the coins to bits ratio for items in the bits shop.").setCategory("price"),
+				new HelpData("copper", "Get the coins to copper ratio for items in the SkyMart shop.").setCategory("price"),
+				new HelpData("flips", "Get current auction flips (**experimental**).").setCategory("price"),
 				// Inventory
 				new HelpData("inventory", "Main inventory command.")
 					.addSubcommands(
@@ -320,9 +319,10 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("fetchur", "Get today's fetchur item.").setCategory("miscellaneous"),
 				new HelpData("level", "Get a player's skyblock level.", "level [player] [profile]").setCategory("miscellaneous"),
 				new HelpData("collections", "Get a player's collections.", "collections [player] [profile]").setCategory("miscellaneous"),
-				new HelpData("jacob [crop]", "Get the upcoming contests and their crops.").setCategory("miscellaneous"),
+				new HelpData("jacob", "Get the upcoming contests and their crops.", "jacob [crop]").setCategory("miscellaneous"),
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
-				new HelpData("leaderboard", "Get a global leaderboard.", "leaderboard <type>").setCategory("miscellaneous"),
+				new HelpData("leaderboard", "Get a global leaderboard.", "leaderboard <type> [player] [gamemode] [page] [rank] [amount]")
+					.setCategory("miscellaneous"),
 				new HelpData("skyblock", "Get an overview of a player's Skyblock profiles", "skyblock [player] [profile]")
 					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
@@ -369,8 +369,7 @@ public class HelpSlashCommand extends SlashCommand {
 						new HelpData("leaderboard", "Get the leaderboard for current event."),
 						new HelpData(
 							"end",
-							"Force end the event. If silent is true, the event will be canceled and no" +
-							" prizes or winners will be announced.",
+							"Force end the event. If silent is true, the event will be canceled and no prizes or winners will be announced.",
 							"end [silent]"
 						)
 					)
@@ -572,7 +571,8 @@ public class HelpSlashCommand extends SlashCommand {
 									"sync",
 									"Enable or disable automatic roles claim sync. This is the same as" +
 									" running `/roles claim` automatically every hour (up to 45" +
-									" members will be updated per sync)."
+									" members will be updated per sync).",
+									"sync <enable|disable>"
 								)
 							),
 						new HelpData("guild", "Main command for automatic guild (application and guild role/ranks).")
@@ -748,8 +748,7 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData(
 					"reload",
 					"Reload the automatic guild application(s) and automatic verification settings." +
-					" This is required for most changes to take effect for both of these" +
-					" features."
+					" This is required for most changes to take effect for both of these features."
 				)
 					.setCategory("settings")
 			)
