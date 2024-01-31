@@ -43,10 +43,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.IMentionable;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -468,20 +465,18 @@ public class RolesSlashCommand extends SlashCommand {
 
 				if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
 					if (!toAdd.isEmpty()) {
-						eb.appendDescription(
-							"\n\n**Added Roles (" +
-							toAdd.size() +
-							")**\n" +
-							toAdd.stream().map(IMentionable::getAsMention).collect(Collectors.joining("\n"))
+						eb.addField(
+							"Added Roles (" + toAdd.size() + ")",
+							truncateRolesString(toAdd.stream().map(IMentionable::getAsMention).collect(Collectors.joining("\n"))),
+							false
 						);
 					}
 
 					if (!toRemove.isEmpty()) {
-						eb.appendDescription(
-							"\n\n**Removed Roles (" +
-							toRemove.size() +
-							")**\n" +
-							toRemove.stream().map(IMentionable::getAsMention).collect(Collectors.joining("\n"))
+						eb.addField(
+							"Removed Roles (" + toRemove.size() + ")",
+							truncateRolesString(toRemove.stream().map(IMentionable::getAsMention).collect(Collectors.joining("\n"))),
+							false
 						);
 					}
 				} else {
@@ -493,11 +488,34 @@ public class RolesSlashCommand extends SlashCommand {
 				}
 
 				if (!errorRoles.isEmpty()) {
-					eb.addField("Error Roles", errorRoles.toString(), false);
+					eb.addField("Error Roles", truncateRolesString(errorRoles), false);
 				}
 			}
 
 			return new Tuple3<>(eb, toAdd, toRemove);
+		}
+
+		private static String truncateRolesString(CharSequence roles) {
+			if (roles.length() <= MessageEmbed.VALUE_MAX_LENGTH) {
+				return roles.toString();
+			}
+
+			StringBuilder out = new StringBuilder();
+			String[] split = roles.toString().split("\n");
+			for (int i = 0; i < split.length; i++) {
+				String role = split[i] + "\n";
+				int rolesLeft = split.length - i;
+				String endStr = "... " + rolesLeft + " more role" + (rolesLeft > 1 ? "s" : "");
+
+				if (out.length() + role.length() > MessageEmbed.VALUE_MAX_LENGTH - endStr.length()) {
+					out.append(endStr);
+					break;
+				}
+
+				out.append(role);
+			}
+
+			return out.toString();
 		}
 
 		private static String roleChangeString(Role role) {

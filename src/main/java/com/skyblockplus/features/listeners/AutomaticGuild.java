@@ -116,8 +116,10 @@ public class AutomaticGuild {
 				.values()
 				.forEach(g -> {
 					try {
-						TimeUnit.SECONDS.sleep(1);
-						g.updateGuild();
+						if (g.updateGuild()) {
+							// Only sleep if an update was actually performed
+							TimeUnit.SECONDS.sleep(1);
+						}
 					} catch (Exception ignored) {}
 				}),
 		5,
@@ -444,13 +446,13 @@ public class AutomaticGuild {
 	}
 
 	/* Automated Guild Methods */
-	public void updateGuild() {
+	public boolean updateGuild() {
 		try {
 			long startTime = System.currentTimeMillis();
 
 			Guild guild = jda.getGuildById(guildId);
 			if (guild == null) {
-				return;
+				return false;
 			}
 
 			JsonElement serverSettings = database.getServerSettings(guild.getId());
@@ -458,7 +460,7 @@ public class AutomaticGuild {
 
 			// Should only happen if the server settings don't exist
 			if (serverSettings == null || guildSettings == null) {
-				return;
+				return false;
 			}
 
 			boolean verifyEnabled = higherDepth(serverSettings, "automatedVerify.enableAutomaticSync", false);
@@ -481,7 +483,7 @@ public class AutomaticGuild {
 			}
 
 			if (filteredGuildSettings.isEmpty() && !verifyEnabled && !rolesEnabled) {
-				return;
+				return false;
 			}
 
 			List<String> blacklist = streamJsonArray(guildMap.get(guildId).getBlacklist())
@@ -850,6 +852,8 @@ public class AutomaticGuild {
 		} catch (Exception e) {
 			log.error("updateGuild - " + guildId, e);
 		}
+
+		return true;
 	}
 
 	/* Fetchur */

@@ -27,6 +27,7 @@ import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -46,7 +47,7 @@ public class MayorSlashCommand extends SlashCommand {
 	public static MessageEditBuilder getMayor() {
 		AutomaticGuild automaticGuild = guildMap.get("796790757947867156");
 
-		List<Button> buttons = automaticGuild.lastMayorElectedMessage.getButtons();
+		List<Button> buttons = new ArrayList<>(automaticGuild.lastMayorElectedMessage.getButtons());
 		if (automaticGuild.lastMayorElectionOpenMessage != null) {
 			buttons.add(Button.primary("mayor_current_election_button", "Current Election"));
 		}
