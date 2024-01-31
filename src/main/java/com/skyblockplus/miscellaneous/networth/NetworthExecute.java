@@ -813,12 +813,14 @@ public class NetworthExecute {
 				}
 
 				double miscPrice = getLowestPrice(attribute.getKey());
-				if (attributesBaseCosts.containsKey(item.getId())) {
-					double calcBasePrice = getLowestPrice(attributesBaseCosts.get(item.getId()));
-					if (calcBasePrice > 0) {
-						miscPrice = Math.min(miscPrice, calcBasePrice);
-					}
-				} else if (isCrimsonArmor(item.getId(), false)) {
+				// TODO: check this
+				//				if (attributesBaseCosts.containsKey(item.getId())) {
+				//					double calcBasePrice = getLowestPrice(attributesBaseCosts.get(item.getId()));
+				//					if (calcBasePrice > 0) {
+				//						miscPrice = Math.min(miscPrice, calcBasePrice);
+				//					}
+				//				} else
+				if (isCrimsonArmor(item.getId(), false)) {
 					double calcBasePrice = Stream
 						.of("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS")
 						.map(a ->
@@ -841,7 +843,9 @@ public class NetworthExecute {
 						.append(attribute.getKey() + ";" + attribute.getValue())
 						.append("\",\"total\":\"")
 						.append(simplifyNumber(miscPrice * count))
-						.append("\",\"cost\":\"")
+						.append("\",\"count\":")
+						.append(count)
+						.append(",\"cost\":\"")
 						.append(simplifyNumber(miscPrice))
 						.append("\"},");
 				}
