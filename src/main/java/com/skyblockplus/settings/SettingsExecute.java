@@ -2822,7 +2822,7 @@ public class SettingsExecute {
 	}
 
 	public boolean isValidTextChannel(String roleMention) {
-		return checkRole(roleMention) instanceof TextChannel;
+		return checkTextChannel(roleMention) instanceof TextChannel;
 	}
 
 	public Object checkTextChannel(String channelMention) {
