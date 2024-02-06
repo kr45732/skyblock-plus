@@ -2821,8 +2821,8 @@ public class SettingsExecute {
 		return category;
 	}
 
-	public boolean isValidTextChannel(String roleMention) {
-		return checkTextChannel(roleMention) instanceof TextChannel;
+	public boolean isValidTextChannel(String channelMention) {
+		return checkTextChannel(channelMention) instanceof TextChannel;
 	}
 
 	public Object checkTextChannel(String channelMention) {
