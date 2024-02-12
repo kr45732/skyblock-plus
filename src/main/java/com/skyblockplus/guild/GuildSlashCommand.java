@@ -1178,6 +1178,7 @@ public class GuildSlashCommand extends SlashCommand {
 			String guild = event.getOptionStr("guild");
 			if (guild != null) {
 				event.paginate(getRanks(null, guild, Player.Gamemode.of(event.getOptionStr("gamemode", "all")), event));
+				return;
 			}
 
 			if (event.invalidPlayerOption()) {
