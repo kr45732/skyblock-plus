@@ -879,8 +879,12 @@
           "requirements": [
             [
               {
-                "amount": 120,
+                "amount": 150,
                 "type": "level"
+              },
+              {
+                "amount": 30,
+                "type": "skills"
               }
             ]
           ],
