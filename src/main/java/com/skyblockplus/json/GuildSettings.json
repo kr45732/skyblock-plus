@@ -957,5 +957,65 @@
         }
       ]
     }
+  },
+  "61e45a648ea8c991568c9b77": {
+    "name": "Tasty Fish",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "lake master",
+        "sea conqueror"
+      ],
+      "default_rank": {
+        "requirements": [],
+        "names": [
+          "beginner angler"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 240,
+                "type": "level"
+              },
+              {
+                "amount": 8000,
+                "type": "weight"
+              },
+              {
+                "amount": 2635200,
+                "type": "duration"
+              }
+            ]
+          ],
+          "names": [
+            "fish fanatic"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 280,
+                "type": "level"
+              },
+              {
+                "amount": 12000,
+                "type": "weight"
+              },
+              {
+                "amount": 7905600,
+                "type": "duration"
+              }
+            ]
+          ],
+          "names": [
+            "pond fisher"
+          ]
+        }
+      ]
+    }
   }
 }
