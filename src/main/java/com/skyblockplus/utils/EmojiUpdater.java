@@ -511,6 +511,7 @@ public class EmojiUpdater {
 					String name = idToName(entry.getKey())
 						.toLowerCase()
 						.replace("⚚ ", "starred ")
+						.replace(", ", "_")
 						.replace(" ", "_")
 						.replace("-", "_")
 						.replace("___", "_")
@@ -537,7 +538,8 @@ public class EmojiUpdater {
 						.replace("extreme_bingo_card_extreme_bingo_1", "extreme_bingo_card")
 						.replace("travel_scroll_to_the_wizard_tower", "travel_scroll_wizard_tower")
 						.replace("perma_jelled_garlic_flavored_re_heated_gummy_polar_bear", "gummy_polar_bear_accessory")
-						.replace("aspect_of_the_jerry,_signature_edition", "aspect_of_the_jerry_signature");
+						.replace("aspect_of_the_jerry_signature_edition", "aspect_of_the_jerry_signature")
+						.replace("cherry_blossom_mithril_golem_skin", "cherry_blosom_mithril_golem_skin");
 
 					name =
 						switch (name = name.startsWith("_") ? name.substring(1) : name) {
