@@ -702,7 +702,7 @@ public class ApiHandler {
 					database.insertLinkedAccount(
 						new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), uuidStruct.username()),
 						null,
-						null
+						null // Discord does not change
 					);
 				}
 			}

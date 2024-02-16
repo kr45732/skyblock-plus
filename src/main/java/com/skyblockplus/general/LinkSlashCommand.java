@@ -140,8 +140,8 @@ public class LinkSlashCommand extends SlashCommand {
 
 		LinkedAccount toAdd = new LinkedAccount(Instant.now().toEpochMilli(), member.getId(), playerInfo.uuid(), playerInfo.username());
 
-		JsonElement verifySettings = database.getVerifySettings(guild.getId());
-		if (database.insertLinkedAccount(toAdd, member, verifySettings)) {
+		JsonElement serverSettings = database.getServerSettings(guild.getId());
+		if (database.insertLinkedAccount(toAdd, member, serverSettings)) {
 			EmbedBuilder eb;
 			JsonElement blacklisted = streamJsonArray(guildMap.get(guild.getId()).getBlacklist())
 				.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(toAdd.uuid()))
@@ -150,6 +150,7 @@ public class LinkSlashCommand extends SlashCommand {
 			if (blacklisted != null) {
 				eb = errorEmbed("You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`");
 			} else {
+				JsonElement verifySettings = higherDepth(serverSettings, "automatedVerify");
 				if (verifySettings != null) {
 					String[] result = updateLinkedUser(verifySettings, toAdd, member);
 					String out =

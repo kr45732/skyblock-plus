@@ -42,6 +42,7 @@ import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.general.LinkSlashCommand;
+import com.skyblockplus.general.UnlinkSlashCommand;
 import com.skyblockplus.general.help.HelpData;
 import com.skyblockplus.general.help.HelpSlashCommand;
 import com.skyblockplus.miscellaneous.MayorSlashCommand;
@@ -51,6 +52,7 @@ import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.ModifyMemberRecord;
+import groovy.lang.Tuple2;
 import groovy.lang.Tuple3;
 import java.io.File;
 import java.time.Duration;
@@ -490,7 +492,8 @@ public class AutomaticGuild {
 				.map(u -> higherDepth(u, "uuid").getAsString())
 				.collect(Collectors.toCollection(ArrayList::new));
 
-			List<Member> inGuildUsers = new ArrayList<>();
+			List<Member> linkedMembers = new ArrayList<>();
+			List<Member> notLinkedMembers = new ArrayList<>();
 			Map<String, LinkedAccount> discordToUuid = new HashMap<>();
 			int counterUpdate = 0;
 			if (roleOrRankEnabled || verifyEnabled || rolesEnabled) {
@@ -504,12 +507,15 @@ public class AutomaticGuild {
 
 				CountDownLatch latch = new CountDownLatch(1);
 				guild
-					.findMembers(member -> discordToUuid.containsKey(member.getId()))
-					.onSuccess(members -> {
-						inGuildUsers.addAll(members);
-						latch.countDown();
+					.loadMembers(m -> {
+						if (discordToUuid.containsKey(m.getId())) {
+							linkedMembers.add(m);
+						} else {
+							notLinkedMembers.add(m);
+						}
 					})
-					.onError(error -> latch.countDown());
+					.onSuccess(ignored -> latch.countDown())
+					.onError(ignored -> latch.countDown());
 
 				try {
 					latch.await(15, TimeUnit.SECONDS);
@@ -561,7 +567,7 @@ public class AutomaticGuild {
 					}
 				}
 				List<String> uuidsToRequest = new ArrayList<>();
-				for (Member linkedMember : inGuildUsers) {
+				for (Member linkedMember : linkedMembers) {
 					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
 					if ((checkVerify && guild.getSelfMember().canInteract(linkedMember)) || rolesEnabled) {
 						uuidsToRequest.add(linkedAccount.uuid());
@@ -572,8 +578,7 @@ public class AutomaticGuild {
 					.stream()
 					.collect(Collectors.toMap(e -> e.getString("uuid"), e -> e));
 
-				for (Member linkedMember : inGuildUsers) {
-					// updatedMembers.add returns true if ele not in set
+				for (Member linkedMember : linkedMembers) {
 					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
 					List<Role> toAddRoles = new ArrayList<>();
 					List<Role> toRemoveRoles = new ArrayList<>();
@@ -731,7 +736,7 @@ public class AutomaticGuild {
 
 						Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getGuildMemberRole()) : null;
 						Role applyGuestRole = guildMap.get(guildId).applyGuestRole;
-						for (Member linkedMember : inGuildUsers) {
+						for (Member linkedMember : linkedMembers) {
 							List<Role> rolesToAdd = new ArrayList<>();
 							List<Role> rolesToRemove = new ArrayList<>();
 
@@ -800,6 +805,23 @@ public class AutomaticGuild {
 							currentSetting.setGuildCounterEnable("false");
 							database.setGuildSettings(guild.getId(), gson.toJsonTree(currentSetting));
 						}
+					}
+				}
+			}
+
+			if (!notLinkedMembers.isEmpty()) {
+				Tuple2<List<Role>, List<Role>> roleChanges = UnlinkSlashCommand.unlinkRoleChanges(guild, serverSettings);
+				if (!roleChanges.getV1().isEmpty() || !roleChanges.getV2().isEmpty()) {
+					for (Member member : notLinkedMembers) {
+						memberToRoleChanges.compute(
+							member,
+							(k, v) ->
+								(v == null ? new ModifyMemberRecord() : v).update(
+										guild.getSelfMember(),
+										roleChanges.getV1(),
+										roleChanges.getV2()
+									)
+						);
 					}
 				}
 			}

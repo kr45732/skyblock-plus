@@ -225,7 +225,7 @@ public class Database {
 		return dataSource.getConnection();
 	}
 
-	public boolean insertLinkedAccount(LinkedAccount linkedAccount, Member member, JsonElement verifySettings) {
+	public boolean insertLinkedAccount(LinkedAccount linkedAccount, Member member, JsonElement serverSettings) {
 		try {
 			boolean upsert = false;
 
@@ -246,10 +246,10 @@ public class Database {
 				try (ResultSet response = statement.executeQuery()) {
 					if (response.next()) {
 						upsert = true;
-						if (member != null && verifySettings != null) {
+						if (member != null && serverSettings != null) {
 							String discordOld = response.getString("discord");
 							if (!discord.equals(discordOld)) {
-								UnlinkSlashCommand.unlinkAccount(member, verifySettings);
+								UnlinkSlashCommand.unlinkAccount(member, serverSettings);
 							}
 						}
 					}

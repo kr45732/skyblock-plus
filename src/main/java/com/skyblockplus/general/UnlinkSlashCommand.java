@@ -19,18 +19,18 @@
 package com.skyblockplus.general;
 
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
-import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
 import static com.skyblockplus.utils.utils.Utils.database;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import groovy.lang.Tuple2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -44,33 +44,64 @@ public class UnlinkSlashCommand extends SlashCommand {
 		this.name = "unlink";
 	}
 
-	public static EmbedBuilder unlinkAccount(Member member, JsonElement verifySettings) {
-		if (verifySettings == null) { // Was run by a user
-			database.deleteByDiscord(member.getId());
-			verifySettings = database.getVerifySettings(member.getGuild().getId());
+	public static Tuple2<List<Role>, List<Role>> unlinkRoleChanges(Guild guild, JsonElement serverSettings) {
+		List<Role> toAdd = new ArrayList<>();
+		List<Role> toRemove = new ArrayList<>();
+
+		JsonElement verifySettings = higherDepth(serverSettings, "automatedVerify");
+		try {
+			toAdd.add(guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
+		} catch (Exception ignored) {}
+
+		for (JsonElement verifiedRole : higherDepth(verifySettings, "verifiedRoles").getAsJsonArray()) {
+			try {
+				toRemove.add(guild.getRoleById(verifiedRole.getAsString()));
+			} catch (Exception ignored) {}
 		}
 
-		if (verifySettings != null && !verifySettings.isJsonNull()) {
-			try {
-				List<Role> toAdd = new ArrayList<>();
-				try {
-					toAdd.add(member.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
-				} catch (Exception ignored) {}
-				List<Role> toRemove = streamJsonArray(higherDepth(verifySettings, "verifiedRoles"))
-					.map(r -> {
-						try {
-							return member.getGuild().getRoleById(r.getAsString());
-						} catch (Exception e) {
-							return null;
-						}
-					})
-					.filter(Objects::nonNull)
-					.collect(Collectors.toCollection(ArrayList::new));
-
-				if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
-					member.getGuild().modifyMemberRoles(member, toAdd, toRemove).queue();
+		JsonElement rolesSettings = higherDepth(serverSettings, "automatedRoles");
+		if (higherDepth(rolesSettings, "enable", false) && higherDepth(rolesSettings, "roles.[0]") != null) {
+			for (JsonElement role : higherDepth(rolesSettings, "roles").getAsJsonArray()) {
+				for (JsonElement level : higherDepth(role, "levels").getAsJsonArray()) {
+					try {
+						toRemove.add(guild.getRoleById(higherDepth(level, "roleId").getAsString()));
+					} catch (Exception ignored) {}
 				}
+			}
+		}
+
+		for (JsonElement guildSettings : higherDepth(serverSettings, "automatedGuilds").getAsJsonArray()) {
+			try {
+				toRemove.add(guild.getRoleById(higherDepth(guildSettings, "guildMemberRole").getAsString()));
 			} catch (Exception ignored) {}
+
+			for (JsonElement guildRank : higherDepth(guildSettings, "guildRanks").getAsJsonArray()) {
+				try {
+					toRemove.add(guild.getRoleById(higherDepth(guildRank, "roleId").getAsString()));
+				} catch (Exception ignored) {}
+			}
+		}
+
+		toAdd.removeIf(Objects::isNull);
+		toRemove.removeIf(Objects::isNull);
+
+		return new Tuple2<>(toAdd, toRemove);
+	}
+
+	public static EmbedBuilder unlinkAccount(Member member, JsonElement serverSettings) {
+		if (serverSettings == null) { // This command was run by a user
+			database.deleteByDiscord(member.getId());
+			serverSettings = database.getServerSettings(member.getGuild().getId());
+		}
+
+		if (serverSettings != null && !serverSettings.isJsonNull()) {
+			Tuple2<List<Role>, List<Role>> roleChanges = unlinkRoleChanges(member.getGuild(), serverSettings);
+
+			if (!roleChanges.getV1().isEmpty() || !roleChanges.getV2().isEmpty()) {
+				try {
+					member.getGuild().modifyMemberRoles(member, roleChanges.getV1(), roleChanges.getV2()).queue();
+				} catch (Exception ignored) {}
+			}
 		}
 
 		return defaultEmbed("Success").setDescription("You were unlinked");
