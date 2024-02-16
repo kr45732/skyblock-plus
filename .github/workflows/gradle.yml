@@ -28,10 +28,3 @@ jobs:
           cache: "gradle"
       - name: Build with Gradle
         run: chmod +x gradlew && ./gradlew build --no-daemon
-      - name: Format code
-        uses: kr45732/prettier_action_java@v1
-        with:
-          branch: ${{ github.head_ref }}
-          commit_message: Automatically format code
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
