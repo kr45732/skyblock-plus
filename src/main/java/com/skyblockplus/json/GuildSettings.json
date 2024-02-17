@@ -1017,5 +1017,61 @@
         }
       ]
     }
+  },
+  "5fb6e6708ea8c9d1008d3bb3": {
+    "name": "Contrived",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "staff"
+      ],
+      "default_rank": {
+        "requirements": [],
+        "names": [
+          "barely alive"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 50000,
+                "type": "gxp"
+              }
+            ]
+          ],
+          "names": [
+            "sloth"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 85000,
+                "type": "gxp"
+              }
+            ]
+          ],
+          "names": [
+            "tryhard"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 200000,
+                "type": "gxp"
+              }
+            ]
+          ],
+          "names": [
+            "superior"
+          ]
+        }
+      ]
+    }
   }
 }
