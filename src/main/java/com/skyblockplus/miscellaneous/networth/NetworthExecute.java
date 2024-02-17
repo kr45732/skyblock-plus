@@ -703,7 +703,16 @@ public class NetworthExecute {
 					}
 
 					if (itemCost == 0) {
-						itemCost = getLowestPrice(itemId, false, false, source);
+						if (item.isShiny()) {
+							itemCost = getLowestPrice(itemId + "_SHINY", false, false, source);
+							if (itemCost > 0 && verbose) {
+								source.append(" - shiny");
+							}
+						}
+
+						if (itemCost == 0) {
+							itemCost = getLowestPrice(itemId, false, false, source);
+						}
 					}
 
 					if (item.getShensAuctionPrice() != -1 && item.getShensAuctionPrice() * 0.9 > itemCost) {

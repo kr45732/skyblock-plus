@@ -1728,13 +1728,9 @@ public class SettingsExecute {
 		}
 		Role role = (Role) eb;
 
-		JsonObject allRoleSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
-		int totalRoleCount = 0;
-		for (Entry<String, JsonElement> i : allRoleSettings.entrySet()) {
-			try {
-				totalRoleCount += higherDepth(i.getValue(), "levels").getAsJsonArray().size();
-			} catch (Exception ignored) {}
-		}
+		int totalRoleCount = streamJsonArray(higherDepth(database.getRolesSettings(guild.getId()), "roles"))
+			.mapToInt(e -> higherDepth(e, "levels").getAsJsonArray().size())
+			.sum();
 		if (totalRoleCount >= 150) {
 			return errorEmbed("You have reached the max number of total roles (150/150)");
 		}

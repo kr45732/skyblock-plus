@@ -426,6 +426,8 @@ public class Utils {
 							itemInfo.setId(itemInfo.getId() + "_" + item.get("tag.ExtraAttributes.new_years_cake"));
 						}
 
+						itemInfo.setShiny(item.getInt("tag.ExtraAttributes.is_shiny", 0) == 1);
+
 						if (
 							item.containsKey("tag.ExtraAttributes.price") &&
 							item.containsKey("tag.ExtraAttributes.auction") &&

@@ -37,6 +37,7 @@ public class InvItem {
 	private int hpbCount = 0;
 	private int fumingCount = 0;
 	private boolean recombobulated = false;
+	private boolean shiny = false;
 	private String modifier;
 	private String rarity;
 	private String skin;
