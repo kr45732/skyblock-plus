@@ -510,7 +510,7 @@ public class AutomaticGuild {
 					.loadMembers(m -> {
 						if (discordToUuid.containsKey(m.getId())) {
 							linkedMembers.add(m);
-						} else {
+						} else if (!m.getUser().isBot()) {
 							notLinkedMembers.add(m);
 						}
 					})
