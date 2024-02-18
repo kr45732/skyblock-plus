@@ -104,12 +104,11 @@ public class MuseumSlashCommand extends SlashCommand {
 			}
 
 			Set<String> bypassedItems = new HashSet<>();
-			for (Map.Entry<String, JsonElement> entry : getConstant("MUSEUM_PARENTS").getAsJsonObject().entrySet()) {
-				List<String> value = streamJsonArray(entry.getValue()).map(JsonElement::getAsString).toList();
-				for (int i = value.size() - 1; i >= 0; i--) {
-					if (items.contains(value.get(i))) {
+			for (Map.Entry<String, List<String>> entry : MUSEUM_PARENTS.entrySet()) {
+				for (int i = entry.getValue().size() - 1; i >= 0; i--) {
+					if (items.contains(entry.getValue().get(i))) {
 						bypassedItems.add(entry.getKey());
-						bypassedItems.addAll(value.subList(0, i));
+						bypassedItems.addAll(entry.getValue().subList(0, i));
 						break;
 					}
 				}
@@ -160,12 +159,11 @@ public class MuseumSlashCommand extends SlashCommand {
 
 			JsonElement museumJson = hypixelResponse.get(player.getUuid());
 			Set<String> items = new HashSet<>(higherDepth(museumJson, "items").getAsJsonObject().keySet());
-			for (Map.Entry<String, JsonElement> entry : getConstant("MUSEUM_PARENTS").getAsJsonObject().entrySet()) {
-				List<String> value = streamJsonArray(entry.getValue()).map(JsonElement::getAsString).toList();
-				for (int i = value.size() - 1; i >= 0; i--) {
-					if (items.contains(value.get(i))) {
+			for (Map.Entry<String, List<String>> entry : MUSEUM_PARENTS.entrySet()) {
+				for (int i = entry.getValue().size() - 1; i >= 0; i--) {
+					if (items.contains(entry.getValue().get(i))) {
 						items.add(entry.getKey());
-						items.addAll(value.subList(0, i));
+						items.addAll(entry.getValue().subList(0, i));
 						break;
 					}
 				}

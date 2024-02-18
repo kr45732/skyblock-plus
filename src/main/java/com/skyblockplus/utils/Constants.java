@@ -21,9 +21,9 @@ package com.skyblockplus.utils;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
-import static com.skyblockplus.utils.utils.Utils.getEmoji;
-import static com.skyblockplus.utils.utils.Utils.gson;
+import static com.skyblockplus.utils.utils.Utils.*;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -1389,6 +1389,7 @@ public class Constants {
 	public static Map<Integer, String> NUMBER_TO_RARITY_MAP;
 	public static List<String> SOULBOUND_ITEMS;
 	public static Map<String, List<String>> CATEGORY_TO_REFORGES;
+	public static Map<String, List<String>> MUSEUM_PARENTS;
 
 	public static void initialize() {
 		try {
@@ -1528,6 +1529,7 @@ public class Constants {
 					.collect(Collectors.toCollection(ArrayList::new));
 			SOULBOUND_ITEMS.add("KUUDRA_FOLLOWER_ARTIFACT");
 
+			/* CATEGORY_TO_REFORGES */
 			CATEGORY_TO_REFORGES = new HashMap<>();
 			for (Map.Entry<String, JsonElement> reforgeStone : getReforgeStonesJson().entrySet()) {
 				String[] itemTypes = higherDepth(reforgeStone.getValue(), "itemTypes").getAsString().split("/");
@@ -1544,6 +1546,29 @@ public class Constants {
 				}
 			}
 			CATEGORY_TO_REFORGES.put("GAUNTLET", ListUtils.union(CATEGORY_TO_REFORGES.get("SWORD"), CATEGORY_TO_REFORGES.get("PICKAXE")));
+
+			/* MUSEUM_PARENTS */
+			MUSEUM_PARENTS = new HashMap<>();
+			JsonObject museumChildren = higherDepth(getMuseumCategoriesJson(), "children").getAsJsonObject();
+			Map<String, String> remainingChildren = new HashMap<>();
+			for (Map.Entry<String, JsonElement> child : museumChildren.entrySet()) {
+				if (!museumChildren.has(child.getValue().getAsString())) {
+					MUSEUM_PARENTS.put(child.getValue().getAsString(), new ArrayList<>(List.of(child.getKey())));
+				} else {
+					remainingChildren.put(child.getValue().getAsString(), child.getKey());
+				}
+			}
+			boolean foundChild;
+			do {
+				foundChild = false;
+				for (Map.Entry<String, List<String>> child : MUSEUM_PARENTS.entrySet()) {
+					String nestedChild = remainingChildren.get(child.getValue().get(child.getValue().size() - 1));
+					if (nestedChild != null) {
+						child.getValue().add(nestedChild);
+						foundChild = true;
+					}
+				}
+			} while (foundChild);
 		} catch (Exception e) {
 			Main.log.error("Exception while initializing constants", e);
 		}
