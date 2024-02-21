@@ -44,41 +44,53 @@ public class UnlinkSlashCommand extends SlashCommand {
 		this.name = "unlink";
 	}
 
-	public static Tuple2<List<Role>, List<Role>> unlinkRoleChanges(Guild guild, JsonElement serverSettings) {
+	public static Tuple2<List<Role>, List<Role>> unlinkRoleChanges(
+		Guild guild,
+		JsonElement serverSettings,
+		boolean updateVerify,
+		boolean updateRoles,
+		boolean updateGuild
+	) {
 		List<Role> toAdd = new ArrayList<>();
 		List<Role> toRemove = new ArrayList<>();
 
-		JsonElement verifySettings = higherDepth(serverSettings, "automatedVerify");
-		try {
-			toAdd.add(guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
-		} catch (Exception ignored) {}
-
-		for (JsonElement verifiedRole : higherDepth(verifySettings, "verifiedRoles").getAsJsonArray()) {
+		if (updateVerify) {
+			JsonElement verifySettings = higherDepth(serverSettings, "automatedVerify");
 			try {
-				toRemove.add(guild.getRoleById(verifiedRole.getAsString()));
+				toAdd.add(guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
 			} catch (Exception ignored) {}
+
+			for (JsonElement verifiedRole : higherDepth(verifySettings, "verifiedRoles").getAsJsonArray()) {
+				try {
+					toRemove.add(guild.getRoleById(verifiedRole.getAsString()));
+				} catch (Exception ignored) {}
+			}
 		}
 
-		JsonElement rolesSettings = higherDepth(serverSettings, "automatedRoles");
-		if (higherDepth(rolesSettings, "enable", false) && higherDepth(rolesSettings, "roles.[0]") != null) {
-			for (JsonElement role : higherDepth(rolesSettings, "roles").getAsJsonArray()) {
-				for (JsonElement level : higherDepth(role, "levels").getAsJsonArray()) {
-					try {
-						toRemove.add(guild.getRoleById(higherDepth(level, "roleId").getAsString()));
-					} catch (Exception ignored) {}
+		if (updateRoles) {
+			JsonElement rolesSettings = higherDepth(serverSettings, "automatedRoles");
+			if (higherDepth(rolesSettings, "enable", false) && higherDepth(rolesSettings, "roles.[0]") != null) {
+				for (JsonElement role : higherDepth(rolesSettings, "roles").getAsJsonArray()) {
+					for (JsonElement level : higherDepth(role, "levels").getAsJsonArray()) {
+						try {
+							toRemove.add(guild.getRoleById(higherDepth(level, "roleId").getAsString()));
+						} catch (Exception ignored) {}
+					}
 				}
 			}
 		}
 
-		for (JsonElement guildSettings : higherDepth(serverSettings, "automatedGuilds").getAsJsonArray()) {
-			try {
-				toRemove.add(guild.getRoleById(higherDepth(guildSettings, "guildMemberRole").getAsString()));
-			} catch (Exception ignored) {}
-
-			for (JsonElement guildRank : higherDepth(guildSettings, "guildRanks").getAsJsonArray()) {
+		if (updateGuild) {
+			for (JsonElement guildSettings : higherDepth(serverSettings, "automatedGuilds").getAsJsonArray()) {
 				try {
-					toRemove.add(guild.getRoleById(higherDepth(guildRank, "roleId").getAsString()));
+					toRemove.add(guild.getRoleById(higherDepth(guildSettings, "guildMemberRole").getAsString()));
 				} catch (Exception ignored) {}
+
+				for (JsonElement guildRank : higherDepth(guildSettings, "guildRanks").getAsJsonArray()) {
+					try {
+						toRemove.add(guild.getRoleById(higherDepth(guildRank, "roleId").getAsString()));
+					} catch (Exception ignored) {}
+				}
 			}
 		}
 
@@ -95,7 +107,7 @@ public class UnlinkSlashCommand extends SlashCommand {
 		}
 
 		if (serverSettings != null && !serverSettings.isJsonNull()) {
-			Tuple2<List<Role>, List<Role>> roleChanges = unlinkRoleChanges(member.getGuild(), serverSettings);
+			Tuple2<List<Role>, List<Role>> roleChanges = unlinkRoleChanges(member.getGuild(), serverSettings, true, true, true);
 
 			if (!roleChanges.getV1().isEmpty() || !roleChanges.getV2().isEmpty()) {
 				try {

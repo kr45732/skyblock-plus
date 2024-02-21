@@ -810,7 +810,13 @@ public class AutomaticGuild {
 			}
 
 			if (!notLinkedMembers.isEmpty()) {
-				Tuple2<List<Role>, List<Role>> roleChanges = UnlinkSlashCommand.unlinkRoleChanges(guild, serverSettings);
+				Tuple2<List<Role>, List<Role>> roleChanges = UnlinkSlashCommand.unlinkRoleChanges(
+					guild,
+					serverSettings,
+					verifyEnabled,
+					rolesEnabled,
+					roleOrRankEnabled
+				);
 				if (!roleChanges.getV1().isEmpty() || !roleChanges.getV2().isEmpty()) {
 					for (Member member : notLinkedMembers) {
 						memberToRoleChanges.compute(
