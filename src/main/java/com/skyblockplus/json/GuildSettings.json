@@ -1073,5 +1073,56 @@
         }
       ]
     }
+  },
+  "63dd804e8ea8c914242cb54d": {
+    "name": "DaySleepers",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "mod",
+        "nightwatch"
+      ],
+      "default_rank": {
+        "requirements": [
+          [
+            {
+              "amount": 210,
+              "type": "level"
+            }
+          ]
+        ],
+        "names": [
+          "sleeper"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 250,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "dreamer"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 300,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "insomniac"
+          ]
+        }
+      ]
+    }
   }
 }
