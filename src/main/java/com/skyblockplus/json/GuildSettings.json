@@ -1124,5 +1124,39 @@
         }
       ]
     }
+  },
+  "5d94866577ce8436b66ad5dd": {
+    "name": "Shadow Hunters",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "hunter"
+      ],
+      "default_rank": {
+        "requirements": [],
+        "names": [
+          "member"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 15552000,
+                "type": "duration"
+              },
+              {
+                "amount": 250,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "veteran"
+          ]
+        }
+      ]
+    }
   }
 }
