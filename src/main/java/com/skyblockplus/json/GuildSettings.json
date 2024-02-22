@@ -891,6 +891,23 @@
           "names": [
             "midgame"
           ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 200,
+                "type": "level"
+              },
+              {
+                "amount": 40,
+                "type": "skills"
+              }
+            ]
+          ],
+          "names": [
+            "lategame"
+          ]
         }
       ]
     }
