@@ -2614,7 +2614,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setSyncUnlinked(boolean syncUnlinked) {
-		int responseCode = database.setSyncUnlinkedMembers(guild.getId(), syncUnlinked);
+		int responseCode = database.setSyncUnlinkedMembers(guild.getId(), "" + syncUnlinked);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}

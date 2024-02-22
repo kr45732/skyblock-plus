@@ -412,7 +412,7 @@ public class HelpSlashCommand extends SlashCommand {
 								),
 								new HelpData(
 									"sync_unlinked",
-									"Toggle whether unlinked members should also be synced for verified roles, automatic roles, and guild roles during automatic updates",
+									"Enable or disable whether unlinked members should also be synced for verified roles, automatic roles, and guild roles during automatic updates.",
 									"sync_unlinked <enable|disable>"
 								)
 							),

@@ -480,7 +480,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> setSyncUnlinkedMembers(String serverId, boolean syncUnlinkedMembers) {
+	public ResponseEntity<HttpStatus> setSyncUnlinkedMembers(String serverId, String syncUnlinkedMembers) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {

@@ -209,7 +209,7 @@ public class Database {
 		return settingsService.setMayorRole(serverId, newSettings).getStatusCode().value();
 	}
 
-	public int setSyncUnlinkedMembers(String serverId, boolean newSettings) {
+	public int setSyncUnlinkedMembers(String serverId, String newSettings) {
 		return settingsService.setSyncUnlinkedMembers(serverId, newSettings).getStatusCode().value();
 	}
 
