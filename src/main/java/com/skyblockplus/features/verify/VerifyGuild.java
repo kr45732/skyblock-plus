@@ -72,6 +72,7 @@ public class VerifyGuild {
 		}
 
 		if (
+			guildMap.get(event.getGuild().getId()).isBlacklistFeatureEnabled("verify") &&
 			streamJsonArray(guildMap.get(event.getGuild().getId()).getBlacklist())
 				.anyMatch(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(linkedUser.uuid()))
 		) {

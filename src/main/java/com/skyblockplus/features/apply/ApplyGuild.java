@@ -264,20 +264,22 @@ public class ApplyGuild {
 			return true;
 		}
 
-		Optional<JsonElement> blacklisted = streamJsonArray(guildMap.get(event.getGuild().getId()).getBlacklist())
-			.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(linkedAccount.uuid()))
-			.findFirst();
-		if (blacklisted.isPresent()) {
-			event
-				.getHook()
-				.editOriginal(
-					client.getError() +
-					" You have been blacklisted with reason `" +
-					higherDepth(blacklisted.get(), "reason").getAsString() +
-					"`"
-				)
-				.queue();
-			return true;
+		if (guildMap.get(event.getGuild().getId()).isBlacklistFeatureEnabled("apply")) {
+			Optional<JsonElement> blacklisted = streamJsonArray(guildMap.get(event.getGuild().getId()).getBlacklist())
+				.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(linkedAccount.uuid()))
+				.findFirst();
+			if (blacklisted.isPresent()) {
+				event
+					.getHook()
+					.editOriginal(
+						client.getError() +
+						" You have been blacklisted with reason `" +
+						higherDepth(blacklisted.get(), "reason").getAsString() +
+						"`"
+					)
+					.queue();
+				return true;
+			}
 		}
 
 		if (higherDepth(currentSettings, "applyScammerCheck", false)) {

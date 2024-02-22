@@ -282,6 +282,8 @@ public class SettingsExecute {
 						case "stop_using" -> stopUsingBlacklist(args[3]);
 						case "remove" -> removeFromBlacklist(args[3]);
 						case "search" -> searchBlacklist(args[3]);
+						case "enable" -> enableBlacklistFeature(args[3]);
+						case "disable" -> disableBlacklistFeature(args[3]);
 						default -> null;
 					};
 			}
@@ -2099,13 +2101,17 @@ public class SettingsExecute {
 			.filter(Objects::nonNull)
 			.map(Guild::getName)
 			.collect(Collectors.joining(", "));
+		String features = streamJsonArray(higherDepth(blacklistSettings, "features"))
+			.map(e -> e.getAsString())
+			.collect(Collectors.joining(", "));
 
 		paginateBuilder.addStrings(
 			"• Shared with: " + (canUse.isEmpty() ? "none" : canUse),
 			"• Using: " + (isUsing.isEmpty() ? "none" : isUsing),
+			"• Enabled for features: " + (features.isEmpty() ? "none" : features),
 			"• Blacklist size (this server): " + currentBlacklist.size()
 		);
-		paginateBuilder.addStrings(Collections.nCopies(27, "").toArray(new String[0]));
+		paginateBuilder.addStrings(Collections.nCopies(26, "").toArray(new String[0]));
 
 		streamJsonArray(higherDepth(blacklistSettings, "isUsing"))
 			.map(g -> higherDepth(database.getBlacklistSettings(g.getAsString()), "blacklist").getAsJsonArray())
@@ -2225,6 +2231,46 @@ public class SettingsExecute {
 			);
 		}
 		return eb;
+	}
+
+	public EmbedBuilder enableBlacklistFeature(String feature) {
+		feature = feature.toLowerCase();
+		if (!feature.equals("verify") && !feature.equals("apply")) {
+			return errorEmbed("Invalid feature type");
+		}
+
+		JsonObject blacklistSettings = getBlacklistSettings();
+		JsonArray features = higherDepth(blacklistSettings, "features").getAsJsonArray();
+		if (!features.contains(new JsonPrimitive(feature))) {
+			features.add(feature);
+		}
+
+		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+		guildMap.get(guild.getId()).setBlacklistFeatures(features);
+
+		return defaultSettingsEmbed("Blacklist enabled for the " + feature + " feature");
+	}
+
+	public EmbedBuilder disableBlacklistFeature(String feature) {
+		feature = feature.toLowerCase();
+		if (!feature.equals("verify") && !feature.equals("apply")) {
+			return errorEmbed("Invalid feature type");
+		}
+
+		JsonObject blacklistSettings = getBlacklistSettings();
+		JsonArray features = higherDepth(blacklistSettings, "features").getAsJsonArray();
+		features.remove(new JsonPrimitive(feature));
+
+		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+		guildMap.get(guild.getId()).setBlacklistFeatures(features);
+
+		return defaultSettingsEmbed("Blacklist disabled for the " + feature + " feature");
 	}
 
 	public EmbedBuilder useBlacklist(String serverId) {

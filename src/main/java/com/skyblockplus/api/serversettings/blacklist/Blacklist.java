@@ -48,4 +48,9 @@ public class Blacklist {
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<String> isUsing = new ArrayList<>();
+
+	// verify or apply
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> features = new ArrayList<>();
 }

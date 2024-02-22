@@ -456,7 +456,13 @@ public class HelpSlashCommand extends SlashCommand {
 								new HelpData("share", "Share your blacklist with another server.", "share <server_id>"),
 								new HelpData("unshare", "Stop sharing your blacklist with another server.", "unshare <server_id>"),
 								new HelpData("use", "Use a shared blacklist from another server.", "use <server_id>"),
-								new HelpData("stop_using", "Stop using a shared blacklist from another server.", "stop_using <server_id>")
+								new HelpData("stop_using", "Stop using a shared blacklist from another server.", "stop_using <server_id>"),
+								new HelpData(
+									"enable",
+									"Blacklisted people will not be able to use this feature. Feature can be verify or apply.",
+									"enable <feature>"
+								),
+								new HelpData("disable", "Blacklisted people will be able to use this feature.", "disable <feature>")
 							),
 						new HelpData("jacob", "Main command for jacob event settings.")
 							.addSecondData("Get the current farming event settings for the bot.", "jacob")

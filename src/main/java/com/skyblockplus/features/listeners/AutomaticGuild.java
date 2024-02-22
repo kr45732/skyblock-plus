@@ -189,6 +189,7 @@ public class AutomaticGuild {
 	private JsonArray blacklist = new JsonArray();
 
 	private List<String> isUsing = new ArrayList<>();
+	private List<String> blacklistFeatures = new ArrayList<>();
 
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
@@ -218,6 +219,7 @@ public class AutomaticGuild {
 		try {
 			blacklist = higherDepth(serverSettings, "blacklist.blacklist").getAsJsonArray();
 			setIsUsing(higherDepth(serverSettings, "blacklist.isUsing").getAsJsonArray());
+			setBlacklistFeatures(higherDepth(serverSettings, "blacklist.features").getAsJsonArray());
 		} catch (Exception ignored) {}
 		try {
 			fetchurChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "fetchurChannel", null));
@@ -501,7 +503,7 @@ public class AutomaticGuild {
 					database
 						.getAllLinkedAccounts()
 						.stream()
-						.filter(o -> !blacklist.contains(o.uuid()))
+						.filter(o -> !isBlacklistFeatureEnabled("verify") || !blacklist.contains(o.uuid()))
 						.collect(Collectors.toMap(LinkedAccount::discord, Function.identity()))
 				);
 
@@ -1475,6 +1477,14 @@ public class AutomaticGuild {
 
 	public void setIsUsing(JsonArray arr) {
 		isUsing = streamJsonArray(arr).map(JsonElement::getAsString).collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	public void setBlacklistFeatures(JsonArray arr) {
+		blacklistFeatures = streamJsonArray(arr).map(JsonElement::getAsString).collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	public boolean isBlacklistFeatureEnabled(String feature) {
+		return blacklistFeatures.contains(feature);
 	}
 
 	public JsonArray getBlacklist() {

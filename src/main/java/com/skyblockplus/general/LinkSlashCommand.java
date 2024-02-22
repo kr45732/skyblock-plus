@@ -42,6 +42,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -143,12 +144,11 @@ public class LinkSlashCommand extends SlashCommand {
 		JsonElement serverSettings = database.getServerSettings(guild.getId());
 		if (database.insertLinkedAccount(toAdd, member, serverSettings)) {
 			EmbedBuilder eb;
-			JsonElement blacklisted = streamJsonArray(guildMap.get(guild.getId()).getBlacklist())
+			Optional<JsonElement> blacklisted = streamJsonArray(guildMap.get(guild.getId()).getBlacklist())
 				.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(toAdd.uuid()))
-				.findFirst()
-				.orElse(null);
-			if (blacklisted != null) {
-				eb = errorEmbed("You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`");
+				.findFirst();
+			if (guildMap.get(guild.getId()).isBlacklistFeatureEnabled("verify") && blacklisted.isPresent()) {
+				eb = errorEmbed("You have been blacklisted with reason `" + higherDepth(blacklisted.get(), "reason").getAsString() + "`");
 			} else {
 				JsonElement verifySettings = higherDepth(serverSettings, "automatedVerify");
 				if (verifySettings != null) {
