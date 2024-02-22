@@ -409,6 +409,11 @@ public class HelpSlashCommand extends SlashCommand {
 									" any of the setup automatic guilds. Requires at least one" +
 									" automatic guild to be setup.",
 									"guest_role <@role>"
+								),
+								new HelpData(
+									"sync_unlinked",
+									"Toggle whether unlinked members should also be synced for verified roles, automatic roles, and guild roles during automatic updates",
+									"sync_unlinked <enable|disable>"
 								)
 							),
 						new HelpData("bot_manager", "Manage bot manager roles.")
@@ -950,9 +955,10 @@ public class HelpSlashCommand extends SlashCommand {
 			) +
 			create("settings set mayor_ping <@role>", "Role that will be pinged when mayor notifications are sent") +
 			create("settings set guest_role <@role>", "Set the guest role") +
-			create("settings set log channel <#channel>", "Set the action log channel") +
-			create("settings set log add <event>", "Add an event to log") +
-			create("settings set log remove <event>", "Remove a log event") +
+			create("settings set sync_unlinked <enable|disable>", "Set whether unlinked people are synced") +
+			create("settings log channel <#channel>", "Set the action log channel") +
+			create("settings log add <event>", "Add an event to log") +
+			create("settings log remove <event>", "Remove a log event") +
 			create("settings bot_manager add <@role>", "Add a bot manager role") +
 			create("settings bot_manager remove <@role>", "Remove a bot manager role") +
 			create("settings reset", "Reset the server settings") +
@@ -967,7 +973,9 @@ public class HelpSlashCommand extends SlashCommand {
 			create("settings blacklist share <server_id>", "Share your blacklist with another server") +
 			create("settings blacklist unshare <server_id>", "Stop sharing your blacklist with another server") +
 			create("settings blacklist use <server_id>", "Use a shared blacklist from another server") +
-			create("settings blacklist stop_using <server_id>", "Stop using a shared blacklist from another server")
+			create("settings blacklist stop_using <server_id>", "Stop using a shared blacklist from another server") +
+			create("settings blacklist enable <feature>", "Blacklisted people will not be able to use this feature") +
+			create("settings blacklist disable <feature>", "Blacklisted people will be able to use this feature")
 		);
 
 		paginateBuilder.addStrings(

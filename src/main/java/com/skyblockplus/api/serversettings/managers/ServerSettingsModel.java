@@ -91,6 +91,8 @@ public class ServerSettingsModel {
 	@Embedded
 	private EventNotifSettings eventNotif = new EventNotifSettings();
 
+	private boolean syncUnlinkedMembers = true;
+
 	public ServerSettingsModel(String serverName, String serverId) {
 		this.serverName = serverName;
 		this.serverId = serverId;

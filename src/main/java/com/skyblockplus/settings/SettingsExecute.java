@@ -257,6 +257,11 @@ public class SettingsExecute {
 					case "fetchur_ping" -> setFetchurPing(args[3]);
 					case "mayor_channel" -> setMayorChannel(args[3]);
 					case "mayor_ping" -> setMayorPing(args[3]);
+					case "sync_unlinked" -> switch (args[3]) {
+						case "enable" -> setSyncUnlinked(true);
+						case "disable" -> setSyncUnlinked(false);
+						default -> getHelpEmbed("settings set");
+					};
 					default -> getHelpEmbed("settings set");
 				};
 		} else if (args.length == 2 && args[1].equals("reset")) {
@@ -362,7 +367,12 @@ public class SettingsExecute {
 					)
 					.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false)
 					.addField("Log Channel", logChannel.equals("none") || logChannel.isEmpty() ? "None" : "<#" + logChannel + ">", false)
-					.addField("Log Events", logEvents.isEmpty() ? "None" : logEvents, false);
+					.addField("Log Events", logEvents.isEmpty() ? "None" : logEvents, false)
+					.addField(
+						"Sync Unlinked Members",
+						higherDepth(serverSettings, "syncUnlinkedMembers", true) ? "Enabled" : "Disabled",
+						false
+					);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
 			if (args.length == 2) {
 				eb = displayJacobSettings();
@@ -2601,6 +2611,15 @@ public class SettingsExecute {
 		guildMap.get(guild.getId()).setMayorPing(role);
 
 		return defaultSettingsEmbed("Set mayor ping to: " + role.getAsMention());
+	}
+
+	public EmbedBuilder setSyncUnlinked(boolean syncUnlinked) {
+		int responseCode = database.setSyncUnlinkedMembers(guild.getId(), syncUnlinked);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Set sync unlinked members: " + (syncUnlinked ? "enabled" : "disabled"));
 	}
 
 	public EmbedBuilder addBotManagerRole(String roleMention) {

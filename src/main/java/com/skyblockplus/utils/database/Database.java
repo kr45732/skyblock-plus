@@ -209,6 +209,10 @@ public class Database {
 		return settingsService.setMayorRole(serverId, newSettings).getStatusCode().value();
 	}
 
+	public int setSyncUnlinkedMembers(String serverId, boolean newSettings) {
+		return settingsService.setSyncUnlinkedMembers(serverId, newSettings).getStatusCode().value();
+	}
+
 	public int setBotManagerRoles(String serverId, JsonArray newSettings) {
 		return settingsService.setBotManagerRoles(serverId, gson.fromJson(newSettings, String[].class)).getStatusCode().value();
 	}

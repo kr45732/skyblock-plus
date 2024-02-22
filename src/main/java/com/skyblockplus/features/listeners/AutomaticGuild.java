@@ -811,7 +811,7 @@ public class AutomaticGuild {
 				}
 			}
 
-			if (!notLinkedMembers.isEmpty()) {
+			if (higherDepth(serverSettings, "syncUnlinkedMembers", true) && !notLinkedMembers.isEmpty()) {
 				Tuple2<List<Role>, List<Role>> roleChanges = UnlinkSlashCommand.unlinkRoleChanges(
 					guild,
 					serverSettings,
