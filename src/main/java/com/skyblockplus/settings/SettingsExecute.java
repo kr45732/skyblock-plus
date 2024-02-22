@@ -260,7 +260,7 @@ public class SettingsExecute {
 					case "sync_unlinked" -> switch (args[3]) {
 						case "enable" -> setSyncUnlinked(true);
 						case "disable" -> setSyncUnlinked(false);
-						default -> getHelpEmbed("settings set");
+						default -> getHelpEmbed("settings set sync_unlinked");
 					};
 					default -> getHelpEmbed("settings set");
 				};
@@ -2619,7 +2619,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Set sync unlinked members: " + (syncUnlinked ? "enabled" : "disabled"));
+		return defaultSettingsEmbed("Sync unlinked members: " + (syncUnlinked ? "enabled" : "disabled"));
 	}
 
 	public EmbedBuilder addBotManagerRole(String roleMention) {
