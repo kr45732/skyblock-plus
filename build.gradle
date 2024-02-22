@@ -83,7 +83,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.1.0'
     implementation 'org.springframework.boot:spring-boot-starter-security:3.1.0'
     implementation 'org.springframework.boot:spring-boot-starter-web:3.1.0'
-    runtimeOnly 'org.postgresql:postgresql:42.7.1'
+    runtimeOnly 'org.postgresql:postgresql:42.7.2'
 
     // MySQL
     implementation 'mysql:mysql-connector-java:8.0.33'
@@ -98,8 +98,8 @@ dependencies {
     implementation "org.codehaus.groovy:groovy:3.0.20"
 
     // Logging
-    implementation 'ch.qos.logback:logback-classic:1.4.14'
-    implementation 'ch.qos.logback:logback-core:1.4.14'
+    implementation 'ch.qos.logback:logback-classic:1.5.0'
+    implementation 'ch.qos.logback:logback-core:1.5.0'
 
     // Git
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.8.0.202311291450-r'
