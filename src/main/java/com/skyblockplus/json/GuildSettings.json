@@ -657,7 +657,7 @@
           "requirements": [
             [
               {
-                "amount": 2592000,
+                "amount": 2628000,
                 "type": "duration"
               }
             ]
@@ -994,15 +994,15 @@
           "requirements": [
             [
               {
-                "amount": 240,
+                "amount": 280,
                 "type": "level"
               },
               {
-                "amount": 8000,
+                "amount": 12000,
                 "type": "weight"
               },
               {
-                "amount": 2635200,
+                "amount": 2628000,
                 "type": "duration"
               }
             ]
@@ -1015,15 +1015,15 @@
           "requirements": [
             [
               {
-                "amount": 280,
+                "amount": 320,
                 "type": "level"
               },
               {
-                "amount": 12000,
+                "amount": 14000,
                 "type": "weight"
               },
               {
-                "amount": 7905600,
+                "amount": 7884000,
                 "type": "duration"
               }
             ]
@@ -1103,7 +1103,7 @@
         "requirements": [
           [
             {
-              "amount": 210,
+              "amount": 220,
               "type": "level"
             }
           ]
@@ -1117,7 +1117,7 @@
           "requirements": [
             [
               {
-                "amount": 250,
+                "amount": 260,
                 "type": "level"
               }
             ]
@@ -1130,13 +1130,26 @@
           "requirements": [
             [
               {
-                "amount": 300,
+                "amount": 290,
                 "type": "level"
               }
             ]
           ],
           "names": [
             "insomniac"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 320,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "hypnos"
           ]
         }
       ]
@@ -1160,7 +1173,7 @@
           "requirements": [
             [
               {
-                "amount": 15552000,
+                "amount": 15770000,
                 "type": "duration"
               },
               {
