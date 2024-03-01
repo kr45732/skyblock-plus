@@ -99,7 +99,7 @@ dependencies {
 
     // Logging
     implementation 'ch.qos.logback:logback-classic:1.5.1'
-    implementation 'ch.qos.logback:logback-core:1.5.0'
+    implementation 'ch.qos.logback:logback-core:1.5.1'
 
     // Git
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.8.0.202311291450-r'
