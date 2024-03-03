@@ -1935,7 +1935,9 @@ public class SettingsExecute {
 					type.equals("SLAYER") ||
 					type.equals("WEIGHT") ||
 					type.equals("CLASS") ||
-					type.equals("LEVEL"))
+					type.equals("LEVEL") ||
+					type.equals("IRONMAN") ||
+					type.equals("EMBLEM"))
 			) {
 				nickname = nickname.replace(matcher.group(0), "");
 			}

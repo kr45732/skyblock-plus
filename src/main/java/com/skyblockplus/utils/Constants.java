@@ -1377,6 +1377,7 @@ public class Constants {
 	public static JsonObject ARMOR_PRESTIGE_COST;
 	public static JsonObject POWER_TO_BASE_STATS;
 	public static Map<String, String> V2_STATS_MAP;
+	public static Map<String, String> EMBLEM_NAME_TO_ICON;
 
 	/* Fetched from other sources */
 	public static List<String> ENCHANT_NAMES;
@@ -1466,6 +1467,9 @@ public class Constants {
 			/* V2_STATS_MAP */
 			V2_STATS_MAP = gson.fromJson(higherDepth(CONSTANTS, "V2_STATS_MAP"), mapStringString);
 
+			/* EMBLEM_NAME_TO_ICON */
+			EMBLEM_NAME_TO_ICON = gson.fromJson(higherDepth(CONSTANTS, "EMBLEM_NAME_TO_ICON"), mapStringString);
+
 			/* ENCHANT_NAMES */
 			HashSet<String> enchantNames = new HashSet<>();
 			for (Map.Entry<String, JsonElement> enchantArr : higherDepth(getEnchantsJson(), "enchants").getAsJsonObject().entrySet()) {
@@ -1532,7 +1536,13 @@ public class Constants {
 			/* CATEGORY_TO_REFORGES */
 			CATEGORY_TO_REFORGES = new HashMap<>();
 			for (Map.Entry<String, JsonElement> reforgeStone : getReforgeStonesJson().entrySet()) {
-				String[] itemTypes = higherDepth(reforgeStone.getValue(), "itemTypes").getAsString().split("/");
+				// Why... https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/pull/1117
+				String[] itemTypes = higherDepth(
+					reforgeStone.getValue(),
+					"itemTypes",
+					reforgeStone.getKey().equals("BOO_STONE") ? "ARMOR" : "SWORD"
+				)
+					.split("/");
 				for (String itemType : itemTypes) {
 					CATEGORY_TO_REFORGES.compute(
 						itemType,

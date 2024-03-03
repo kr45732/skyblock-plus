@@ -153,8 +153,7 @@ public class RolesSlashCommand extends SlashCommand {
 					(roleName.equals("guild_member") ||
 						roleName.equals("guild_ranks") ||
 						roleName.equals("dungeon_secrets") ||
-						roleName.equals("player_items") ||
-						roleName.equals("gamemode"))
+						roleName.equals("player_items"))
 				) {
 					continue;
 				}
@@ -303,7 +302,15 @@ public class RolesSlashCommand extends SlashCommand {
 								continue;
 							}
 
-							if (player.isGamemode(Player.Gamemode.of(mode))) {
+							if (
+								Player.Gamemode
+									.of(mode)
+									.isGamemode(
+										player != null
+											? player.getGamemode()
+											: Player.Gamemode.values()[(int) cachedData.getDouble("gamemode")]
+									)
+							) {
 								if (!member.getRoles().contains(currentLevelRole)) {
 									if (botRole.canInteract(currentLevelRole)) {
 										toAdd.add(currentLevelRole);

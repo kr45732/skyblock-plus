@@ -308,7 +308,7 @@ public class NetworthExecute {
 			" (" +
 			roundAndFormat(totalNetworth) +
 			")\n**" +
-			(Player.Gamemode.IRONMAN_STRANDED.isGamemode(player.getGamemode())
+			(player.getGamemode() == Player.Gamemode.IRONMAN || player.getGamemode() == Player.Gamemode.STRANDED
 					? capitalizeString(player.getGamemode().toString()) + " "
 					: "") +
 			"Leaderboard Position:** " +

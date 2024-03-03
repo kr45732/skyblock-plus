@@ -22,6 +22,7 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.jerryEmbed;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
+import static com.skyblockplus.utils.Constants.EMBLEM_NAME_TO_ICON;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
 import static com.skyblockplus.utils.utils.StringUtils.*;
@@ -560,7 +561,9 @@ public class AutomaticGuild {
 									type.equals("SLAYER") ||
 									type.equals("WEIGHT") ||
 									type.equals("CLASS") ||
-									type.equals("LEVEL"))
+									type.equals("LEVEL") ||
+									type.equals("IRONMAN") ||
+									type.equals("EMBLEM"))
 							) {
 								checkVerify = true;
 								break;
@@ -576,7 +579,7 @@ public class AutomaticGuild {
 					}
 				}
 				Map<String, DataObject> uuidToPlayer = leaderboardDatabase
-					.getCachedPlayers(LinkSlashCommand.getLbTypes(rolesEnabled), Player.Gamemode.SELECTED, uuidsToRequest)
+					.getCachedPlayers(LinkSlashCommand.lbTypes, Player.Gamemode.SELECTED, uuidsToRequest)
 					.stream()
 					.collect(Collectors.toMap(e -> e.getString("uuid"), e -> e));
 
@@ -651,7 +654,9 @@ public class AutomaticGuild {
 										type.equals("SLAYER") ||
 										type.equals("WEIGHT") ||
 										type.equals("CLASS") ||
-										type.equals("LEVEL"))
+										type.equals("LEVEL") ||
+										type.equals("IRONMAN") ||
+										type.equals("EMBLEM"))
 								) {
 									if (player != null) {
 										nicknameTemplate =
@@ -669,6 +674,14 @@ public class AutomaticGuild {
 															.get((int) player.getDouble("selected_class"))
 															.toUpperCase()
 															.charAt(0);
+													case "IRONMAN" -> Player.Gamemode.values()[(int) player.getDouble("gamemode")] ==
+														Player.Gamemode.IRONMAN
+														? "\u267B️"
+														: "";
+													case "EMBLEM" -> player.getDouble("emblem") == -1
+														? ""
+														: new ArrayList<>(EMBLEM_NAME_TO_ICON.values())
+															.get((int) player.getDouble("emblem"));
 													default -> throw new IllegalStateException("Unexpected value: " + type);
 												} +
 												extra

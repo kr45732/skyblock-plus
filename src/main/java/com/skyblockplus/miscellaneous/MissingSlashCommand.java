@@ -260,7 +260,7 @@ public class MissingSlashCommand extends SlashCommand {
 
 		missingInternalArr.sort(
 			Comparator.comparingDouble(e ->
-				SOULBOUND_ITEMS.contains(e) || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(e))
+				SOULBOUND_ITEMS.contains(e) || (player.getGamemode() == Player.Gamemode.IRONMAN && unobtainableIronmanTalismans.contains(e))
 					? Double.MAX_VALUE
 					: calc.getLowestPrice(e)
 			)
@@ -277,7 +277,7 @@ public class MissingSlashCommand extends SlashCommand {
 			String costOut;
 			if (SOULBOUND_ITEMS.contains(curId)) {
 				costOut = (cost != 0 ? " ➜ " + roundAndFormat(cost) : "") + " (Soulbound)";
-			} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
+			} else if (player.getGamemode() == Player.Gamemode.IRONMAN && unobtainableIronmanTalismans.contains(curId)) {
 				costOut = " (Unobtainable)";
 			} else {
 				costOut = " ➜ " + (cost > 0 ? roundAndFormat(cost) : "Unknown");
