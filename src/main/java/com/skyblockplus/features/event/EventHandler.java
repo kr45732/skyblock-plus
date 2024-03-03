@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021-2023 kr45732
+ * Copyright (c) 2021-2024 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -60,9 +60,9 @@ public class EventHandler {
 					String[] times = m.getContentRaw().split("\n");
 
 					ZonedDateTime nowDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
-					Map<String, MessageEmbed> ebs = new HashMap<>();
-					ebs.putAll(getEventEmbeds(times, nowDateTime, 0));
-					ebs.putAll(getEventEmbeds(times, nowDateTime, 5));
+					Map<String, MessageEmbed> ebs = getEventEmbeds(times, nowDateTime, 5);
+					//					ebs.putAll(getEventEmbeds(times, nowDateTime, 0));
+					//					ebs.putAll(getEventEmbeds(times, nowDateTime, 5));
 
 					if (!ebs.isEmpty()) {
 						for (AutomaticGuild guild : guildMap.values()) {

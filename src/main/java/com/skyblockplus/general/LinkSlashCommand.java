@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021-2023 kr45732
+ * Copyright (c) 2021-2024 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,6 +22,7 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
+import static com.skyblockplus.utils.Constants.EMBLEM_NAME_TO_ICON;
 import static com.skyblockplus.utils.utils.HypixelUtils.getPlayerDiscordInfo;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.JsonUtils.streamJsonArray;
@@ -61,7 +62,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LinkSlashCommand extends SlashCommand {
 
-	private static final List<String> rolesClaimLbTypes = List.of(
+	public static final List<String> lbTypes = List.of(
 		"wolf",
 		"zombie",
 		"spider",
@@ -97,13 +98,11 @@ public class LinkSlashCommand extends SlashCommand {
 		"taming",
 		"enchanting",
 		"social",
-		"weight"
+		"weight",
+		"selected_class",
+		"gamemode",
+		"emblem"
 	);
-	private static final List<String> nicknameLbTypes = List.of("skills", "catacombs", "slayer", "weight", "selected_class", "level");
-
-	public static List<String> getLbTypes(boolean rolesClaimEnabled) {
-		return rolesClaimEnabled ? rolesClaimLbTypes : nicknameLbTypes;
-	}
 
 	public LinkSlashCommand() {
 		this.name = "link";
@@ -245,15 +244,12 @@ public class LinkSlashCommand extends SlashCommand {
 							type.equals("SLAYER") ||
 							type.equals("WEIGHT") ||
 							type.equals("CLASS") ||
-							type.equals("LEVEL"))
+							type.equals("LEVEL") ||
+							type.equals("IRONMAN") ||
+							type.equals("EMBLEM"))
 					) {
 						if (!playerRequested) {
-							player =
-								leaderboardDatabase.getCachedPlayer(
-									getLbTypes(rolesClaimOnLink),
-									Player.Gamemode.SELECTED,
-									linkedAccount.uuid()
-								);
+							player = leaderboardDatabase.getCachedPlayer(lbTypes, Player.Gamemode.SELECTED, linkedAccount.uuid());
 							playerRequested = true;
 						}
 
@@ -270,6 +266,13 @@ public class LinkSlashCommand extends SlashCommand {
 											? ""
 											: "" +
 											DUNGEON_CLASS_NAMES.get((int) player.getDouble("selected_class")).toUpperCase().charAt(0);
+										case "IRONMAN" -> Player.Gamemode.values()[(int) player.getDouble("gamemode")] ==
+											Player.Gamemode.IRONMAN
+											? "\u267B️"
+											: "";
+										case "EMBLEM" -> player.getDouble("emblem") == -1
+											? ""
+											: new ArrayList<>(EMBLEM_NAME_TO_ICON.values()).get((int) player.getDouble("emblem"));
 										default -> throw new IllegalStateException("Unexpected value: " + type);
 									} +
 									extra
@@ -301,12 +304,7 @@ public class LinkSlashCommand extends SlashCommand {
 			if (rolesClaimOnLink) {
 				try {
 					if (!playerRequested) {
-						player =
-							leaderboardDatabase.getCachedPlayer(
-								getLbTypes(rolesClaimOnLink),
-								Player.Gamemode.SELECTED,
-								linkedAccount.uuid()
-							);
+						player = leaderboardDatabase.getCachedPlayer(lbTypes, Player.Gamemode.SELECTED, linkedAccount.uuid());
 					}
 
 					if (player != null) {

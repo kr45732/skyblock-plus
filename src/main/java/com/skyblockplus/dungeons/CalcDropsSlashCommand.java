@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021-2023 kr45732
+ * Copyright (c) 2021-2024 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -21,8 +21,7 @@ package com.skyblockplus.dungeons;
 import static com.skyblockplus.utils.Constants.dungeonLootChestToEmoji;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -80,7 +79,7 @@ public class CalcDropsSlashCommand extends SlashCommand {
 					String name = higherDepth(itemData, "item").getAsString();
 					eb.appendDescription(
 						"\n" +
-						higherDepth(getEmojiMap(), nameToId(name), "") +
+						getEmoji(nameToId(name)) +
 						" **" +
 						name +
 						"**: " +

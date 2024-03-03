@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021-2023 kr45732
+ * Copyright (c) 2021-2024 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -260,7 +260,7 @@ public class MissingSlashCommand extends SlashCommand {
 
 		missingInternalArr.sort(
 			Comparator.comparingDouble(e ->
-				SOULBOUND_ITEMS.contains(e) || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(e))
+				SOULBOUND_ITEMS.contains(e) || (player.getGamemode() == Player.Gamemode.IRONMAN && unobtainableIronmanTalismans.contains(e))
 					? Double.MAX_VALUE
 					: calc.getLowestPrice(e)
 			)
@@ -277,7 +277,7 @@ public class MissingSlashCommand extends SlashCommand {
 			String costOut;
 			if (SOULBOUND_ITEMS.contains(curId)) {
 				costOut = (cost != 0 ? " ➜ " + roundAndFormat(cost) : "") + " (Soulbound)";
-			} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
+			} else if (player.getGamemode() == Player.Gamemode.IRONMAN && unobtainableIronmanTalismans.contains(curId)) {
 				costOut = " (Unobtainable)";
 			} else {
 				costOut = " ➜ " + (cost > 0 ? roundAndFormat(cost) : "Unknown");

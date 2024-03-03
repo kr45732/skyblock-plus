@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021-2023 kr45732
+ * Copyright (c) 2021-2024 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,11 +18,12 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.collectionNameToId;
 import static com.skyblockplus.utils.Constants.skyblockStats;
 import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
+import static com.skyblockplus.utils.utils.JsonUtils.getLevelingJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 
@@ -52,7 +53,7 @@ import org.slf4j.LoggerFactory;
 public class LeaderboardDatabase {
 
 	public static final Map<String, String> typeToNameSubMap = new HashMap<>();
-	private static final int MAX_INSERT_COUNT = 60;
+	private static final List<String> ignoredTypes = List.of("selected_class", "gamemode", "emblem", "farming_cap");
 	private static final List<String> types = new ArrayList<>(
 		List.of(
 			"username",
@@ -101,7 +102,10 @@ public class LeaderboardDatabase {
 			"lily_slayer_weight",
 			"selected_class",
 			"cole_weight",
-			"bestiary"
+			"bestiary",
+			"gamemode",
+			"emblem",
+			"farming_cap"
 		)
 	);
 	private static final List<String> typesSubList = new ArrayList<>();
@@ -113,7 +117,7 @@ public class LeaderboardDatabase {
 
 		typesSubList.addAll(types.subList(2, types.size()));
 		for (String type : typesSubList) {
-			if (!type.equals("selected_class")) {
+			if (!ignoredTypes.contains(type)) {
 				typeToNameSubMap.put(type, capitalizeString(type.replace("_", " ")));
 			}
 		}
@@ -133,7 +137,7 @@ public class LeaderboardDatabase {
 	public LeaderboardDatabase() {
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(LEADERBOARD_DB_URL);
-		config.setMaximumPoolSize(MAX_INSERT_COUNT);
+		config.setMaximumPoolSize(20);
 		config.setPoolName("Leaderbord Database Pool");
 		dataSource = new HikariDataSource(config);
 
@@ -176,35 +180,25 @@ public class LeaderboardDatabase {
 
 	public void insertIntoLeaderboard(Player.Profile player) {
 		if (player.isValid()) {
-			List<Player.Profile> players = List.of(player);
-			for (Player.Gamemode gamemode : leaderboardGamemodes) {
-				leaderboardDbInsertQueue.submit(() -> insertIntoLeaderboard(players, 0, gamemode));
-			}
+			List<Player.Profile> players = new ArrayList<>();
+			players.add(player);
+			insertIntoLeaderboard(players);
 		}
 	}
 
-	/** Once called, these players should not be used again to access stats (does not copy) */
 	public void insertIntoLeaderboard(List<Player.Profile> players) {
 		players.removeIf(p -> !p.isValid());
 		if (!players.isEmpty()) {
-			for (int i = 0; i < players.size(); i += MAX_INSERT_COUNT) {
-				int finalI = i;
-				for (Player.Gamemode gamemode : leaderboardGamemodes) {
-					leaderboardDbInsertQueue.submit(() -> insertIntoLeaderboard(players, finalI, gamemode));
-				}
+			for (Player.Gamemode gamemode : leaderboardGamemodes) {
+				leaderboardDbInsertQueue.submit(() -> insertIntoLeaderboard(players, gamemode));
 			}
 		}
 	}
 
-	private void insertIntoLeaderboard(List<Player.Profile> players, int startingIndex, Player.Gamemode gamemode) {
+	private void insertIntoLeaderboard(List<Player.Profile> players, Player.Gamemode gamemode) {
 		try {
 			String paramStr = "?,".repeat(types.size() + 1); // Add 1 for last_updated
 			paramStr = paramStr.substring(0, paramStr.length() - 1);
-			String multiParamsStr =
-				("(" + paramStr + "),").repeat(
-						startingIndex + MAX_INSERT_COUNT <= players.size() ? MAX_INSERT_COUNT : (players.size() - startingIndex)
-					);
-			multiParamsStr = multiParamsStr.substring(0, multiParamsStr.length() - 1);
 
 			boolean updateNetworth = players.size() == 1 || players.stream().noneMatch(p -> p.getProfileToNetworth().isEmpty());
 
@@ -215,9 +209,9 @@ public class LeaderboardDatabase {
 					gamemode.toLeaderboardName() +
 					"(uuid,username,last_updated," +
 					String.join(",", typesSubList) +
-					") VALUES " +
-					multiParamsStr +
-					" ON CONFLICT (uuid) DO UPDATE SET " +
+					") SELECT * FROM unnest(" +
+					paramStr +
+					") ON CONFLICT (uuid) DO UPDATE SET " +
 					typesSubList
 						.stream()
 						.map(t ->
@@ -228,30 +222,19 @@ public class LeaderboardDatabase {
 						.collect(Collectors.joining(",", "username=EXCLUDED.username,last_updated=EXCLUDED.last_updated,", ""))
 				)
 			) {
-				for (int j = startingIndex; j < Math.min(startingIndex + MAX_INSERT_COUNT, players.size()); j++) {
-					Player.Profile player = players.get(j);
-					int offset = (j - startingIndex) * (3 + typesSubList.size());
+				Object[][] params = new Object[types.size() + 1][players.size()];
+				for (int playerIndex = 0; playerIndex < players.size(); playerIndex++) {
+					Player.Profile player = players.get(playerIndex);
 
-					statement.setObject(1 + offset, stringToUuid(player.getUuid()));
-					statement.setString(2 + offset, player.getUsername());
-					statement.setLong(3 + offset, Instant.now().toEpochMilli());
-					for (int i = 0; i < typesSubList.size(); i++) {
-						String type = typesSubList.get(i);
+					params[0][playerIndex] = stringToUuid(player.getUuid());
+					params[1][playerIndex] = player.getUsername();
+					params[2][playerIndex] = Instant.now().toEpochMilli();
+
+					for (int paramIndex = 0; paramIndex < typesSubList.size(); paramIndex++) {
+						String type = typesSubList.get(paramIndex);
 						double value = type.equals("networth") && !updateNetworth ? 0 : player.getHighestAmount(type, gamemode);
 
-						if (type.equals("highest_critical_damage") || type.equals("highest_damage")) {
-							if (value < 0) {
-								statement.setNull(i + 4 + offset, Types.DOUBLE);
-							} else {
-								statement.setDouble(i + 4 + offset, value);
-							}
-						} else {
-							if (value < 0) {
-								statement.setNull(i + 4 + offset, Types.FLOAT);
-							} else {
-								statement.setFloat(i + 4 + offset, (float) value);
-							}
-						}
+						params[paramIndex + 3][playerIndex] = value < 0 ? null : value;
 					}
 
 					if (gamemode == Player.Gamemode.ALL) {
@@ -261,6 +244,27 @@ public class LeaderboardDatabase {
 						}
 					}
 				}
+
+				for (int i = 0; i < params.length; i++) {
+					statement.setArray(
+						i + 1,
+						connection.createArrayOf(
+							switch (i) {
+								case 0 -> "uuid";
+								case 1 -> "text";
+								case 2 -> "bigint";
+								default -> {
+									String type = typesSubList.get(i - 3);
+									yield type.equals("highest_critical_damage") || type.equals("highest_damage")
+										? "double precision"
+										: "real";
+								}
+							},
+							params[i]
+						)
+					);
+				}
+
 				statement.executeUpdate();
 			}
 		} catch (Exception e) {
@@ -275,11 +279,11 @@ public class LeaderboardDatabase {
 		}
 
 		List<Player.Profile> players = List.of(player);
-		insertIntoLeaderboard(players, 0, requestedGamemode);
+		insertIntoLeaderboard(players, requestedGamemode);
 		leaderboardDbInsertQueue.submit(() -> {
 			for (Player.Gamemode gamemode : leaderboardGamemodes) {
 				if (gamemode != requestedGamemode) {
-					insertIntoLeaderboard(players, 0, gamemode);
+					insertIntoLeaderboard(players, gamemode);
 				}
 			}
 		});
@@ -314,11 +318,16 @@ public class LeaderboardDatabase {
 				"berserk",
 				"archer",
 				"tank",
-				"catacombs" -> levelingInfoFromExp((long) row.getDouble(lbType + "_xp"), lbType).getProgressLevel();
-			case "selected_class" -> {
+				"catacombs" -> levelingInfoFromExp(
+				(long) row.getDouble(lbType + "_xp"),
+				lbType,
+				higherDepth(getLevelingJson(), "leveling_caps." + lbType, 50) +
+				(lbType.equals("farming") ? (int) row.getDouble("farming_cap") : 0)
+			)
+				.getProgressLevel();
+			case "selected_class", "emblem" -> {
 				double value = row.getDouble(lbType);
-				boolean isNull = row.wasNull();
-				yield isNull ? -1 : value;
+				yield row.wasNull() ? -1 : value;
 			}
 			default -> row.getDouble(lbType);
 		};
@@ -473,7 +482,6 @@ public class LeaderboardDatabase {
 							case "alchemy",
 								"combat",
 								"fishing",
-								"farming",
 								"foraging",
 								"carpentry",
 								"mining",
@@ -486,6 +494,7 @@ public class LeaderboardDatabase {
 								"archer",
 								"tank",
 								"catacombs" -> e + "_xp";
+							case "farming" -> "farming_xp, farming_cap";
 							default -> e;
 						}
 					)

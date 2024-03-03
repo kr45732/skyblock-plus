@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021-2023 kr45732
+ * Copyright (c) 2021-2024 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -43,6 +43,7 @@ import com.skyblockplus.utils.utils.Utils;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -58,7 +59,10 @@ public class Player {
 	private String uuid;
 	private String username;
 	private int selectedProfileIndex;
+
+	@Getter
 	private boolean valid = false;
+
 	private String failCause = "Unknown fail cause";
 	private int dungeonSecretsAchievement = -2;
 	private int crystalNucleusAchievement = -2;
@@ -259,10 +263,6 @@ public class Player {
 		}
 	}
 
-	public boolean isValid() {
-		return valid;
-	}
-
 	@Override
 	public String toString() {
 		return (
@@ -311,12 +311,12 @@ public class Player {
 			);
 		}
 
-		public boolean isGamemode(Object gamemode) {
-			if (gamemode instanceof Gamemode mode) {
-				return (this == IRONMAN_STRANDED) ? ((gamemode == IRONMAN) || (gamemode == STRANDED)) : ((this == ALL) || (this == mode));
+		public boolean isGamemode(Gamemode mode) {
+			if (this == IRONMAN_STRANDED) {
+				return mode == IRONMAN || mode == STRANDED;
 			}
 
-			return isGamemode(of((String) gamemode));
+			return this == ALL || this == mode;
 		}
 
 		public String getSymbol(String... prefix) {
@@ -350,9 +350,14 @@ public class Player {
 
 	public class Profile {
 
+		@Getter
 		private final int profileIndex;
+
 		private final JsonElement profileJson;
+
+		@Getter
 		private final String profileName;
+
 		private HypixelResponse museumResponse;
 
 		public Profile(int profileIndex, JsonElement profileJson) {
@@ -400,14 +405,6 @@ public class Player {
 
 		public JsonElement profileJson() {
 			return higherDepth(profileJson, "members." + uuid);
-		}
-
-		public String getProfileName() {
-			return profileName;
-		}
-
-		public int getProfileIndex() {
-			return profileIndex;
 		}
 
 		public boolean isSelected() {
@@ -460,12 +457,12 @@ public class Player {
 			return useHighest ? getHighestAmount(type, Gamemode.ALL) : getAmount(getSelectedProfile(), type);
 		}
 
-		public double getAmount(Profile profile, String type) {
+		public static double getAmount(Profile profile, String type) {
 			return switch (type) {
-				case "selected_class" -> {
-					String selectedClass = profile.getSelectedDungeonClass();
-					yield selectedClass.equals("none") ? -1 : DUNGEON_CLASS_NAMES.indexOf(selectedClass);
-				}
+				case "selected_class" -> DUNGEON_CLASS_NAMES.indexOf(profile.getSelectedDungeonClass());
+				case "gamemode" -> profile.getGamemode().ordinal();
+				case "emblem" -> new ArrayList<>(EMBLEM_NAME_TO_ICON.keySet()).indexOf(profile.getEmblem());
+				case "farming_cap" -> profile.getFarmingCapUpgrade();
 				case "slayer", "total_slayer" -> profile.getTotalSlayerXp();
 				case "skills" -> profile.getSkillAverage();
 				case "skills_xp" -> profile.getTotalSkillsXp();
@@ -499,7 +496,7 @@ public class Player {
 				case "museum_hypixel" -> profile.getHypixelMuseumWorth();
 				case "fairy_souls" -> profile.getFairySouls();
 				case "minion_slots" -> profile.getNumberMinionSlots();
-				case "dungeon_secrets" -> getDungeonSecrets();
+				case "dungeon_secrets" -> profile.getDungeonSecrets();
 				case "maxed_slayers" -> profile.getNumMaxedSlayers();
 				case "maxed_collections" -> profile.getNumMaxedCollections();
 				case "class_average" -> profile.getDungeonClassAverage();
@@ -530,7 +527,7 @@ public class Player {
 			double highestAmount = -1.0;
 
 			for (Profile profile : profiles) {
-				if (gamemode == Gamemode.SELECTED ? isSelected() : profile.isGamemode(gamemode)) {
+				if (gamemode == Gamemode.SELECTED ? isSelected() : gamemode.isGamemode(profile.getGamemode())) {
 					highestAmount = Math.max(getAmount(profile, type), highestAmount);
 				}
 			}
@@ -1322,6 +1319,10 @@ public class Player {
 		}
 
 		/* Miscellaneous */
+		public String getEmblem() {
+			return higherDepth(profileJson(), "leveling.selected_symbol", "none");
+		}
+
 		public int getFairySouls() {
 			return higherDepth(profileJson(), "fairy_soul.total_collected", 0);
 		}
@@ -1565,10 +1566,6 @@ public class Player {
 
 		public String getSymbol(String... prefix) {
 			return getGamemode().getSymbol(prefix);
-		}
-
-		public boolean isGamemode(Gamemode gamemode) {
-			return gamemode.isGamemode(getGamemode());
 		}
 
 		public Gamemode getGamemode() {

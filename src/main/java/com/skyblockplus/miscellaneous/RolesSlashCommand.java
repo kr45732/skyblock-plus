@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021-2023 kr45732
+ * Copyright (c) 2021-2024 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -153,8 +153,7 @@ public class RolesSlashCommand extends SlashCommand {
 					(roleName.equals("guild_member") ||
 						roleName.equals("guild_ranks") ||
 						roleName.equals("dungeon_secrets") ||
-						roleName.equals("player_items") ||
-						roleName.equals("gamemode"))
+						roleName.equals("player_items"))
 				) {
 					continue;
 				}
@@ -303,7 +302,15 @@ public class RolesSlashCommand extends SlashCommand {
 								continue;
 							}
 
-							if (player.isGamemode(Player.Gamemode.of(mode))) {
+							if (
+								Player.Gamemode
+									.of(mode)
+									.isGamemode(
+										player != null
+											? player.getGamemode()
+											: Player.Gamemode.values()[(int) cachedData.getDouble("gamemode")]
+									)
+							) {
 								if (!member.getRoles().contains(currentLevelRole)) {
 									if (botRole.canInteract(currentLevelRole)) {
 										toAdd.add(currentLevelRole);
