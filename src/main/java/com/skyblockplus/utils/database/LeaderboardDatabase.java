@@ -22,6 +22,8 @@ import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.collectionNameToId;
 import static com.skyblockplus.utils.Constants.skyblockStats;
 import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
+import static com.skyblockplus.utils.utils.JsonUtils.getLevelingJson;
+import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 
@@ -316,7 +318,13 @@ public class LeaderboardDatabase {
 				"berserk",
 				"archer",
 				"tank",
-				"catacombs" -> levelingInfoFromExp((long) row.getDouble(lbType + "_xp"), lbType).getProgressLevel();
+				"catacombs" -> levelingInfoFromExp(
+				(long) row.getDouble(lbType + "_xp"),
+				lbType,
+				higherDepth(getLevelingJson(), "leveling_caps." + lbType, 50) +
+				(lbType.equals("farming") ? (int) row.getDouble("farming_cap") : 0)
+			)
+				.getProgressLevel();
 			case "selected_class", "emblem" -> {
 				double value = row.getDouble(lbType);
 				yield row.wasNull() ? -1 : value;
