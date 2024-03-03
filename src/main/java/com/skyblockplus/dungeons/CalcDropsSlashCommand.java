@@ -21,8 +21,7 @@ package com.skyblockplus.dungeons;
 import static com.skyblockplus.utils.Constants.dungeonLootChestToEmoji;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -80,7 +79,7 @@ public class CalcDropsSlashCommand extends SlashCommand {
 					String name = higherDepth(itemData, "item").getAsString();
 					eb.appendDescription(
 						"\n" +
-						higherDepth(getEmojiMap(), nameToId(name), "") +
+						getEmoji(nameToId(name)) +
 						" **" +
 						name +
 						"**: " +

@@ -22,8 +22,7 @@ import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.HypixelUtils.getNpcSellPrice;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
-import static com.skyblockplus.utils.utils.Utils.errorEmbed;
-import static com.skyblockplus.utils.utils.Utils.withApiHelpButton;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -109,20 +108,22 @@ public class SacksSlashCommand extends SlashCommand {
 					} *
 					entry.getValue();
 
-				String emoji = higherDepth(
-					getEmojiMap(),
-					entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey(),
-					null
-				);
+				String id = entry.getKey();
+				if (id.startsWith("RUNE_")) {
+					id = id.substring(id.indexOf("_") + 1, id.lastIndexOf("_")) + "_RUNE;" + id.substring(id.lastIndexOf("_") + 1);
+				}
+
+				String emoji = getEmoji(id.equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : id, null);
 
 				paginateBuilder.addStrings(
 					(emoji != null ? emoji + " " : "") +
 					"**" +
-					idToName(entry.getKey()) +
+					idToName(id) +
 					":** " +
 					formatNumber(entry.getValue()) +
 					" ➜ " +
-					simplifyNumber(sackPrice)
+					simplifyNumber(sackPrice) +
+					(source.equals("bazaar_npc") && loc == 1 ? " (npc)" : "")
 				);
 				total[loc] += sackPrice;
 			});
@@ -132,7 +133,7 @@ public class SacksSlashCommand extends SlashCommand {
 			.setEveryPageText(
 				"**Total value:** " +
 				roundAndFormat(total[0] + total[1]) +
-				(source.equals("bazaar_npc") ? " (" + roundAndFormat(total[0]) + " bazaar + " + roundAndFormat(total[1]) + " npc)" : "") +
+				(source.equals("bazaar_npc") ? " (" + simplifyNumber(total[0]) + " bazaar + " + simplifyNumber(total[1]) + " npc)" : "") +
 				"\n"
 			);
 		event.paginate(paginateBuilder);
