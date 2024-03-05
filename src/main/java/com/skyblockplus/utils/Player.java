@@ -527,7 +527,7 @@ public class Player {
 			double highestAmount = -1.0;
 
 			for (Profile profile : profiles) {
-				if (gamemode == Gamemode.SELECTED ? isSelected() : gamemode.isGamemode(profile.getGamemode())) {
+				if (gamemode == Gamemode.SELECTED ? profile.isSelected() : gamemode.isGamemode(profile.getGamemode())) {
 					highestAmount = Math.max(getAmount(profile, type), highestAmount);
 				}
 			}
