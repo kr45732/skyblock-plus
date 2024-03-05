@@ -558,7 +558,9 @@ public class Player {
 		}
 
 		public double getPurseCoins() {
-			return higherDepth(profileJson(), "currencies.coin_purse", 0.0);
+			double purseCoins = higherDepth(profileJson(), "currencies.coin_purse", 0.0);
+			// How are people able to have 9E-70 coins??
+			return purseCoins < 0.01 ? 0 : purseCoins;
 		}
 
 		public JsonArray getBankHistory() {
