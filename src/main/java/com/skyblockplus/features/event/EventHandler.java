@@ -60,9 +60,9 @@ public class EventHandler {
 					String[] times = m.getContentRaw().split("\n");
 
 					ZonedDateTime nowDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
-					Map<String, MessageEmbed> ebs = getEventEmbeds(times, nowDateTime, 5);
-					//					ebs.putAll(getEventEmbeds(times, nowDateTime, 0));
-					//					ebs.putAll(getEventEmbeds(times, nowDateTime, 5));
+					Map<String, MessageEmbed> ebs = new HashMap<>();
+					getEventEmbeds(times, nowDateTime, 0);
+					ebs.putAll(getEventEmbeds(times, nowDateTime, 5));
 
 					if (!ebs.isEmpty()) {
 						for (AutomaticGuild guild : guildMap.values()) {
