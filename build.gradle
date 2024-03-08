@@ -102,7 +102,7 @@ dependencies {
     implementation 'ch.qos.logback:logback-core:1.5.3'
 
     // Git
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:6.8.0.202311291450-r'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r'
 
     // Caching
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
