@@ -293,8 +293,8 @@ public class AutomaticGuild {
 					.collect(Collectors.toCollection(ArrayList::new))
 			);
 		} catch (Exception ignored) {}
-		if (cacheDatabase.partyCaches.containsKey(guildId)) {
-			partyList.addAll(cacheDatabase.partyCaches.get(guildId));
+		if (leaderboardDatabase.parties.containsKey(guildId)) {
+			partyList.addAll(leaderboardDatabase.parties.get(guildId));
 		}
 	}
 

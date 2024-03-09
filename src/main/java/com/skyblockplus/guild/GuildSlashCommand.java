@@ -464,7 +464,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 			String lbTypeFormatted = capitalizeString(lbType.replace("_", " "));
 			String guildId = higherDepth(guildJson, "_id").getAsString();
-			Instant lastUpdatedGuild = cacheDatabase.getGuildCacheRequestTime(guildId);
+			Instant lastUpdatedGuild = leaderboardDatabase.getGuildCacheRequestTime(guildId);
 			if (lastUpdatedGuild != null && lastUpdatedPlayers.isBefore(lastUpdatedGuild)) {
 				lastUpdatedPlayers = lastUpdatedGuild;
 			}
@@ -700,7 +700,7 @@ public class GuildSlashCommand extends SlashCommand {
 				}
 			}
 
-			Instant lastUpdatedGuild = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+			Instant lastUpdatedGuild = leaderboardDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
 			if (lastUpdatedGuild != null && lastUpdatedPlayers.isBefore(lastUpdatedGuild)) {
 				lastUpdatedPlayers = lastUpdatedGuild;
 			}
@@ -1143,7 +1143,7 @@ public class GuildSlashCommand extends SlashCommand {
 				paginateBuilder.getExtras().addStrings(pbItems.stream().sorted().collect(Collectors.toCollection(ArrayList::new)));
 			}
 
-			Instant lastUpdatedGuild = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+			Instant lastUpdatedGuild = leaderboardDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
 			if (lastUpdatedGuild != null && lastUpdatedPlayers.isBefore(lastUpdatedGuild)) {
 				lastUpdatedPlayers = lastUpdatedGuild;
 			}
@@ -1269,7 +1269,7 @@ public class GuildSlashCommand extends SlashCommand {
 			Instant lastUpdatedPlayers = Instant.ofEpochMilli(
 				playerList.stream().mapToLong(m -> m.getLong("last_updated")).min().orElse(Instant.now().toEpochMilli())
 			);
-			Instant lastUpdatedGuild = cacheDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
+			Instant lastUpdatedGuild = leaderboardDatabase.getGuildCacheRequestTime(higherDepth(guildJson, "_id").getAsString());
 			if (lastUpdatedGuild != null && lastUpdatedPlayers.isBefore(lastUpdatedGuild)) {
 				lastUpdatedPlayers = lastUpdatedGuild;
 			}
@@ -1419,7 +1419,7 @@ public class GuildSlashCommand extends SlashCommand {
 					return true;
 				}
 
-				Instant lastUserRequest = cacheDatabase.getGuildCacheLastRequest(action.event().getUser().getId());
+				Instant lastUserRequest = leaderboardDatabase.getGuildCacheLastRequest(action.event().getUser().getId());
 				if (lastUserRequest != null && Duration.between(lastUserRequest, Instant.now()).toMinutes() < 15) {
 					action
 						.event()
@@ -1457,7 +1457,7 @@ public class GuildSlashCommand extends SlashCommand {
 					)
 					.setComponents()
 					.queue(m -> {
-						List<DataObject> out = cacheDatabase.fetchGuild(
+						List<DataObject> out = leaderboardDatabase.fetchGuild(
 							guildId,
 							guildName,
 							members,
