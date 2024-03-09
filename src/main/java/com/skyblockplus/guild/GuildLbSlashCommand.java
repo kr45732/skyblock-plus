@@ -65,7 +65,7 @@ public class GuildLbSlashCommand extends SlashCommand {
 
 		String lbType = getType(lbTypeParam);
 
-		Map<Tuple2<String, String>, List<String>> guildCaches = cacheDatabase.getGuildCaches();
+		Map<Tuple2<String, String>, List<String>> guildCaches = leaderboardDatabase.getGuildCaches();
 		List<String> allGuildMembers = guildCaches.values().stream().flatMap(Collection::stream).toList();
 
 		Map<String, Double> cachedPlayers = leaderboardDatabase

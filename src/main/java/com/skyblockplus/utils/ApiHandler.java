@@ -31,7 +31,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.price.PriceSlashCommand;
-import com.skyblockplus.utils.database.CacheDatabase;
 import com.skyblockplus.utils.database.LeaderboardDatabase;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.JsonResponse;
@@ -51,7 +50,6 @@ import org.slf4j.LoggerFactory;
 
 public class ApiHandler {
 
-	public static final CacheDatabase cacheDatabase = new CacheDatabase();
 	public static final LeaderboardDatabase leaderboardDatabase = new LeaderboardDatabase();
 	private static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
 	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);
@@ -68,13 +66,13 @@ public class ApiHandler {
 
 	public static void initialize() {
 		try {
-			cacheDatabase.initializeParties();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 90, 3 * 60 * 60, TimeUnit.SECONDS);
-			cacheDatabase.initializeCommandUses();
-			cacheDatabase.initializeJacobData();
-			cacheDatabase.initializeTokens();
-			cacheDatabase.initializeAhTracker();
-			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 60, TimeUnit.SECONDS);
+			leaderboardDatabase.initializeCommandUses();
+			leaderboardDatabase.initializeAuctionTracker();
+			leaderboardDatabase.initializeJacob();
+			leaderboardDatabase.initializeTokens();
+			leaderboardDatabase.initializeParties();
+			scheduler.scheduleWithFixedDelay(leaderboardDatabase::updateJsonCache, 60, 60, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCaches, 60, 60, TimeUnit.MINUTES);
 			if (isMainBot()) {
 				scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
@@ -87,10 +85,10 @@ public class ApiHandler {
 	public static void updateCaches() {
 		try {
 			cacheApplyGuildUsers();
-			cacheDatabase.cachePartyData();
-			cacheDatabase.cacheCommandUsesData();
-			cacheDatabase.cacheAhTrackerData();
-			cacheDatabase.cacheTokensData();
+			leaderboardDatabase.cacheCommandUses();
+			leaderboardDatabase.cacheAuctionTracker();
+			leaderboardDatabase.cacheTokens();
+			leaderboardDatabase.cacheParties();
 		} catch (Exception e) {
 			log.error("Exception when interval caching", e);
 		}
@@ -337,7 +335,7 @@ public class ApiHandler {
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, boolean useCache, boolean shouldCache) {
 		if (useCache) {
-			JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_PROFILES, uuid);
+			JsonElement cachedResponse = leaderboardDatabase.getCachedJson(LeaderboardDatabase.CacheType.SKYBLOCK_PROFILES, uuid);
 			if (cachedResponse != null) {
 				return new HypixelResponse(cachedResponse);
 			}
@@ -360,7 +358,10 @@ public class ApiHandler {
 
 				JsonArray profileArray = higherDepth(profilesJson, "profiles").getAsJsonArray();
 				if (shouldCache) {
-					cacheDatabase.cacheJson(new CacheDatabase.CacheId(CacheDatabase.CacheType.SKYBLOCK_PROFILES, uuid), profileArray);
+					leaderboardDatabase.cacheJson(
+						new LeaderboardDatabase.CacheId(LeaderboardDatabase.CacheType.SKYBLOCK_PROFILES, uuid),
+						profileArray
+					);
 				}
 				return new HypixelResponse(profileArray);
 			} catch (Exception e) {
@@ -373,7 +374,7 @@ public class ApiHandler {
 
 	/** Does not cache the profiles json */
 	public static CompletableFuture<HypixelResponse> asyncSkyblockProfilesFromUuid(String uuid) {
-		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_PROFILES, uuid);
+		JsonElement cachedResponse = leaderboardDatabase.getCachedJson(LeaderboardDatabase.CacheType.SKYBLOCK_PROFILES, uuid);
 		if (cachedResponse != null) {
 			return CompletableFuture.completedFuture(new HypixelResponse(cachedResponse));
 		} else {
@@ -439,7 +440,7 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse skyblockBingoFromUuid(String uuid) {
-		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_BINGO, uuid);
+		JsonElement cachedResponse = leaderboardDatabase.getCachedJson(LeaderboardDatabase.CacheType.SKYBLOCK_BINGO, uuid);
 		if (cachedResponse != null) {
 			return new HypixelResponse(cachedResponse);
 		}
@@ -449,7 +450,10 @@ public class ApiHandler {
 
 			try {
 				JsonArray eventsArray = higherDepth(bingoJson, "events").getAsJsonArray();
-				cacheDatabase.cacheJson(new CacheDatabase.CacheId(CacheDatabase.CacheType.SKYBLOCK_BINGO, uuid), eventsArray);
+				leaderboardDatabase.cacheJson(
+					new LeaderboardDatabase.CacheId(LeaderboardDatabase.CacheType.SKYBLOCK_BINGO, uuid),
+					eventsArray
+				);
 				return new HypixelResponse(eventsArray);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(bingoJson, "cause").getAsString());
@@ -460,7 +464,7 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse skyblockMuseumFromProfileId(String profileId, String uuid) {
-		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.SKYBLOCK_MUSEUM, profileId);
+		JsonElement cachedResponse = leaderboardDatabase.getCachedJson(LeaderboardDatabase.CacheType.SKYBLOCK_MUSEUM, profileId);
 		if (cachedResponse != null) {
 			return new HypixelResponse(cachedResponse);
 		}
@@ -475,7 +479,10 @@ public class ApiHandler {
 				}
 
 				JsonObject membersObject = higherDepth(museumJson, "members").getAsJsonObject();
-				cacheDatabase.cacheJson(new CacheDatabase.CacheId(CacheDatabase.CacheType.SKYBLOCK_MUSEUM, profileId), membersObject);
+				leaderboardDatabase.cacheJson(
+					new LeaderboardDatabase.CacheId(LeaderboardDatabase.CacheType.SKYBLOCK_MUSEUM, profileId),
+					membersObject
+				);
 				return new HypixelResponse(membersObject);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(museumJson, "cause").getAsString());
@@ -491,7 +498,7 @@ public class ApiHandler {
 
 	public static HypixelResponse playerFromUuid(String uuid, boolean useCache) {
 		if (useCache) {
-			JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.PLAYER, uuid);
+			JsonElement cachedResponse = leaderboardDatabase.getCachedJson(LeaderboardDatabase.CacheType.PLAYER, uuid);
 			if (cachedResponse != null) {
 				return new HypixelResponse(cachedResponse);
 			}
@@ -507,7 +514,7 @@ public class ApiHandler {
 				}
 
 				JsonObject playerObject = higherDepth(playerJson, "player").getAsJsonObject();
-				cacheDatabase.cacheJson(new CacheDatabase.CacheId(CacheDatabase.CacheType.PLAYER, uuid), playerObject);
+				leaderboardDatabase.cacheJson(new LeaderboardDatabase.CacheId(LeaderboardDatabase.CacheType.PLAYER, uuid), playerObject);
 				return new HypixelResponse(playerObject);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(playerJson, "cause").getAsString());
@@ -540,7 +547,7 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse getGuildGeneric(String param, String value) {
-		JsonElement cachedResponse = cacheDatabase.getCachedJson(CacheDatabase.CacheType.GUILD, value);
+		JsonElement cachedResponse = leaderboardDatabase.getCachedJson(LeaderboardDatabase.CacheType.GUILD, value);
 		if (cachedResponse != null) {
 			return new HypixelResponse(cachedResponse);
 		}
@@ -564,9 +571,9 @@ public class ApiHandler {
 				}
 
 				JsonObject guildObject = higherDepth(guildResponse, "guild").getAsJsonObject();
-				cacheDatabase.cacheJson(
-					new CacheDatabase.CacheId(
-						CacheDatabase.CacheType.GUILD,
+				leaderboardDatabase.cacheJson(
+					new LeaderboardDatabase.CacheId(
+						LeaderboardDatabase.CacheType.GUILD,
 						higherDepth(guildObject, "_id").getAsString(),
 						higherDepth(guildObject, "name").getAsString()
 					)

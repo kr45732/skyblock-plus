@@ -19,7 +19,7 @@
 package com.skyblockplus.api.controller;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
@@ -121,7 +121,7 @@ public class ApiController {
 			}
 
 			JacobHandler.setJacobData(jacobData);
-			cacheDatabase.cacheJacobData();
+			leaderboardDatabase.cacheJacob();
 			jda.getTextChannelById("937894945564545035").sendMessage(client.getSuccess() + " Received jacob data").queue();
 			return new ResponseEntity<>(DataObject.empty().put("success", true).toMap(), HttpStatus.OK);
 		} else {

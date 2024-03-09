@@ -166,7 +166,6 @@ public class Utils {
 	public static String GITHUB_TOKEN = "";
 	public static String DEFAULT_PREFIX = "";
 	public static String AUCTION_API_KEY = "";
-	public static String PLANET_SCALE_URL = "";
 	public static String SBZ_SCAMMER_DB_KEY = "";
 	public static String LEADERBOARD_DB_URL = "";
 	public static String CLIENT_SECRET = "";
@@ -293,7 +292,6 @@ public class Utils {
 			API_PASSWORD = (String) appProps.get("API_PASSWORD");
 			DEFAULT_PREFIX = (String) appProps.get("DEFAULT_PREFIX");
 			AUCTION_API_KEY = (String) appProps.get("AUCTION_API_KEY");
-			PLANET_SCALE_URL = (String) appProps.get("PLANET_SCALE_URL");
 			SBZ_SCAMMER_DB_KEY = (String) appProps.get("SBZ_SCAMMER_DB_KEY");
 			LEADERBOARD_DB_URL = (String) appProps.get("LEADERBOARD_DB_URL");
 			CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
@@ -317,7 +315,6 @@ public class Utils {
 			API_PASSWORD = System.getenv("API_PASSWORD");
 			DEFAULT_PREFIX = System.getenv("DEFAULT_PREFIX");
 			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
-			PLANET_SCALE_URL = System.getenv("PLANET_SCALE_URL");
 			SBZ_SCAMMER_DB_KEY = System.getenv("SBZ_SCAMMER_DB_KEY");
 			LEADERBOARD_DB_URL = System.getenv("LEADERBOARD_DB_URL");
 			CLIENT_SECRET = System.getenv("CLIENT_SECRET");

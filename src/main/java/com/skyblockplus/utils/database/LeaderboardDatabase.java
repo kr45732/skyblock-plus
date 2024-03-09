@@ -18,8 +18,9 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.miscellaneous.CalendarSlashCommand.getSkyblockYear;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.collectionNameToId;
 import static com.skyblockplus.utils.Constants.skyblockStats;
 import static com.skyblockplus.utils.utils.HypixelUtils.levelingInfoFromExp;
@@ -30,7 +31,16 @@ import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.features.jacob.JacobData;
+import com.skyblockplus.features.jacob.JacobHandler;
+import com.skyblockplus.features.listeners.AutomaticGuild;
+import com.skyblockplus.features.party.Party;
+import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.oauth.TokenData;
@@ -38,18 +48,14 @@ import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import groovy.lang.Tuple2;
+import java.sql.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,6 +143,8 @@ public class LeaderboardDatabase {
 	private ScheduledFuture<?> leaderboardUpdateTask;
 	private int numLeaderboardUpdates = 0;
 	private final Cache<String, Boolean> failedUpdates = Caffeine.newBuilder().expireAfterWrite(12, TimeUnit.HOURS).build();
+	private final Map<CacheId, Long> cacheIdToExpiry = new ConcurrentHashMap<>();
+	public final Map<String, List<Party>> parties = new HashMap<>();
 
 	public LeaderboardDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -717,6 +725,402 @@ public class LeaderboardDatabase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/* JSON storage */
+	public void cacheCommandUses() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		insertIntoJsonStorage(JsonStorageId.COMMAND_USES, getCommandUses());
+	}
+
+	public void cacheAuctionTracker() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		insertIntoJsonStorage(JsonStorageId.AUCTION_TRACKER, AuctionTracker.commandAuthorToTrackingUser);
+	}
+
+	public void cacheJacob() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		insertIntoJsonStorage(JsonStorageId.JACOB, JacobHandler.getJacobData());
+	}
+
+	public void cacheTokens() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		insertIntoJsonStorage(JsonStorageId.TOKENS, oAuthClient.getTokensMap());
+	}
+
+	public void cacheParties() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		Map<String, List<Party>> partyMap = new HashMap<>();
+		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
+			if (!automaticGuild.getValue().partyList.isEmpty()) {
+				partyMap.put(automaticGuild.getValue().guildId, automaticGuild.getValue().partyList);
+			}
+		}
+
+		insertIntoJsonStorage(JsonStorageId.PARTIES, partyMap);
+	}
+
+	private void insertIntoJsonStorage(JsonStorageId id, Object json) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"INSERT INTO json_storage (id, data) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data"
+			)
+		) {
+			statement.setInt(1, id.id);
+			statement.setObject(2, gson.toJsonTree(json), Types.OTHER);
+
+			statement.executeUpdate();
+
+			log.info("Cached " + id.name());
+		} catch (Exception e) {
+			log.error("Failed to cache " + id.name(), e);
+		}
+	}
+
+	public void initializeCommandUses() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		try {
+			slashCommandClient.setCommandUses(gson.fromJson(selectFromJsonStorage(JsonStorageId.COMMAND_USES), new TypeToken<>() {}));
+		} catch (Exception e) {
+			log.error("", e);
+		}
+	}
+
+	public void initializeAuctionTracker() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		try {
+			AuctionTracker.commandAuthorToTrackingUser.putAll(
+				gson.fromJson(selectFromJsonStorage(JsonStorageId.AUCTION_TRACKER), new TypeToken<Map<String, UsernameUuidStruct>>() {})
+			);
+		} catch (Exception e) {
+			log.error("", e);
+		}
+	}
+
+	public void initializeJacob() {
+		try {
+			JacobData jacobData = gson.fromJson(selectFromJsonStorage(JsonStorageId.JACOB), JacobData.class);
+			if (jacobData.getYear() == getSkyblockYear()) {
+				JacobHandler.setJacobData(jacobData);
+			}
+		} catch (Exception e) {
+			log.error("", e);
+		}
+
+		if (JacobHandler.getJacobData() == null) {
+			try {
+				JacobHandler.setJacobDataFromApi();
+				log.info("Fetched jacob data from API");
+			} catch (Exception e) {
+				log.error("", e);
+			}
+		}
+	}
+
+	public void initializeTokens() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		try {
+			oAuthClient
+				.getTokensMap()
+				.putAll(gson.fromJson(selectFromJsonStorage(JsonStorageId.TOKENS), new TypeToken<Map<String, TokenData>>() {}));
+		} catch (Exception e) {
+			log.error("", e);
+		}
+	}
+
+	public void initializeParties() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		try {
+			parties.putAll(gson.fromJson(selectFromJsonStorage(JsonStorageId.PARTIES), new TypeToken<Map<String, List<Party>>>() {}));
+		} catch (Exception e) {
+			log.error("", e);
+		}
+	}
+
+	private String selectFromJsonStorage(JsonStorageId id) throws SQLException {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT data FROM json_storage WHERE id = ?")
+		) {
+			statement.setInt(1, id.id);
+
+			try (ResultSet response = statement.executeQuery()) {
+				response.next();
+				String json = response.getString("data");
+				log.info("Retrieved " + id.name());
+				return json;
+			}
+		}
+	}
+
+	private enum JsonStorageId {
+		COMMAND_USES(0),
+		AUCTION_TRACKER(1),
+		JACOB(2),
+		TOKENS(3),
+		PARTIES(4);
+
+		private final int id;
+
+		JsonStorageId(int id) {
+			this.id = id;
+		}
+	}
+
+	/* Guild cache */
+	private void cacheGuild(String guildId, String guildName, JsonArray members, String discordId) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"INSERT INTO guild (guild_id, guild_name, request_time, members, request_discord)" +
+				" VALUES (?, ?, ?, ?, ?) ON CONFLICT (guild_id) DO UPDATE SET guild_name = EXCLUDED.guild_name, request_time = EXCLUDED.request_time, members = EXCLUDED.members, request_discord = EXCLUDED.request_discord"
+			)
+		) {
+			statement.setString(1, guildId);
+			statement.setString(2, guildName);
+			statement.setLong(3, Instant.now().toEpochMilli());
+			statement.setObject(4, members, Types.OTHER);
+			statement.setString(5, discordId);
+
+			statement.executeUpdate();
+		} catch (Exception ignored) {}
+	}
+
+	/**
+	 * @return timestamp of when guild was last cached or null if not present
+	 */
+	public Instant getGuildCacheRequestTime(String guildId) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT request_time FROM guild WHERE guild_id = ? LIMIT 1")
+		) {
+			statement.setObject(1, guildId);
+
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					return Instant.ofEpochMilli(response.getLong("request_time"));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return timestamp of last guild update made by user or null if not present
+	 */
+	public Instant getGuildCacheLastRequest(String discordId) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT request_time FROM guild WHERE request_discord = ? ORDER BY request_time DESC LIMIT 1"
+			)
+		) {
+			statement.setObject(1, discordId);
+
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					return Instant.ofEpochMilli(response.getLong("request_time"));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public List<DataObject> fetchGuild(
+		String guildId,
+		String guildName,
+		List<String> members,
+		String discordId,
+		List<String> lbTypes,
+		Player.Gamemode gamemode
+	) {
+		if (!hypixelGuildFetchQueue.contains(guildId)) {
+			hypixelGuildFetchQueue.add(guildId);
+		}
+
+		List<DataObject> out = null;
+		try {
+			out = guildRequestExecutor.submit(() -> leaderboardDatabase.fetchPlayers(lbTypes, gamemode, members)).get();
+		} catch (Exception ignored) {}
+
+		hypixelGuildFetchQueue.remove(guildId);
+
+		if (out != null) {
+			cacheGuild(guildId, guildName, gson.toJsonTree(members).getAsJsonArray(), discordId);
+		}
+
+		return out;
+	}
+
+	public Map<Tuple2<String, String>, List<String>> getGuildCaches() {
+		Map<Tuple2<String, String>, List<String>> out = new HashMap<>();
+
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT guild_id, guild_name, members FROM guild")
+		) {
+			try (ResultSet response = statement.executeQuery()) {
+				while (response.next()) {
+					out.put(
+						new Tuple2<>(response.getString("guild_id"), response.getString("guild_name")),
+						gson.fromJson(response.getString("members"), new TypeToken<List<String>>() {}.getType())
+					);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return out;
+	}
+
+	/* JSON cache */
+	public void cacheJson(CacheId id, JsonElement json) {
+		long expiry = Instant.now().plus(90, ChronoUnit.SECONDS).toEpochMilli();
+		executor.submit(() -> {
+			try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+					"INSERT INTO json_cache (id, expiry, data) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET expiry = EXCLUDED.expiry, data = EXCLUDED.data"
+				)
+			) {
+				statement.setString(1, id.getGeneratedId());
+				statement.setLong(2, expiry);
+				statement.setObject(3, json, Types.OTHER);
+
+				statement.executeUpdate();
+
+				cacheIdToExpiry.put(id, expiry);
+			} catch (Exception ignored) {}
+		});
+	}
+
+	public JsonElement getCachedJson(CacheType cacheType, String id) {
+		Optional<Map.Entry<CacheId, Long>> cacheEntry = cacheIdToExpiry
+			.entrySet()
+			.stream()
+			.filter(e -> e.getKey().matches(cacheType, id))
+			.findAny();
+		if (cacheEntry.isPresent() && cacheEntry.get().getValue() > Instant.now().toEpochMilli()) {
+			try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement("SELECT data FROM json_cache WHERE id = ? LIMIT 1")
+			) {
+				statement.setString(1, cacheEntry.get().getKey().getGeneratedId());
+
+				try (ResultSet response = statement.executeQuery()) {
+					if (response.next()) {
+						return JsonParser.parseString(response.getString("data"));
+					}
+				}
+			} catch (Exception ignored) {}
+		}
+		return null;
+	}
+
+	public void updateJsonCache() {
+		long now = Instant.now().toEpochMilli();
+		List<String> expiredCacheIds = new ArrayList<>();
+
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT id FROM json_cache WHERE expiry <= ?")
+		) {
+			statement.setLong(1, now);
+
+			try (ResultSet response = statement.executeQuery()) {
+				while (response.next()) {
+					expiredCacheIds.add(response.getString("id"));
+				}
+			}
+		} catch (Exception ignored) {}
+
+		if (!expiredCacheIds.isEmpty()) {
+			cacheIdToExpiry.keySet().removeIf(cacheId -> expiredCacheIds.contains(cacheId.getGeneratedId()));
+
+			try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+				statement.executeUpdate(
+					"DELETE FROM json_cache WHERE id IN (" + expiredCacheIds.stream().collect(Collectors.joining("','", "'", "'")) + ")"
+				);
+			} catch (Exception ignored) {}
+		}
+	}
+
+	public static class CacheId {
+
+		private final CacheType cacheType;
+		private final List<String> ids = new ArrayList<>();
+
+		@Getter
+		private final String generatedId;
+
+		public CacheId(CacheType cacheType, String... ids) {
+			this.cacheType = cacheType;
+
+			for (String id : ids) {
+				this.ids.add(id.toLowerCase());
+			}
+
+			String generatedId;
+			while (true) {
+				String finalGeneratedId = generatedId = UUID.randomUUID().toString();
+				if (leaderboardDatabase.cacheIdToExpiry.keySet().stream().noneMatch(c -> c.generatedId.equals(finalGeneratedId))) {
+					break;
+				}
+			}
+			this.generatedId = generatedId;
+		}
+
+		public CacheId addIds(List<String> ids) {
+			this.ids.addAll(ids);
+			return this;
+		}
+
+		public boolean matches(CacheType cacheType, String id) {
+			return this.cacheType == cacheType && this.ids.contains(id.toLowerCase());
+		}
+	}
+
+	public enum CacheType {
+		SKYBLOCK_PROFILES,
+		GUILD,
+		PLAYER,
+		SKYBLOCK_MUSEUM,
+		SKYBLOCK_BINGO,
 	}
 
 	public void close() {
