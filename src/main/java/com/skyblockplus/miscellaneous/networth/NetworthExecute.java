@@ -328,7 +328,7 @@ public class NetworthExecute {
 		if (!museumStr.isEmpty()) {
 			eb.addField("Museum | " + simplifyNumber(getTotal("museum", ignoreSoulbound)), museumStr.toString().split("\n\n")[0], false);
 		} else if (!player.getMuseum().isValid()) {
-			eb.addField("Museum", "Museum API is disabled ([**help enabling**](https://i.imgur.com/h2ybRgU.mp4))", false);
+			eb.addField("Museum", "Museum API disabled ([**help enabling**](https://i.imgur.com/h2ybRgU.mp4))", false);
 		} else {
 			eb.addField("Museum", "Museum empty or all items are being borrowed", false);
 		}

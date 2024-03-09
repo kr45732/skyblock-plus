@@ -101,15 +101,15 @@ public class LeaderboardPaginator {
 		if (this.player != null && player != null && playerAmount.equals("None")) {
 			if (lbType.equals("networth")) {
 				if (!player.isInventoryApiEnabled()) {
-					playerAmount = "Inventory API is disabled";
+					playerAmount = "Inventory API disabled";
 				}
 			} else if (ALL_SKILL_NAMES.contains(lbType)) {
 				if (!player.isSkillsApiEnabled()) {
-					playerAmount = "Skills API is Disabled";
+					playerAmount = "Skills API disabled";
 				}
 			} else if (collectionNameToId.containsKey(lbType)) {
 				if (!player.isCollectionsApiEnabled()) {
-					playerAmount = "Collections API is disabled";
+					playerAmount = "Collections API disabled";
 				}
 			}
 		}

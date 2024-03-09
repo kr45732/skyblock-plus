@@ -255,7 +255,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 					)
 					.addField(
 						"Accessory Counts",
-						player.isInventoryApiEnabled() ? accessoryStr.toString() : "Inventory API is disabled",
+						player.isInventoryApiEnabled() ? accessoryStr.toString() : "Inventory API disabled",
 						false
 					);
 				if (higherDepth(tuningJson, "unlocked_powers") != null) {

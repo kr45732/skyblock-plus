@@ -522,7 +522,7 @@ public class ApplyUser {
 							.addField("Bank & Purse", playerCoins, true)
 							.addField(
 								"Networth",
-								playerNetworth == -1 ? "Inventory API is disabled" : roundAndFormat(playerNetworth),
+								playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
 								true
 							);
 
