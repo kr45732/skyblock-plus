@@ -144,8 +144,6 @@ public class LeaderboardDatabase {
 	private int numLeaderboardUpdates = 0;
 	private final Cache<String, Boolean> failedUpdates = Caffeine.newBuilder().expireAfterWrite(12, TimeUnit.HOURS).build();
 	private final Map<CacheId, Long> cacheIdToExpiry = new ConcurrentHashMap<>();
-
-	// Cache
 	public final Map<String, List<Party>> parties = new HashMap<>();
 
 	public LeaderboardDatabase() {
