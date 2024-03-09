@@ -779,11 +779,11 @@ public class LeaderboardDatabase {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"INSERT INTO json_storage (id, json) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET json = EXCLUDED.json"
+				"INSERT INTO json_storage (id, data) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data"
 			)
 		) {
 			statement.setInt(1, id.id);
-			statement.setObject(2, gson.toJsonTree(json));
+			statement.setObject(2, gson.toJsonTree(json), Types.OTHER);
 
 			statement.executeUpdate();
 
@@ -799,7 +799,7 @@ public class LeaderboardDatabase {
 		}
 
 		try {
-			slashCommandClient.setCommandUses(selectFromJsonStorage(JsonStorageId.COMMAND_USES));
+			slashCommandClient.setCommandUses(gson.fromJson(selectFromJsonStorage(JsonStorageId.COMMAND_USES), new TypeToken<>() {}));
 		} catch (Exception e) {
 			log.error("", e);
 		}
@@ -811,7 +811,9 @@ public class LeaderboardDatabase {
 		}
 
 		try {
-			AuctionTracker.commandAuthorToTrackingUser.putAll(selectFromJsonStorage(JsonStorageId.AUCTION_TRACKER));
+			AuctionTracker.commandAuthorToTrackingUser.putAll(
+				gson.fromJson(selectFromJsonStorage(JsonStorageId.AUCTION_TRACKER), new TypeToken<Map<String, UsernameUuidStruct>>() {})
+			);
 		} catch (Exception e) {
 			log.error("", e);
 		}
@@ -819,7 +821,7 @@ public class LeaderboardDatabase {
 
 	public void initializeJacob() {
 		try {
-			JacobData jacobData = selectFromJsonStorage(JsonStorageId.JACOB);
+			JacobData jacobData = gson.fromJson(selectFromJsonStorage(JsonStorageId.JACOB), JacobData.class);
 			if (jacobData.getYear() == getSkyblockYear()) {
 				JacobHandler.setJacobData(jacobData);
 			}
@@ -843,7 +845,9 @@ public class LeaderboardDatabase {
 		}
 
 		try {
-			oAuthClient.getTokensMap().putAll(selectFromJsonStorage(JsonStorageId.TOKENS));
+			oAuthClient
+				.getTokensMap()
+				.putAll(gson.fromJson(selectFromJsonStorage(JsonStorageId.TOKENS), new TypeToken<Map<String, TokenData>>() {}));
 		} catch (Exception e) {
 			log.error("", e);
 		}
@@ -855,22 +859,22 @@ public class LeaderboardDatabase {
 		}
 
 		try {
-			parties.putAll(selectFromJsonStorage(JsonStorageId.PARTIES));
+			parties.putAll(gson.fromJson(selectFromJsonStorage(JsonStorageId.PARTIES), new TypeToken<Map<String, List<Party>>>() {}));
 		} catch (Exception e) {
 			log.error("", e);
 		}
 	}
 
-	private <T> T selectFromJsonStorage(JsonStorageId id) throws SQLException {
+	private String selectFromJsonStorage(JsonStorageId id) throws SQLException {
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT json FROM json_storage WHERE id = ?")
+			PreparedStatement statement = connection.prepareStatement("SELECT data FROM json_storage WHERE id = ?")
 		) {
 			statement.setInt(1, id.id);
 
 			try (ResultSet response = statement.executeQuery()) {
 				response.next();
-				T json = gson.fromJson(response.getObject("json", JsonElement.class), new TypeToken<T>() {}.getType());
+				String json = response.getString("data");
 				log.info("Retrieved " + id.name());
 				return json;
 			}
@@ -903,7 +907,7 @@ public class LeaderboardDatabase {
 			statement.setString(1, guildId);
 			statement.setString(2, guildName);
 			statement.setLong(3, Instant.now().toEpochMilli());
-			statement.setString(4, members.toString());
+			statement.setObject(4, members, Types.OTHER);
 			statement.setString(5, discordId);
 
 			statement.executeUpdate();
@@ -1011,12 +1015,12 @@ public class LeaderboardDatabase {
 			try (
 				Connection connection = getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-					"INSERT INTO cache (id, expiry, data) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET expiry = EXCLUDED.expiry, data = EXCLUDED.data"
+					"INSERT INTO json_cache (id, expiry, data) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET expiry = EXCLUDED.expiry, data = EXCLUDED.data"
 				)
 			) {
 				statement.setString(1, id.getGeneratedId());
 				statement.setLong(2, expiry);
-				statement.setString(3, json.toString());
+				statement.setObject(3, json, Types.OTHER);
 
 				statement.executeUpdate();
 
@@ -1034,7 +1038,7 @@ public class LeaderboardDatabase {
 		if (cacheEntry.isPresent() && cacheEntry.get().getValue() > Instant.now().toEpochMilli()) {
 			try (
 				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement("SELECT data FROM cache WHERE id = ? LIMIT 1")
+				PreparedStatement statement = connection.prepareStatement("SELECT data FROM json_cache WHERE id = ? LIMIT 1")
 			) {
 				statement.setString(1, cacheEntry.get().getKey().getGeneratedId());
 
@@ -1054,7 +1058,7 @@ public class LeaderboardDatabase {
 
 		try (
 			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT id FROM cache WHERE expiry <= ?")
+			PreparedStatement statement = connection.prepareStatement("SELECT id FROM json_cache WHERE expiry <= ?")
 		) {
 			statement.setLong(1, now);
 
@@ -1070,7 +1074,7 @@ public class LeaderboardDatabase {
 
 			try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
 				statement.executeUpdate(
-					"DELETE FROM cache WHERE id IN (" + expiredCacheIds.stream().collect(Collectors.joining("','", "'", "'")) + ")"
+					"DELETE FROM json_cache WHERE id IN (" + expiredCacheIds.stream().collect(Collectors.joining("','", "'", "'")) + ")"
 				);
 			} catch (Exception ignored) {}
 		}
