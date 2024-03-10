@@ -20,19 +20,18 @@ package com.skyblockplus.miscellaneous.weight.weight;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
+import lombok.Getter;
 
 public abstract class SlayerWeight {
 
 	protected final Player.Profile player;
+
+	@Getter
 	protected final WeightStruct weightStruct;
 
 	public SlayerWeight(Player.Profile player) {
 		this.player = player;
 		this.weightStruct = new WeightStruct();
-	}
-
-	public WeightStruct getWeightStruct() {
-		return weightStruct;
 	}
 
 	public abstract WeightStruct getSlayerWeight(String slayerName);

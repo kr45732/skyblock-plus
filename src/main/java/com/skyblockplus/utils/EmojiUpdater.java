@@ -284,7 +284,7 @@ public class EmojiUpdater {
 
 	private static List<String> getEnchantedItems() {
 		try {
-			List<String> enchantedItems = Arrays
+			return Arrays
 				.stream(
 					new File("src/main/java/com/skyblockplus/json/neu/items")
 						.listFiles(f -> {
@@ -308,8 +308,6 @@ public class EmojiUpdater {
 				)
 				.map(f -> f.getName().split(".json")[0])
 				.collect(Collectors.toCollection(ArrayList::new));
-
-			return enchantedItems;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

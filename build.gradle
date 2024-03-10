@@ -73,7 +73,7 @@ dependencies {
     implementation 'pw.chew:jda-chewtils:2.0-SNAPSHOT'
     // implementation 'com.github.chew.jda-chewtils:jda-chewtils:e9fbfeadc3'
 
-    // Google libraries
+    // JSON
     implementation 'com.google.code.gson:gson:2.10.1'
 
     // NBT parser
@@ -85,7 +85,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web:3.2.3'
     runtimeOnly 'org.postgresql:postgresql:42.7.2'
 
-    // Http Client
+    // Http client
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
 
     // Emoji parser
@@ -104,6 +104,6 @@ dependencies {
     // Caching
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 
-    // Fuzzy Searching
+    // Fuzzy searching
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
 }

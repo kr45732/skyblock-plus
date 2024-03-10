@@ -125,7 +125,7 @@ public class SkyblockSlashCommand extends SlashCommand {
 
 				eb.addField(getEmoji("COBBLESTONE") + " Maxed Collections", profile.getNumMaxedCollections() + "/73", true);
 				eb.addField(SKILLS_EMOJI_MAP.get("combat") + " Bestiary", roundAndFormat(profile.getBestiaryLevel()), true);
-				eb.addField(getEmoji("COBBLESTONE_GENERATOR_11") + " Minion Slots", "" + profile.getNumberMinionSlots() + "/26", true);
+				eb.addField(getEmoji("COBBLESTONE_GENERATOR_11") + " Minion Slots", profile.getNumberMinionSlots() + "/26", true);
 
 				if (profile.isSelected()) {
 					extras.getEmbedPages().add(0, eb);

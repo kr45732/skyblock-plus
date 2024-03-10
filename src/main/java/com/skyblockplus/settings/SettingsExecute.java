@@ -2114,7 +2114,7 @@ public class SettingsExecute {
 			.map(Guild::getName)
 			.collect(Collectors.joining(", "));
 		String features = streamJsonArray(higherDepth(blacklistSettings, "features"))
-			.map(e -> e.getAsString())
+			.map(JsonElement::getAsString)
 			.collect(Collectors.joining(", "));
 
 		paginateBuilder.addStrings(

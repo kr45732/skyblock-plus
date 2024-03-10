@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class HelpData {
@@ -31,7 +32,10 @@ public class HelpData {
 	private final String description;
 	private final String usage;
 	private final List<String> examples = new ArrayList<>();
+
+	@Getter
 	private final List<HelpData> subcommands = new ArrayList<>();
+
 	private boolean ignoreSuperCommand;
 	private transient HelpData superCommand;
 	private String secondDescription;
@@ -140,10 +144,6 @@ public class HelpData {
 		}
 
 		return ("`/" + command.getUsage() + " <subcommand>`" + (command.secondUsage != null ? "\n`/" + getSecondUsage(command) + "`" : ""));
-	}
-
-	public List<HelpData> getSubcommands() {
-		return subcommands;
 	}
 
 	public String getSubcommandsFormatted() {

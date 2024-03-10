@@ -30,14 +30,22 @@ import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.skyblockplus.utils.utils.Utils;
 import java.time.Instant;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class HypixelPlayer {
 
 	private JsonObject playerJson;
+
+	@Getter
 	private String uuid;
+
+	@Getter
 	private String username;
+
 	private boolean validPlayer = false;
+
+	@Getter
 	private String failCause = "Unknown fail cause";
 
 	public HypixelPlayer(String username) {
@@ -63,18 +71,6 @@ public class HypixelPlayer {
 	/* Getters */
 	public boolean isValid() {
 		return validPlayer;
-	}
-
-	public String getFailCause() {
-		return failCause;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public String getUuid() {
-		return uuid;
 	}
 
 	public EmbedBuilder getDefaultEmbed() {

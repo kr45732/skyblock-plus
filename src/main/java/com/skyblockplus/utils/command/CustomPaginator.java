@@ -323,11 +323,17 @@ public class CustomPaginator {
 		private final Set<User> users = new HashSet<>();
 		private long timeout = 1;
 		private TimeUnit unit = TimeUnit.MINUTES;
+
+		@Getter
 		private final PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.DEFAULT);
+
 		private Color color = null;
 		private Consumer<Message> finalAction = m -> m.delete().queue(null, throwableConsumer);
 		private int columns = 1;
+
+		@Getter
 		private int itemsPerPage = 12;
+
 		private boolean wrapPageEnds = false;
 		private boolean showPageNumbers = true;
 
@@ -442,10 +448,6 @@ public class CustomPaginator {
 			return this;
 		}
 
-		public PaginatorExtras getExtras() {
-			return extras;
-		}
-
 		public Builder updateExtras(Function<PaginatorExtras, PaginatorExtras> extras) {
 			extras.apply(this.extras);
 			return this;
@@ -457,10 +459,6 @@ public class CustomPaginator {
 				case EMBED_FIELDS -> extras.getEmbedFields().size();
 				case EMBED_PAGES -> extras.getEmbedPages().size();
 			};
-		}
-
-		public int getItemsPerPage() {
-			return itemsPerPage;
 		}
 	}
 }

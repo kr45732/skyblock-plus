@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
+import lombok.Getter;
 
 public final class TokenData {
 
@@ -39,6 +40,8 @@ public final class TokenData {
 	private String tokenType;
 	private long expiresAt;
 	private long lastMetadataUpdate = -1;
+
+	@Getter
 	private JsonObject body;
 
 	public TokenData(JsonElement json) {
@@ -155,10 +158,6 @@ public final class TokenData {
 
 	public void refreshLastMetadataUpdate() {
 		this.lastMetadataUpdate = Instant.now().toEpochMilli();
-	}
-
-	public JsonObject getBody() {
-		return body;
 	}
 
 	public CompletableFuture<Boolean> updateMetadata(JsonObject body) {

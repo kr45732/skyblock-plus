@@ -25,6 +25,7 @@ import static com.skyblockplus.utils.utils.StringUtils.idToName;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.Setter;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 
@@ -51,7 +52,10 @@ public class InvItem {
 	private int essenceCount;
 	private String essenceType;
 	private long darkAuctionPrice = -1;
+
+	@Setter
 	private long shensAuctionPrice = -1;
+
 	private int dungeonFloor = -1;
 	private boolean soulbound = false;
 	private NBTCompound nbtTag;
@@ -75,10 +79,6 @@ public class InvItem {
 		} else {
 			this.modifier = modifier;
 		}
-	}
-
-	public void setShensAuctionPrice(long shensAuctionPrice) {
-		this.shensAuctionPrice = shensAuctionPrice;
 	}
 
 	/**

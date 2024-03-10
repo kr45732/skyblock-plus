@@ -299,19 +299,9 @@ public class ApplyUser {
 				}
 
 				if (applicationChannel != null) {
-					applicationChannel
-						.sendMessageEmbeds(eb.build())
-						.setActionRow(buttons)
-						.queue(m -> {
-							reactMessageId = m.getId();
-						});
+					applicationChannel.sendMessageEmbeds(eb.build()).setActionRow(buttons).queue(m -> reactMessageId = m.getId());
 				} else {
-					hook
-						.editOriginalEmbeds(eb.build())
-						.setActionRow(buttons)
-						.queue(m -> {
-							reactMessageId = m.getId();
-						});
+					hook.editOriginalEmbeds(eb.build()).setActionRow(buttons).queue(m -> reactMessageId = m.getId());
 				}
 				return;
 			}
@@ -386,19 +376,9 @@ public class ApplyUser {
 				}
 
 				if (applicationChannel != null) {
-					applicationChannel
-						.sendMessageEmbeds(eb.build())
-						.setActionRow(buttons)
-						.queue(m -> {
-							reactMessageId = m.getId();
-						});
+					applicationChannel.sendMessageEmbeds(eb.build()).setActionRow(buttons).queue(m -> reactMessageId = m.getId());
 				} else {
-					hook
-						.editOriginalEmbeds(eb.build())
-						.setActionRow(buttons)
-						.queue(m -> {
-							reactMessageId = m.getId();
-						});
+					hook.editOriginalEmbeds(eb.build()).setActionRow(buttons).queue(m -> reactMessageId = m.getId());
 				}
 				return;
 			}
@@ -550,8 +530,7 @@ public class ApplyUser {
 							.setDescription("Please select the profile you want to apply with.\n");
 
 						StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("apply_user_profile");
-						for (int i = 0; i < profileNames.size(); i++) {
-							String profileName = profileNames.get(i);
+						for (String profileName : profileNames) {
 							boolean isLastPlayed = profileName.startsWith("*");
 							if (isLastPlayed) {
 								profileName = profileName.substring(1);

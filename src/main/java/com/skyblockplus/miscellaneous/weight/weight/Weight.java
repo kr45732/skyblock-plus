@@ -22,7 +22,9 @@ import com.skyblockplus.miscellaneous.weight.lily.LilyWeight;
 import com.skyblockplus.miscellaneous.weight.senither.SenitherWeight;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
+import lombok.Getter;
 
+@Getter
 public abstract class Weight {
 
 	protected final SlayerWeight slayerWeight;
@@ -41,18 +43,6 @@ public abstract class Weight {
 
 	public static Weight of(Player.WeightType weightType, Player.Profile player) {
 		return weightType == Player.WeightType.LILY ? new LilyWeight(player) : new SenitherWeight(player);
-	}
-
-	public SkillsWeight getSkillsWeight() {
-		return skillsWeight;
-	}
-
-	public SlayerWeight getSlayerWeight() {
-		return slayerWeight;
-	}
-
-	public DungeonsWeight getDungeonsWeight() {
-		return dungeonsWeight;
 	}
 
 	public WeightStruct getTotalWeight() {

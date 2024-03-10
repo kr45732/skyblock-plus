@@ -22,6 +22,7 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import lombok.Getter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -30,7 +31,10 @@ import net.dv8tion.jda.api.utils.data.SerializableData;
 public abstract class AbstractSlashCommand {
 
 	protected final Permission[] botPermissions = defaultPerms();
+
+	@Getter
 	protected String name = "null";
+
 	protected int cooldown = GLOBAL_COOLDOWN;
 	protected Permission[] userPermissions = new Permission[0];
 
@@ -128,10 +132,6 @@ public abstract class AbstractSlashCommand {
 					.queue();
 			}
 		});
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	private int getRemainingCooldown(SlashCommandEvent event) {

@@ -697,7 +697,7 @@ public class NetworthExecute {
 						if (attributeItemCost > 0) {
 							itemCost = attributeItemCost;
 							if (verbose) {
-								source.append(" - " + String.join(" & ", item.getAttributes().keySet()));
+								source.append(" - ").append(String.join(" & ", item.getAttributes().keySet()));
 							}
 						}
 					}
@@ -849,7 +849,9 @@ public class NetworthExecute {
 				if (verbose) {
 					miscStr
 						.append("{\"name\":\"")
-						.append(attribute.getKey() + ";" + attribute.getValue())
+						.append(attribute.getKey())
+						.append(";")
+						.append(attribute.getValue())
 						.append("\",\"total\":\"")
 						.append(simplifyNumber(miscPrice * count))
 						.append("\",\"count\":")
@@ -1231,7 +1233,7 @@ public class NetworthExecute {
 		return (ignoreSoulbound ? soulboundIgnoredTotals : totals).getOrDefault(location, 0.0);
 	}
 
-	public List<NetworthItem> getItems(String location) {
+	private List<NetworthItem> getItems(String location) {
 		return items.getOrDefault(location, new ArrayList<>());
 	}
 
