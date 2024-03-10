@@ -24,6 +24,8 @@ import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.sun.management.OperatingSystemMXBean;
+import java.lang.management.ManagementFactory;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -94,7 +96,8 @@ public class InformationSlashCommand extends SlashCommand {
 											(100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())) /
 											(Runtime.getRuntime().maxMemory())
 										) +
-										"%",
+										"%\n**CPU:** " +
+										roundAndFormat(ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getCpuLoad() * 100),
 										true
 									)
 									.setThumbnail(
