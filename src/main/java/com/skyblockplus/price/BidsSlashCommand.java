@@ -53,7 +53,7 @@ public class BidsSlashCommand extends SlashCommand {
 		}
 
 		JsonArray bids = getBidsFromPlayer(usernameUuidStruct.uuid());
-		if (bids == null || bids.size() == 0) {
+		if (bids == null || bids.isEmpty()) {
 			return defaultEmbed("No bids found for " + usernameUuidStruct.username());
 		}
 

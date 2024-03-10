@@ -191,7 +191,7 @@ public class HypixelSlashCommand extends SlashCommand {
 			"\n";
 		}
 
-		if (skyblockItems.length() > 0) {
+		if (!skyblockItems.isEmpty()) {
 			eb.addField("Skyblock", skyblockItems, true);
 		}
 

@@ -44,7 +44,7 @@ public class CategoriesSlashCommand extends SlashCommand {
 			ebString.append("\n• ").append(category.getName()).append(" ⇢ `").append(category.getId()).append("`");
 		}
 
-		return defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString());
+		return defaultEmbed("Guild Categories").setDescription(ebString.isEmpty() ? "None" : ebString.toString());
 	}
 
 	@Override

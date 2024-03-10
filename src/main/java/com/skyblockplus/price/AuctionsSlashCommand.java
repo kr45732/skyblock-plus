@@ -176,7 +176,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 			} else {
 				button = Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + player.getUuid(), "Track Auctions");
 			}
-			if (extras.getEmbedFields().size() == 0) {
+			if (extras.getEmbedFields().isEmpty()) {
 				return new MessageEditBuilder()
 					.setEmbeds(errorEmbed("No auctions found for " + player.getEscapedUsername()).build())
 					.setActionRow(button);
@@ -188,12 +188,12 @@ public class AuctionsSlashCommand extends SlashCommand {
 				.setEveryPageThumbnail(player.getAvatarUrl())
 				.setEveryPageText(
 					(totalSoldValue > 0
-							? "**Sold Auctions Value:** " +
-							simplifyNumber(totalSoldValue) +
-							(auctionTax > 0 ? " - " + simplifyNumber(auctionTax) + " = " + simplifyNumber(totalSoldValue - auctionTax) : "")
+							? "**Sold Value:** " +
+							simplifyNumber(totalSoldValue - auctionTax) +
+							(auctionTax > 0 ? " (" + simplifyNumber(totalSoldValue) + " - " + simplifyNumber(auctionTax) + ")" : "")
 							: "") +
-					(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue) : "") +
-					(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "")
+					(totalPendingValue > 0 ? "\n**Unsold Value:** " + simplifyNumber(totalPendingValue) : "") +
+					(failedToSell > 0 ? "\n**Did Not Sell Value:** " + simplifyNumber(failedToSell) : "")
 				)
 				.addButton(button);
 
@@ -286,7 +286,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 				}
 			}
 
-			if (extras.getEmbedPages().size() == 0) {
+			if (extras.getEmbedPages().isEmpty()) {
 				return errorEmbed("No auctions found for " + player.getEscapedUsername());
 			}
 

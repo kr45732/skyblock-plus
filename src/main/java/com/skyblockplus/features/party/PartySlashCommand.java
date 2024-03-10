@@ -146,7 +146,7 @@ public class PartySlashCommand extends SlashCommand {
 
 	public static EmbedBuilder getPartyList(String guildId) {
 		List<Party> partyList = guildMap.get(guildId).partyList;
-		if (partyList.size() == 0) {
+		if (partyList.isEmpty()) {
 			return errorEmbed("No active parties");
 		}
 

@@ -135,7 +135,7 @@ public class HelpData {
 	}
 
 	public String getUsageFormatted(HelpData command) {
-		if (command.subcommands.size() == 0) {
+		if (command.subcommands.isEmpty()) {
 			return ("`/" + command.getUsage() + "`" + (command.secondUsage != null ? "\n`/" + getSecondUsage(command) + "`" : ""));
 		}
 

@@ -114,7 +114,7 @@ public class SkillsSlashCommand extends SlashCommand {
 			} else {
 				eb.addField("Unique Golds", "None", false);
 			}
-			if (higherDepth(jacobStats, "perks") != null && higherDepth(jacobStats, "perks").getAsJsonObject().size() > 0) {
+			if (higherDepth(jacobStats, "perks") != null && !higherDepth(jacobStats, "perks").getAsJsonObject().isEmpty()) {
 				StringBuilder ebStr = new StringBuilder();
 				for (Map.Entry<String, JsonElement> perk : higherDepth(jacobStats, "perks").getAsJsonObject().entrySet()) {
 					if (!perk.getValue().isJsonPrimitive() || !perk.getValue().getAsJsonPrimitive().isNumber()) {

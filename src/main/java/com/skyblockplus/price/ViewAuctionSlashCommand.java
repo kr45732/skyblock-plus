@@ -90,7 +90,7 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 			} else {
 				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending " + getRelativeTimestamp(endingAt);
 				ebStr +=
-				bidsArr.size() > 0
+				!bidsArr.isEmpty()
 					? "\n**Highest bidder:** " +
 					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username()
 					: "";

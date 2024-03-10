@@ -98,7 +98,7 @@ public class StringUtils {
 			? null
 			: Stream
 				.of(str.trim().split("\\s"))
-				.filter(word -> word.length() > 0)
+				.filter(word -> !word.isEmpty())
 				.map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
 				.collect(Collectors.joining(" "));
 	}

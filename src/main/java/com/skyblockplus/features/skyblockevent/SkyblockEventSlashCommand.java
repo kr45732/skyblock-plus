@@ -278,7 +278,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 					ebString.append("`").append(prize.getKey()).append(")` ").append(prize.getValue().getAsString()).append("\n");
 				}
 
-				if (ebString.length() == 0) {
+				if (ebString.isEmpty()) {
 					ebString = new StringBuilder("None");
 				}
 

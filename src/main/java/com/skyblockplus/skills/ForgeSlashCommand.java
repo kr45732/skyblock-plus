@@ -94,7 +94,7 @@ public class ForgeSlashCommand extends SlashCommand {
 					false
 				);
 			}
-			if (eb.getFields().size() == 0) {
+			if (eb.getFields().isEmpty()) {
 				return defaultEmbed(player.getEscapedUsername() + " has no items in the forge");
 			}
 			if (bonus != 1) {

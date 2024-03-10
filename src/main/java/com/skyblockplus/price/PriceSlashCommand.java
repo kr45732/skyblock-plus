@@ -93,7 +93,7 @@ public class PriceSlashCommand extends SlashCommand {
 			}
 		}
 
-		if (auctionsArr.size() == 0) {
+		if (auctionsArr.isEmpty()) {
 			return errorEmbed("No " + auctionType.getName() + " matching '" + query + "' found");
 		}
 

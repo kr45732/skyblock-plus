@@ -515,7 +515,7 @@ public class SkyblockEventHandler {
 					} catch (Exception ignored) {}
 				}
 
-				if (prizeListMap.size() == 0) {
+				if (prizeListMap.isEmpty()) {
 					event.editMessageEmbeds(eb.setDescription("`" + textPrizes + "` is invalid. Please try again.").build()).queue();
 				} else {
 					eb.addField(

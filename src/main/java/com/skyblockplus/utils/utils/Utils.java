@@ -716,7 +716,7 @@ public class Utils {
 			return;
 		}
 
-		log.info("Caching Apply Users");
+		log.info("Caching apply users");
 		long startTime = System.currentTimeMillis();
 		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
 			List<ApplyGuild> applySettings = automaticGuild.getValue().applyGuilds;
@@ -735,7 +735,7 @@ public class Utils {
 						.collect(Collectors.toCollection(ArrayList::new));
 					database.setApplyCacheSettings(automaticGuild.getKey(), name, gson.toJson(applyUserList));
 
-					if (applyUserList.size() > 0) {
+					if (!applyUserList.isEmpty()) {
 						log.info(
 							"Cached ApplyUser - size={" +
 							applyUserList.size() +
@@ -748,10 +748,10 @@ public class Utils {
 					}
 				} catch (Exception e) {
 					log.error(
-						"Error caching applyUser - guildId={" +
+						"Error caching ApplyUser - guildId={" +
 						automaticGuild.getKey() +
 						"}, name={" +
-						higherDepth(applySetting.currentSettings, "guildName", "null") +
+						higherDepth(applySetting.currentSettings, "guildName", null) +
 						"}",
 						e
 					);

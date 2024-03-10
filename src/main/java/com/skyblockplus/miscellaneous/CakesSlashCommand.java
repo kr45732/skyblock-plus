@@ -83,7 +83,7 @@ public class CakesSlashCommand extends SlashCommand {
 					}
 				}
 			}
-			eb.appendDescription("**Active Cakes**\n" + (activeCakes.length() > 0 ? activeCakes.toString() : "None\n"));
+			eb.appendDescription("**Active Cakes**\n" + (!activeCakes.isEmpty() ? activeCakes.toString() : "None\n"));
 
 			StringBuilder missingCakesStr = new StringBuilder();
 			for (Map.Entry<String, String> missingCake : cakeNameToId.entrySet()) {
@@ -93,7 +93,7 @@ public class CakesSlashCommand extends SlashCommand {
 					.append(capitalizeString(missingCake.getKey().split("cake_")[1].replace("_", " ")))
 					.append("\n");
 			}
-			eb.appendDescription("\n**Inactive Cakes**\n" + (missingCakesStr.length() > 0 ? missingCakesStr.toString() : "None"));
+			eb.appendDescription("\n**Inactive Cakes**\n" + (!missingCakesStr.isEmpty() ? missingCakesStr.toString() : "None"));
 
 			return eb;
 		}
