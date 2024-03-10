@@ -107,7 +107,7 @@ public class AuctionFlipper {
 				long buyPrice = higherDepth(auction, "starting_bid").getAsLong();
 				double profit = calculateWithTaxes(resellPrice) - buyPrice;
 
-				if (profit < 1000000) {
+				if (profit < 2500000) {
 					continue;
 				}
 

@@ -100,18 +100,23 @@ public class MayorHandler {
 				int votes = higherDepth(curMayor, "votes").getAsInt();
 
 				if (higherDepth(curMayor, "name").getAsString().equals(currentMayor)) {
-					StringBuilder perksStr = new StringBuilder();
-					for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
-						perksStr
-							.append("\n➜ ")
-							.append(higherDepth(perk, "name").getAsString())
-							.append(": ")
-							.append(cleanMcCodes(higherDepth(perk, "description").getAsString()));
-					}
-
 					eb.addField(
-						mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
-						"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
+						mayorNameToEmoji.get(name.toUpperCase()) +
+						" Mayor " +
+						name +
+						" | " +
+						roundProgress(votes / totalVotes) +
+						" (" +
+						formatNumber(votes) +
+						")",
+						streamJsonArray(higherDepth(curMayor, "perks"))
+							.map(e ->
+								"\n➜ " +
+								higherDepth(e, "name").getAsString() +
+								": " +
+								cleanMcCodes(higherDepth(e, "description").getAsString())
+							)
+							.collect(Collectors.joining()),
 						false
 					);
 				} else {
