@@ -58,8 +58,7 @@ public class MissingSlashCommand extends SlashCommand {
 		"CRUX_TALISMAN_3",
 		"CRUX_TALISMAN_4",
 		"CRUX_TALISMAN_5",
-		"CRUX_TALISMAN_6",
-		"GENERAL_MEDALLION"
+		"CRUX_TALISMAN_6"
 	);
 	private static final List<String> crabHatColors = List.of(
 		"RED",
