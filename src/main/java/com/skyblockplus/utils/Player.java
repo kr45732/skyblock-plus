@@ -64,7 +64,6 @@ public class Player {
 	private boolean valid = false;
 
 	private String failCause = "Unknown fail cause";
-	private int dungeonSecretsAchievement = -2;
 	private int crystalNucleusAchievement = -2;
 
 	/* Constructors */
@@ -433,23 +432,11 @@ public class Player {
 			return Utils.getEmoji(itemName.toUpperCase(), "❓");
 		}
 
-		private void refreshAchievementsJson() {
-			JsonElement achievementsJson = playerFromUuid(uuid).response();
-			dungeonSecretsAchievement = higherDepth(achievementsJson, "achievements.skyblock_treasure_hunter", 0);
-			crystalNucleusAchievement = higherDepth(achievementsJson, "achievements.skyblock_crystal_nucleus", -1);
-		}
-
-		public int getDungeonSecrets() {
-			if (dungeonSecretsAchievement == -2) {
-				refreshAchievementsJson();
-			}
-			return dungeonSecretsAchievement;
-		}
-
 		public int getCrystalNucleusAchievements() {
 			if (crystalNucleusAchievement == -2) {
-				refreshAchievementsJson();
+				crystalNucleusAchievement = higherDepth(playerFromUuid(uuid).response(), "achievements.skyblock_crystal_nucleus", -1);
 			}
+
 			return crystalNucleusAchievement;
 		}
 
@@ -686,6 +673,10 @@ public class Player {
 		}
 
 		/* Dungeons */
+		public int getDungeonSecrets() {
+			return higherDepth(profileJson(), "dungeons.secrets", 0);
+		}
+
 		public String getSelectedDungeonClass() {
 			try {
 				return higherDepth(profileJson(), "dungeons.selected_dungeon_class").getAsString();

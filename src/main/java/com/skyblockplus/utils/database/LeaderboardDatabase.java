@@ -115,7 +115,8 @@ public class LeaderboardDatabase {
 			"bestiary",
 			"gamemode",
 			"emblem",
-			"farming_cap"
+			"farming_cap",
+			"dungeon_secrets"
 		)
 	);
 	private static final List<String> typesSubList = new ArrayList<>();

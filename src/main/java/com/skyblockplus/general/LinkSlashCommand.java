@@ -101,7 +101,8 @@ public class LinkSlashCommand extends SlashCommand {
 		"weight",
 		"selected_class",
 		"gamemode",
-		"emblem"
+		"emblem",
+		"dungeon_secrets"
 	);
 
 	public LinkSlashCommand() {

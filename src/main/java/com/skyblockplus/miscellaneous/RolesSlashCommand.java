@@ -112,8 +112,7 @@ public class RolesSlashCommand extends SlashCommand {
 		}
 
 		/**
-		 * @param skipRoles Whether to skip certain roles: (guild roles, guild ranks, dungeon secrets,
-		 *     player items)
+		 * @param skipRoles Whether to skip certain roles: (guild roles, guild ranks, player items)
 		 * @return eb or [eb, toAdd, toRemove]
 		 */
 		public static Tuple3<EmbedBuilder, List<Role>, List<Role>> updateRoles(
@@ -152,7 +151,6 @@ public class RolesSlashCommand extends SlashCommand {
 					skipRoles &&
 					(roleName.equals("guild_member") ||
 						roleName.equals("guild_ranks") ||
-						roleName.equals("dungeon_secrets") ||
 						roleName.equals("player_items"))
 				) {
 					continue;
