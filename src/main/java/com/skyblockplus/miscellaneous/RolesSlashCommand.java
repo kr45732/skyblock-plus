@@ -147,12 +147,7 @@ public class RolesSlashCommand extends SlashCommand {
 					continue;
 				}
 
-				if (
-					skipRoles &&
-					(roleName.equals("guild_member") ||
-						roleName.equals("guild_ranks") ||
-						roleName.equals("player_items"))
-				) {
+				if (skipRoles && (roleName.equals("guild_member") || roleName.equals("guild_ranks") || roleName.equals("player_items"))) {
 					continue;
 				}
 
