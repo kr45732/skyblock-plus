@@ -83,7 +83,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.2.3'
     implementation 'org.springframework.boot:spring-boot-starter-security:3.2.3'
     implementation 'org.springframework.boot:spring-boot-starter-web:3.2.3'
-    runtimeOnly 'org.postgresql:postgresql:42.7.2'
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'
 
     // Http client
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
