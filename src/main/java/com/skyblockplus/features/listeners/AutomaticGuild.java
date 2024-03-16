@@ -545,7 +545,7 @@ public class AutomaticGuild {
 				}
 
 				boolean canModifyNicknames = guild.getSelfMember().hasPermission(Permission.NICKNAME_MANAGE);
-				boolean checkVerify = false;
+				boolean checkVerify = false; // If nickname need profiles to be fetched
 				if (verifyEnabled) {
 					String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
 					if (nicknameTemplate.contains("[IGN]") && canModifyNicknames) {
@@ -595,7 +595,14 @@ public class AutomaticGuild {
 						toRemoveRoles.addAll(verifyRolesRemove);
 
 						String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
-						if (nicknameTemplate.contains("[IGN]") && canModifyNicknames && guild.getSelfMember().canInteract(linkedMember)) {
+						// Last AND condition: player wasn't requested or they were requested successfully
+						// So that any players who were requested unsuccessfully are ignored
+						if (
+							nicknameTemplate.contains("[IGN]") &&
+							canModifyNicknames &&
+							guild.getSelfMember().canInteract(linkedMember) &&
+							(!uuidsToRequest.contains(linkedAccount.uuid()) || uuidToPlayer.containsKey(linkedAccount.uuid()))
+						) {
 							nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
 
 							Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
@@ -690,10 +697,7 @@ public class AutomaticGuild {
 								}
 							}
 
-							// Player wasn't requested or they were requested successfully
-							if (!uuidsToRequest.contains(linkedAccount.uuid()) || uuidToPlayer.containsKey(linkedAccount.uuid())) {
-								nickname = nicknameTemplate;
-							}
+							nickname = nicknameTemplate;
 						}
 					}
 

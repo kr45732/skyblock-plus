@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.utils.Utils.updateGuildExecutor;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.internal.entities.MemberImpl;
@@ -35,14 +36,16 @@ public final class ModifyMemberRecord {
 	private String nickname;
 
 	public ModifyMemberRecord update(Member selfMember, List<Role> add, List<Role> remove) {
-		for (Role role : add) {
-			if (role != null && selfMember.canInteract(role)) {
-				this.add.add(role);
+		if (!selfMember.hasPermission(Permission.MANAGE_ROLES)) {
+			for (Role role : add) {
+				if (role != null && selfMember.canInteract(role)) {
+					this.add.add(role);
+				}
 			}
-		}
-		for (Role role : remove) {
-			if (role != null && selfMember.canInteract(role)) {
-				this.remove.add(role);
+			for (Role role : remove) {
+				if (role != null && selfMember.canInteract(role)) {
+					this.remove.add(role);
+				}
 			}
 		}
 		return this;

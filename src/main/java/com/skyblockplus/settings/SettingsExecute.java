@@ -1828,7 +1828,7 @@ public class SettingsExecute {
 		if (higherDepth(verifySettings, "enableAutomaticSync", false)) {
 			ebFieldString += "\n• **DM On Join Sync:** " + displaySettings(verifySettings, "dmOnSync");
 		}
-		ebFieldString += "\n• **Automatic SB Roles Claim On Join:** " + displaySettings(verifySettings, "enableRolesClaim");
+		ebFieldString += "\n• **Automatic SB Roles Claim On Join/Link:** " + displaySettings(verifySettings, "enableRolesClaim");
 		return ebFieldString;
 	}
 
