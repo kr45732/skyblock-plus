@@ -1096,8 +1096,7 @@
     "guild_leaderboard": {
       "lb_type": "amount",
       "ignored_ranks": [
-        "mod",
-        "nightwatch"
+        "staff"
       ],
       "default_rank": {
         "requirements": [
