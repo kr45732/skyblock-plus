@@ -36,7 +36,7 @@ public final class ModifyMemberRecord {
 	private String nickname;
 
 	public ModifyMemberRecord update(Member selfMember, List<Role> add, List<Role> remove) {
-		if (!selfMember.hasPermission(Permission.MANAGE_ROLES)) {
+		if (selfMember.hasPermission(Permission.MANAGE_ROLES)) {
 			for (Role role : add) {
 				if (role != null && selfMember.canInteract(role)) {
 					this.add.add(role);

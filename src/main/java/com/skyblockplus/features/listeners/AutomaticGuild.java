@@ -545,7 +545,7 @@ public class AutomaticGuild {
 				}
 
 				boolean canModifyNicknames = guild.getSelfMember().hasPermission(Permission.NICKNAME_MANAGE);
-				boolean checkVerify = false; // If nickname need profiles to be fetched
+				boolean checkVerify = false; // If nickname needs profiles to be fetched
 				if (verifyEnabled) {
 					String nicknameTemplate = higherDepth(serverSettings, "automatedVerify.verifiedNickname").getAsString();
 					if (nicknameTemplate.contains("[IGN]") && canModifyNicknames) {
