@@ -1066,7 +1066,7 @@
           "requirements": [
             [
               {
-                "amount": 85000,
+                "amount": 100000,
                 "type": "gxp"
               }
             ]
@@ -1079,7 +1079,7 @@
           "requirements": [
             [
               {
-                "amount": 200000,
+                "amount": 225000,
                 "type": "gxp"
               }
             ]
