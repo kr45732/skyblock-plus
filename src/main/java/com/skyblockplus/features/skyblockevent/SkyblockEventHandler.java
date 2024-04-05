@@ -489,7 +489,7 @@ public class SkyblockEventHandler {
 					event.editMessageEmbeds(getEb("`" + textMinAmt + "` is invalid. Please try again.").build()).queue();
 				}
 			}
-			case "config_maxmimum_amount" -> {
+			case "config_maximum_amount" -> {
 				String textMaxAmt = event.getValues().get(0).getAsString();
 				try {
 					int maxAmount = Integer.parseInt(textMaxAmt);
@@ -649,7 +649,7 @@ public class SkyblockEventHandler {
 		if (!eventSettings.getTimeEndingSeconds().isEmpty()) {
 			eb.addField(
 				"End Date",
-				"Ends " + getRelativeTimestamp(Instant.ofEpochMilli(Long.parseLong(eventSettings.getTimeEndingSeconds()))),
+				"Ends " + getRelativeTimestamp(Instant.ofEpochSecond(Long.parseLong(eventSettings.getTimeEndingSeconds()))),
 				false
 			);
 		}
