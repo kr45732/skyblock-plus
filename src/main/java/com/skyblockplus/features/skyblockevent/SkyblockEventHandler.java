@@ -637,11 +637,11 @@ public class SkyblockEventHandler {
 		if (!eventSettings.getEventType().isEmpty()) {
 			eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 		}
-		if (addGuildMembers) {
-			eb.addField("Automatically Add Guild Members", "Enabled", false);
-		}
 		if (guildResponse != null) {
 			eb.addField("Guild", guildResponse.get("name").getAsString(), false);
+		}
+		if (addGuildMembers) {
+			eb.addField("Automatically Add Guild Members", "Enabled", false);
 		}
 		if (announcementChannel != null) {
 			eb.addField("Announcement Channel", announcementChannel.getAsMention(), false);
@@ -660,7 +660,7 @@ public class SkyblockEventHandler {
 			eb.addField("Maximum Amount", formatNumber(Integer.parseInt(eventSettings.getMaxAmount())), false);
 		}
 		if (!eventSettings.getWhitelistRole().isEmpty()) {
-			eb.addField("Required role", "<@&" + eventSettings.getWhitelistRole() + ">", false);
+			eb.addField("Required Role", "<@&" + eventSettings.getWhitelistRole() + ">", false);
 		}
 		if (!eventSettings.getPrizeMap().isEmpty()) {
 			eb.addField(
