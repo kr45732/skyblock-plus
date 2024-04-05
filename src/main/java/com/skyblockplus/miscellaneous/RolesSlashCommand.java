@@ -390,6 +390,11 @@ public class RolesSlashCommand extends SlashCommand {
 										playerAmount = useHighest ? player.getHighestAmount(roleName) : player.getWeight();
 										yield playerAmount;
 									}
+									case "hotm_3_ironman" -> player.getGamemode() == Player.Gamemode.IRONMAN &&
+										player.getHOTM() != null &&
+										player.getHOTM().currentLevel() >= 3
+										? 1
+										: -1;
 									default -> -1;
 								};
 						} else {

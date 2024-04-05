@@ -75,7 +75,7 @@ public class RoleModel {
 	}
 
 	public void addLevel(String value, String roleId) {
-		levels.removeIf(l -> l.getValue().equals(value));
+		levels.removeIf(l -> l.getValue().equals(value) || l.getRoleId().equals(roleId));
 		levels.add(new RoleObject(value, roleId));
 		try {
 			levels.sort(Comparator.comparingLong(r -> Long.parseLong(r.getValue())));

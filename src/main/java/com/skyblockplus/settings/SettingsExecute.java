@@ -145,10 +145,7 @@ public class SettingsExecute {
 			"guild_member",
 			"**Member role for Hypixel guilds**\nExample: `/settings roles add guild_member skyblock_forceful @guild member`\n",
 			"guild_ranks",
-			"**If a player is in a guild setup in `/settings guild`, they will be given the" +
-			" corresponding rank role set there**\n" +
-			"Note: this role can only be linked here. To modify guild ranks use `/settings" +
-			" guild <name>`\n",
+			"**If a player is in a guild setup in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be linked here. To modify guild ranks use `/settings guild <name>`\n",
 			"coins",
 			"**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n",
 			"fairy_souls",
@@ -170,8 +167,7 @@ public class SettingsExecute {
 			"gamemode",
 			"**Playing on an ironman or stranded profile**\nExample: `/settings roles add gamemode stranded @stranded gamer`\n",
 			"maxed_collections",
-			"**Number of a player's individually maxed collections**\n" +
-			"Example: `/settings roles add maxed_collections 62 @all collections maxed`\n",
+			"**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n",
 			"player_items",
 			"**Items that a player has**\nExample: `/settings roles add player_items hyperion @mage gamer`\n",
 			"class_average",
@@ -181,7 +177,10 @@ public class SettingsExecute {
 			"barbarian_reputation",
 			"**A player's barbarian reputation**\nExample: `/settings roles add barbarian_reputation 1000 @1k barbarian rep`\n",
 			"level",
-			"**A player's Skyblock level**\nExample: `/settings roles add level 500 @maxed level`\n"
+			"**A player's Skyblock level**\nExample: `/settings roles add level 500 @maxed level`\n",
+			// BELOW ROLE SHOULD ALWAYS BE LAST IN MAP
+			"hotm_3_ironman",
+			"Your computer may or may not self destruct\n"
 		)
 	);
 
@@ -1533,7 +1532,8 @@ public class SettingsExecute {
 
 		List<String> roleNames = new ArrayList<>(allAutomatedRoles.keySet());
 		StringBuilder pageNumbers = new StringBuilder();
-		for (int i = 0; i < roleNames.size(); i++) {
+		// -1 to ignore hotm_3_ironman
+		for (int i = 0; i < roleNames.size() - 1; i++) {
 			pageNumbers.append("\n**Page ").append(i + 2).append(":** ").append(roleNames.get(i));
 		}
 		paginateBuilder.addStrings(
@@ -1548,6 +1548,11 @@ public class SettingsExecute {
 		);
 
 		for (Entry<String, String> roleDesc : allAutomatedRoles.entrySet()) {
+			// -1 (last element) +2 (starts on page 2)
+			if (roleDesc.getKey().equals("hotm_3_ironman") && pageNum != roleNames.size() + 1) {
+				continue;
+			}
+
 			StringBuilder ebFieldString = new StringBuilder().append(roleDesc.getValue()).append("\nSettings");
 			JsonElement roleSettings = streamJsonArray(higherDepth(rolesSettings, "roles"))
 				.filter(e -> higherDepth(e, "name", "").equals(roleDesc.getKey()))
@@ -1751,6 +1756,15 @@ public class SettingsExecute {
 		if (roleSettings == null) {
 			roleSettings = new RoleModel(roleName);
 		}
+
+		// "one level role"
+		if (roleName.equals("hotm_3_ironman")) {
+			if (roleSettings.getLevels().size() == 1) {
+				return errorEmbed("your computer self destructed");
+			}
+			roleValue = "1";
+		}
+
 		roleSettings.addLevel(roleValue, role.getId());
 
 		int responseCode = database.setRoleSettings(guild.getId(), roleSettings);
@@ -1782,7 +1796,7 @@ public class SettingsExecute {
 				levelValue = guildJson.get("name").getAsString();
 			}
 
-			if (levelValue.equalsIgnoreCase(value.replace("_", " "))) {
+			if (levelValue.equalsIgnoreCase(value.replace("_", " ")) || roleName.equals("hotm_3_ironman")) {
 				try {
 					iter.remove();
 				} catch (Exception ignored) {
