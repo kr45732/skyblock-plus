@@ -331,18 +331,6 @@ public class ServerSettingsService {
 	}
 
 	// Event
-	public boolean eventHasMemberByUuid(String serverId, String minecraftUuid) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			EventSettings eventSettings = currentServerSettings.getSbEvent();
-			if (!eventSettings.getEventType().isEmpty()) {
-				return eventSettings.getMembersList().stream().anyMatch(eventMember -> eventMember.getUuid().equals(minecraftUuid));
-			}
-		}
-		return false;
-	}
-
 	public ResponseEntity<EventSettings> getSkyblockEventSettings(String serverId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 

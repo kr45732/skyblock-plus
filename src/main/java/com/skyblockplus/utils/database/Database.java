@@ -146,10 +146,6 @@ public class Database {
 		return settingsService.removeMemberFromSkyblockEvent(serverId, minecraftUuid).getStatusCode().value();
 	}
 
-	public boolean eventHasMemberByUuid(String serverId, String minecraftUuid) {
-		return settingsService.eventHasMemberByUuid(serverId, minecraftUuid);
-	}
-
 	public int setApplyReqs(String serverId, String name, JsonArray newApplyReqs) {
 		return settingsService
 			.setApplyReqs(serverId, name, gson.fromJson(newApplyReqs, new TypeToken<List<ApplyRequirement>>() {}.getType()))

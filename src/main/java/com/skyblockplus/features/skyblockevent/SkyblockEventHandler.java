@@ -27,6 +27,7 @@ import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
@@ -61,7 +62,8 @@ public class SkyblockEventHandler {
 	private final EmbedBuilder eb = defaultEmbed("Skyblock Event").setDescription("Use the menu below to choose the event type");
 	private Message message;
 	private GuildMessageChannel announcementChannel;
-	private String guildName;
+	private HypixelResponse guildResponse;
+	private boolean addGuildMembers;
 	private SelectMenuState selectMenuState = SelectMenuState.TYPE_GENERIC;
 
 	public SkyblockEventHandler(SlashCommandEvent slashCommandEvent) {
@@ -240,8 +242,8 @@ public class SkyblockEventHandler {
 									.setDescription("A new Skyblock event has been created!")
 									.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 
-								if (guildName != null) {
-									announcementEb.addField("Guild", guildName, false);
+								if (guildResponse != null) {
+									announcementEb.addField("Guild", guildResponse.get("name").getAsString(), false);
 								}
 
 								announcementEb.addField("End Date", "Ends <t:" + eventSettings.getTimeEndingSeconds() + ":R>", false);
@@ -273,11 +275,50 @@ public class SkyblockEventHandler {
 									.queue(m -> {
 										eventSettings.setAnnouncementMessageId(m.getId());
 										if (setSkyblockEventInDatabase()) {
+											int successCount = 0;
+											if (addGuildMembers) {
+												hook
+													.editOriginalEmbeds(
+														defaultEmbed("Skyblock Event")
+															.setDescription(
+																"Attempting to add all guild members to the event. This may take some time depending on the guild size."
+															)
+															.build()
+													)
+													.setComponents()
+													.queue();
+												for (JsonElement guildMember : guildResponse.get("members").getAsJsonArray()) {
+													if (
+														SkyblockEventSlashCommand.JoinSubcommand
+															.joinSkyblockEvent(
+																higherDepth(guildMember, "uuid").getAsString(),
+																null,
+																null,
+																event.getGuild().getId(),
+																guildResponse
+															)
+															.build()
+															.getTitle()
+															.equals("Added player to event")
+													) {
+														successCount++;
+													}
+												}
+											}
+
 											hook
 												.editOriginalEmbeds(
 													defaultEmbed("Skyblock Event")
 														.setDescription(
-															"Event successfully started in " + announcementChannel.getAsMention()
+															"Event successfully started in " +
+															announcementChannel.getAsMention() +
+															(addGuildMembers
+																	? "\n• Successfully added " +
+																	successCount +
+																	" guild members\n• Failed to add " +
+																	(guildResponse.get("members").getAsJsonArray().size() - successCount) +
+																	" guild members"
+																	: "")
 														)
 														.build()
 												)
@@ -306,6 +347,11 @@ public class SkyblockEventHandler {
 								.build()
 						)
 						.queue();
+					case "add_guild_members" -> {
+						addGuildMembers = !addGuildMembers;
+						eb.addField("Automatically Add Guild Members", "" + addGuildMembers, false);
+						event.editMessage(getGenericConfigMessage()).queue();
+					}
 					case "duration" -> event
 						.replyModal(
 							Modal
@@ -405,9 +451,9 @@ public class SkyblockEventHandler {
 				if (!response.isValid()) {
 					event.editMessageEmbeds(eb.setDescription(response.failCause() + ". Please try again.").build()).queue();
 				} else {
-					guildName = response.get("name").getAsString();
+					guildResponse = response;
 					eventSettings.setEventGuildId(response.get("_id").getAsString());
-					eb.addField("Guild", guildName, false);
+					eb.addField("Guild", response.get("name").getAsString(), false);
 					event.editMessage(getGenericConfigMessage()).queue();
 				}
 			}
@@ -580,13 +626,17 @@ public class SkyblockEventHandler {
 	}
 
 	private MessageEditData getGenericConfigMessage() {
+		StringSelectMenu.Builder selectMenu = StringSelectMenu
+			.create("skyblock_event_" + selectMenuState)
+			.addOption("Create Event", "create_event")
+			.addOption("Guild", "guild");
+		if (guildResponse != null) {
+			selectMenu.addOption("Add Guild Members", "add_guild_members");
+		}
 		return new MessageEditBuilder()
 			.setEmbeds(eb.setDescription("Use the menu below to configure the event settings and start the event").build())
 			.setActionRow(
-				StringSelectMenu
-					.create("skyblock_event_" + selectMenuState)
-					.addOption("Create Event", "create_event")
-					.addOption("Guild", "guild")
+				selectMenu
 					.addOption("Duration", "duration")
 					.addOption("Channel", "channel")
 					.addOption("Prizes", "prizes")

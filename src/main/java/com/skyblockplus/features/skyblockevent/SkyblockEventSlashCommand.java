@@ -21,8 +21,7 @@ package com.skyblockplus.features.skyblockevent;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
-import static com.skyblockplus.utils.utils.JsonUtils.getJsonKeys;
-import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
+import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 
@@ -309,7 +308,18 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		}
 
 		public static EmbedBuilder joinSkyblockEvent(String username, String profile, Member member, String guildId) {
+			return joinSkyblockEvent(username, profile, member, guildId, null);
+		}
+
+		public static EmbedBuilder joinSkyblockEvent(
+			String username,
+			String profile,
+			Member member,
+			String guildId,
+			HypixelResponse guildJson
+		) {
 			JsonElement eventSettings = database.getSkyblockEventSettings(guildId);
+
 			if (!higherDepth(eventSettings, "eventType", "").isEmpty()) {
 				String uuid;
 				if (member != null) {
@@ -330,7 +340,10 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 					username = uuidStruct.username();
 				}
 
-				if (database.eventHasMemberByUuid(guildId, uuid)) {
+				if (
+					streamJsonArray(higherDepth(eventSettings, "membersList"))
+						.anyMatch(e -> higherDepth(e, "uuid").getAsString().equals(uuid))
+				) {
 					return errorEmbed(
 						member != null
 							? "You are already in the event! If you want to leave or change profile use `/event leave`"
@@ -340,7 +353,10 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 				if (member != null) {
 					if (!higherDepth(eventSettings, "eventGuildId", "").isEmpty()) {
-						HypixelResponse guildJson = getGuildFromPlayer(uuid);
+						if (guildJson == null) {
+							guildJson = getGuildFromPlayer(uuid);
+						}
+
 						if (!guildJson.isValid()) {
 							return guildJson.getErrorEmbed();
 						}
