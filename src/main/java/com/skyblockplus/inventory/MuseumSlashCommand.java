@@ -20,17 +20,14 @@ package com.skyblockplus.inventory;
 
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
-import static com.skyblockplus.utils.utils.StringUtils.formatOrSimplify;
-import static com.skyblockplus.utils.utils.StringUtils.idToName;
+import static com.skyblockplus.utils.utils.StringUtils.*;
+import static com.skyblockplus.utils.utils.StringUtils.simplifyNumber;
 import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
-import com.skyblockplus.utils.command.Subcommand;
+import com.skyblockplus.utils.command.*;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.InvItem;
@@ -39,6 +36,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -159,13 +157,22 @@ public class MuseumSlashCommand extends SlashCommand {
 
 			JsonElement museumJson = hypixelResponse.get(player.getUuid());
 			Set<String> items = new HashSet<>(higherDepth(museumJson, "items").getAsJsonObject().keySet());
+			Set<String> itemsHighest = new HashSet<>();
 			for (Map.Entry<String, List<String>> entry : MUSEUM_PARENTS.entrySet()) {
-				for (int i = entry.getValue().size() - 1; i >= 0; i--) {
-					if (items.contains(entry.getValue().get(i))) {
+				List<String> v = entry.getValue();
+
+				for (int i = v.size() - 1; i >= 0; i--) {
+					if (items.contains(v.get(i))) {
 						items.add(entry.getKey());
-						items.addAll(entry.getValue().subList(0, i));
+						items.addAll(v.subList(0, i));
 						break;
 					}
+				}
+
+				// If player doesn't have the highest item then add all below it
+				if (!items.contains(v.get(v.size() - 1))) {
+					itemsHighest.add(entry.getKey());
+					itemsHighest.addAll(v.subList(0, v.size() - 1));
 				}
 			}
 
@@ -173,6 +180,7 @@ public class MuseumSlashCommand extends SlashCommand {
 			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(event.getUser()).setItemsPerPage(25);
 
 			Map<String, Double> formattedToCost = new HashMap<>();
+			List<String> useForHighest = new ArrayList<>();
 
 			for (Map.Entry<String, JsonElement> entry : getMuseumCategoriesJson().entrySet()) {
 				if (entry.getKey().equals("weapons") || entry.getKey().equals("rarities") || entry.getKey().equals("armor")) {
@@ -182,6 +190,9 @@ public class MuseumSlashCommand extends SlashCommand {
 						if (items.contains(itemId)) {
 							continue;
 						}
+
+						String name;
+						double cost = 0;
 
 						if (entry.getKey().equals("armor")) {
 							List<String> setPieces = streamJsonArray(getConstant("MUSEUM_ARMOR_TO_SET." + itemId))
@@ -208,25 +219,28 @@ public class MuseumSlashCommand extends SlashCommand {
 									(itemId.contains("ARMOR") || itemId.endsWith("_SUIT") || itemId.endsWith("_TUXEDO") ? "" : " Armor");
 								};
 
-							double cost = 0;
 							for (String setItemId : setPieces) {
 								cost += calc.getLowestPrice(setItemId);
 							}
 
-							formattedToCost.put(
+							name =
 								getEmoji(setPieces.get(0)) +
 								" " +
 								setName +
-								(!isSoulbound ? ": " + formatOrSimplify(cost) : " (Soulbound)"),
-								!isSoulbound ? cost : Double.MAX_VALUE
-							);
+								(!isSoulbound ? ": " + formatOrSimplify(cost) : " (Soulbound)");
+							cost = !isSoulbound ? cost : Double.MAX_VALUE;
 						} else {
-							double cost = calc.getLowestPrice(itemId);
+							cost = calc.getLowestPrice(itemId);
 							boolean isSoulbound = SOULBOUND_ITEMS.contains(itemId);
-							formattedToCost.put(
-								getEmoji(itemId) + " " + idToName(itemId) + (!isSoulbound ? ": " + formatOrSimplify(cost) : " (Soulbound)"),
-								isSoulbound ? Double.MAX_VALUE : cost
-							);
+							name =
+								getEmoji(itemId) + " " + idToName(itemId) + (!isSoulbound ? ": " + formatOrSimplify(cost) : " (Soulbound)");
+							cost = isSoulbound ? Double.MAX_VALUE : cost;
+						}
+
+						formattedToCost.put(name, cost);
+
+						if (!itemsHighest.contains(itemId)) {
+							useForHighest.add(name);
 						}
 					}
 				}
@@ -236,25 +250,82 @@ public class MuseumSlashCommand extends SlashCommand {
 				return player.defaultPlayerEmbed().setDescription("331/331 museum items donated");
 			}
 
+			List<String> missing = new ArrayList<>();
+			List<String> missingHighest = new ArrayList<>();
+			double missingTotal = 0;
+			double missingTotalHighest = 0;
 			for (Map.Entry<String, Double> entry : formattedToCost
 				.entrySet()
 				.stream()
 				.sorted(Comparator.comparingDouble(Map.Entry::getValue))
 				.toList()) {
-				paginateBuilder.addStrings(entry.getKey());
+				missing.add(entry.getKey());
+				if (entry.getValue() != Double.MAX_VALUE) {
+					missingTotal += entry.getValue();
+				}
+
+				if (useForHighest.contains(entry.getKey())) {
+					missingHighest.add(entry.getKey());
+					if (entry.getValue() != Double.MAX_VALUE) {
+						missingTotalHighest += entry.getValue();
+					}
+				}
 			}
+
+			double finalMissingTotalHighest = missingTotalHighest;
+			double finalMissingTotal = missingTotal;
 
 			paginateBuilder
 				.getExtras()
+				.addStrings(missing)
 				.setEveryPageText(
-					"**Total Missing:** " +
-					paginateBuilder.size() +
-					"\n**Missing Cost:** " +
-					formatOrSimplify(
-						(long) formattedToCost.values().stream().mapToDouble(e -> e).filter(e -> e != Double.MAX_VALUE).sum()
-					) +
-					"\n"
+					"**Total Missing:** " + missing.size() + "\n**Missing Cost:** " + formatOrSimplify((long) missingTotal) + "\n"
 				);
+			// Only show button if highest is different from all
+			if (missing.size() != missingHighest.size()) {
+				paginateBuilder
+					.getExtras()
+					.addReactiveButtons(
+						new PaginatorExtras.ReactiveButton(
+							Button.primary("reactive_museum_command_show_highest", "Show Highest Tier"),
+							action -> {
+								action
+									.paginator()
+									.getExtras()
+									.setStrings(missingHighest)
+									.setEveryPageText(
+										"**Total Missing:** " +
+										missingHighest.size() +
+										"\n**Total Cost:** " +
+										simplifyNumber((long) finalMissingTotalHighest) +
+										"\n**Note:** Showing highest tier\n"
+									)
+									.toggleReactiveButton("reactive_museum_command_show_highest", false)
+									.toggleReactiveButton("reactive_museum_command_show_all", true);
+							},
+							true
+						),
+						new PaginatorExtras.ReactiveButton(
+							Button.primary("reactive_museum_command_show_all", "Show All Tiers"),
+							action -> {
+								action
+									.paginator()
+									.getExtras()
+									.setStrings(missing)
+									.setEveryPageText(
+										"**Total Missing:** " +
+										missing.size() +
+										"\n**Total Cost:** " +
+										simplifyNumber((long) finalMissingTotal) +
+										"\n"
+									)
+									.toggleReactiveButton("reactive_museum_command_show_highest", true)
+									.toggleReactiveButton("reactive_museum_command_show_all", false);
+							},
+							false
+						)
+					);
+			}
 			event.paginate(paginateBuilder);
 			return null;
 		}

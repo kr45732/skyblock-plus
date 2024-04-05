@@ -245,7 +245,7 @@ public class LeaderboardDatabase {
 
 					for (int paramIndex = 0; paramIndex < typesSubList.size(); paramIndex++) {
 						String type = typesSubList.get(paramIndex);
-						double value = type.equals("networth") && !updateNetworth ? 0 : player.getHighestAmount(type, gamemode);
+						double value = type.equals("networth") && !updateNetworth ? 0 : player.getHighestAmount(type, gamemode, true);
 
 						params[paramIndex + 3][playerIndex] = value < 0 ? null : value;
 					}

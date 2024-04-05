@@ -1125,7 +1125,7 @@ public class HelpSlashCommand extends SlashCommand {
 		}
 	}
 
-	private List<String> commandToNames(HelpData command) {
+	public List<String> commandToNames(HelpData command) {
 		List<String> commands = new ArrayList<>();
 		commands.add(command.getName());
 		for (HelpData subcommand : command.getSubcommands()) {

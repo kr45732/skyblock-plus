@@ -170,7 +170,7 @@ public class MissingSlashCommand extends SlashCommand {
 				.addStrings(missing.getValue())
 				.setEveryPageText(
 					"**Total Missing:** " +
-					missingTalismans.size() +
+					missing.getValue().size() +
 					"\n**Total Cost:** " +
 					simplifyNumber(missing.getKey()) +
 					"\n**Note:** Talismans with a * have higher tiers\n"
@@ -185,7 +185,7 @@ public class MissingSlashCommand extends SlashCommand {
 								.setStrings(missingHighest.getValue())
 								.setEveryPageText(
 									"**Total Missing:** " +
-									missingTalismans.size() +
+									missingHighest.getValue().size() +
 									"\n**Total Cost:** " +
 									simplifyNumber(missingHighest.getKey()) +
 									"\n**Note:** Showing highest tiers\n"
@@ -204,7 +204,7 @@ public class MissingSlashCommand extends SlashCommand {
 								.setStrings(missing.getValue())
 								.setEveryPageText(
 									"**Total Missing:** " +
-									missingTalismans.size() +
+									missing.getValue().size() +
 									"\n**Total Cost:** " +
 									simplifyNumber(missing.getKey()) +
 									"\n**Note:** Talismans with a * have higher tiers\n"

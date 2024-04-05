@@ -511,10 +511,19 @@ public class Player {
 		}
 
 		public double getHighestAmount(String type, Gamemode gamemode) {
+			return getHighestAmount(type, gamemode, false);
+		}
+
+		public double getHighestAmount(String type, Gamemode gamemode, boolean isLb) {
 			double highestAmount = -1.0;
 
 			for (Profile profile : profiles) {
-				if (gamemode == Gamemode.SELECTED ? profile.isSelected() : gamemode.isGamemode(profile.getGamemode())) {
+				// Skip bingo profiles for selected leaderboard
+				if (
+					gamemode == Gamemode.SELECTED
+						? profile.isSelected() && (!isLb || !profile.isBingo())
+						: gamemode.isGamemode(profile.getGamemode())
+				) {
 					highestAmount = Math.max(getAmount(profile, type), highestAmount);
 				}
 			}
@@ -1559,6 +1568,10 @@ public class Player {
 
 		public String getSymbol(String... prefix) {
 			return getGamemode().getSymbol(prefix);
+		}
+
+		public boolean isBingo() {
+			return higherDepth(getOuterProfileJson(), "game_mode", "regular").equals("bingo");
 		}
 
 		public Gamemode getGamemode() {

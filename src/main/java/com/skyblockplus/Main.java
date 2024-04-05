@@ -195,11 +195,14 @@ public class Main {
 
 	@PreDestroy
 	public void onExit() {
+		// Hotswap Agent runs the PreDestroy hook for some reason
+		if (!isMainBot()) {
+			return;
+		}
+
 		log.info("Stopping");
 
-		if (isMainBot()) {
-			botStatusWebhook.send(client.getSuccess() + " Restarting for an update");
-		}
+		botStatusWebhook.send(client.getSuccess() + " Restarting for an update");
 
 		ApiHandler.updateCaches();
 		HttpUtils.closeHttpClient();
