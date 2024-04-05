@@ -923,7 +923,7 @@
         "requirements": [
           [
             {
-              "amount": 1000,
+              "amount": 3000,
               "type": "weight"
             }
           ]
@@ -937,7 +937,7 @@
           "requirements": [
             [
               {
-                "amount": 5000,
+                "amount": 7000,
                 "type": "weight"
               }
             ]
@@ -950,7 +950,7 @@
           "requirements": [
             [
               {
-                "amount": 10000,
+                "amount": 11000,
                 "type": "weight"
               }
             ]

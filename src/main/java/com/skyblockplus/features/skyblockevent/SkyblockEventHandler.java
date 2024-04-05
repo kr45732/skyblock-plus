@@ -27,7 +27,6 @@ import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
 import static com.skyblockplus.utils.utils.StringUtils.*;
 import static com.skyblockplus.utils.utils.Utils.*;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
@@ -59,7 +58,6 @@ public class SkyblockEventHandler {
 
 	private final SlashCommandEvent slashCommandEvent;
 	private final EventSettings eventSettings = new EventSettings();
-	private final EmbedBuilder eb = defaultEmbed("Skyblock Event").setDescription("Use the menu below to choose the event type");
 	private Message message;
 	private GuildMessageChannel announcementChannel;
 	private HypixelResponse guildResponse;
@@ -70,7 +68,7 @@ public class SkyblockEventHandler {
 		this.slashCommandEvent = slashCommandEvent;
 		slashCommandEvent
 			.getHook()
-			.editOriginalEmbeds(eb.build())
+			.editOriginalEmbeds(getEb("Use the menu below to choose the event type").build())
 			.setActionRow(
 				StringSelectMenu
 					.create("skyblock_event_" + selectMenuState)
@@ -98,7 +96,6 @@ public class SkyblockEventHandler {
 					case "catacombs" -> {
 						selectMenuState = SelectMenuState.CONFIG_GENERIC;
 						eventSettings.setEventType(selectedType);
-						eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 						event.editMessage(getGenericConfigMessage()).queue();
 					}
 					case "weight" -> {
@@ -109,9 +106,7 @@ public class SkyblockEventHandler {
 							.map(name -> SelectOption.of(capitalizeString(name), name))
 							.collect(Collectors.toCollection(ArrayList::new));
 						event
-							.editMessageEmbeds(
-								eb.setDescription("Use the menu below to choose the weight types that should be tracked").build()
-							)
+							.editMessageEmbeds(getEb("Use the menu below to choose the weight types that should be tracked").build())
 							.setActionRow(
 								StringSelectMenu
 									.create("skyblock_event_" + selectMenuState)
@@ -130,7 +125,7 @@ public class SkyblockEventHandler {
 							.map(name -> SelectOption.of(capitalizeString(name), name))
 							.collect(Collectors.toCollection(ArrayList::new));
 						event
-							.editMessageEmbeds(eb.setDescription("Use the menu below to choose the slayers that should be tracked").build())
+							.editMessageEmbeds(getEb("Use the menu below to choose the slayers that should be tracked").build())
 							.setActionRow(
 								StringSelectMenu
 									.create("skyblock_event_" + selectMenuState)
@@ -148,7 +143,7 @@ public class SkyblockEventHandler {
 							.map(name -> SelectOption.of(capitalizeString(name), name))
 							.collect(Collectors.toCollection(ArrayList::new));
 						event
-							.editMessageEmbeds(eb.setDescription("Use the menu below to choose the skills that should be tracked").build())
+							.editMessageEmbeds(getEb("Use the menu below to choose the skills that should be tracked").build())
 							.setActionRow(
 								StringSelectMenu
 									.create("skyblock_event_" + selectMenuState)
@@ -179,7 +174,6 @@ public class SkyblockEventHandler {
 					weightTypes.add("catacombs");
 				}
 				eventSettings.setEventType("weight." + String.join("-", weightTypes));
-				eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 				event.editMessage(getGenericConfigMessage()).queue();
 			}
 			case TYPE_SLAYER -> {
@@ -189,7 +183,6 @@ public class SkyblockEventHandler {
 					slayerTypes.addAll(SLAYER_NAMES);
 				}
 				eventSettings.setEventType("slayer." + String.join("-", slayerTypes));
-				eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 				event.editMessage(getGenericConfigMessage()).queue();
 			}
 			case TYPE_SKILLS -> {
@@ -199,7 +192,6 @@ public class SkyblockEventHandler {
 					skillTypes.addAll(SKILL_NAMES);
 				}
 				eventSettings.setEventType("skills." + String.join("-", skillTypes));
-				eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 				event.editMessage(getGenericConfigMessage()).queue();
 			}
 			case CONFIG_GENERIC -> {
@@ -208,9 +200,7 @@ public class SkyblockEventHandler {
 						if (eventSettings.getAnnouncementId() == null || eventSettings.getAnnouncementId().isEmpty()) {
 							event
 								.editMessageEmbeds(
-									eb
-										.setDescription("An announcement channel must be set before creating the event. Please try again.")
-										.build()
+									getEb("An announcement channel must be set before creating the event. Please try again.").build()
 								)
 								.queue();
 							waitForEvent();
@@ -218,9 +208,7 @@ public class SkyblockEventHandler {
 						}
 						if (eventSettings.getTimeEndingSeconds() == null || eventSettings.getTimeEndingSeconds().isEmpty()) {
 							event
-								.editMessageEmbeds(
-									eb.setDescription("The duration must be set before creating the event. Please try again.").build()
-								)
+								.editMessageEmbeds(getEb("The duration must be set before creating the event. Please try again.").build())
 								.queue();
 							waitForEvent();
 							return;
@@ -228,7 +216,7 @@ public class SkyblockEventHandler {
 						if (!eventSettings.isMinMaxValid()) {
 							event
 								.editMessageEmbeds(
-									eb.setDescription("The maximum value cannot be less than the minimum value. Please try again.").build()
+									getEb("The maximum value cannot be less than the minimum value. Please try again.").build()
 								)
 								.queue();
 							waitForEvent();
@@ -349,7 +337,6 @@ public class SkyblockEventHandler {
 						.queue();
 					case "add_guild_members" -> {
 						addGuildMembers = !addGuildMembers;
-						eb.addField("Automatically Add Guild Members", "" + addGuildMembers, false);
 						event.editMessage(getGenericConfigMessage()).queue();
 					}
 					case "duration" -> event
@@ -424,7 +411,6 @@ public class SkyblockEventHandler {
 					if (collectionName.equalsIgnoreCase(selectedName)) {
 						eventSettings.setEventType("collection." + collection.getKey() + "-" + collectionName.toLowerCase());
 						selectMenuState = SelectMenuState.CONFIG_GENERIC;
-						eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
 						event.editMessage(getGenericConfigMessage()).queue();
 						waitForEvent();
 						return;
@@ -434,14 +420,13 @@ public class SkyblockEventHandler {
 
 				event
 					.editMessageEmbeds(
-						eb
-							.setDescription(
-								"`" +
-								selectedName +
-								"` is invalid. Did you mean `" +
-								getClosestMatch(selectedName, collections).toLowerCase() +
-								"`? Please try again."
-							)
+						getEb(
+							"`" +
+							selectedName +
+							"` is invalid. Did you mean `" +
+							getClosestMatch(selectedName, collections).toLowerCase() +
+							"`? Please try again."
+						)
 							.build()
 					)
 					.queue();
@@ -449,11 +434,10 @@ public class SkyblockEventHandler {
 			case "config_guild" -> {
 				HypixelResponse response = getGuildFromName(event.getValues().get(0).getAsString().trim());
 				if (!response.isValid()) {
-					event.editMessageEmbeds(eb.setDescription(response.failCause() + ". Please try again.").build()).queue();
+					event.editMessageEmbeds(getEb(response.failCause() + ". Please try again.").build()).queue();
 				} else {
 					guildResponse = response;
 					eventSettings.setEventGuildId(response.get("_id").getAsString());
-					eb.addField("Guild", response.get("name").getAsString(), false);
 					event.editMessage(getGenericConfigMessage()).queue();
 				}
 			}
@@ -466,10 +450,9 @@ public class SkyblockEventHandler {
 					announcementChannel = event.getGuild().getTextChannelsByName(textChannel.replaceAll("[<#>]", ""), true).get(0);
 				} catch (Exception ignored) {}
 				if (announcementChannel == null) {
-					event.editMessageEmbeds(eb.setDescription("`" + textChannel + "` is invalid. Please try again.").build()).queue();
+					event.editMessageEmbeds(getEb("`" + textChannel + "` is invalid. Please try again.").build()).queue();
 				} else {
 					eventSettings.setAnnouncementId(announcementChannel.getId());
-					eb.addField("Announcement Channel", announcementChannel.getAsMention(), false);
 					event.editMessage(getGenericConfigMessage()).queue();
 				}
 			}
@@ -478,16 +461,18 @@ public class SkyblockEventHandler {
 				try {
 					int eventDuration = Integer.parseInt(textDuration);
 					if (eventDuration <= 0 || eventDuration > 672) {
-						eb.setDescription("The event must be at least an hour and at most 4 weeks (672 hours). Please try again.");
-						event.editMessageEmbeds(eb.build()).queue();
+						event
+							.editMessageEmbeds(
+								getEb("The event must be at least an hour and at most 4 weeks (672 hours). Please try again.").build()
+							)
+							.queue();
 					} else {
 						Instant endingTime = Instant.now().plus(eventDuration, ChronoUnit.HOURS);
 						eventSettings.setTimeEndingSeconds("" + endingTime.getEpochSecond());
-						eb.addField("End Date", "Ends " + getRelativeTimestamp(endingTime), false);
 						event.editMessage(getGenericConfigMessage()).queue();
 					}
 				} catch (Exception e) {
-					event.editMessageEmbeds(eb.setDescription("`" + textDuration + "` is invalid. Please try again.").build()).queue();
+					event.editMessageEmbeds(getEb("`" + textDuration + "` is invalid. Please try again.").build()).queue();
 				}
 			}
 			case "config_minimum_amount" -> {
@@ -495,14 +480,13 @@ public class SkyblockEventHandler {
 				try {
 					int minAmount = Integer.parseInt(textMinAmt);
 					if (minAmount < 0) {
-						event.editMessageEmbeds(eb.setDescription("Minimum value cannot be negative. Please try again.").build()).queue();
+						event.editMessageEmbeds(getEb("Minimum value cannot be negative. Please try again.").build()).queue();
 					} else {
 						eventSettings.setMinAmount("" + minAmount);
-						eb.addField("Minimum Amount", formatNumber(minAmount), false);
 						event.editMessage(getGenericConfigMessage()).queue();
 					}
 				} catch (Exception e) {
-					event.editMessageEmbeds(eb.setDescription("`" + textMinAmt + "` is invalid. Please try again.").build()).queue();
+					event.editMessageEmbeds(getEb("`" + textMinAmt + "` is invalid. Please try again.").build()).queue();
 				}
 			}
 			case "config_maxmimum_amount" -> {
@@ -510,16 +494,13 @@ public class SkyblockEventHandler {
 				try {
 					int maxAmount = Integer.parseInt(textMaxAmt);
 					if (maxAmount <= 0) {
-						event
-							.editMessageEmbeds(eb.setDescription("Maximum value must be greater than 0. Please try again.").build())
-							.queue();
+						event.editMessageEmbeds(getEb("Maximum value must be greater than 0. Please try again.").build()).queue();
 					} else {
 						eventSettings.setMaxAmount("" + maxAmount);
-						eb.addField("Maximum Amount", formatNumber(maxAmount), false);
 						event.editMessage(getGenericConfigMessage()).queue();
 					}
 				} catch (Exception e) {
-					event.editMessageEmbeds(eb.setDescription("`" + textMaxAmt + "` is invalid. Please try again.").build()).queue();
+					event.editMessageEmbeds(getEb("`" + textMaxAmt + "` is invalid. Please try again.").build()).queue();
 				}
 			}
 			case "config_whitelist_role" -> {
@@ -532,6 +513,7 @@ public class SkyblockEventHandler {
 					role = event.getGuild().getRolesByName(textRole.replaceAll("[<@&>]", ""), true).get(0);
 				} catch (Exception ignored) {}
 
+				EmbedBuilder eb = getEb(null);
 				if (role == null) {
 					eb.setDescription("The provided role does not exist");
 				} else if (role.isPublicRole()) {
@@ -546,7 +528,6 @@ public class SkyblockEventHandler {
 					event.editMessageEmbeds(eb.appendDescription(". Please try again.").build()).queue();
 				} else {
 					eventSettings.setWhitelistRole(role.getId());
-					eb.addField("Required role", role.getAsMention(), false);
 					event.editMessage(getGenericConfigMessage()).queue();
 				}
 			}
@@ -562,17 +543,8 @@ public class SkyblockEventHandler {
 				}
 
 				if (prizeListMap.isEmpty()) {
-					event.editMessageEmbeds(eb.setDescription("`" + textPrizes + "` is invalid. Please try again.").build()).queue();
+					event.editMessageEmbeds(getEb("`" + textPrizes + "` is invalid. Please try again.").build()).queue();
 				} else {
-					eb.addField(
-						"Prizes",
-						prizeListMap
-							.entrySet()
-							.stream()
-							.map(prize -> "`" + prize.getKey() + ")` " + prize.getValue() + "\n")
-							.collect(Collectors.joining()),
-						false
-					);
 					eventSettings.setPrizeMap(prizeListMap);
 					event.editMessage(getGenericConfigMessage()).queue();
 				}
@@ -634,7 +606,7 @@ public class SkyblockEventHandler {
 			selectMenu.addOption("Add Guild Members", "add_guild_members");
 		}
 		return new MessageEditBuilder()
-			.setEmbeds(eb.setDescription("Use the menu below to configure the event settings and start the event").build())
+			.setEmbeds(getEb("Use the menu below to configure the event settings and start the event").build())
 			.setActionRow(
 				selectMenu
 					.addOption("Duration", "duration")
@@ -657,6 +629,53 @@ public class SkyblockEventHandler {
 		}
 
 		return database.setSkyblockEventSettings(slashCommandEvent.getGuild().getId(), eventSettings) == 200;
+	}
+
+	private EmbedBuilder getEb(String description) {
+		EmbedBuilder eb = defaultEmbed("Skyblock Event").setDescription(description);
+
+		if (!eventSettings.getEventType().isEmpty()) {
+			eb.addField("Event Type", getEventTypeFormatted(eventSettings.getEventType()), false);
+		}
+		if (addGuildMembers) {
+			eb.addField("Automatically Add Guild Members", "Enabled", false);
+		}
+		if (guildResponse != null) {
+			eb.addField("Guild", guildResponse.get("name").getAsString(), false);
+		}
+		if (announcementChannel != null) {
+			eb.addField("Announcement Channel", announcementChannel.getAsMention(), false);
+		}
+		if (!eventSettings.getTimeEndingSeconds().isEmpty()) {
+			eb.addField(
+				"End Date",
+				"Ends " + getRelativeTimestamp(Instant.ofEpochMilli(Long.parseLong(eventSettings.getTimeEndingSeconds()))),
+				false
+			);
+		}
+		if (!eventSettings.getMinAmount().equals("-1")) {
+			eb.addField("Minimum Amount", formatNumber(Integer.parseInt(eventSettings.getMinAmount())), false);
+		}
+		if (!eventSettings.getMaxAmount().equals("-1")) {
+			eb.addField("Maximum Amount", formatNumber(Integer.parseInt(eventSettings.getMaxAmount())), false);
+		}
+		if (!eventSettings.getWhitelistRole().isEmpty()) {
+			eb.addField("Required role", "<@&" + eventSettings.getWhitelistRole() + ">", false);
+		}
+		if (!eventSettings.getPrizeMap().isEmpty()) {
+			eb.addField(
+				"Prizes",
+				eventSettings
+					.getPrizeMap()
+					.entrySet()
+					.stream()
+					.map(prize -> "`" + prize.getKey() + ")` " + prize.getValue() + "\n")
+					.collect(Collectors.joining()),
+				false
+			);
+		}
+
+		return eb;
 	}
 
 	private enum SelectMenuState {
