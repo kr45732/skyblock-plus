@@ -458,7 +458,17 @@ public class Player {
 				case "healer", "mage", "berserk", "archer", "tank" -> profile.getDungeonClass(type).getProgressLevel();
 				case "weight" -> profile.getWeight();
 				case "wolf", "zombie", "spider", "enderman", "blaze", "vampire" -> profile.getSlayerXp(type);
-				case "alchemy", "combat", "fishing", "farming", "foraging", "carpentry", "mining", "taming", "enchanting", "social" -> {
+				case "alchemy",
+					"combat",
+					"fishing",
+					"farming",
+					"foraging",
+					"carpentry",
+					"mining",
+					"taming",
+					"enchanting",
+					"social",
+					"runecrafting" -> {
 					SkillsStruct skillsStruct = profile.getSkill(type);
 					yield skillsStruct != null ? skillsStruct.getProgressLevel() : -1;
 				}
@@ -471,7 +481,8 @@ public class Player {
 					"mining_xp",
 					"taming_xp",
 					"enchanting_xp",
-					"social_xp" -> profile.getSkillXp(type.split("_xp")[0]);
+					"social_xp",
+					"runecrafting_xp" -> profile.getSkillXp(type.split("_xp")[0]);
 				case "healer_xp", "mage_xp", "berserk_xp", "archer_xp", "tank_xp" -> profile.getDungeonClassXp(type.split("_xp")[0]);
 				case "hotm" -> profile.getHOTM() != null ? profile.getHOTM().totalExp() : -1;
 				case "bank" -> profile.getBankBalance();

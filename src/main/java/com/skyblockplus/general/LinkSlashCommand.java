@@ -98,6 +98,7 @@ public class LinkSlashCommand extends SlashCommand {
 		"taming",
 		"enchanting",
 		"social",
+		"runecrafting",
 		"weight",
 		"selected_class",
 		"gamemode",

@@ -376,7 +376,8 @@ public class RolesSlashCommand extends SlashCommand {
 										"mining",
 										"taming",
 										"enchanting",
-										"social" -> {
+										"social",
+										"runecrafting" -> {
 										playerAmount = player.getAmount(roleName, useHighest);
 										if (playerAmount == -1 && !disabledAPI.toString().contains("Skills")) {
 											disabledAPI.append("• Skills API disabled\n");
