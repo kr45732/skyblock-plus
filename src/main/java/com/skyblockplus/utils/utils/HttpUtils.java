@@ -129,7 +129,7 @@ public class HttpUtils {
 					InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent());
 					JsonReader jsonIn = new JsonReader(in)
 				) {
-					JsonElement json = httpGet.getURI().getPath().equals("/skyblock/profiles")
+					JsonElement json = httpGet.getURI().getPath().equals("/v2/skyblock/profiles")
 						? SkyblockProfilesParser.parse(jsonIn, httpGet.getURI().getQuery().split("uuid=")[1])
 						: JsonParser.parseReader(jsonIn);
 

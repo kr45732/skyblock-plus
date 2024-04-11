@@ -23,9 +23,7 @@ import com.google.gson.internal.LazilyParsedNumber;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 public class SkyblockProfilesParser {
 
@@ -56,6 +54,16 @@ public class SkyblockProfilesParser {
 		"daily_runs",
 		"treasures"
 	);
+	private static final List<String> SKIP_PROFILE_ALLOWED_PATHS = new ArrayList<>();
+
+	static {
+		for (String fullPath : List.of("collection", "profile.deletion_notice.timestamp", "player_data.crafted_generators")) {
+			StringBuilder path = new StringBuilder();
+			for (String string : fullPath.split("\\.")) {
+				SKIP_PROFILE_ALLOWED_PATHS.add(path.append(".").append(string).toString());
+			}
+		}
+	}
 
 	/**
 	 * Tries to begin reading a JSON array or JSON object, returning {@code null} if the next element
@@ -117,11 +125,7 @@ public class SkyblockProfilesParser {
 							if (in.getPath().endsWith("].members." + name)) {
 								skipProfile = !name.equals(uuid);
 							} else if (skipProfile) {
-								if (
-									!in.getPath().contains(".deletion_notice") &&
-									!in.getPath().contains(".collection") &&
-									!in.getPath().contains(".crafted_generators")
-								) {
+								if (SKIP_PROFILE_ALLOWED_PATHS.stream().noneMatch(e -> in.getPath().endsWith(e))) {
 									in.skipValue();
 									continue;
 								}
