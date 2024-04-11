@@ -1187,5 +1187,127 @@
         }
       ]
     }
+  },
+  "65f49e688ea8c96c04bee856": {
+    "name": "LeftOnRed",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "helper",
+        "admin"
+      ],
+      "default_rank": {
+        "requirements": [
+          [
+            {
+              "amount": 25,
+              "type": "level"
+            },
+            {
+              "amount": 25000,
+              "type": "gxp"
+            }
+          ]
+        ],
+        "names": [
+          "member"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 100000,
+                "type": "gxp"
+              }
+            ]
+          ],
+          "names": [
+            "active "
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 2628000,
+                "type": "duration"
+              },
+              {
+                "amount": 100000,
+                "type": "gxp"
+              }
+            ]
+          ],
+          "names": [
+            "veteran"
+          ]
+        }
+      ]
+    }
+  },
+  "600db3988ea8c9e004b049d3": {
+    "name": "Embryo",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "officer"
+      ],
+      "default_rank": {
+        "requirements": [
+          [
+            {
+              "amount": 80,
+              "type": "level"
+            }
+          ]
+        ],
+        "names": [
+          "newcomer"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 120,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "elite"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 180,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "emperor"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 280,
+                "type": "level"
+              }
+            ]
+          ],
+          "names": [
+            "superior"
+          ]
+        }
+      ]
+    }
   }
 }
