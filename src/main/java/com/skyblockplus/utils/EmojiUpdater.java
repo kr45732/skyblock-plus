@@ -538,7 +538,7 @@ public class EmojiUpdater {
 						.replace("perma_jelled_garlic_flavored_re_heated_gummy_polar_bear", "gummy_polar_bear_accessory")
 						.replace("aspect_of_the_jerry_signature_edition", "aspect_of_the_jerry_signature")
 						.replace("cherry_blossom_mithril_golem_skin", "cherry_blosom_mithril_golem_skin")
-							.replace("travel_scroll_to_the_dwarven_base_camp", "travel_scroll_dwarven_base_camp");
+						.replace("travel_scroll_to_the_dwarven_base_camp", "travel_scroll_dwarven_base_camp");
 
 					name =
 						switch (name = name.startsWith("_") ? name.substring(1) : name) {
