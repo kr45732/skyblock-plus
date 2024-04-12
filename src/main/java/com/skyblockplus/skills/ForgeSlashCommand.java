@@ -76,21 +76,18 @@ public class ForgeSlashCommand extends SlashCommand {
 				.collect(Collectors.toCollection(ArrayList::new))) {
 				String itemId = higherDepth(forgeItem, "id").getAsString();
 				itemId = itemId.equals("PET") ? "AMMONITE;4" : itemId;
+				long duration = higherDepth(getInternalJsonMappings(), itemId + ".forge", -1L);
+
 				eb.addField(
 					getEmoji(itemId) + " " + idToName(itemId),
 					"Slot: " +
 					higherDepth(forgeItem, "slot", 0) +
 					"\nEnd: " +
-					getRelativeTimestamp(
-						Instant
-							.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong())
-							.plusSeconds(
-								(long) ((itemId.equals("AMMONITE;4")
-											? 1036800
-											: higherDepth(getInternalJsonMappings(), itemId + ".forge").getAsLong()) *
-									bonus)
+					(duration != -1
+							? getRelativeTimestamp(
+								Instant.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong()).plusSeconds((long) (duration * bonus))
 							)
-					),
+							: "Unknown"),
 					false
 				);
 			}
