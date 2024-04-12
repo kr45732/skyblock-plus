@@ -131,10 +131,11 @@ public class RolesSlashCommand extends SlashCommand {
 			boolean useHighest = higherDepth(rolesSettings, "useHighest", false);
 
 			StringBuilder disabledAPI = new StringBuilder();
-			StringBuilder errorRoles = new StringBuilder();
+			int deletedRolesCount = 0;
 
 			List<Role> toAdd = new ArrayList<>();
 			List<Role> toRemove = new ArrayList<>();
+			List<Role> errorRoles = new ArrayList<>();
 			HypixelResponse guildResponse = null;
 
 			for (JsonElement roleSettings : higherDepth(rolesSettings, "roles").getAsJsonArray()) {
@@ -165,7 +166,7 @@ public class RolesSlashCommand extends SlashCommand {
 								String currentLevelValue = higherDepth(currentLevel, "value").getAsString();
 								Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 								if (currentLevelRole == null) {
-									errorRoles.append(roleDeletedString(higherDepth(currentLevel, "roleId").getAsString()));
+									deletedRolesCount++;
 									continue;
 								}
 
@@ -174,7 +175,7 @@ public class RolesSlashCommand extends SlashCommand {
 										if (botRole.canInteract(currentLevelRole)) {
 											toAdd.add(currentLevelRole);
 										} else {
-											errorRoles.append(roleChangeString(currentLevelRole));
+											errorRoles.add(currentLevelRole);
 										}
 									}
 								} else {
@@ -182,7 +183,7 @@ public class RolesSlashCommand extends SlashCommand {
 										if (botRole.canInteract(currentLevelRole)) {
 											toRemove.add(currentLevelRole);
 										} else {
-											errorRoles.append(roleChangeString(currentLevelRole));
+											errorRoles.add(currentLevelRole);
 										}
 									}
 								}
@@ -215,7 +216,7 @@ public class RolesSlashCommand extends SlashCommand {
 											for (JsonElement guildRank : guildRanks) {
 												Role currentLevelRole = guild.getRoleById(higherDepth(guildRank, "roleId").getAsString());
 												if (currentLevelRole == null) {
-													errorRoles.append(roleDeletedString(higherDepth(guildRank, "roleId").getAsString()));
+													deletedRolesCount++;
 													continue;
 												}
 
@@ -224,7 +225,7 @@ public class RolesSlashCommand extends SlashCommand {
 														if (botRole.canInteract(currentLevelRole)) {
 															toAdd.add(currentLevelRole);
 														} else {
-															errorRoles.append(roleChangeString(currentLevelRole));
+															errorRoles.add(currentLevelRole);
 														}
 													}
 												} else {
@@ -232,7 +233,7 @@ public class RolesSlashCommand extends SlashCommand {
 														if (botRole.canInteract(currentLevelRole)) {
 															toRemove.add(currentLevelRole);
 														} else {
-															errorRoles.append(roleChangeString(currentLevelRole));
+															errorRoles.add(currentLevelRole);
 														}
 													}
 												}
@@ -261,7 +262,7 @@ public class RolesSlashCommand extends SlashCommand {
 							String id = higherDepth(currentLevel, "value").getAsString();
 							Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 							if (currentLevelRole == null) {
-								errorRoles.append(roleDeletedString(higherDepth(currentLevel, "roleId").getAsString()));
+								deletedRolesCount++;
 								continue;
 							}
 
@@ -270,7 +271,7 @@ public class RolesSlashCommand extends SlashCommand {
 									if (botRole.canInteract(currentLevelRole)) {
 										toAdd.add(currentLevelRole);
 									} else {
-										errorRoles.append(roleChangeString(currentLevelRole));
+										errorRoles.add(currentLevelRole);
 									}
 								}
 							} else {
@@ -278,7 +279,7 @@ public class RolesSlashCommand extends SlashCommand {
 									if (botRole.canInteract(currentLevelRole)) {
 										toRemove.add(currentLevelRole);
 									} else {
-										errorRoles.append(roleChangeString(currentLevelRole));
+										errorRoles.add(currentLevelRole);
 									}
 								}
 							}
@@ -291,7 +292,7 @@ public class RolesSlashCommand extends SlashCommand {
 							String mode = higherDepth(currentLevel, "value").getAsString();
 							Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 							if (currentLevelRole == null) {
-								errorRoles.append(roleDeletedString(higherDepth(currentLevel, "roleId").getAsString()));
+								deletedRolesCount++;
 								continue;
 							}
 
@@ -308,7 +309,7 @@ public class RolesSlashCommand extends SlashCommand {
 									if (botRole.canInteract(currentLevelRole)) {
 										toAdd.add(currentLevelRole);
 									} else {
-										errorRoles.append(roleChangeString(currentLevelRole));
+										errorRoles.add(currentLevelRole);
 									}
 								}
 							} else {
@@ -316,7 +317,7 @@ public class RolesSlashCommand extends SlashCommand {
 									if (botRole.canInteract(currentLevelRole)) {
 										toRemove.add(currentLevelRole);
 									} else {
-										errorRoles.append(roleChangeString(currentLevelRole));
+										errorRoles.add(currentLevelRole);
 									}
 								}
 							}
@@ -421,7 +422,7 @@ public class RolesSlashCommand extends SlashCommand {
 							String levelRoleId = higherDepth(level, "roleId").getAsString();
 							Role levelRole = guild.getRoleById(levelRoleId);
 							if (levelRole == null) {
-								errorRoles.append(roleDeletedString(levelRoleId));
+								deletedRolesCount++;
 								continue;
 							}
 
@@ -430,7 +431,7 @@ public class RolesSlashCommand extends SlashCommand {
 									if (botRole.canInteract(levelRole)) {
 										toRemove.add(levelRole);
 									} else {
-										errorRoles.append(roleChangeString(levelRole));
+										errorRoles.add(levelRole);
 									}
 								}
 							} else {
@@ -438,7 +439,7 @@ public class RolesSlashCommand extends SlashCommand {
 									if (botRole.canInteract(levelRole)) {
 										toAdd.add(levelRole);
 									} else {
-										errorRoles.append(roleChangeString(levelRole));
+										errorRoles.add(levelRole);
 									}
 								}
 
@@ -446,7 +447,7 @@ public class RolesSlashCommand extends SlashCommand {
 									String levelRemoveRoleId = higherDepth(levelsArray.get(j), "roleId").getAsString();
 									Role levelRemoveRole = guild.getRoleById(levelRemoveRoleId);
 									if (levelRemoveRole == null) {
-										errorRoles.append(roleDeletedString(levelRemoveRoleId));
+										deletedRolesCount++;
 										continue;
 									}
 
@@ -454,7 +455,7 @@ public class RolesSlashCommand extends SlashCommand {
 										if (botRole.canInteract(levelRemoveRole)) {
 											toRemove.add(levelRemoveRole);
 										} else {
-											errorRoles.append(roleChangeString(levelRemoveRole));
+											errorRoles.add(levelRemoveRole);
 										}
 									}
 								}
@@ -493,8 +494,18 @@ public class RolesSlashCommand extends SlashCommand {
 					eb.addField("Disabled APIs", disabledAPI.toString(), false);
 				}
 
-				if (!errorRoles.isEmpty()) {
-					eb.addField("Error Roles", truncateRolesString(errorRoles), false);
+				if (!errorRoles.isEmpty() || deletedRolesCount > 0) {
+					eb.addField(
+						"Error Roles",
+						truncateRolesString(
+							(deletedRolesCount > 0 ? deletedRolesCount + " deleted roles\n\n" : "") +
+							(!errorRoles.isEmpty()
+									? "Missing permissions:\n" +
+									errorRoles.stream().map(IMentionable::getAsMention).collect(Collectors.joining("\n"))
+									: "")
+						),
+						false
+					);
 				}
 			}
 
@@ -522,14 +533,6 @@ public class RolesSlashCommand extends SlashCommand {
 			}
 
 			return out.toString();
-		}
-
-		private static String roleChangeString(Role role) {
-			return role.getAsMention() + "\n";
-		}
-
-		private static String roleDeletedString(String name) {
-			return "<@&" + name + ">\n";
 		}
 
 		@Override
