@@ -71,6 +71,10 @@ public class HotmSlashCommand extends SlashCommand {
 				formatNumber(higherDepth(miningJson, "powder_gemstone", 0)) +
 				" (**Spent:** " +
 				formatNumber(higherDepth(miningJson, "powder_spent_gemstone", 0)) +
+				")\n• **Glacite Powder:** " +
+				formatNumber(higherDepth(miningJson, "powder_glacite", 0)) +
+				" (**Spent:** " +
+				formatNumber(higherDepth(miningJson, "powder_spent_glacite", 0)) +
 				")\n• **Selected Ability:** " +
 				capitalizeString(higherDepth(miningJson, "selected_pickaxe_ability", "none").replace("_", " ")),
 				false
