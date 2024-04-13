@@ -36,11 +36,17 @@ public abstract class AbstractSlashCommand {
 	protected String name = "null";
 
 	protected int cooldown = GLOBAL_COOLDOWN;
+	protected boolean disable = false;
 	protected Permission[] userPermissions = new Permission[0];
 
 	protected void execute(SlashCommandEvent event) {}
 
 	protected void run(SlashCommandEvent event) {
+		if (!event.isOwner() && disable) {
+			event.replyEmbeds(errorEmbed("This command has been disabled").build()).setEphemeral(true).queue();
+			return;
+		}
+
 		slashCommandClient.getCommandUses().compute(getFullName(), (k, v) -> (v != null ? v : 0) + 1);
 
 		if (!event.isOwner()) {
@@ -49,7 +55,7 @@ public abstract class AbstractSlashCommand {
 				event
 					.replyEmbeds(
 						errorEmbed(
-							"That command is on cooldown for " + remainingCooldown + " more second" + (remainingCooldown == 1 ? "" : "s")
+							"This command is on cooldown for " + remainingCooldown + " more second" + (remainingCooldown == 1 ? "" : "s")
 						)
 							.build()
 					)
@@ -63,14 +69,14 @@ public abstract class AbstractSlashCommand {
 			if (p.isChannel()) {
 				if (!event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), p)) {
 					event
-						.replyEmbeds(errorEmbed("I need the " + p.getName() + " permission in this channel!").build())
+						.replyEmbeds(errorEmbed("I need the " + p.getName() + " permission in this channel").build())
 						.setEphemeral(true)
 						.queue();
 					return;
 				}
 			} else if (!event.getGuild().getSelfMember().hasPermission(p)) {
 				event
-					.replyEmbeds(errorEmbed("I need the " + p.getName() + " permission in this server!").build())
+					.replyEmbeds(errorEmbed("I need the " + p.getName() + " permission in this server").build())
 					.setEphemeral(true)
 					.queue();
 				return;
@@ -83,7 +89,7 @@ public abstract class AbstractSlashCommand {
 					if (!event.getMember().hasPermission(event.getGuildChannel(), p)) {
 						event
 							.replyEmbeds(
-								errorEmbed("You must have the " + p.getName() + " permission in this channel to use that!").build()
+								errorEmbed("You must have the " + p.getName() + " permission in this channel to use this command").build()
 							)
 							.setEphemeral(true)
 							.queue();
@@ -99,7 +105,9 @@ public abstract class AbstractSlashCommand {
 					}
 				} else if (!event.getMember().hasPermission(p)) {
 					event
-						.replyEmbeds(errorEmbed("You must have the " + p.getName() + " permission in this server to use that!").build())
+						.replyEmbeds(
+							errorEmbed("You must have the " + p.getName() + " permission in this server to use this command").build()
+						)
 						.setEphemeral(true)
 						.queue();
 					return;

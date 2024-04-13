@@ -18,6 +18,7 @@
 
 package com.skyblockplus.skills;
 
+import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.Constants.profilesCommandOption;
 import static com.skyblockplus.utils.utils.JsonUtils.getInternalJsonMappings;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
@@ -75,7 +76,9 @@ public class ForgeSlashCommand extends SlashCommand {
 				.map(Map.Entry::getValue)
 				.collect(Collectors.toCollection(ArrayList::new))) {
 				String itemId = higherDepth(forgeItem, "id").getAsString();
-				itemId = itemId.equals("PET") ? "AMMONITE;4" : itemId;
+				if (PET_NAMES.contains(itemId)) {
+					itemId += ";4";
+				}
 				long duration = higherDepth(getInternalJsonMappings(), itemId + ".forge", -1L);
 
 				eb.addField(

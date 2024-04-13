@@ -323,6 +323,8 @@ public class HelpSlashCommand extends SlashCommand {
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
 				new HelpData("leaderboard", "Get a global leaderboard.", "leaderboard <type> [player] [gamemode] [page] [rank] [amount]")
 					.setCategory("miscellaneous"),
+				new HelpData("serverlb", "Get a leaderboard for this server.", "serverlb <type> [player] [gamemode]")
+					.setCategory("miscellaneous"),
 				new HelpData("skyblock", "Get an overview of a player's Skyblock profiles", "skyblock [player] [profile]")
 					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
@@ -909,6 +911,7 @@ public class HelpSlashCommand extends SlashCommand {
 			create("mayor", "Get information about the current mayor or the running election") +
 			create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
 			create("leaderboard <type> [player] [gamemode] [page] [rank] [amount]", "Get a global leaderboard") +
+			create("serverlb <type> [player] [gamemode]", "Get a leaderboard for this server") +
 			create("skyblock [player] [profile]", "Get an overview of a player's Skyblock profiles") +
 			create("recipe <item>", "Get the crafting recipe of an item") +
 			create("craft <item>", "Calculate the cost of an item and added upgrades") +
