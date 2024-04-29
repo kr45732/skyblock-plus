@@ -97,7 +97,10 @@ public class InformationSlashCommand extends SlashCommand {
 											(Runtime.getRuntime().maxMemory())
 										) +
 										"%\n**CPU:** " +
-										roundAndFormat(ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getCpuLoad() * 100),
+										roundAndFormat(
+											ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getCpuLoad() * 100
+										) +
+										"%",
 										true
 									)
 									.setThumbnail(
