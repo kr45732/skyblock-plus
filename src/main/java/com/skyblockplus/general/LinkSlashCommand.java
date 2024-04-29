@@ -333,6 +333,14 @@ public class LinkSlashCommand extends SlashCommand {
 						}
 					}
 
+					for (Role role : toRemove) {
+						if (member.getGuild().getSelfMember().canInteract(role)) {
+							member.getGuild().removeRoleFromMember(member, role).queue();
+						} else {
+							updatedRoles = "error";
+						}
+					}
+
 					if (!updatedRoles.equals("error")) {
 						updatedRoles = "true";
 					}

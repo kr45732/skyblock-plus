@@ -302,12 +302,17 @@ public class NetworthExecute {
 		StringBuilder museumStr = getSectionString("museum", ignoreSoulbound);
 
 		double totalNetworth = getNetworth(ignoreSoulbound);
+		double irlNetworth =
+			totalNetworth *
+			((((4.99 / 675 + 9.99 / 1390 + 24.99 / 3600 + 49.99 / 7300 + 99.99 / 16400) / 5) * 325) / getLowestPrice("BOOSTER_COOKIE"));
 		String ebDesc =
 			"**Total Networth:** " +
 			simplifyNumber(totalNetworth) +
 			" (" +
 			roundAndFormat(totalNetworth) +
-			")\n**" +
+			")\n**IRL Networth:** $" +
+			simplifyNumber(irlNetworth) +
+			"\n**" +
 			(player.getGamemode() == Player.Gamemode.IRONMAN || player.getGamemode() == Player.Gamemode.STRANDED
 					? capitalizeString(player.getGamemode().toString()) + " "
 					: "") +

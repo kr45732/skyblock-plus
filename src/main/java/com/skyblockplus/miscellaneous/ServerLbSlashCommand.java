@@ -106,7 +106,7 @@ public class ServerLbSlashCommand extends SlashCommand {
 		for (int i = 0, playersListSize = playerList.size(); i < playersListSize; i++) {
 			DataObject player = playerList.get(i);
 			double amount = player.getDouble(lbType, -1);
-			if (amount < 0) {
+			if (amount <= 0) {
 				continue;
 			}
 
