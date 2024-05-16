@@ -561,7 +561,9 @@ public class Player {
 		 * @return Bank balance or -1 if bank API disabled
 		 */
 		public double getBankBalance() {
-			return higherDepth(getOuterProfileJson(), "banking.balance", -1.0);
+			double bankBalance = higherDepth(getOuterProfileJson(), "banking.balance", -1.0);
+			// bank_account is personal bank
+			return bankBalance == -1 ? -1 : bankBalance + higherDepth(profileJson(), "profile.bank_account", 0);
 		}
 
 		public double getPurseCoins() {

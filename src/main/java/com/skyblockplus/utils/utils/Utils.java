@@ -485,6 +485,8 @@ public class Utils {
 							}
 						}
 
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.sack_pss", 0), "POCKET_SACK_IN_A_SACK");
+
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.jalapeno_count", 0), "JALAPENO_BOOK");
 
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.wood_singularity_count", 0), "WOOD_SINGULARITY");
