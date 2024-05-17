@@ -42,7 +42,7 @@ public abstract class AbstractSlashCommand {
 	protected void execute(SlashCommandEvent event) {}
 
 	protected void run(SlashCommandEvent event) {
-		if (!event.isOwner() && disable) {
+		if (disable && !event.isOwner()) {
 			event.replyEmbeds(errorEmbed("This command has been disabled").build()).setEphemeral(true).queue();
 			return;
 		}
