@@ -18,7 +18,9 @@
 
 package com.skyblockplus.utils.database;
 
+import static com.skyblockplus.utils.ApiHandler.getHypixelApiUrl;
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
+import static com.skyblockplus.utils.utils.HttpUtils.getJsonObject;
 import static com.skyblockplus.utils.utils.Utils.gson;
 
 import com.google.gson.JsonArray;
@@ -44,6 +46,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
@@ -57,6 +61,8 @@ public class Database {
 
 	public final ServerSettingsService settingsService;
 	public final HikariDataSource dataSource;
+	private final List<LinkedAccount> linkedAccountsCache = new ArrayList<>();
+	private Instant linkedAccountsCacheLastUpdated = null;
 
 	@Autowired
 	public Database(ServerSettingsService settingsService, HikariDataSource dataSource) {
@@ -292,17 +298,28 @@ public class Database {
 		return getBy("discord", discord);
 	}
 
-	public List<LinkedAccount> getAllLinkedAccounts() {
+	public List<LinkedAccount> getAllLinkedAccountsCached() {
+		if (linkedAccountsCacheLastUpdated == null || Duration.between(linkedAccountsCacheLastUpdated, Instant.now()).toMinutes() >= 1) {
+			linkedAccountsCacheLastUpdated = Instant.now();
+			getAllLinkedAccounts();
+		}
+
+		return linkedAccountsCache;
+	}
+
+	private List<LinkedAccount> getAllLinkedAccounts() {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account")
 		) {
 			try (ResultSet response = statement.executeQuery()) {
-				List<LinkedAccount> linkedAccounts = new ArrayList<>();
-				while (response.next()) {
-					linkedAccounts.add(responseToRecord(response));
+				synchronized (linkedAccountsCache) {
+					linkedAccountsCache.clear();
+					while (response.next()) {
+						linkedAccountsCache.add(responseToRecord(response));
+					}
 				}
-				return linkedAccounts;
+				return linkedAccountsCache;
 			}
 		} catch (Exception ignored) {}
 		return null;

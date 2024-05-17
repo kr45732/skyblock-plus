@@ -502,7 +502,7 @@ public class AutomaticGuild {
 			if (roleOrRankEnabled || verifyEnabled || rolesEnabled) {
 				discordToUuid.putAll(
 					database
-						.getAllLinkedAccounts()
+						.getAllLinkedAccountsCached()
 						.stream()
 						.filter(o -> !isBlacklistFeatureEnabled("verify") || !blacklist.contains(o.uuid()))
 						.collect(Collectors.toMap(LinkedAccount::discord, Function.identity()))
@@ -553,7 +553,6 @@ public class AutomaticGuild {
 						while (matcher.find()) {
 							String category = matcher.group(1).toUpperCase();
 							String type = matcher.group(2).toUpperCase();
-
 							if (
 								category.equals("PLAYER") &&
 								(type.equals("SKILLS") ||

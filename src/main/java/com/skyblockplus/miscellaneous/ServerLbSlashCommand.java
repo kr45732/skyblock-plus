@@ -62,7 +62,7 @@ public class ServerLbSlashCommand extends SlashCommand {
 		}
 
 		Map<String, String> discordToUuid = database
-			.getAllLinkedAccounts()
+			.getAllLinkedAccountsCached()
 			.stream()
 			.collect(Collectors.toMap(LinkedAccount::discord, LinkedAccount::uuid));
 		List<String> uuids = new ArrayList<>();

@@ -177,7 +177,7 @@ public class ApiController {
 
 	@GetMapping("/private/linked/all")
 	public List<LinkedAccount> getAllLinkedAccounts() {
-		return database.getAllLinkedAccounts();
+		return database.getAllLinkedAccountsCached();
 	}
 
 	@GetMapping("/private/linked/by")
