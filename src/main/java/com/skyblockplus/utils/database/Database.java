@@ -18,9 +18,7 @@
 
 package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.utils.ApiHandler.getHypixelApiUrl;
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
-import static com.skyblockplus.utils.utils.HttpUtils.getJsonObject;
 import static com.skyblockplus.utils.utils.Utils.gson;
 
 import com.google.gson.JsonArray;
