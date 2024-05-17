@@ -113,22 +113,22 @@ public class AutomaticGuild {
 		5,
 		TimeUnit.MINUTES
 	);
-	private static final ScheduledFuture<?> updateGuildFuture = scheduler.scheduleAtFixedRate(
-		() ->
-			guildMap
-				.values()
-				.forEach(g -> {
-					try {
-						if (g.updateGuild()) {
-							// Only sleep if an update was actually performed
-							TimeUnit.SECONDS.sleep(1);
-						}
-					} catch (Exception ignored) {}
-				}),
-		5,
-		60,
-		TimeUnit.MINUTES
-	);
+	//	private static final ScheduledFuture<?> updateGuildFuture = scheduler.scheduleAtFixedRate(
+	//		() ->
+	//			guildMap
+	//				.values()
+	//				.forEach(g -> {
+	//					try {
+	//						if (g.updateGuild()) {
+	//							// Only sleep if an update was actually performed
+	//							TimeUnit.SECONDS.sleep(1);
+	//						}
+	//					} catch (Exception ignored) {}
+	//				}),
+	//		5,
+	//		60,
+	//		TimeUnit.MINUTES
+	//	);
 
 	/* Apply */
 	public final List<ApplyGuild> applyGuilds = new ArrayList<>();
