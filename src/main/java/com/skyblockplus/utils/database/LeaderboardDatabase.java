@@ -156,7 +156,7 @@ public class LeaderboardDatabase {
 		dataSource = new HikariDataSource(config);
 
 		if (isMainBot()) {
-			//			leaderboardUpdateTask = scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
+			leaderboardUpdateTask = scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
 	}
 
