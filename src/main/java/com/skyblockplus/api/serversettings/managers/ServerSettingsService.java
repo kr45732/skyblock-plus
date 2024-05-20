@@ -358,6 +358,7 @@ public class ServerSettingsService {
 			EventSettings eventSettings = currentServerSettings.getSbEvent();
 			if (!eventSettings.getEventType().isEmpty()) {
 				List<EventMember> eventMembers = eventSettings.getMembersList();
+				eventMembers.removeIf(e -> e.getUuid().equals(newEventMember.getUuid()));
 				eventMembers.add(newEventMember);
 				eventSettings.setMembersList(eventMembers);
 
