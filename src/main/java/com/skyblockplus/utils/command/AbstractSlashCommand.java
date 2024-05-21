@@ -42,7 +42,7 @@ public abstract class AbstractSlashCommand {
 	protected void execute(SlashCommandEvent event) {}
 
 	protected void run(SlashCommandEvent event) {
-		if (disable && !event.isOwner()) {
+		if (isDisabled() && !event.isOwner()) {
 			event.replyEmbeds(errorEmbed("This command has been disabled").build()).setEphemeral(true).queue();
 			return;
 		}
@@ -158,4 +158,6 @@ public abstract class AbstractSlashCommand {
 	protected void onAutoComplete(AutoCompleteEvent event) {}
 
 	protected abstract String getFullName();
+
+	protected abstract boolean isDisabled();
 }

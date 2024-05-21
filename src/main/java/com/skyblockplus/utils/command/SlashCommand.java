@@ -77,4 +77,9 @@ public abstract class SlashCommand extends AbstractSlashCommand {
 		return getCommandData()
 			.addSubcommands(subcommands.stream().map(Subcommand::getCommandData).collect(Collectors.toCollection(ArrayList::new)));
 	}
+
+	@Override
+	protected boolean isDisabled() {
+		return disable;
+	}
 }

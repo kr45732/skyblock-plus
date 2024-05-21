@@ -33,4 +33,9 @@ public abstract class Subcommand extends AbstractSlashCommand {
 	protected String getFullName() {
 		return superCommand.getFullName() + " " + name;
 	}
+
+	@Override
+	protected boolean isDisabled() {
+		return disable || superCommand.isDisabled();
+	}
 }
