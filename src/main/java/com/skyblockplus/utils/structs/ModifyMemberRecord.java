@@ -53,7 +53,7 @@ public final class ModifyMemberRecord {
 
 	public ModifyMemberRecord update(Member selfMember, List<Role> add, List<Role> remove, String nickname) {
 		update(selfMember, add, remove);
-		this.nickname = nickname.trim();
+		this.nickname = nickname != null ? nickname.trim() : nickname;
 		return this;
 	}
 
