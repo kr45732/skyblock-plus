@@ -53,7 +53,9 @@ public final class ModifyMemberRecord {
 
 	public ModifyMemberRecord update(Member selfMember, List<Role> add, List<Role> remove, String nickname) {
 		update(selfMember, add, remove);
-		this.nickname = nickname != null ? nickname.trim() : nickname;
+		if (nickname != null) {
+			this.nickname = nickname.trim();
+		}
 		return this;
 	}
 
