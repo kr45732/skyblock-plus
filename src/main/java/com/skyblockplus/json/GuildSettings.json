@@ -1102,13 +1102,13 @@
         "requirements": [
           [
             {
-              "amount": 220,
+              "amount": 250,
               "type": "level"
             }
           ],
           [
             {
-              "amount": 12000,
+              "amount": 13000,
               "type": "weight"
             }
           ]
@@ -1122,7 +1122,7 @@
           "requirements": [
             [
               {
-                "amount": 270,
+                "amount": 280,
                 "type": "level"
               }
             ]
@@ -1135,7 +1135,7 @@
           "requirements": [
             [
               {
-                "amount": 300,
+                "amount": 310,
                 "type": "level"
               }
             ]
@@ -1148,7 +1148,7 @@
           "requirements": [
             [
               {
-                "amount": 330,
+                "amount": 340,
                 "type": "level"
               }
             ]
