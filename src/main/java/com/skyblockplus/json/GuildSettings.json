@@ -1315,5 +1315,73 @@
         }
       ]
     }
+  },
+  "665ccf7a8ea8c9d0525e3e3c": {
+    "name": "Skysend",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "primal dragon"
+      ],
+      "default_rank": {
+        "requirements": [],
+        "names": [
+          "enderman"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 240,
+                "type": "level"
+              },
+              {
+                "amount": 2000000000,
+                "type": "networth"
+              }
+            ]
+          ],
+          "names": [
+            "watcher"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 280,
+                "type": "level"
+              },
+              {
+                "amount": 5000000000,
+                "type": "networth"
+              }
+            ]
+          ],
+          "names": [
+            "zealot"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 320,
+                "type": "level"
+              },
+              {
+                "amount": 10000000000,
+                "type": "networth"
+              }
+            ]
+          ],
+          "names": [
+            "voidling"
+          ]
+        }
+      ]
+    }
   }
 }
