@@ -1383,5 +1383,56 @@
         }
       ]
     }
+  },
+  "662bc7698ea8c9d0525e2928": {
+    "name": "Umber",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "council",
+        "recruiter"
+      ],
+      "default_rank": {
+        "requirements": [
+          [
+            {
+              "amount": 10000,
+              "type": "gxp"
+            }
+          ]
+        ],
+        "names": [
+          "tourist"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 50000,
+                "type": "gxp"
+              }
+            ]
+          ],
+          "names": [
+            "resident"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 200000,
+                "type": "gxp"
+              }
+            ]
+          ],
+          "names": [
+            "celeb"
+          ]
+        }
+      ]
+    }
   }
 }
