@@ -1453,7 +1453,7 @@
           "requirements": [
             [
               {
-                "amount": 40,
+                "amount": 30,
                 "type": "skills"
               },
               {
