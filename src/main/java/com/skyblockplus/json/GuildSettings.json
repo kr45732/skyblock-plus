@@ -1434,5 +1434,73 @@
         }
       ]
     }
+  },
+  "652b5cea8ea8c9dca6f34e4e": {
+    "name": "Espanons",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "ignored_ranks": [
+        "helper"
+      ],
+      "default_rank": {
+        "requirements": [],
+        "names": [
+          "maxor"
+        ]
+      },
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 40,
+                "type": "skills"
+              },
+              {
+                "amount": 1000000000,
+                "type": "networth"
+              }
+            ]
+          ],
+          "names": [
+            "storm"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 35,
+                "type": "skills"
+              },
+              {
+                "amount": 2500000000,
+                "type": "networth"
+              }
+            ]
+          ],
+          "names": [
+            "goldor"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 40,
+                "type": "skills"
+              },
+              {
+                "amount": 5000000000,
+                "type": "networth"
+              }
+            ]
+          ],
+          "names": [
+            "necron"
+          ]
+        }
+      ]
+    }
   }
 }
