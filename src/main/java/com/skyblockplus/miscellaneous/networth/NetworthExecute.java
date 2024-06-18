@@ -1000,7 +1000,8 @@ public class NetworthExecute {
 			enchantName.equalsIgnoreCase("expertise") ||
 			enchantName.equalsIgnoreCase("cultivating") ||
 			enchantName.equalsIgnoreCase("champion") ||
-			enchantName.equalsIgnoreCase("hecatomb")
+			enchantName.equalsIgnoreCase("hecatomb") ||
+			enchantName.equalsIgnoreCase("toxophilite")
 		) {
 			enchantLevel = 1;
 		}
