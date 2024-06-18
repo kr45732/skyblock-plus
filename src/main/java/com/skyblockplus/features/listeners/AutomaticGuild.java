@@ -61,6 +61,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -119,11 +120,14 @@ public class AutomaticGuild {
 				.values()
 				.forEach(g -> {
 					try {
-						if (g.updateGuild()) {
+						// updateGuild freezes sometimes for some reason
+						if (executor.submit(g::updateGuild).get(1, TimeUnit.MINUTES)) {
 							// Only sleep if an update was actually performed
 							TimeUnit.SECONDS.sleep(1);
 						}
-					} catch (Exception ignored) {}
+					} catch (Exception e) {
+						log.error("updateGuild - " + g.guildId, e);
+					}
 				}),
 		5,
 		60,
@@ -521,10 +525,10 @@ public class AutomaticGuild {
 					.onError(ignored -> latch.countDown());
 
 				try {
-					latch.await(15, TimeUnit.SECONDS);
-				} catch (Exception e) {
-					log.error("updateGuild latch - " + guildId, e);
-				}
+					if (!latch.await(15, TimeUnit.SECONDS)) {
+						log.error("Retrieve linked members latch timeout - " + guildId);
+					}
+				} catch (Exception ignored) {}
 			}
 
 			Map<String, HypixelResponse> guildResponses = null;
