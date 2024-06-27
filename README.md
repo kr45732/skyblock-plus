@@ -75,7 +75,7 @@ If you made it this far, good job & good luck! If you are stuck or encounter a p
 6. Everything is finally set up (I hope) and you're ready to run the bot (yay!)
    - Use gradle or gradelw to build: `gradle build`
    - It will create a jar: "build/libs/SkyblockPlus-0.0.1.jar"
-   - Run the jar using Java. I suggest using systemctl to keep it running in the background (see sample in setup-resources/skyblock-plus.service)
+   - Run the jar using Java 17. I suggest using systemctl to keep it running in the background (see sample in setup-resources/skyblock-plus.service)
 
 ## Bug reports
 Feel free to make an issue or report the bug using the support server linked below.
