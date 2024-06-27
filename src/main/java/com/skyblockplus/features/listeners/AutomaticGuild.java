@@ -200,9 +200,9 @@ public class AutomaticGuild {
 	public AutomaticGuild(GenericGuildEvent event) {
 		guildId = event.getGuild().getId();
 
-		if (!IS_DEV && guildId.equals("796790757947867156")) {
+		if (!IS_DEV && guildId.equals(PRIMARY_GUILD_ID)) {
 			try {
-				((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
+				((GuildMessageChannel) jda.getGuildChannelById(BOT_STATUS_CHANNEL_ID)).getHistory()
 					.retrievePast(1)
 					.queue(m -> {
 						long seconds = Duration.between(m.get(0).getTimeCreated().toInstant(), Instant.now()).toSeconds();
@@ -1177,7 +1177,7 @@ public class AutomaticGuild {
 		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorSlashCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 		} else if (event.getComponentId().equals("mayor_current_election_button")) {
-			Message msg = guildMap.get("796790757947867156").lastMayorElectionOpenMessage;
+			Message msg = guildMap.get(PRIMARY_GUILD_ID).lastMayorElectionOpenMessage;
 			event
 				.reply(
 					(msg != null

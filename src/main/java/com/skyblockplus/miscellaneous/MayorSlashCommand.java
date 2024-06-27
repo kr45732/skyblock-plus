@@ -21,6 +21,7 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Constants.mayorNameToEmoji;
 import static com.skyblockplus.utils.utils.StringUtils.getRelativeTimestamp;
+import static com.skyblockplus.utils.utils.Utils.PRIMARY_GUILD_ID;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;
@@ -45,7 +46,7 @@ public class MayorSlashCommand extends SlashCommand {
 	}
 
 	public static MessageEditBuilder getMayor() {
-		AutomaticGuild automaticGuild = guildMap.get("796790757947867156");
+		AutomaticGuild automaticGuild = guildMap.get(PRIMARY_GUILD_ID);
 
 		List<Button> buttons = new ArrayList<>(automaticGuild.lastMayorElectedMessage.getButtons());
 		if (automaticGuild.lastMayorElectionOpenMessage != null) {

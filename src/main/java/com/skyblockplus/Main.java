@@ -126,7 +126,7 @@ public class Main {
 			!IS_DEV
 				? database.getAllServerSettings().stream().collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()))
 				: Stream
-					.of("796790757947867156", "782154976243089429", "869217817680044042")
+					.of(PRIMARY_GUILD_ID, "782154976243089429", "869217817680044042")
 					.collect(Collectors.toMap(Function.identity(), e -> database.getServerSettingsModel(e), (e1, e2) -> e1));
 		log.info("Loaded all server settings");
 

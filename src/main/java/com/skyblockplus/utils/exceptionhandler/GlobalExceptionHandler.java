@@ -36,7 +36,7 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 	public void uncaughtException(Thread t, Throwable e) {
 		try {
 			if (errorLogChannel == null) {
-				errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
+				errorLogChannel = jda.getGuildById(PRIMARY_GUILD_ID).getTextChannelById(ERROR_LOG_CHANNEL_ID);
 			}
 
 			String stackTrace = getStackTrace(e);
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 
 	public String uncaughtException(SlashCommandEvent event, Throwable e) {
 		if (errorLogChannel == null) {
-			errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
+			errorLogChannel = jda.getGuildById(PRIMARY_GUILD_ID).getTextChannelById(ERROR_LOG_CHANNEL_ID);
 		}
 
 		String description = "**Guild:** " + event.getGuild().getName() + " (" + event.getGuild().getId() + ")";
@@ -91,7 +91,7 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 
 	public void uncaughtException(CommandEvent event, Command command, Throwable e) {
 		if (errorLogChannel == null) {
-			errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
+			errorLogChannel = jda.getGuildById(PRIMARY_GUILD_ID).getTextChannelById(ERROR_LOG_CHANNEL_ID);
 		}
 
 		String stackTrace = getStackTrace(e);

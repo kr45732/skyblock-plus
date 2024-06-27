@@ -181,6 +181,11 @@ public class Utils {
 	public static String BOT_ID = "";
 	public static boolean IS_DEV = false;
 	public static String OWNER_ID = "";
+	public static String PRIMARY_GUILD_ID = "";
+	public static String LOG_CHANNEL_ID = "";
+	public static String NETWORTH_BUG_REPORT_CHANNEL_ID = "";
+	public static String ERROR_LOG_CHANNEL_ID = "";
+	public static String BOT_STATUS_CHANNEL_ID = "";
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
@@ -203,7 +208,7 @@ public class Utils {
 		System.out.println(commandInput);
 
 		if (botLogChannel == null) {
-			botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
+			botLogChannel = jda.getGuildById(PRIMARY_GUILD_ID).getTextChannelById(LOG_CHANNEL_ID);
 		}
 
 		EmbedBuilder eb = defaultEmbed(null);
@@ -225,7 +230,7 @@ public class Utils {
 		System.out.println(commandInput);
 
 		if (botLogChannel == null) {
-			botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
+			botLogChannel = jda.getGuildById(PRIMARY_GUILD_ID).getTextChannelById(LOG_CHANNEL_ID);
 		}
 
 		EmbedBuilder eb = defaultEmbed(null);
@@ -307,6 +312,11 @@ public class Utils {
 			BOT_ID = (String) appProps.get("BOT_ID");
 			IS_DEV = Objects.equals(((String) appProps.get("DEV")).toLowerCase(), "true");
 			OWNER_ID = (String) appProps.get("OWNER_ID");
+			PRIMARY_GUILD_ID = (String) appProps.get("PRIMARY_GUILD_ID");
+			LOG_CHANNEL_ID = (String) appProps.get("LOG_CHANNEL_ID");
+			NETWORTH_BUG_REPORT_CHANNEL_ID = (String) appProps.get("NETWORTH_BUG_REPORT_CHANNEL_ID");
+			ERROR_LOG_CHANNEL_ID = (String) appProps.get("ERROR_LOG_CHANNEL_ID");
+			BOT_STATUS_CHANNEL_ID = (String) appProps.get("BOT_STATUS_CHANNEL_ID");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -331,6 +341,11 @@ public class Utils {
 			BOT_ID = System.getenv("BOT_ID");
 			IS_DEV = Objects.equals(System.getenv("DEV").toLowerCase(), "true");
 			OWNER_ID = System.getenv("OWNER_ID");
+			PRIMARY_GUILD_ID = System.getenv("PRIMARY_GUILD_ID");
+			LOG_CHANNEL_ID = System.getenv("LOG_CHANNEL_ID");
+			NETWORTH_BUG_REPORT_CHANNEL_ID = System.getenv("NETWORTH_BUG_REPORT_CHANNEL_ID");
+			ERROR_LOG_CHANNEL_ID = System.getenv("ERROR_LOG_CHANNEL_ID");
+			BOT_STATUS_CHANNEL_ID = System.getenv("BOT_STATUS_CHANNEL_ID");
 		}
 	}
 
@@ -369,7 +384,7 @@ public class Utils {
 	/* Miscellaneous */
 	public static TextChannel getNetworthBugReportChannel() {
 		if (networthBugReportChannel == null) {
-			networthBugReportChannel = jda.getGuildById("796790757947867156").getTextChannelById("1017573342288564264");
+			networthBugReportChannel = jda.getGuildById(PRIMARY_GUILD_ID).getTextChannelById(NETWORTH_BUG_REPORT_CHANNEL_ID);
 		}
 		return networthBugReportChannel;
 	}

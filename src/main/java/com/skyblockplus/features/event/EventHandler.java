@@ -53,7 +53,7 @@ public class EventHandler {
 			}
 
 			jda
-				.getGuildById("796790757947867156")
+				.getGuildById(PRIMARY_GUILD_ID)
 				.getTextChannelById("959829695686381658")
 				.retrieveMessageById(messageId)
 				.queue(m -> {

@@ -1,8 +1,8 @@
-If you're really lazy or completely stuck you might be able to just copy and paste SQL from the dumps, but I haven't tested it so no guarantee it will work. The "server-settings-linked-accounts-dump.sql" has the SQL for server settings schema and linked accounts. 
+If you're really lazy or completely stuck you might be able to just copy and paste SQL from the database dumps. I haven't tested this so no guarantee it will work. [server-settings-linked-accounts-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/server-settings-linked-accounts-dump.sql) has the SQL for server settings and linked accounts. [leaderboard-cache-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/leaderboard-cache-dump.sql) has the SQL for leaderboards and caching. 
 
 
 # Server settings schemas
-If you need this, then you might be cooked. Try using the database dump and pray
+Should be automatically created on first startup by Spring. If you need to manually create it, try using [server-settings-linked-accounts-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/server-settings-linked-accounts-dump.sql).
 
 # Linked accounts schema
 ```postgresql
@@ -21,8 +21,8 @@ Indexes:
     "linked_account_uuid_key" UNIQUE CONSTRAINT, btree (uuid)
 ```
 
-# Leaderboard schemas
-Remember all four have the same schema, just different table names
+# Leaderboards schema
+All four leaderboards (all_lb, ironman_lb, stranded_lb, and selected_lb) have the same schema, just different table names.
 ```postgresql
                                                Table "public.all_lb"
                              Column                             |       Type       | Collation | Nullable | Default
