@@ -19,7 +19,7 @@ This is the source code for the Skyblock Plus Discord bot. A full list of comman
 You may need basic Discord, Gradle, Java, and Postgres knowledge to set up and maintain the bot. There are hardcoded constants that you will need to replace, databases you will need to create, and more. Note that I did not design the bot with the intention of others self-hosting it, so the process isn't very straightforward.
 
 ### Prerequisites
-Some of these prerequisites aren't necessary required but having all of them will make setting up bot without modification much easier.
+Some of these prerequisites aren't necessarily required but having all of them will make setting up bot without modification much easier.
 - A Discord Bot (created using the [Discord Developers Portal](https://discord.com/developers/applications)). You will also need to enable the server members and message content intents found in Discord Developer Portal --> Bot --> Privileged Gateway Intents
 - 2 Postgres databases (using one might be possible but may require code modifications)
 - Self-hosted [rust-query-api](https://github.com/kr45732/rust-query-api) (used in lowest bin, average bin, average auction, querying the auction house, auction flipper, etc)
@@ -66,6 +66,7 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
    - Follow "#item-repo-github" and send it to the channel you just created
 6. Hardcoded constants you will need to change:
    - You will need to update all emoji maps in the Constants.json from [skyblock-plus-data](https://github.com/kr45732/skyblock-plus-data/blob/main/Constants.json) with your own emojis
+   - Update L145 of `com.skyblockplus.Main.java` to `.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)`
    - Create 2 messages in a channel to be used for the scuffed event system (they will be constantly edited, so they must not be deleted). These messages Update the assignment of messageId in `com.skyblockplus.features.event.EventHandler` on L46. Update the channel on L57
    - More will be added as I find/remember them
 7. Running the bot:
