@@ -21,8 +21,7 @@ package com.skyblockplus.utils;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.capitalizeString;
-import static com.skyblockplus.utils.utils.Utils.getEmoji;
-import static com.skyblockplus.utils.utils.Utils.gson;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -1395,7 +1394,7 @@ public class Constants {
 
 	public static void initialize() {
 		try {
-			CONSTANTS = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Constants.json").getAsJsonObject();
+			CONSTANTS = getJson("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/Constants.json").getAsJsonObject();
 
 			Type mapStringString = new TypeToken<Map<String, String>>() {}.getType();
 			Type listInteger = new TypeToken<List<Integer>>() {}.getType();

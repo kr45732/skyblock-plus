@@ -187,6 +187,7 @@ public class Utils {
 	public static String ERROR_LOG_CHANNEL_ID = "";
 	public static String BOT_STATUS_CHANNEL_ID = "";
 	public static String NEU_REPO_UPDATE_CHANNEL_ID = "";
+	public static String DATA_REPO_GITHUB = "";
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
@@ -319,6 +320,7 @@ public class Utils {
 			ERROR_LOG_CHANNEL_ID = (String) appProps.get("ERROR_LOG_CHANNEL_ID");
 			BOT_STATUS_CHANNEL_ID = (String) appProps.get("BOT_STATUS_CHANNEL_ID");
 			NEU_REPO_UPDATE_CHANNEL_ID = (String) appProps.get("NEU_REPO_UPDATE_CHANNEL_ID");
+			DATA_REPO_GITHUB = (String) appProps.get("DATA_REPO_GITHUB");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -349,6 +351,7 @@ public class Utils {
 			ERROR_LOG_CHANNEL_ID = System.getenv("ERROR_LOG_CHANNEL_ID");
 			BOT_STATUS_CHANNEL_ID = System.getenv("BOT_STATUS_CHANNEL_ID");
 			NEU_REPO_UPDATE_CHANNEL_ID = System.getenv("NEU_REPO_UPDATE_CHANNEL_ID");
+			DATA_REPO_GITHUB = System.getenv("DATA_REPO_GITHUB");
 		}
 	}
 
@@ -846,7 +849,7 @@ public class Utils {
 
 			Git skyblockPlusDataRepo = Git
 				.cloneRepository()
-				.setURI("https://github.com/kr45732/skyblock-plus-data.git")
+				.setURI("https://github.com/" + DATA_REPO_GITHUB + ".git")
 				.setDirectory(skyblockPlusDir)
 				.call();
 
@@ -868,8 +871,8 @@ public class Utils {
 				skyblockPlusDataRepo
 					.commit()
 					.setAllowEmpty(false)
-					.setAuthor("kr45632", "52721908+kr45732@users.noreply.github.com")
-					.setCommitter("kr45632", "52721908+kr45732@users.noreply.github.com")
+					.setAuthor("kr45732", "52721908+kr45732@users.noreply.github.com")
+					.setCommitter("kr45732", "52721908+kr45732@users.noreply.github.com")
 					.setMessage("Automatic update (" + neuRepo.log().setMaxCount(1).call().iterator().next().getName() + ")")
 					.call();
 				skyblockPlusDataRepo.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();

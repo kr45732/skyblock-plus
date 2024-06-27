@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.getConstant;
 import static com.skyblockplus.utils.utils.HttpUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.nameToId;
+import static com.skyblockplus.utils.utils.Utils.DATA_REPO_GITHUB;
 import static com.skyblockplus.utils.utils.Utils.executor;
 
 import com.google.gson.JsonArray;
@@ -99,7 +100,7 @@ public class JsonUtils {
 	public static JsonObject getInternalJsonMappings() {
 		if (internalJsonMappings == null) {
 			internalJsonMappings =
-				getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json");
+				getJsonObject("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/InternalNameMappings.json");
 		}
 
 		return internalJsonMappings;
@@ -334,7 +335,7 @@ public class JsonUtils {
 
 	public static JsonObject getDungeonLootJson() {
 		if (dungeonLootJson == null) {
-			dungeonLootJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/DungeonLoot.json");
+			dungeonLootJson = getJsonObject("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/DungeonLoot.json");
 			for (Map.Entry<String, JsonElement> floor : dungeonLootJson.entrySet()) {
 				for (Map.Entry<String, JsonElement> chest : floor.getValue().getAsJsonObject().entrySet()) {
 					for (JsonElement item : chest.getValue().getAsJsonArray()) {
@@ -351,7 +352,7 @@ public class JsonUtils {
 
 	public static JsonObject getDragonLootJson() {
 		if (dragonLootJson == null) {
-			dragonLootJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/DragonLoot.json");
+			dragonLootJson = getJsonObject("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/DragonLoot.json");
 		}
 
 		return dragonLootJson;
@@ -409,7 +410,7 @@ public class JsonUtils {
 
 	public static JsonObject getBitsJson() {
 		if (bitsJson == null) {
-			bitsJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/BitPrices.json");
+			bitsJson = getJsonObject("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/BitPrices.json");
 		}
 
 		return bitsJson;
@@ -417,7 +418,7 @@ public class JsonUtils {
 
 	public static JsonObject getCopperJson() {
 		if (copperJson == null) {
-			copperJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/CopperPrices.json");
+			copperJson = getJsonObject("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/CopperPrices.json");
 		}
 
 		return copperJson;
@@ -534,9 +535,7 @@ public class JsonUtils {
 
 	public static JsonObject getPriceOverrideJson() {
 		if (priceOverrideJson == null) {
-			JsonElement splitPriceOverrides = getJson(
-				"https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json"
-			)
+			JsonElement splitPriceOverrides = getJson("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/PriceOverrides.json")
 				.getAsJsonObject();
 			priceOverrideJson = higherDepth(splitPriceOverrides, "automatic").getAsJsonObject();
 			vanillaItems.addAll(priceOverrideJson.keySet());

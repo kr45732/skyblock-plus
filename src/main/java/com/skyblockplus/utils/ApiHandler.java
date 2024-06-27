@@ -85,6 +85,7 @@ public class ApiHandler {
 	public static void updateCaches() {
 		try {
 			cacheApplyGuildUsers();
+			leaderboardDatabase.cacheJacob();
 			leaderboardDatabase.cacheCommandUses();
 			leaderboardDatabase.cacheAuctionTracker();
 			leaderboardDatabase.cacheTokens();
@@ -95,7 +96,7 @@ public class ApiHandler {
 	}
 
 	public static void initializeConstants() {
-		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Settings.json");
+		JsonElement settings = getJson("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/Settings.json");
 		ahApiUrl = higherDepth(settings, "ahApiUrl").getAsString();
 		mojangApiNum = higherDepth(settings, "mojangApiNum", 0);
 		allowMojangApi = higherDepth(settings, "allowMojangApi", false);

@@ -63,7 +63,7 @@ public class EmojiUpdater {
 							.getAsJsonObject()
 						: getJson(url[0])).getAsJsonObject()
 					.keySet();
-			Set<String> allItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
+			Set<String> allItems = getJson("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/InternalNameMappings.json")
 				.getAsJsonObject()
 				.keySet();
 			allItems.removeIf(processedItemsSet::contains);
@@ -85,7 +85,7 @@ public class EmojiUpdater {
 			}
 
 			Collection<JsonElement> sbItems = getSkyblockItemsJson().values();
-			Set<String> allSbItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
+			Set<String> allSbItems = getJson("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/InternalNameMappings.json")
 				.getAsJsonObject()
 				.keySet();
 			Set<String> added = JsonParser

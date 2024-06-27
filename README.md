@@ -41,7 +41,7 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
    - Same thing as above with JACOB_KEY, you probably won't ever use that endpoint, but you don't want anyone to be able to POST data to it
    - Ensure the AUCTION_API_KEY is the same as the ADMIN_API_KEY of your self-hosted rust-query-api
    - If you are self-hosted [hste](https://github.com/kr45732/hste), then HASTE_KEY should be the same as the KEY set on there
-3. Databases: At the moment, there are two databases instead of a single one. You might be able to combine it into one without needing to modify code by setting both databases to the same URL, but I haven't tested that. Refer to [setup-resources](https://github.com/kr45732/skyblock-plus/tree/master/setup-resources) for schemas and database dumps. You will also need to install the [pg_trgm module](https://www.postgresql.org/docs/current/pgtrgm.html) on your databases. 
+3. Databases: At the moment, there are two databases instead of a single one. You might be able to combine it into one without needing to modify code by setting both databases to the same URL, but I haven't tested that. Refer to [setup-resources](https://github.com/kr45732/skyblock-plus/tree/master/setup-resources) for schemas and database dumps. You will also need to install the [pg_trgm module](https://www.postgresql.org/docs/current/pgtrgm.html) on your databases. This can be done by executing `CREATE EXTENSION pg_trgm` when connected to your database  
    - [Server Settings Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#server-settings-schema)
    - [Linked Accounts Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#linked-accounts-schema)
    - [Leaderboards Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#leaderboards-schema)
@@ -56,7 +56,11 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
    - Using the evaluate command run `ev com.skyblockplus.utils.EmojiUpdater.runEmojis(json)` where json is a haste link to the output JSON you got from processAll() above
    - Paste the JSON output of runEmojis into the "IdToEmojiMappings.json"
 5. Data repository: you will need to make your own clone of the skyblock-plus-data repository so your bot can automatically update it:
-   - Clone [skyblock-plus-data](https://github.com/kr45732/skyblock-plus-data)
+   - Fork [skyblock-plus-data](https://github.com/kr45732/skyblock-plus-data)
+   - Set "DATA_REPO_GITHUB" in DevSettings.properties to point to your repository
+   - Navigate to "Settings.json" of your repository and edit the following:
+     - Change "ahApiUrl" to point to your self-hosted rust-query-api
+     - Change "hasteUrl" to point to your self-hosted hastebin
    - Create a new channel in your PRIMARY_GUILD and set "NEU_REPO_UPDATE_CHANNEL_ID" in DevSettings.properties
    - Join [Moulberry's Bush](https://discord.gg/moulberry)
    - Follow "#item-repo-github" and send it to the channel you just created
