@@ -42,10 +42,10 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
    - Ensure the AUCTION_API_KEY is the same as the ADMIN_API_KEY of your self-hosted rust-query-api
    - If you are self-hosted [hste](https://github.com/kr45732/hste), then HASTE_KEY should be the same as the KEY set on there
 3. Databases: At the moment, there are two databases instead of a single one. You might be able to combine it into one without needing to modify code by setting both databases to the same URL, but I haven't tested that. Refer to [setup-resources](https://github.com/kr45732/skyblock-plus/tree/master/setup-resources) for schemas and database dumps. You will also need to install the [pg_trgm module](https://www.postgresql.org/docs/current/pgtrgm.html) on your databases. 
-   - Server settings: I highly suggest to let Spring automatically generate it on the first startup
-   - Linked accounts
-   - Leaderboards
-   - Caching
+   - [Server Settings Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#server-settings-schema)
+   - [Linked Accounts Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#leaderboards-schema)
+   - [Leaderboards Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#leaderboards-schema)
+   - [Cache Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#leaderboards-schema)
 4. Emojis: At the moment, there are around 90 custom emoji servers. To create your own:
    - Make "IdToEmojiMappings.json" an empty JSON object
    - Create and add the bot to 90 servers with the name "Skyblock Plus - Emoji Server xx" (xx is the server number starting at 1)
