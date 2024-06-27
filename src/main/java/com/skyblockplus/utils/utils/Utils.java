@@ -884,8 +884,7 @@ public class Utils {
 				skyblockPlusDataRepo.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();
 			} catch (Exception ignored) {}
 
-			FileUtils.deleteDirectory(neuDir);
-			FileUtils.deleteDirectory(skyblockPlusDir);
+			// Closing should also delete the directory
 			neuRepo.close();
 			skyblockPlusDataRepo.close();
 
