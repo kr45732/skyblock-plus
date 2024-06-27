@@ -20,10 +20,10 @@ You may need basic Discord, Gradle, Java, and Postgres knowledge to set up and m
 
 ### Prerequisites
 Some of these prerequisites aren't necessary required but having all of them will make setting up bot without modification much easier.
-- A Discord Bot (created using the [Discord Developers Portal](https://discord.com/developers/applications)) 
+- A Discord Bot (created using the [Discord Developers Portal](https://discord.com/developers/applications)). You will also need to enable the server members and message content intents found in Discord Developer Portal --> Bot --> Privileged Gateway Intents
 - 2 Postgres databases (using one might be possible but may require code modifications)
 - Self-hosted [rust-query-api](https://github.com/kr45732/rust-query-api) (used in lowest bin, average bin, average auction, querying the auction house, auction flipper, etc)
-- Self-hosted [hastebin](https://github.com/kr45732/hste) (my haste implementation is wacky, so I would suggest replace it with your own (which will require some code modification) otherwise self-hosting steps are below)
+- Self-hosted hastebin (my haste implementation is wacky, so I would suggest replace it with your own (which will require some code modification) otherwise self-hosting steps are below)
   - Clone [hste](https://github.com/kr45732/hste)
   - Obtain a [fauna database]([hste](https://github.com/kr45732/hste))
   - Set FAUNA_ADMIN_KEY environment variable (might be called secret)
