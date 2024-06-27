@@ -12,7 +12,7 @@
   <img alt="license" src="https://img.shields.io/github/contributors/kr45732/skyblock-plus?style=for-the-badge" />
 </a>
 
-This is the source code for the Skyblock Plus Discord bot. A full list of commands and features as well as additional information can be found on the website linked below. This bot was developed over 3 years with a lot of head banging against my wall so place consider dropping a star ❤️
+This is the source code for the Skyblock Plus Discord bot. A full list of commands and features as well as additional information can be found on the website linked below. This bot was developed over 3 years with a lot of head banging against my wall so please consider dropping a star ❤️
 
 ## Self Hosting
 ### Preface
