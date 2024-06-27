@@ -43,12 +43,12 @@ public class EventHandler {
 
 	public static void initialize() {
 		scheduler.scheduleAtFixedRate(EventHandler::updateEvents, 30, 30, TimeUnit.SECONDS);
-		messageId = isMainBot() ? "960675388441387058" : "960687190990520400";
+		messageId = !IS_DEV ? "960675388441387058" : "960687190990520400";
 	}
 
 	public static void updateEvents() {
 		try {
-			if (!isMainBot()) {
+			if (IS_DEV) {
 				return;
 			}
 

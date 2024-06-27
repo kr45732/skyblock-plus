@@ -164,15 +164,13 @@ public class Utils {
 	public static String API_USERNAME = "";
 	public static String API_PASSWORD = "";
 	public static String GITHUB_TOKEN = "";
-	public static String DEFAULT_PREFIX = "";
+	public static String PREFIX = "";
 	public static String AUCTION_API_KEY = "";
 	public static String SBZ_SCAMMER_DB_KEY = "";
 	public static String LEADERBOARD_DB_URL = "";
 	public static String CLIENT_SECRET = "";
 	public static String BASE_URL = "";
 	public static String JACOB_KEY = "";
-	public static String JACOB_API = "";
-	public static String EXTRAS_API = "";
 	public static String HASTE_KEY = "";
 	public static String DISCORD_BOT_LIST_TOKEN = "";
 	public static String DISCORD_BOTS_GG_TOKEN = "";
@@ -180,6 +178,9 @@ public class Utils {
 	public static String TOP_GG_TOKEN = "";
 	public static String AUCTION_FLIPPER_WEBHOOK = "";
 	public static String BOT_STATUS_WEBHOOK = "";
+	public static String BOT_ID;
+	public static boolean IS_DEV;
+	public static String OWNER_ID;
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
@@ -191,7 +192,6 @@ public class Utils {
 	public static OAuthClient oAuthClient;
 	public static Map<String, ServerSettingsModel> allServerSettings;
 	public static ConfigurableApplicationContext springContext;
-	public static String selfUserId;
 	/* Miscellaneous */
 	private static TextChannel botLogChannel;
 	private static TextChannel networthBugReportChannel;
@@ -290,15 +290,13 @@ public class Utils {
 			GITHUB_TOKEN = (String) appProps.get("GITHUB_TOKEN");
 			API_USERNAME = (String) appProps.get("API_USERNAME");
 			API_PASSWORD = (String) appProps.get("API_PASSWORD");
-			DEFAULT_PREFIX = (String) appProps.get("DEFAULT_PREFIX");
+			PREFIX = (String) appProps.get("PREFIX");
 			AUCTION_API_KEY = (String) appProps.get("AUCTION_API_KEY");
 			SBZ_SCAMMER_DB_KEY = (String) appProps.get("SBZ_SCAMMER_DB_KEY");
 			LEADERBOARD_DB_URL = (String) appProps.get("LEADERBOARD_DB_URL");
 			CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
 			BASE_URL = (String) appProps.get("BASE_URL");
 			JACOB_KEY = (String) appProps.get("JACOB_KEY");
-			JACOB_API = (String) appProps.get("JACOB_API");
-			EXTRAS_API = (String) appProps.get("EXTRAS_API");
 			HASTE_KEY = (String) appProps.get("HASTE_KEY");
 			DISCORD_BOT_LIST_TOKEN = (String) appProps.get("DISCORD_BOT_LIST_TOKEN");
 			DISCORD_BOTS_GG_TOKEN = (String) appProps.get("DISCORD_BOTS_GG_TOKEN");
@@ -306,6 +304,9 @@ public class Utils {
 			TOP_GG_TOKEN = (String) appProps.get("TOP_GG_TOKEN");
 			AUCTION_FLIPPER_WEBHOOK = (String) appProps.get("AUCTION_FLIPPER_WEBHOOK");
 			BOT_STATUS_WEBHOOK = (String) appProps.get("BOT_STATUS_WEBHOOK");
+			BOT_ID = (String) appProps.get("BOT_ID");
+			IS_DEV = Objects.equals(((String) appProps.get("DEV")).toLowerCase(), "true");
+			OWNER_ID = (String) appProps.get("OWNER_ID");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -313,15 +314,13 @@ public class Utils {
 			GITHUB_TOKEN = System.getenv("GITHUB_TOKEN");
 			API_USERNAME = System.getenv("API_USERNAME");
 			API_PASSWORD = System.getenv("API_PASSWORD");
-			DEFAULT_PREFIX = System.getenv("DEFAULT_PREFIX");
+			PREFIX = System.getenv("PREFIX");
 			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
 			SBZ_SCAMMER_DB_KEY = System.getenv("SBZ_SCAMMER_DB_KEY");
 			LEADERBOARD_DB_URL = System.getenv("LEADERBOARD_DB_URL");
 			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
 			BASE_URL = System.getenv("BASE_URL");
 			JACOB_KEY = System.getenv("JACOB_KEY");
-			JACOB_API = System.getenv("JACOB_API");
-			EXTRAS_API = System.getenv("EXTRAS_API");
 			HASTE_KEY = System.getenv("HASTE_KEY");
 			DISCORD_BOT_LIST_TOKEN = System.getenv("DISCORD_BOT_LIST_TOKEN");
 			DISCORD_BOTS_GG_TOKEN = System.getenv("DISCORD_BOTS_GG_TOKEN");
@@ -329,6 +328,9 @@ public class Utils {
 			TOP_GG_TOKEN = System.getenv("TOP_GG_TOKEN");
 			AUCTION_FLIPPER_WEBHOOK = System.getenv("AUCTION_FLIPPER_WEBHOOK");
 			BOT_STATUS_WEBHOOK = System.getenv("BOT_STATUS_WEBHOOK");
+			BOT_ID = System.getenv("BOT_ID");
+			IS_DEV = Objects.equals(System.getenv("DEV").toLowerCase(), "true");
+			OWNER_ID = System.getenv("OWNER_ID");
 		}
 	}
 
@@ -714,7 +716,7 @@ public class Utils {
 	}
 
 	public static void cacheApplyGuildUsers() {
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 
@@ -782,10 +784,6 @@ public class Utils {
 
 	public static Permission[] defaultPerms() {
 		return new Permission[] { Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS };
-	}
-
-	public static boolean isMainBot() {
-		return DEFAULT_PREFIX.equals("+");
 	}
 
 	public static Map<String, Integer> getCommandUses() {

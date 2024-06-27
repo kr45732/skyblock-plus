@@ -20,7 +20,7 @@ package com.skyblockplus.utils.oauth;
 
 import static com.skyblockplus.utils.utils.HttpUtils.httpClient;
 import static com.skyblockplus.utils.utils.JsonUtils.higherDepth;
-import static com.skyblockplus.utils.utils.Utils.selfUserId;
+import static com.skyblockplus.utils.utils.Utils.BOT_ID;
 
 import com.google.gson.JsonParser;
 import java.io.IOException;
@@ -123,7 +123,7 @@ public class OAuthClient {
 
 	public URI createAuthorizationUri(String state) throws URISyntaxException {
 		return new URIBuilder("https://discord.com/api/oauth2/authorize")
-			.addParameter("client_id", selfUserId)
+			.addParameter("client_id", BOT_ID)
 			.addParameter("redirect_uri", states.get(state))
 			.addParameter("response_type", "code")
 			.addParameter("state", state)

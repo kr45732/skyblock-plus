@@ -163,7 +163,7 @@ public class MainListener extends ListenerAdapter {
 			return;
 		}
 
-		if (isMainBot() && event.getChannel().getId().equals("869278025018114108")) {
+		if (!IS_DEV && event.getChannel().getId().equals("869278025018114108")) {
 			String commitSha = higherDepth(
 				getJson("https://api.github.com/repos/NotEnoughUpdates/NotEnoughUpdates-REPO/commits?per_page=1&sha=" + getNeuBranch()),
 				"[0].sha",

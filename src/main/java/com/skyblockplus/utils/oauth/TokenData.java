@@ -163,7 +163,7 @@ public final class TokenData {
 	public CompletableFuture<Boolean> updateMetadata(JsonObject body) {
 		this.body = body;
 		return asyncPutJson(
-			"https://discord.com/api/v10/users/@me/applications/" + selfUserId + "/role-connection",
+			"https://discord.com/api/v10/users/@me/applications/" + BOT_ID + "/role-connection",
 			body,
 			"Content-Type",
 			"application/json",

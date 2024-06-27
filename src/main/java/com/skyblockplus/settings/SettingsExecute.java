@@ -1003,7 +1003,7 @@ public class SettingsExecute {
 					)
 					.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
 					.addMemberPermissionOverride(
-						Long.parseLong(selfUserId),
+						Long.parseLong(BOT_ID),
 						EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
 						null
 					)

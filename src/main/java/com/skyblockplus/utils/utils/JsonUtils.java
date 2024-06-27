@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.getConstant;
 import static com.skyblockplus.utils.utils.HttpUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.nameToId;
-import static com.skyblockplus.utils.utils.Utils.EXTRAS_API;
 import static com.skyblockplus.utils.utils.Utils.executor;
 
 import com.google.gson.JsonArray;
@@ -315,7 +314,7 @@ public class JsonUtils {
 
 	public static JsonObject getExtraPricesJson() {
 		if (extraPricesJson == null || Duration.between(extraPricesJsonLastUpdated, Instant.now()).toMinutes() >= 15) {
-			extraPricesJson = getJson(EXTRAS_API).getAsJsonObject();
+			extraPricesJson = getJson("https://raw.githubusercontent.com/SkyHelperBot/Prices/main/prices.json").getAsJsonObject();
 			extraPricesJsonLastUpdated = Instant.now();
 		}
 

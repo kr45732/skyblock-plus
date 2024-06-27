@@ -94,7 +94,7 @@ public class JacobHandler {
 	}
 
 	public static void setJacobDataFromApi() {
-		JsonObject rawJacobData = getJsonObject(JACOB_API + "/" + getSkyblockYear());
+		JsonObject rawJacobData = getJsonObject("https://api.elitebot.dev/Contests/at/" + getSkyblockYear());
 		rawJacobData.add(
 			"contests",
 			collectJsonArray(

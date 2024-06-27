@@ -74,7 +74,7 @@ public class ApiHandler {
 			leaderboardDatabase.initializeParties();
 			scheduler.scheduleWithFixedDelay(leaderboardDatabase::updateJsonCache, 60, 60, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCaches, 60, 60, TimeUnit.MINUTES);
-			if (isMainBot()) {
+			if (!IS_DEV) {
 				scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 			}
 		} catch (Exception e) {
@@ -116,7 +116,7 @@ public class ApiHandler {
 			int serverCount = jda.getGuilds().size();
 			jda.setActivity(Activity.watching("/help in " + serverCount + " servers"));
 
-			if (!isMainBot()) {
+			if (IS_DEV) {
 				return;
 			}
 
@@ -124,7 +124,7 @@ public class ApiHandler {
 			dscBotListJson.addProperty("guilds", serverCount);
 			dscBotListJson.addProperty("users", getUserCount());
 			postJson(
-				"https://discordbotlist.com/api/v1/bots/" + selfUserId + "/stats",
+				"https://discordbotlist.com/api/v1/bots/" + BOT_ID + "/stats",
 				dscBotListJson,
 				new BasicHeader("Authorization", DISCORD_BOT_LIST_TOKEN)
 			);
@@ -132,18 +132,18 @@ public class ApiHandler {
 			JsonObject dscBotsJson = new JsonObject();
 			dscBotsJson.addProperty("guildCount", serverCount);
 			postJson(
-				"https://discord.bots.gg/api/v1/bots/" + selfUserId + "/stats",
+				"https://discord.bots.gg/api/v1/bots/" + BOT_ID + "/stats",
 				dscBotsJson,
 				new BasicHeader("Authorization", DISCORD_BOTS_GG_TOKEN)
 			);
 
 			JsonObject discordsJson = new JsonObject();
 			discordsJson.addProperty("server_count", serverCount);
-			postJson("https://discords.com/bots/api/bot/" + selfUserId, discordsJson, new BasicHeader("Authorization", DISCORDS_COM_TOKEN));
+			postJson("https://discords.com/bots/api/bot/" + BOT_ID, discordsJson, new BasicHeader("Authorization", DISCORDS_COM_TOKEN));
 
 			JsonObject topGgJson = new JsonObject();
 			topGgJson.addProperty("server_count", serverCount);
-			postJson("https://top.gg/api/bots/" + selfUserId + "/stats", topGgJson, new BasicHeader("Authorization", TOP_GG_TOKEN));
+			postJson("https://top.gg/api/bots/" + BOT_ID + "/stats", topGgJson, new BasicHeader("Authorization", TOP_GG_TOKEN));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

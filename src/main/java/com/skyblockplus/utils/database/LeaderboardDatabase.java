@@ -155,7 +155,7 @@ public class LeaderboardDatabase {
 		config.setPoolName("Leaderbord Database Pool");
 		dataSource = new HikariDataSource(config);
 
-		if (isMainBot()) {
+		if (!IS_DEV) {
 			leaderboardUpdateTask = scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
 	}
@@ -733,7 +733,7 @@ public class LeaderboardDatabase {
 
 	/* JSON storage */
 	public void cacheCommandUses() {
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 
@@ -741,7 +741,7 @@ public class LeaderboardDatabase {
 	}
 
 	public void cacheAuctionTracker() {
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 
@@ -749,7 +749,7 @@ public class LeaderboardDatabase {
 	}
 
 	public void cacheJacob() {
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 
@@ -757,7 +757,7 @@ public class LeaderboardDatabase {
 	}
 
 	public void cacheTokens() {
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 
@@ -765,7 +765,7 @@ public class LeaderboardDatabase {
 	}
 
 	public void cacheParties() {
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 
@@ -798,7 +798,7 @@ public class LeaderboardDatabase {
 	}
 
 	public void initializeCommandUses() {
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 
@@ -810,7 +810,7 @@ public class LeaderboardDatabase {
 	}
 
 	public void initializeAuctionTracker() {
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 
@@ -844,7 +844,7 @@ public class LeaderboardDatabase {
 	}
 
 	public void initializeTokens() {
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 
@@ -858,7 +858,7 @@ public class LeaderboardDatabase {
 	}
 
 	public void initializeParties() {
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 

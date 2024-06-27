@@ -84,7 +84,6 @@ public class Main {
 		Utils.initialize();
 		ApiHandler.initializeConstants();
 		Constants.initialize();
-		selfUserId = isMainBot() ? "796791167366594592" : "799042642092228658";
 		botStatusWebhook =
 			new WebhookClientBuilder(BOT_STATUS_WEBHOOK).setExecutorService(scheduler).setHttpClient(okHttpClient).buildJDA();
 
@@ -95,9 +94,9 @@ public class Main {
 		waiter = new EventWaiter(scheduler, true);
 		client =
 			new CommandClientBuilder()
-				.setPrefix(DEFAULT_PREFIX)
+				.setPrefix(PREFIX)
 				.setAlternativePrefix("@mention")
-				.setOwnerId("385939031596466176")
+				.setOwnerId(OWNER_ID)
 				.setEmojis("<:yes:948359788889251940>", "⚠️", "<:no:948359781125607424>")
 				.useHelpBuilder(false)
 				.setListener(
@@ -115,16 +114,16 @@ public class Main {
 				.build();
 
 		slashCommandClient =
-			new SlashCommandClient().setOwnerId(client.getOwnerId()).addCommands(springContext.getBeansOfType(SlashCommand.class).values());
+			new SlashCommandClient().setOwnerId(OWNER_ID).addCommands(springContext.getBeansOfType(SlashCommand.class).values());
 
-		oAuthClient = new OAuthClient(selfUserId, CLIENT_SECRET);
+		oAuthClient = new OAuthClient(BOT_ID, CLIENT_SECRET);
 
 		log.info(
 			"Loaded " + client.getCommands().size() + " prefix commands and " + slashCommandClient.getCommands().size() + " slash commands"
 		);
 
 		allServerSettings =
-			isMainBot()
+			!IS_DEV
 				? database.getAllServerSettings().stream().collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()))
 				: Stream
 					.of("796790757947867156", "782154976243089429", "869217817680044042")
@@ -145,7 +144,7 @@ public class Main {
 			.disableCache(CacheFlag.VOICE_STATE, CacheFlag.STICKER, CacheFlag.FORUM_TAGS, CacheFlag.SCHEDULED_EVENTS)
 			.enableIntents(GatewayIntent.GUILD_MEMBERS)
 			.setEnableShutdownHook(false);
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			jdaBuilder.enableIntents(GatewayIntent.MESSAGE_CONTENT);
 		}
 		jda = jdaBuilder.build();
@@ -169,14 +168,14 @@ public class Main {
 
 		ApiHandler.initialize();
 		AuctionTracker.initialize();
-		AuctionFlipper.initialize(isMainBot());
+		AuctionFlipper.initialize(!IS_DEV);
 		ApiController.initialize();
 		FetchurHandler.initialize();
 		scheduler.scheduleWithFixedDelay(MayorHandler::initialize, 1, 5, TimeUnit.MINUTES);
 		JacobHandler.initialize();
 		EventHandler.initialize();
 
-		if (isMainBot()) {
+		if (!IS_DEV) {
 			scheduler.scheduleWithFixedDelay(
 				() -> {
 					if (Runtime.getRuntime().totalMemory() > 4500000000L) {
@@ -196,7 +195,7 @@ public class Main {
 	@PreDestroy
 	public void onExit() {
 		// Hotswap Agent runs the PreDestroy hook for some reason
-		if (!isMainBot()) {
+		if (IS_DEV) {
 			return;
 		}
 

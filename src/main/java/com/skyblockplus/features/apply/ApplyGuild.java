@@ -56,7 +56,7 @@ public class ApplyGuild {
 
 		if (prevApplyUsers != null) { // Triggered by reload command
 			applyUserList.addAll(prevApplyUsers);
-		} else if (isMainBot()) { // Triggered by initial startup
+		} else if (!IS_DEV) { // Triggered by initial startup
 			String guildId = reactMessage.getGuild().getId();
 			String guildName = higherDepth(currentSettings, "guildName", null);
 

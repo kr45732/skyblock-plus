@@ -23,7 +23,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 
     // Spring boot
-    id 'org.springframework.boot' version '3.2.5'
+    id 'org.springframework.boot' version '3.3.1'
     id "io.spring.dependency-management" version "1.1.5"
 
     // Lombok annotations
@@ -80,9 +80,9 @@ dependencies {
     implementation 'me.nullicorn:Nedit:2.2.0'
 
     // Spring boot and postgresql
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.2.5'
-    implementation 'org.springframework.boot:spring-boot-starter-security:3.2.5'
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.5'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.3.1'
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.3.1'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.1'
     runtimeOnly 'org.postgresql:postgresql:42.7.3'
 
     // Http client

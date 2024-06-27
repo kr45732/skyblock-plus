@@ -200,7 +200,7 @@ public class AutomaticGuild {
 	public AutomaticGuild(GenericGuildEvent event) {
 		guildId = event.getGuild().getId();
 
-		if (isMainBot() && guildId.equals("796790757947867156")) {
+		if (!IS_DEV && guildId.equals("796790757947867156")) {
 			try {
 				((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
 					.retrievePast(1)
@@ -244,7 +244,7 @@ public class AutomaticGuild {
 					.get()
 					.stream()
 					.filter(m ->
-						m.getAuthor().getId().equals(selfUserId) &&
+						m.getAuthor().getId().equals(BOT_ID) &&
 						!m.getEmbeds().isEmpty() &&
 						m.getEmbeds().get(0).getTitle() != null &&
 						m.getEmbeds().get(0).getTitle().startsWith("Mayor Election Open | Year ")
@@ -269,7 +269,7 @@ public class AutomaticGuild {
 					.get()
 					.stream()
 					.filter(m ->
-						m.getAuthor().getId().equals(selfUserId) &&
+						m.getAuthor().getId().equals(BOT_ID) &&
 						!m.getEmbeds().isEmpty() &&
 						m.getEmbeds().get(0).getTitle() != null &&
 						m.getEmbeds().get(0).getTitle().startsWith("Mayor Elected | Year ")
@@ -1047,7 +1047,7 @@ public class AutomaticGuild {
 					}
 				});
 		} else if (event.getModalId().startsWith("nw_reply_")) {
-			if (event.getUser().getId().equals(client.getOwnerId())) {
+			if (event.getUser().getId().equals(OWNER_ID)) {
 				event
 					.editComponents(
 						ActionRow.of(
@@ -1189,7 +1189,7 @@ public class AutomaticGuild {
 		} else if (event.getComponentId().equals("mayor_jerry_button")) {
 			event.replyEmbeds(jerryEmbed).setEphemeral(true).queue();
 		} else if (event.getComponentId().startsWith("nw_reply_")) {
-			if (event.getUser().getId().equals(client.getOwnerId())) {
+			if (event.getUser().getId().equals(OWNER_ID)) {
 				event
 					.replyModal(
 						Modal
@@ -1200,7 +1200,7 @@ public class AutomaticGuild {
 					.queue();
 			}
 		} else if (event.getComponentId().startsWith("nw_resolved_")) {
-			if (event.getUser().getId().equals(client.getOwnerId())) {
+			if (event.getUser().getId().equals(OWNER_ID)) {
 				event
 					.editComponents(
 						ActionRow.of(

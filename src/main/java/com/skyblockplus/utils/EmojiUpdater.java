@@ -76,7 +76,7 @@ public class EmojiUpdater {
 
 	public static JsonObject processAll() {
 		try {
-			if (isMainBot()) {
+			if (!IS_DEV) {
 				throw new RuntimeException("Cannot run this on the main bot");
 			}
 
