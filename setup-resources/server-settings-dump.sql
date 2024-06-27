@@ -1,11 +1,8 @@
---
--- PostgreSQL database dump
---
-
 -- Dumped from database version 14.1
 
+
 --
--- Name: apply_requirement; Type: TABLE; Schema: public; Owner: postgres
+-- Name: apply_requirement; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.apply_requirement (
@@ -14,10 +11,8 @@ CREATE TABLE public.apply_requirement (
 );
 
 
-ALTER TABLE public.apply_requirement OWNER TO postgres;
-
 --
--- Name: apply_requirement_requirements; Type: TABLE; Schema: public; Owner: postgres
+-- Name: apply_requirement_requirements; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.apply_requirement_requirements (
@@ -27,10 +22,8 @@ CREATE TABLE public.apply_requirement_requirements (
 );
 
 
-ALTER TABLE public.apply_requirement_requirements OWNER TO postgres;
-
 --
--- Name: apply_requirement_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: apply_requirement_seq; Type: SEQUENCE; Schema: public
 --
 
 CREATE SEQUENCE public.apply_requirement_seq
@@ -41,10 +34,8 @@ CREATE SEQUENCE public.apply_requirement_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.apply_requirement_seq OWNER TO postgres;
-
 --
--- Name: automated_guild; Type: TABLE; Schema: public; Owner: postgres
+-- Name: automated_guild; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.automated_guild (
@@ -75,10 +66,8 @@ CREATE TABLE public.automated_guild (
 );
 
 
-ALTER TABLE public.automated_guild OWNER TO postgres;
-
 --
--- Name: automated_guild_apply_staff_roles; Type: TABLE; Schema: public; Owner: postgres
+-- Name: automated_guild_apply_staff_roles; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.automated_guild_apply_staff_roles (
@@ -87,10 +76,8 @@ CREATE TABLE public.automated_guild_apply_staff_roles (
 );
 
 
-ALTER TABLE public.automated_guild_apply_staff_roles OWNER TO postgres;
-
 --
--- Name: automated_guild_guild_ranks; Type: TABLE; Schema: public; Owner: postgres
+-- Name: automated_guild_guild_ranks; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.automated_guild_guild_ranks (
@@ -100,10 +87,8 @@ CREATE TABLE public.automated_guild_guild_ranks (
 );
 
 
-ALTER TABLE public.automated_guild_guild_ranks OWNER TO postgres;
-
 --
--- Name: automated_guild_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: automated_guild_seq; Type: SEQUENCE; Schema: public
 --
 
 CREATE SEQUENCE public.automated_guild_seq
@@ -114,10 +99,8 @@ CREATE SEQUENCE public.automated_guild_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.automated_guild_seq OWNER TO postgres;
-
 --
--- Name: hibernate_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: hibernate_sequence; Type: SEQUENCE; Schema: public
 --
 
 CREATE SEQUENCE public.hibernate_sequence
@@ -128,10 +111,8 @@ CREATE SEQUENCE public.hibernate_sequence
     CACHE 1;
 
 
-ALTER SEQUENCE public.hibernate_sequence OWNER TO postgres;
-
 --
--- Name: hibernate_sequences; Type: TABLE; Schema: public; Owner: postgres
+-- Name: hibernate_sequences; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.hibernate_sequences (
@@ -140,47 +121,8 @@ CREATE TABLE public.hibernate_sequences (
 );
 
 
-ALTER TABLE public.hibernate_sequences OWNER TO postgres;
-
 --
--- Name: linked_account; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.linked_account (
-    id integer NOT NULL,
-    last_updated bigint,
-    discord character varying(255),
-    username character varying(255),
-    uuid character varying(255)
-);
-
-
-ALTER TABLE public.linked_account OWNER TO postgres;
-
---
--- Name: linked_account_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.linked_account_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.linked_account_id_seq OWNER TO postgres;
-
---
--- Name: linked_account_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.linked_account_id_seq OWNED BY public.linked_account.id;
-
-
---
--- Name: role_model; Type: TABLE; Schema: public; Owner: postgres
+-- Name: role_model; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.role_model (
@@ -190,10 +132,8 @@ CREATE TABLE public.role_model (
 );
 
 
-ALTER TABLE public.role_model OWNER TO postgres;
-
 --
--- Name: role_model_levels; Type: TABLE; Schema: public; Owner: postgres
+-- Name: role_model_levels; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.role_model_levels (
@@ -203,10 +143,8 @@ CREATE TABLE public.role_model_levels (
 );
 
 
-ALTER TABLE public.role_model_levels OWNER TO postgres;
-
 --
--- Name: role_model_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: role_model_seq; Type: SEQUENCE; Schema: public
 --
 
 CREATE SEQUENCE public.role_model_seq
@@ -217,10 +155,8 @@ CREATE SEQUENCE public.role_model_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.role_model_seq OWNER TO postgres;
-
 --
--- Name: server_settings_model; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model (
@@ -261,10 +197,8 @@ CREATE TABLE public.server_settings_model (
 );
 
 
-ALTER TABLE public.server_settings_model OWNER TO postgres;
-
 --
--- Name: server_settings_model_automated_verify_verified_roles; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_automated_verify_verified_roles; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_automated_verify_verified_roles (
@@ -273,10 +207,8 @@ CREATE TABLE public.server_settings_model_automated_verify_verified_roles (
 );
 
 
-ALTER TABLE public.server_settings_model_automated_verify_verified_roles OWNER TO postgres;
-
 --
--- Name: server_settings_model_blacklist_blacklist; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_blacklist_blacklist; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_blacklist_blacklist (
@@ -287,10 +219,8 @@ CREATE TABLE public.server_settings_model_blacklist_blacklist (
 );
 
 
-ALTER TABLE public.server_settings_model_blacklist_blacklist OWNER TO postgres;
-
 --
--- Name: server_settings_model_blacklist_can_use; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_blacklist_can_use; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_blacklist_can_use (
@@ -299,10 +229,8 @@ CREATE TABLE public.server_settings_model_blacklist_can_use (
 );
 
 
-ALTER TABLE public.server_settings_model_blacklist_can_use OWNER TO postgres;
-
 --
--- Name: server_settings_model_blacklist_features; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_blacklist_features; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_blacklist_features (
@@ -311,10 +239,8 @@ CREATE TABLE public.server_settings_model_blacklist_features (
 );
 
 
-ALTER TABLE public.server_settings_model_blacklist_features OWNER TO postgres;
-
 --
--- Name: server_settings_model_blacklist_is_using; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_blacklist_is_using; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_blacklist_is_using (
@@ -323,10 +249,8 @@ CREATE TABLE public.server_settings_model_blacklist_is_using (
 );
 
 
-ALTER TABLE public.server_settings_model_blacklist_is_using OWNER TO postgres;
-
 --
--- Name: server_settings_model_bot_manager_roles; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_bot_manager_roles; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_bot_manager_roles (
@@ -335,10 +259,8 @@ CREATE TABLE public.server_settings_model_bot_manager_roles (
 );
 
 
-ALTER TABLE public.server_settings_model_bot_manager_roles OWNER TO postgres;
-
 --
--- Name: server_settings_model_event_notif_events; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_event_notif_events; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_event_notif_events (
@@ -349,10 +271,8 @@ CREATE TABLE public.server_settings_model_event_notif_events (
 );
 
 
-ALTER TABLE public.server_settings_model_event_notif_events OWNER TO postgres;
-
 --
--- Name: server_settings_model_jacob_settings_crops; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_jacob_settings_crops; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_jacob_settings_crops (
@@ -362,10 +282,8 @@ CREATE TABLE public.server_settings_model_jacob_settings_crops (
 );
 
 
-ALTER TABLE public.server_settings_model_jacob_settings_crops OWNER TO postgres;
-
 --
--- Name: server_settings_model_log_events; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_log_events; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_log_events (
@@ -374,10 +292,8 @@ CREATE TABLE public.server_settings_model_log_events (
 );
 
 
-ALTER TABLE public.server_settings_model_log_events OWNER TO postgres;
-
 --
--- Name: server_settings_model_sb_event_members_list; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_sb_event_members_list; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_sb_event_members_list (
@@ -389,10 +305,8 @@ CREATE TABLE public.server_settings_model_sb_event_members_list (
 );
 
 
-ALTER TABLE public.server_settings_model_sb_event_members_list OWNER TO postgres;
-
 --
--- Name: server_settings_model_sb_event_prize_map; Type: TABLE; Schema: public; Owner: postgres
+-- Name: server_settings_model_sb_event_prize_map; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.server_settings_model_sb_event_prize_map (
@@ -402,10 +316,8 @@ CREATE TABLE public.server_settings_model_sb_event_prize_map (
 );
 
 
-ALTER TABLE public.server_settings_model_sb_event_prize_map OWNER TO postgres;
-
 --
--- Name: server_settings_model_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: server_settings_model_seq; Type: SEQUENCE; Schema: public
 --
 
 CREATE SEQUENCE public.server_settings_model_seq
@@ -416,16 +328,8 @@ CREATE SEQUENCE public.server_settings_model_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.server_settings_model_seq OWNER TO postgres;
-
 --
--- Name: linked_account id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.linked_account ALTER COLUMN id SET DEFAULT nextval('public.linked_account_id_seq'::regclass);
-
---
--- Name: apply_requirement apply_requirement_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: apply_requirement apply_requirement_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.apply_requirement
@@ -433,7 +337,7 @@ ALTER TABLE ONLY public.apply_requirement
 
 
 --
--- Name: apply_requirement_requirements apply_requirement_requirements_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: apply_requirement_requirements apply_requirement_requirements_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.apply_requirement_requirements
@@ -441,7 +345,7 @@ ALTER TABLE ONLY public.apply_requirement_requirements
 
 
 --
--- Name: automated_guild automated_guild_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: automated_guild automated_guild_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.automated_guild
@@ -449,7 +353,7 @@ ALTER TABLE ONLY public.automated_guild
 
 
 --
--- Name: hibernate_sequences hibernate_sequences_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: hibernate_sequences hibernate_sequences_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.hibernate_sequences
@@ -457,39 +361,7 @@ ALTER TABLE ONLY public.hibernate_sequences
 
 
 --
--- Name: linked_account linked_account_discord_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.linked_account
-    ADD CONSTRAINT linked_account_discord_key UNIQUE (discord);
-
-
---
--- Name: linked_account linked_account_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.linked_account
-    ADD CONSTRAINT linked_account_pkey PRIMARY KEY (id);
-
-
---
--- Name: linked_account linked_account_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.linked_account
-    ADD CONSTRAINT linked_account_username_key UNIQUE (username);
-
-
---
--- Name: linked_account linked_account_uuid_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.linked_account
-    ADD CONSTRAINT linked_account_uuid_key UNIQUE (uuid);
-
-
---
--- Name: role_model role_model_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: role_model role_model_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.role_model
@@ -497,7 +369,7 @@ ALTER TABLE ONLY public.role_model
 
 
 --
--- Name: server_settings_model server_settings_model_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model server_settings_model_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model
@@ -505,7 +377,7 @@ ALTER TABLE ONLY public.server_settings_model
 
 
 --
--- Name: server_settings_model_sb_event_prize_map server_settings_model_sb_event_prize_map_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_sb_event_prize_map server_settings_model_sb_event_prize_map_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_sb_event_prize_map
@@ -513,7 +385,7 @@ ALTER TABLE ONLY public.server_settings_model_sb_event_prize_map
 
 
 --
--- Name: apply_requirement_requirements fk3pnowfox24h3fpak6hm91usq0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: apply_requirement_requirements fk3pnowfox24h3fpak6hm91usq0; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.apply_requirement_requirements
@@ -521,7 +393,7 @@ ALTER TABLE ONLY public.apply_requirement_requirements
 
 
 --
--- Name: server_settings_model_blacklist_blacklist fk4v1wg3gehyvt0apdmvrfrl7jv; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_blacklist_blacklist fk4v1wg3gehyvt0apdmvrfrl7jv; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_blacklist_blacklist
@@ -529,7 +401,7 @@ ALTER TABLE ONLY public.server_settings_model_blacklist_blacklist
 
 
 --
--- Name: role_model fk6882lq77kkfrifts5gs1xoq7b; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: role_model fk6882lq77kkfrifts5gs1xoq7b; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.role_model
@@ -537,7 +409,7 @@ ALTER TABLE ONLY public.role_model
 
 
 --
--- Name: apply_requirement fk6cvgixuuxwvo0we9tw5w0c05a; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: apply_requirement fk6cvgixuuxwvo0we9tw5w0c05a; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.apply_requirement
@@ -545,7 +417,7 @@ ALTER TABLE ONLY public.apply_requirement
 
 
 --
--- Name: server_settings_model_blacklist_is_using fk6q3p6k50ss9pmmbo35o5uyd4l; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_blacklist_is_using fk6q3p6k50ss9pmmbo35o5uyd4l; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_blacklist_is_using
@@ -553,7 +425,7 @@ ALTER TABLE ONLY public.server_settings_model_blacklist_is_using
 
 
 --
--- Name: automated_guild_apply_staff_roles fk6yg3lgsowe4b2etli1a9e44q4; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: automated_guild_apply_staff_roles fk6yg3lgsowe4b2etli1a9e44q4; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.automated_guild_apply_staff_roles
@@ -561,7 +433,7 @@ ALTER TABLE ONLY public.automated_guild_apply_staff_roles
 
 
 --
--- Name: server_settings_model_log_events fk9hkhi1g0wpgs9ntu3ygma85rq; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_log_events fk9hkhi1g0wpgs9ntu3ygma85rq; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_log_events
@@ -569,7 +441,7 @@ ALTER TABLE ONLY public.server_settings_model_log_events
 
 
 --
--- Name: server_settings_model_event_notif_events fkboq3k0qq548jibo6fxlaq2wtg; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_event_notif_events fkboq3k0qq548jibo6fxlaq2wtg; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_event_notif_events
@@ -577,7 +449,7 @@ ALTER TABLE ONLY public.server_settings_model_event_notif_events
 
 
 --
--- Name: server_settings_model_sb_event_members_list fkekrl0m5bceww9g96yo7tj5h4l; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_sb_event_members_list fkekrl0m5bceww9g96yo7tj5h4l; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_sb_event_members_list
@@ -585,7 +457,7 @@ ALTER TABLE ONLY public.server_settings_model_sb_event_members_list
 
 
 --
--- Name: server_settings_model_bot_manager_roles fkex5o4t0ps3ylyl3igywpt1m19; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_bot_manager_roles fkex5o4t0ps3ylyl3igywpt1m19; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_bot_manager_roles
@@ -593,7 +465,7 @@ ALTER TABLE ONLY public.server_settings_model_bot_manager_roles
 
 
 --
--- Name: server_settings_model_blacklist_can_use fkf85sv09mud1s084wyghnan5y3; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_blacklist_can_use fkf85sv09mud1s084wyghnan5y3; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_blacklist_can_use
@@ -601,7 +473,7 @@ ALTER TABLE ONLY public.server_settings_model_blacklist_can_use
 
 
 --
--- Name: role_model_levels fkkm75mav7u6sumwijtlal5m4yo; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: role_model_levels fkkm75mav7u6sumwijtlal5m4yo; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.role_model_levels
@@ -609,7 +481,7 @@ ALTER TABLE ONLY public.role_model_levels
 
 
 --
--- Name: server_settings_model_automated_verify_verified_roles fkkphac3ya6m60aw9jmb0or5dg1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_automated_verify_verified_roles fkkphac3ya6m60aw9jmb0or5dg1; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_automated_verify_verified_roles
@@ -617,7 +489,7 @@ ALTER TABLE ONLY public.server_settings_model_automated_verify_verified_roles
 
 
 --
--- Name: automated_guild_guild_ranks fkmg2b6wjjbf9kluv5vbrff3uuq; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: automated_guild_guild_ranks fkmg2b6wjjbf9kluv5vbrff3uuq; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.automated_guild_guild_ranks
@@ -625,7 +497,7 @@ ALTER TABLE ONLY public.automated_guild_guild_ranks
 
 
 --
--- Name: server_settings_model_jacob_settings_crops fkoslo8rg4iltnt5obds5u8hxpj; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_jacob_settings_crops fkoslo8rg4iltnt5obds5u8hxpj; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_jacob_settings_crops
@@ -633,7 +505,7 @@ ALTER TABLE ONLY public.server_settings_model_jacob_settings_crops
 
 
 --
--- Name: automated_guild fkqfrsgorlwe3x0bi18oww4t4v; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: automated_guild fkqfrsgorlwe3x0bi18oww4t4v; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.automated_guild
@@ -641,7 +513,7 @@ ALTER TABLE ONLY public.automated_guild
 
 
 --
--- Name: server_settings_model_sb_event_prize_map fkqp14wvlfwmkbr6349jawwrw4h; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_sb_event_prize_map fkqp14wvlfwmkbr6349jawwrw4h; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_sb_event_prize_map
@@ -649,12 +521,8 @@ ALTER TABLE ONLY public.server_settings_model_sb_event_prize_map
 
 
 --
--- Name: server_settings_model_blacklist_features fks41nargnw7tiwub9mfpubpxb5; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: server_settings_model_blacklist_features fks41nargnw7tiwub9mfpubpxb5; Type: FK CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.server_settings_model_blacklist_features
     ADD CONSTRAINT fks41nargnw7tiwub9mfpubpxb5 FOREIGN KEY (server_settings_model_id) REFERENCES public.server_settings_model(id);
-
-
--- PostgreSQL database dump complete
---

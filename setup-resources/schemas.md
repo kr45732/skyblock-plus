@@ -1,10 +1,10 @@
-If you're really lazy or completely stuck you might be able to just copy and paste SQL from the database dumps. I haven't tested this so no guarantee it will work. [server-settings-linked-accounts-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/server-settings-linked-accounts-dump.sql) has the SQL for server settings and linked accounts. [leaderboard-cache-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/leaderboard-cache-dump.sql) has the SQL for leaderboards and caching. 
+If you're really lazy or completely stuck you might be able to just copy and paste SQL from the database dumps. I haven't tested this so no guarantee it will work. [server-settings-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/server-settings-dump.sql) has the SQL for server settings. [linked-accounts-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/linked-accounts-dump.sql) has the SQL for linked accounts. [leaderboard-cache-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/leaderboard-cache-dump.sql) has the SQL for leaderboards and caching. 
 
 
-# Server settings schemas
-Should be automatically created on first startup by Spring. If you need to manually create it, try using [server-settings-linked-accounts-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/server-settings-linked-accounts-dump.sql).
+# Server Settings Schema
+I highly suggest to let Spring automatically create this on first startup. Only as a backup, try using [server-settings-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/server-settings-dump.sql) to manually create it.
 
-# Linked accounts schema
+# Linked Accounts Schema
 ```postgresql
                                        Table "public.linked_account"
     Column    |          Type          | Collation | Nullable |                  Default
@@ -21,8 +21,8 @@ Indexes:
     "linked_account_uuid_key" UNIQUE CONSTRAINT, btree (uuid)
 ```
 
-# Leaderboards schema
-All four leaderboards (all_lb, ironman_lb, stranded_lb, and selected_lb) have the same schema, just different table names.
+# Leaderboards Schema
+There are 4 leaderboards (all_lb, ironman_lb, stranded_lb, and selected_lb) with identical schemas. The first 3 are self-explanatory. The last one is a cache that stores players' last played profile for automatic nickname updates, automatic roles claim, etc
 ```postgresql
                                                Table "public.all_lb"
                              Column                             |       Type       | Collation | Nullable | Default
@@ -1071,6 +1071,7 @@ Indexes:
 
 # Cache Schemas
 ### guild
+Used for tracking guilds for "/serverlb" command
 ```postgresql
                            Table "public.guild"
                            Column      |         Type          | Collation | Nullable | Default
@@ -1085,6 +1086,7 @@ Indexes:
 ```
 
 ### json_cache
+Used to cache JSON responses from the Hypixel API
 ```postgresql
                     Table "public.json_cache"
  Column |          Type          | Collation | Nullable | Default
@@ -1097,6 +1099,7 @@ Indexes:
 ```
 
 ### json_storage
+Persistent cache for features like auction tracker, dungeon parties, etc
 ```postgresql
             Table "public.json_storage"
  Column |  Type   | Collation | Nullable | Default

@@ -1,12 +1,8 @@
---
--- PostgreSQL database dump
---
-
 -- Dumped from database version 14.4
 
 
 --
--- Name: all_lb; Type: TABLE; Schema: public; Owner: postgres
+-- Name: all_lb; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.all_lb (
@@ -1049,10 +1045,8 @@ CREATE TABLE public.all_lb (
 );
 
 
-ALTER TABLE public.all_lb OWNER TO postgres;
-
 --
--- Name: guild; Type: TABLE; Schema: public; Owner: postgres
+-- Name: guild; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.guild (
@@ -1064,10 +1058,8 @@ CREATE TABLE public.guild (
 );
 
 
-ALTER TABLE public.guild OWNER TO postgres;
-
 --
--- Name: ironman_lb; Type: TABLE; Schema: public; Owner: postgres
+-- Name: ironman_lb; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.ironman_lb (
@@ -2110,10 +2102,8 @@ CREATE TABLE public.ironman_lb (
 );
 
 
-ALTER TABLE public.ironman_lb OWNER TO postgres;
-
 --
--- Name: json_cache; Type: TABLE; Schema: public; Owner: postgres
+-- Name: json_cache; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.json_cache (
@@ -2123,10 +2113,8 @@ CREATE TABLE public.json_cache (
 );
 
 
-ALTER TABLE public.json_cache OWNER TO postgres;
-
 --
--- Name: json_storage; Type: TABLE; Schema: public; Owner: postgres
+-- Name: json_storage; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.json_storage (
@@ -2135,10 +2123,8 @@ CREATE TABLE public.json_storage (
 );
 
 
-ALTER TABLE public.json_storage OWNER TO postgres;
-
 --
--- Name: selected_lb; Type: TABLE; Schema: public; Owner: postgres
+-- Name: selected_lb; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.selected_lb (
@@ -3181,10 +3167,8 @@ CREATE TABLE public.selected_lb (
 );
 
 
-ALTER TABLE public.selected_lb OWNER TO postgres;
-
 --
--- Name: stranded_lb; Type: TABLE; Schema: public; Owner: postgres
+-- Name: stranded_lb; Type: TABLE; Schema: public
 --
 
 CREATE TABLE public.stranded_lb (
@@ -4227,10 +4211,8 @@ CREATE TABLE public.stranded_lb (
 );
 
 
-ALTER TABLE public.stranded_lb OWNER TO postgres;
-
 --
--- Name: all_lb all_lb_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: all_lb all_lb_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.all_lb
@@ -4238,7 +4220,7 @@ ALTER TABLE ONLY public.all_lb
 
 
 --
--- Name: guild guild_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: guild guild_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.guild
@@ -4246,7 +4228,7 @@ ALTER TABLE ONLY public.guild
 
 
 --
--- Name: ironman_lb ironman_lb_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: ironman_lb ironman_lb_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.ironman_lb
@@ -4254,7 +4236,7 @@ ALTER TABLE ONLY public.ironman_lb
 
 
 --
--- Name: json_cache json_cache_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: json_cache json_cache_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.json_cache
@@ -4262,7 +4244,7 @@ ALTER TABLE ONLY public.json_cache
 
 
 --
--- Name: json_storage json_storage_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: json_storage json_storage_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.json_storage
@@ -4270,7 +4252,7 @@ ALTER TABLE ONLY public.json_storage
 
 
 --
--- Name: selected_lb selected_lb_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: selected_lb selected_lb_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.selected_lb
@@ -4278,7 +4260,7 @@ ALTER TABLE ONLY public.selected_lb
 
 
 --
--- Name: stranded_lb stranded_lb_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: stranded_lb stranded_lb_pkey; Type: CONSTRAINT; Schema: public
 --
 
 ALTER TABLE ONLY public.stranded_lb
@@ -4286,54 +4268,49 @@ ALTER TABLE ONLY public.stranded_lb
 
 
 --
--- Name: all_lb_networth_idx; Type: INDEX; Schema: public; Owner: postgres
+-- Name: all_lb_networth_idx; Type: INDEX; Schema: public
 --
 
 CREATE INDEX all_lb_networth_idx ON public.all_lb USING btree (networth);
 
 
 --
--- Name: all_lb_username_idx; Type: INDEX; Schema: public; Owner: postgres
+-- Name: all_lb_username_idx; Type: INDEX; Schema: public
 --
 
 CREATE INDEX all_lb_username_idx ON public.all_lb USING gist (username public.gist_trgm_ops);
 
 
 --
--- Name: ironman_lb_networth_idx; Type: INDEX; Schema: public; Owner: postgres
+-- Name: ironman_lb_networth_idx; Type: INDEX; Schema: public
 --
 
 CREATE INDEX ironman_lb_networth_idx ON public.ironman_lb USING btree (networth);
 
 
 --
--- Name: selected_lb_networth_idx; Type: INDEX; Schema: public; Owner: postgres
+-- Name: selected_lb_networth_idx; Type: INDEX; Schema: public
 --
 
 CREATE INDEX selected_lb_networth_idx ON public.selected_lb USING btree (networth);
 
 
 --
--- Name: selected_lb_username_idx; Type: INDEX; Schema: public; Owner: postgres
+-- Name: selected_lb_username_idx; Type: INDEX; Schema: public
 --
 
 CREATE INDEX selected_lb_username_idx ON public.selected_lb USING gist (username public.gist_trgm_ops);
 
 
 --
--- Name: stranded_lb_networth_idx; Type: INDEX; Schema: public; Owner: postgres
+-- Name: stranded_lb_networth_idx; Type: INDEX; Schema: public
 --
 
 CREATE INDEX stranded_lb_networth_idx ON public.stranded_lb USING btree (networth);
 
 
 --
--- Name: stranded_lb_username_idx; Type: INDEX; Schema: public; Owner: postgres
+-- Name: stranded_lb_username_idx; Type: INDEX; Schema: public
 --
 
 CREATE INDEX stranded_lb_username_idx ON public.stranded_lb USING gist (username public.gist_trgm_ops);
-
-
---
--- PostgreSQL database dump complete
---
