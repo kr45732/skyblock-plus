@@ -186,6 +186,7 @@ public class Utils {
 	public static String NETWORTH_BUG_REPORT_CHANNEL_ID = "";
 	public static String ERROR_LOG_CHANNEL_ID = "";
 	public static String BOT_STATUS_CHANNEL_ID = "";
+	public static String NEU_REPO_UPDATE_CHANNEL_ID = "";
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
@@ -317,6 +318,7 @@ public class Utils {
 			NETWORTH_BUG_REPORT_CHANNEL_ID = (String) appProps.get("NETWORTH_BUG_REPORT_CHANNEL_ID");
 			ERROR_LOG_CHANNEL_ID = (String) appProps.get("ERROR_LOG_CHANNEL_ID");
 			BOT_STATUS_CHANNEL_ID = (String) appProps.get("BOT_STATUS_CHANNEL_ID");
+			NEU_REPO_UPDATE_CHANNEL_ID = (String) appProps.get("NEU_REPO_UPDATE_CHANNEL_ID");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -346,6 +348,7 @@ public class Utils {
 			NETWORTH_BUG_REPORT_CHANNEL_ID = System.getenv("NETWORTH_BUG_REPORT_CHANNEL_ID");
 			ERROR_LOG_CHANNEL_ID = System.getenv("ERROR_LOG_CHANNEL_ID");
 			BOT_STATUS_CHANNEL_ID = System.getenv("BOT_STATUS_CHANNEL_ID");
+			NEU_REPO_UPDATE_CHANNEL_ID = System.getenv("NEU_REPO_UPDATE_CHANNEL_ID");
 		}
 	}
 

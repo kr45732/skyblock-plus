@@ -1069,7 +1069,7 @@ Indexes:
     "all_lb_username_idx" gist (username gist_trgm_ops)
 ```
 
-# Cache Schemas
+# Cache Schema
 ### guild
 Used for tracking guilds for "/serverlb" command
 ```postgresql

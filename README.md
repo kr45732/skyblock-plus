@@ -43,9 +43,9 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
    - If you are self-hosted [hste](https://github.com/kr45732/hste), then HASTE_KEY should be the same as the KEY set on there
 3. Databases: At the moment, there are two databases instead of a single one. You might be able to combine it into one without needing to modify code by setting both databases to the same URL, but I haven't tested that. Refer to [setup-resources](https://github.com/kr45732/skyblock-plus/tree/master/setup-resources) for schemas and database dumps. You will also need to install the [pg_trgm module](https://www.postgresql.org/docs/current/pgtrgm.html) on your databases. 
    - [Server Settings Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#server-settings-schema)
-   - [Linked Accounts Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#leaderboards-schema)
+   - [Linked Accounts Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#linked-accounts-schema)
    - [Leaderboards Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#leaderboards-schema)
-   - [Cache Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#leaderboards-schema)
+   - [Cache Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#cache-schema)
 4. Emojis: At the moment, there are around 90 custom emoji servers. To create your own:
    - Make "IdToEmojiMappings.json" an empty JSON object
    - Create and add the bot to 90 servers with the name "Skyblock Plus - Emoji Server xx" (xx is the server number starting at 1)
@@ -57,7 +57,9 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
    - Paste the JSON output of runEmojis into the "IdToEmojiMappings.json"
 5. Data repository: you will need to make your own clone of the skyblock-plus-data repository so your bot can automatically update it:
    - Clone [skyblock-plus-data](https://github.com/kr45732/skyblock-plus-data)
-   - Create a new channel in your PRIMARY_GUILD
+   - Create a new channel in your PRIMARY_GUILD and set "NEU_REPO_UPDATE_CHANNEL_ID" in DevSettings.properties
+   - Join [Moulberry's Bush](https://discord.gg/moulberry)
+   - Follow "#item-repo-github" and send it to the channel you just created
 6. Hardcoded constants you will need to change:
    - You will need to update all emoji maps in the Constants.json from [skyblock-plus-data](https://github.com/kr45732/skyblock-plus-data/blob/main/Constants.json) with your own emojis
    - Create 2 messages in a channel to be used for the scuffed event system (they will be constantly edited, so they must not be deleted). These messages Update the assignment of messageId in `com.skyblockplus.features.event.EventHandler` on L46. Update the channel on L57
