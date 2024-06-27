@@ -54,7 +54,7 @@ public class AuctionFlipper {
 
 	public static void onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
-			if (event.getChannel().getId().equals("958771784004567063") && event.isWebhookMessage()) {
+			if (event.getChannel().getId().equals(QUERY_API_LOG_CHANNEL_ID) && event.isWebhookMessage()) {
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
 				if (desc.contains(" query auctions into database in ")) {
 					resetQueryItems();

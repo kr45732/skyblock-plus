@@ -188,6 +188,8 @@ public class Utils {
 	public static String BOT_STATUS_CHANNEL_ID = "";
 	public static String NEU_REPO_UPDATE_CHANNEL_ID = "";
 	public static String DATA_REPO_GITHUB = "";
+	public static String GITHUB_EMAIL = "";
+	public static String QUERY_API_LOG_CHANNEL_ID = "";
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
@@ -321,6 +323,8 @@ public class Utils {
 			BOT_STATUS_CHANNEL_ID = (String) appProps.get("BOT_STATUS_CHANNEL_ID");
 			NEU_REPO_UPDATE_CHANNEL_ID = (String) appProps.get("NEU_REPO_UPDATE_CHANNEL_ID");
 			DATA_REPO_GITHUB = (String) appProps.get("DATA_REPO_GITHUB");
+			GITHUB_EMAIL = (String) appProps.get("GITHUB_EMAIL");
+			QUERY_API_LOG_CHANNEL_ID = (String) appProps.get("QUERY_API_LOG_CHANNEL_ID");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -352,6 +356,8 @@ public class Utils {
 			BOT_STATUS_CHANNEL_ID = System.getenv("BOT_STATUS_CHANNEL_ID");
 			NEU_REPO_UPDATE_CHANNEL_ID = System.getenv("NEU_REPO_UPDATE_CHANNEL_ID");
 			DATA_REPO_GITHUB = System.getenv("DATA_REPO_GITHUB");
+			GITHUB_EMAIL = System.getenv("GITHUB_EMAIL");
+			QUERY_API_LOG_CHANNEL_ID = System.getenv("QUERY_API_LOG_CHANNEL_ID");
 		}
 	}
 
@@ -871,8 +877,8 @@ public class Utils {
 				skyblockPlusDataRepo
 					.commit()
 					.setAllowEmpty(false)
-					.setAuthor("kr45732", "52721908+kr45732@users.noreply.github.com")
-					.setCommitter("kr45732", "52721908+kr45732@users.noreply.github.com")
+					.setAuthor("Skyblock Plus", GITHUB_EMAIL)
+					.setCommitter("Skyblock Plus", GITHUB_EMAIL)
 					.setMessage("Automatic update (" + neuRepo.log().setMaxCount(1).call().iterator().next().getName() + ")")
 					.call();
 				skyblockPlusDataRepo.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();
