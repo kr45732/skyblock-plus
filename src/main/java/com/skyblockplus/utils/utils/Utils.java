@@ -178,9 +178,9 @@ public class Utils {
 	public static String TOP_GG_TOKEN = "";
 	public static String AUCTION_FLIPPER_WEBHOOK = "";
 	public static String BOT_STATUS_WEBHOOK = "";
-	public static String BOT_ID;
-	public static boolean IS_DEV;
-	public static String OWNER_ID;
+	public static String BOT_ID = "";
+	public static boolean IS_DEV = false;
+	public static String OWNER_ID = "";
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
