@@ -20,13 +20,13 @@ You may need basic Discord, Gradle, Java, and Postgres knowledge to set up and m
 
 ### Prerequisites
 Some of these prerequisites are not necessarily required but having all of them will make setting up bot without modification much easier.
-- A Discord Bot (created using the [Discord Developers Portal](https://discord.com/developers/applications)). In the Discord Developer Portal → Application:
+- A Discord Bot (created using the [Discord Developers Portal](https://discord.com/developers/applications)). Under Discord Developer Portal → Application:
   - Under Installation → Authorization Methods, check "Guild Install"
   - Under Installation → Install Link, set it to "Discord Provided Link"
   - Under Installation → Default Install Settings → Guild Install, add "applications.commands" & "bot" scopes
   - Under Installation → Default Install Settings → Guild Install, add these recommended permissions: `Add Reactions, Attach Files, Connect Create, Instant Invite, Create Private Threads, Create Public Threads, Embed Links, Manage Channels, Manage Messages, Manage Nicknames, Manage Roles, Manage Threads, Read Message History, Read Messages/View Channels, Send Messages, Send Messages in Threads, Use External Emojis`
   - Under Bot → Authorization Flow, enable "Public Bot" if you want others to be able to invite the bot to their server
-  - Under Bot → Privileged Gateway Intents, enable server members and message content intents  
+  - Under Bot → Privileged Gateway Intents, enable "Server Members Intent" & "Message Content Intent"  
 - 2 Postgres databases (using one might be possible but may require code modifications)
 - Self-hosted [rust-query-api](https://github.com/kr45732/rust-query-api) (used in lowest bin, average bin, average auction, querying the auction house, auction flipper, etc)
 - Self-hosted hastebin (my haste implementation is wacky, so I would suggest to replace it with your own (which will require some code modification) otherwise self-hosting steps are below)
@@ -70,7 +70,7 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
    - Join [Moulberry's Bush](https://discord.gg/moulberry) and follow "#item-repo-github" (send it to the channel you just created)
 6. Hardcoded constants you will need to change:
    - You will need to update all emoji maps in the Constants.json from [skyblock-plus-data](https://github.com/kr45732/skyblock-plus-data/blob/main/Constants.json) with your own emojis
-   - Update L145 of `com.skyblockplus.Main.java` to `.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)`
+   - Update L145 of `com.skyblockplus.Main` to `.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)`
    - Create 2 messages in a channel to be used for the scuffed event system (they will be constantly edited, so they must not be deleted). These messages Update the assignment of messageId in `com.skyblockplus.features.event.EventHandler` on L46. Update the channel on L57
    - More will be added as I find/remember them
 7. Running the bot:
