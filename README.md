@@ -16,7 +16,7 @@ This is the source code for the Skyblock Plus Discord bot. A full list of comman
 
 ## Self Hosting
 ### Preface
-You may need basic Discord, Gradle, Java, and Postgres knowledge to set up and maintain the bot. There are hardcoded constants that you will need to replace, databases you will need to create, and more. Note that I did not design the bot with the intention of others self-hosting it, so the process may not be straightforward.
+You may need basic Discord, Gradle, Java, and Postgres knowledge to set up and maintain the bot. There are hardcoded constants that you will need to replace, databases you will need to create, and more. Note that I did not design the bot with the intention of others self-hosting it, so the process may not be straightforward. Please give me credit if you are self-hosting the bot!
 
 ### Prerequisites
 Some of these prerequisites are not necessarily required but having all of them will make setting up bot without modification much easier.
@@ -51,10 +51,9 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
    - [Linked Accounts Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#linked-accounts-schema)
    - [Leaderboards Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#leaderboards-schema)
    - [Cache Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#cache-schema)
-4. Emojis: At the moment, there are around 90 custom emoji servers. To create your own:
+4. Emojis: At the moment, there are over 90 custom emoji servers. To create your own:
    - Make "IdToEmojiMappings.json" an empty JSON object
    - Create and add the bot to 90 servers with the name "Skyblock Plus - Emoji Server xx" (xx is the server number starting at 1)
-   - Copy all glint_images from [skyblock-plus-data](https://github.com/kr45732/skyblock-plus-data) to "src/main/java/com/skyblockplus/json/glint_images/"
    - Optionally (may not work in the future), copy the CIT folder from the latest FurfSky Reborn to "src/main/java/com/skyblockplus/json/cit" 
    - Set `DEV = true` and run the bot
    - Using the evaluate command run `ev com.skyblockplus.utils.EmojiUpdater.processAll()`
