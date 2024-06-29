@@ -19,12 +19,12 @@
 package com.skyblockplus.utils.utils;
 
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
-import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.ApiHandler.getHypixelApiUrl;
+import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.Constants.getConstant;
 import static com.skyblockplus.utils.utils.HttpUtils.*;
 import static com.skyblockplus.utils.utils.StringUtils.nameToId;
-import static com.skyblockplus.utils.utils.Utils.DATA_REPO_GITHUB;
-import static com.skyblockplus.utils.utils.Utils.executor;
+import static com.skyblockplus.utils.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -122,9 +122,7 @@ public class JsonUtils {
 			try {
 				JsonObject bestiaryJsonParsed = new JsonObject();
 				for (Map.Entry<String, JsonElement> entry : getJsonObject(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" +
-					getNeuBranch() +
-					"/constants/bestiary.json"
+					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + NEU_BRANCH + "/constants/bestiary.json"
 				)
 					.entrySet()) {
 					if (higherDepth(entry.getValue(), "hasSubcategories", false)) {
@@ -326,7 +324,7 @@ public class JsonUtils {
 		if (miscJson == null) {
 			miscJson =
 				getJsonObject(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + getNeuBranch() + "/constants/misc.json"
+					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + NEU_BRANCH + "/constants/misc.json"
 				);
 		}
 
@@ -362,7 +360,7 @@ public class JsonUtils {
 		if (weightJson == null) {
 			weightJson =
 				getJsonObject(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + getNeuBranch() + "/constants/weight.json"
+					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + NEU_BRANCH + "/constants/weight.json"
 				);
 		}
 
@@ -372,9 +370,7 @@ public class JsonUtils {
 	public static JsonObject getSbLevelsJson() {
 		if (sbLevelsJson == null) {
 			sbLevelsJson =
-				getJsonObject(
-					"https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/raw/" + getNeuBranch() + "/constants/sblevels.json"
-				);
+				getJsonObject("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/raw/" + NEU_BRANCH + "/constants/sblevels.json");
 		}
 
 		return sbLevelsJson;
@@ -385,7 +381,7 @@ public class JsonUtils {
 			essenceShopsJson =
 				getJsonObject(
 					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" +
-					getNeuBranch() +
+					NEU_BRANCH +
 					"/constants/essenceshops.json"
 				);
 		}
@@ -398,9 +394,7 @@ public class JsonUtils {
 			try {
 				museumCategoriesJson =
 					getJsonObject(
-						"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" +
-						getNeuBranch() +
-						"/constants/museum.json"
+						"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + NEU_BRANCH + "/constants/museum.json"
 					);
 			} catch (Exception ignored) {}
 		}
@@ -429,7 +423,7 @@ public class JsonUtils {
 			reforgeStonesJson =
 				getJsonObject(
 					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" +
-					getNeuBranch() +
+					NEU_BRANCH +
 					"/constants/reforgestones.json"
 				);
 		}
@@ -441,7 +435,7 @@ public class JsonUtils {
 		if (petsJson == null) {
 			petsJson =
 				getJsonObject(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + getNeuBranch() + "/constants/pets.json"
+					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + NEU_BRANCH + "/constants/pets.json"
 				);
 		}
 		return petsJson;
@@ -451,7 +445,7 @@ public class JsonUtils {
 		if (parentsJson == null) {
 			parentsJson =
 				getJsonObject(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + getNeuBranch() + "/constants/parents.json"
+					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + NEU_BRANCH + "/constants/parents.json"
 				);
 		}
 		return parentsJson;
@@ -461,7 +455,7 @@ public class JsonUtils {
 		if (petNumsJson == null) {
 			petNumsJson =
 				getJsonObject(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + getNeuBranch() + "/constants/petnums.json"
+					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + NEU_BRANCH + "/constants/petnums.json"
 				);
 		}
 		return petNumsJson;
@@ -471,9 +465,7 @@ public class JsonUtils {
 		if (enchantsJson == null) {
 			enchantsJson =
 				getJsonObject(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" +
-					getNeuBranch() +
-					"/constants/enchants.json"
+					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + NEU_BRANCH + "/constants/enchants.json"
 				);
 		}
 		return enchantsJson;
@@ -483,9 +475,7 @@ public class JsonUtils {
 		if (levelingJson == null) {
 			levelingJson =
 				getJsonObject(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" +
-					getNeuBranch() +
-					"/constants/leveling.json"
+					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" + NEU_BRANCH + "/constants/leveling.json"
 				);
 		}
 		return levelingJson;
@@ -496,7 +486,7 @@ public class JsonUtils {
 			essenceCostsJson =
 				getJsonObject(
 					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/" +
-					getNeuBranch() +
+					NEU_BRANCH +
 					"/constants/essencecosts.json"
 				);
 			for (Map.Entry<String, JsonElement> entry : getConstant("ADDITIONAL_ESSENCE_UPGRADE_DATA").getAsJsonObject().entrySet()) {

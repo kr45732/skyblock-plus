@@ -1104,7 +1104,7 @@ public class AutomaticGuild {
 								split[0],
 								split[1],
 								split[2],
-								makeHastePost(formattedGson.toJson(calc.getVerboseJson())).split(getHasteUrl())[1],
+								makeHastePost(formattedGson.toJson(calc.getVerboseJson())).split(HASTE_URL)[1],
 							};
 					}
 					split[2] = "" + Instant.now().toEpochMilli();
@@ -1143,7 +1143,7 @@ public class AutomaticGuild {
 						)
 						.setComponents(
 							ActionRow.of(
-								Button.link(getHasteUrl() + finalSplit[3], "Verbose Link"),
+								Button.link(HASTE_URL + finalSplit[3], "Verbose Link"),
 								Button.primary("nw_run_" + finalSplit[0] + "_" + finalSplit[1], "Run Networth"),
 								Button.success("nw_resolved_" + event.getUser().getId(), "Resolved"),
 								Button.success("nw_reply_" + event.getUser().getId(), "Reply")

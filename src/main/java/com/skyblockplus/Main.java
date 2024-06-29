@@ -48,6 +48,7 @@ import com.skyblockplus.utils.utils.HttpUtils;
 import com.skyblockplus.utils.utils.Utils;
 import jakarta.annotation.PreDestroy;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -76,13 +77,12 @@ public class Main {
 
 	public static final Logger log = LoggerFactory.getLogger(Main.class);
 
-	public static void main(String[] args) throws IllegalArgumentException {
+	public static void main(String[] args) throws IllegalArgumentException, IOException {
 		globalExceptionHandler = new GlobalExceptionHandler();
 		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(Thread.currentThread(), e));
 		Message.suppressContentIntentWarning();
 
 		Utils.initialize();
-		ApiHandler.initializeConstants();
 		Constants.initialize();
 		botStatusWebhook =
 			new WebhookClientBuilder(BOT_STATUS_WEBHOOK).setExecutorService(scheduler).setHttpClient(okHttpClient).buildJDA();

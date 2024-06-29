@@ -262,7 +262,7 @@ public class NetworthExecute {
 					"_" +
 					player.getProfileName() +
 					"_0" +
-					(verboseLink != null ? "_" + verboseLink.split(getHasteUrl())[1] : ""),
+					(verboseLink != null ? "_" + verboseLink.split(HASTE_URL)[1] : ""),
 					"Report Incorrect Calculations"
 				)
 			)

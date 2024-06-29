@@ -1,8 +1,5 @@
-If you are really lazy or completely stuck you might be able to just copy and paste SQL from the database dumps. I have not tested this so no guarantee it will work. [server-settings-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/server-settings-dump.sql) has the SQL for server settings. [linked-accounts-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/linked-accounts-dump.sql) has the SQL for linked accounts. [leaderboard-cache-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/leaderboard-cache-dump.sql) has the SQL for leaderboards and caching. 
-
-
 # Server Settings Schema
-I highly suggest to let Spring automatically create this on first startup. Only as a backup, try using [server-settings-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/server-settings-dump.sql) to manually create it.
+I highly suggest to let Spring automatically create this on first startup. Only as a backup, try using [server-settings-dump.sql](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/server-settings-dump.sql) to manually create it
 
 # Linked Accounts Schema
 ```postgresql

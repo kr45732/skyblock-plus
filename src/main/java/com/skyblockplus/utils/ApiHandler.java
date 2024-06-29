@@ -57,12 +57,6 @@ public class ApiHandler {
 		"[\\da-f]{32}|[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}"
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-	private static String ahApiUrl;
-	private static int mojangApiNum = 0;
-	private static boolean allowMojangApi = false;
-	private static String neuBranch = null;
-
-	private static String hasteUrl = null;
 
 	public static void initialize() {
 		try {
@@ -93,23 +87,6 @@ public class ApiHandler {
 		} catch (Exception e) {
 			log.error("Exception when interval caching", e);
 		}
-	}
-
-	public static void initializeConstants() {
-		JsonElement settings = getJson("https://raw.githubusercontent.com/" + DATA_REPO_GITHUB + "/main/Settings.json");
-		ahApiUrl = higherDepth(settings, "ahApiUrl").getAsString();
-		mojangApiNum = higherDepth(settings, "mojangApiNum", 0);
-		allowMojangApi = higherDepth(settings, "allowMojangApi", false);
-		hasteUrl = higherDepth(settings, "hasteUrl").getAsString();
-		neuBranch = higherDepth(settings, "neuBranch").getAsString();
-	}
-
-	public static String getNeuBranch() {
-		return neuBranch;
-	}
-
-	public static String getHasteUrl() {
-		return hasteUrl;
 	}
 
 	public static void updateBotStatistics() {
@@ -181,7 +158,7 @@ public class ApiHandler {
 
 		UsernameUuidStruct response = uuidUsername(username);
 		if (response.rateLimited()) {
-			if (allowMojangApi) {
+			if (ALLOW_MOJANG_API) {
 				UsernameUuidStruct mojangResponse = uuidUsernameMojang(username);
 				if (!mojangResponse.rateLimited()) {
 					return mojangResponse;
@@ -208,7 +185,7 @@ public class ApiHandler {
 
 	private static UsernameUuidStruct uuidUsername(String username) {
 		try {
-			switch (mojangApiNum) {
+			switch (MOJANG_API_NUM) {
 				case 1 -> {
 					JsonResponse usernameResponse = getJsonResponse("https://playerdb.co/api/player/minecraft/" + username);
 					if (usernameResponse == null) {
@@ -268,7 +245,7 @@ public class ApiHandler {
 			return CompletableFuture.completedFuture(cachedResponse);
 		} else {
 			return asyncGetJson(
-				(switch (mojangApiNum) {
+				(switch (MOJANG_API_NUM) {
 						case 1 -> "https://playerdb.co/api/player/minecraft/";
 						case 2 -> "https://api.minetools.eu/uuid/";
 						default -> "https://api.ashcon.app/mojang/v2/user/";
@@ -280,7 +257,7 @@ public class ApiHandler {
 						try {
 							String username = higherDepth(
 								uuidToUsernameJson,
-								switch (mojangApiNum) {
+								switch (MOJANG_API_NUM) {
 									case 1 -> "data.player.username";
 									case 2, 3 -> "name";
 									default -> "username";
@@ -620,7 +597,7 @@ public class ApiHandler {
 
 	public static URIBuilder getQueryApiUrl(String path) {
 		try {
-			return new URIBuilder(ahApiUrl).setPath(path).addParameter("key", AUCTION_API_KEY);
+			return new URIBuilder(QUERY_API_URL).setPath(path).addParameter("key", AUCTION_API_KEY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

@@ -18,7 +18,6 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
 import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
 import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
@@ -112,7 +111,7 @@ public class EmojiUpdater {
 			Git
 				.cloneRepository()
 				.setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
-				.setBranch(getNeuBranch())
+				.setBranch(NEU_BRANCH)
 				.setDirectory(neuDir)
 				.call()
 				.close();

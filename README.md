@@ -41,7 +41,7 @@ Some of these prerequisites are not necessarily required but having all of them 
 ### Steps
 If you are stuck or encounter a problem in the steps below, create an issue and I will try to help you in 3-5 business days!
 1. Clone this repository
-2. Rename DevSettingsTemplate.properties to DevSettings.properties and move it to the project root (or use environment variables) and follow the instructions there and below to fill it out (see [DevSettingsExample.properties](https://github.com/kr45732/skyblock-plus/tree/master/setup-resources/DevSettingsExample.properties) for examples):
+2. Rename DevSettingsTemplate.properties to DevSettings.properties and move it to the project root and follow the instructions there and below to fill it out:
    - Feel free to set the API_USERNAME and API_PASSWORD to some gibberish, but do not leave it blank because you do not want anyone to be able to access the private endpoints (server settings, linked accounts, etc)
    - Same thing as above with JACOB_KEY, you will probably never use that endpoint, but you do not want anyone to be able to POST data to it
    - Ensure the AUCTION_API_KEY is the same as the ADMIN_API_KEY of your self-hosted rust-query-api
@@ -62,9 +62,6 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
 5. Data repository: you will need to make your own clone of the skyblock-plus-data repository so your bot can automatically update it:
    - Fork or clone [skyblock-plus-data](https://github.com/kr45732/skyblock-plus-data)
    - Set "DATA_REPO_GITHUB" in DevSettings to point to your repository **on GitHub**
-   - Navigate to "Settings.json" of your repository and edit the following:
-     - Change "ahApiUrl" to point to your self-hosted rust-query-api
-     - Change "hasteUrl" to point to your self-hosted hastebin
    - Create a new channel in your PRIMARY_GUILD and set "NEU_REPO_UPDATE_CHANNEL_ID" in DevSettings
    - Join [Moulberry's Bush](https://discord.gg/moulberry) and follow "#item-repo-github" (send it to the channel you just created)
 6. Hardcoded constants you will need to change:

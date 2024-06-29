@@ -19,8 +19,6 @@
 package com.skyblockplus.utils.utils;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.getHasteUrl;
-import static com.skyblockplus.utils.ApiHandler.getNeuBranch;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
 import static com.skyblockplus.utils.utils.HttpUtils.postUrl;
@@ -190,6 +188,11 @@ public class Utils {
 	public static String DATA_REPO_GITHUB = "";
 	public static String GITHUB_EMAIL = "";
 	public static String QUERY_API_LOG_CHANNEL_ID = "";
+	public static String QUERY_API_URL = "";
+	public static int MOJANG_API_NUM = 0;
+	public static boolean ALLOW_MOJANG_API = false;
+	public static String NEU_BRANCH = "";
+	public static String HASTE_URL = "";
 	public static TextChannel errorLogChannel;
 	public static ShardManager jda;
 	public static Database database;
@@ -289,75 +292,47 @@ public class Utils {
 			.setUsers(eventAuthor);
 	}
 
-	public static void initialize() {
+	public static void initialize() throws IOException {
 		try (FileInputStream fs = new FileInputStream("DevSettings.properties")) {
 			Properties appProps = new Properties();
 			appProps.load(fs);
-			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
-			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
-			DATABASE_URL = (String) appProps.get("DATABASE_URL");
-			GITHUB_TOKEN = (String) appProps.get("GITHUB_TOKEN");
-			API_USERNAME = (String) appProps.get("API_USERNAME");
-			API_PASSWORD = (String) appProps.get("API_PASSWORD");
-			PREFIX = (String) appProps.get("PREFIX");
-			AUCTION_API_KEY = (String) appProps.get("AUCTION_API_KEY");
-			SBZ_SCAMMER_DB_KEY = (String) appProps.get("SBZ_SCAMMER_DB_KEY");
-			LEADERBOARD_DB_URL = (String) appProps.get("LEADERBOARD_DB_URL");
-			CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
-			BASE_URL = (String) appProps.get("BASE_URL");
-			JACOB_KEY = (String) appProps.get("JACOB_KEY");
-			HASTE_KEY = (String) appProps.get("HASTE_KEY");
-			DISCORD_BOT_LIST_TOKEN = (String) appProps.get("DISCORD_BOT_LIST_TOKEN");
-			DISCORD_BOTS_GG_TOKEN = (String) appProps.get("DISCORD_BOTS_GG_TOKEN");
-			DISCORDS_COM_TOKEN = (String) appProps.get("DISCORDS_COM_TOKEN");
-			TOP_GG_TOKEN = (String) appProps.get("TOP_GG_TOKEN");
-			AUCTION_FLIPPER_WEBHOOK = (String) appProps.get("AUCTION_FLIPPER_WEBHOOK");
-			BOT_STATUS_WEBHOOK = (String) appProps.get("BOT_STATUS_WEBHOOK");
-			BOT_ID = (String) appProps.get("BOT_ID");
-			IS_DEV = Objects.equals(((String) appProps.get("DEV")).toLowerCase(), "true");
-			OWNER_ID = (String) appProps.get("OWNER_ID");
-			PRIMARY_GUILD_ID = (String) appProps.get("PRIMARY_GUILD_ID");
-			LOG_CHANNEL_ID = (String) appProps.get("LOG_CHANNEL_ID");
-			NETWORTH_BUG_REPORT_CHANNEL_ID = (String) appProps.get("NETWORTH_BUG_REPORT_CHANNEL_ID");
-			ERROR_LOG_CHANNEL_ID = (String) appProps.get("ERROR_LOG_CHANNEL_ID");
-			BOT_STATUS_CHANNEL_ID = (String) appProps.get("BOT_STATUS_CHANNEL_ID");
-			NEU_REPO_UPDATE_CHANNEL_ID = (String) appProps.get("NEU_REPO_UPDATE_CHANNEL_ID");
-			DATA_REPO_GITHUB = (String) appProps.get("DATA_REPO_GITHUB");
-			GITHUB_EMAIL = (String) appProps.get("GITHUB_EMAIL");
-			QUERY_API_LOG_CHANNEL_ID = (String) appProps.get("QUERY_API_LOG_CHANNEL_ID");
-		} catch (IOException e) {
-			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
-			BOT_TOKEN = System.getenv("BOT_TOKEN");
-			DATABASE_URL = System.getenv("DATABASE_URL");
-			GITHUB_TOKEN = System.getenv("GITHUB_TOKEN");
-			API_USERNAME = System.getenv("API_USERNAME");
-			API_PASSWORD = System.getenv("API_PASSWORD");
-			PREFIX = System.getenv("PREFIX");
-			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
-			SBZ_SCAMMER_DB_KEY = System.getenv("SBZ_SCAMMER_DB_KEY");
-			LEADERBOARD_DB_URL = System.getenv("LEADERBOARD_DB_URL");
-			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
-			BASE_URL = System.getenv("BASE_URL");
-			JACOB_KEY = System.getenv("JACOB_KEY");
-			HASTE_KEY = System.getenv("HASTE_KEY");
-			DISCORD_BOT_LIST_TOKEN = System.getenv("DISCORD_BOT_LIST_TOKEN");
-			DISCORD_BOTS_GG_TOKEN = System.getenv("DISCORD_BOTS_GG_TOKEN");
-			DISCORDS_COM_TOKEN = System.getenv("DISCORDS_COM_TOKEN");
-			TOP_GG_TOKEN = System.getenv("TOP_GG_TOKEN");
-			AUCTION_FLIPPER_WEBHOOK = System.getenv("AUCTION_FLIPPER_WEBHOOK");
-			BOT_STATUS_WEBHOOK = System.getenv("BOT_STATUS_WEBHOOK");
-			BOT_ID = System.getenv("BOT_ID");
-			IS_DEV = Objects.equals(System.getenv("DEV").toLowerCase(), "true");
-			OWNER_ID = System.getenv("OWNER_ID");
-			PRIMARY_GUILD_ID = System.getenv("PRIMARY_GUILD_ID");
-			LOG_CHANNEL_ID = System.getenv("LOG_CHANNEL_ID");
-			NETWORTH_BUG_REPORT_CHANNEL_ID = System.getenv("NETWORTH_BUG_REPORT_CHANNEL_ID");
-			ERROR_LOG_CHANNEL_ID = System.getenv("ERROR_LOG_CHANNEL_ID");
-			BOT_STATUS_CHANNEL_ID = System.getenv("BOT_STATUS_CHANNEL_ID");
-			NEU_REPO_UPDATE_CHANNEL_ID = System.getenv("NEU_REPO_UPDATE_CHANNEL_ID");
-			DATA_REPO_GITHUB = System.getenv("DATA_REPO_GITHUB");
-			GITHUB_EMAIL = System.getenv("GITHUB_EMAIL");
-			QUERY_API_LOG_CHANNEL_ID = System.getenv("QUERY_API_LOG_CHANNEL_ID");
+			HYPIXEL_API_KEY = appProps.getProperty("HYPIXEL_API_KEY");
+			BOT_TOKEN = appProps.getProperty("BOT_TOKEN");
+			DATABASE_URL = appProps.getProperty("DATABASE_URL");
+			GITHUB_TOKEN = appProps.getProperty("GITHUB_TOKEN");
+			API_USERNAME = appProps.getProperty("API_USERNAME");
+			API_PASSWORD = appProps.getProperty("API_PASSWORD");
+			PREFIX = appProps.getProperty("PREFIX");
+			AUCTION_API_KEY = appProps.getProperty("AUCTION_API_KEY");
+			SBZ_SCAMMER_DB_KEY = appProps.getProperty("SBZ_SCAMMER_DB_KEY");
+			LEADERBOARD_DB_URL = appProps.getProperty("LEADERBOARD_DB_URL");
+			CLIENT_SECRET = appProps.getProperty("CLIENT_SECRET");
+			BASE_URL = appProps.getProperty("BASE_URL");
+			JACOB_KEY = appProps.getProperty("JACOB_KEY");
+			HASTE_KEY = appProps.getProperty("HASTE_KEY");
+			DISCORD_BOT_LIST_TOKEN = appProps.getProperty("DISCORD_BOT_LIST_TOKEN");
+			DISCORD_BOTS_GG_TOKEN = appProps.getProperty("DISCORD_BOTS_GG_TOKEN");
+			DISCORDS_COM_TOKEN = appProps.getProperty("DISCORDS_COM_TOKEN");
+			TOP_GG_TOKEN = appProps.getProperty("TOP_GG_TOKEN");
+			AUCTION_FLIPPER_WEBHOOK = appProps.getProperty("AUCTION_FLIPPER_WEBHOOK");
+			BOT_STATUS_WEBHOOK = appProps.getProperty("BOT_STATUS_WEBHOOK");
+			BOT_ID = appProps.getProperty("BOT_ID");
+			IS_DEV = Objects.equals(appProps.getProperty("DEV").toLowerCase(), "true");
+			OWNER_ID = appProps.getProperty("OWNER_ID");
+			PRIMARY_GUILD_ID = appProps.getProperty("PRIMARY_GUILD_ID");
+			LOG_CHANNEL_ID = appProps.getProperty("LOG_CHANNEL_ID");
+			NETWORTH_BUG_REPORT_CHANNEL_ID = appProps.getProperty("NETWORTH_BUG_REPORT_CHANNEL_ID");
+			ERROR_LOG_CHANNEL_ID = appProps.getProperty("ERROR_LOG_CHANNEL_ID");
+			BOT_STATUS_CHANNEL_ID = appProps.getProperty("BOT_STATUS_CHANNEL_ID");
+			NEU_REPO_UPDATE_CHANNEL_ID = appProps.getProperty("NEU_REPO_UPDATE_CHANNEL_ID");
+			DATA_REPO_GITHUB = appProps.getProperty("DATA_REPO_GITHUB");
+			GITHUB_EMAIL = appProps.getProperty("GITHUB_EMAIL");
+			QUERY_API_LOG_CHANNEL_ID = appProps.getProperty("QUERY_API_LOG_CHANNEL_ID");
+			MOJANG_API_NUM = Integer.parseInt(appProps.getProperty("MOJANG_API_NUM"));
+			ALLOW_MOJANG_API = Objects.equals(appProps.getProperty("ALLOW_MOJANG_API").toLowerCase(), "true");
+			QUERY_API_URL = appProps.getProperty("QUERY_API_URL");
+			HASTE_URL = appProps.getProperty("HASTE_URL");
+			NEU_BRANCH = appProps.getProperty("NEU_BRANCH");
 		}
 	}
 
@@ -379,7 +354,7 @@ public class Utils {
 
 	public static String makeHastePost(Object body) {
 		try {
-			return getHasteUrl() + higherDepth(postUrl(getHasteUrl() + "?key=" + HASTE_KEY, body), "key").getAsString();
+			return HASTE_URL + higherDepth(postUrl(HASTE_URL + "?key=" + HASTE_KEY, body), "key").getAsString();
 		} catch (Exception e) {
 			return null;
 		}
@@ -849,7 +824,7 @@ public class Utils {
 			Git neuRepo = Git
 				.cloneRepository()
 				.setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
-				.setBranch(getNeuBranch())
+				.setBranch(NEU_BRANCH)
 				.setDirectory(neuDir)
 				.call();
 
