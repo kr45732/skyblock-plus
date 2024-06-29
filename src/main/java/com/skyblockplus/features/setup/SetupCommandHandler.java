@@ -82,6 +82,12 @@ public class SetupCommandHandler {
 						.addOption("Toggle SB Roles Sync On Join", "roles_claim")
 						.build()
 				)
+				.setContent(
+					":warning: Skyblock Plus will be discontinued <t:1720670400:R>. For more information see https://discord.com/channels/796790757947867156/802749920679165994/1255564326228721706 in the [Skyblock Plus Discord Server](" +
+					DISCORD_SERVER_INVITE_LINK +
+					") . If you want to self-host the bot, see the instructions in the [GitHub repository](https://github.com/kr45732/skyblock-plus). Thank you all so much for being a part of this journey with me <:lov" +
+					"e:1015051675523891200>"
+				)
 				.queue(m -> waitForEvent(m.getId()));
 			case GUILD_NAME -> {
 				List<SelectOption> selectOptions = new ArrayList<>();
@@ -101,6 +107,12 @@ public class SetupCommandHandler {
 							.build()
 					)
 					.setActionRow(StringSelectMenu.create("setup_command_" + featureType).addOptions(selectOptions).build())
+					.setContent(
+						":warning: Skyblock Plus will be discontinued <t:1720670400:R>. For more information see https://discord.com/channels/796790757947867156/802749920679165994/1255564326228721706 in the [Skyblock Plus Discord Server](" +
+						DISCORD_SERVER_INVITE_LINK +
+						") . If you want to self-host the bot, see the instructions in the [GitHub repository](https://github.com/kr45732/skyblock-plus). Thank you all so much for being a part of this journey with me <:lov" +
+						"e:1015051675523891200>"
+					)
 					.queue(m -> waitForEvent(m.getId()));
 			}
 			case ROLES -> hook
@@ -124,6 +136,12 @@ public class SetupCommandHandler {
 						)
 						.build()
 				)
+				.setContent(
+					":warning: Skyblock Plus will be discontinued <t:1720670400:R>. For more information see https://discord.com/channels/796790757947867156/802749920679165994/1255564326228721706 in the [Skyblock Plus Discord Server](" +
+					DISCORD_SERVER_INVITE_LINK +
+					") . If you want to self-host the bot, see the instructions in the [GitHub repository](https://github.com/kr45732/skyblock-plus). Thank you all so much for being a part of this journey with me <:lov" +
+					"e:1015051675523891200>"
+				)
 				.setComponents()
 				.queue();
 			case FETCHUR -> hook
@@ -135,6 +153,12 @@ public class SetupCommandHandler {
 						.addOption("Fetchur Role", "role")
 						.build()
 				)
+				.setContent(
+					":warning: Skyblock Plus will be discontinued <t:1720670400:R>. For more information see https://discord.com/channels/796790757947867156/802749920679165994/1255564326228721706 in the [Skyblock Plus Discord Server](" +
+					DISCORD_SERVER_INVITE_LINK +
+					") . If you want to self-host the bot, see the instructions in the [GitHub repository](https://github.com/kr45732/skyblock-plus). Thank you all so much for being a part of this journey with me <:lov" +
+					"e:1015051675523891200>"
+				)
 				.queue(m -> waitForEvent(m.getId()));
 			case MAYOR -> hook
 				.editOriginalEmbeds(defaultEmbed("Setup").setDescription("Use the menu below to configure the mayor settings").build())
@@ -144,6 +168,12 @@ public class SetupCommandHandler {
 						.addOption("Mayor Channel", "channel")
 						.addOption("Mayor Role", "role")
 						.build()
+				)
+				.setContent(
+					":warning: Skyblock Plus will be discontinued <t:1720670400:R>. For more information see https://discord.com/channels/796790757947867156/802749920679165994/1255564326228721706 in the [Skyblock Plus Discord Server](" +
+					DISCORD_SERVER_INVITE_LINK +
+					") . If you want to self-host the bot, see the instructions in the [GitHub repository](https://github.com/kr45732/skyblock-plus). Thank you all so much for being a part of this journey with me <:lov" +
+					"e:1015051675523891200>"
 				)
 				.queue(m -> waitForEvent(m.getId()));
 			case JACOB -> hook
@@ -155,6 +185,12 @@ public class SetupCommandHandler {
 						.addOption("Jacob Channel", "channel")
 						.addOption("Crops", "crops")
 						.build()
+				)
+				.setContent(
+					":warning: Skyblock Plus will be discontinued <t:1720670400:R>. For more information see https://discord.com/channels/796790757947867156/802749920679165994/1255564326228721706 in the [Skyblock Plus Discord Server](" +
+					DISCORD_SERVER_INVITE_LINK +
+					") . If you want to self-host the bot, see the instructions in the [GitHub repository](https://github.com/kr45732/skyblock-plus). Thank you all so much for being a part of this journey with me <:lov" +
+					"e:1015051675523891200>"
 				)
 				.queue(m -> waitForEvent(m.getId()));
 		}

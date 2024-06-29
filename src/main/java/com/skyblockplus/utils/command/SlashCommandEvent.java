@@ -87,9 +87,25 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 
 	public void embed(Object ebOrMb) {
 		if (ebOrMb instanceof EmbedBuilder eb) {
-			getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
+			getHook()
+				.editOriginalEmbeds(eb.build())
+				.setContent(
+					":warning: Skyblock Plus will be discontinued <t:1720670400:R>. For more information see https://discord.com/channels/796790757947867156/802749920679165994/1255564326228721706 in the [Skyblock Plus Discord Server](" +
+					DISCORD_SERVER_INVITE_LINK +
+					") . If you want to self-host the bot, see the instructions in the [GitHub repository](https://github.com/kr45732/skyblock-plus). Thank you all so much for being a part of this journey with me <:lov" +
+					"e:1015051675523891200>"
+				)
+				.queue(ignore, ignore);
 		} else if (ebOrMb instanceof MessageEditBuilder mb) {
-			getHook().editOriginal(mb.build()).queue(ignore, ignore);
+			getHook()
+				.editOriginal(mb.build())
+				.setContent(
+					":warning: Skyblock Plus will be discontinued <t:1720670400:R>. For more information see https://discord.com/channels/796790757947867156/802749920679165994/1255564326228721706 in the [Skyblock Plus Discord Server](" +
+					DISCORD_SERVER_INVITE_LINK +
+					") . If you want to self-host the bot, see the instructions in the [GitHub repository](https://github.com/kr45732/skyblock-plus). Thank you all so much for being a part of this journey with me <:lov" +
+					"e:1015051675523891200>"
+				)
+				.queue(ignore, ignore);
 		} else {
 			throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
 		}

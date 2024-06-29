@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils.command;
 
+import static com.skyblockplus.utils.utils.Utils.DISCORD_SERVER_INVITE_LINK;
 import static com.skyblockplus.utils.utils.Utils.defaultEmbed;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -138,9 +139,21 @@ public class CustomPaginator {
 		action.setComponents(actionRows);
 
 		if (pages == 0) {
-			((RestAction<?>) action.setEmbeds(defaultEmbed("No items to paginate").build())).queue();
+			((RestAction<?>) action
+					.setEmbeds(defaultEmbed("No items to paginate").build())
+					.setContent(
+						":warning: Skyblock Plus will be discontinued <t:1720670400:R>. For more information see https://discord.com/channels/796790757947867156/802749920679165994/1255564326228721706 in the [Skyblock Plus Discord Server](" +
+						DISCORD_SERVER_INVITE_LINK +
+						") . If you want to self-host the bot, see the instructions in the [GitHub repository](https://github.com/kr45732/skyblock-plus). Thank you all so much for being a part of this journey with me <:lov" +
+						"e:1015051675523891200>"
+					)).queue();
 		} else {
-			((RestAction<?>) action).queue(m -> pagination((Message) m, pageNum), throwableConsumer);
+			((RestAction<?>) action.setContent(
+					":warning: Skyblock Plus will be discontinued <t:1720670400:R>. For more information see https://discord.com/channels/796790757947867156/802749920679165994/1255564326228721706 in the [Skyblock Plus Discord Server](" +
+					DISCORD_SERVER_INVITE_LINK +
+					") . If you want to self-host the bot, see the instructions in the [GitHub repository](https://github.com/kr45732/skyblock-plus). Thank you all so much for being a part of this journey with me <:lov" +
+					"e:1015051675523891200>"
+				)).queue(m -> pagination((Message) m, pageNum), throwableConsumer);
 		}
 	}
 
