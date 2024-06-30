@@ -66,6 +66,7 @@ public class ApiHandler {
 			leaderboardDatabase.initializeJacob();
 			leaderboardDatabase.initializeTokens();
 			leaderboardDatabase.initializeParties();
+			leaderboardDatabase.initializeEventTimers();
 			scheduler.scheduleWithFixedDelay(leaderboardDatabase::updateJsonCache, 60, 60, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCaches, 60, 60, TimeUnit.MINUTES);
 			if (!IS_DEV) {
@@ -84,6 +85,7 @@ public class ApiHandler {
 			leaderboardDatabase.cacheAuctionTracker();
 			leaderboardDatabase.cacheTokens();
 			leaderboardDatabase.cacheParties();
+			leaderboardDatabase.cacheEventTimers();
 		} catch (Exception e) {
 			log.error("Exception when interval caching", e);
 		}

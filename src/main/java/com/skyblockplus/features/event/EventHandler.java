@@ -32,52 +32,49 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class EventHandler {
 
-	public static String messageId;
+	public static final List<Long> eventTimers = new ArrayList<>();
 
 	public static void initialize() {
+		if (eventTimers.size() != 24) {
+			setEventTimers(Collections.nCopies(24, Instant.now().toEpochMilli()));
+		}
+
+		if (IS_DEV) {
+			return;
+		}
+
 		scheduler.scheduleAtFixedRate(EventHandler::updateEvents, 30, 30, TimeUnit.SECONDS);
-		messageId = !IS_DEV ? "960675388441387058" : "960687190990520400";
+	}
+
+	public static void setEventTimers(List<Long> eventTimers) {
+		EventHandler.eventTimers.clear();
+		EventHandler.eventTimers.addAll(eventTimers);
 	}
 
 	public static void updateEvents() {
 		try {
-			if (IS_DEV) {
-				return;
+			ZonedDateTime nowDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
+			Map<String, MessageEmbed> ebs = new HashMap<>();
+			getEventEmbeds(nowDateTime, 0);
+			ebs.putAll(getEventEmbeds(nowDateTime, 5));
+
+			if (!ebs.isEmpty()) {
+				for (AutomaticGuild guild : guildMap.values()) {
+					guild.onEventNotif(ebs);
+				}
 			}
-
-			jda
-				.getGuildById(PRIMARY_GUILD_ID)
-				.getTextChannelById("959829695686381658")
-				.retrieveMessageById(messageId)
-				.queue(m -> {
-					String[] times = m.getContentRaw().split("\n");
-
-					ZonedDateTime nowDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
-					Map<String, MessageEmbed> ebs = new HashMap<>();
-					getEventEmbeds(times, nowDateTime, 0);
-					ebs.putAll(getEventEmbeds(times, nowDateTime, 5));
-
-					if (!ebs.isEmpty()) {
-						for (AutomaticGuild guild : guildMap.values()) {
-							guild.onEventNotif(ebs);
-						}
-
-						m.editMessage(String.join("\n", times)).queue();
-					}
-				});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static Map<String, MessageEmbed> getEventEmbeds(String[] times, ZonedDateTime nowDateTime, int timeBefore) {
+	public static Map<String, MessageEmbed> getEventEmbeds(ZonedDateTime nowDateTime, int timeBefore) {
 		// 0 - bingo start
 		// 1 - bingo end
 		// 2 - zoo early summer
@@ -92,7 +89,7 @@ public class EventHandler {
 		// 11 - bank interest
 
 		nowDateTime = nowDateTime.plusMinutes(timeBefore);
-		int index = timeBefore == 0 ? 0 : times.length / 2;
+		int index = timeBefore == 0 ? 0 : eventTimers.size() / 2;
 		Map<String, MessageEmbed> ebs = new HashMap<>();
 
 		long nowEpoch = nowDateTime.toInstant().toEpochMilli();
@@ -103,15 +100,15 @@ public class EventHandler {
 		if (
 			startOfBingo.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= startOfBingo.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < startOfBingo.toEpochMilli()
+			eventTimers.get(index) < startOfBingo.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"bingo_start",
 				defaultEmbed("Bingo Start").setDescription("Bingo starts " + getRelativeTimestamp(startOfBingo)).build()
 			);
-		} else if (nowEpoch > startOfBingo.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < startOfBingo.toEpochMilli()) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > startOfBingo.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < startOfBingo.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"bingo_start",
 				defaultEmbed("Bingo Start").setDescription("Bingo starts " + getRelativeTimestamp(startOfBingo)).build()
@@ -123,12 +120,12 @@ public class EventHandler {
 		if (
 			endOfBingo.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= endOfBingo.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < endOfBingo.toEpochMilli()
+			eventTimers.get(index) < endOfBingo.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put("bingo_end", defaultEmbed("Bingo End").setDescription("Bingo ends " + getRelativeTimestamp(endOfBingo)).build());
-		} else if (nowEpoch > endOfBingo.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < endOfBingo.toEpochMilli()) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > endOfBingo.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < endOfBingo.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put("bingo_end", defaultEmbed("Bingo End").setDescription("Bingo ends " + getRelativeTimestamp(endOfBingo)).build());
 		}
 
@@ -148,9 +145,9 @@ public class EventHandler {
 		if (
 			zooEarlySummer.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= zooEarlySummer.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < zooEarlySummer.toEpochMilli()
+			eventTimers.get(index) < zooEarlySummer.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"zoo",
 				defaultEmbed("Traveling Zoo")
@@ -164,10 +161,8 @@ public class EventHandler {
 					)
 					.build()
 			);
-		} else if (
-			nowEpoch > zooEarlySummer.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < zooEarlySummer.toEpochMilli()
-		) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > zooEarlySummer.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < zooEarlySummer.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"zoo",
 				defaultEmbed("Traveling Zoo")
@@ -192,9 +187,9 @@ public class EventHandler {
 		if (
 			zooEarlyWinter.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= zooEarlyWinter.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < zooEarlyWinter.toEpochMilli()
+			eventTimers.get(index) < zooEarlyWinter.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"zoo",
 				defaultEmbed("Traveling Zoo")
@@ -208,10 +203,8 @@ public class EventHandler {
 					)
 					.build()
 			);
-		} else if (
-			nowEpoch > zooEarlyWinter.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < zooEarlyWinter.toEpochMilli()
-		) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > zooEarlyWinter.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < zooEarlyWinter.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"zoo",
 				defaultEmbed("Traveling Zoo")
@@ -236,17 +229,15 @@ public class EventHandler {
 		if (
 			jerryIslandOpen.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= jerryIslandOpen.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < jerryIslandOpen.toEpochMilli()
+			eventTimers.get(index) < jerryIslandOpen.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"winter_island",
 				defaultEmbed("Winter Island").setDescription("Winter island opens " + getRelativeTimestamp(jerryIslandOpen)).build()
 			);
-		} else if (
-			nowEpoch > jerryIslandOpen.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < jerryIslandOpen.toEpochMilli()
-		) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > jerryIslandOpen.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < jerryIslandOpen.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"winter_island",
 				defaultEmbed("Winter Island").setDescription("Winter island opens " + getRelativeTimestamp(jerryIslandOpen)).build()
@@ -258,17 +249,15 @@ public class EventHandler {
 		if (
 			darkAuctionOpen.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= darkAuctionOpen.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < darkAuctionOpen.toEpochMilli()
+			eventTimers.get(index) < darkAuctionOpen.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"dark_auction",
 				defaultEmbed("Dark Auction").setDescription("Dark auction opens " + getRelativeTimestamp(darkAuctionOpen)).build()
 			);
-		} else if (
-			nowEpoch > darkAuctionOpen.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < darkAuctionOpen.toEpochMilli()
-		) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > darkAuctionOpen.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < darkAuctionOpen.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"dark_auction",
 				defaultEmbed("Dark Auction").setDescription("Dark auction opens " + getRelativeTimestamp(darkAuctionOpen)).build()
@@ -285,17 +274,17 @@ public class EventHandler {
 		if (
 			newYearEvent.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= newYearEvent.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < newYearEvent.toEpochMilli()
+			eventTimers.get(index) < newYearEvent.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"new_year",
 				defaultEmbed("New Year Celebration")
 					.setDescription("New year celebration starts " + getRelativeTimestamp(newYearEvent))
 					.build()
 			);
-		} else if (nowEpoch > newYearEvent.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < newYearEvent.toEpochMilli()) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > newYearEvent.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < newYearEvent.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"new_year",
 				defaultEmbed("New Year Celebration")
@@ -316,15 +305,15 @@ public class EventHandler {
 		if (
 			spookyFishing.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= spookyFishing.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < spookyFishing.toEpochMilli()
+			eventTimers.get(index) < spookyFishing.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"spooky_fishing",
 				defaultEmbed("Spooky Fishing").setDescription("Spooky fishing starts " + getRelativeTimestamp(spookyFishing)).build()
 			);
-		} else if (nowEpoch > spookyFishing.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < spookyFishing.toEpochMilli()) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > spookyFishing.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < spookyFishing.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"spooky_fishing",
 				defaultEmbed("Spooky Fishing").setDescription("Spooky fishing starts " + getRelativeTimestamp(spookyFishing)).build()
@@ -341,15 +330,15 @@ public class EventHandler {
 		if (
 			spookyEvent.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= spookyEvent.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < spookyEvent.toEpochMilli()
+			eventTimers.get(index) < spookyEvent.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"spooky",
 				defaultEmbed("Spooky Festival").setDescription("Spooky festival starts " + getRelativeTimestamp(spookyEvent)).build()
 			);
-		} else if (nowEpoch > spookyEvent.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < spookyEvent.toEpochMilli()) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > spookyEvent.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < spookyEvent.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"spooky",
 				defaultEmbed("Spooky Festival").setDescription("Spooky festival starts " + getRelativeTimestamp(spookyEvent)).build()
@@ -370,9 +359,9 @@ public class EventHandler {
 			if (
 				fishingFestival.toEpochMilli() <= nowEpoch &&
 				nowEpoch <= fishingFestival.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[index]) < fishingFestival.toEpochMilli()
+				eventTimers.get(index) < fishingFestival.toEpochMilli()
 			) {
-				times[index] = "" + nowEpoch;
+				eventTimers.set(index, nowEpoch);
 				ebs.put(
 					"fishing_festival",
 					defaultEmbed("Fishing Festival")
@@ -380,9 +369,9 @@ public class EventHandler {
 						.build()
 				);
 			} else if (
-				nowEpoch > fishingFestival.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < fishingFestival.toEpochMilli()
+				nowEpoch > fishingFestival.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < fishingFestival.toEpochMilli()
 			) {
-				times[index] = "" + nowEpoch;
+				eventTimers.set(index, nowEpoch);
 				ebs.put(
 					"fishing_festival",
 					defaultEmbed("Fishing Festival")
@@ -416,17 +405,17 @@ public class EventHandler {
 		if (
 			fallenStar.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= fallenStar.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < fallenStar.toEpochMilli()
+			eventTimers.get(index) < fallenStar.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"fallen_star",
 				defaultEmbed("Cult Of Fallen Star")
 					.setDescription("Cult of fallen star arrives " + getRelativeTimestamp(fallenStar))
 					.build()
 			);
-		} else if (nowEpoch > fallenStar.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < fallenStar.toEpochMilli()) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > fallenStar.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < fallenStar.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"fallen_star",
 				defaultEmbed("Cult Of Fallen Star")
@@ -455,15 +444,15 @@ public class EventHandler {
 		if (
 			bankStart.toEpochMilli() <= nowEpoch &&
 			nowEpoch <= bankStart.plusSeconds(60).toEpochMilli() &&
-			Long.parseLong(times[index]) < bankStart.toEpochMilli()
+			eventTimers.get(index) < bankStart.toEpochMilli()
 		) {
-			times[index] = "" + nowEpoch;
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"bank_interest",
 				defaultEmbed("Bank Interest").setDescription("Bank interest is deposited " + getRelativeTimestamp(spookyEvent)).build()
 			);
-		} else if (nowEpoch > spookyEvent.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < spookyEvent.toEpochMilli()) {
-			times[index] = "" + nowEpoch;
+		} else if (nowEpoch > spookyEvent.plusSeconds(60).toEpochMilli() && eventTimers.get(index) < spookyEvent.toEpochMilli()) {
+			eventTimers.set(index, nowEpoch);
 			ebs.put(
 				"bank_interest",
 				defaultEmbed("Bank Interest").setDescription("Bank interest is deposited " + getRelativeTimestamp(spookyEvent)).build()

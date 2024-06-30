@@ -36,6 +36,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.features.event.EventHandler;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.listeners.AutomaticGuild;
@@ -779,6 +780,14 @@ public class LeaderboardDatabase {
 		insertIntoJsonStorage(JsonStorageId.PARTIES, partyMap);
 	}
 
+	public void cacheEventTimers() {
+		if (IS_DEV) {
+			return;
+		}
+
+		insertIntoJsonStorage(JsonStorageId.EVENT_TIMERS, EventHandler.eventTimers);
+	}
+
 	private void insertIntoJsonStorage(JsonStorageId id, Object json) {
 		try (
 			Connection connection = getConnection();
@@ -869,6 +878,18 @@ public class LeaderboardDatabase {
 		}
 	}
 
+	public void initializeEventTimers() {
+		if (IS_DEV) {
+			return;
+		}
+
+		try {
+			EventHandler.setEventTimers(gson.fromJson(selectFromJsonStorage(JsonStorageId.EVENT_TIMERS), new TypeToken<List<Long>>() {}));
+		} catch (Exception e) {
+			log.error("", e);
+		}
+	}
+
 	private String selectFromJsonStorage(JsonStorageId id) throws SQLException {
 		try (
 			Connection connection = getConnection();
@@ -890,7 +911,8 @@ public class LeaderboardDatabase {
 		AUCTION_TRACKER(1),
 		JACOB(2),
 		TOKENS(3),
-		PARTIES(4);
+		PARTIES(4),
+		EVENT_TIMERS(5);
 
 		private final int id;
 
