@@ -29,12 +29,6 @@ Some of these prerequisites are not necessarily required but having all of them 
   - Under Bot → Privileged Gateway Intents, enable "Server Members Intent" & "Message Content Intent"  
 - 2 Postgres databases (using one might be possible but may require code modifications)
 - Self-hosted [rust-query-api](https://github.com/kr45732/rust-query-api) (used in lowest bin, average bin, average auction, querying the auction house, auction flipper, etc)
-- Self-hosted hastebin (my haste implementation is wacky, so I would suggest to replace it with your own (which will require some code modification) otherwise self-hosting steps are below)
-  1. Clone [hste](https://github.com/kr45732/hste)
-  2. Obtain a [fauna database]([hste](https://github.com/kr45732/hste))
-  3. Set FAUNA_ADMIN_KEY environment variable (might be called secret)
-  4. Set FAUNA_DB_DOMAIN environment variable (might be called endpoint)
-  5. Set KEY environment variable to your choosing
 - GitHub [personal token](https://github.com/settings/tokens) with the repo scope
   - This is used to automatically update the [skyblock-plus-data](https://github.com/kr45732/skyblock-plus-data) repo, which you should clone your own of
 
@@ -45,7 +39,6 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
    - Feel free to set the API_USERNAME and API_PASSWORD to some gibberish, but do not leave it blank because you do not want anyone to be able to access the private endpoints (server settings, linked accounts, etc)
    - Same thing as above with JACOB_KEY, you will probably never use that endpoint, but you do not want anyone to be able to POST data to it
    - Ensure the AUCTION_API_KEY is the same as the ADMIN_API_KEY of your self-hosted rust-query-api
-   - If you self-hosted [hste](https://github.com/kr45732/hste), then HASTE_KEY should be the same as the KEY set on there
 3. Databases: At the moment, there are two databases instead of a single one. You might be able to combine it into one without needing to modify code by setting both databases to the same URL, but I have not tested that. Refer to [setup-resources](https://github.com/kr45732/skyblock-plus/tree/master/setup-resources) for schemas and database dumps. You will also need to install the [pg_trgm module](https://www.postgresql.org/docs/current/pgtrgm.html) on your databases. This can be done by executing `CREATE EXTENSION pg_trgm` when connected to your database  
    - [Server Settings Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#server-settings-schema)
    - [Linked Accounts Schema](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/schemas.md#linked-accounts-schema)

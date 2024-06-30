@@ -1149,6 +1149,57 @@ public class LeaderboardDatabase {
 		SKYBLOCK_BINGO,
 	}
 
+	/* Haste */
+	public String postHaste(Object data) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("INSERT INTO haste (expiry, data) VALUES (?, ?) RETURNING id")
+		) {
+			statement.setLong(1, Instant.now().plus(14, ChronoUnit.DAYS).toEpochMilli());
+			statement.setString(2, (String) data);
+
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					return response.getString("id");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public String getHaste(String id) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT data FROM haste WHERE id = ? LIMIT 1")
+		) {
+			statement.setObject(1, stringToUuid(id));
+
+			try (ResultSet response = statement.executeQuery()) {
+				if (response.next()) {
+					return response.getString("data");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public void updateHastes() {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM haste WHERE expiry <= ?")
+		) {
+			statement.setLong(1, Instant.now().toEpochMilli());
+
+			statement.executeUpdate();
+		} catch (Exception ignored) {}
+	}
+
 	public void close() {
 		log.info("Closing leaderboard database");
 		if (leaderboardUpdateTask != null) {

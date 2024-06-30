@@ -19,9 +19,9 @@
 package com.skyblockplus.utils.utils;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.utils.HttpUtils.getJson;
-import static com.skyblockplus.utils.utils.HttpUtils.postUrl;
 import static com.skyblockplus.utils.utils.HypixelUtils.getNpcSellPrice;
 import static com.skyblockplus.utils.utils.HypixelUtils.isCrimsonArmor;
 import static com.skyblockplus.utils.utils.JsonUtils.*;
@@ -331,8 +331,9 @@ public class Utils {
 			MOJANG_API_NUM = Integer.parseInt(appProps.getProperty("MOJANG_API_NUM"));
 			ALLOW_MOJANG_API = Objects.equals(appProps.getProperty("ALLOW_MOJANG_API").toLowerCase(), "true");
 			QUERY_API_URL = appProps.getProperty("QUERY_API_URL");
-			HASTE_URL = appProps.getProperty("HASTE_URL");
 			NEU_BRANCH = appProps.getProperty("NEU_BRANCH");
+
+			HASTE_URL = "https://haste." + BASE_URL + "/";
 		}
 	}
 
@@ -353,11 +354,8 @@ public class Utils {
 	}
 
 	public static String makeHastePost(Object body) {
-		try {
-			return HASTE_URL + higherDepth(postUrl(HASTE_URL + "?key=" + HASTE_KEY, body), "key").getAsString();
-		} catch (Exception e) {
-			return null;
-		}
+		String id = leaderboardDatabase.postHaste(body);
+		return id == null ? null : HASTE_URL + id;
 	}
 
 	public static String makeJsonPost(Object body) {

@@ -1106,3 +1106,16 @@ Persistent cache for features like auction tracker, dungeon parties, etc
 Indexes:
     "json_storage_pkey" PRIMARY KEY, btree (id)
 ```
+
+### haste
+Storage for hastes
+```postgresql
+                       Table "public.haste"
+ Column |          Type          | Collation | Nullable | Default
+--------+------------------------+-----------+----------+---------
+ id     | character varying(255) |           | not null |
+ expiry | bigint                 |           | not null |
+ data   | text                   |           | not null |
+Indexes:
+    "haste_pkey" PRIMARY KEY, btree (id)
+```

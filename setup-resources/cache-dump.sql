@@ -36,6 +36,17 @@ CREATE TABLE public.json_storage (
 
 
 --
+-- Name: haste; Type: TABLE; Schema: public
+--
+
+CREATE TABLE public.haste (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    expiry bigint NOT NULL,
+    data text NOT NULL
+);
+
+
+--
 -- Name: guild guild_pkey; Type: CONSTRAINT; Schema: public
 --
 
@@ -57,3 +68,11 @@ ALTER TABLE ONLY public.json_cache
 
 ALTER TABLE ONLY public.json_storage
     ADD CONSTRAINT json_storage_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: haste haste_pkey; Type: CONSTRAINT; Schema: public
+--
+
+ALTER TABLE ONLY public.haste
+    ADD CONSTRAINT haste_pkey PRIMARY KEY (id);
