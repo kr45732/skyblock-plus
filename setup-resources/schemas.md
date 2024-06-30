@@ -1110,12 +1110,12 @@ Indexes:
 ### haste
 Storage for hastes
 ```postgresql
-                       Table "public.haste"
- Column |          Type          | Collation | Nullable | Default
---------+------------------------+-----------+----------+---------
- id     | character varying(255) |           | not null |
- expiry | bigint                 |           | not null |
- data   | text                   |           | not null |
+                    Table "public.haste"
+ Column |  Type  | Collation | Nullable |      Default
+--------+--------+-----------+----------+-------------------
+ id     | uuid   |           | not null | gen_random_uuid()
+ expiry | bigint |           | not null |
+ data   | text   |           | not null |
 Indexes:
     "haste_pkey" PRIMARY KEY, btree (id)
 ```
