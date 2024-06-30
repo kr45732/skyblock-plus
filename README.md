@@ -67,7 +67,6 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
 6. Hardcoded constants you will need to change:
    - You will need to update all emoji maps in the Constants.json from [skyblock-plus-data](https://github.com/kr45732/skyblock-plus-data/blob/main/Constants.json) with your own emojis
    - Update L145 of `com.skyblockplus.Main` to `.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)`
-   - Create 2 messages in a channel to be used for the scuffed event system (they will be constantly edited, so they must not be deleted). These messages Update the assignment of messageId in `com.skyblockplus.features.event.EventHandler` on L46. Update the channel on L57
    - More will be added as I find/remember them
 7. Running the bot:
    - Build using gradle or gradlew (`gradle build`) to create a jar at "build/libs/SkyblockPlus-0.0.1.jar"
