@@ -70,7 +70,7 @@ If you are stuck or encounter a problem in the steps below, create an issue and 
    - More will be added as I find/remember them
 7. Running the bot:
    - Build using gradle or gradlew (`gradle build`) to create a jar at "build/libs/SkyblockPlus-0.0.1.jar"
-   - Run the jar using Java 17 (example using systemctl to run it in the background [here](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/skyblock-plus.service))
+   - Run the jar using Java 17 (example using systemctl to run it in the background [here](https://github.com/kr45732/skyblock-plus/blob/master/setup-resources/skyblock-plus.service)). You may receive a lot of errors on the first run. If so, after it's fully booted up, try gracefully shutting the bot down and then running it again
    - To register slash commands, run the `d-slash global` prefix command
    - If you choose to set up linked roles, then you will need a domain (localhost will not work):
      - Set Discord Developer Portal → Application → General Information → Linked Roles Verification URL to "ht<span>tps://</span>verify.[DOMAIN]/"
