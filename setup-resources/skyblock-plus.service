@@ -9,7 +9,7 @@ Restart=always
 RestartSec=1
 User=skyblock-plus
 WorkingDirectory=/home/skyblock-plus/SB/skyblock-plus/
-ExecStart=/usr/bin/java -Dserver.port=8080 -XX:+UseStringDeduplication -Xmx6543m -jar /home/skyblock-plus/SB/skyblock-plus/build/libs/SkyblockPlus-0.0.1-active.jar
+ExecStart=/usr/bin/java -Dfile.encoding=UTF-8 -Dserver.port=8080 -XX:+UseStringDeduplication -Xmx6543m -jar /home/skyblock-plus/SB/skyblock-plus/build/libs/SkyblockPlus-0.0.1-active.jar
 SuccessExitStatus=143
 OOMScoreAdjust=-150
 
