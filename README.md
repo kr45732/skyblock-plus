@@ -2,7 +2,7 @@
 <a href="https://github.com/kr45732/skyblock-plus/blob/master/LICENSE" target="_blank">
   <img alt="license" src="https://img.shields.io/github/license/kr45732/skyblock-plus?style=for-the-badge" />
 </a>
-<a href="https://sbplus.codes/support" target="_blank">
+<a href="https://discord.gg/Z4Fn3eNDXT" target="_blank">
   <img alt="license" src="https://img.shields.io/discord/796790757947867156?color=4166f5&label=discord&style=for-the-badge" />
 </a> 
 <a href="https://github.com/kr45732/skyblock-plus/stargazers" target="_blank">
@@ -82,4 +82,4 @@ You can contact me through the Discord server linked below.
 ## Useful links
 - Website: https://sbplus.codes
 - Invite: https://sbplus.codes/invite
-- Support: https://sbplus.codes/support
+- Support: https://discord.gg/Z4Fn3eNDXT
